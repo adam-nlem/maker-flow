@@ -54,6 +54,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'user')]
     private Collection $tokens;
 
+    /**
+     * @var Collection<int, Integration>
+     */
+    #[ORM\OneToMany(targetEntity: Integration::class, mappedBy: 'user')]
+    private Collection $integrations;
+
+    /**
+     * @var Collection<int, UserModule>
+     */
+    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'user')]
+    private Collection $userModules;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -67,6 +79,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         }
 
         $this->tokens = new ArrayCollection();
+        $this->integrations = new ArrayCollection();
+        $this->userModules = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -204,5 +218,65 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function eraseCredentials(): void
     {
         // TODO: Implement eraseCredentials() method.
+    }
+
+    /**
+     * @return Collection<int, Integration>
+     */
+    public function getIntegrations(): Collection
+    {
+        return $this->integrations;
+    }
+
+    public function addIntegration(Integration $integration): static
+    {
+        if (!$this->integrations->contains($integration)) {
+            $this->integrations->add($integration);
+            $integration->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeIntegration(Integration $integration): static
+    {
+        if ($this->integrations->removeElement($integration)) {
+            // set the owning side to null (unless already changed)
+            if ($integration->getUser() === $this) {
+                $integration->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserModule>
+     */
+    public function getUserModules(): Collection
+    {
+        return $this->userModules;
+    }
+
+    public function addUserModule(UserModule $userModule): static
+    {
+        if (!$this->userModules->contains($userModule)) {
+            $this->userModules->add($userModule);
+            $userModule->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserModule(UserModule $userModule): static
+    {
+        if ($this->userModules->removeElement($userModule)) {
+            // set the owning side to null (unless already changed)
+            if ($userModule->getUser() === $this) {
+                $userModule->setUser(null);
+            }
+        }
+
+        return $this;
     }
 }
