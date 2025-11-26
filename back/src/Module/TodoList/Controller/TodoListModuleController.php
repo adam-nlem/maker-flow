@@ -1,24 +1,25 @@
 <?php
 
-namespace App\\Module\\{{ moduleName }}\\Controller;
+namespace App\Module\TodoList\Controller;
 
-use App\\Module\\{{ moduleName }}\\Service\\{{ moduleName }}ModuleService;
+use App\Module\TodoList\Service\TodoListModuleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/modules/{{ moduleNameSnake }}', name: 'module_{{ moduleNameSnake }}_')]
-class {{ moduleName }}ModuleController extends AbstractController
+#[Route('/api/modules/todo-list', name: 'module_todo_list_')]
+class TodoListModuleController extends AbstractController
 {
     public function __construct(
-        private readonly {{ moduleName }}ModuleService $service,
+        private readonly TodoListModuleService $service,
     ) {
     }
 
     #[Route('/', name: 'index', methods: ['GET'])]
     public function index(Request $request): JsonResponse
     {
+        // TODO: call service etc.
         return $this->json();
     }
 }
