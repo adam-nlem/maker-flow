@@ -11,7 +11,7 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({ label, error, fullWidth = false, className = '', icon, ...props }, ref) => {
     return (
-      <div className={`${fullWidth ? 'w-full' : ''} space-y-2`}>
+      <div className={`${fullWidth ? 'w-full' : ''}`}>
         {label && (
           <label
             htmlFor={props.id}
@@ -30,13 +30,13 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <input
               ref={ref}
               className={`
-                block rounded-md border border-primary bg-clear pl-12 pr-3 py-2 text-body-sm text-dark
-                placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
-                focus:ring-1 focus:ring-primary 
-                ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
-                ${fullWidth ? 'w-full' : ''}
-                ${className}
-              `}
+              block rounded-xl border border-gray-400 bg-clear px-3 py-1.5 text-body-sm text-black
+              placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
+              focus:ring-1 focus:ring-primary 
+              ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
+              ${fullWidth ? 'w-full' : ''}
+              ${className}
+            `}
               {...props}
             />
           </div>
@@ -44,7 +44,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             className={`
-              block rounded-md border border-primary bg-clear px-3 py-2 text-body-sm text-dark
+              block rounded-xl border border-gray-400 bg-clear px-3 py-1.5 text-body-sm text-black
               placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
               focus:ring-1 focus:ring-primary 
               ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
