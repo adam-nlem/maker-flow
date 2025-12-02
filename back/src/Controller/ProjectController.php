@@ -51,37 +51,23 @@ final class ProjectController extends AbstractController
             return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $hasUpdatedProject = false;
-
         if ($dto->getName() !== null && $dto->getName() != $project->getName()) {
-
             $projectWithSameName = $projectRepository->getByNameAndUser($dto->getName(), $user);
-
             if ($projectWithSameName !== null) {
                 return $this->json(data: ["Message" => "You already use this name for another project"], status: Response::HTTP_CONFLICT);
             }
-
             $project->setName($dto->getName());
-
-            $hasUpdatedProject = true;
         }
 
         if ($dto->getDescription() !== null && $dto->getDescription() != $project->getDescription()) {
             $project->setDescription($dto->getDescription());
-            $hasUpdatedProject = true;
         }
 
         if ($dto->getType() !== null) {
             $project->setType($dto->getType());
-            $hasUpdatedProject = true;
         }
 
-
-
-        if ($hasUpdatedProject) {
-            $project->setUpdatedAt(DateHelper::createUtcDateTimeImmutable());
-            $projectRepository->save($project, true);
-        }
+        $projectRepository->save($project, true);
 
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_update']]);
     }
@@ -111,6 +97,8 @@ final class ProjectController extends AbstractController
 
         return $this->json(data: $projects, status: Response::HTTP_OK, context: ['groups' => ['api_projects_get_paginated']]);
     }
+
+
 
     # Finish
     # Delete
