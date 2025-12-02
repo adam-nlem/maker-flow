@@ -59,6 +59,19 @@ class ProjectRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    public function getByUserPaginated(User $user, int $page, int $limit): array
+    {
+        $query = $this->createQueryBuilder('p')
+            ->where('p.user = :user')
+            ->setParameter('user', $user)
+            ->setFirstResult(($page - 1) * $limit)
+            ->orderBy('p.createdAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery();
+        $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
+        return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
     //    /**
     //     * @return Project[] Returns an array of Project objects
     //     */

@@ -7,7 +7,9 @@ use App\DTO\Request\Project\CreateProjectRequestDTO;
 use App\DTO\Request\Project\UpdateProjectRequestDTO;
 use App\Entity\Project;
 use App\Entity\User;
+use App\Helper\DateHelper;
 use App\Repository\ProjectRepository;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -38,7 +40,7 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}', name: 'api_project_update', methods: ['PATCH'])]
-    public function update(string $projectUuid, UpdateProjectRequestDTO $dto, ProjectRepository $projectRepository): JsonResponse
+    public function update(string $projectUuid, UpdateProjectRequestDTO $dto, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -49,9 +51,9 @@ final class ProjectController extends AbstractController
             return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
+        $hasUpdatedProject = false;
 
-
-        if ($dto->getName() !== null) {
+        if ($dto->getName() !== null && $dto->getName() != $project->getName()) {
 
             $projectWithSameName = $projectRepository->getByNameAndUser($dto->getName(), $user);
 
@@ -60,25 +62,56 @@ final class ProjectController extends AbstractController
             }
 
             $project->setName($dto->getName());
+
+            $hasUpdatedProject = true;
         }
 
-        if ($dto->getDescription() !== null) {
+        if ($dto->getDescription() !== null && $dto->getDescription() != $project->getDescription()) {
             $project->setDescription($dto->getDescription());
+            $hasUpdatedProject = true;
         }
 
         if ($dto->getType() !== null) {
             $project->setType($dto->getType());
+            $hasUpdatedProject = true;
         }
 
-        $projectRepository->save($project, true);
+
+
+        if ($hasUpdatedProject) {
+            $project->setUpdatedAt(DateHelper::createUtcDateTimeImmutable());
+            $projectRepository->save($project, true);
+        }
 
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_update']]);
     }
 
-    #TODO: Create
-    # Update
-    # Get Single
-    # Get All Paginated
+    #[Route('/{projectUuid}', name: 'api_project_get_by_uuid', methods: ['GET'])]
+    public function getByUuid(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+
+        if ($project === null) {
+            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_get_by_uuid']]);
+    }
+
+    #[Route('/{page}/{limit}', name: 'api_projects_get_paginated', methods: ['GET'])]
+    public function getPaginated(int $page, int $limit, ProjectRepository $projectRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $projects = $projectRepository->getByUserPaginated($user, $page, $limit);
+
+        return $this->json(data: $projects, status: Response::HTTP_OK, context: ['groups' => ['api_projects_get_paginated']]);
+    }
+
     # Finish
     # Delete
 }
