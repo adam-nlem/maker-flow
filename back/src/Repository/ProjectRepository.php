@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Project;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 /**
  * @extends ServiceEntityRepository<Project>
@@ -32,6 +34,30 @@ class ProjectRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getByUuidAndUser(string $uuid, User $user): ?Project
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.uuid = :uuid')
+            ->andWhere('p.user = :user')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByNameAndUser(string $name, User $user): ?Project
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.name = :name')
+            ->andWhere('p.user = :user')
+            ->setParameter('name', $name)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
     //    /**
     //     * @return Project[] Returns an array of Project objects

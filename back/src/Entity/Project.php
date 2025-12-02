@@ -21,31 +21,31 @@ class Project
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_project_create'])]
+    #[Groups(['api_project_create', 'api_project_update'])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_project_create'])]
+    #[Groups(['api_project_create', 'api_project_update'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_project_create'])]
+    #[Groups(['api_project_create', 'api_project_update'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['api_project_create'])]
+    #[Groups(['api_project_create', 'api_project_update'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_project_create'])]
+    #[Groups(['api_project_create', 'api_project_update'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_project_create'])]
+    #[Groups(['api_project_create', 'api_project_update'])]
     private ?\DateTimeImmutable $finishedAt = null;
 
     #[ORM\Column(enumType: ProjectType::class)]
-    #[Groups(['api_project_create'])]
+    #[Groups(['api_project_create', 'api_project_update'])]
     private ?ProjectType $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'projects')]

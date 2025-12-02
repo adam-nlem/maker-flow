@@ -8,11 +8,11 @@ use App\Entity\Project;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class CreateProjectRequestDTO extends AbstractRequestDTO
+class UpdateProjectRequestDTO extends AbstractRequestDTO
 {
-    private string $name;
+    private ?string $name;
     private ?string $description;
-    private ProjectType $type;
+    private ?ProjectType $type;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -23,22 +23,21 @@ class CreateProjectRequestDTO extends AbstractRequestDTO
 
     public function fromPayload(array $payload)
     {
-        $this->name  = $payload["name"];
+        $this->name = $payload["name"] ?? null;
         $this->description = $payload["description"] ?? null;
-        $this->type = ProjectType::from($payload["type"]);
+        $this->type = isset($payload["type"]) ? ProjectType::from($payload["type"]) : null;
     }
 
-    public function buildObject(): Project
+    public function buildObject(): array
     {
-        $project = new Project();
-
-        return $project
-            ->setName($this->getName())
-            ->setDescription($this->getDescription())
-            ->setType($this->getType());
+        return [
+            'name' => $this->getName(),
+            'description' => $this->getDescription(),
+            'type' => $this->getType()
+        ];
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -48,7 +47,7 @@ class CreateProjectRequestDTO extends AbstractRequestDTO
         return $this->description;
     }
 
-    public function getType(): ProjectType
+    public function getType(): ?ProjectType
     {
         return $this->type;
     }
