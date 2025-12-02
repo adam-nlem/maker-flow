@@ -87,6 +87,52 @@ final class ProjectController extends AbstractController
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_get_by_uuid']]);
     }
 
+    #[Route('/{projectUuid}/finish', name: 'api_project_finish', methods: ['POST'])]
+    public function finish(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+
+        if ($project === null) {
+            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        if ($project->getFinishedAt() !== null) {
+            return $this->json(data: ["message" => "This project has already been finished"], status: Response::HTTP_NOT_MODIFIED);
+        }
+
+        $project->setFinishedAt(DateHelper::createUtcDateTimeImmutable());
+
+        $projectRepository->save($project, true);
+
+        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_finish']]);
+    }
+
+    #[Route('/{projectUuid}/reopen', name: 'api_project_reopen', methods: ['POST'])]
+    public function reopen(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+
+        if ($project === null) {
+            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        if ($project->getFinishedAt() === null) {
+            return $this->json(data: ["message" => "This project is already open"], status: Response::HTTP_NOT_MODIFIED);
+        }
+
+        $project->setFinishedAt(null);
+
+        $projectRepository->save($project, true);
+
+        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_reopen']]);
+    }
+
     #[Route('/{page}/{limit}', name: 'api_projects_get_paginated', methods: ['GET'])]
     public function getPaginated(int $page, int $limit, ProjectRepository $projectRepository): JsonResponse
     {
@@ -98,8 +144,5 @@ final class ProjectController extends AbstractController
         return $this->json(data: $projects, status: Response::HTTP_OK, context: ['groups' => ['api_projects_get_paginated']]);
     }
 
-
-
-    # Finish
-    # Delete
+    //TODO: Maybe do a delete route here ? 
 }
