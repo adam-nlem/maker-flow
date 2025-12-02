@@ -18,7 +18,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="w-full pt-10 flex justify-center items-center">
-      <div className="border rounded-xl border-gray-400 flex flex-col gap-3 py-5 px-10 shadow-lg">
+      <div className="border rounded-xl border-light-gray flex flex-col gap-3 py-5 px-10 shadow-lg">
         <div className="flex flex-row items-center gap-3">
           <div className="flex flex-row items-center gap-1">
             <div className="rounded-full bg-primary h-min  p-0.5">
@@ -28,7 +28,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             </div>
             <p className="text-heading-xs ">Introduction</p>
           </div>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4 text-gray">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="size-4 text-gray-400">
             <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
           </svg>
 
@@ -66,7 +66,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
           // value={description}
           // onChange={(e) => setDescription(e.target.value)}
           // disabled={isSubmitting}
-          className="block rounded-xl border border-gray-400 bg-clear px-3 py-1.5 text-body-sm text-black
+          className="block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-body-sm text-black
               placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
               focus:ring-1 focus:ring-primary w-100"
         />
@@ -81,11 +81,12 @@ export default function Home({ loaderData }: Route.ComponentProps) {
             // value={selectedType}
             // onChange={(e) => setSelectedType(e.target.value)}
             required
-            className="block rounded-xl border border-gray-400 bg-clear px-3 py-1.5 text-body-sm text-black
+            className="block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-body-sm text-black
               shadow-sm focus:border-primary focus:outline-none 
-              focus:ring-1 focus:ring-primary w-100 appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27currentColor%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e')] bg-[length:1.25rem] bg-[right_0.5rem_center] bg-no-repeat pr-10"
+              placeholder-gray-400
+              focus:ring-1 focus:ring-primary w-100 appearance-none"
           >
-            <option value="" disabled selected className="text-gray">
+            <option value="" disabled selected className="text-light-gray">
               Choisissez de quel type de projet il s'agit
             </option>
             {Object.values(ProjectType).map((type) => (

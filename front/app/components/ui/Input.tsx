@@ -30,7 +30,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             <input
               ref={ref}
               className={`
-              block rounded-xl border border-gray-400 bg-clear px-3 py-1.5 text-body-sm text-black
+              block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-body-sm text-black
               placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
               focus:ring-1 focus:ring-primary 
               ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
@@ -44,7 +44,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             className={`
-              block rounded-xl border border-gray-400 bg-clear px-3 py-1.5 text-body-sm text-black
+              block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-body-sm text-black
               placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
               focus:ring-1 focus:ring-primary 
               ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
