@@ -18,7 +18,7 @@ abstract class AbstractRequestDTO
     protected function __construct(
         protected RequestStack       $requestStack,
         protected ValidatorInterface $validator,
-        protected ?array             $payload = null, 
+        protected ?array             $payload = null,
     ) {
         if (null === $payload) {
             $this->payload = json_decode($this->requestStack->getCurrentRequest()->getContent(), true);
@@ -38,23 +38,20 @@ abstract class AbstractRequestDTO
      * Validates the data and then calls buildObject method
      * @return mixed
      */
-    public function build(): mixed
+    public function build()
     {
         $errors = $this->validator->validate($this);
         if (count($errors) > 0) {
-            $exceptions = [];
             foreach ($errors as $error) {
                 switch ($error->getCode()) {
                     case ORMAssert\UniqueEntity::NOT_UNIQUE_ERROR:
-                        $exceptions[] = (new CustomValidationExceptionDataItem(
+                        throw new CustomValidationException(
                             ValidationExceptionType::AlreadyUsedValue,
                             $error->getPropertyPath()
-                        ));
+                        );
                         break;
                 }
             }
-
-            throw new CustomValidationException($exceptions);
         } else {
             //? Here i need to make sure the object is valid
             // Allows me to send a custom error message and having custom assertion (not just sql exceptions)
@@ -62,19 +59,16 @@ abstract class AbstractRequestDTO
             $object = $this->buildObject();
             $errors = $this->validator->validate($object);
             if (count($errors) > 0) {
-                $exceptions = [];
                 foreach ($errors as $error) {
                     switch ($error->getCode()) {
                         case ORMAssert\UniqueEntity::NOT_UNIQUE_ERROR:
-                            $exceptions[] = (new CustomValidationExceptionDataItem(
+                            throw new CustomValidationException(
                                 ValidationExceptionType::AlreadyUsedValue,
                                 $error->getPropertyPath()
-                            ));
+                            );
                             break;
                     }
                 }
-
-                throw new CustomValidationException($exceptions);
             }
 
             return $this->buildObject();

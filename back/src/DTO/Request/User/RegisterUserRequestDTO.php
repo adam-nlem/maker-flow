@@ -54,17 +54,11 @@ class RegisterUserRequestDTO extends AbstractRequestDTO
         return $this->lastName;
     }
 
-    /** 
-     * @return string
-     */
     public function getEmail(): string
     {
         return $this->email;
     }
 
-    /**
-     * @return string
-     */
     public function getPlainPassword(): string
     {
         return $this->plainPassword;

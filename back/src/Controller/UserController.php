@@ -13,8 +13,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/users')]
 final class UserController extends AbstractController
 {
-
-    #[Route('/register', name: 'api_users_register', methods: ["POST"])]
+    #[Route('/register', name: 'api_user_register', methods: ["POST"])]
     public function register(
         RegisterUserRequestDTO $dto,
         UserRepository $userRepository,
@@ -22,17 +21,11 @@ final class UserController extends AbstractController
         try {
             /** @var User $user */
             $user = $dto->build();
-        } catch (\Throwable $th) {
-            if ($th instanceof CustomValidationException) {
-                return $this->json(data: $th->getData(), status: Response::HTTP_CONFLICT,);
-            }
-
-            return $this->json(data: ["message" => $th->getMessage()], status: Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (CustomValidationException $e) {
+            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
         }
 
         $userRepository->save($user, true);
-
-
 
         return $this->json(data: $user, status: Response::HTTP_OK, context: ['groups' => ['api_user_register']]);
     }
