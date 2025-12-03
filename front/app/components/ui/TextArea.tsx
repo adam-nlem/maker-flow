@@ -1,4 +1,5 @@
-import React, { forwardRef } from 'react';
+import React, { forwardRef, useRef, useImperativeHandle } from 'react';
+import { useAutoResizeTextarea } from '~/hooks/useAutoResizeTextarea';
 
 interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: string;
@@ -9,6 +10,14 @@ interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   ({ label, error, fullWidth = false, className = '', ...props }, ref) => {
+    const internalRef = useRef<HTMLTextAreaElement>(null);
+    
+    // Use the auto-resize hook
+    useAutoResizeTextarea(internalRef, (props.value as string) || '', 60);
+    
+    // Sync the internal ref with the forwarded ref
+    useImperativeHandle(ref, () => internalRef.current as HTMLTextAreaElement);
+    
     return (
       <div className={`${fullWidth ? 'w-full' : ''}`}>
         {label && (
@@ -20,7 +29,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           </label>
         )}
         <textarea
-          ref={ref}
+          ref={internalRef}
           placeholder={props.placeholder}
           className={`block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-body-sm text-black
               placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 

@@ -32,12 +32,14 @@ export const CreateProjectModal = () => {
                 // onChange={(e) => setEmail(e.target.value)}
                 fullWidth
             />
+            
             <TextArea
                 label="Description"
                 placeholder="Écrivez une description (optionel)"
                 id="description"
                 name="description"
                 fullWidth
+
             />
 
             <Select
