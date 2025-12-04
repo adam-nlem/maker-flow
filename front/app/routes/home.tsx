@@ -1,12 +1,8 @@
-import { Input } from "~/components/ui/Input";
-import { ProjectType } from "~/models/enums/ProjectType";
-import type { Route } from "./+types/home";
+import { useState } from "react";
 import { Button } from "~/components/ui/Button";
-import { CircularProgress } from "~/components/ui/CircularProgress";
-import { TextArea } from "~/components/ui/TextArea";
-import { Select } from "~/components/ui/Select";
-import { StepBadge } from "~/components/ui/StepBadge";
-import { CreateProjectModal } from "~/components/projects/CreateProjectModal";
+import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import type { Route } from "./+types/home";
+import CreateProjectModal from "~/components/projects/CreateProjectModal";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -19,10 +15,22 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
+  const [showModal, setShowModal] = useState(false);
 
   return (
     <div className="w-full pt-10 flex justify-center items-center">
-      <CreateProjectModal />
+      <Button
+        size="sm"
+        variant="secondary"
+        onClick={() => setShowModal(true)}
+      >
+        <div className="flex flex-row justify-center items-center gap-3">
+          <p className="text-sm">Créer un nouveau projet</p>
+          <ChevronRightIcon className="size-4 text-clear" strokeWidth={2} />
+        </div>
+      </Button>
+
+      <CreateProjectModal showModal={showModal} onClose={() => setShowModal(false)} />
     </div>
   );
 }

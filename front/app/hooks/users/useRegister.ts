@@ -89,18 +89,12 @@ export function useRegister() {
     }
 
     return {
-        firstName,
-        setFirstName,
-        lastName,
-        setLastName,
-        email,
-        setEmail,
-        password,
-        setPassword,
-        confirmPassword,
-        setConfirmPassword,
-        errorMessage,
-        setErrorMessage,
+        firstName, setFirstName,
+        lastName, setLastName,
+        email, setEmail,
+        password, setPassword,
+        confirmPassword, setConfirmPassword,
+        errorMessage, setErrorMessage,
         isSubmitting,
         register
     }

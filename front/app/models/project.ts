@@ -1,3 +1,5 @@
+import type { ProjectType } from "./enums/ProjectType"
+
 export class Project {
     constructor(
         public uuid: string,
