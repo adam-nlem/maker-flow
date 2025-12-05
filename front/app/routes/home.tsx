@@ -18,9 +18,24 @@ export function loader({ context }: Route.LoaderArgs) {
 export default function Home({ loaderData }: Route.ComponentProps) {
   const [showModal, setShowModal] = useState(false);
 
+  const [showSidebar, setShowSidebar] = useState(false);
+
   return (
     <div className="w-full pt-10 flex justify-center items-center">
-      <SideBar />
+      <SideBar show={showSidebar} onClose={() => setShowSidebar(false)} />
+      
+      <Button
+        size="sm"
+        variant="secondary"
+        onClick={() => setShowSidebar(true)}
+        className="mr-4"
+      >
+        <div className="flex flex-row justify-center items-center gap-3">
+          <p className="text-sm">Ouvrir la sidebar</p>
+          <ChevronRightIcon className="size-4 text-clear" strokeWidth={2} />
+        </div>
+      </Button>
+
       <Button
         size="sm"
         variant="secondary"
