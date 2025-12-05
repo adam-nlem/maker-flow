@@ -31,17 +31,17 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         <textarea
           ref={internalRef}
           placeholder={props.placeholder}
-          className={`block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-body-sm text-black
+          className={`block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-sm
               placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
               focus:ring-1 focus:ring-primary 
-              ${error ? 'border-red-500 focus:border-red-500 focus:ring-red-500' : ''}
+              ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
               ${fullWidth ? 'w-full' : ''}
               ${className}
               `}
               {...props}
         />
         {error && (
-          <p className="mt-1 text-body-sm text-red-600">{error}</p>
+          <p className="mt-1 text-sm text-danger">{error}</p>
         )}
       </div>
     );

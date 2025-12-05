@@ -4,6 +4,8 @@ import { useProject } from "~/context/ProjectContext";
 // import { useUserModules } from "~/hooks/modules/useUserModules";
 import { useNavigate, useLocation } from "react-router";
 import { Button } from "../ui/Button";
+import { useState, useEffect } from "react";
+import CreateProjectModal from "../projects/CreateProjectModal";
 
 interface SideBarProps {
     show: boolean;
@@ -17,13 +19,28 @@ export default function SideBar({ show, onClose }: SideBarProps) {
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
+
     const isActive = (path: string) => location.pathname === path;
 
-    if (!show) return null;
+    // Close modal when sidebar closes
+    useEffect(() => {
+        if (!show) {
+            setShowCreateProjectModal(false);
+        }
+    }, [show]);
 
     return (
-        <div className="fixed inset-0 z-50 flex items-start justify-start bg-light-gray bg-opacity-50" onClick={onClose}>
-            <div className="border-r rounded-r-xl h-full  border-light-gray flex flex-col justify-between w-1/5 lg:w-1/6 xl:w-[280px] bg-white" onClick={(e) => e.stopPropagation()}>
+        <div
+            className={`fixed inset-0 z-50 flex items-start justify-start transition-all duration-300 ${show ? 'bg-black/20 pointer-events-auto' : 'bg-transparent pointer-events-none'
+                }`}
+            onClick={onClose}
+        >
+            <div
+                className={`border-r rounded-r-xl h-full border-light-gray flex flex-col justify-between w-1/5 lg:w-1/6 xl:w-[280px] bg-white transform transition-transform duration-300 ease-in-out ${show ? 'translate-x-0' : '-translate-x-full'
+                    }`}
+                onClick={(e) => e.stopPropagation()}
+            >
                 {/* TOP SECTION */}
                 <div className="p-3">
                     {/* PROJECT SELECTOR */}
@@ -49,6 +66,7 @@ export default function SideBar({ show, onClose }: SideBarProps) {
                             fullWidth
                             size="lg"
                             variant="secondary"
+                            onClick={() => setShowCreateProjectModal(true)}
                         >
                             <div className="flex flex-row justify-center items-center gap-3">
                                 <p className="text-sm">Créer un nouveau Projet</p>
@@ -144,6 +162,10 @@ export default function SideBar({ show, onClose }: SideBarProps) {
                         </div>
                     )}
                 </div>
+            </div>
+            
+            <div className="m-3">
+                <CreateProjectModal showModal={showCreateProjectModal} onClose={() => setShowCreateProjectModal(false)} />
             </div>
         </div>
     )

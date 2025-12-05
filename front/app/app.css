@@ -138,11 +138,12 @@
 
 .text-md {
   font-family: var(--font-family-display);
+  font-size: var(--font-size-md);
 }
 
 .text-sm {
   font-family: var(--font-family-display);
-  font-weight: 200;
+  font-size: var(--font-size-sm);
 }
 
 @utility scrollbar-none {
