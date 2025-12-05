@@ -1,14 +1,21 @@
+interface UserJSON {
+    uuid: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    createdAt: string;
+}
+
 export class User {
     constructor(
-        public uuid: string,
+        public readonly uuid: string,
         public firstName: string,
         public lastName: string,
         public email: string,
-        public createdAt: Date,
+        public readonly createdAt: Date,
     ) { }
 
-    static fromJSON(json: any): User {
-
+    static fromJSON(json: UserJSON): User {
         return new User(
             json.uuid,
             json.firstName,
@@ -18,7 +25,7 @@ export class User {
         );
     }
 
-    toJSON(): any {
+    toJSON(): UserJSON {
         return {
             uuid: this.uuid,
             firstName: this.firstName,
@@ -26,5 +33,9 @@ export class User {
             email: this.email,
             createdAt: this.createdAt.toISOString(),
         };
+    }
+
+    get fullName(): string {
+        return `${this.firstName} ${this.lastName}`;
     }
 }

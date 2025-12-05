@@ -52,6 +52,10 @@ class UserModule
     #[ORM\ManyToOne(inversedBy: 'userModules')]
     private ?Integration $integration = null;
 
+    #[ORM\ManyToOne(inversedBy: 'userModules')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Project $project = null;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -195,6 +199,18 @@ class UserModule
     public function setIntegration(?Integration $integration): static
     {
         $this->integration = $integration;
+
+        return $this;
+    }
+
+    public function getProject(): ?Project
+    {
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): static
+    {
+        $this->project = $project;
 
         return $this;
     }

@@ -81,36 +81,32 @@
 
 
 .text-body-lg {
-  font-family: var(--font-family-sans);
+  font-family: var(--font-family-display);
   font-size: var(--font-size-lg);
-  font-weight: 400;
   color: var(--color-gray);
 }
 
 .text-body-md {
-  font-family: var(--font-family-sans);
+  font-family: var(--font-family-display);
   font-size: var(--font-size-md);
-  font-weight: 400;
   color: var(--color-gray);
 }
 
 .text-body-base {
-  font-family: var(--font-family-sans);
+  font-family: var(--font-family-display);
   font-size: var(--font-size-base);
-  font-weight: 400;
   color: var(--color-gray);
 }
 
 .text-body-sm {
-  font-family: var(--font-family-sans);
+  font-family: var(--font-family-display);
   font-size: var(--font-size-sm);
-  font-weight: 400;
+  color: var(--color-gray);
 }
 
 .text-body-xs {
-  font-family: var(--font-family-sans);
+  font-family: var(--font-family-display);
   font-size: var(--font-size-xs);
-  font-weight: 400;
   color: var(--color-gray);
 }
 

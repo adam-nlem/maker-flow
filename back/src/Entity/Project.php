@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Entity\Enum\ProjectType;
 use App\Helper\DateHelper;
 use App\Repository\ProjectRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
@@ -102,6 +104,12 @@ class Project
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    /**
+     * @var Collection<int, UserModule>
+     */
+    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'project')]
+    private Collection $userModules;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -111,6 +119,7 @@ class Project
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
+        $this->userModules = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -216,6 +225,36 @@ class Project
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, UserModule>
+     */
+    public function getUserModules(): Collection
+    {
+        return $this->userModules;
+    }
+
+    public function addUserModule(UserModule $userModule): static
+    {
+        if (!$this->userModules->contains($userModule)) {
+            $this->userModules->add($userModule);
+            $userModule->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeUserModule(UserModule $userModule): static
+    {
+        if ($this->userModules->removeElement($userModule)) {
+            // set the owning side to null (unless already changed)
+            if ($userModule->getProject() === $this) {
+                $userModule->setProject(null);
+            }
+        }
 
         return $this;
     }
