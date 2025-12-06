@@ -4,32 +4,32 @@ import { Project } from "~/models/project";
 import { usePaginatedProjects } from "~/hooks/projects/usePaginatedProjects";
 
 interface ProjectContextType {
-    currentProject: Project | null;
+    focusedProject: Project | null;
     projects: Project[];
     isLoading: boolean;
     errorMessage: string | null;
-    setCurrentProject: (project: Project) => void;
+    setFocusedProject: (project: Project) => void;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
     const { projects, isLoading, errorMessage } = usePaginatedProjects();
-    const [currentProject, setCurrentProject] = useState<Project | null>(null);
+    const [focusedProject, setFocusedProject] = useState<Project | null>(null);
 
     // Set the first project as current when projects are loaded
     useEffect(() => {
-        if (projects.length > 0 && !currentProject) {
-            setCurrentProject(projects[0]);
+        if (projects.length > 0 && !focusedProject) {
+            setFocusedProject(projects[0]);
         }
-    }, [projects, currentProject]);
+    }, [projects, focusedProject]);
 
     const value = {
-        currentProject,
+        focusedProject,
         projects,
         isLoading,
         errorMessage,
-        setCurrentProject
+        setFocusedProject
     };
 
     return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;

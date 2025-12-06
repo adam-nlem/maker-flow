@@ -7,6 +7,8 @@ import { Button } from "../ui/Button";
 import { useState, useEffect } from "react";
 import CreateProjectModal from "../projects/CreateProjectModal";
 import { useProjectUserModules } from "~/hooks/projects/useProjectUserModules";
+import ProjectTile from "../projects/ProjectTile";
+import SelectFocusedProjectModal from "../projects/SelectFocusedProjectModal";
 
 interface SideBarProps {
     show: boolean;
@@ -15,11 +17,12 @@ interface SideBarProps {
 
 export default function SideBar({ show, onClose }: SideBarProps) {
     const { user } = useAuth();
-    const { currentProject, projects, setCurrentProject } = useProject();
-    const { userModules } = useProjectUserModules(currentProject?.uuid);
+    const { focusedProject, projects, setFocusedProject } = useProject();
+    const { userModules } = useProjectUserModules(focusedProject?.uuid);
     const navigate = useNavigate();
     const location = useLocation();
 
+    const [showSelectFocusedProjectModal, setShowSelectFocusedProjectModal] = useState(false);
     const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
 
     const isActive = (path: string) => location.pathname === path;
@@ -27,6 +30,7 @@ export default function SideBar({ show, onClose }: SideBarProps) {
     // Close modal when sidebar closes
     useEffect(() => {
         if (!show) {
+            setShowSelectFocusedProjectModal(false);
             setShowCreateProjectModal(false);
         }
     }, [show]);
@@ -45,22 +49,18 @@ export default function SideBar({ show, onClose }: SideBarProps) {
                 {/* TOP SECTION */}
                 <div className="p-3">
                     {/* PROJECT SELECTOR */}
-                    {currentProject ?
-                        <div className="flex flex-row justify-between hover:bg-light-gray cursor-pointer rounded-md p-2">
-                            <div className="flex flex-row gap-3">
-                                <div className="rounded-md bg-primary flex items-center justify-center h-10 w-10 text-heading-md">
-                                    {currentProject.name.charAt(0).toUpperCase()}
+                    {focusedProject ?
+                        <ProjectTile
+                            project={focusedProject}
+                            moduleCount={userModules.length}
+                            rightIcon={
+                                <div className="flex flex-col justify-center leading-none">
+                                    <ChevronUpIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} />
+                                    <ChevronDownIcon className="size-3.5 text-gray -mt-0.5" strokeWidth={2} />
                                 </div>
-                                <div className="flex flex-col">
-                                    <h1 className="text-heading-sm">{currentProject.name}</h1>
-                                    <p className="text-body-xs">{userModules.length} Module{userModules.length !== 1 ? 's' : ''} Actif{userModules.length !== 1 ? 's' : ''}</p>
-                                </div>
-                            </div>
-                            <div className="flex flex-col justify-center leading-none">
-                                <ChevronUpIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} />
-                                <ChevronDownIcon className="size-3.5 text-gray -mt-0.5" strokeWidth={2} />
-                            </div>
-                        </div>
+                            }
+                            onClick={() => setShowSelectFocusedProjectModal(true)}
+                        />
                         :
                         <Button
                             type="submit"
@@ -165,7 +165,8 @@ export default function SideBar({ show, onClose }: SideBarProps) {
                 </div>
             </div>
 
-            <div className="m-3">
+            <div className="m-3 flex flex-row gap-3">
+                <SelectFocusedProjectModal showModal={showSelectFocusedProjectModal} onClose={() => setShowSelectFocusedProjectModal(false)} projects={projects} focusedProject={focusedProject} setFocusedProject={setFocusedProject} onClickCreateProjectButton={() => setShowCreateProjectModal(true)} />
                 <CreateProjectModal showModal={showCreateProjectModal} onClose={() => setShowCreateProjectModal(false)} />
             </div>
         </div>
