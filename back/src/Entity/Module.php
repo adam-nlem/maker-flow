@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: ModuleRepository::class)]
@@ -20,27 +21,35 @@ class Module
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
+    #[Groups(['api_project_get_user_modules'])]
     private ?string $uuid = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255)] 
+    #[Groups(['api_project_get_user_modules'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['api_project_get_user_modules'])]
     private ?string $description = null;
 
     #[ORM\Column]
+    #[Groups(['api_project_get_user_modules'])]
     private ?bool $isActive = null;
 
     #[ORM\Column]
+    #[Groups(['api_project_get_user_modules'])]
     private ?bool $isPremium = null;
 
     #[ORM\Column]
+    #[Groups(['api_project_get_user_modules'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['api_project_get_user_modules'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: ModuleIdentifier::class)]
+    #[Groups(['api_project_get_user_modules'])]
     private ?ModuleIdentifier $moduleIdentifier = null;
 
     /**

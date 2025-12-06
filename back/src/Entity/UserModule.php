@@ -7,6 +7,7 @@ use App\Helper\DateHelper;
 use App\Repository\UserModuleRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: UserModuleRepository::class)]
@@ -18,27 +19,36 @@ class UserModule
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
+
+    #[Groups(['api_project_get_user_modules'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
+    #[Groups(['api_project_get_user_modules'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['api_project_get_user_modules'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column]
+    #[Groups(['api_project_get_user_modules'])]
     private ?int $xIndex = null;
 
     #[ORM\Column]
+    #[Groups(['api_project_get_user_modules'])]
     private ?int $yIndex = null;
 
     #[ORM\Column(enumType: ModuleSize::class)]
+    #[Groups(['api_project_get_user_modules'])]
     private ?ModuleSize $size = null;
 
     #[ORM\Column]
+    #[Groups(['api_project_get_user_modules'])]
     private ?bool $isActive = null;
 
     #[ORM\Column]
+    #[Groups(['api_project_get_user_modules'])]
     private ?bool $isHidden = null;
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]
@@ -47,6 +57,7 @@ class UserModule
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['api_project_get_user_modules'])]
     private ?Module $module = null;
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]

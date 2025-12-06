@@ -6,6 +6,7 @@ import { useNavigate, useLocation } from "react-router";
 import { Button } from "../ui/Button";
 import { useState, useEffect } from "react";
 import CreateProjectModal from "../projects/CreateProjectModal";
+import { useProjectUserModules } from "~/hooks/projects/useProjectUserModules";
 
 interface SideBarProps {
     show: boolean;
@@ -15,7 +16,7 @@ interface SideBarProps {
 export default function SideBar({ show, onClose }: SideBarProps) {
     const { user } = useAuth();
     const { currentProject, projects, setCurrentProject } = useProject();
-    // const { userModules } = useUserModules(currentProject?.uuid);
+    const { userModules } = useProjectUserModules(currentProject?.uuid);
     const navigate = useNavigate();
     const location = useLocation();
 
@@ -52,7 +53,7 @@ export default function SideBar({ show, onClose }: SideBarProps) {
                                 </div>
                                 <div className="flex flex-col">
                                     <h1 className="text-heading-sm">{currentProject.name}</h1>
-                                    {/* <p className="text-body-xs">{userModules.length} Module{userModules.length !== 1 ? 's' : ''} Actif{userModules.length !== 1 ? 's' : ''}</p> */}
+                                    <p className="text-body-xs">{userModules.length} Module{userModules.length !== 1 ? 's' : ''} Actif{userModules.length !== 1 ? 's' : ''}</p>
                                 </div>
                             </div>
                             <div className="flex flex-col justify-center leading-none">
@@ -104,7 +105,7 @@ export default function SideBar({ show, onClose }: SideBarProps) {
 
                     <div className="mt-5 border-t border-light-gray rounded mx-2"></div>
 
-                    {/* MODULES SECTION
+                    {/* MODULES SECTION */}
                     {userModules.length > 0 && (
                         <div className="mt-5 flex flex-col">
                             <h1 className="text-heading-xs text-gray pl-2 pb-1">Modules Actifs</h1>
@@ -121,7 +122,7 @@ export default function SideBar({ show, onClose }: SideBarProps) {
                                 </div>
                             ))}
                         </div>
-                    )} */}
+                    )}
                 </div>
 
                 {/* BOTTOM SECTION */}
@@ -163,7 +164,7 @@ export default function SideBar({ show, onClose }: SideBarProps) {
                     )}
                 </div>
             </div>
-            
+
             <div className="m-3">
                 <CreateProjectModal showModal={showCreateProjectModal} onClose={() => setShowCreateProjectModal(false)} />
             </div>

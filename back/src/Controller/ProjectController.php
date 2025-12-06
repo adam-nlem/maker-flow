@@ -9,6 +9,7 @@ use App\Entity\Project;
 use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Repository\ProjectRepository;
+use App\Repository\UserModuleRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
@@ -131,6 +132,33 @@ final class ProjectController extends AbstractController
         $projectRepository->save($project, true);
 
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_reopen']]);
+    }
+
+    #[Route('/{projectUuid}/user-modules', name: 'api_project_get_user_modules', methods: ['GET'])]
+    public function getUserModules(
+        string $projectUuid,
+        ProjectRepository $projectRepository,
+        UserModuleRepository $userModuleRepository
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+
+        if ($project === null) {
+            return $this->json(
+                data: ["message" => "You don't have any project with this uuid"],
+                status: Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $userModules = $userModuleRepository->getByUserAndProject($user, $project);
+
+        return $this->json(
+            data: $userModules,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_project_get_user_modules']]
+        );
     }
 
     #[Route('/{page}/{limit}', name: 'api_projects_get_paginated', methods: ['GET'])]
