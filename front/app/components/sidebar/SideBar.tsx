@@ -42,10 +42,10 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                         !showCreateProjectModal)
                         setIsExpanded(false)
                 }}
-                className={`h-full border-r border-light-gray bg-white flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out pointer-events-auto ${isExpanded ? 'w-72' : 'w-16'}`}
+                className={`h-full shrink-0 border-r border-light-gray bg-white flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out pointer-events-auto ${isExpanded ? 'w-72' : 'w-16'}`}
             >
                 {/* TOP SECTION */}
-                <div className={`p-3 ${isExpanded ? '' : 'flex flex-col items-center'}`}>
+                <div className={`p-3 ${isExpanded ? '' : 'flex flex-col items-center'}`}>   
                     {/* PROJECT SELECTOR */}
 
                     {focusedProject ?
@@ -60,8 +60,7 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                                 </div>
                             }
                             onClick={() => {
-                                console.log("Click select")
-                                setShowSelectFocusedProjectModal(true)
+                                setShowSelectFocusedProjectModal(!showSelectFocusedProjectModal)
                             }}
                         />
                         :
@@ -70,7 +69,7 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                             fullWidth
                             size="lg"
                             variant="secondary"
-                            onClick={() => setShowCreateProjectModal(true)}
+                            onClick={() => setShowCreateProjectModal(!showCreateProjectModal)}
                         >
                             <div className="flex flex-row justify-center items-center gap-3">
                                 <p className="text-sm">Créer un nouveau Projet</p>
@@ -146,7 +145,7 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                                 </div>
                             </div>
                         ) : (
-                            <div className="mb-3 p-2 rounded-lg cursor-pointer hover:bg-light-gray">
+                            <div className="my-4.75 p-2 rounded-lg cursor-pointer hover:bg-light-gray">
                                 <UserCircleIcon className="size-6 text-gray" strokeWidth={1.5} />
                             </div>
                         )
@@ -157,7 +156,7 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
             {/* Modals */}
             {(showSelectFocusedProjectModal || showCreateProjectModal) && (
                 <div
-                    className="flex-1 h-full bg-black/20 pointer-events-auto p-3"
+                    className="w-full flex flex-row gap-3 bg-black/5 pointer-events-auto p-3"
                     onClick={() => setIsExpanded(false)}
                 >
                     <SelectFocusedProjectModal
@@ -166,7 +165,7 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                         projects={projects}
                         focusedProject={focusedProject}
                         setFocusedProject={setFocusedProject}
-                        onClickCreateProjectButton={() => setShowCreateProjectModal(true)}
+                        onClickCreateProjectButton={() => setShowCreateProjectModal(!showCreateProjectModal)}
                     />
                     <CreateProjectModal
                         showModal={showCreateProjectModal}

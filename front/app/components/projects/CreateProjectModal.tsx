@@ -32,7 +32,7 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
 
     return (
 
-        <div className="border rounded-xl border-light-gray flex flex-col gap-3 py-5 px-10 shadow-lg bg-white" onClick={(e) => e.stopPropagation()}>
+        <div className="border rounded-xl border-light-gray w-fit h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-white" onClick={(e) => e.stopPropagation()}>
             {showStepHeader && (
                 <div className="flex flex-row items-center gap-3">
                     <StepBadge label="Introduction" completed={true} />
