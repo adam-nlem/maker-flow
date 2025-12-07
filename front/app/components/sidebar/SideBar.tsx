@@ -10,6 +10,7 @@ import { useProjectUserModules } from "~/hooks/projects/useProjectUserModules";
 import ProjectTile from "../projects/ProjectTile";
 import SelectFocusedProjectModal from "../projects/SelectFocusedProjectModal";
 import NavigationTile from "./NavigationTile";
+import ModuleTile from "./ModuleTile";
 
 interface SideBarProps {
     isExpanded: boolean;
@@ -45,7 +46,7 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                 className={`h-full shrink-0 border-r border-light-gray bg-white flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out pointer-events-auto ${isExpanded ? 'w-72' : 'w-16'}`}
             >
                 {/* TOP SECTION */}
-                <div className={`p-3 ${isExpanded ? '' : 'flex flex-col items-center'}`}>   
+                <div className={`p-3 ${isExpanded ? '' : 'flex flex-col items-center'}`}>
                     {/* PROJECT SELECTOR */}
 
                     {focusedProject ?
@@ -92,16 +93,7 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                         <div className={`mt-5 flex flex-col ${isExpanded ? '' : 'items-center'}`}>
                             {isExpanded && <h1 className="text-heading-xs text-gray pl-2 pb-1">Modules Actifs</h1>}
                             {userModules.map((userModule) => (
-                                <div
-                                    key={userModule.uuid}
-                                    className={`flex flex-row items-center gap-3 hover:bg-light-gray cursor-pointer rounded-lg p-2 ${isExpanded ? '' : 'justify-center'}`}
-                                    onClick={() => navigate(`/modules/${userModule.module.uuid}`)}
-                                >
-                                    <div className="w-6 h-6 rounded-md bg-dark flex items-center justify-center text-xs text-white font-semibold shrink-0">
-                                        {userModule.module.title.charAt(0).toUpperCase()}
-                                    </div>
-                                    {isExpanded && <h1 className="text-heading-sm whitespace-nowrap">{userModule.module.title}</h1>}
-                                </div>
+                                <ModuleTile isExpanded={isExpanded} userModule={userModule} />
                             ))}
                         </div>
                     )}
