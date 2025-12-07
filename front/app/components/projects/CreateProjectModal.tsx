@@ -2,7 +2,7 @@ import { Input } from "~/components/ui/Input";
 import { ProjectType, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
 import { Button } from "~/components/ui/Button";
 import { TextArea } from "~/components/ui/TextArea";
-import { Select } from "~/components/ui/Select";
+import { ToggleChip } from "~/components/ui/ToggleChip";
 import { StepBadge } from "~/components/ui/StepBadge";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useCreateProject } from "~/hooks/projects/useCreateProject";
@@ -16,7 +16,7 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
     const {
         name, setName,
         description, setDescription,
-        type, setType,
+        types, setTypes,
         errorMessage, setErrorMessage,
         isSubmitting,
         createProject
@@ -32,7 +32,7 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
 
     return (
 
-        <div className="border rounded-xl border-light-gray w-fit h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-white" onClick={(e) => e.stopPropagation()}>
+        <div className="border rounded-xl border-light-gray w-[500px] h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-white" onClick={(e) => e.stopPropagation()}>
             {showStepHeader && (
                 <div className="flex flex-row items-center gap-3">
                     <StepBadge label="Introduction" completed={true} />
@@ -71,20 +71,23 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
                     onChange={(e) => setDescription(e.target.value)}
                 />
 
-                <Select
-                    label="Type"
-                    placeholder="Choisissez de quel type de projet il s'agit"
-                    id="type"
-                    name="type"
-                    required
-                    fullWidth
-                    options={Object.values(ProjectType).map((type) => ({
-                        value: type,
-                        label: projectTypeToFrenchTranslation[type],
-                    }))}
-                    value={type ?? ''}
-                    onChange={(e) => setType(e.target.value as ProjectType)}
-                />
+                <div>
+                    <h1 className="text-heading-sm">Types</h1>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {Object.values(ProjectType).map((type) => (
+                            <ToggleChip
+                                key={type}
+                                label={projectTypeToFrenchTranslation[type]}
+                                isSelected={types.includes(type)}
+                                onToggle={() => setTypes(prev => 
+                                    prev.includes(type) 
+                                        ? prev.filter(t => t !== type) 
+                                        : [...prev, type]
+                                )}
+                            />
+                        ))}
+                    </div>
+                </div>
 
                 <Button
                     type="submit"

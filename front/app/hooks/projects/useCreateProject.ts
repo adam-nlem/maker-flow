@@ -6,7 +6,7 @@ import { httpClient } from "~/services/httpClient/httpClient";
 export function useCreateProject() {
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
-    const [type, setType] = useState<ProjectType | null>(null)
+    const [types, setTypes] = useState<ProjectType[]>([])
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -14,7 +14,7 @@ export function useCreateProject() {
     function resetForm() {
         setName("")
         setDescription("")
-        setType(null)
+        setTypes([])
         setErrorMessage(null)
         setIsSubmitting(false)
     }
@@ -27,7 +27,7 @@ export function useCreateProject() {
             await httpClient.post('/projects/', {
                 "name": name,
                 "description": description,
-                "type": type
+                "types": types
             })
 
             resetForm()
@@ -48,7 +48,7 @@ export function useCreateProject() {
     return {
         name, setName,
         description, setDescription,
-        type, setType,
+        types, setTypes,
         errorMessage, setErrorMessage,
         isSubmitting,
         createProject

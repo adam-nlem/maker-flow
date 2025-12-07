@@ -72,8 +72,8 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                             variant="secondary"
                             onClick={() => setShowCreateProjectModal(!showCreateProjectModal)}
                         >
-                            <div className="flex flex-row justify-center items-center gap-3">
-                                <p className="text-sm">Créer un nouveau Projet</p>
+                            <div className="flex flex-row justify-center items-center gap-3 shrink-0 ">
+                                {isExpanded && <p className="text-sm ">Créer un nouveau Projet</p>}
                                 <PlusCircleIcon className="size-4 text-clear" strokeWidth={2} />
                             </div>
                         </Button>

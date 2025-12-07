@@ -89,7 +89,7 @@ class Project
     ])]
     private ?\DateTimeImmutable $finishedAt = null;
 
-    #[ORM\Column(enumType: ProjectType::class)]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ProjectType::class)]
     #[Groups([
         'api_project_create',
         'api_project_update',
@@ -98,7 +98,7 @@ class Project
         'api_project_finish',
         'api_project_reopen'
     ])]
-    private ?ProjectType $type = null;
+    private array $types = [];
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
     #[ORM\JoinColumn(nullable: false)]
@@ -205,14 +205,17 @@ class Project
         return $this;
     }
 
-    public function getType(): ?ProjectType
+    /**
+     * @return ProjectType[]
+     */
+    public function getTypes(): array
     {
-        return $this->type;
+        return $this->types;
     }
 
-    public function setType(ProjectType $type): static
+    public function setTypes(array $types): static
     {
-        $this->type = $type;
+        $this->types = $types;
 
         return $this;
     }

@@ -1,0 +1,25 @@
+import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+
+interface ToggleChipProps {
+    label: string;
+    isSelected: boolean;
+    onToggle: () => void;
+}
+
+export function ToggleChip({ label, isSelected, onToggle }: ToggleChipProps) {
+    return (
+        <span
+            onClick={onToggle}
+            className={`px-3 py-1 border ${isSelected
+                ? 'bg-primary text-white text-heading-xs'
+                : 'text-body-xs border-light-gray hover:bg-light-gray'
+                }  rounded-full cursor-pointer whitespace-nowrap transition-colors
+                flex flex-row gap-1
+                `}
+        >
+            {label}
+
+            {isSelected && <CheckBadgeIcon className="size-4 text-white" strokeWidth={2} />}
+        </span>
+    );
+}

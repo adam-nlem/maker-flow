@@ -4,7 +4,7 @@ interface ProjectJSON {
     uuid: string;
     name: string;
     description: string;
-    type: ProjectType;
+    types: ProjectType[];
     createdAt: string;
     updatedAt?: string;
     finishedAt?: string;
@@ -15,7 +15,7 @@ export class Project {
         public readonly uuid: string,
         public name: string,
         public description: string,
-        public type: ProjectType,
+        public types: ProjectType[],
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
         public readonly finishedAt?: Date,
@@ -26,7 +26,7 @@ export class Project {
             json.uuid,
             json.name,
             json.description,
-            json.type,
+            json.types,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
             json.finishedAt ? new Date(json.finishedAt) : undefined,
@@ -38,7 +38,7 @@ export class Project {
             uuid: this.uuid,
             name: this.name,
             description: this.description,
-            type: this.type,
+            types: this.types,
             createdAt: this.createdAt.toISOString(),
             updatedAt: this.updatedAt?.toISOString(),
             finishedAt: this.finishedAt?.toISOString(),

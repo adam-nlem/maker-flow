@@ -12,7 +12,8 @@ class CreateProjectRequestDTO extends AbstractRequestDTO
 {
     private string $name;
     private ?string $description;
-    private ProjectType $type;
+    /** @var ProjectType[] */
+    private array $types;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -25,7 +26,10 @@ class CreateProjectRequestDTO extends AbstractRequestDTO
     {
         $this->name  = $payload["name"];
         $this->description = $payload["description"] ?? null;
-        $this->type = ProjectType::from($payload["type"]);
+        $this->types = array_map(
+            fn(string $type) => ProjectType::from($type),
+            $payload["types"] ?? []
+        );
     }
 
     public function buildObject(): Project
@@ -35,7 +39,7 @@ class CreateProjectRequestDTO extends AbstractRequestDTO
         return $project
             ->setName($this->getName())
             ->setDescription($this->getDescription())
-            ->setType($this->getType());
+            ->setTypes($this->getTypes());
     }
 
     public function getName(): string
@@ -48,8 +52,11 @@ class CreateProjectRequestDTO extends AbstractRequestDTO
         return $this->description;
     }
 
-    public function getType(): ProjectType
+    /**
+     * @return ProjectType[]
+     */
+    public function getTypes(): array
     {
-        return $this->type;
+        return $this->types;
     }
 }
