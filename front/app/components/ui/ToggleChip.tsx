@@ -1,4 +1,4 @@
-import { CheckBadgeIcon } from "@heroicons/react/24/outline";
+import { CheckBadgeIcon } from "@heroicons/react/24/solid";
 
 interface ToggleChipProps {
     label: string;
@@ -19,7 +19,7 @@ export function ToggleChip({ label, isSelected, onToggle }: ToggleChipProps) {
         >
             {label}
 
-            {isSelected && <CheckBadgeIcon className="size-4 text-white" strokeWidth={2} />}
+            {isSelected && <CheckBadgeIcon className="size-4 text-white" strokeWidth={2.5} />}
         </span>
     );
 }
