@@ -18,16 +18,16 @@ export function loader({ context }: Route.LoaderArgs) {
 export default function Home({ loaderData }: Route.ComponentProps) {
   const [showModal, setShowModal] = useState(false);
 
-  const [showSidebar, setShowSidebar] = useState(false);
+  const [expandSidebar, setExpandSidebar] = useState(false);
 
   return (
     <div className="w-full pt-10 flex justify-center items-center">
-      <SideBar show={showSidebar} onClose={() => setShowSidebar(false)} />
+      <SideBar expand={expandSidebar} setExpand={setExpandSidebar} />
       
       <Button
         size="sm"
         variant="secondary"
-        onClick={() => setShowSidebar(true)}
+        onClick={() => setExpandSidebar(true)}
         className="mr-4"
       >
         <div className="flex flex-row justify-center items-center gap-3">
