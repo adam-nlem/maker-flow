@@ -15,9 +15,10 @@ export default function SelectFocusedProjectModal({ showModal, focusedProject, p
     if (!showModal) return null;
 
     return (
-        <div className="border rounded-xl border-light-gray h-min flex flex-col gap-3 p-3 shadow-lg bg-white" onClick={(e) => e.stopPropagation()}>
+        <div className="border rounded-xl border-light-gray h-min w-min flex flex-col gap-3 p-3 shadow-lg bg-white" onClick={(e) => e.stopPropagation()}>
             {projects.map((project) => (
                 <ProjectTile
+                    key={project.uuid}
                     project={project}
                     showCreatedAt={true}
                     rightIcon={
