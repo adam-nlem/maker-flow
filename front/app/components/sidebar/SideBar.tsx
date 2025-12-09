@@ -11,6 +11,7 @@ import ProjectTile from "../projects/ProjectTile";
 import SelectFocusedProjectModal from "../projects/SelectFocusedProjectModal";
 import NavigationTile from "./NavigationTile";
 import ModuleTile from "./ModuleTile";
+import Shimmer from "../ui/Shimmer";
 
 interface SideBarProps {
     isExpanded: boolean;
@@ -19,7 +20,7 @@ interface SideBarProps {
 
 export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
     const { user } = useAuth();
-    const { focusedProject, projects, setFocusedProject } = useProject();
+    const { focusedProject, projects, isLoadingProjects, setFocusedProject } = useProject();
     const { userModules } = useProjectUserModules(focusedProject?.uuid);
     const navigate = useNavigate();
 
@@ -48,35 +49,39 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                 {/* TOP SECTION */}
                 <div className={`p-3 ${isExpanded ? '' : 'flex flex-col items-center'}`}>
                     {/* PROJECT SELECTOR */}
+                    
+                    {isLoadingProjects ? <Shimmer width="w-10" height="h-10"/> :
 
-                    {focusedProject ?
-                        <ProjectTile
-                            project={focusedProject}
-                            moduleCount={userModules.length}
-                            isExpanded={isExpanded}
-                            rightIcon={
-                                isExpanded && <div className="flex flex-col justify-center leading-none">
-                                    <ChevronUpIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} />
-                                    <ChevronDownIcon className="size-3.5 text-gray -mt-0.5" strokeWidth={2} />
+                        focusedProject ?
+                            <ProjectTile
+                                project={focusedProject}
+                                moduleCount={userModules.length
+                                }
+                                isExpanded={isExpanded}
+                                rightIcon={
+                                    isExpanded && <div className="flex flex-col justify-center leading-none">
+                                        <ChevronUpIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} />
+                                        <ChevronDownIcon className="size-3.5 text-gray -mt-0.5" strokeWidth={2} />
+                                    </div>
+                                }
+                                onClick={() => {
+                                    setShowSelectFocusedProjectModal(!showSelectFocusedProjectModal)
+                                }}
+                            />
+                            :
+                            <Button
+                                type="button"
+                                fullWidth
+                                size="lg"
+                                variant="secondary"
+                                onClick={() => setShowCreateProjectModal(!showCreateProjectModal)}
+                            >
+                                <div className="flex flex-row justify-center items-center gap-3 shrink-0 ">
+                                    {isExpanded && <p className="text-sm ">Créer un nouveau Projet</p>}
+                                    <PlusCircleIcon className="size-4 text-clear" strokeWidth={2} />
                                 </div>
-                            }
-                            onClick={() => {
-                                setShowSelectFocusedProjectModal(!showSelectFocusedProjectModal)
-                            }}
-                        />
-                        :
-                        <Button
-                            type="button"
-                            fullWidth
-                            size="lg"
-                            variant="secondary"
-                            onClick={() => setShowCreateProjectModal(!showCreateProjectModal)}
-                        >
-                            <div className="flex flex-row justify-center items-center gap-3 shrink-0 ">
-                                {isExpanded && <p className="text-sm ">Créer un nouveau Projet</p>}
-                                <PlusCircleIcon className="size-4 text-clear" strokeWidth={2} />
-                            </div>
-                        </Button>
+                            </Button>
+
 
                     }
 
