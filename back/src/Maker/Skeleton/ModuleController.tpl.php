@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/modules/<?= $moduleNameDash ?>', name: 'module_<?= $moduleNameSnake ?>_')]
+#[Route('/api/modules/<?= $moduleNameDash ?>', name: 'api_module_<?= $moduleNameSnake ?>_')]
 class <?= $moduleName ?>ModuleController extends AbstractController
 {
     public function __construct(

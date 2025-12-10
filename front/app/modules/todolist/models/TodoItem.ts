@@ -1,11 +1,13 @@
-import type { TodoPriority } from "./enums/TodoPriority";
+import type { TodoItemPriority } from "./enums/TodoItemPriority";
+import type { TodoItemStatus } from "./enums/TodoItemStatus";
 import { TodoCategory, type TodoCategoryJSON } from "./TodoCategory";
 
 interface TodoItemJSON {
     uuid: string;
     title: string;
     content: string;
-    priority?: TodoPriority;
+    status: TodoItemStatus;
+    priority?: TodoItemPriority;
     categories: TodoCategoryJSON[];
     createdAt: string;
     updatedAt?: string;
@@ -20,7 +22,8 @@ export class TodoItem {
         public content: string,
         public categories: TodoCategory[],
         public readonly createdAt: Date,
-        public priority?: TodoPriority,
+        public status: TodoItemStatus,
+        public priority?: TodoItemPriority,
         public readonly updatedAt?: Date,
         public readonly finishedAt?: Date,
         public dueDate?: Date,
@@ -33,6 +36,7 @@ export class TodoItem {
             json.content,
             json.categories.map(c => TodoCategory.fromJSON(c)),
             new Date(json.createdAt),
+            json.status,
             json.priority,
             json.updatedAt ? new Date(json.updatedAt) : undefined,
             json.finishedAt ? new Date(json.finishedAt) : undefined,
@@ -45,6 +49,7 @@ export class TodoItem {
             uuid: this.uuid,
             title: this.title,
             content: this.content,
+            status: this.status,
             priority: this.priority,
             categories: this.categories.map(c => c.toJSON()),
             createdAt: this.createdAt.toISOString(),
@@ -53,12 +58,9 @@ export class TodoItem {
             dueDate: this.dueDate?.toISOString(),
         }
     }
-
-    get isFinished(): boolean {
-        return this.finishedAt !== undefined;
-    }
-
-    get isOverdue(): boolean {
-        return this.dueDate !== undefined && this.dueDate < new Date() && !this.isFinished;
-    }
+    
+    //TODO: do this
+    // get isOverdue(): boolean {
+    // return this.dueDate !== undefined && this.dueDate < new Date() && !this.status ==;
+    // }
 }

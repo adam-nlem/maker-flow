@@ -160,6 +160,13 @@ class MakeModule extends AbstractMaker
         if (!$this->filesystem->exists($entityDir)) {
             $this->filesystem->mkdir($entityDir, 0777);
         }
+
+        // Repository folder
+        $repositoryDir = $rootDir . '/src/Module/' . $moduleName . '/Repository';
+
+        if (!$this->filesystem->exists($repositoryDir)) {
+            $this->filesystem->mkdir($repositoryDir, 0777);
+        }
     }
 
     private function toSnakeCase(string $name): string
