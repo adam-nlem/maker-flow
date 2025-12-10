@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
-import { Project } from "~/models/project";
+import { Project } from "~/models/Project";
 import { usePaginatedProjects } from "~/hooks/projects/usePaginatedProjects";
 
 interface ProjectContextType {

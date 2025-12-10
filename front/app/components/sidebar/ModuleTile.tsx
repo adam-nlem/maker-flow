@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router";
 import { useModuleIcon } from "~/hooks/modules/useModuleIcon";
-import type { UserModule } from "~/models/userModule";
+import type { UserModule } from "~/models/UserModule";
 
 interface ModuleTileProps {
     isExpanded: boolean;

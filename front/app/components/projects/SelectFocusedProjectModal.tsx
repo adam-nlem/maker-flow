@@ -1,4 +1,4 @@
-import type { Project } from "~/models/project";
+import type { Project } from "~/models/Project";
 import ProjectTile from "./ProjectTile";
 import { CheckIcon, PlusCircleIcon } from "@heroicons/react/24/outline";
 import { Button } from "../ui/Button";

@@ -1,4 +1,4 @@
-import type { Project } from "~/models/project";
+import type { Project } from "~/models/Project";
 import type { ReactNode } from "react";
 import { formatToFrenchDateShort } from "~/utils/dateFormatters";
 

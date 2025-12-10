@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User } from "~/models/user";
+import { User } from "~/models/User";
 import { ConflictException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
 

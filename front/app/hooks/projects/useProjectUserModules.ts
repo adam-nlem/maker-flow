@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { UserModule } from "~/models/userModule";
+import { UserModule } from "~/models/UserModule";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
 

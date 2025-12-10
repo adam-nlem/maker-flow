@@ -1,6 +1,6 @@
 import type { ModuleSize } from "./enums/ModuleSize";
-import { Module } from "./module";
-import type { ModuleJSON } from "./module";
+
+import { Module, type ModuleJSON } from "./Module";
 
 interface UserModuleJSON {
     uuid: string;

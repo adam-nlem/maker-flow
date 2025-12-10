@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Project } from "~/models/project";
+import { Project } from "~/models/Project";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
 
