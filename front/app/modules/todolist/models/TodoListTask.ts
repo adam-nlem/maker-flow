@@ -1,40 +1,40 @@
-import type { TodoItemPriority } from "./enums/TodoItemPriority";
-import type { TodoItemStatus } from "./enums/TodoItemStatus";
-import { TodoCategory, type TodoCategoryJSON } from "./TodoCategory";
+import type { TodoListPriority } from "./enums/TodoListPriority";
+import type { TodoListStatus } from "./enums/TodoListStatus";
+import { TodoListTag, type TodoListTagJSON } from "./TodoListTag";
 
-interface TodoItemJSON {
+interface TodoListTaskJSON {
     uuid: string;
     title: string;
     content: string;
-    status: TodoItemStatus;
-    priority?: TodoItemPriority;
-    categories: TodoCategoryJSON[];
+    status: TodoListStatus;
+    priority?: TodoListPriority;
+    tags: TodoListTagJSON[];
     createdAt: string;
     updatedAt?: string;
     finishedAt?: string;
     dueDate?: string;
 }
 
-export class TodoItem {
+export class TodoListTask {
     constructor(
         public readonly uuid: string,
         public title: string,
         public content: string,
-        public categories: TodoCategory[],
+        public tags: TodoListTag[],
         public readonly createdAt: Date,
-        public status: TodoItemStatus,
-        public priority?: TodoItemPriority,
+        public status: TodoListStatus,
+        public priority?: TodoListPriority,
         public readonly updatedAt?: Date,
         public readonly finishedAt?: Date,
         public dueDate?: Date,
     ) { }
 
-    static fromJSON(json: TodoItemJSON): TodoItem {
-        return new TodoItem(
+    static fromJSON(json: TodoListTaskJSON): TodoListTask {
+        return new TodoListTask(
             json.uuid,
             json.title,
             json.content,
-            json.categories.map(c => TodoCategory.fromJSON(c)),
+            json.tags.map(c => TodoListTag.fromJSON(c)),
             new Date(json.createdAt),
             json.status,
             json.priority,
@@ -44,14 +44,14 @@ export class TodoItem {
         )
     }
 
-    toJSON(): TodoItemJSON {
+    toJSON(): TodoListTaskJSON {
         return {
             uuid: this.uuid,
             title: this.title,
             content: this.content,
             status: this.status,
             priority: this.priority,
-            categories: this.categories.map(c => c.toJSON()),
+            tags: this.tags.map(c => c.toJSON()),
             createdAt: this.createdAt.toISOString(),
             updatedAt: this.updatedAt?.toISOString(),
             finishedAt: this.finishedAt?.toISOString(),

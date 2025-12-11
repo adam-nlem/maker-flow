@@ -2,22 +2,54 @@
 
 namespace App\Module\TodoList\Repository;
 
-use App\Module\TodoList\Entity\TodoItemCategory;
+use App\Entity\User;
+use App\Module\TodoList\Entity\TodoListTag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 /**
- * @extends ServiceEntityRepository<TodoItemCategory>
+ * @extends ServiceEntityRepository<TodoListTag>
  */
-class TodoItemCategoryRepository extends ServiceEntityRepository
+class TodoListTagRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, TodoItemCategory::class);
+        parent::__construct($registry, TodoListTag::class);
+    }
+
+    public function save(TodoListTag $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(TodoListTag $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function getByUserAndWithUuidIn(User $user, array $uuids): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.user = :user')
+            ->andWhere('t.uuid IN (:uuids)')
+            ->setParameter('user', $user)
+            ->setParameter('uuids', $uuids)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     //    /**
-    //     * @return TodoItemCategory[] Returns an array of TodoItemCategory objects
+    //     * @return TodoListTag[] Returns an array of TodoListTag objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +63,7 @@ class TodoItemCategoryRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?TodoItemCategory
+    //    public function findOneBySomeField($value): ?TodoListTag
     //    {
     //        return $this->createQueryBuilder('t')
     //            ->andWhere('t.exampleField = :val')

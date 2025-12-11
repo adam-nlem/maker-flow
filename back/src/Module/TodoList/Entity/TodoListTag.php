@@ -3,17 +3,20 @@
 namespace App\Module\TodoList\Entity;
 
 use App\Entity\Enum\Color;
+use App\Entity\User;
 use App\Helper\DateHelper;
-use App\Module\TodoList\Repository\TodoItemCategoryRepository;
+use App\Module\TodoList\Repository\TodoListTagRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints as ORMAssert;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: TodoItemCategoryRepository::class)]
+#[ORM\Entity(repositoryClass: TodoListTagRepository::class)]
+#[ORMAssert\UniqueEntity('title', 'todoList')]
 #[ORM\HasLifecycleCallbacks]
-class TodoItemCategory
+class TodoListTag
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -36,10 +39,18 @@ class TodoItemCategory
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**
-     * @var Collection<int, TodoItem>
+     * @var Collection<int, TodoListTask>
      */
-    #[ORM\ManyToMany(targetEntity: TodoItem::class, mappedBy: 'categories')]
+    #[ORM\ManyToMany(targetEntity: TodoListTask::class, mappedBy: 'tags')]
     private Collection $todoItems;
+
+    #[ORM\ManyToOne(inversedBy: 'todoListTags')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(inversedBy: 'todoListTags')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TodoList $todoList = null;
 
     public function __construct()
     {
@@ -126,28 +137,52 @@ class TodoItemCategory
     }
 
     /**
-     * @return Collection<int, TodoItem>
+     * @return Collection<int, TodoListTask>
      */
-    public function getTodoItems(): Collection
+    public function getTodoListTasks(): Collection
     {
         return $this->todoItems;
     }
 
-    public function addTodoItem(TodoItem $todoItem): static
+    public function addTodoListTask(TodoListTask $todoItem): static
     {
         if (!$this->todoItems->contains($todoItem)) {
             $this->todoItems->add($todoItem);
-            $todoItem->addCategory($this);
+            $todoItem->addTag($this);
         }
 
         return $this;
     }
 
-    public function removeTodoItem(TodoItem $todoItem): static
+    public function removeTodoListTask(TodoListTask $todoItem): static
     {
         if ($this->todoItems->removeElement($todoItem)) {
-            $todoItem->removeCategory($this);
+            $todoItem->removeTag($this);
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getTodoList(): ?TodoList
+    {
+        return $this->todoList;
+    }
+
+    public function setTodoList(?TodoList $todoList): static
+    {
+        $this->todoList = $todoList;
 
         return $this;
     }

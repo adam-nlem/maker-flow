@@ -2,42 +2,22 @@
 
 namespace App\Module\TodoList\Repository;
 
-use App\Module\TodoList\Entity\TodoListTask;
+use App\Module\TodoList\Entity\TodoList;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<TodoListTask>
+ * @extends ServiceEntityRepository<TodoList>
  */
-class TodoListTaskRepository extends ServiceEntityRepository
+class TodoListRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, TodoListTask::class);
+        parent::__construct($registry, TodoList::class);
     }
-
-    public function save(TodoListTask $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->persist($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    public function remove(TodoListTask $entity, bool $flush = false): void
-    {
-        $this->getEntityManager()->remove($entity);
-
-        if ($flush) {
-            $this->getEntityManager()->flush();
-        }
-    }
-
-    
 
     //    /**
-    //     * @return TodoListTask[] Returns an array of TodoListTask objects
+    //     * @return TodoList[] Returns an array of TodoList objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -51,7 +31,7 @@ class TodoListTaskRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?TodoListTask
+    //    public function findOneBySomeField($value): ?TodoList
     //    {
     //        return $this->createQueryBuilder('t')
     //            ->andWhere('t.exampleField = :val')

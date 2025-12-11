@@ -1,6 +1,6 @@
 import type { Color } from "~/models/enums/Color";
 
-export interface TodoCategoryJSON {
+export interface TodoListTagJSON {
     uuid: string;
     title: string;
     color: Color;
@@ -8,7 +8,7 @@ export interface TodoCategoryJSON {
     updatedAt?: string;
 }
 
-export class TodoCategory {
+export class TodoListTag {
     constructor(
         public readonly uuid: string,
         public title: string,
@@ -17,8 +17,8 @@ export class TodoCategory {
         public readonly updatedAt?: Date,
     ) { }
 
-    static fromJSON(json: TodoCategoryJSON): TodoCategory {
-        return new TodoCategory(
+    static fromJSON(json: TodoListTagJSON): TodoListTag {
+        return new TodoListTag(
             json.uuid,
             json.title,
             json.color,
@@ -27,7 +27,7 @@ export class TodoCategory {
         )
     }
 
-    toJSON(): TodoCategoryJSON {
+    toJSON(): TodoListTagJSON {
         return {
             uuid: this.uuid,
             title: this.title,

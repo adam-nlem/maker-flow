@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Helper\DateHelper;
+use App\Module\TodoList\Entity\TodoListTag;
+use App\Module\TodoList\Entity\TodoListTask;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;

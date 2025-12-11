@@ -5,6 +5,7 @@ namespace <?= $namespace ?>;
 use App\Module\<?= $moduleName ?>\Entity\<?= $moduleName . $entity ?>;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 class <?= $moduleName . $entity ?>Repository extends ServiceEntityRepository
 {

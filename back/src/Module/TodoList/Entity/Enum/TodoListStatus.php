@@ -2,7 +2,7 @@
 
 namespace App\Module\TodoList\Entity\Enum;
 
-enum TodoItemStatus: string
+enum TodoListStatus: string
 {
     case Pending = 'pending';
     case InProgress = 'in_progress';

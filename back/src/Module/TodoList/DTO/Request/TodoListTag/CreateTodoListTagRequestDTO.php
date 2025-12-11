@@ -1,0 +1,47 @@
+<?php
+
+namespace App\Module\TodoList\DTO\Request\TodoListTag;
+
+use App\DTO\Request\AbstractRequestDTO;
+use App\Entity\Enum\Color;
+use App\Module\TodoList\Entity\TodoListTag;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+class CreateTodoListTagRequestDTO extends AbstractRequestDTO
+{
+    private string $title;
+    private Color $color;
+
+    public function __construct(
+        protected RequestStack $requestStack,
+        protected ValidatorInterface $validator,
+    ) {
+        parent::__construct($requestStack, $validator);
+    }
+
+    protected function fromPayload(array $payload): void
+    {
+        $this->title = $payload["title"];
+        $this->color = Color::tryFrom($payload["color"] ?? "") ?? Color::Green;
+    }
+
+    protected function buildObject(): TodoListTag
+    {
+        $tag = new TodoListTag();
+
+        return $tag
+            ->setTitle($this->getTitle())
+            ->setColor($this->getColor());
+    }
+
+    public function getTitle(): string
+    {
+        return $this->title;
+    }
+
+    public function getColor(): Color
+    {
+        return $this->color;
+    }
+}

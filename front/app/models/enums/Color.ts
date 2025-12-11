@@ -1,5 +1,5 @@
 // These colors are all the colors available for the user to pick from 
-// to customize todo categories etc.
+// to customize todo tags etc.
 
 export enum Color {
     Red = 'red',

@@ -2,19 +2,20 @@
 
 namespace App\Module\TodoList\Entity;
 
+use App\Entity\User;
 use App\Helper\DateHelper;
-use App\Module\TodoList\Entity\Enum\TodoItemPriority;
-use App\Module\TodoList\Entity\Enum\TodoItemStatus;
-use App\Module\TodoList\Repository\TodoItemRepository;
+use App\Module\TodoList\Entity\Enum\TodoListPriority;
+use App\Module\TodoList\Entity\Enum\TodoListStatus;
+use App\Module\TodoList\Repository\TodoListTaskRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: TodoItemRepository::class)]
+#[ORM\Entity(repositoryClass: TodoListTaskRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class TodoItem
+class TodoListTask
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -30,11 +31,11 @@ class TodoItem
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $content = null;
 
-    #[ORM\Column(enumType: TodoItemStatus::class)]
-    private ?TodoItemStatus $status = null;
+    #[ORM\Column(enumType: TodoListStatus::class)]
+    private ?TodoListStatus $status = null;
 
-    #[ORM\Column(nullable: true, enumType: TodoItemPriority::class)]
-    private ?TodoItemPriority $priority = null;
+    #[ORM\Column(nullable: true, enumType: TodoListPriority::class)]
+    private ?TodoListPriority $priority = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -49,10 +50,18 @@ class TodoItem
     private ?\DateTimeImmutable $dueDate = null;
 
     /**
-     * @var Collection<int, TodoItemCategory>
+     * @var Collection<int, TodoListTag>
      */
-    #[ORM\ManyToMany(targetEntity: TodoItemCategory::class, inversedBy: 'todoItems')]
-    private Collection $categories;
+    #[ORM\ManyToMany(targetEntity: TodoListTag::class, inversedBy: 'todoItems')]
+    private Collection $tags;
+
+    #[ORM\ManyToOne(inversedBy: 'todoListTasks')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    #[ORM\ManyToOne(inversedBy: 'todoListTasks')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?TodoList $todoList = null;
 
     public function __construct()
     {
@@ -63,7 +72,7 @@ class TodoItem
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
-        $this->categories = new ArrayCollection();
+        $this->tags = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -113,24 +122,24 @@ class TodoItem
         return $this;
     }
 
-    public function getStatus(): ?TodoItemStatus
+    public function getStatus(): ?TodoListStatus
     {
         return $this->status;
     }
 
-    public function setStatus(TodoItemStatus $status): static
+    public function setStatus(TodoListStatus $status): static
     {
         $this->status = $status;
 
         return $this;
     }
 
-    public function getPriority(): ?TodoItemPriority
+    public function getPriority(): ?TodoListPriority
     {
         return $this->priority;
     }
 
-    public function setPriority(?TodoItemPriority $priority): static
+    public function setPriority(?TodoListPriority $priority): static
     {
         $this->priority = $priority;
 
@@ -186,25 +195,48 @@ class TodoItem
     }
 
     /**
-     * @return Collection<int, TodoItemCategory>
+     * @return Collection<int, TodoListTag>
      */
-    public function getCategories(): Collection
+    public function getTags(): Collection
     {
-        return $this->categories;
+        return $this->tags;
     }
 
-    public function addCategory(TodoItemCategory $category): static
+    public function addTag(TodoListTag $tag): static
     {
-        if (!$this->categories->contains($category)) {
-            $this->categories->add($category);
+        if (!$this->tags->contains($tag)) {
+            $this->tags->add($tag);
         }
+        return $this;
+    }
+
+    public function removeTag(TodoListTag $tag): static
+    {
+        $this->tags->removeElement($tag);
 
         return $this;
     }
 
-    public function removeCategory(TodoItemCategory $category): static
+    public function getUser(): ?User
     {
-        $this->categories->removeElement($category);
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+
+    public function getTodoList(): ?TodoList
+    {
+        return $this->todoList;
+    }
+
+    public function setTodoList(?TodoList $todoList): static
+    {
+        $this->todoList = $todoList;
 
         return $this;
     }

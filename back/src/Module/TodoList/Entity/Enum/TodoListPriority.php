@@ -2,7 +2,7 @@
 
 namespace App\Module\TodoList\Entity\Enum;
 
-enum TodoItemPriority: string
+enum TodoListPriority: string
 {
     case Low = 'low';
     case Medium = 'medium';
