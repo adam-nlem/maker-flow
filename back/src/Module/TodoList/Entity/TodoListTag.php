@@ -12,6 +12,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints as ORMAssert;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TodoListTagRepository::class)]
 #[ORMAssert\UniqueEntity('title', 'todoList')]
@@ -24,18 +25,38 @@ class TodoListTag
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
+    #[Groups([
+        'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tasks_create'
+    ])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([
+        'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tasks_create'
+    ])]
     private ?string $title = null;
 
     #[ORM\Column(enumType: Color::class)]
+    #[Groups([
+        'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tasks_create'
+    ])]
     private ?Color $color = null;
 
     #[ORM\Column]
+    #[Groups([
+        'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tasks_create'
+    ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups([
+        'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tasks_create'
+    ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**

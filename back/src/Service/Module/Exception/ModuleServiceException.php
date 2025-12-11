@@ -2,7 +2,7 @@
 
 namespace App\Service\Module\Exception;
 
-use App\Serivce\ServiceException;
+use App\Service\ServiceException;
 
 abstract class ModuleServiceException extends ServiceException
 {

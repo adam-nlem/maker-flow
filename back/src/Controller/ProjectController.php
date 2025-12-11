@@ -20,7 +20,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/projects')]
 final class ProjectController extends AbstractController
 {
-    #[Route('/', name: 'api_project_create', methods: ['POST'])]
+    #[Route('', name: 'api_project_create', methods: ['POST'])]
     public function create(CreateProjectRequestDTO $dto, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */

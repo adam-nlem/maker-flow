@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Module\TodoList\DTO\Request\TodoListTag\CreateTodoListTagRequestDTO;
 use App\Module\TodoList\Entity\TodoListTag;
 use App\Module\TodoList\Entity\TodoListTask;
+use App\Module\TodoList\Repository\TodoListRepository;
 use App\Module\TodoList\Repository\TodoListTagRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -25,10 +26,19 @@ class TodoListTagController extends AbstractController
     }
 
     #[Route('', name: 'api_modules_todo_lists_tags_create', methods: ['POST'])]
-    public function create(CreateTodoListTagRequestDTO $dto, TodoListTagRepository $tagRepository): JsonResponse
-    {
+    public function create(
+        CreateTodoListTagRequestDTO $dto,
+        TodoListRepository $todoListRepository,
+        TodoListTagRepository $tagRepository
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
+
+        $todoList = $todoListRepository->getByUuidAndUser($dto->getTodoListUuid(), $user);
+
+        if ($todoList === null) {
+            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
 
         try {
             /** @var TodoListTag $tag */
@@ -37,7 +47,9 @@ class TodoListTagController extends AbstractController
             return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
         }
 
-
+        $tag
+            ->setUser($user)
+            ->setTodoList($todoList);
 
         $tagRepository->save($tag, true);
 

@@ -10,6 +10,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CreateTodoListTagRequestDTO extends AbstractRequestDTO
 {
+    private string $todoListUuid;
     private string $title;
     private Color $color;
 
@@ -22,6 +23,7 @@ class CreateTodoListTagRequestDTO extends AbstractRequestDTO
 
     protected function fromPayload(array $payload): void
     {
+        $this->todoListUuid = $payload["todoListUuid"];
         $this->title = $payload["title"];
         $this->color = Color::tryFrom($payload["color"] ?? "") ?? Color::Green;
     }
@@ -33,6 +35,11 @@ class CreateTodoListTagRequestDTO extends AbstractRequestDTO
         return $tag
             ->setTitle($this->getTitle())
             ->setColor($this->getColor());
+    }
+
+    public function getTodoListUuid(): string
+    {
+        return $this->todoListUuid;
     }
 
     public function getTitle(): string

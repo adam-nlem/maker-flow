@@ -7,6 +7,7 @@ use App\Module\<?= $moduleName ?>\Repository\<?= $moduleName . $entity ?>Reposit
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: <?= $moduleName . $entity ?>Repository::class)]
 #[ORM\HasLifecycleCallbacks]

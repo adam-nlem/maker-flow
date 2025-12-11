@@ -21,35 +21,59 @@ class Module
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_project_get_user_modules',
+        'api_user_modules_create',
+    ])]
     private ?string $uuid = null;
 
-    #[ORM\Column(length: 255)] 
-    #[Groups(['api_project_get_user_modules'])]
+    #[ORM\Column(length: 255)]
+    #[Groups([
+        'api_project_get_user_modules',
+        'api_user_modules_create',
+    ])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_project_get_user_modules',
+        'api_user_modules_create',
+    ])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_project_get_user_modules',
+        'api_user_modules_create',
+    ])]
     private ?bool $isActive = null;
 
     #[ORM\Column]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_project_get_user_modules',
+        'api_user_modules_create',
+    ])]
     private ?bool $isPremium = null;
 
     #[ORM\Column]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_project_get_user_modules',
+        'api_user_modules_create',
+    ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_project_get_user_modules',
+        'api_user_modules_create',
+    ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: ModuleIdentifier::class)]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_project_get_user_modules',
+        'api_user_modules_create',
+    ])]
     private ?ModuleIdentifier $moduleIdentifier = null;
 
     /**

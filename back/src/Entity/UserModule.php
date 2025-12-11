@@ -20,35 +20,59 @@ class UserModule
 
     #[ORM\Column(type: Types::GUID, unique: true)]
 
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_user_modules_create',
+        'api_project_get_user_modules'
+    ])]
     private ?string $uuid = null;
 
     #[ORM\Column]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_user_modules_create',
+        'api_project_get_user_modules'
+    ])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column]
-    #[Groups(['api_project_get_user_modules'])]
+    #[ORM\Column(nullable: true)]
+    #[Groups([
+        'api_user_modules_create',
+        'api_project_get_user_modules'
+    ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_user_modules_create',
+        'api_project_get_user_modules'
+    ])]
     private ?int $xIndex = null;
 
     #[ORM\Column]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_user_modules_create',
+        'api_project_get_user_modules'
+    ])]
     private ?int $yIndex = null;
 
     #[ORM\Column(enumType: ModuleSize::class)]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_user_modules_create',
+        'api_project_get_user_modules'
+    ])]
     private ?ModuleSize $size = null;
 
     #[ORM\Column]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_user_modules_create',
+        'api_project_get_user_modules'
+    ])]
     private ?bool $isActive = null;
 
     #[ORM\Column]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_user_modules_create',
+        'api_project_get_user_modules'
+    ])]
     private ?bool $isHidden = null;
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]
@@ -57,7 +81,10 @@ class UserModule
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['api_project_get_user_modules'])]
+    #[Groups([
+        'api_user_modules_create',
+        'api_project_get_user_modules'
+    ])]
     private ?Module $module = null;
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]
@@ -75,6 +102,14 @@ class UserModule
 
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if ($this->isActive === null) {
+            $this->isActive = true;
+        }
+
+        if ($this->isHidden === null) {
+            $this->isHidden = false;
         }
     }
     public function getId(): ?int

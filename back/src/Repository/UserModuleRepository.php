@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Module;
 use App\Entity\Project;
 use App\Entity\User;
 use App\Entity\UserModule;
@@ -40,7 +41,6 @@ class UserModuleRepository extends ServiceEntityRepository
     public function getByUserAndProject(User $user, Project $project): array
     {
         return $this->createQueryBuilder('um')
-
             ->where('um.user = :user')
             ->andWhere('um.project = :project')
             ->setParameter('user', $user)
@@ -48,5 +48,32 @@ class UserModuleRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUuidAndUser(string $uuid, User $user): ?UserModule
+    {
+        return $this->createQueryBuilder('um')
+            ->where('um.uuid = :uuid')
+            ->andWhere('um.user = :user')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    // This returnes one or null result because the user is not supposed to have
+    // two user modules for the same module in the same project
+    // ie. one instance of a module per project
+    public function getByUserAndProjectAndModule(User $user, Project $project, Module $module): ?UserModule {
+        return $this->createQueryBuilder('um')
+            ->where('um.user = :user')
+            ->andWhere('um.project = :project')
+            ->andWhere('um.module = :module')
+            ->setParameter('user', $user)
+            ->setParameter('project', $project)
+            ->setParameter('module', $module)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 }

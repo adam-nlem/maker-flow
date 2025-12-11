@@ -6,6 +6,7 @@ use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
 use App\Module\TodoList\DTO\Request\TodoListTask\CreateTodoListTaskRequestDTO;
 use App\Module\TodoList\Entity\TodoListTask;
+use App\Module\TodoList\Repository\TodoListRepository;
 use App\Module\TodoList\Repository\TodoListTagRepository;
 use App\Module\TodoList\Repository\TodoListTaskRepository;
 use App\Module\TodoList\Service\TodoListModuleService;
@@ -27,10 +28,20 @@ class TodoListTaskController extends AbstractController
     }
 
     #[Route('', name: 'api_modules_todo_lists_tasks_create', methods: ['POST'])]
-    public function create(CreateTodoListTaskRequestDTO $dto, TodoListTaskRepository $taskRepository, TodoListTagRepository $tagRepository): JsonResponse
-    {
+    public function create(
+        CreateTodoListTaskRequestDTO $dto,
+        TodoListRepository $todoListRepository,
+        TodoListTaskRepository $taskRepository,
+        TodoListTagRepository $tagRepository,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
+
+        $todoList = $todoListRepository->getByUuidAndUser($dto->getTodoListUuid(), $user);
+
+        if ($todoList === null) {
+            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
 
         try {
             /** @var TodoListTask $task */
@@ -43,7 +54,9 @@ class TodoListTaskController extends AbstractController
 
         $tags = $tagRepository->getByUserAndWithUuidIn($user, $tagUuids);
 
-        $task->setUser($user);
+        $task
+            ->setUser($user)
+            ->setTodoList($todoList);
 
         foreach ($tags as $tag) {
             $task->addTag($tag);

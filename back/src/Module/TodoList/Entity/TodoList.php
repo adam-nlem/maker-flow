@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 #[ORM\Entity(repositoryClass: TodoListRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -22,15 +23,27 @@ class TodoList
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
+    #[Groups([
+        'api_modules_todo_lists_create',
+    ])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups([
+        'api_modules_todo_lists_create',
+    ])]
     private ?string $title = null;
 
     #[ORM\Column]
+    #[Groups([
+        'api_modules_todo_lists_create',
+    ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups([
+        'api_modules_todo_lists_create',
+    ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne]
@@ -45,6 +58,10 @@ class TodoList
      * @var Collection<int, TodoListTask>
      */
     #[ORM\OneToMany(targetEntity: TodoListTask::class, mappedBy: 'todoList')]
+
+    #[Groups([
+        'api_modules_todo_lists_create',
+    ])]
     private Collection $todoListTasks;
 
     /**

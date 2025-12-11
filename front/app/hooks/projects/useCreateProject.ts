@@ -24,7 +24,7 @@ export function useCreateProject() {
         setIsSubmitting(true)
 
         try {
-            await httpClient.post('/projects/', {
+            await httpClient.post('/projects', {
                 "name": name,
                 "description": description,
                 "types": types

@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Module;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -44,4 +45,6 @@ class ModuleRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    
 }

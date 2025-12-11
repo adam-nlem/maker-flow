@@ -11,12 +11,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CreateTodoListTaskRequestDTO extends AbstractRequestDTO
 {
+    private string $todoListUuid;
     private string $title;
     private ?string $content;
     private ?TodoListPriority $priority;
     private ?TodoListStatus $status;
     private ?\DateTimeImmutable $dueDate;
-    private ?\DateTimeImmutable $finishedAt;
     /** @var string[] */
     private array $tagUuids;
 
@@ -29,6 +29,7 @@ class CreateTodoListTaskRequestDTO extends AbstractRequestDTO
 
     protected function fromPayload(array $payload): void
     {
+        $this->todoListUuid = $payload["todoListUuid"];
         $this->title = $payload["title"];
         $this->content = $payload["content"] ?? null;
         $this->priority = TodoListPriority::tryFrom($payload["priority"] ?? "");
@@ -46,8 +47,12 @@ class CreateTodoListTaskRequestDTO extends AbstractRequestDTO
             ->setContent($this->getContent())
             ->setPriority($this->getPriority())
             ->setStatus($this->getStatus() ?? TodoListStatus::Pending)
-            ->setDueDate($this->getDueDate())
-            ->setFinishedAt($this->getFinishedAt());
+            ->setDueDate($this->getDueDate());
+    }
+
+    public function getTodoListUuid(): string
+    {
+        return $this->todoListUuid;
     }
 
     public function getTitle(): string
@@ -73,11 +78,6 @@ class CreateTodoListTaskRequestDTO extends AbstractRequestDTO
     public function getDueDate(): ?\DateTimeImmutable
     {
         return $this->dueDate;
-    }
-
-    public function getFinishedAt(): ?\DateTimeImmutable
-    {
-        return $this->finishedAt;
     }
 
     /**
