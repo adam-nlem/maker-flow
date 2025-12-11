@@ -10,6 +10,7 @@ use Symfony\Bundle\MakerBundle\Maker\AbstractMaker;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 
@@ -27,7 +28,7 @@ class MakeModule extends AbstractMaker
 
     public static function getCommandDescription(): string
     {
-        return 'Generates the required structure for a new module';
+        return 'Generates the required structure for a new module (controllers, entities, services...)';
     }
 
     public function configureCommand(Command $command, InputConfiguration $inputConfig): void
@@ -36,33 +37,48 @@ class MakeModule extends AbstractMaker
             ->addArgument(
                 'name',
                 InputArgument::REQUIRED,
-                'Module\'s name (ex: Github, YoutubeStudio, SleepTracker)'
+                'Module name (ex: TodoList, Github, YoutubeStudio)'
+            )
+            ->addOption(
+                'entities',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Comma-separated list of entities (ex: Item,Project,Label)'
             );
     }
 
     public function generate(InputInterface $input, ConsoleStyle $io, Generator $generator): void
     {
-        $moduleName = $input->getArgument('name');          // ex: "github_module" -> "GithubModule"
-        $moduleNameSnake = $this->toSnakeCase($moduleName);   // ex: "GithubModule" -> "github_module"
-        $moduleNameDash = $this->toDashCase($moduleName); // ex: "GithubModule" -> "github-module"
+        $moduleName = $input->getArgument('name');
+        $moduleNameSnake = $this->toSnakeCase($moduleName);
+        $moduleNameDash  = $this->toDashCase($moduleName);
 
-        $io->title(sprintf('Creating the module "%s" (%s)', $moduleName, $moduleNameSnake));
+        $entitiesOption = $input->getOption('entities');
+        $entities = $entitiesOption
+            ? array_map('trim', explode(',', $entitiesOption))
+            : [];
+
+        $io->title(sprintf('Creating module "%s"', $moduleName));
 
         // 1. Update enum
         $this->updateModuleIdentifierEnum($io, $moduleName, $moduleNameSnake);
 
-        // 2. Generate backend structure
-        $this->generateBackendFiles($generator, $moduleName, $moduleNameSnake, $moduleNameDash);
+        // 2. Backend structure
+        $this->generateBackendFiles(
+            $generator,
+            $moduleName,
+            $moduleNameSnake,
+            $moduleNameDash,
+            $entities
+        );
 
         $generator->writeChanges();
 
-        $io->success(sprintf('Module "%s" created successfully ✅', $moduleName));
+        $io->success(sprintf('Module "%s" created successfully! 🚀', $moduleName));
     }
 
     /**
-     * Update App\Entity\Enum\ModuleIdentifier enum:
-     * - check if case already exists
-     * - append: "case {{ ModuleName }} = '{{ module_name_snake }}';"
+     * Update Enum ModuleIdentifier.php
      */
     private function updateModuleIdentifierEnum(ConsoleStyle $io, string $moduleName, string $moduleNameSnake): void
     {
@@ -70,124 +86,132 @@ class MakeModule extends AbstractMaker
         $enumPath = $rootDir . '/src/Entity/Enum/ModuleIdentifier.php';
 
         if (!$this->filesystem->exists($enumPath)) {
-            $io->error('Enum file ModuleIdentifier not found : ' . $enumPath);
-            throw new \RuntimeException('Enum ModuleIdentifier not found.');
+            throw new \RuntimeException("Enum ModuleIdentifier.php not found");
         }
 
         $content = file_get_contents($enumPath);
-        if ($content === false) {
-            $io->error('Unable to read ModuleIdentifier enum file.');
-            throw new \RuntimeException('Cannot read ModuleIdentifier.');
-        }
 
-        // check if the case or value already exists
         if (
-            str_contains($content, 'case ' . $moduleName . ' ')
-            || str_contains($content, "'" . $moduleNameSnake . "'")
+            str_contains($content, "case $moduleName ") ||
+            str_contains($content, "'$moduleNameSnake'")
         ) {
-            $io->error(sprintf(
-                'The module name "%s" (or value "%s") is already taken in ModuleIdentifier.',
-                $moduleName,
-                $moduleNameSnake
-            ));
-            throw new \RuntimeException('Module name already taken.');
+            throw new \RuntimeException("Module name or enum value already exists");
         }
 
-        $caseLine = sprintf('    case %s = \'%s\';', $moduleName, $moduleNameSnake);
+        $caseLine = sprintf("    case %s = '%s';", $moduleName, $moduleNameSnake);
 
-        // insert before closing brace of enum
         $newContent = preg_replace(
             '/}\s*$/',
             $caseLine . PHP_EOL . "}" . PHP_EOL,
-            $content,
-            1,
-            $count
+            $content
         );
 
-        if ($count === 0 || $newContent === null) {
-            $io->error('Unable to insert new case into ModuleIdentifier enum file.');
-            throw new \RuntimeException('Cannot update ModuleIdentifier.');
-        }
-
         file_put_contents($enumPath, $newContent);
-        $io->text(sprintf('➕ Added in ModuleIdentifier : %s', $caseLine));
+        $io->text("➕ Added enum case: $caseLine");
     }
 
     /**
-     * Generate:
-     * - src/Module/{{ModuleName}}/Controller/{{ModuleName}}ModuleController.php
-     * - src/Module/{{ModuleName}}/Service/{{ModuleName}}ModuleService.php
-     * - src/Module/{{ModuleName}}/Entity/ (empty dir)
+     * Generate module structure
      */
-    private function generateBackendFiles(Generator $generator, string $moduleName, string $moduleNameSnake, string $moduleNameDash): void
-    {
-        $baseNamespace = 'App\\Module\\' . $moduleName;
-        $rootDir = $this->params->get('kernel.project_dir');
+    private function generateBackendFiles(
+        Generator $generator,
+        string $moduleName,
+        string $moduleNameSnake,
+        string $moduleNameDash,
+        array $entities
+    ): void {
 
-        // Absolute paths to our templates (.tpl.php)
-        $controllerTemplate = $rootDir . '/src/Maker/skeleton/ModuleController.tpl.php';
-        $serviceTemplate    = $rootDir . '/src/Maker/skeleton/ModuleService.tpl.php';
+        $root = $this->params->get('kernel.project_dir');
+        $baseNamespace = "App\\Module\\$moduleName";
 
-
-        // Controller
-        $controllerClassName = $baseNamespace . '\\Controller\\' . $moduleName . 'ModuleController';
-        $generator->generateClass(
-            $controllerClassName,
-            $controllerTemplate,
-            [
-                'namespace' => $baseNamespace . '\\Controller',
-                'moduleName' => $moduleName,
-                'moduleNameSnake' => $moduleNameSnake,
-                'moduleNameDash' => $moduleNameDash,
-            ]
-        );
-
-        // Service
-        $serviceClassName = $baseNamespace . '\\Service\\' . $moduleName . 'ModuleService';
-        $generator->generateClass(
-            $serviceClassName,
-            $serviceTemplate,
-            [
-                'namespace'       => $baseNamespace . '\\Service',
-                'moduleName'      => $moduleName,
-                'moduleNameSnake' => $moduleNameSnake,
-            ]
-        );
-
-        // Entity folder
-        $entityDir = $rootDir . '/src/Module/' . $moduleName . '/Entity';
-
-        if (!$this->filesystem->exists($entityDir)) {
-            $this->filesystem->mkdir($entityDir, 0777);
+        // Create folders
+        foreach (['Controller', 'Entity', 'Service', 'Repository', 'DTO'] as $dir) {
+            $path = "$root/src/Module/$moduleName/$dir";
+            if (!$this->filesystem->exists($path)) {
+                $this->filesystem->mkdir($path, 0777);
+            }
         }
 
-        // Repository folder
-        $repositoryDir = $rootDir . '/src/Module/' . $moduleName . '/Repository';
+        // Templates
+        $controllerTpl = "$root/src/Maker/skeleton/ModuleController.tpl.php";
+        $serviceTpl    = "$root/src/Maker/skeleton/ModuleService.tpl.php";
+        $entityTpl     = "$root/src/Maker/skeleton/ModuleEntity.tpl.php";
+        $repositoryTpl     = "$root/src/Maker/skeleton/ModuleRepository.tpl.php";
 
-        if (!$this->filesystem->exists($repositoryDir)) {
-            $this->filesystem->mkdir($repositoryDir, 0777);
+        // Generate controllers/services/entities for each entity
+        foreach ($entities as $entity) {
+
+            $controllerClass  = "$baseNamespace\\Controller\\{$moduleName}{$entity}Controller";
+            $serviceClass     = "$baseNamespace\\Service\\{$moduleName}{$entity}Service";
+            $entityClass      = "$baseNamespace\\Entity\\{$moduleName}{$entity}";
+            $repositoryClass      = "$baseNamespace\\Repository\\{$moduleName}{$entity}Repository";
+
+            // Controller
+            $generator->generateClass(
+                $controllerClass,
+                $controllerTpl,
+                [
+                    'namespace'       => "$baseNamespace\\Controller",
+                    'entity'          => $entity,
+                    'entitySnake'     => $this->toSnakeCase($entity),
+                    'entityKebab'     => $this->toDashCase($entity),
+                    'moduleName'      => $moduleName,
+                    'moduleNameSnake' => $moduleNameSnake,
+                    'moduleNameDash'  => $moduleNameDash,
+                ]
+            );
+
+            // Service
+            $generator->generateClass(
+                $serviceClass,
+                $serviceTpl,
+                [
+                    'namespace'       => "$baseNamespace\\Service",
+                    'entity'          => $entity,
+                    'moduleName'      => $moduleName,
+                ]
+            );
+
+            // Entity
+            $generator->generateClass(
+                $entityClass,
+                $entityTpl,
+                [
+                    'namespace'       => "$baseNamespace\\Entity",
+                    'moduleName'      => $moduleName,
+                    'entity'          => $entity,
+                    'tableName'       => strtolower($moduleNameSnake . '_' . $this->toSnakeCase($entity)),
+                ]
+            );
+
+            // Repository
+            $generator->generateClass(
+                $repositoryClass,
+                $repositoryTpl,
+                [
+                    'namespace'  => "$baseNamespace\\Repository",
+                    'moduleName' => $moduleName,
+                    'entity'     => $entity,
+                ]
+            );
         }
     }
 
+    /**
+     * Utility: PascalCase -> snake_case
+     */
     private function toSnakeCase(string $name): string
     {
-        // transforms "GithubModule" into "github_module"
-        $snake = preg_replace('/(?<!^)[A-Z]/', '_$0', $name);
-
-        return strtolower($snake);
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $name));
     }
 
+    /**
+     * Utility: PascalCase -> kebab-case
+     */
     private function toDashCase(string $name): string
     {
-        // Insert a hyphen before each uppercase letter (except the first)
-        $dashCase = preg_replace('/(?<!^)[A-Z]/', '-$0', $name);
-
-        // Lowercase everything
-        return strtolower($dashCase);
+        return strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $name));
     }
 
-    public function configureDependencies(DependencyBuilder $dependencies): void
-    {
-        // No extra dependencies required for now
-    }
+    public function configureDependencies(DependencyBuilder $dependencies): void {}
 }

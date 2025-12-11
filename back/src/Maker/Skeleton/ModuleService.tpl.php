@@ -2,16 +2,7 @@
 
 namespace <?= $namespace ?>;
 
-use App\Entity\User;
-
-class <?= $moduleName ?>ModuleService
+class <?= $moduleName . $entity ?>Service
 {
-    public function getWidgetData(?User $user = null): array
-    {
-        // TODO: implement real logic
-        return [
-            'module' => '<?= $moduleName ?>',
-            'userId' => $user?->getId(),
-        ];
-    }
+    // TODO: implement service logic
 }
