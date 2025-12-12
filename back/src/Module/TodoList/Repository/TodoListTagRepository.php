@@ -48,6 +48,32 @@ class TodoListTagRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    public function getByUserLimited(User $user, int $limit)
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.user = :user')
+            ->setParameter('user', $user)
+            ->setMaxResults($limit)
+            ->orderBy('t.createdAt', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getBySearchTermAndUserLimited(string $searchTerm, User $user, int $limit): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.user = :user')
+            ->andWhere('LOWER(t.title) LIKE LOWER(:searchTerm)')
+            ->setParameter('user', $user)
+            ->setParameter('searchTerm', '%' . $searchTerm . '%')
+            ->setMaxResults($limit)
+            ->orderBy('t.createdAt', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     //    /**
     //     * @return TodoListTag[] Returns an array of TodoListTag objects
     //     */

@@ -14,7 +14,11 @@ export function useListTodoLists({ userModuleUuid }: { userModuleUuid: string })
             setIsLoading(true)
 
             try {
-                const res = await httpClient.get(`/modules/todo-lists/${userModuleUuid}`)
+                const res = await httpClient.get('/modules/todo-lists', {
+                    params: {
+                        "userModuleUuid": userModuleUuid
+                    }
+                })
                 const todoListsData = res.data.map((json: TodoListJSON) => TodoList.fromJSON(json))
                 setTodoLists(todoListsData)
                 setErrorMessage(null)

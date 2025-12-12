@@ -10,6 +10,7 @@ use App\Module\TodoList\Repository\TodoListRepository;
 use App\Repository\UserModuleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -17,11 +18,20 @@ use Symfony\Component\Routing\Annotation\Route;
 class TodoListController extends AbstractController
 {
 
-    #[Route('/{userModuleUuid}', name: 'api_modules_todo_lists_list', methods: ['GET'])]
-    public function list(string $userModuleUuid, TodoListRepository $todoListRepository, UserModuleRepository $userModuleRepository)
-    {
+    #[Route('', name: 'api_modules_todo_lists_list', methods: ['GET'])]
+    public function list(
+        TodoListRepository $todoListRepository,
+        UserModuleRepository $userModuleRepository,
+        Request $request,
+    ) {
         /** @var User $user */
-        $user = $this->getUser();
+        $user = $this->getUser();   
+
+        $userModuleUuid = $request->query->get('userModuleUuid');
+
+        if ($userModuleUuid === null) {
+            return $this->json(data: ["message" => "userModuleUuid query parameter is required"], status: Response::HTTP_BAD_REQUEST);
+        }
 
         $userModule = $userModuleRepository->getByUuidAndUser($userModuleUuid, $user);
 

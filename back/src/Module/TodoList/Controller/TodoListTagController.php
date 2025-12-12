@@ -11,6 +11,7 @@ use App\Module\TodoList\Repository\TodoListRepository;
 use App\Module\TodoList\Repository\TodoListTagRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -18,11 +19,40 @@ use Symfony\Component\Routing\Annotation\Route;
 class TodoListTagController extends AbstractController
 {
 
-    #[Route('', name: 'list', methods: ['GET'])]
-    public function list(TodoListTagRepository $tagRepository)
-    {
+    #[Route('', name: 'api_modules_todo_lists_tags_list', methods: ['GET'])]
+    public function list(
+        TodoListTagRepository $tagRepository,
+        TodoListRepository $todoListRepository,
+        Request $request,
+    ) {
         /** @var User $user */
         $user = $this->getUser();
+
+        $todoListUuid = $request->query->get('todoListUuid');
+        $searchTerm = $request->query->get('searchTerm');
+
+        if ($todoListUuid === null) {
+            return $this->json(data: ["message" => "todoListUuid query parameter is required"], status: Response::HTTP_BAD_REQUEST);
+        }
+
+        $todoList = $todoListRepository->getByUuidAndUser($todoListUuid, $user);
+
+        if ($todoList === null) {
+            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        if ($searchTerm !== null) {
+            $tags = $tagRepository->getBySearchTermAndUserLimited($searchTerm, $user, 20);
+            // List Tags by serach term and limit to 20
+        } else {
+            $tags = $tagRepository->getByUserLimited($user, 20);
+        }
+
+        return $this->json(
+            data: $tags,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_modules_todo_lists_tags_list']]
+        );
     }
 
     #[Route('', name: 'api_modules_todo_lists_tags_create', methods: ['POST'])]

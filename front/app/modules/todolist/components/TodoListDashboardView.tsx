@@ -55,7 +55,14 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                             // onChange={(e) => setName(e.target.value)}
                             />
 
-                            <Select />
+                            <Badge
+                                icon={TagIcon} label="Catégorie"
+                                textColor="text-gray"
+                                bgColor="bg-gray/30" />
+                            <Badge
+                                icon={ExclamationTriangleIcon} label="Priorité"
+                                textColor="text-gray"
+                                bgColor="bg-gray/30" />
                         </div>
                     </div>
 

@@ -26,6 +26,7 @@ class TodoListTag
 
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
+        'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
         'api_modules_todo_lists_tasks_create'
     ])]
@@ -33,6 +34,7 @@ class TodoListTag
 
     #[ORM\Column(length: 255)]
     #[Groups([
+        'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
         'api_modules_todo_lists_tasks_create'
     ])]
@@ -40,6 +42,7 @@ class TodoListTag
 
     #[ORM\Column(enumType: Color::class)]
     #[Groups([
+        'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
         'api_modules_todo_lists_tasks_create'
     ])]
@@ -47,6 +50,7 @@ class TodoListTag
 
     #[ORM\Column]
     #[Groups([
+        'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
         'api_modules_todo_lists_tasks_create'
     ])]
@@ -54,6 +58,7 @@ class TodoListTag
 
     #[ORM\Column(nullable: true)]
     #[Groups([
+        'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
         'api_modules_todo_lists_tasks_create'
     ])]
