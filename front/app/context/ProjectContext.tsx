@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from "react";
 import type { ReactNode } from "react";
 import { Project } from "~/models/Project";
-import { usePaginatedProjects } from "~/hooks/projects/usePaginatedProjects";
+import { useListPaginatedProjects } from "~/hooks/projects/useListPaginatedProjects";
 
 interface ProjectContextType {
     focusedProject: Project | null;
@@ -14,7 +14,7 @@ interface ProjectContextType {
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
-    const { projects, isLoading: isLoadingProjects, errorMessage } = usePaginatedProjects();
+    const { projects, isLoading: isLoadingProjects, errorMessage } = useListPaginatedProjects();
     const [focusedProject, setFocusedProject] = useState<Project | null>(null);
 
     // Set the first project as current when projects are loaded

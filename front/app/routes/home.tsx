@@ -6,7 +6,7 @@ import CreateProjectModal from "~/components/projects/CreateProjectModal";
 import SideBar from "~/components/sidebar/SideBar";
 import { CalendarDateRangeIcon, ExclamationCircleIcon, ExclamationTriangleIcon, TagIcon } from "@heroicons/react/24/solid";
 import { Badge } from "~/components/ui/Badge";
-import TodoListDashboardView from "~/modules/todolist/components/TodoListDashboardView";
+import TodoListDashboardView from "~/modules/todoList/components/TodoListDashboardView";
 
 
 export function meta({ }: Route.MetaArgs) {

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { useModuleIcon } from "~/hooks/modules/useModuleIcon";
+import { useShowModuleIcon } from "~/hooks/modules/useShowModuleIcon";
 import type { UserModule } from "~/models/UserModule";
 
 interface ModuleTileProps {
@@ -9,7 +9,7 @@ interface ModuleTileProps {
 export default function ModuleTile({ isExpanded, userModule }: ModuleTileProps) {
     const module = userModule.module;
     const navigate = useNavigate();
-    const { iconUrl } = useModuleIcon(module.uuid);
+    const { iconUrl } = useShowModuleIcon(module.uuid);
 
     return <div
         key={userModule.uuid}

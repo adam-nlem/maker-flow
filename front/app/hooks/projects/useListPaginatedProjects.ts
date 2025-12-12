@@ -3,7 +3,7 @@ import { Project } from "~/models/Project";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
 
-export function usePaginatedProjects(limit: number = 10) {
+export function useListPaginatedProjects(limit: number = 10) {
     const [projects, setProjects] = useState<Project[]>([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
@@ -11,7 +11,7 @@ export function usePaginatedProjects(limit: number = 10) {
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const getPaginatedProjects = useCallback(async (pageToFetch: number, append: boolean = false) => {
+    const listPaginatedProjects = useCallback(async (pageToFetch: number, append: boolean = false) => {
         if (append) {
             setIsLoadingMore(true);
         } else {
@@ -40,16 +40,16 @@ export function usePaginatedProjects(limit: number = 10) {
     }, [limit]);
 
     useEffect(() => {
-        getPaginatedProjects(1, false);
-    }, [getPaginatedProjects]);
+        listPaginatedProjects(1, false);
+    }, [listPaginatedProjects]);
 
-    const loadMore = useCallback(() => {
+    const listMore = useCallback(() => {
         if (!isLoadingMore && hasMore) {
             const nextPage = page + 1;
             setPage(nextPage);
-            getPaginatedProjects(nextPage, true);
+            listPaginatedProjects(nextPage, true);
         }
-    }, [page, isLoadingMore, hasMore, getPaginatedProjects]);
+    }, [page, isLoadingMore, hasMore, listPaginatedProjects]);
 
 
     return {
@@ -58,6 +58,6 @@ export function usePaginatedProjects(limit: number = 10) {
         isLoadingMore,
         hasMore,
         errorMessage,
-        loadMore,
+        listMore,
     };
 }

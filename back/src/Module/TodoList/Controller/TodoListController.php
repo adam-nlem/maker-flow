@@ -17,11 +17,25 @@ use Symfony\Component\Routing\Annotation\Route;
 class TodoListController extends AbstractController
 {
 
-    #[Route('', name: 'api_modules_todo_lists_list', methods: ['GET'])]
-    public function list(string $userModuleUuid, TodoListRepository $todoListRepository)
+    #[Route('/{userModuleUuid}', name: 'api_modules_todo_lists_list', methods: ['GET'])]
+    public function list(string $userModuleUuid, TodoListRepository $todoListRepository, UserModuleRepository $userModuleRepository)
     {
         /** @var User $user */
         $user = $this->getUser();
+
+        $userModule = $userModuleRepository->getByUuidAndUser($userModuleUuid, $user);
+
+        if ($userModule === null) {
+            return $this->json(data: ["message" => "You don't have any user module with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        $todoLists = $todoListRepository->getByUserModuleAndUser($userModule, $user);
+
+        return $this->json(
+            data: $todoLists,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_modules_todo_lists_list']]
+        );
     }
 
     #[Route('', name: 'api_modules_todo_lists_create', methods: ['POST'])]

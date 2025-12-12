@@ -6,7 +6,7 @@ import { useNavigate, useLocation } from "react-router";
 import { Button } from "../ui/Button";
 import { useState, useEffect } from "react";
 import CreateProjectModal from "../projects/CreateProjectModal";
-import { useProjectUserModules } from "~/hooks/projects/useProjectUserModules";
+import { useListProjectUserModules } from "~/hooks/projects/useListProjectUserModules";
 import ProjectTile from "../projects/ProjectTile";
 import SelectFocusedProjectModal from "../projects/SelectFocusedProjectModal";
 import NavigationTile from "./NavigationTile";
@@ -21,7 +21,7 @@ interface SideBarProps {
 export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
     const { user } = useAuth();
     const { focusedProject, projects, isLoadingProjects, setFocusedProject } = useProject();
-    const { userModules } = useProjectUserModules(focusedProject?.uuid);
+    const { userModules } = useListProjectUserModules(focusedProject?.uuid);
     const navigate = useNavigate();
 
     const [showSelectFocusedProjectModal, setShowSelectFocusedProjectModal] = useState(false);

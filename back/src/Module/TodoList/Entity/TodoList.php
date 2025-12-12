@@ -25,24 +25,28 @@ class TodoList
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
         'api_modules_todo_lists_create',
+        'api_modules_todo_lists_list',
     ])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
     #[Groups([
         'api_modules_todo_lists_create',
+        'api_modules_todo_lists_list',
     ])]
     private ?string $title = null;
 
     #[ORM\Column]
     #[Groups([
         'api_modules_todo_lists_create',
+        'api_modules_todo_lists_list',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups([
         'api_modules_todo_lists_create',
+        'api_modules_todo_lists_list',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 

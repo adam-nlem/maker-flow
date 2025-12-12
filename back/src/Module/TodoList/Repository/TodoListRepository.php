@@ -3,6 +3,7 @@
 namespace App\Module\TodoList\Repository;
 
 use App\Entity\User;
+use App\Entity\UserModule;
 use App\Module\TodoList\Entity\TodoList;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -46,6 +47,18 @@ class TodoListRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUserModuleAndUser(UserModule $userModule, User $user): array
+    {
+        return $this->createQueryBuilder('tl')
+            ->where('tl.userModule = :userModule')
+            ->andWhere('tl.user = :user')
+            ->setParameter('userModule', $userModule)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
 

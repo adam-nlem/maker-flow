@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
 
-export function useModuleIcon(moduleUuid?: string) {
+export function useShowModuleIcon(moduleUuid?: string) {
     const [iconUrl, setIconUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -14,7 +14,7 @@ export function useModuleIcon(moduleUuid?: string) {
             return;
         }
         let url: string | null = null;
-        const fetchIcon = async () => {
+        const showIcon = async () => {
             setIsLoading(true);
             try {
                 const res = await httpClient.get(`/modules/${moduleUuid}/icon`, {
@@ -30,7 +30,7 @@ export function useModuleIcon(moduleUuid?: string) {
             }
         };
 
-        fetchIcon();
+        showIcon();
         return () => {
             if (url) URL.revokeObjectURL(url);
         };

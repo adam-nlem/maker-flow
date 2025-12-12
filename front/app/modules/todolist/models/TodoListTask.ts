@@ -2,7 +2,7 @@ import type { TodoListPriority } from "./enums/TodoListPriority";
 import type { TodoListStatus } from "./enums/TodoListStatus";
 import { TodoListTag, type TodoListTagJSON } from "./TodoListTag";
 
-interface TodoListTaskJSON {
+export interface TodoListTaskJSON {
     uuid: string;
     title: string;
     content: string;

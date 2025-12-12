@@ -2,7 +2,7 @@ import type { ModuleSize } from "./enums/ModuleSize";
 
 import { Module, type ModuleJSON } from "./Module";
 
-interface UserModuleJSON {
+export interface UserModuleJSON {
     uuid: string;
     createdAt: string;
     updatedAt: string;

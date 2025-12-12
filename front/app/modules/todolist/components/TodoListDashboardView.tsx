@@ -4,14 +4,28 @@ import TodoListTaskCard from "./TodoListTaskCard";
 import { TodoListTask } from "../models/TodoListTask";
 import { TodoListPriority } from "../models/enums/TodoListPriority";
 import { Color } from "~/models/enums/Color";
+import { useListTodoLists } from "../hooks/todoLists/useListTodoLists";
+import { useState } from "react";
 
 export default function TodoListDashboardView() {
+    const { todoLists } = useListTodoLists({ userModuleUuid: "1713ec13-6fe5-4326-8724-7f21e5e5c100" })
+    const [currentIndex, setCurrentIndex] = useState(0)
+
+    const currentTodoList = todoLists[currentIndex]
+
+    const goToPrevious = () => {
+        setCurrentIndex((prev) => (prev > 0 ? prev - 1 : todoLists.length - 1))
+    }
+
+    const goToNext = () => {
+        setCurrentIndex((prev) => (prev < todoLists.length - 1 ? prev + 1 : 0))
+    }
     return (
         <div className="m-5 w-1/3 max-h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center">
-                <ChevronLeftIcon className="size-4 text-gray cursor-pointer" strokeWidth={2} />
-                <h1 className="text-heading-md">Développement à faire</h1>
-                <ChevronRightIcon className="size-4 text-gray cursor-pointer" strokeWidth={2} />
+                <ChevronLeftIcon onClick={goToPrevious} className="size-4 text-gray cursor-pointer" strokeWidth={2} />
+                <h1 className="text-heading-md">{currentTodoList?.title ?? "Aucune liste"}</h1>
+                <ChevronRightIcon onClick={goToNext} className="size-4 text-gray cursor-pointer" strokeWidth={2} />
             </div>
 
             <div className="flex flex-row gap-1.5">
@@ -23,11 +37,11 @@ export default function TodoListDashboardView() {
                     </div>
 
                     <div className="max-h-[50vh] overflow-y-auto">
-                        <TodoListTaskCard todoItem={TodoListTask.fromJSON({
+                        {/* <TodoListTaskCard todoItem={TodoListTask.fromJSON({
                             uuid: 'test-uuid-001',
                             title: 'Désigner l\'interface utilisateur',
                             content: 'Créer les maquettes Figma pour le module ToDo List',
-                            priority: TodoListPriority.High,
+                            priority: TodoListPriority.High.valueOf,
                             tags: [
                                 { uuid: 'cat-1', title: 'ToDo List Module', color: Color.Purple, createdAt: '2024-12-01T00:00:00Z' },
                                 { uuid: 'cat-2', title: 'Design', color: Color.Blue, createdAt: '2024-12-01T00:00:00Z' }
@@ -59,7 +73,7 @@ export default function TodoListDashboardView() {
                             ],
                             createdAt: '2024-12-05T10:00:00Z',
                             dueDate: '2024-12-22T18:00:00Z'
-                        })} />
+                        })} /> */}
                     </div>
 
                 </div>
