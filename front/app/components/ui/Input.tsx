@@ -4,12 +4,22 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
   fullWidth?: boolean;
+  simple?: boolean
   icon?: React.ReactNode;
 
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, fullWidth = false, className = '', icon, ...props }, ref) => {
+  ({ label, error, fullWidth = false, simple = false, className = '', icon, ...props }, ref) => {
+
+    const inputElement = <input ref={ref} className={`
+      block bg-transparent text-sm placeholder-gray-400
+      ${!simple ? 'rounded-xl border border-light-gray px-3 py-1.5 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary' : 'border-0 shadow-none outline-none focus:outline-none focus:ring-0 p-0'}
+      ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
+      ${fullWidth ? 'w-full' : ''}
+      ${className}
+    `} {...props} />;
+
     return (
       <div className={`${fullWidth ? 'w-full' : ''}`}>
         {label && (
@@ -27,32 +37,10 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
                 {icon}
               </div>
             </div>
-            <input
-              ref={ref}
-              className={`
-              block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-sm
-              placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
-              focus:ring-1 focus:ring-primary 
-              ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
-              ${fullWidth ? 'w-full' : ''}
-              ${className}
-            `}
-              {...props}
-            />
+            {inputElement}
           </div>
         ) : (
-          <input
-            ref={ref}
-            className={`
-              block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-sm
-              placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
-              focus:ring-1 focus:ring-primary 
-              ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
-              ${fullWidth ? 'w-full' : ''}
-              ${className}
-            `}
-            {...props}
-          />
+          inputElement
         )}
         {error && (
           <p className="mt-1 text-body-sm text-danger">{error}</p>

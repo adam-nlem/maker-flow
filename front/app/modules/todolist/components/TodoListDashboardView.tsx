@@ -8,6 +8,8 @@ import { useListTodoLists } from "../hooks/todoLists/useListTodoLists";
 import { useState } from "react";
 
 import type { ModuleWidgetProps } from "~/modules/registry";
+import { Input } from "~/components/ui/Input";
+import { Select } from "~/components/ui/Select";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists } = useListTodoLists({ userModuleUuid })
@@ -39,43 +41,22 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                     </div>
 
                     <div className="max-h-[50vh] overflow-y-auto">
-                        {/* <TodoListTaskCard todoItem={TodoListTask.fromJSON({
-                            uuid: 'test-uuid-001',
-                            title: 'Désigner l\'interface utilisateur',
-                            content: 'Créer les maquettes Figma pour le module ToDo List',
-                            priority: TodoListPriority.High.valueOf,
-                            tags: [
-                                { uuid: 'cat-1', title: 'ToDo List Module', color: Color.Purple, createdAt: '2024-12-01T00:00:00Z' },
-                                { uuid: 'cat-2', title: 'Design', color: Color.Blue, createdAt: '2024-12-01T00:00:00Z' }
-                            ],
-                            createdAt: '2024-12-05T10:00:00Z',
-                            dueDate: '2024-12-22T18:00:00Z'
-                        })} />
+                        <div className="border border-light-gray rounded-lg p-2 flex flex-col gap-3">
+                            <Input
+                                placeholder="Titre"
+                                id="title"
+                                name="title"
+                                type="text"
+                                required
+                                fullWidth
+                                simple
 
-                        <TodoListTaskCard todoItem={TodoListTask.fromJSON({
-                            uuid: 'test-uuid-001',
-                            title: 'Désigner l\'interface utilisateur',
-                            content: 'Créer les maquettes Figma pour le module ToDo List',
-                            priority: TodoListPriority.Medium,
-                            tags: [
-                                { uuid: 'cat-1', title: 'ToDo List Module', color: Color.Red, createdAt: '2024-12-01T00:00:00Z' },
-                                { uuid: 'cat-2', title: 'Design', color: Color.Yellow, createdAt: '2024-12-01T00:00:00Z' }
-                            ],
-                            createdAt: '2024-12-05T10:00:00Z',
-                            dueDate: '2024-12-22T18:00:00Z'
-                        })} />
+                            // value={name}
+                            // onChange={(e) => setName(e.target.value)}
+                            />
 
-                        <TodoListTaskCard todoItem={TodoListTask.fromJSON({
-                            uuid: 'test-uuid-001',
-                            title: 'Désigner l\'interface utilisateur',
-                            content: 'Créer les maquettes Figma pour le module ToDo List',
-                            priority: TodoListPriority.Low,
-                            tags: [
-                                { uuid: 'cat-2', title: 'Design', color: Color.Green, createdAt: '2024-12-01T00:00:00Z' }
-                            ],
-                            createdAt: '2024-12-05T10:00:00Z',
-                            dueDate: '2024-12-22T18:00:00Z'
-                        })} /> */}
+                            <Select />
+                        </div>
                     </div>
 
                 </div>
