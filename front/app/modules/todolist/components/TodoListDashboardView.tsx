@@ -7,8 +7,10 @@ import { Color } from "~/models/enums/Color";
 import { useListTodoLists } from "../hooks/todoLists/useListTodoLists";
 import { useState } from "react";
 
-export default function TodoListDashboardView() {
-    const { todoLists } = useListTodoLists({ userModuleUuid: "1713ec13-6fe5-4326-8724-7f21e5e5c100" })
+import type { ModuleWidgetProps } from "~/modules/registry";
+
+export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
+    const { todoLists } = useListTodoLists({ userModuleUuid })
     const [currentIndex, setCurrentIndex] = useState(0)
 
     const currentTodoList = todoLists[currentIndex]

@@ -1,13 +1,9 @@
 import { useState } from "react";
-import { Button } from "~/components/ui/Button";
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import type { Route } from "./+types/home";
-import CreateProjectModal from "~/components/projects/CreateProjectModal";
 import SideBar from "~/components/sidebar/SideBar";
-import { CalendarDateRangeIcon, ExclamationCircleIcon, ExclamationTriangleIcon, TagIcon } from "@heroicons/react/24/solid";
-import { Badge } from "~/components/ui/Badge";
-import TodoListDashboardView from "~/modules/todoList/components/TodoListDashboardView";
-
+import { useListProjectUserModules } from "~/hooks/projects/useListProjectUserModules";
+import { getModuleWidget, hasModuleWidget } from "~/modules/registry";
+import { useProject } from "~/context/ProjectContext";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -20,22 +16,23 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-
   const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
+  const { focusedProject } = useProject();
+  const { userModules, isLoading } = useListProjectUserModules(focusedProject?.uuid);
 
   return (
     <div className="w-full">
-      <SideBar isExpanded={isSidebarExpanded} setIsExpanded={setIsSidebarExpanded} />
-    <div className="w-full pl-16 flex flex-row">
-      <TodoListDashboardView />
-
-    </div>
-    
-    <div className="w-full pl-16 flex flex-row">
-      <TodoListDashboardView />
-    </div>
-
-
+      <SideBar isExpanded={isSidebarExpanded} setIsExpanded={setIsSidebarExpanded} userModules={userModules} />
+      <div className="w-full pl-16 flex flex-row flex-wrap">
+        {isLoading && <p>Chargement...</p>}
+        {userModules
+          .filter((um) => hasModuleWidget(um.module.moduleIdentifier))
+          .map((userModule) => {
+            const Widget = getModuleWidget(userModule.module.moduleIdentifier);
+            if (!Widget) return null;
+            return <Widget key={userModule.uuid} userModuleUuid={userModule.uuid} />;
+          })}
+      </div>
     </div>
   );
 }

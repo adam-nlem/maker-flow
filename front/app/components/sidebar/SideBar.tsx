@@ -6,22 +6,23 @@ import { useNavigate, useLocation } from "react-router";
 import { Button } from "../ui/Button";
 import { useState, useEffect } from "react";
 import CreateProjectModal from "../projects/CreateProjectModal";
-import { useListProjectUserModules } from "~/hooks/projects/useListProjectUserModules";
 import ProjectTile from "../projects/ProjectTile";
 import SelectFocusedProjectModal from "../projects/SelectFocusedProjectModal";
 import NavigationTile from "./NavigationTile";
 import ModuleTile from "./ModuleTile";
 import Shimmer from "../ui/Shimmer";
 
+import type { UserModule } from "~/models/UserModule";
+
 interface SideBarProps {
     isExpanded: boolean;
     setIsExpanded: (isExpanded: boolean) => void;
+    userModules: UserModule[];
 }
 
-export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
+export default function SideBar({ isExpanded, setIsExpanded, userModules }: SideBarProps) {
     const { user } = useAuth();
     const { focusedProject, projects, isLoadingProjects, setFocusedProject } = useProject();
-    const { userModules } = useListProjectUserModules(focusedProject?.uuid);
     const navigate = useNavigate();
 
     const [showSelectFocusedProjectModal, setShowSelectFocusedProjectModal] = useState(false);

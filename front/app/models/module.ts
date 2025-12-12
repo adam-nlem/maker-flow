@@ -1,3 +1,5 @@
+import type { ModuleIdentifier } from "./enums/ModuleIdentifier";
+
 export interface ModuleJSON {
   uuid: string;
   title: string;
@@ -6,6 +8,7 @@ export interface ModuleJSON {
   createdAt: string;
   updatedAt: string;
   description?: string;
+  moduleIdentifier: ModuleIdentifier;
 }
 
 export class Module {
@@ -16,6 +19,7 @@ export class Module {
     public isPremium: boolean,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
+    public moduleIdentifier: ModuleIdentifier,
     public description?: string,
   ) { }
 
@@ -27,6 +31,7 @@ export class Module {
       json.isPremium,
       new Date(json.createdAt),
       new Date(json.updatedAt),
+      json.moduleIdentifier,
       json.description,
     )
   }
@@ -39,6 +44,7 @@ export class Module {
       isPremium: this.isPremium,
       createdAt: this.createdAt.toISOString(),
       updatedAt: this.updatedAt.toISOString(),
+      moduleIdentifier: this.moduleIdentifier,
       description: this.description,
     }
   }
