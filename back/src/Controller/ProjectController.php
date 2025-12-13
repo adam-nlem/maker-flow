@@ -64,8 +64,8 @@ final class ProjectController extends AbstractController
             $project->setDescription($dto->getDescription());
         }
 
-        if ($dto->getType() !== null) {
-            $project->setType($dto->getType());
+        if ($dto->getTypes() !== null && $dto->getTypes() !== []) {
+            $project->setTypes($dto->getTypes());
         }
 
         $projectRepository->save($project, true);

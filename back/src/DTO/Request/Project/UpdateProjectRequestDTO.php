@@ -12,7 +12,8 @@ class UpdateProjectRequestDTO extends AbstractRequestDTO
 {
     private ?string $name;
     private ?string $description;
-    private ?ProjectType $type;
+    /** @var ?ProjectType[] */
+    private ?array $types;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -25,7 +26,10 @@ class UpdateProjectRequestDTO extends AbstractRequestDTO
     {
         $this->name = $payload["name"] ?? null;
         $this->description = $payload["description"] ?? null;
-        $this->type = isset($payload["type"]) ? ProjectType::from($payload["type"]) : null;
+        $this->types = isset($payload["types"]) ? array_map(
+            fn(string $type) => ProjectType::from($type),
+            $payload["types"] ?? []
+        ) : null;
     }
 
     public function buildObject(): array
@@ -33,7 +37,7 @@ class UpdateProjectRequestDTO extends AbstractRequestDTO
         return [
             'name' => $this->getName(),
             'description' => $this->getDescription(),
-            'type' => $this->getType()
+            'types' => $this->getTypes()
         ];
     }
 
@@ -47,8 +51,11 @@ class UpdateProjectRequestDTO extends AbstractRequestDTO
         return $this->description;
     }
 
-    public function getType(): ?ProjectType
+    /**
+     * @return ?ProjectType[]
+     */
+    public function getTypes(): ?array
     {
-        return $this->type;
+        return $this->types;
     }
 }
