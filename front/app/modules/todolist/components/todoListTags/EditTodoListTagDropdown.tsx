@@ -6,6 +6,7 @@ import { useUpdateTodoListTag } from "../../hooks/todoListTags/useUpdateTodoList
 import type { TodoListTag } from "../../models/TodoListTag";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { useDeleteTodoListTag } from "../../hooks/todoListTags/useDeleteTodoListTag";
 
 interface EditTodoListTagDropdownProps {
     tag: TodoListTag;
@@ -14,7 +15,17 @@ interface EditTodoListTagDropdownProps {
 }
 
 export default function EditTodoListTagDropdown({ tag, onClose, onTagUpdated }: EditTodoListTagDropdownProps) {
-    const { title, setTitle, color, setColor, isSubmitting, updateTodoListTag } = useUpdateTodoListTag({ tag });
+    const {
+        title,
+        setTitle,
+        color,
+        setColor,
+        isSubmitting,
+        updateTodoListTag } = useUpdateTodoListTag({ tag });
+    const {
+        errorMessage, isLoading, deleteTodoListTag
+    } = useDeleteTodoListTag({ tagUuid: tag.uuid });
+
     const inputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -63,7 +74,7 @@ export default function EditTodoListTagDropdown({ tag, onClose, onTagUpdated }: 
                 Enregistrer
             </Button>
 
-            <SimpleTextButton onClick={() => { }}
+            <SimpleTextButton onClick={() => deleteTodoListTag}
                 hoverColor={"hover:text-danger"} children={
                     <>
                         <TrashIcon className="size-3.5" strokeWidth={2} />

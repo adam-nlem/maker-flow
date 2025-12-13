@@ -126,6 +126,20 @@ class TodoListTagController extends AbstractController
         return $this->json(data: $tag, status: Response::HTTP_OK, context: ['groups' => ['api_modules_todo_lists_tags_update']]);
     }
 
-    #[Route('/{uuid}', name: 'delete', methods: ['DELETE'])]
-    public function delete(string $uuid) {}
+    #[Route('/{tagUuid}', name: 'api_modules_todo_lists_tags_delete', methods: ['DELETE'])]
+    public function delete(string $tagUuid, TodoListTagRepository $tagRepository)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
+
+        if ($tag === null) {
+            return $this->json(data: ["message" => "You don't have any tag with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        $tagRepository->remove($tag, true);
+
+        return $this->json(data: ['message' => 'Tag deleted succesfully'], status: Response::HTTP_OK);
+    }
 }
