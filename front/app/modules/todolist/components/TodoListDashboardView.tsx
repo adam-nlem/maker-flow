@@ -28,9 +28,9 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
     return (
         <div className="m-5 w-1/3 max-h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center">
-                <ChevronLeftIcon onClick={goToPrevious} className="size-4 text-gray cursor-pointer" strokeWidth={2} />
+                <ChevronLeftIcon onClick={goToPrevious} className="size-4 text-gray cursor-pointer hover:text-dark" strokeWidth={2} />
                 <h1 className="text-heading-md">{currentTodoList?.title ?? "Aucune liste"}</h1>
-                <ChevronRightIcon onClick={goToNext} className="size-4 text-gray cursor-pointer" strokeWidth={2} />
+                <ChevronRightIcon onClick={goToNext} className="size-4 text-gray cursor-pointer hover:text-dark" strokeWidth={2} />
             </div>
 
             <div className="flex flex-row gap-1.5">

@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
-import type { Color } from "~/models/enums/Color";
+import { Color } from "~/models/enums/Color";
 import { TodoListTag } from "../../models/TodoListTag";
 
-interface UseCreateTodoListTagProps {
-    todoListUuid: string,
-    title: string
-}
-export function useCreateTodoListTag({ todoListUuid, title }: UseCreateTodoListTagProps) {
+export function useCreateTodoListTag({ todoListUuid }: { todoListUuid: string }) {
+    const [title, setTitle] = useState("")
+    const [color, setColor] = useState(Color.Purple)
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    function resetForm() {
+        setTitle("")
+        setColor(Color.Purple)
+        setErrorMessage(null)
+    }
 
     async function createTodoListTag(): Promise<TodoListTag | undefined> {
         setErrorMessage(null)
@@ -21,10 +25,10 @@ export function useCreateTodoListTag({ todoListUuid, title }: UseCreateTodoListT
             const res = await httpClient.post('/modules/todo-lists/tags', {
                 "todoListUuid": todoListUuid,
                 "title": title,
+                "color": color,
             })
 
-            setErrorMessage(null)
-            setIsSubmitting(false)
+            resetForm()
 
             return TodoListTag.fromJSON(res.data);
         } catch (err) {
@@ -35,11 +39,14 @@ export function useCreateTodoListTag({ todoListUuid, title }: UseCreateTodoListT
                 message = "Une erreur est survenue lors de la création de votre tag"
             }
             setErrorMessage(err instanceof Error ? err.message : message)
+        } finally {
             setIsSubmitting(false)
         }
     }
 
     return {
+        title, setTitle,
+        color, setColor,
         errorMessage, setErrorMessage,
         isSubmitting,
         createTodoListTag,

@@ -95,7 +95,7 @@ class TodoListTask
     ])]
     private Collection $tags;
 
-    #[ORM\ManyToOne(inversedBy: 'todoListTasks')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 

@@ -11,7 +11,6 @@ export function useCreateTodoList({ userModuleUuid }: { userModuleUuid: string }
     function resetForm() {
         setTitle("")
         setErrorMessage(null)
-        setIsSubmitting(false)
     }
 
     async function createTodoList(): Promise<void> {

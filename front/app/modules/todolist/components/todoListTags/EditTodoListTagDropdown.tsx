@@ -5,13 +5,13 @@ import { Color, colorToBgClass } from "~/models/enums/Color";
 import { useUpdateTodoListTag } from "../../hooks/todoListTags/useUpdateTodoListTag";
 import type { TodoListTag } from "../../models/TodoListTag";
 
-interface TodoListTagEditDropdownProps {
+interface EditTodoListTagDropdownProps {
     tag: TodoListTag;
     onClose: () => void;
     onTagUpdated: (updatedTag: TodoListTag) => void;
 }
 
-export default function TodoListTagEditDropdown({ tag, onClose, onTagUpdated }: TodoListTagEditDropdownProps) {
+export default function EditTodoListTagDropdown({ tag, onClose, onTagUpdated }: EditTodoListTagDropdownProps) {
     const { title, setTitle, color, setColor, isSubmitting, updateTodoListTag } = useUpdateTodoListTag({ tag });
     const inputRef = useRef<HTMLInputElement>(null);
 

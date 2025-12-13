@@ -2,7 +2,7 @@ import { ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon } from "@heroic
 import { useState } from "react";
 import { Badge } from "~/components/ui/Badge";
 import { Input } from "~/components/ui/Input";
-import TodoListTagsDropdown from "../todoListTags/TodoListTagsDropdown";
+import ListTodoListTagsDropdown from "../todoListTags/ListTodoListTagsDropdown";
 
 import { useCreateTodoListTask } from "../../hooks/todoListTasks/useCreateTodoListTask";
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
@@ -10,10 +10,9 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 
 export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid: string }) {
-    const [showTodoListTagsDropdown, setShowTodoListTagsDropdown] = useState(true);
+    const [showTodoListTagsDropdown, setShowTodoListTagsDropdown] = useState(false);
     const {
         title, setTitle,
-        content, setContent,
         priority, setPriority,
         status, setStatus,
         dueDate, setDueDate,
@@ -34,8 +33,8 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
                 fullWidth
                 simple
 
-            // value={name}
-            // onChange={(e) => setName(e.target.value)}
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
             />
 
 
@@ -46,7 +45,7 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
                 </>
             } />
 
-            {showTodoListTagsDropdown && <TodoListTagsDropdown todoListUuid={todoListUuid} setShowTodoListTagsDropdown={setShowTodoListTagsDropdown} selectedTags={tags} setSelectedTags={setTags} />}
+            {showTodoListTagsDropdown && <ListTodoListTagsDropdown todoListUuid={todoListUuid} setShowTodoListTagsDropdown={setShowTodoListTagsDropdown} selectedTags={tags} setSelectedTags={setTags} />}
 
             {tags.length > 0 && tags.map((tag) =>
                 <Badge

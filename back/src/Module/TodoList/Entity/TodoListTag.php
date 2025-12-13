@@ -15,7 +15,7 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TodoListTagRepository::class)]
-#[ORMAssert\UniqueEntity('title', 'todoList', 'user')]
+#[ORMAssert\UniqueEntity(fields: ['title', 'todoList', 'user'])]
 #[ORM\HasLifecycleCallbacks]
 class TodoListTag
 {
@@ -75,7 +75,7 @@ class TodoListTag
     #[ORM\ManyToMany(targetEntity: TodoListTask::class, mappedBy: 'tags')]
     private Collection $todoItems;
 
-    #[ORM\ManyToOne(inversedBy: 'todoListTags')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
