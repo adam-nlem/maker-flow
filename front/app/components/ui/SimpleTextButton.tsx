@@ -2,11 +2,13 @@
 interface SimpleTextButtonProps {
     onClick?: () => void;
     children: React.ReactNode;
+    color?: string;
+    hoverColor?: string;
 }
-export default function SimpleTextButton({ onClick, children }: SimpleTextButtonProps) {
+export default function SimpleTextButton({ onClick, children, color = 'text-gray', hoverColor = 'hover:text-dark' }: SimpleTextButtonProps) {
     return <div
         onClick={onClick}
-        className="flex flex-row justify-start items-center gap-1 shrink-0 cursor-pointer text-gray hover:text-dark text-xs "
+        className={`flex flex-row justify-start items-center gap-1 shrink-0 cursor-pointer ${color} ${hoverColor} text-xs`}
     >
         {children}
     </div>

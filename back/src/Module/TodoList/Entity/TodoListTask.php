@@ -118,6 +118,9 @@ class TodoListTask
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
+        //TODO: Check status and update the finishedAt accordingly
+        //TODO: status === completed -> finishedAt = now utc
+        //TODO: else -> finishedAt = null
         $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
     }
 

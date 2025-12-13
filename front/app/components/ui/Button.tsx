@@ -4,7 +4,7 @@ interface ButtonProps {
     children: React.ReactNode;
     type?: 'button' | 'submit' | 'reset';
     variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-    size?: 'sm' | 'md' | 'lg';
+    size?: 'xs' | 'sm' | 'md' | 'lg';
     fullWidth?: boolean;
     isLoading?: boolean;
     disabled?: boolean;
@@ -23,19 +23,20 @@ export function Button({
     onClick,
     className = '',
 }: ButtonProps) {
-    const baseStyles = 'inline-flex items-center justify-center rounded-xl font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
+    const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
 
     const variantStyles = {
-        primary: 'inline-flex items-center gap-x-1.5 rounded-xl bg-primary px-3 py-2 text-heading-sm text-clear shadow-xs hover:bg-primary-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
+        primary: 'inline-flex items-center gap-x-1.5 bg-primary px-3 py-2 text-clear shadow-xs hover:bg-primary-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
         secondary: 'bg-dark text-clear hover:bg-gray',
         outline: 'border border-primary bg-transparent hover:bg-primary hover:text-clear text-primary',
         ghost: 'bg-transparent hover:bg-gray-100',
     };
 
     const sizeStyles = {
-        sm: 'h-9 px-3 text-sm',
-        md: 'h-10 px-4',
-        lg: 'h-11 px-6',
+        xs: 'h-7 px-2 text-xs rounded-md',
+        sm: 'h-9 px-3 text-sm rounded-xl text-heading-sm',
+        md: 'h-10 px-4 rounded-xl text-heading-sm',
+        lg: 'h-11 px-6 rounded-xl text-heading-sm',
     };
 
     const widthStyle = fullWidth ? 'w-full' : '';

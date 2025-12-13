@@ -50,8 +50,8 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
                 {/* TOP SECTION */}
                 <div className={`p-3 ${isExpanded ? '' : 'flex flex-col items-center'}`}>
                     {/* PROJECT SELECTOR */}
-                    
-                    {isLoadingProjects ? <Shimmer width="w-10" height="h-10"/> :
+
+                    {isLoadingProjects ? <Shimmer width="w-10" height="h-10" /> :
 
                         focusedProject ?
                             <ProjectTile
@@ -99,7 +99,7 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
                         <div className={`mt-5 flex flex-col ${isExpanded ? '' : 'items-center'}`}>
                             {isExpanded && <h1 className="text-heading-xs text-gray pl-2 pb-1">Modules Actifs</h1>}
                             {userModules.map((userModule) => (
-                                <ModuleTile isExpanded={isExpanded} userModule={userModule} />
+                                <ModuleTile key={userModule.uuid} isExpanded={isExpanded} userModule={userModule} />
                             ))}
                         </div>
                     )}
