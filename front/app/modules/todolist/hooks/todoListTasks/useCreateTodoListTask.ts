@@ -46,7 +46,7 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
         } catch (err) {
             let message
             if (err instanceof NotFoundException) {
-                message = "Vous n'avez pas de Todo List avec cet identifiant"
+                message = "Vous n'avez pas de tâche avec cet identifiant"
             } else {
                 message = "Une erreur est survenue lors de la création de votre tâche"
             }

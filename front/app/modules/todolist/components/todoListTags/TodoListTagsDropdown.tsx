@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Badge } from "~/components/ui/Badge";
 import { useListTodoListTagsWithSearch } from "../../hooks/todoListTags/useListTodoListTags";
 import { TagIcon } from "@heroicons/react/16/solid";
@@ -10,6 +10,7 @@ import { useCreateTodoListTag } from "../../hooks/todoListTags/useCreateTodoList
 import type { TodoListTag } from "../../models/TodoListTag";
 import Shimmer from "~/components/ui/Shimmer";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
+import TodoListTagEditDropdown from "./TodoListTagEditDropdown";
 
 interface TodoListTagsDropdownProps {
     todoListUuid: string;
@@ -19,11 +20,10 @@ interface TodoListTagsDropdownProps {
 }
 
 export default function TodoListTagsDropdown({ todoListUuid, setShowTodoListTagsDropdown, selectedTags, setSelectedTags }: TodoListTagsDropdownProps) {
-    const { searchTerm, setSearchTerm, todoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
+    const { searchTerm, setSearchTerm, todoListTags, setTodoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
     const { createTodoListTag } = useCreateTodoListTag({ todoListUuid: todoListUuid, title: searchTerm })
     const inputRef = useRef<HTMLInputElement>(null);
-
-    console.log(selectedTags);
+    const [editingTag, setEditingTag] = useState<TodoListTag | null>(null);
 
     // Auto-focus the search input when the dropdown opens
     useEffect(() => {
@@ -46,14 +46,27 @@ export default function TodoListTagsDropdown({ todoListUuid, setShowTodoListTags
                 <div className="flex flex-col gap-1">
                     {todoListTags.map((tag) => {
                         if (!selectedTags.some(t => t.uuid === tag.uuid))
-                            return <Badge
-                                key={tag.uuid}
-                                icon={TagIcon}
-                                label={tag.title}
-                                textColor={colorToTextClass[tag.color]}
-                                bgColor={colorToBgClass[tag.color]}
-                                onClick={() => setSelectedTags([...selectedTags, tag])}
-                            />
+                            return (
+                                <div key={tag.uuid} className="relative">
+                                    <Badge
+                                        icon={TagIcon}
+                                        label={tag.title}
+                                        textColor={colorToTextClass[tag.color]}
+                                        bgColor={colorToBgClass[tag.color]}
+                                        onOptionClick={() => setEditingTag(tag)}
+                                        onClick={() => setSelectedTags([...selectedTags, tag])}
+                                    />
+                                    {editingTag?.uuid === tag.uuid && (
+                                        <TodoListTagEditDropdown
+                                            tag={tag}
+                                            onClose={() => setEditingTag(null)}
+                                            onTagUpdated={(updatedTag) => {
+                                                setTodoListTags(todoListTags.map(t => t.uuid === updatedTag.uuid ? updatedTag : t));
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            )
 
                     })}
                 </div>
@@ -77,7 +90,10 @@ export default function TodoListTagsDropdown({ todoListUuid, setShowTodoListTags
     }
 
     return (
-        <div className="absolute top-14 left-0  mt-1 z-10 bg-white border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center">
+        <>
+            {/* Backdrop to close dropdown when clicking outside */}
+            <div className="fixed inset-0 z-0" onClick={() => setShowTodoListTagsDropdown(false)} />
+            <div className="absolute top-14 left-0 mt-1 z-10 bg-white border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center">
             <Input
                 ref={inputRef}
                 placeholder="Tag"
@@ -95,6 +111,7 @@ export default function TodoListTagsDropdown({ todoListUuid, setShowTodoListTags
             />
 
             {renderContent()}
-        </div>
+            </div>
+        </>
     );
 }   

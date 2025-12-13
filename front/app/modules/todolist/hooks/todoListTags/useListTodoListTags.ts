@@ -47,6 +47,7 @@ export function useListTodoListTagsWithSearch({ todoListUuid }: { todoListUuid: 
         searchTerm,
         setSearchTerm,
         todoListTags,
+        setTodoListTags,
         isLoading,
         errorMessage
     }

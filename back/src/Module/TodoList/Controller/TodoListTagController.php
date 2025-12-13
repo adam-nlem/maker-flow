@@ -5,6 +5,7 @@ namespace App\Module\TodoList\Controller;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
 use App\Module\TodoList\DTO\Request\TodoListTag\CreateTodoListTagRequestDTO;
+use App\Module\TodoList\DTO\Request\TodoListTag\UpdateTodoListTagRequestDTO;
 use App\Module\TodoList\Entity\TodoListTag;
 use App\Module\TodoList\Entity\TodoListTask;
 use App\Module\TodoList\Repository\TodoListRepository;
@@ -18,7 +19,6 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/modules/todo-lists/tags')]
 class TodoListTagController extends AbstractController
 {
-
     #[Route('', name: 'api_modules_todo_lists_tags_list', methods: ['GET'])]
     public function list(
         TodoListTagRepository $tagRepository,
@@ -93,8 +93,38 @@ class TodoListTagController extends AbstractController
     #[Route('/{uuid}', name: 'show', methods: ['GET'])]
     public function show(string $uuid) {}
 
-    #[Route('/{uuid}', name: 'update', methods: ['PUT'])]
-    public function update(string $uuid) {}
+    #[Route('/{tagUuid}', name: 'api_modules_todo_lists_tags_update', methods: ['PATCH'])]
+    public function update(
+        string $tagUuid,
+        UpdateTodoListTagRequestDTO $dto,
+        TodoListTagRepository $tagRepository,
+    ) {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
+
+        if ($tag === null) {
+            return $this->json(data: ["message" => "You don't have any tag with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        if ($dto->getTitle() !== null && $dto->getTitle() != $tag->getTitle()) {
+            // We check if there is another tag with the same title in the same todo list (we don't want that to happen)
+            $tagWithSameTitle = $tagRepository->getByTitleAndTodoListAndUser($dto->getTitle(), $tag->getTodoList(), $user);
+            if ($tagWithSameTitle !== null) {
+                return $this->json(data: ["Message" => "You already use this title for another tag in this todo list"], status: Response::HTTP_CONFLICT);
+            }
+            $tag->setTitle($dto->getTitle());
+        }
+
+        if ($dto->getColor() !== null && $dto->getColor() !== $tag->getColor()) {
+            $tag->setColor($dto->getColor());
+        }
+
+        $tagRepository->save($tag, true);
+
+        return $this->json(data: $tag, status: Response::HTTP_OK, context: ['groups' => ['api_modules_todo_lists_tags_update']]);
+    }
 
     #[Route('/{uuid}', name: 'delete', methods: ['DELETE'])]
     public function delete(string $uuid) {}

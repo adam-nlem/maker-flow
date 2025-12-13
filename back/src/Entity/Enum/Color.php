@@ -8,7 +8,7 @@ namespace App\Entity\Enum;
 enum Color: string
 {
     case Red = 'red';
-    case Blue = 'blued';
+    case Blue = 'blue';
     case Purple = 'purple';
     case Yellow = 'yellow';
     case Green = 'green';

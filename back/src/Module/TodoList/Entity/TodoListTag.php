@@ -15,7 +15,7 @@ use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: TodoListTagRepository::class)]
-#[ORMAssert\UniqueEntity('title', 'todoList')]
+#[ORMAssert\UniqueEntity('title', 'todoList', 'user')]
 #[ORM\HasLifecycleCallbacks]
 class TodoListTag
 {
@@ -28,7 +28,8 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tags_update'
     ])]
     private ?string $uuid = null;
 
@@ -36,7 +37,8 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tags_update'
     ])]
     private ?string $title = null;
 
@@ -44,7 +46,8 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tags_update'
     ])]
     private ?Color $color = null;
 
@@ -52,7 +55,8 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tags_update'
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -60,7 +64,8 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tags_update'
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 

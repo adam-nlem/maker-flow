@@ -10,17 +10,17 @@ export enum Color {
 }
 
 export const colorToTextClass: Record<Color, string> = {
-    [Color.Red]: "text-red-300",
-    [Color.Blue]: "text-blue-300",
-    [Color.Purple]: "text-purple-300",
-    [Color.Yellow]: "text-yellow-300",
-    [Color.Green]: "text-green-300",
+    [Color.Red]: "text-red",
+    [Color.Blue]: "text-blue",
+    [Color.Purple]: "text-purple",
+    [Color.Yellow]: "text-yellow",
+    [Color.Green]: "text-green",
 }
 
 export const colorToBgClass: Record<Color, string> = {
-    [Color.Red]: "bg-red-300/30",
-    [Color.Blue]: "bg-blue-300/30",
-    [Color.Purple]: "bg-purple-300/30",
-    [Color.Yellow]: "bg-yellow-300/30",
-    [Color.Green]: "bg-green-300/30",
+    [Color.Red]: "bg-red/30",
+    [Color.Blue]: "bg-blue/30",
+    [Color.Purple]: "bg-purple/30",
+    [Color.Yellow]: "bg-yellow/30",
+    [Color.Green]: "bg-green/30",
 }

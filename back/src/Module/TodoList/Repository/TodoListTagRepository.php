@@ -37,6 +37,18 @@ class TodoListTagRepository extends ServiceEntityRepository
         }
     }
 
+    public function getByUuidAndUser(string $uuid, User $user): ?TodoListTag
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.uuid = :uuid')
+            ->andWhere('t.user = :user')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     public function getByUserAndWithUuidIn(User $user, array $uuids): array
     {
         return $this->createQueryBuilder('t')
@@ -77,6 +89,20 @@ class TodoListTagRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByTitleAndTodoListAndUser(string $title, TodoList $todoList, User $user): ?TodoListTag
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.title = :title')
+            ->andWhere('t.todoList = :todoList')
+            ->andWhere('t.user = :user')
+            ->setParameter('title', $title)
+            ->setParameter('user', $user)
+            ->setParameter('todoList', $todoList)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     //    /**

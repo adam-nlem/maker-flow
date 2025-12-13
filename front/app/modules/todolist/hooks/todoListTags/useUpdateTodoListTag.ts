@@ -1,26 +1,24 @@
 import { useState } from "react";
-import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
+import { ConflictException, NotFoundException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
 import type { Color } from "~/models/enums/Color";
 import { TodoListTag } from "../../models/TodoListTag";
 
-interface UseCreateTodoListTagProps {
-    todoListUuid: string,
-    title: string
-}
-export function useCreateTodoListTag({ todoListUuid, title }: UseCreateTodoListTagProps) {
+export function useUpdateTodoListTag({ tag }: { tag: TodoListTag }) {
+    const [title, setTitle] = useState(tag.title)
+    const [color, setColor] = useState(tag.color)
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    async function createTodoListTag(): Promise<TodoListTag | undefined> {
+    async function updateTodoListTag(): Promise<TodoListTag | undefined> {
         setErrorMessage(null)
         setIsSubmitting(true)
 
         try {
-            const res = await httpClient.post('/modules/todo-lists/tags', {
-                "todoListUuid": todoListUuid,
+            const res = await httpClient.patch(`/modules/todo-lists/tags/${tag.uuid}`, {
                 "title": title,
+                "color": color,
             })
 
             setErrorMessage(null)
@@ -31,7 +29,10 @@ export function useCreateTodoListTag({ todoListUuid, title }: UseCreateTodoListT
             let message
             if (err instanceof NotFoundException) {
                 message = "Vous n'avez pas de tag avec cet identifiant"
-            } else {
+            } else if (err instanceof ConflictException) {
+                message = "Ce tag existe déjà pour cette todo list"
+            }
+            else {
                 message = "Une erreur est survenue lors de la création de votre tag"
             }
             setErrorMessage(err instanceof Error ? err.message : message)
@@ -40,8 +41,10 @@ export function useCreateTodoListTag({ todoListUuid, title }: UseCreateTodoListT
     }
 
     return {
+        title, setTitle,
+        color, setColor,
         errorMessage, setErrorMessage,
         isSubmitting,
-        createTodoListTag,
+        updateTodoListTag,
     }
 }

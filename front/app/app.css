@@ -28,6 +28,12 @@ body {
   --color-clear: #FFFFFF;
   --color-danger: #D33F49;
 
+  --color-red: #E4572E;
+  --color-yellow: #E7BC21;
+  --color-green: #A8C686;
+  --color-blue: #669BBC;
+  --color-purple: #5346B6;
+
   --color-pastel-green: #BCD5AA;
 
   /* Custom text sizes with appropriate fonts */
@@ -180,6 +186,7 @@ input[type="number"]::-webkit-inner-spin-button {
   0% {
     transform: translateX(-100%);
   }
+
   100% {
     transform: translateX(110%);
   }

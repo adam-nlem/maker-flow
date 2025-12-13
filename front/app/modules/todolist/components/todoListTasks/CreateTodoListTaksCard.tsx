@@ -1,4 +1,4 @@
-import { ExclamationTriangleIcon, TagIcon } from "@heroicons/react/16/solid";
+import { ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon } from "@heroicons/react/16/solid";
 import { useState } from "react";
 import { Badge } from "~/components/ui/Badge";
 import { Input } from "~/components/ui/Input";
@@ -6,11 +6,11 @@ import TodoListTagsDropdown from "../todoListTags/TodoListTagsDropdown";
 
 import { useCreateTodoListTask } from "../../hooks/todoListTasks/useCreateTodoListTask";
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
-import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 
 export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid: string }) {
-    const [showTodoListTagsDropdown, setShowTodoListTagsDropdown] = useState(false);
+    const [showTodoListTagsDropdown, setShowTodoListTagsDropdown] = useState(true);
     const {
         title, setTitle,
         content, setContent,
@@ -45,22 +45,30 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
                     <p>Ajouter un tag</p>
                 </>
             } />
-                {showTodoListTagsDropdown && <TodoListTagsDropdown todoListUuid={todoListUuid} setShowTodoListTagsDropdown={setShowTodoListTagsDropdown} selectedTags={tags} setSelectedTags={setTags} />}
 
-                {tags.length > 0 && tags.map((tag) => <div className="flex flex-row justify-between">
-                    <Badge
-                        key={tag.uuid}
-                        icon={TagIcon} label={tag.title}
-                        textColor={colorToTextClass[tag.color]}
-                        bgColor={colorToBgClass[tag.color]}
-                    />
+            {showTodoListTagsDropdown && <TodoListTagsDropdown todoListUuid={todoListUuid} setShowTodoListTagsDropdown={setShowTodoListTagsDropdown} selectedTags={tags} setSelectedTags={setTags} />}
 
-                    <XMarkIcon className="size-3.5 text-danger cursor-pointer" strokeWidth={2} onClick={() => setTags(tags.filter(t => t.uuid !== tag.uuid))} />
-                </div>)}
-            <Badge
-                icon={ExclamationTriangleIcon} label="Priorité"
-                textColor="text-gray"
-                bgColor="bg-gray/30" />
+            {tags.length > 0 && tags.map((tag) =>
+                <Badge
+                    key={tag.uuid}
+                    icon={TagIcon} label={tag.title}
+                    textColor={colorToTextClass[tag.color]}
+                    bgColor={colorToBgClass[tag.color]}
+                    onRemoveClick={() => setTags(tags.filter(t => t.uuid !== tag.uuid))}
+                />
+            )}
+            <SimpleTextButton onClick={() => { }} children={
+                <>
+                    <ExclamationTriangleIcon className="size-3.5" strokeWidth={2} />
+                    <p>Ajouter une priorité</p>
+                </>
+            } />
+            <SimpleTextButton onClick={() => { }} children={
+                <>
+                    <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
+                    <p>Ajouter une date</p>
+                </>
+            } />
         </div>
     );
 }
