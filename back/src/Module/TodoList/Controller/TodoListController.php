@@ -83,12 +83,12 @@ class TodoListController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_modules_todo_lists_show', methods: ['GET'])]
-    public function show(string $uuid) {}
+    // #[Route('/{uuid}', name: 'api_modules_todo_lists_show', methods: ['GET'])]
+    // public function show(string $uuid) {}
 
-    #[Route('/{uuid}', name: 'api_modules_todo_lists_update', methods: ['PUT'])]
-    public function update(string $uuid) {}
+    // #[Route('/{uuid}', name: 'api_modules_todo_lists_update', methods: ['PUT'])]
+    // public function update(string $uuid) {}
 
-    #[Route('/{uuid}', name: 'api_modules_todo_lists_delete', methods: ['DELETE'])]
-    public function delete(string $uuid) {}
+    // #[Route('/{uuid}', name: 'api_modules_todo_lists_delete', methods: ['DELETE'])]
+    // public function delete(string $uuid) {}
 }

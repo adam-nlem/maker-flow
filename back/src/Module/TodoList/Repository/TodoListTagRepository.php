@@ -3,6 +3,7 @@
 namespace App\Module\TodoList\Repository;
 
 use App\Entity\User;
+use App\Module\TodoList\Entity\TodoList;
 use App\Module\TodoList\Entity\TodoListTag;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -48,10 +49,12 @@ class TodoListTagRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserLimited(User $user, int $limit)
+    public function getByUserAndTodoListLimited(User $user, TodoList $todoList, int $limit)
     {
         return $this->createQueryBuilder('t')
             ->where('t.user = :user')
+            ->andWhere('t.todoList = :todoList')
+            ->setParameter('todoList', $todoList)
             ->setParameter('user', $user)
             ->setMaxResults($limit)
             ->orderBy('t.createdAt', 'ASC')
@@ -60,12 +63,14 @@ class TodoListTagRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getBySearchTermAndUserLimited(string $searchTerm, User $user, int $limit): array
+    public function getBySearchTermAndUserAndTodoListLimited(string $searchTerm, User $user, TodoList $todoList, int $limit): array
     {
         return $this->createQueryBuilder('t')
             ->where('t.user = :user')
+            ->andWhere('t.todoList = :todoList')
             ->andWhere('LOWER(t.title) LIKE LOWER(:searchTerm)')
             ->setParameter('user', $user)
+            ->setParameter('todoList', $todoList)
             ->setParameter('searchTerm', '%' . $searchTerm . '%')
             ->setMaxResults($limit)
             ->orderBy('t.createdAt', 'ASC')

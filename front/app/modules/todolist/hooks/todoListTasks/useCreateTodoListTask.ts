@@ -3,6 +3,7 @@ import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
 import type { TodoListPriority } from "../../models/enums/TodoListPriority";
 import type { TodoListStatus } from "../../models/enums/TodoListStatus";
+import type { TodoListTag } from "../../models/TodoListTag";
 
 export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }) {
     const [title, setTitle] = useState("");
@@ -10,7 +11,7 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
     const [priority, setPriority] = useState<TodoListPriority | null>(null);
     const [status, setStatus] = useState<TodoListStatus | null>(null);
     const [dueDate, setDueDate] = useState<string | null>(null);
-    const [tagUuids, setTagUuids] = useState<string[]>([]);
+    const [tags, setTags] = useState<TodoListTag[]>([]);
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -21,7 +22,7 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
         setPriority(null)
         setStatus(null)
         setDueDate(null)
-        setTagUuids([])
+        setTags([])
         setErrorMessage(null)
         setIsSubmitting(false)
     }
@@ -38,7 +39,7 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
                 "priority": priority,
                 "status": status,
                 "dueDate": dueDate,
-                "tagUuids": tagUuids,
+                "tagUuids": tags.map((tag) => tag.uuid),
             })
 
             resetForm()
@@ -61,7 +62,7 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
         priority, setPriority,
         status, setStatus,
         dueDate, setDueDate,
-        tagUuids, setTagUuids,
+        tags, setTags,
         errorMessage, setErrorMessage,
         isSubmitting,
         createTodoListTask,

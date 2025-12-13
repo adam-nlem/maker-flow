@@ -42,10 +42,10 @@ class TodoListTagController extends AbstractController
         }
 
         if ($searchTerm !== null) {
-            $tags = $tagRepository->getBySearchTermAndUserLimited($searchTerm, $user, 20);
+            $tags = $tagRepository->getBySearchTermAndUserAndTodoListLimited($searchTerm, $user, $todoList, 20);
             // List Tags by serach term and limit to 20
         } else {
-            $tags = $tagRepository->getByUserLimited($user, 20);
+            $tags = $tagRepository->getByUserAndTodoListLimited($user, $todoList, 20);
         }
 
         return $this->json(

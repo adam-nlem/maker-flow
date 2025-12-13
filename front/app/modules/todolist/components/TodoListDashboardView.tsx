@@ -10,6 +10,7 @@ import { useState } from "react";
 import type { ModuleWidgetProps } from "~/modules/registry";
 import { Input } from "~/components/ui/Input";
 import { Select } from "~/components/ui/Select";
+import CreateTodoListTaskCard from "./todoListTasks/CreateTodoListTaksCard";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists } = useListTodoLists({ userModuleUuid })
@@ -40,31 +41,9 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                         A Faire
                     </div>
 
-                    <div className="max-h-[50vh] overflow-y-auto">
-                        <div className="border border-light-gray rounded-lg p-2 flex flex-col gap-3">
-                            <Input
-                                placeholder="Titre"
-                                id="title"
-                                name="title"
-                                type="text"
-                                required
-                                fullWidth
-                                simple
+                    
+                  {currentTodoList && <CreateTodoListTaskCard todoListUuid={currentTodoList.uuid} />}
 
-                            // value={name}
-                            // onChange={(e) => setName(e.target.value)}
-                            />
-
-                            <Badge
-                                icon={TagIcon} label="Catégorie"
-                                textColor="text-gray"
-                                bgColor="bg-gray/30" />
-                            <Badge
-                                icon={ExclamationTriangleIcon} label="Priorité"
-                                textColor="text-gray"
-                                bgColor="bg-gray/30" />
-                        </div>
-                    </div>
 
                 </div>
 

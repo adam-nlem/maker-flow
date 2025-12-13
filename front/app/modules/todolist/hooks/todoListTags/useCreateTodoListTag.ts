@@ -2,33 +2,27 @@ import { useState } from "react";
 import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
 import type { Color } from "~/models/enums/Color";
+import { TodoListTag } from "../../models/TodoListTag";
 
-export function useCreateTodoListTag({ todoListUuid }: { todoListUuid: string }) {
-    const [title, setTitle] = useState("");
-    const [color, setColor] = useState<Color | null>(null);
+export function useCreateTodoListTag({ todoListUuid, title }: { todoListUuid: string, title: string }) {
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    function resetForm() {
-        setTitle("")
-        setColor(null)
-        setErrorMessage(null)
-        setIsSubmitting(false)
-    }
-
-    async function createTodoListTag(): Promise<void> {
+    async function createTodoListTag(): Promise<TodoListTag | undefined> {
         setErrorMessage(null)
         setIsSubmitting(true)
 
         try {
-            await httpClient.post('/modules/todo-lists/tags', {
+            const res = await httpClient.post('/modules/todo-lists/tags', {
                 "todoListUuid": todoListUuid,
                 "title": title,
-                "color": color,
             })
 
-            resetForm()
+            setErrorMessage(null)
+            setIsSubmitting(false)
+
+            return TodoListTag.fromJSON(res.data);
         } catch (err) {
             let message
             if (err instanceof NotFoundException) {
@@ -37,14 +31,11 @@ export function useCreateTodoListTag({ todoListUuid }: { todoListUuid: string })
                 message = "Une erreur est survenue lors de la création de votre tag"
             }
             setErrorMessage(err instanceof Error ? err.message : message)
-        } finally {
             setIsSubmitting(false)
         }
     }
 
     return {
-        title, setTitle,
-        color, setColor,
         errorMessage, setErrorMessage,
         isSubmitting,
         createTodoListTag,
