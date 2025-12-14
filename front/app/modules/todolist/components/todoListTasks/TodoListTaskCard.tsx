@@ -1,24 +1,33 @@
 import { Badge } from "~/components/ui/Badge";
 import { useDraggable } from '@dnd-kit/core';
-import { ChevronLeftIcon, ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
+import { ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon } from "@heroicons/react/24/solid";
 import type { TodoListTask } from "../../models/TodoListTask";
 import { todoListPriorityToTextClass, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation } from "../../models/enums/TodoListPriority";
 import { colorToTextClass, colorToBgClass } from "~/models/enums/Color";
+import { useState } from "react";
+import DetailTodoListTaskModal from "./DetailTodoListTaskModal";
 
+interface TodoListTaskCardProps {
+    task: TodoListTask;
 
+}
 
-export default function TodoListTaskCard({ task }: { task: TodoListTask }) {
+export default function TodoListTaskCard({ task }: TodoListTaskCardProps) {
 
-    const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
         id: task.uuid
     });
 
-    const style = transform ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
-    } : undefined;
+    const [showTodoListTaskModal, setShowTodoListTaskModal] = useState(false)
 
     return (
-        <div className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 cursor-pointer" ref={setNodeRef} style={style} {...listeners} {...attributes}>
+        <div
+            className={`border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 cursor-pointer ${isDragging ? 'opacity-50' : ''}`}
+            ref={setNodeRef}
+            {...listeners}
+            {...attributes}
+            onClick={() => setShowTodoListTaskModal(!showTodoListTaskModal)}
+        >
             <h1 className="text-sm">{task.title}</h1>
             <div className="flex flex-col gap-1.5">
 
@@ -41,6 +50,8 @@ export default function TodoListTaskCard({ task }: { task: TodoListTask }) {
                 {task.dueDate &&
                     <Badge icon={CalendarDateRangeIcon} label={task.dueDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })} />}
             </div>
+
+            {showTodoListTaskModal && <DetailTodoListTaskModal showModal={showTodoListTaskModal} onClose={() => setShowTodoListTaskModal(!showTodoListTaskModal)} />}
         </div>
     );
 }

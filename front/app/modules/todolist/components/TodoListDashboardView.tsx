@@ -6,14 +6,13 @@ import type { ModuleWidgetProps } from "~/modules/registry";
 import { useListPaginatedTodoListTasks } from "../hooks/todoListTasks/useListPaginatedTodoListTasks";
 import { TodoListStatus } from "../models/enums/TodoListStatus";
 import TodoListStatusColumn from "./todoListTasks/TodoListStatusColumn";
-import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
+import type { TodoListTask } from "../models/TodoListTask";
+import TodoListTaskCard from "./todoListTasks/TodoListTaskCard";
 import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListTask";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists } = useListTodoLists({ userModuleUuid })
-
-    
-
 
     const [currentIndex, setCurrentIndex] = useState(0)
 
@@ -26,10 +25,23 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
         isLoadingMore,
         errorMessage,
         listMoreForStatus,
-        moveTaskToStatus,
+        syncTaskInGroups,
+        getTaskByUuid
     } = useListPaginatedTodoListTasks({ todoListUuid: currentTodoList?.uuid, limit: 10 })
 
     const { updateTodoListTask } = useUpdateTodoListTask()
+
+    const [draggedTask, setDraggedTask] = useState<TodoListTask | null>(null)
+
+    // The drag only activates after the pointer moves at least 8 pixels
+    // Prevents the drag to trigger onClick
+    const sensors = useSensors(
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        })
+    )
 
     const goToPrevious = () => {
         setCurrentIndex((prev) => (prev > 0 ? prev - 1 : todoLists.length - 1))
@@ -47,30 +59,38 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
             </div>
 
             <div className="flex flex-row gap-1.5 flex-1 min-h-0">
-                <DndContext onDragEnd={handleDragEnd}>
+                <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                     {Object.values(TodoListStatus).map((status) =>
                         <TodoListStatusColumn
                             key={status}
                             status={status}
                             tasks={todoListTasksGroupedByStatus.find(dto => dto.status === status)?.todoListTasks ?? []}
                             hasMore={paginationByStatus[status].hasMore}
+                            isLoading={isLoading}
                             todoListUuid={currentTodoList?.uuid}
                             onLoadMore={() => listMoreForStatus(status)}
                         />
                     )}
+                    <DragOverlay dropAnimation={null}>
+                        {draggedTask && <TodoListTaskCard task={draggedTask} />}
+                    </DragOverlay>
                 </DndContext>
             </div>
         </div>
     );
 
-    function handleDragEnd(event: DragEndEvent) {
+    function handleDragStart(event: DragStartEvent) {
+        const task = getTaskByUuid(event.active.id as string);
+        setDraggedTask(task ?? null);
+    }
+
+    async function handleDragEnd(event: DragEndEvent) {
         const { over, active } = event;
         if (!over) return;
 
-        const taskUuid = active.id as string;
-        const newStatus = over.id as TodoListStatus;
-
-        moveTaskToStatus(taskUuid, newStatus);
-        updateTodoListTask(taskUuid, { status: newStatus });
+        const updatedTask = await updateTodoListTask(active.id as string, { status: over.id as TodoListStatus });
+        if (errorMessage === null && updatedTask !== undefined) {
+            syncTaskInGroups(updatedTask);
+        }
     }
 }

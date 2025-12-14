@@ -116,15 +116,13 @@ export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseL
         return todoListTasksGroupedByStatus.flatMap(g => g.todoListTasks).find(t => t.uuid === taskUuid);
     }, [todoListTasksGroupedByStatus]);
 
-    const moveTaskToStatus = useCallback((taskUuid: string, newStatus: TodoListStatus) => {
+    const syncTaskInGroups = useCallback((task: TodoListTask) => {
         setTodoListTasksGroupedByStatus(prev => {
-            const taskToMove = prev.flatMap(g => g.todoListTasks).find(t => t.uuid === taskUuid);
-            if (!taskToMove) return prev;
 
             return prev.map(group => {
-                const tasksWithoutMoved = group.todoListTasks.filter(t => t.uuid !== taskUuid);
-                const tasks = group.status === newStatus
-                    ? [taskToMove, ...tasksWithoutMoved]
+                const tasksWithoutMoved = group.todoListTasks.filter(t => t.uuid !== task.uuid);
+                const tasks = group.status === task.status
+                    ? [task, ...tasksWithoutMoved]
                     : tasksWithoutMoved;
 
                 return new TodoListTasksGroupedByStatusDTO(group.status, tasks);
@@ -139,7 +137,7 @@ export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseL
         isLoadingMore,
         errorMessage,
         listMoreForStatus,
-        moveTaskToStatus,
+        syncTaskInGroups,
         getTaskByUuid,
     };
 }

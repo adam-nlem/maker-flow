@@ -56,8 +56,7 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
                         focusedProject ?
                             <ProjectTile
                                 project={focusedProject}
-                                moduleCount={userModules.length
-                                }
+                                moduleCount={userModules.length}
                                 isExpanded={isExpanded}
                                 rightIcon={
                                     isExpanded && <div className="flex flex-col justify-center leading-none">
@@ -66,7 +65,8 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
                                     </div>
                                 }
                                 onClick={() => {
-                                    setShowSelectFocusedProjectModal(!showSelectFocusedProjectModal)
+                                    setShowSelectFocusedProjectModal(true)
+                                    setShowCreateProjectModal(false)
                                 }}
                             />
                             :
@@ -75,7 +75,11 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
                                 fullWidth
                                 size="lg"
                                 variant="secondary"
-                                onClick={() => setShowCreateProjectModal(!showCreateProjectModal)}
+                                onClick={() => {
+                                    setShowSelectFocusedProjectModal(!showSelectFocusedProjectModal)
+                                    setShowCreateProjectModal(!showCreateProjectModal)
+                                }
+                                }
                             >
                                 <div className="flex flex-row justify-center items-center gap-3 shrink-0 ">
                                     {isExpanded && <p className="text-sm ">Créer un nouveau Projet</p>}
@@ -152,25 +156,24 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
             </div>
 
             {/* Modals */}
-            {(showSelectFocusedProjectModal || showCreateProjectModal) && (
-                <div
-                    className="w-full flex flex-row gap-3 bg-black/5 pointer-events-auto p-3"
-                    onClick={() => setIsExpanded(false)}
-                >
-                    <SelectFocusedProjectModal
-                        showModal={showSelectFocusedProjectModal}
-                        onClose={() => setShowSelectFocusedProjectModal(false)}
-                        projects={projects}
-                        focusedProject={focusedProject}
-                        setFocusedProject={setFocusedProject}
-                        onClickCreateProjectButton={() => setShowCreateProjectModal(!showCreateProjectModal)}
-                    />
-                    <CreateProjectModal
-                        showModal={showCreateProjectModal}
-                        onClose={() => setShowCreateProjectModal(false)}
-                    />
-                </div>
-            )}
+            <SelectFocusedProjectModal
+                showModal={showSelectFocusedProjectModal}
+                onClose={() => {
+                    setShowSelectFocusedProjectModal(false);
+                    setIsExpanded(false);
+                }}
+                projects={projects}
+                focusedProject={focusedProject}
+                setFocusedProject={setFocusedProject}
+                onClickCreateProjectButton={() => setShowCreateProjectModal(!showCreateProjectModal)}
+            />
+            <CreateProjectModal
+                showModal={showCreateProjectModal}
+                onClose={() => {
+                    setShowCreateProjectModal(false);
+                    setIsExpanded(false);
+                }}
+            />
 
         </div>
     );
