@@ -11,12 +11,27 @@ import type { ModuleWidgetProps } from "~/modules/registry";
 import { Input } from "~/components/ui/Input";
 import { Select } from "~/components/ui/Select";
 import CreateTodoListTaskCard from "./todoListTasks/CreateTodoListTaksCard";
+import { useListPaginatedTodoListTasks } from "../hooks/todoListTasks/useListPaginatedTodoListTasks";
+import { TodoListStatus, todoListStatusToFrenchTranslation } from "../models/enums/TodoListStatus";
+import SimpleTextButton from "~/components/ui/SimpleTextButton";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists } = useListTodoLists({ userModuleUuid })
+
+
     const [currentIndex, setCurrentIndex] = useState(0)
 
     const currentTodoList = todoLists[currentIndex]
+
+    const {
+        todoListTasksGroupedByStatus,
+        paginationByStatus,
+        isLoading,
+        isLoadingMore,
+        errorMessage,
+        listMoreForStatus,
+    } = useListPaginatedTodoListTasks({ todoListUuid: currentTodoList?.uuid, limit: 10 })
 
     const goToPrevious = () => {
         setCurrentIndex((prev) => (prev > 0 ? prev - 1 : todoLists.length - 1))
@@ -35,33 +50,25 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
 
             <div className="flex flex-row gap-1.5">
 
-                <div className="flex flex-col w-1/3 gap-3">
+                {Object.values(TodoListStatus).map((status) =>
+                    <div className="flex flex-col w-1/3 gap-3">
 
-                    <div className="text-sm w-full rounded-sm text-center text-gray bg-light-gray">
-                        A Faire
-                    </div>
+                        <div className="text-sm w-full rounded-sm text-center text-gray bg-light-gray">
+                            {todoListStatusToFrenchTranslation[status]}
+                        </div>
 
-                    
-                  {currentTodoList && <CreateTodoListTaskCard todoListUuid={currentTodoList.uuid} />}
+                        {
+                            todoListTasksGroupedByStatus
+                                .find(dto => dto.status === status)
+                                ?.todoListTasks.map((task) => <TodoListTaskCard task={task} />)
+                        }
 
-
-                </div>
-
-                <div className="flex flex-col w-1/3 ">
-
-                    <div className="text-sm w-full rounded-sm text-center text-blue-600 bg-blue-300">
-                        En Cours
-                    </div>
-
-                </div>
-
-                <div className="flex flex-col w-1/3 ">
-
-                    <div className="text-sm w-full rounded-sm text-center text-primary bg-primary/30">
-                        Terminée
-                    </div>
-
-                </div>
+                        {paginationByStatus[status].hasMore && <SimpleTextButton onClick={() => listMoreForStatus(status)}>
+                            <ArrowPathIcon className="size-3.5" strokeWidth={2} />
+                            <p>Charger plus de tâches</p>
+                        </SimpleTextButton>}
+                        {currentTodoList && <CreateTodoListTaskCard todoListUuid={currentTodoList.uuid} />}
+                    </div>)}
             </div>
         </div>
     );

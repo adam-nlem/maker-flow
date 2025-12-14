@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Module\TodoList\DTO\QueryParam\TodoListTask;
+namespace App\Module\TodoList\DTO\QueryParam\TodoList;
 
 use App\DTO\QueryParam\AbstractQueryParamDTO;
 use App\Module\TodoList\Entity\Enum\TodoListStatus;

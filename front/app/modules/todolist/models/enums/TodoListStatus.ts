@@ -4,7 +4,7 @@ export enum TodoListStatus {
     Completed = 'completed',
 }
 
-export const todoItemStatusToFrenchTranslation: Record<TodoListStatus, string> = {
+export const todoListStatusToFrenchTranslation: Record<TodoListStatus, string> = {
     [TodoListStatus.Pending]: "À Faire",
     [TodoListStatus.InProgress]: "En Cours",
     [TodoListStatus.Completed]: "Terminée",

@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Module\TodoList\DTO\QueryParam\TodoListTask;
+namespace App\Module\TodoList\DTO\QueryParam\TodoListTag;
 
 use App\DTO\QueryParam\AbstractQueryParamDTO;
-use App\Module\TodoList\Entity\Enum\TodoListStatus;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;

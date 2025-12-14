@@ -4,7 +4,7 @@ namespace App\Module\TodoList\Controller;
 
 use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
-use App\Module\TodoList\DTO\QueryParam\TodoListTask\ListTodoListTagsQueryParamDTO;
+use App\Module\TodoList\DTO\QueryParam\TodoListTag\ListTodoListTagsQueryParamDTO;
 use App\Module\TodoList\DTO\Request\TodoListTag\CreateTodoListTagRequestDTO;
 use App\Module\TodoList\DTO\Request\TodoListTag\UpdateTodoListTagRequestDTO;
 use App\Module\TodoList\Entity\TodoListTag;
