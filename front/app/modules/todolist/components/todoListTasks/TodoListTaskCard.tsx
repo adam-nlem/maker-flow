@@ -4,21 +4,18 @@ import { ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon } from "@heroic
 import type { TodoListTask } from "../../models/TodoListTask";
 import { todoListPriorityToTextClass, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation } from "../../models/enums/TodoListPriority";
 import { colorToTextClass, colorToBgClass } from "~/models/enums/Color";
-import { useState } from "react";
-import DetailTodoListTaskModal from "./DetailTodoListTaskModal";
 
 interface TodoListTaskCardProps {
-    todoListUuid: string;
+    todoListUuid?: string;
     task: TodoListTask;
-    onTaskUpdated?: (task: TodoListTask) => void;
+    onClick?: () => void;
+    isDragDisabled?: boolean;
 }
 
-export default function TodoListTaskCard({ todoListUuid, task, onTaskUpdated }: TodoListTaskCardProps) {
-    const [showTodoListTaskModal, setShowTodoListTaskModal] = useState(false)
-
-    const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
+export default function TodoListTaskCard({ todoListUuid, task, onClick, isDragDisabled = false }: TodoListTaskCardProps) {
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: task.uuid,
-        disabled: showTodoListTaskModal,
+        disabled: isDragDisabled,
     });
 
     return (
@@ -27,7 +24,7 @@ export default function TodoListTaskCard({ todoListUuid, task, onTaskUpdated }: 
             ref={setNodeRef}
             {...listeners}
             {...attributes}
-            onClick={() => setShowTodoListTaskModal(!showTodoListTaskModal)}
+            onClick={onClick}
         >
             <h1 className="text-sm">{task.title}</h1>
             <div className="flex flex-col gap-1.5">
@@ -52,16 +49,6 @@ export default function TodoListTaskCard({ todoListUuid, task, onTaskUpdated }: 
                 {task.dueDate &&
                     <Badge icon={CalendarDateRangeIcon} label={task.dueDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })} />}
             </div>
-
-            {showTodoListTaskModal && (
-                <DetailTodoListTaskModal
-                    todoListUuid={todoListUuid}
-                    task={task}
-                    showModal={showTodoListTaskModal}
-                    onClose={() => setShowTodoListTaskModal(false)}
-                    onTaskUpdated={onTaskUpdated}
-                />
-            )}
         </div>
     );
 }

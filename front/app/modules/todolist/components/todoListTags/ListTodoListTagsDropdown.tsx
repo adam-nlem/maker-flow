@@ -10,7 +10,7 @@ import { useCreateTodoListTag } from "../../hooks/todoListTags/useCreateTodoList
 import type { TodoListTag } from "../../models/TodoListTag";
 import Shimmer from "~/components/ui/Shimmer";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import EditTodoListTagDropdown from "./EditTodoListTagDropdown";
+import UpdateTodoListTagDropdown from "./UpdateTodoListTagDropdown";
 
 interface ListTodoListTagsDropdownProps {
     todoListUuid: string;
@@ -23,7 +23,7 @@ interface ListTodoListTagsDropdownProps {
 export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListTodoListTagsDropdownProps) {
     const { searchTerm, setSearchTerm, todoListTags, setTodoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
     const { title, setTitle, color, setColor, createTodoListTag } = useCreateTodoListTag({ todoListUuid: todoListUuid })
-    const [editingTag, setEditingTag] = useState<TodoListTag | null>(null);
+    const [updatingTag, setUpdatingTag] = useState<TodoListTag | null>(null);
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -55,13 +55,13 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
                                         label={tag.title}
                                         textColor={colorToTextClass[tag.color]}
                                         bgColor={colorToBgClass[tag.color]}
-                                        onOptionClick={() => setEditingTag(tag)}
+                                        onOptionClick={() => setUpdatingTag(tag)}
                                         onClick={() => onTagSelected(tag)}
                                     />
-                                    {editingTag?.uuid === tag.uuid && (
-                                        <EditTodoListTagDropdown
+                                    {updatingTag?.uuid === tag.uuid && (
+                                        <UpdateTodoListTagDropdown
                                             tag={tag}
-                                            onClose={() => setEditingTag(null)}
+                                            onClose={() => setUpdatingTag(null)}
                                             onTagUpdated={(updatedTag) => {
                                                 setTodoListTags(todoListTags.map(t => t.uuid === updatedTag.uuid ? updatedTag : t));
                                             }}

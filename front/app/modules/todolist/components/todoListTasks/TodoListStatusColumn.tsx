@@ -14,10 +14,10 @@ interface TodoListStatusColumnProps {
     isLoading: boolean;
     todoListUuid: string | undefined;
     onLoadMore: () => void;
-    onTaskUpdated: (task: TodoListTask) => void;
+    onTaskClick: (task: TodoListTask) => void;
 }
 
-export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskUpdated }: TodoListStatusColumnProps) {
+export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskClick }: TodoListStatusColumnProps) {
     const { isOver, setNodeRef } = useDroppable({ id: status });
 
     return (
@@ -36,7 +36,7 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
                         ))
                     ) : (
                         <>
-                            {tasks.map((task) => <TodoListTaskCard todoListUuid={todoListUuid!} key={task.uuid} task={task} onTaskUpdated={onTaskUpdated} />)}
+                            {tasks.map((task) => <TodoListTaskCard key={task.uuid} task={task} onClick={() => onTaskClick(task)} />)}
 
                             {hasMore && <SimpleTextButton onClick={onLoadMore}>
                                 <ArrowPathIcon className="size-3.5" strokeWidth={2} />

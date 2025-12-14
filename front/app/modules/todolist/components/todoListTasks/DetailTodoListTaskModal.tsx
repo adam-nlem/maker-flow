@@ -15,6 +15,8 @@ import SelectEnumDropdown from "~/components/ui/SelectEnumDropdown";
 import ListTodoListTagsDropdown from "../todoListTags/ListTodoListTagsDropdown";
 import type { TodoListTag } from "../../models/TodoListTag";
 import AddDueDateDropdown from "./AddDueDateDropdown";
+import { useDeleteTodoListTask } from "../../hooks/todoListTasks/useDeleteTodoListTask";
+import { TrashIcon } from "@heroicons/react/24/outline";
 
 interface DetailTodoListTaskModalProps {
     todoListUuid: string;
@@ -22,9 +24,10 @@ interface DetailTodoListTaskModalProps {
     showModal: boolean;
     onClose: () => void;
     onTaskUpdated?: (task: TodoListTask) => void;
+    onTaskDeleted: (deletedTaskUuid: string) => void;
 }
 
-export default function DetailTodoListTaskModal({ todoListUuid, task, showModal, onClose, onTaskUpdated }: DetailTodoListTaskModalProps) {
+export default function DetailTodoListTaskModal({ todoListUuid, task, showModal, onClose, onTaskUpdated, onTaskDeleted }: DetailTodoListTaskModalProps) {
     const [title, setTitle] = useState(task.title)
     const [content, setContent] = useState(task.content)
     const [status, setStatus] = useState(task.status)
@@ -38,6 +41,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
     const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
 
     const { updateTodoListTask } = useUpdateTodoListTask()
+    const { deleteTodoListTask } = useDeleteTodoListTask({ taskUuid: task.uuid })
 
     const hasChanges = () => {
         const tagsChanged = tags.length !== task.tags.length ||
@@ -74,18 +78,31 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}>
                 <div className="flex flex-col gap-3 flex-1 min-h-0">
-                    <TextArea
-                        placeholder="Titre de la tâche"
-                        id="title"
-                        name="title"
+                    <div className="flex flex-row justify-around items-start">
+                        <TextArea
+                            placeholder="Titre de la tâche"
+                            id="title"
+                            name="title"
 
-                        required
-                        fullWidth
-                        simple
-                        textStyle="text-heading-xl"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                    />
+                            required
+                            fullWidth
+                            simple
+                            textStyle="text-heading-xl"
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
+                        />
+                        <SimpleTextButton onClick={async () => {
+                            await deleteTodoListTask();
+                            onTaskDeleted(task.uuid);
+                            onClose();
+                        }}
+                            hoverColor={"hover:text-danger"} children={
+                                <>
+                                    <TrashIcon className="size-3.5" strokeWidth={2} />
+                                    <p>Supprimer</p>
+                                </>
+                            } />
+                    </div>
 
                     <p className="text-body-xs mb-1.5">Crée le {task.createdAt.toLocaleDateString('fr-FR')} à {task.createdAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}{task.updatedAt && ` • Modifié le ${task.updatedAt.toLocaleDateString('fr-FR')} à ${task.updatedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`}</p>
 

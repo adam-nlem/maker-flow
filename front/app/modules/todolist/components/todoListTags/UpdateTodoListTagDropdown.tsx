@@ -8,14 +8,14 @@ import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { useDeleteTodoListTag } from "../../hooks/todoListTags/useDeleteTodoListTag";
 
-interface EditTodoListTagDropdownProps {
+interface UpdateTodoListTagDropdownProps {
     tag: TodoListTag;
     onClose: () => void;
     onTagUpdated: (updatedTag: TodoListTag) => void;
     onTagDeleted: (deletedTagUuid: string) => void;
 }
 
-export default function EditTodoListTagDropdown({ tag, onClose, onTagUpdated, onTagDeleted }: EditTodoListTagDropdownProps) {
+export default function UpdateTodoListTagDropdown({ tag, onClose, onTagUpdated, onTagDeleted }: UpdateTodoListTagDropdownProps) {
     const {
         title,
         setTitle,
@@ -46,8 +46,8 @@ export default function EditTodoListTagDropdown({ tag, onClose, onTagUpdated, on
             <Input
                 ref={inputRef}
                 placeholder="Tag"
-                id="edit-tag-title"
-                name="edit-tag-title"
+                id="title"
+                name="title"
                 type="text"
                 required
                 fullWidth
@@ -76,10 +76,10 @@ export default function EditTodoListTagDropdown({ tag, onClose, onTagUpdated, on
             </Button>
 
             <SimpleTextButton onClick={async () => {
-                    await deleteTodoListTag();
-                    onTagDeleted(tag.uuid);
-                    onClose();
-                }}
+                await deleteTodoListTag();
+                onTagDeleted(tag.uuid);
+                onClose();
+            }}
                 hoverColor={"hover:text-danger"} children={
                     <>
                         <TrashIcon className="size-3.5" strokeWidth={2} />

@@ -130,6 +130,15 @@ export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseL
         });
     }, []);
 
+    const removeTaskFromGroups = useCallback((taskUuid: string) => {
+        setTodoListTasksGroupedByStatus(prev => {
+            return prev.map(group => {
+                const filteredTasks = group.todoListTasks.filter(t => t.uuid !== taskUuid);
+                return new TodoListTasksGroupedByStatusDTO(group.status, filteredTasks);
+            });
+        });
+    }, []);
+
     return {
         todoListTasksGroupedByStatus,
         paginationByStatus,
@@ -138,6 +147,7 @@ export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseL
         errorMessage,
         listMoreForStatus,
         syncTaskInGroups,
+        removeTaskFromGroups,
         getTaskByUuid,
     };
 }

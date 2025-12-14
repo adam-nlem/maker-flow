@@ -167,5 +167,19 @@ class TodoListTaskController extends AbstractController
     }
 
     #[Route('/{taskUuid}', name: 'api_modules_todo_lists_tasks_delete', methods: ['DELETE'])]
-    public function delete(string $taskUuid) {}
+    public function delete(string $taskUuid, TodoListTaskRepository $taskRepository)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $task = $taskRepository->getByUuidAndUser($taskUuid, $user);
+
+        if ($task === null) {
+            return $this->json(data: ["message" => "You don't have any task with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        $taskRepository->remove($task, true);
+
+        return $this->json(data: ['message' => 'Task deleted succesfully'], status: Response::HTTP_OK);
+    }
 }

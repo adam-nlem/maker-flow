@@ -10,6 +10,7 @@ import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, type Dra
 import type { TodoListTask } from "../models/TodoListTask";
 import TodoListTaskCard from "./todoListTasks/TodoListTaskCard";
 import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListTask";
+import DetailTodoListTaskModal from "./todoListTasks/DetailTodoListTaskModal";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists } = useListTodoLists({ userModuleUuid })
@@ -26,12 +27,14 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
         errorMessage,
         listMoreForStatus,
         syncTaskInGroups,
+        removeTaskFromGroups,
         getTaskByUuid
     } = useListPaginatedTodoListTasks({ todoListUuid: currentTodoList?.uuid, limit: 10 })
 
     const { updateTodoListTask } = useUpdateTodoListTask()
 
     const [draggedTask, setDraggedTask] = useState<TodoListTask | null>(null)
+    const [selectedTask, setSelectedTask] = useState<TodoListTask | null>(null)
 
     // The drag only activates after the pointer moves at least 8 pixels
     // Prevents the drag to trigger onClick
@@ -69,14 +72,28 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                             isLoading={isLoading}
                             todoListUuid={currentTodoList?.uuid}
                             onLoadMore={() => listMoreForStatus(status)}
-                            onTaskUpdated={syncTaskInGroups}
+                            onTaskClick={setSelectedTask}
                         />
                     )}
                     <DragOverlay dropAnimation={null}>
-                        {draggedTask && <TodoListTaskCard todoListUuid={currentTodoList?.uuid} task={draggedTask} />}
+                        {draggedTask && <TodoListTaskCard task={draggedTask} isDragDisabled />}
                     </DragOverlay>
                 </DndContext>
             </div>
+
+            {selectedTask && currentTodoList && (
+                <DetailTodoListTaskModal
+                    todoListUuid={currentTodoList.uuid}
+                    task={selectedTask}
+                    showModal={!!selectedTask}
+                    onClose={() => setSelectedTask(null)}
+                    onTaskUpdated={syncTaskInGroups}
+                    onTaskDeleted={(deletedTaskUuid) => {
+                        removeTaskFromGroups(deletedTaskUuid);
+                        setSelectedTask(null);
+                    }}
+                />
+            )}
         </div>
     );
 
