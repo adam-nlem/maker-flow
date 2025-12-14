@@ -6,6 +6,8 @@ use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
 use App\Module\TodoList\DTO\QueryParam\TodoListTask\ListTodoListTasksQueryParamDTO;
 use App\Module\TodoList\DTO\Request\TodoListTask\CreateTodoListTaskRequestDTO;
+use App\Module\TodoList\DTO\Response\TodoListTask\ListTodoListTasksGroupedByStatusResponseDTO;
+use App\Module\TodoList\Entity\Enum\TodoListStatus;
 use App\Module\TodoList\Entity\TodoListTask;
 use App\Module\TodoList\Repository\TodoListRepository;
 use App\Module\TodoList\Repository\TodoListTagRepository;
@@ -19,20 +21,40 @@ use Symfony\Component\Routing\Annotation\Route;
 class TodoListTaskController extends AbstractController
 {
 
-    #[Route('', name: 'list', methods: ['GET'])]
+    #[Route('', name: 'api_modules_todo_lists_tasks_list', methods: ['GET'])]
     public function list(
         ListTodoListTasksQueryParamDTO $queryParamDto,
         TodoListTaskRepository $taskRepository,
+        TodoListRepository $todoListRepository,
     ) {
         /** @var User $user */
         $user = $this->getUser();
 
-        return $this->json($queryParamDto);
-        if ($queryParamDto->getTodoListStatus() === null) {
-            //TODO: get All the todo list tasks paginated for a todo list
-        } else {
-            //TODO: get the amount of tasks for the status
+        $todoList = $todoListRepository->getByUuidAndUser($queryParamDto->getTodoListUuid(), $user);
+
+        if ($todoList === null) {
+            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
+
+        $statuses = $queryParamDto->getStatus() !== null
+            ? [$queryParamDto->getStatus()]
+            : TodoListStatus::cases();
+
+        $result = array_map(
+            fn(TodoListStatus $status) => (new ListTodoListTasksGroupedByStatusResponseDTO(
+                $status,
+                $taskRepository->getByTodoListAndStatusAndUserPaginated(
+                    $todoList,
+                    $status,
+                    $user,
+                    $queryParamDto->getPage(),
+                    $queryParamDto->getLimit()
+                )
+            ))->getData(),
+            $statuses
+        );
+
+        return $this->json(data: $result, status: Response::HTTP_OK, context: ['groups' => ['api_modules_todo_lists_tasks_list']]);
     }
 
     #[Route('', name: 'api_modules_todo_lists_tasks_create', methods: ['POST'])]

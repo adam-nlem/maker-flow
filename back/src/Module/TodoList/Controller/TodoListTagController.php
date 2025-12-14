@@ -4,6 +4,7 @@ namespace App\Module\TodoList\Controller;
 
 use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
+use App\Module\TodoList\DTO\QueryParam\TodoListTask\ListTodoListTagsQueryParamDTO;
 use App\Module\TodoList\DTO\Request\TodoListTag\CreateTodoListTagRequestDTO;
 use App\Module\TodoList\DTO\Request\TodoListTag\UpdateTodoListTagRequestDTO;
 use App\Module\TodoList\Entity\TodoListTag;
@@ -21,6 +22,7 @@ class TodoListTagController extends AbstractController
 {
     #[Route('', name: 'api_modules_todo_lists_tags_list', methods: ['GET'])]
     public function list(
+        ListTodoListTagsQueryParamDTO $queryParamDto,
         TodoListTagRepository $tagRepository,
         TodoListRepository $todoListRepository,
         Request $request,
@@ -28,21 +30,14 @@ class TodoListTagController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $todoListUuid = $request->query->get('todoListUuid');
-        $searchTerm = $request->query->get('searchTerm');
-
-        if ($todoListUuid === null) {
-            return $this->json(data: ["message" => "todoListUuid query parameter is required"], status: Response::HTTP_BAD_REQUEST);
-        }
-
-        $todoList = $todoListRepository->getByUuidAndUser($todoListUuid, $user);
+        $todoList = $todoListRepository->getByUuidAndUser($queryParamDto->getTodoListUuid(), $user);
 
         if ($todoList === null) {
             return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        if ($searchTerm !== null) {
-            $tags = $tagRepository->getBySearchTermAndUserAndTodoListLimited($searchTerm, $user, $todoList, 20);
+        if ($queryParamDto->getSearchTerm() !== null) {
+            $tags = $tagRepository->getBySearchTermAndUserAndTodoListLimited($queryParamDto->getSearchTerm(), $user, $todoList, 20);
             // List Tags by serach term and limit to 20
         } else {
             $tags = $tagRepository->getByUserAndTodoListLimited($user, $todoList, 20);

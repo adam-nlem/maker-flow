@@ -28,8 +28,10 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tags_update',
+
+        'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
-        'api_modules_todo_lists_tags_update'
     ])]
     private ?string $uuid = null;
 
@@ -37,8 +39,10 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tags_update',
+
+        'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
-        'api_modules_todo_lists_tags_update'
     ])]
     private ?string $title = null;
 
@@ -46,8 +50,10 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tags_update',
+
+        'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
-        'api_modules_todo_lists_tags_update'
     ])]
     private ?Color $color = null;
 
@@ -55,8 +61,10 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tags_update',
+
+        'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
-        'api_modules_todo_lists_tags_update'
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -64,8 +72,10 @@ class TodoListTag
     #[Groups([
         'api_modules_todo_lists_tags_list',
         'api_modules_todo_lists_tags_create',
+        'api_modules_todo_lists_tags_update',
+
+        'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
-        'api_modules_todo_lists_tags_update'
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 

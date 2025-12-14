@@ -2,9 +2,13 @@
 
 namespace App\Module\TodoList\Repository;
 
+use App\Entity\User;
+use App\Module\TodoList\Entity\Enum\TodoListStatus;
+use App\Module\TodoList\Entity\TodoList;
 use App\Module\TodoList\Entity\TodoListTask;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 /**
  * @extends ServiceEntityRepository<TodoListTask>
@@ -34,7 +38,24 @@ class TodoListTaskRepository extends ServiceEntityRepository
         }
     }
 
-    
+    public function getByTodoListAndStatusAndUserPaginated(TodoList $todoList, TodoListStatus $status, User $user, int $page, int $limit): array
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.user = :user')
+            ->andWhere('t.todoList = :todoList')
+            ->andWhere('t.status = :status')
+            ->setParameter('user', $user)
+            ->setParameter('todoList', $todoList)
+            ->setParameter('status', $status)
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->orderBy('t.createdAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+
 
     //    /**
     //     * @return TodoListTask[] Returns an array of TodoListTask objects

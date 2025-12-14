@@ -8,20 +8,12 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ListTodoListTasksQueryParamDTO extends AbstractQueryParamDTO
+class ListTodoListTagsQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
     private string $todoListUuid;
 
-    #[Assert\NotBlank]
-    #[Assert\Positive]
-    private int $page;
-
-    #[Assert\NotBlank]
-    #[Assert\Positive]
-    private int $limit;
-
-    private ?TodoListStatus $status;
+    private ?string $searchTerm;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -33,9 +25,7 @@ class ListTodoListTasksQueryParamDTO extends AbstractQueryParamDTO
     protected function fromQueryParams(array $queryParams): void
     {
         $this->todoListUuid = $queryParams["todoListUuid"];
-        $this->page = $queryParams["page"];
-        $this->limit = $queryParams["limit"];
-        $this->status = TodoListStatus::tryFrom($queryParams["status"] ?? "");
+        $this->searchTerm = $queryParams["searchTerm"] ?? null;
     }
 
     public function getTodoListUuid(): string
@@ -43,18 +33,8 @@ class ListTodoListTasksQueryParamDTO extends AbstractQueryParamDTO
         return $this->todoListUuid;
     }
 
-    public function getPage(): int
+    public function getSearchTerm(): ?string
     {
-        return $this->page;
-    }
-
-    public function getLimit(): int
-    {
-        return $this->limit;
-    }
-
-    public function getStatus(): ?TodoListStatus
-    {
-        return $this->status;
+        return $this->searchTerm;
     }
 }

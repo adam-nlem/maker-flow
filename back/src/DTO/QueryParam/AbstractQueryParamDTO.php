@@ -18,17 +18,8 @@ abstract class AbstractQueryParamDTO
         $this->fromQueryParams($queryParams);
     }
 
-    /**
-     * Allows to manipulate and set the values from the query params to this object properties
-     * @param array $queryParams
-     * @return void
-     */
     abstract protected function fromQueryParams(array $queryParams): void;
 
-    /**
-     * Validates the data
-     * @return void
-     */
     public function validate(): void
     {
         $errors = $this->validator->validate($this);

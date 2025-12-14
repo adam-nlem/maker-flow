@@ -19,7 +19,7 @@ class CreateTodoListTaskRequestDTO extends AbstractRequestDTO
     private ?\DateTimeImmutable $dueDate;
     /** @var string[] */
     private array $tagUuids;
-
+    
     public function __construct(
         protected RequestStack $requestStack,
         protected ValidatorInterface $validator,

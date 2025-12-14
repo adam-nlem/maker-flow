@@ -4,6 +4,7 @@ namespace App\Module\TodoList\Controller;
 
 use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
+use App\Module\TodoList\DTO\QueryParam\TodoListTask\ListTodoListsQueryParamDTO;
 use App\Module\TodoList\DTO\Request\TodoList\CreateTodoListRequestDTO;
 use App\Module\TodoList\Entity\TodoList;
 use App\Module\TodoList\Repository\TodoListRepository;
@@ -20,20 +21,15 @@ class TodoListController extends AbstractController
 
     #[Route('', name: 'api_modules_todo_lists_list', methods: ['GET'])]
     public function list(
+        ListTodoListsQueryParamDTO $queryParamDto,
         TodoListRepository $todoListRepository,
         UserModuleRepository $userModuleRepository,
         Request $request,
     ) {
         /** @var User $user */
-        $user = $this->getUser();   
+        $user = $this->getUser();
 
-        $userModuleUuid = $request->query->get('userModuleUuid');
-
-        if ($userModuleUuid === null) {
-            return $this->json(data: ["message" => "userModuleUuid query parameter is required"], status: Response::HTTP_BAD_REQUEST);
-        }
-
-        $userModule = $userModuleRepository->getByUuidAndUser($userModuleUuid, $user);
+        $userModule = $userModuleRepository->getByUuidAndUser($queryParamDto->getUserModuleUuid(), $user);
 
         if ($userModule === null) {
             return $this->json(data: ["message" => "You don't have any user module with this uuid"], status: Response::HTTP_NOT_FOUND);

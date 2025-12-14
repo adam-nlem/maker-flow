@@ -69,7 +69,7 @@ class TodoListTagRepository extends ServiceEntityRepository
             ->setParameter('todoList', $todoList)
             ->setParameter('user', $user)
             ->setMaxResults($limit)
-            ->orderBy('t.createdAt', 'ASC')
+            ->orderBy('t.createdAt', 'DESC')
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -85,7 +85,7 @@ class TodoListTagRepository extends ServiceEntityRepository
             ->setParameter('todoList', $todoList)
             ->setParameter('searchTerm', '%' . $searchTerm . '%')
             ->setMaxResults($limit)
-            ->orderBy('t.createdAt', 'ASC')
+            ->orderBy('t.createdAt', 'DESC')
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);

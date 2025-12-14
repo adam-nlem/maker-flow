@@ -66,8 +66,8 @@ class ProjectRepository extends ServiceEntityRepository
             ->where('p.user = :user')
             ->setParameter('user', $user)
             ->setFirstResult(($page - 1) * $limit)
-            ->orderBy('p.createdAt', 'DESC')
             ->setMaxResults($limit)
+            ->orderBy('p.createdAt', 'DESC')
             ->getQuery();
         $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
         return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
