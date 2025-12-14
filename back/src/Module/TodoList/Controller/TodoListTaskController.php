@@ -4,15 +4,14 @@ namespace App\Module\TodoList\Controller;
 
 use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
+use App\Module\TodoList\DTO\QueryParam\TodoListTask\ListTodoListTasksQueryParamDTO;
 use App\Module\TodoList\DTO\Request\TodoListTask\CreateTodoListTaskRequestDTO;
 use App\Module\TodoList\Entity\TodoListTask;
 use App\Module\TodoList\Repository\TodoListRepository;
 use App\Module\TodoList\Repository\TodoListTagRepository;
 use App\Module\TodoList\Repository\TodoListTaskRepository;
-use App\Module\TodoList\Service\TodoListModuleService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
@@ -21,10 +20,19 @@ class TodoListTaskController extends AbstractController
 {
 
     #[Route('', name: 'list', methods: ['GET'])]
-    public function list(TodoListTaskRepository $taskRepository)
-    {
+    public function list(
+        ListTodoListTasksQueryParamDTO $queryParamDto,
+        TodoListTaskRepository $taskRepository,
+    ) {
         /** @var User $user */
         $user = $this->getUser();
+
+        return $this->json($queryParamDto);
+        if ($queryParamDto->getTodoListStatus() === null) {
+            //TODO: get All the todo list tasks paginated for a todo list
+        } else {
+            //TODO: get the amount of tasks for the status
+        }
     }
 
     #[Route('', name: 'api_modules_todo_lists_tasks_create', methods: ['POST'])]
