@@ -38,6 +38,18 @@ class TodoListTaskRepository extends ServiceEntityRepository
         }
     }
 
+    public function getByUuidAndUser(string $uuid, User $user): ?TodoListTask
+    {
+        return $this->createQueryBuilder('t')
+            ->where('t.uuid = :uuid')
+            ->andWhere('t.user = :user')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     public function getByTodoListAndStatusAndUserPaginated(TodoList $todoList, TodoListStatus $status, User $user, int $page, int $limit): array
     {
         return $this->createQueryBuilder('t')
@@ -49,36 +61,12 @@ class TodoListTaskRepository extends ServiceEntityRepository
             ->setParameter('status', $status)
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
-            ->orderBy('t.createdAt', 'DESC')
+            ->addOrderBy(
+                'CASE WHEN t.updatedAt IS NOT NULL THEN t.updatedAt ELSE t.createdAt END',
+                'DESC'
+            )
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
-
-
-
-    //    /**
-    //     * @return TodoListTask[] Returns an array of TodoListTask objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?TodoListTask
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

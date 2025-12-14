@@ -26,42 +26,48 @@ class TodoListTask
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
         'api_modules_todo_lists_tasks_list',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
     #[Groups([
         'api_modules_todo_lists_tasks_list',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
         'api_modules_todo_lists_tasks_list',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?string $content = null;
 
     #[ORM\Column(enumType: TodoListStatus::class)]
     #[Groups([
         'api_modules_todo_lists_tasks_list',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?TodoListStatus $status = null;
 
     #[ORM\Column(nullable: true, enumType: TodoListPriority::class)]
     #[Groups([
         'api_modules_todo_lists_tasks_list',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?TodoListPriority $priority = null;
 
     #[ORM\Column]
     #[Groups([
         'api_modules_todo_lists_tasks_list',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -75,14 +81,16 @@ class TodoListTask
     #[ORM\Column(nullable: true)]
     #[Groups([
         'api_modules_todo_lists_tasks_list',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?\DateTimeImmutable $finishedAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups([
         'api_modules_todo_lists_tasks_list',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?\DateTimeImmutable $dueDate = null;
 
@@ -92,7 +100,8 @@ class TodoListTask
     #[ORM\ManyToMany(targetEntity: TodoListTag::class, inversedBy: 'todoItems')]
     #[Groups([
         'api_modules_todo_lists_tasks_list',
-        'api_modules_todo_lists_tasks_create'
+        'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private Collection $tags;
 

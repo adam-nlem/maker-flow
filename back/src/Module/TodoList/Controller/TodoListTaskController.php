@@ -6,6 +6,7 @@ use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
 use App\Module\TodoList\DTO\QueryParam\TodoListTask\ListTodoListTasksQueryParamDTO;
 use App\Module\TodoList\DTO\Request\TodoListTask\CreateTodoListTaskRequestDTO;
+use App\Module\TodoList\DTO\Request\TodoListTask\UpdateTodoListTaskRequestDTO;
 use App\Module\TodoList\DTO\Response\TodoListTask\ListTodoListTasksGroupedByStatusResponseDTO;
 use App\Module\TodoList\Entity\Enum\TodoListStatus;
 use App\Module\TodoList\Entity\TodoListTask;
@@ -101,12 +102,63 @@ class TodoListTaskController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'show', methods: ['GET'])]
-    public function show(string $uuid) {}
+    #[Route('/{taskUuid}', name: 'api_modules_todo_lists_tasks_show', methods: ['GET'])]
+    public function show(string $taskUuid) {}
 
-    #[Route('/{uuid}', name: 'update', methods: ['PUT'])]
-    public function update(string $uuid) {}
+    #[Route('/{taskUuid}', name: 'api_modules_todo_lists_tasks_update', methods: ['PATCH'])]
+    public function update(
+        string $taskUuid,
+        UpdateTodoListTaskRequestDTO $dto,
+        TodoListTaskRepository $taskRepository,
+        TodoListTagRepository $tagRepository,
+    ) {
+        /** @var User $user */
+        $user = $this->getUser();
 
-    #[Route('/{uuid}', name: 'delete', methods: ['DELETE'])]
-    public function delete(string $uuid) {}
+        $task = $taskRepository->getByUuidAndUser($taskUuid, $user);
+
+        if ($task === null) {
+            return $this->json(data: ["message" => "You don't have any task with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        if ($dto->getTitle() !== null) {
+            $task->setTitle($dto->getTitle());
+        }
+
+        if ($dto->getContent() !== null) {
+            $task->setContent($dto->getContent());
+        }
+
+        if ($dto->getStatus() !== null) {
+            $task->setStatus($dto->getStatus());
+        }
+
+        if ($dto->getPriority() !== null) {
+            $task->setPriority($dto->getPriority());
+        }
+
+        if ($dto->getDueDate() !== null) {
+            $task->setDueDate($dto->getDueDate());
+        }
+
+        if (!empty($dto->getTagUuids())) {
+            $tags = $tagRepository->getByUserAndWithUuidIn($user, $dto->getTagUuids());
+
+            $task->getTags()->clear();
+            foreach ($tags as $tag) {
+                $task->addTag($tag);
+            }
+        }
+
+        $taskRepository->save($task, true);
+
+        return $this->json(
+            data: $task,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_modules_todo_lists_tasks_update']]
+        );
+    }
+
+    #[Route('/{taskUuid}', name: 'api_modules_todo_lists_tasks_delete', methods: ['DELETE'])]
+    public function delete(string $taskUuid) {}
 }

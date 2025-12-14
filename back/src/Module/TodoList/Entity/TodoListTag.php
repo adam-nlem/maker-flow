@@ -32,6 +32,7 @@ class TodoListTag
 
         'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?string $uuid = null;
 
@@ -43,6 +44,7 @@ class TodoListTag
 
         'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?string $title = null;
 
@@ -54,6 +56,7 @@ class TodoListTag
 
         'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?Color $color = null;
 
@@ -65,6 +68,7 @@ class TodoListTag
 
         'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -76,6 +80,7 @@ class TodoListTag
 
         'api_modules_todo_lists_tasks_list',
         'api_modules_todo_lists_tasks_create',
+        'api_modules_todo_lists_tasks_update'
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 

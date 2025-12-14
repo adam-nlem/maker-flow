@@ -3,6 +3,7 @@ import { httpClient } from "~/services/httpClient/httpClient";
 import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
 import { TodoListStatus } from "../../models/enums/TodoListStatus";
 import { TodoListTasksGroupedByStatusDTO, type TodoListTasksGroupedByStatusDTOJSON } from "../../dtos/TodoListTasksGroupedByStatusDTO";
+import type { TodoListTask } from "../../models/TodoListTask";
 
 interface UseListPaginatedTodoListTasksProps {
     todoListUuid: string | undefined;
@@ -111,6 +112,26 @@ export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseL
         }
     }, [todoListUuid, listInitialTasks]);
 
+    const getTaskByUuid = useCallback((taskUuid: string): TodoListTask | undefined => {
+        return todoListTasksGroupedByStatus.flatMap(g => g.todoListTasks).find(t => t.uuid === taskUuid);
+    }, [todoListTasksGroupedByStatus]);
+
+    const moveTaskToStatus = useCallback((taskUuid: string, newStatus: TodoListStatus) => {
+        setTodoListTasksGroupedByStatus(prev => {
+            const taskToMove = prev.flatMap(g => g.todoListTasks).find(t => t.uuid === taskUuid);
+            if (!taskToMove) return prev;
+
+            return prev.map(group => {
+                const tasksWithoutMoved = group.todoListTasks.filter(t => t.uuid !== taskUuid);
+                const tasks = group.status === newStatus
+                    ? [taskToMove, ...tasksWithoutMoved]
+                    : tasksWithoutMoved;
+
+                return new TodoListTasksGroupedByStatusDTO(group.status, tasks);
+            });
+        });
+    }, []);
+
     return {
         todoListTasksGroupedByStatus,
         paginationByStatus,
@@ -118,5 +139,7 @@ export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseL
         isLoadingMore,
         errorMessage,
         listMoreForStatus,
+        moveTaskToStatus,
+        getTaskByUuid,
     };
 }

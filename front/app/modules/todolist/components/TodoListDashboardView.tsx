@@ -1,23 +1,18 @@
-import { ChevronLeftIcon, ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { Badge } from "~/components/ui/Badge";
-import TodoListTaskCard from "./TodoListTaskCard";
-import { TodoListTask } from "../models/TodoListTask";
-import { TodoListPriority } from "../models/enums/TodoListPriority";
-import { Color } from "~/models/enums/Color";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import { useListTodoLists } from "../hooks/todoLists/useListTodoLists";
 import { useState } from "react";
 
 import type { ModuleWidgetProps } from "~/modules/registry";
-import { Input } from "~/components/ui/Input";
-import { Select } from "~/components/ui/Select";
-import CreateTodoListTaskCard from "./todoListTasks/CreateTodoListTaksCard";
 import { useListPaginatedTodoListTasks } from "../hooks/todoListTasks/useListPaginatedTodoListTasks";
-import { TodoListStatus, todoListStatusToFrenchTranslation } from "../models/enums/TodoListStatus";
-import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { TodoListStatus } from "../models/enums/TodoListStatus";
+import TodoListStatusColumn from "./todoListTasks/TodoListStatusColumn";
+import { DndContext, type DragEndEvent } from "@dnd-kit/core";
+import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListTask";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists } = useListTodoLists({ userModuleUuid })
+
+    
 
 
     const [currentIndex, setCurrentIndex] = useState(0)
@@ -31,7 +26,10 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
         isLoadingMore,
         errorMessage,
         listMoreForStatus,
+        moveTaskToStatus,
     } = useListPaginatedTodoListTasks({ todoListUuid: currentTodoList?.uuid, limit: 10 })
+
+    const { updateTodoListTask } = useUpdateTodoListTask()
 
     const goToPrevious = () => {
         setCurrentIndex((prev) => (prev > 0 ? prev - 1 : todoLists.length - 1))
@@ -49,35 +47,30 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
             </div>
 
             <div className="flex flex-row gap-1.5 flex-1 min-h-0">
-
-                {Object.values(TodoListStatus).map((status) =>
-                    <div key={status} className="flex flex-col w-1/3 gap-3 min-h-0">
-
-                        <div className="text-sm w-full rounded-sm text-center text-gray bg-light-gray shrink-0">
-                            {todoListStatusToFrenchTranslation[status]}
-                        </div>
-
-                        <div className="relative flex-1 min-h-0">
-
-                            <div className="flex flex-col gap-1.5 overflow-y-auto scrollbar-none h-full pb-5">
-                                {
-                                    todoListTasksGroupedByStatus
-                                        .find(dto => dto.status === status)
-                                        ?.todoListTasks.map((task) => <TodoListTaskCard key={task.uuid} task={task} />)
-                                }
-                                {paginationByStatus[status].hasMore && <SimpleTextButton onClick={() => listMoreForStatus(status)}>
-                                    <ArrowPathIcon className="size-3.5" strokeWidth={2} />
-                                    <p>Charger plus de tâches</p>
-                                </SimpleTextButton>}
-
-                                {currentTodoList && <CreateTodoListTaskCard todoListUuid={currentTodoList.uuid} />}
-                            </div>
-                            {/* Bottom Fade to smooth the scroll */}
-                            <div className="absolute bottom-0 left-0 right-0 h-8 bg-linear-to-t from-white to-transparent pointer-events-none" />
-                        </div>
-
-                    </div>)}
+                <DndContext onDragEnd={handleDragEnd}>
+                    {Object.values(TodoListStatus).map((status) =>
+                        <TodoListStatusColumn
+                            key={status}
+                            status={status}
+                            tasks={todoListTasksGroupedByStatus.find(dto => dto.status === status)?.todoListTasks ?? []}
+                            hasMore={paginationByStatus[status].hasMore}
+                            todoListUuid={currentTodoList?.uuid}
+                            onLoadMore={() => listMoreForStatus(status)}
+                        />
+                    )}
+                </DndContext>
             </div>
         </div>
     );
+
+    function handleDragEnd(event: DragEndEvent) {
+        const { over, active } = event;
+        if (!over) return;
+
+        const taskUuid = active.id as string;
+        const newStatus = over.id as TodoListStatus;
+
+        moveTaskToStatus(taskUuid, newStatus);
+        updateTodoListTask(taskUuid, { status: newStatus });
+    }
 }
