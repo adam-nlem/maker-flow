@@ -45,7 +45,13 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
                 </>
             } />
 
-            {showTodoListTagsDropdown && <ListTodoListTagsDropdown todoListUuid={todoListUuid} setShowTodoListTagsDropdown={setShowTodoListTagsDropdown} selectedTags={tags} setSelectedTags={setTags} />}
+            {showTodoListTagsDropdown && <ListTodoListTagsDropdown
+                todoListUuid={todoListUuid}
+                setShowTodoListTagsDropdown={setShowTodoListTagsDropdown}
+                selectedTags={tags}
+                setSelectedTags={setTags}
+                onTagDeleted={(deletedTagUuid) => setTags(tags.filter(t => t.uuid !== deletedTagUuid))}
+            />}
 
             {tags.length > 0 && tags.map((tag) =>
                 <Badge

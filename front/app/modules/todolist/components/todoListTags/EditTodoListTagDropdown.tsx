@@ -12,9 +12,10 @@ interface EditTodoListTagDropdownProps {
     tag: TodoListTag;
     onClose: () => void;
     onTagUpdated: (updatedTag: TodoListTag) => void;
+    onTagDeleted: (deletedTagUuid: string) => void;
 }
 
-export default function EditTodoListTagDropdown({ tag, onClose, onTagUpdated }: EditTodoListTagDropdownProps) {
+export default function EditTodoListTagDropdown({ tag, onClose, onTagUpdated, onTagDeleted }: EditTodoListTagDropdownProps) {
     const {
         title,
         setTitle,
@@ -74,7 +75,11 @@ export default function EditTodoListTagDropdown({ tag, onClose, onTagUpdated }: 
                 Enregistrer
             </Button>
 
-            <SimpleTextButton onClick={() => deleteTodoListTag}
+            <SimpleTextButton onClick={async () => {
+                    await deleteTodoListTag();
+                    onTagDeleted(tag.uuid);
+                    onClose();
+                }}
                 hoverColor={"hover:text-danger"} children={
                     <>
                         <TrashIcon className="size-3.5" strokeWidth={2} />

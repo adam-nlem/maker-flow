@@ -17,9 +17,10 @@ interface ListTodoListTagsDropdownProps {
     setShowTodoListTagsDropdown: (showTodoListTagsDropdown: boolean) => void;
     selectedTags: TodoListTag[];
     setSelectedTags: (selectedTags: TodoListTag[]) => void;
+    onTagDeleted?: (deletedTagUuid: string) => void;
 }
 
-export default function ListTodoListTagsDropdown({ todoListUuid, setShowTodoListTagsDropdown, selectedTags, setSelectedTags }: ListTodoListTagsDropdownProps) {
+export default function ListTodoListTagsDropdown({ todoListUuid, setShowTodoListTagsDropdown, selectedTags, setSelectedTags, onTagDeleted }: ListTodoListTagsDropdownProps) {
     const { searchTerm, setSearchTerm, todoListTags, setTodoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
     const { title, setTitle, color, setColor, createTodoListTag } = useCreateTodoListTag({ todoListUuid: todoListUuid })
     const [editingTag, setEditingTag] = useState<TodoListTag | null>(null);
@@ -63,6 +64,10 @@ export default function ListTodoListTagsDropdown({ todoListUuid, setShowTodoList
                                             onClose={() => setEditingTag(null)}
                                             onTagUpdated={(updatedTag) => {
                                                 setTodoListTags(todoListTags.map(t => t.uuid === updatedTag.uuid ? updatedTag : t));
+                                            }}
+                                            onTagDeleted={(deletedTagUuid) => {
+                                                setTodoListTags(todoListTags.filter(t => t.uuid !== deletedTagUuid));
+                                                onTagDeleted?.(deletedTagUuid);
                                             }}
                                         />
                                     )}
