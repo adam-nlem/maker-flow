@@ -4,6 +4,7 @@ import { httpClient } from "~/services/httpClient/httpClient";
 import type { TodoListPriority } from "../../models/enums/TodoListPriority";
 import type { TodoListStatus } from "../../models/enums/TodoListStatus";
 import type { TodoListTag } from "../../models/TodoListTag";
+import { TodoListTask } from "../../models/TodoListTask";
 
 export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }) {
     const [title, setTitle] = useState("");
@@ -24,17 +25,14 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
         setDueDate(undefined)
         setTags([])
         setErrorMessage(null)
-        setIsSubmitting(false)
     }
 
-    async function createTodoListTask(): Promise<void> {
+    async function createTodoListTask(): Promise<TodoListTask | undefined> {
         setErrorMessage(null)
         setIsSubmitting(true)
 
-        console.log(dueDate?.toISOString())
-
         try {
-            await httpClient.post('/modules/todo-lists/tasks', {
+            const res = await httpClient.post('/modules/todo-lists/tasks', {
                 "todoListUuid": todoListUuid,
                 "title": title,
                 "content": content,
@@ -45,6 +43,8 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
             })
 
             resetForm()
+
+            return TodoListTask.fromJSON(res.data);
         } catch (err) {
             let message
             if (err instanceof NotFoundException) {

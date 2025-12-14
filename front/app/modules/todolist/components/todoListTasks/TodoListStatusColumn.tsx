@@ -1,4 +1,4 @@
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, PlusIcon } from "@heroicons/react/24/outline";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import { TodoListStatus, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "../../models/enums/TodoListStatus";
 import type { TodoListTask } from "../../models/TodoListTask";
@@ -6,6 +6,7 @@ import CreateTodoListTaskCard from "./CreateTodoListTaksCard";
 import TodoListTaskCard from "./TodoListTaskCard";
 import { useDroppable } from "@dnd-kit/core";
 import Shimmer from "~/components/ui/Shimmer";
+import { useState } from "react";
 
 interface TodoListStatusColumnProps {
     status: TodoListStatus;
@@ -15,9 +16,12 @@ interface TodoListStatusColumnProps {
     todoListUuid: string | undefined;
     onLoadMore: () => void;
     onTaskClick: (task: TodoListTask) => void;
+    onTaskCreated: (task: TodoListTask) => void;
 }
 
-export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskClick }: TodoListStatusColumnProps) {
+export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskClick, onTaskCreated }: TodoListStatusColumnProps) {
+    const [showCreateTaskCard, setShowCreateTaskCard] = useState(false)
+
     const { isOver, setNodeRef } = useDroppable({ id: status });
 
     return (
@@ -36,14 +40,22 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
                         ))
                     ) : (
                         <>
+
+                            {status === TodoListStatus.Pending && todoListUuid && (
+                                showCreateTaskCard ?
+                                <CreateTodoListTaskCard todoListUuid={todoListUuid} onTaskCreated={onTaskCreated} /> :
+                                <SimpleTextButton onClick={() => setShowCreateTaskCard(true)}>
+                                    <PlusIcon className="size-3.5" strokeWidth={2} />
+                                    <p>Créer une nouvelle tâche</p>
+                                </SimpleTextButton>
+                            )}
+
                             {tasks.map((task) => <TodoListTaskCard key={task.uuid} task={task} onClick={() => onTaskClick(task)} />)}
 
                             {hasMore && <SimpleTextButton onClick={onLoadMore}>
                                 <ArrowPathIcon className="size-3.5" strokeWidth={2} />
                                 <p>Charger plus de tâches</p>
                             </SimpleTextButton>}
-
-                            {todoListUuid && <CreateTodoListTaskCard todoListUuid={todoListUuid} />}
                         </>
                     )}
 

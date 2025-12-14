@@ -73,6 +73,7 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                             todoListUuid={currentTodoList?.uuid}
                             onLoadMore={() => listMoreForStatus(status)}
                             onTaskClick={setSelectedTask}
+                            onTaskCreated={syncTaskInGroups}
                         />
                     )}
                     <DragOverlay dropAnimation={null}>

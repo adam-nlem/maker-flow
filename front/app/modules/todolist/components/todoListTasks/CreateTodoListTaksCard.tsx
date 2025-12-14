@@ -12,12 +12,17 @@ import { todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoLis
 import SelectEnumDropdown from "~/components/ui/SelectEnumDropdown";
 import AddDueDateDropdown from "./AddDueDateDropdown";
 import { Button } from "~/components/ui/Button";
+import type { TodoListTask } from "../../models/TodoListTask";
 
-export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid: string }) {
+interface CreateTodoListTaskCardProps {
+    todoListUuid: string;
+    onTaskCreated: (task: TodoListTask) => void;
+}
+
+export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: CreateTodoListTaskCardProps) {
     const {
         title, setTitle,
         priority, setPriority,
-        status, setStatus,
         dueDate, setDueDate,
         tags, setTags,
         errorMessage, setErrorMessage,
@@ -117,7 +122,12 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
             )}
 
             {title !== "" && <Button
-                onClick={createTodoListTask}
+                onClick={async () => {
+                    const createdTask = await createTodoListTask()
+                    if (createdTask && errorMessage === null) {
+                        onTaskCreated(createdTask)
+                    }
+                }}
                 disabled={isSubmitting || title.trim() === ""}
                 size="xs"
                 fullWidth
