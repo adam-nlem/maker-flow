@@ -14,13 +14,13 @@ import EditTodoListTagDropdown from "./EditTodoListTagDropdown";
 
 interface ListTodoListTagsDropdownProps {
     todoListUuid: string;
-    setShowTodoListTagsDropdown: (showTodoListTagsDropdown: boolean) => void;
     selectedTags: TodoListTag[];
-    setSelectedTags: (selectedTags: TodoListTag[]) => void;
+    onClose: () => void;
+    onTagSelected: (selectedTag: TodoListTag) => void;
     onTagDeleted?: (deletedTagUuid: string) => void;
 }
 
-export default function ListTodoListTagsDropdown({ todoListUuid, setShowTodoListTagsDropdown, selectedTags, setSelectedTags, onTagDeleted }: ListTodoListTagsDropdownProps) {
+export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListTodoListTagsDropdownProps) {
     const { searchTerm, setSearchTerm, todoListTags, setTodoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
     const { title, setTitle, color, setColor, createTodoListTag } = useCreateTodoListTag({ todoListUuid: todoListUuid })
     const [editingTag, setEditingTag] = useState<TodoListTag | null>(null);
@@ -35,8 +35,8 @@ export default function ListTodoListTagsDropdown({ todoListUuid, setShowTodoList
     const handleCreateTag = async () => {
         const newTag = await createTodoListTag()
         if (newTag !== undefined) {
-            setSelectedTags([...selectedTags, newTag])
-            setShowTodoListTagsDropdown(false)
+            onTagSelected(newTag)
+            onClose()
         }
     }
 
@@ -56,7 +56,7 @@ export default function ListTodoListTagsDropdown({ todoListUuid, setShowTodoList
                                         textColor={colorToTextClass[tag.color]}
                                         bgColor={colorToBgClass[tag.color]}
                                         onOptionClick={() => setEditingTag(tag)}
-                                        onClick={() => setSelectedTags([...selectedTags, tag])}
+                                        onClick={() => onTagSelected(tag)}
                                     />
                                     {editingTag?.uuid === tag.uuid && (
                                         <EditTodoListTagDropdown
@@ -108,7 +108,7 @@ export default function ListTodoListTagsDropdown({ todoListUuid, setShowTodoList
     return (
         <>
             {/* Backdrop to close dropdown when clicking outside */}
-            <div className="fixed inset-0 z-0" onClick={() => setShowTodoListTagsDropdown(false)} />
+            <div className="fixed inset-0 z-0" onClick={onClose} />
             <div className="absolute top-14 left-0 mt-1 z-10 bg-white border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center">
                 <Input
                     ref={inputRef}

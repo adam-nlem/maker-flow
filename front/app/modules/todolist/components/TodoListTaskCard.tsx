@@ -2,7 +2,7 @@ import { Badge } from "~/components/ui/Badge";
 
 import { ChevronLeftIcon, ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
 import type { TodoListTask } from "../models/TodoListTask";
-import { todoItemPriorityToTextClass, todoItemPriorityToBgClass, todoItemPriorityToFrenchTranslation } from "../models/enums/TodoListPriority";
+import { todoListPriorityToTextClass, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation } from "../models/enums/TodoListPriority";
 import { colorToTextClass, colorToBgClass } from "~/models/enums/Color";
 
 
@@ -24,9 +24,9 @@ export default function TodoListTaskCard({ todoItem }: { todoItem: TodoListTask 
             {todoItem.priority &&
                 <Badge
                     icon={ExclamationTriangleIcon}
-                    label={todoItemPriorityToFrenchTranslation[todoItem.priority]}
-                    textColor={todoItemPriorityToTextClass[todoItem.priority]}
-                    bgColor={todoItemPriorityToBgClass[todoItem.priority]} />}
+                    label={todoListPriorityToFrenchTranslation[todoItem.priority]}
+                    textColor={todoListPriorityToTextClass[todoItem.priority]}
+                    bgColor={todoListPriorityToBgClass[todoItem.priority]} />}
 
             {todoItem.dueDate &&
                 <Badge icon={CalendarDateRangeIcon} label={todoItem.dueDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })} />}

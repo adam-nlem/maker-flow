@@ -6,11 +6,13 @@ import ListTodoListTagsDropdown from "../todoListTags/ListTodoListTagsDropdown";
 
 import { useCreateTodoListTask } from "../../hooks/todoListTasks/useCreateTodoListTask";
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
-import { XMarkIcon } from "@heroicons/react/24/outline";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
+import type { TodoListTag } from "../../models/TodoListTag";
+import { TodoListPriority, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoListPriorityToTextClass } from "../../models/enums/TodoListPriority";
+import AddTodoListPriorityDropdown from "../todoListPriority/AddTodoListPriorityDropdown";
+import { Button } from "~/components/ui/Button";
 
 export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid: string }) {
-    const [showTodoListTagsDropdown, setShowTodoListTagsDropdown] = useState(false);
     const {
         title, setTitle,
         priority, setPriority,
@@ -21,6 +23,10 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
         isSubmitting,
         createTodoListTask,
     } = useCreateTodoListTask({ todoListUuid: todoListUuid })
+
+    const [showTodoListTagsDropdown, setShowTodoListTagsDropdown] = useState(false);
+    const [showTodoListPriorityDropdown, setShowTodoListPriorityDropdown] = useState(false);
+
 
     return (
         <div className="border border-light-gray rounded-lg p-2 flex flex-col gap-3 relative">
@@ -38,18 +44,18 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
             />
 
 
-            <SimpleTextButton onClick={() => setShowTodoListTagsDropdown(!showTodoListTagsDropdown)} children={
-                <>
-                    <TagIcon className="size-3.5" strokeWidth={2} />
-                    <p>Ajouter un tag</p>
-                </>
-            } />
+            <SimpleTextButton onClick={() => setShowTodoListTagsDropdown(!showTodoListTagsDropdown)}>
+                <TagIcon className="size-3.5" strokeWidth={2} />
+                <p>Ajouter un tag</p>
+            </SimpleTextButton>
 
             {showTodoListTagsDropdown && <ListTodoListTagsDropdown
                 todoListUuid={todoListUuid}
-                setShowTodoListTagsDropdown={setShowTodoListTagsDropdown}
                 selectedTags={tags}
-                setSelectedTags={setTags}
+                onClose={() => setShowTodoListTagsDropdown(false)}
+                onTagSelected={(selectedTag: TodoListTag) => {
+                    setTags([...tags, selectedTag])
+                }}
                 onTagDeleted={(deletedTagUuid) => setTags(tags.filter(t => t.uuid !== deletedTagUuid))}
             />}
 
@@ -62,18 +68,43 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
                     onRemoveClick={() => setTags(tags.filter(t => t.uuid !== tag.uuid))}
                 />
             )}
-            <SimpleTextButton onClick={() => { }} children={
-                <>
+
+            {priority !== null ? (
+                <Badge
+                    icon={ExclamationTriangleIcon}
+                    label={todoListPriorityToFrenchTranslation[priority]}
+                    textColor={todoListPriorityToTextClass[priority]}
+                    bgColor={todoListPriorityToBgClass[priority]}
+                    onRemoveClick={() => setPriority(null)}
+                    onClick={() => setShowTodoListPriorityDropdown(!showTodoListPriorityDropdown)}
+                />
+            ) : (
+                <SimpleTextButton onClick={() => setShowTodoListPriorityDropdown(!showTodoListPriorityDropdown)}>
                     <ExclamationTriangleIcon className="size-3.5" strokeWidth={2} />
                     <p>Ajouter une priorité</p>
-                </>
-            } />
-            <SimpleTextButton onClick={() => { }} children={
-                <>
-                    <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
-                    <p>Ajouter une date</p>
-                </>
-            } />
+                </SimpleTextButton>
+            )}
+
+            {showTodoListPriorityDropdown && (
+                <AddTodoListPriorityDropdown
+                    selectedPriority={priority}
+                    onClose={() => setShowTodoListPriorityDropdown(false)}
+                    onPrioritySelected={(selectedPriority) => setPriority(selectedPriority)}
+                />
+            )}
+            <SimpleTextButton onClick={() => { }}>
+                <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
+                <p>Ajouter une date</p>
+            </SimpleTextButton>
+
+            {title !== "" && <Button
+                onClick={createTodoListTask}
+                disabled={isSubmitting || title.trim() === ""}
+                size="xs"
+                fullWidth
+            >
+                Créer
+            </Button>}
         </div>
     );
 }
