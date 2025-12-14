@@ -9,7 +9,8 @@ import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import type { TodoListTag } from "../../models/TodoListTag";
 import { TodoListPriority, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoListPriorityToTextClass } from "../../models/enums/TodoListPriority";
-import AddTodoListPriorityDropdown from "../todoListPriority/AddTodoListPriorityDropdown";
+import AddTodoListPriorityDropdown from "./AddTodoListPriorityDropdown";
+import AddDueDateDropdown from "./AddDueDateDropdown";
 import { Button } from "~/components/ui/Button";
 
 export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid: string }) {
@@ -26,6 +27,7 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
 
     const [showTodoListTagsDropdown, setShowTodoListTagsDropdown] = useState(false);
     const [showTodoListPriorityDropdown, setShowTodoListPriorityDropdown] = useState(false);
+    const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
 
 
     return (
@@ -42,7 +44,6 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
             />
-
 
             <SimpleTextButton onClick={() => setShowTodoListTagsDropdown(!showTodoListTagsDropdown)}>
                 <TagIcon className="size-3.5" strokeWidth={2} />
@@ -92,10 +93,28 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
                     onPrioritySelected={(selectedPriority) => setPriority(selectedPriority)}
                 />
             )}
-            <SimpleTextButton onClick={() => { }}>
-                <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
-                <p>Ajouter une date</p>
-            </SimpleTextButton>
+            {dueDate !== null ? (
+                <Badge
+                    icon={CalendarDateRangeIcon}
+                    label={dueDate.toLocaleDateString('fr-FR')}
+                    textColor="text-gray"
+                    onRemoveClick={() => setDueDate(null)}
+                    onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}
+                />
+            ) : (
+                <SimpleTextButton onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}>
+                    <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
+                    <p>Ajouter une date</p>
+                </SimpleTextButton>
+            )}
+
+            {showDueDateDropdown && (
+                <AddDueDateDropdown
+                    selectedDueDate={dueDate}
+                    onClose={() => setShowDueDateDropdown(false)}
+                    onDueDateSelected={(selectedDate) => setDueDate(selectedDate)}
+                />
+            )}
 
             {title !== "" && <Button
                 onClick={createTodoListTask}

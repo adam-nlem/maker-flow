@@ -10,7 +10,7 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
     const [content, setContent] = useState<string | null>(null);
     const [priority, setPriority] = useState<TodoListPriority | null>(null);
     const [status, setStatus] = useState<TodoListStatus | null>(null);
-    const [dueDate, setDueDate] = useState<string | null>(null);
+    const [dueDate, setDueDate] = useState<Date | null>(null);
     const [tags, setTags] = useState<TodoListTag[]>([]);
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -31,6 +31,8 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
         setErrorMessage(null)
         setIsSubmitting(true)
 
+        console.log(dueDate?.toISOString())
+
         try {
             await httpClient.post('/modules/todo-lists/tasks', {
                 "todoListUuid": todoListUuid,
@@ -38,7 +40,7 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
                 "content": content,
                 "priority": priority,
                 "status": status,
-                "dueDate": dueDate,
+                "dueDate": dueDate ? dueDate.toLocaleDateString('sv-SE') : null, // 'sv-SE' outputs YYYY-MM-DD
                 "tagUuids": tags.map((tag) => tag.uuid),
             })
 
