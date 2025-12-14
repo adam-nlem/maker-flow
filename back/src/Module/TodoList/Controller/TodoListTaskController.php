@@ -121,32 +121,39 @@ class TodoListTaskController extends AbstractController
             return $this->json(data: ["message" => "You don't have any task with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        if ($dto->getTitle() !== null) {
+        if ($dto->getTitle() !== null && $dto->getTitle() !== $task->getTitle()) {
             $task->setTitle($dto->getTitle());
         }
 
-        if ($dto->getContent() !== null) {
+        if ($dto->getContent() !== null && $dto->getContent() !== $task->getContent()) {
             $task->setContent($dto->getContent());
         }
 
-        if ($dto->getStatus() !== null) {
+        if ($dto->getStatus() !== null && $dto->getStatus() !== $task->getStatus()) {
             $task->setStatus($dto->getStatus());
         }
 
-        if ($dto->getPriority() !== null) {
+        if ($dto->getPriority() !== null && $dto->getPriority() !== $task->getPriority()) {
             $task->setPriority($dto->getPriority());
         }
 
-        if ($dto->getDueDate() !== null) {
+        if ($dto->getDueDate() !== null && $dto->getDueDate() != $task->getDueDate()) {
             $task->setDueDate($dto->getDueDate());
         }
 
-        if (!empty($dto->getTagUuids())) {
-            $tags = $tagRepository->getByUserAndWithUuidIn($user, $dto->getTagUuids());
+        if ($dto->getTagUuids() !== null) {
+            $currentTagUuids = $task->getTags()->map(fn($tag) => $tag->getUuid())->toArray();
+            sort($currentTagUuids);
+            $newTagUuids = $dto->getTagUuids();
+            sort($newTagUuids);
 
-            $task->getTags()->clear();
-            foreach ($tags as $tag) {
-                $task->addTag($tag);
+            if ($currentTagUuids !== $newTagUuids) {
+                $tags = $tagRepository->getByUserAndWithUuidIn($user, $dto->getTagUuids());
+
+                $task->getTags()->clear();
+                foreach ($tags as $tag) {
+                    $task->addTag($tag);
+                }
             }
         }
 

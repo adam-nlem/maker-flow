@@ -1,3 +1,5 @@
+import { ExclamationTriangleIcon } from "@heroicons/react/16/solid";
+
 export enum TodoListPriority {
     Low = 'low',
     Medium = 'medium',
@@ -21,3 +23,11 @@ export const todoListPriorityToBgClass: Record<TodoListPriority, string> = {
     [TodoListPriority.Medium]: "bg-orange-400/30",
     [TodoListPriority.High]: "bg-danger/30",
 }
+
+export const selectTodoListPriorityDropdownOptions = Object.values(TodoListPriority).map((priority) => ({
+    value: priority,
+    icon: ExclamationTriangleIcon,
+    label: todoListPriorityToFrenchTranslation[priority],
+    textColor: todoListPriorityToTextClass[priority],
+    bgColor: todoListPriorityToBgClass[priority],
+}));

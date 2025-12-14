@@ -19,7 +19,7 @@ export function Badge({ icon: Icon, label, textColor = "text-gray", bgColor, onC
         <div className="group flex flex-row justify-between">
             <div
                 onClick={onClick}
-                className={`cursor-pointer flex flex-row gap-1 w-fit items-center ${textColor} ${bgColor ? `px-1.5 rounded-xl ${bgColor}` : ''}`}>
+                className={`cursor-pointer flex flex-row gap-1 min-w-fit items-center ${textColor} ${bgColor ? `px-1.5 rounded-xl ${bgColor}` : ''}`}>
                 <Icon className="size-3" strokeWidth={2} />
                 <p className="text-xs">{label}</p>
             </div>

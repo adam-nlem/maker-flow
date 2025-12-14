@@ -7,13 +7,14 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   simple?: boolean;
   icon?: React.ReactNode;
   autoComplete?: string;
+  textStyle?: string;
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, fullWidth = false, simple = false, className = '', icon, autoComplete = 'off', ...props }, ref) => {
+  ({ label, error, fullWidth = false, simple = false, className = '', icon, autoComplete = 'off', textStyle = 'text-sm', ...props }, ref) => {
 
     const inputElement = <input ref={ref} autoComplete={autoComplete} className={`
-      block bg-transparent text-sm placeholder-gray-400
+      block bg-transparent placeholder-gray-400 ${textStyle}
       ${!simple ? 'rounded-xl border border-light-gray px-3 py-1.5 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary' : 'border-0 shadow-none outline-none focus:outline-none focus:ring-0 p-0'}
       ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
       ${fullWidth ? 'w-full' : ''}

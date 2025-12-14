@@ -1,9 +1,9 @@
 import { DatePicker } from "~/components/ui/DatePicker";
 
 interface AddDueDateDropdownProps {
-    selectedDueDate: Date | null;
+    selectedDueDate?: Date;
     onClose: () => void;
-    onDueDateSelected: (dueDate: Date | null) => void;
+    onDueDateSelected: (dueDate: Date) => void;
 }
 
 export default function AddDueDateDropdown({ selectedDueDate, onClose, onDueDateSelected }: AddDueDateDropdownProps) {

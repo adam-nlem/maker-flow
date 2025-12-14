@@ -8,17 +8,18 @@ import { useState } from "react";
 import DetailTodoListTaskModal from "./DetailTodoListTaskModal";
 
 interface TodoListTaskCardProps {
+    todoListUuid: string;
     task: TodoListTask;
-
+    onTaskUpdated?: (task: TodoListTask) => void;
 }
 
-export default function TodoListTaskCard({ task }: TodoListTaskCardProps) {
+export default function TodoListTaskCard({ todoListUuid, task, onTaskUpdated }: TodoListTaskCardProps) {
+    const [showTodoListTaskModal, setShowTodoListTaskModal] = useState(false)
 
     const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
-        id: task.uuid
+        id: task.uuid,
+        disabled: showTodoListTaskModal,
     });
-
-    const [showTodoListTaskModal, setShowTodoListTaskModal] = useState(false)
 
     return (
         <div
@@ -35,6 +36,7 @@ export default function TodoListTaskCard({ task }: TodoListTaskCardProps) {
                     <div className="flex flex-col gap-1">
                         {task.tags.map((tag) =>
                             <Badge
+                                key={tag.uuid}
                                 icon={TagIcon} label={tag.title}
                                 textColor={colorToTextClass[tag.color]}
                                 bgColor={colorToBgClass[tag.color]} />)}
@@ -51,7 +53,15 @@ export default function TodoListTaskCard({ task }: TodoListTaskCardProps) {
                     <Badge icon={CalendarDateRangeIcon} label={task.dueDate.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric' })} />}
             </div>
 
-            {showTodoListTaskModal && <DetailTodoListTaskModal showModal={showTodoListTaskModal} onClose={() => setShowTodoListTaskModal(!showTodoListTaskModal)} />}
+            {showTodoListTaskModal && (
+                <DetailTodoListTaskModal
+                    todoListUuid={todoListUuid}
+                    task={task}
+                    showModal={showTodoListTaskModal}
+                    onClose={() => setShowTodoListTaskModal(false)}
+                    onTaskUpdated={onTaskUpdated}
+                />
+            )}
         </div>
     );
 }

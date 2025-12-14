@@ -69,10 +69,11 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                             isLoading={isLoading}
                             todoListUuid={currentTodoList?.uuid}
                             onLoadMore={() => listMoreForStatus(status)}
+                            onTaskUpdated={syncTaskInGroups}
                         />
                     )}
                     <DragOverlay dropAnimation={null}>
-                        {draggedTask && <TodoListTaskCard task={draggedTask} />}
+                        {draggedTask && <TodoListTaskCard todoListUuid={currentTodoList?.uuid} task={draggedTask} />}
                     </DragOverlay>
                 </DndContext>
             </div>

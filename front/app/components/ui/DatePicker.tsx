@@ -2,8 +2,8 @@ import { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 
 interface DatePickerProps {
-    selectedDate: Date | null;
-    onDateSelected: (date: Date | null) => void;
+    selectedDate?: Date;
+    onDateSelected: (date: Date) => void;
     minDate?: Date;
 }
 

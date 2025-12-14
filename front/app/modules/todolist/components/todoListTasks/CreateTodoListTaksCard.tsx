@@ -8,8 +8,8 @@ import { useCreateTodoListTask } from "../../hooks/todoListTasks/useCreateTodoLi
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import type { TodoListTag } from "../../models/TodoListTag";
-import { TodoListPriority, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoListPriorityToTextClass } from "../../models/enums/TodoListPriority";
-import AddTodoListPriorityDropdown from "./AddTodoListPriorityDropdown";
+import { todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoListPriorityToTextClass, selectTodoListPriorityDropdownOptions } from "../../models/enums/TodoListPriority";
+import SelectEnumDropdown from "~/components/ui/SelectEnumDropdown";
 import AddDueDateDropdown from "./AddDueDateDropdown";
 import { Button } from "~/components/ui/Button";
 
@@ -25,10 +25,9 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
         createTodoListTask,
     } = useCreateTodoListTask({ todoListUuid: todoListUuid })
 
-    const [showTodoListTagsDropdown, setShowTodoListTagsDropdown] = useState(false);
-    const [showTodoListPriorityDropdown, setShowTodoListPriorityDropdown] = useState(false);
+    const [showTagsDropdown, setShowTagsDropdown] = useState(false);
+    const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
     const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
-
 
     return (
         <div className="border border-light-gray rounded-lg p-2 flex flex-col gap-3 relative">
@@ -45,15 +44,15 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
                 onChange={(e) => setTitle(e.target.value)}
             />
 
-            <SimpleTextButton onClick={() => setShowTodoListTagsDropdown(!showTodoListTagsDropdown)}>
+            <SimpleTextButton onClick={() => setShowTagsDropdown(!showTagsDropdown)}>
                 <TagIcon className="size-3.5" strokeWidth={2} />
                 <p>Ajouter un tag</p>
             </SimpleTextButton>
 
-            {showTodoListTagsDropdown && <ListTodoListTagsDropdown
+            {showTagsDropdown && <ListTodoListTagsDropdown
                 todoListUuid={todoListUuid}
                 selectedTags={tags}
-                onClose={() => setShowTodoListTagsDropdown(false)}
+                onClose={() => setShowTagsDropdown(false)}
                 onTagSelected={(selectedTag: TodoListTag) => {
                     setTags([...tags, selectedTag])
                 }}
@@ -70,35 +69,36 @@ export default function CreateTodoListTaskCard({ todoListUuid }: { todoListUuid:
                 />
             )}
 
-            {priority !== null ? (
+            {priority ? (
                 <Badge
                     icon={ExclamationTriangleIcon}
                     label={todoListPriorityToFrenchTranslation[priority]}
                     textColor={todoListPriorityToTextClass[priority]}
                     bgColor={todoListPriorityToBgClass[priority]}
-                    onRemoveClick={() => setPriority(null)}
-                    onClick={() => setShowTodoListPriorityDropdown(!showTodoListPriorityDropdown)}
+                    onRemoveClick={() => setPriority(undefined)}
+                    onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
                 />
             ) : (
-                <SimpleTextButton onClick={() => setShowTodoListPriorityDropdown(!showTodoListPriorityDropdown)}>
+                <SimpleTextButton onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}>
                     <ExclamationTriangleIcon className="size-3.5" strokeWidth={2} />
                     <p>Ajouter une priorité</p>
                 </SimpleTextButton>
             )}
 
-            {showTodoListPriorityDropdown && (
-                <AddTodoListPriorityDropdown
-                    selectedPriority={priority}
-                    onClose={() => setShowTodoListPriorityDropdown(false)}
-                    onPrioritySelected={(selectedPriority) => setPriority(selectedPriority)}
+            {showPriorityDropdown && (
+                <SelectEnumDropdown
+                    selectedValue={priority}
+                    options={selectTodoListPriorityDropdownOptions}
+                    onClose={() => setShowPriorityDropdown(false)}
+                    onSelect={(selectedPriority) => setPriority(selectedPriority)}
                 />
             )}
-            {dueDate !== null ? (
+            {dueDate ? (
                 <Badge
                     icon={CalendarDateRangeIcon}
                     label={dueDate.toLocaleDateString('fr-FR')}
                     textColor="text-gray"
-                    onRemoveClick={() => setDueDate(null)}
+                    onRemoveClick={() => setDueDate(undefined)}
                     onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}
                 />
             ) : (

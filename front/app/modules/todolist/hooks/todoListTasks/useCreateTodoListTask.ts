@@ -7,10 +7,10 @@ import type { TodoListTag } from "../../models/TodoListTag";
 
 export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }) {
     const [title, setTitle] = useState("");
-    const [content, setContent] = useState<string | null>(null);
-    const [priority, setPriority] = useState<TodoListPriority | null>(null);
-    const [status, setStatus] = useState<TodoListStatus | null>(null);
-    const [dueDate, setDueDate] = useState<Date | null>(null);
+    const [content, setContent] = useState<string | undefined>(undefined);
+    const [priority, setPriority] = useState<TodoListPriority | undefined>(undefined);
+    const [status, setStatus] = useState<TodoListStatus | undefined>(undefined);
+    const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
     const [tags, setTags] = useState<TodoListTag[]>([]);
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -18,10 +18,10 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
 
     function resetForm() {
         setTitle("")
-        setContent(null)
-        setPriority(null)
-        setStatus(null)
-        setDueDate(null)
+        setContent(undefined)
+        setPriority(undefined)
+        setStatus(undefined)
+        setDueDate(undefined)
         setTags([])
         setErrorMessage(null)
         setIsSubmitting(false)
@@ -40,7 +40,7 @@ export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }
                 "content": content,
                 "priority": priority,
                 "status": status,
-                "dueDate": dueDate ? dueDate.toLocaleDateString('sv-SE') : null, // 'sv-SE' outputs YYYY-MM-DD
+                "dueDate": dueDate ? dueDate.toLocaleDateString('sv-SE') : undefined, // 'sv-SE' outputs YYYY-MM-DD
                 "tagUuids": tags.map((tag) => tag.uuid),
             })
 

@@ -6,10 +6,12 @@ interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   placeholder?: string;
   error?: string;
   fullWidth?: boolean;
+  simple?: boolean;
+  textStyle?: string;
 }
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ label, error, fullWidth = false, className = '', ...props }, ref) => {
+  ({ label, error, fullWidth = false, simple = false, textStyle = 'text-sm', className = '', ...props }, ref) => {
     const internalRef = useRef<HTMLTextAreaElement>(null);
     
     // Use the auto-resize hook
@@ -31,9 +33,9 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
         <textarea
           ref={internalRef}
           placeholder={props.placeholder}
-          className={`block rounded-xl border border-light-gray bg-clear px-3 py-1.5 text-sm
-              placeholder-gray-400 shadow-sm focus:border-primary focus:outline-none 
-              focus:ring-1 focus:ring-primary 
+          className={`
+              block bg-transparent placeholder-gray-400 ${textStyle} resize-none
+              ${!simple ? 'rounded-xl border border-light-gray px-3 py-1.5 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary' : 'border-0 shadow-none outline-none focus:outline-none focus:ring-0 p-0'}
               ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
               ${fullWidth ? 'w-full' : ''}
               ${className}

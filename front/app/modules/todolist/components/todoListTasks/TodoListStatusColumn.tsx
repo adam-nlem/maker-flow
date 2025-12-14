@@ -1,6 +1,6 @@
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import { TodoListStatus, todoListStatusToFrenchTranslation } from "../../models/enums/TodoListStatus";
+import { TodoListStatus, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "../../models/enums/TodoListStatus";
 import type { TodoListTask } from "../../models/TodoListTask";
 import CreateTodoListTaskCard from "./CreateTodoListTaksCard";
 import TodoListTaskCard from "./TodoListTaskCard";
@@ -14,15 +14,16 @@ interface TodoListStatusColumnProps {
     isLoading: boolean;
     todoListUuid: string | undefined;
     onLoadMore: () => void;
+    onTaskUpdated: (task: TodoListTask) => void;
 }
 
-export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore }: TodoListStatusColumnProps) {
+export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskUpdated }: TodoListStatusColumnProps) {
     const { isOver, setNodeRef } = useDroppable({ id: status });
 
     return (
         <div className="flex flex-col w-1/3 gap-3 min-h-0" ref={setNodeRef}>
 
-            <div className="text-sm w-full rounded-sm text-center text-gray bg-light-gray shrink-0">
+            <div className={`text-sm w-full rounded-sm text-center ${todoListStatusToTextClass[status]} ${todoListStatusToBgClass[status]} shrink-0`}>
                 {todoListStatusToFrenchTranslation[status]}
             </div>
 
@@ -31,11 +32,11 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
                 <div className="flex flex-col gap-1.5 overflow-y-auto scrollbar-none h-full pb-5">
                     {isLoading ? (
                         Array.from({ length: 3 }).map((_, i) => (
-                            <Shimmer key={i} height="h-20"/>
+                            <Shimmer key={i} height="h-20" />
                         ))
                     ) : (
                         <>
-                            {tasks.map((task) => <TodoListTaskCard key={task.uuid} task={task} />)}
+                            {tasks.map((task) => <TodoListTaskCard todoListUuid={todoListUuid!} key={task.uuid} task={task} onTaskUpdated={onTaskUpdated} />)}
 
                             {hasMore && <SimpleTextButton onClick={onLoadMore}>
                                 <ArrowPathIcon className="size-3.5" strokeWidth={2} />
