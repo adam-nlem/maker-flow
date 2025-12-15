@@ -11,13 +11,17 @@ import type { TodoListTask } from "../models/TodoListTask";
 import TodoListTaskCard from "./todoListTasks/TodoListTaskCard";
 import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListTask";
 import DetailTodoListTaskModal from "./todoListTasks/DetailTodoListTaskModal";
+import { Input } from "~/components/ui/Input";
+import { useUpdateTodoList } from "../hooks/todoLists/useUpdateTodoList";
+import Shimmer from "~/components/ui/Shimmer";
+import useSelectCurrentTodoListView from "../hooks/todoLists/useSelectCurrentTodoListView";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists } = useListTodoLists({ userModuleUuid })
 
-    const [currentIndex, setCurrentIndex] = useState(0)
+    const { currentTodoList, goToPrevious, goToNext } = useSelectCurrentTodoListView({ todoLists })
 
-    const currentTodoList = todoLists[currentIndex]
+    const { title, setTitle } = useUpdateTodoList({ todoList: currentTodoList })
 
     const {
         todoListTasksGroupedByStatus,
@@ -46,18 +50,22 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
         })
     )
 
-    const goToPrevious = () => {
-        setCurrentIndex((prev) => (prev > 0 ? prev - 1 : todoLists.length - 1))
-    }
-
-    const goToNext = () => {
-        setCurrentIndex((prev) => (prev < todoLists.length - 1 ? prev + 1 : 0))
-    }
     return (
         <div className="m-5 w-1/3 h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center shrink-0">
                 <ChevronLeftIcon onClick={goToPrevious} className="size-4 text-gray cursor-pointer hover:text-dark" strokeWidth={2} />
-                <h1 className="text-heading-md">{currentTodoList?.title ?? "Aucune liste"}</h1>
+                <Input
+                    placeholder="Aucune Liste"
+                    id="title"
+                    name="title"
+                    type="text"
+                    required
+                    simple
+                    textStyle="text-heading-md"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                />
+                {/* <h1 className="text-heading-md">{currentTodoList?.title ?? "Aucune liste"}</h1> */}
                 <ChevronRightIcon onClick={goToNext} className="size-4 text-gray cursor-pointer hover:text-dark" strokeWidth={2} />
             </div>
 

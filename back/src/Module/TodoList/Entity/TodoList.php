@@ -26,6 +26,7 @@ class TodoList
     #[Groups([
         'api_modules_todo_lists_create',
         'api_modules_todo_lists_list',
+        'api_modules_todo_lists_update',
     ])]
     private ?string $uuid = null;
 
@@ -33,6 +34,7 @@ class TodoList
     #[Groups([
         'api_modules_todo_lists_create',
         'api_modules_todo_lists_list',
+        'api_modules_todo_lists_update',
     ])]
     private ?string $title = null;
 
@@ -40,6 +42,7 @@ class TodoList
     #[Groups([
         'api_modules_todo_lists_create',
         'api_modules_todo_lists_list',
+        'api_modules_todo_lists_update',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -47,6 +50,7 @@ class TodoList
     #[Groups([
         'api_modules_todo_lists_create',
         'api_modules_todo_lists_list',
+        'api_modules_todo_lists_update',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 

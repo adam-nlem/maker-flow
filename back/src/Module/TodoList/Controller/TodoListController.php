@@ -6,6 +6,7 @@ use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
 use App\Module\TodoList\DTO\QueryParam\TodoList\ListTodoListsQueryParamDTO;
 use App\Module\TodoList\DTO\Request\TodoList\CreateTodoListRequestDTO;
+use App\Module\TodoList\DTO\Request\TodoList\UpdateTodoListRequestDTO;
 use App\Module\TodoList\Entity\TodoList;
 use App\Module\TodoList\Repository\TodoListRepository;
 use App\Repository\UserModuleRepository;
@@ -82,8 +83,33 @@ class TodoListController extends AbstractController
     // #[Route('/{uuid}', name: 'api_modules_todo_lists_show', methods: ['GET'])]
     // public function show(string $uuid) {}
 
-    // #[Route('/{uuid}', name: 'api_modules_todo_lists_update', methods: ['PUT'])]
-    // public function update(string $uuid) {}
+    #[Route('/{todoListUuid}', name: 'api_modules_todo_lists_update', methods: ['PATCH'])]
+    public function update(
+        string $todoListUuid,
+        UpdateTodoListRequestDTO $dto,
+        TodoListRepository $todoListRepository,
+    ) {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $todoList = $todoListRepository->getByUuidAndUser($todoListUuid, $user);
+
+        if ($todoList === null) {
+            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        if ($dto->getTitle() !== null && $dto->getTitle() != $todoList->getTitle()) {
+            $todoList->setTitle($dto->getTitle());
+        }
+
+        $todoListRepository->save($todoList, true);
+
+        return $this->json(
+            data: $todoList,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_modules_todo_lists_update']]
+        );
+    }
 
     // #[Route('/{uuid}', name: 'api_modules_todo_lists_delete', methods: ['DELETE'])]
     // public function delete(string $uuid) {}
