@@ -74,10 +74,10 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
 
     return (
         <ModalOverlay isOpen={showModal} onClose={handleClose} className="justify-center items-center ">
-            <div className="border rounded-xl border-light-gray w-1/2 h-3/4 flex flex-col min-h-0 min-w-0 overflow-y-auto scrollbar-none gap-5 py-5 px-10 shadow-lg bg-white"
+            <div className="border rounded-xl border-light-gray w-1/2 h-3/4 flex flex-col min-h-0 min-w-0 gap-5 shadow-lg bg-white"
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}>
-                <div className="flex flex-col gap-3 flex-1 min-h-0">
+                <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-y-auto scrollbar-none px-5 py-5 scroll-pb-5">
                     <div className="flex flex-row justify-around items-start">
                         <TextArea
                             placeholder="Titre de la tâche"
@@ -222,7 +222,6 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
 
                     <div className="border-t border-light-gray rounded w-full my-5"></div>
 
-
                     <TextArea
                         placeholder="Contenu de la tâche"
                         id="content"
@@ -232,9 +231,6 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                     />
-
-
-
 
                 </div>
             </div>

@@ -5,15 +5,15 @@ import { TodoList } from "../../models/TodoList";
 
 export function useUpdateTodoList({ todoList }: { todoList?: TodoList }) {
     const [title, setTitle] = useState(todoList?.title ?? "");
-    const [debouncedTitle, setDebouncedTitle] = useState("");
+    const [debouncedTitle, setDebouncedTitle] = useState(todoList?.title ?? "");
 
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
+    // Sync title when todoList changes (e.g., navigating between lists)
     useEffect(() => {
-        if (!todoList) return;
-
-        setTitle(todoList.title);
+        setTitle(todoList?.title ?? "");
+        setDebouncedTitle(todoList?.title ?? "");
     }, [todoList?.uuid]);
 
     useEffect(() => {
@@ -29,7 +29,7 @@ export function useUpdateTodoList({ todoList }: { todoList?: TodoList }) {
 
 
         // Do not PATCH if nothing changed
-        if (debouncedTitle === todoList.title) return;
+        if (debouncedTitle === "" || debouncedTitle === todoList.title) return;
 
         let isCancelled = false;
 
@@ -66,7 +66,7 @@ export function useUpdateTodoList({ todoList }: { todoList?: TodoList }) {
         return () => {
             isCancelled = true;
         };
-    }, [debouncedTitle, todoList?.uuid]);
+    }, [debouncedTitle]);
 
     return {
         title,
