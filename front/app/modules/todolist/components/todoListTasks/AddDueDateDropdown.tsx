@@ -15,7 +15,7 @@ export default function AddDueDateDropdown({ selectedDueDate, onClose, onDueDate
                 <DatePicker
                     selectedDate={selectedDueDate}
                     onDateSelected={(date) => {
-                        onDueDateSelected(date);
+                        onDueDateSelected(date);    
                         onClose();
                     }}
                     minDate={new Date()}
