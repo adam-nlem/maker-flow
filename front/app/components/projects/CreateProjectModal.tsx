@@ -7,14 +7,16 @@ import { StepBadge } from "~/components/ui/StepBadge";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useCreateProject } from "~/hooks/projects/useCreateProject";
 import ModalOverlay from "~/components/ui/ModalOverlay";
+import type { Project } from "~/models/Project";
 
 interface CreateProjectModalProps {
     showModal: boolean;
     showStepHeader?: boolean;
     onClose: () => void;
+    onProjectCreated: (project: Project) => void;
 }
 
-export default function CreateProjectModal({ showModal, showStepHeader = false, onClose }: CreateProjectModalProps) {
+export default function CreateProjectModal({ showModal, showStepHeader = false, onClose, onProjectCreated }: CreateProjectModalProps) {
     const {
         name, setName,
         description, setDescription,
@@ -26,8 +28,11 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await createProject();
-        onClose();
+        const project = await createProject();
+        if (project && errorMessage === null) {
+            onProjectCreated(project)
+            onClose();
+        }
     }
 
     if (!showModal) return null;

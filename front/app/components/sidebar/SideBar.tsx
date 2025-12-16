@@ -22,7 +22,7 @@ interface SideBarProps {
 
 export default function SideBar({ isExpanded, setIsExpanded, userModules }: SideBarProps) {
     const { user } = useAuth();
-    const { focusedProject, projects, isLoadingProjects, setFocusedProject } = useProject();
+    const { focusedProject, projects, isLoadingProjects, setFocusedProject, addProjectInList } = useProject();
     const navigate = useNavigate();
 
     const [showSelectFocusedProjectModal, setShowSelectFocusedProjectModal] = useState(false);
@@ -169,6 +169,7 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
             />
             <CreateProjectModal
                 showModal={showCreateProjectModal}
+                onProjectCreated={(project) => addProjectInList(project)}
                 onClose={() => {
                     setShowCreateProjectModal(false);
                     setIsExpanded(false);

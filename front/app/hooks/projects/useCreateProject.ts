@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { ProjectType } from "~/models/enums/ProjectType";
+import { Project } from "~/models/Project";
 import { ConflictException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
 
@@ -19,18 +20,19 @@ export function useCreateProject() {
         setIsSubmitting(false)
     }
 
-    async function createProject(): Promise<void> {
+    async function createProject(): Promise<Project | undefined> {
         setErrorMessage(null)
         setIsSubmitting(true)
 
         try {
-            await httpClient.post('/projects', {
+            const res = await httpClient.post('/projects', {
                 "name": name,
                 "description": description,
                 "types": types
             })
 
             resetForm()
+            return Project.fromJSON(res.data)
         } catch (err) {
             let message
             if (err instanceof ConflictException) {

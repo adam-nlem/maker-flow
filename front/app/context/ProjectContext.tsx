@@ -9,12 +9,13 @@ interface ProjectContextType {
     isLoadingProjects: boolean;
     errorMessage: string | null;
     setFocusedProject: (project: Project) => void;
+    addProjectInList: (project: Project) => void;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
-    const { projects, isLoading: isLoadingProjects, errorMessage } = useListPaginatedProjects();
+    const { projects, isLoading: isLoadingProjects, errorMessage, addProjectInList } = useListPaginatedProjects();
     const [focusedProject, setFocusedProject] = useState<Project | null>(null);
 
     // Set the first project as current when projects are loaded
@@ -29,7 +30,8 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
         projects,
         isLoadingProjects,
         errorMessage,
-        setFocusedProject
+        setFocusedProject,
+        addProjectInList
     };
 
     return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;

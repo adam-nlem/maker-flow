@@ -21,13 +21,13 @@ export function useListPaginatedProjects(limit: number = 10) {
         try {
             const res = await httpClient.get(`/projects/${pageToFetch}/${limit}`);
             const projectsData = res.data.map((json: any) => Project.fromJSON(json));
-            
+
             if (append) {
                 setProjects(prev => [...prev, ...projectsData]);
             } else {
                 setProjects(projectsData);
             }
-            
+
             // If we received fewer items than the limit, there are no more pages
             setHasMore(projectsData.length === limit);
             setErrorMessage(null);
@@ -51,7 +51,13 @@ export function useListPaginatedProjects(limit: number = 10) {
         }
     }, [page, isLoadingMore, hasMore, listPaginatedProjects]);
 
-
+    function addProjectInList(newProject: Project) {
+        setProjects(prev =>
+            prev.some(project => project.uuid === newProject.uuid)
+                ? prev
+                : [...prev, newProject],
+        );
+    }
     return {
         projects,
         isLoading,
@@ -59,5 +65,6 @@ export function useListPaginatedProjects(limit: number = 10) {
         hasMore,
         errorMessage,
         listMore,
+        addProjectInList,
     };
 }
