@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 import type { ModuleWidgetProps } from "~/modules/registry";
 import { useListTodoLists } from "../hooks/todoLists/useListTodoLists";
-import useSelectCurrentTodoListView from "../hooks/todoLists/useSelectCurrentTodoListView";
+import useSelectCurrentTodoListView from "../hooks/todoLists/useSelectFocusedTodoList";
 import { useListPaginatedTodoListTasks } from "../hooks/todoListTasks/useListPaginatedTodoListTasks";
 import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListTask";
 import type { TodoListTask } from "../models/TodoListTask";
@@ -15,17 +15,12 @@ import TodoListTile from "./todoLists/TodoListTile";
 import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import { TodoList } from "../models/TodoList";
 import SelectItemModal from "~/components/ui/SelectItemModal";
+import useSelectFocusedTodoList from "../hooks/todoLists/useSelectFocusedTodoList";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists, syncTodoListInList } = useListTodoLists({ userModuleUuid })
 
-    const [focusedTodoList, setFocusedTodoList] = useState<TodoList | null>(null)
-
-    useEffect(() => {
-        if (todoLists.length > 0 && !focusedTodoList) {
-            setFocusedTodoList(todoLists[0]);
-        }
-    }, [todoLists, focusedTodoList]);
+    const { focusedTodoList, setFocusedTodoList } = useSelectFocusedTodoList({ todoLists: todoLists })
 
     const {
         todoListTasksGroupedByStatus,
