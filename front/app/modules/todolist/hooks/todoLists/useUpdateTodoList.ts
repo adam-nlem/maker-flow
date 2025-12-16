@@ -3,7 +3,11 @@ import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { TodoList } from "../../models/TodoList";
 
-export function useUpdateTodoList({ todoList }: { todoList?: TodoList }) {
+interface useUpdateTodoListProps {
+    todoList?: TodoList,
+    onTodoListUdated: (todoList: TodoList) => void
+}
+export function useUpdateTodoList({ todoList, onTodoListUdated }: useUpdateTodoListProps) {
     const [title, setTitle] = useState(todoList?.title ?? "");
     const [debouncedTitle, setDebouncedTitle] = useState(todoList?.title ?? "");
 
@@ -47,7 +51,11 @@ export function useUpdateTodoList({ todoList }: { todoList?: TodoList }) {
                     setIsSubmitting(false);
                 }
 
-                return TodoList.fromJSON(res.data);
+                const updatedTodoList = TodoList.fromJSON(res.data);
+
+                if (updatedTodoList) {
+                    onTodoListUdated(updatedTodoList)
+                }
             } catch (err) {
                 if (isCancelled) return;
 

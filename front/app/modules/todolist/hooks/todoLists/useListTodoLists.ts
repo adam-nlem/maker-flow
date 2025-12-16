@@ -32,12 +32,21 @@ export function useListTodoLists({ userModuleUuid }: { userModuleUuid: string })
         listTodoLists()
     }, [userModuleUuid])
 
-    function addTodoListInList(newTodoList: TodoList) {
-        setTodoLists(prev =>
-            prev.some(todoList => todoList.uuid === newTodoList.uuid)
-                ? prev
-                : [...prev, newTodoList],
-        );
+    function syncTodoListInList(newTodoList: TodoList) {
+        setTodoLists(prev => {
+            let replaced = false;
+
+            const updated = prev.map(todo => {
+                if (todo.uuid === newTodoList.uuid) {
+                    replaced = true;
+                    return newTodoList;
+                }
+                return todo;
+            });
+
+            return replaced ? updated : [...updated, newTodoList];
+        });
+
     }
 
 
@@ -45,6 +54,6 @@ export function useListTodoLists({ userModuleUuid }: { userModuleUuid: string })
         todoLists,
         isLoading,
         errorMessage,
-        addTodoListInList
+        syncTodoListInList
     }
 }

@@ -11,7 +11,17 @@ interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, fullWidth = false, simple = false, className = '', icon, autoComplete = 'off', textStyle = 'text-sm', ...props }, ref) => {
+  ({
+    label,
+    error,
+    fullWidth = false,
+    simple = false,
+    className = '',
+    icon,
+    autoComplete = 'off',
+    textStyle = 'text-sm',
+    ...props },
+    ref) => {
 
     const inputElement = <input ref={ref} autoComplete={autoComplete} className={`
       block bg-transparent placeholder-gray-400 ${textStyle}

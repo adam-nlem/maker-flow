@@ -11,6 +11,7 @@ interface UpdateTodoListHeaderProps {
     onGoToPrevious: () => void;
     onGoToNext: () => void;
     onShowCreateTodoListModal: () => void;
+    onTodoListUdated: (todoList: TodoList) => void;
 }
 
 export default function UpdateTodoListHeader({
@@ -19,9 +20,11 @@ export default function UpdateTodoListHeader({
     isLastTodoList,
     onGoToPrevious,
     onGoToNext,
-    onShowCreateTodoListModal: onShowCreateTodoListModal,
+    onShowCreateTodoListModal,
+    onTodoListUdated
+
 }: UpdateTodoListHeaderProps) {
-    const { title, setTitle } = useUpdateTodoList({ todoList });
+    const { title, setTitle } = useUpdateTodoList({ todoList: todoList, onTodoListUdated: onTodoListUdated });
 
     return (
         <>
@@ -42,6 +45,8 @@ export default function UpdateTodoListHeader({
                 textStyle="text-heading-md"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
+                size={Math.max(title.length, 12)}   // 12ch minimum
+                className="inline-block w-auto min-w-32 max-w-50"
             />
             {isLastTodoList ? (
                 <PlusCircleIcon

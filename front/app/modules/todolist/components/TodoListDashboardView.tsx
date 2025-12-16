@@ -8,12 +8,12 @@ import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListT
 import type { TodoListTask } from "../models/TodoListTask";
 import { TodoListStatus } from "../models/enums/TodoListStatus";
 import DetailTodoListTaskModal from "./todoListTasks/DetailTodoListTaskModal";
-import TodoListTasksBoard from "./todoListTasks/TodoListTasksBoard";    
+import TodoListTasksBoard from "./todoListTasks/TodoListTasksBoard";
 import UpdateTodoListHeader from "./todoLists/UpdateTodoListHeader";
 import CreateTodoListModal from "./todoLists/CreateTodoListModal";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
-    const { todoLists, addTodoListInList } = useListTodoLists({ userModuleUuid })
+    const { todoLists, syncTodoListInList } = useListTodoLists({ userModuleUuid })
 
     const { currentTodoList, goToPrevious, goToNext, isLastTodoList } = useSelectCurrentTodoListView({ todoLists })
 
@@ -47,6 +47,7 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                     onGoToPrevious={goToPrevious}
                     onGoToNext={goToNext}
                     onShowCreateTodoListModal={() => setShowCreateTodoListModal(true)}
+                    onTodoListUdated={(todoList) => syncTodoListInList(todoList)}
                 />
             </div>
 
@@ -69,7 +70,7 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                 showModal={showCreateTodoListModal}
                 onClose={() => setShowCreateTodoListModal(false)}
                 onTodoListCreated={(todoList) => {
-                    addTodoListInList(todoList)
+                    syncTodoListInList(todoList)
                     //! The new todo list is added at the end of the list
                     //! so this works for now
                     goToNext()

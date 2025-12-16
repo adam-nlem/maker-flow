@@ -46,7 +46,7 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
                                 <CreateTodoListTaskCard todoListUuid={todoListUuid} onTaskCreated={onTaskCreated} /> :
                                 <SimpleTextButton onClick={() => setShowCreateTaskCard(true)}>
                                     <PlusIcon className="size-3.5" strokeWidth={2} />
-                                    <p>Créer une nouvelle tâche</p>
+                                    <p>Nouvelle tâche</p>
                                 </SimpleTextButton>
                             )}
 
