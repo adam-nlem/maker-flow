@@ -1,27 +1,21 @@
-import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { useListTodoLists } from "../hooks/todoLists/useListTodoLists";
 import { useState } from "react";
 
 import type { ModuleWidgetProps } from "~/modules/registry";
-import { useListPaginatedTodoListTasks } from "../hooks/todoListTasks/useListPaginatedTodoListTasks";
-import { TodoListStatus } from "../models/enums/TodoListStatus";
-import TodoListStatusColumn from "./todoListTasks/TodoListStatusColumn";
-import { DndContext, DragOverlay, PointerSensor, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
-import type { TodoListTask } from "../models/TodoListTask";
-import TodoListTaskCard from "./todoListTasks/TodoListTaskCard";
-import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListTask";
-import DetailTodoListTaskModal from "./todoListTasks/DetailTodoListTaskModal";
-import { Input } from "~/components/ui/Input";
-import { useUpdateTodoList } from "../hooks/todoLists/useUpdateTodoList";
-import Shimmer from "~/components/ui/Shimmer";
+import { useListTodoLists } from "../hooks/todoLists/useListTodoLists";
 import useSelectCurrentTodoListView from "../hooks/todoLists/useSelectCurrentTodoListView";
+import { useListPaginatedTodoListTasks } from "../hooks/todoListTasks/useListPaginatedTodoListTasks";
+import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListTask";
+import type { TodoListTask } from "../models/TodoListTask";
+import { TodoListStatus } from "../models/enums/TodoListStatus";
+import DetailTodoListTaskModal from "./todoListTasks/DetailTodoListTaskModal";
+import TodoListTasksBoard from "./todoListTasks/TodoListTasksBoard";
+import CreateTodoListHeader from "./todoLists/CreateTodoListHeader";
+import UpdateTodoListHeader from "./todoLists/UpdateTodoListHeader";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
-    const { todoLists } = useListTodoLists({ userModuleUuid })
+    const { todoLists, addTodoListInList } = useListTodoLists({ userModuleUuid })
 
-    const { currentTodoList, goToPrevious, goToNext } = useSelectCurrentTodoListView({ todoLists })
-
-    const { title, setTitle } = useUpdateTodoList({ todoList: currentTodoList })
+    const { currentTodoList, goToPrevious, goToNext, isLastTodoList } = useSelectCurrentTodoListView({ todoLists })
 
     const {
         todoListTasksGroupedByStatus,
@@ -35,59 +29,48 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
         getTaskByUuid
     } = useListPaginatedTodoListTasks({ todoListUuid: currentTodoList?.uuid, limit: 10 })
 
-    const { updateTodoListTask } = useUpdateTodoListTask()
+    const { updateTodoListTask, errorMessage: updateTaskErrorMessage } = useUpdateTodoListTask()
 
-    const [draggedTask, setDraggedTask] = useState<TodoListTask | null>(null)
     const [selectedTask, setSelectedTask] = useState<TodoListTask | null>(null)
 
-    // The drag only activates after the pointer moves at least 8 pixels
-    // Prevents the drag to trigger onClick
-    const sensors = useSensors(
-        useSensor(PointerSensor, {
-            activationConstraint: {
-                distance: 8,
-            },
-        })
-    )
+    const [showCreateTodoListInput, setShowCreateTodoListInput] = useState(false)
+
+    const hideChevronLeft = (todoLists.length > 1 || !isLastTodoList)
 
     return (
         <div className="m-5 w-1/3 h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center shrink-0">
-                <ChevronLeftIcon onClick={goToPrevious} className="size-4 text-gray cursor-pointer hover:text-dark" strokeWidth={2} />
-                <Input
-                    placeholder="Aucune Liste"
-                    id="title"
-                    name="title"
-                    type="text"
-                    required
-                    simple
-                    textStyle="text-heading-md"
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
-                {/* <h1 className="text-heading-md">{currentTodoList?.title ?? "Aucune liste"}</h1> */}
-                <ChevronRightIcon onClick={goToNext} className="size-4 text-gray cursor-pointer hover:text-dark" strokeWidth={2} />
+                {showCreateTodoListInput ?
+                    <CreateTodoListHeader
+                        userModuleUuid={userModuleUuid}
+                        onCancel={() => setShowCreateTodoListInput(false)}
+                        onTodoListCreated={(newTodoList) => {
+                            addTodoListInList(newTodoList)
+                            setShowCreateTodoListInput(false)
+                        }}
+                    /> :
+                    <UpdateTodoListHeader
+                        todoList={currentTodoList}
+                        hideChevronLeft={hideChevronLeft}
+                        isLastTodoList={isLastTodoList}
+                        onGoToPrevious={goToPrevious}
+                        onGoToNext={goToNext}
+                        onRequestCreateMode={() => setShowCreateTodoListInput(true)}
+                    />}
             </div>
 
             <div className="flex flex-row gap-1.5 flex-1 min-h-0">
-                <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                    {Object.values(TodoListStatus).map((status) =>
-                        <TodoListStatusColumn
-                            key={status}
-                            status={status}
-                            tasks={todoListTasksGroupedByStatus.find(dto => dto.status === status)?.todoListTasks ?? []}
-                            hasMore={paginationByStatus[status].hasMore}
-                            isLoading={isLoading}
-                            todoListUuid={currentTodoList?.uuid}
-                            onLoadMore={() => listMoreForStatus(status)}
-                            onTaskClick={setSelectedTask}
-                            onTaskCreated={syncTaskInGroups}
-                        />
-                    )}
-                    <DragOverlay dropAnimation={null}>
-                        {draggedTask && <TodoListTaskCard task={draggedTask} isDragDisabled />}
-                    </DragOverlay>
-                </DndContext>
+                <TodoListTasksBoard
+                    todoListUuid={currentTodoList?.uuid}
+                    taskGroups={todoListTasksGroupedByStatus}
+                    paginationByStatus={paginationByStatus}
+                    isLoading={isLoading}
+                    onLoadMore={listMoreForStatus}
+                    onTaskClick={setSelectedTask}
+                    onTaskCreated={syncTaskInGroups}
+                    getTaskByUuid={getTaskByUuid}
+                    onTaskMoved={handleTaskMoved}
+                />
             </div>
 
             {selectedTask && currentTodoList && (
@@ -106,17 +89,9 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
         </div>
     );
 
-    function handleDragStart(event: DragStartEvent) {
-        const task = getTaskByUuid(event.active.id as string);
-        setDraggedTask(task ?? null);
-    }
-
-    async function handleDragEnd(event: DragEndEvent) {
-        const { over, active } = event;
-        if (!over) return;
-
-        const updatedTask = await updateTodoListTask(active.id as string, { status: over.id as TodoListStatus });
-        if (errorMessage === null && updatedTask !== undefined) {
+    async function handleTaskMoved(taskUuid: string, status: TodoListStatus) {
+        const updatedTask = await updateTodoListTask(taskUuid, { status });
+        if (updatedTask && updateTaskErrorMessage === null) {
             syncTaskInGroups(updatedTask);
         }
     }

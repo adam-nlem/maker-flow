@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { TodoList } from "../../models/TodoList";
 
 export function useCreateTodoList({ userModuleUuid }: { userModuleUuid: string }) {
     const [title, setTitle] = useState("");
@@ -13,17 +14,19 @@ export function useCreateTodoList({ userModuleUuid }: { userModuleUuid: string }
         setErrorMessage(null)
     }
 
-    async function createTodoList(): Promise<void> {
+    async function createTodoList(): Promise<TodoList | undefined> {
         setErrorMessage(null)
         setIsSubmitting(true)
 
         try {
-            await httpClient.post('/modules/todo-lists', {
+            const res = await httpClient.post('/modules/todo-lists', {
                 "userModuleUuid": userModuleUuid,
                 "title": title,
             })
 
             resetForm()
+
+            return TodoList.fromJSON(res.data)
         } catch (err) {
             let message
             if (err instanceof NotFoundException) {
@@ -43,5 +46,6 @@ export function useCreateTodoList({ userModuleUuid }: { userModuleUuid: string }
         errorMessage, setErrorMessage,
         isSubmitting,
         createTodoList,
+        resetForm
     }
 }

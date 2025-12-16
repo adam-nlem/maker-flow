@@ -22,7 +22,7 @@ interface ListTodoListTagsDropdownProps {
 
 export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListTodoListTagsDropdownProps) {
     const { searchTerm, setSearchTerm, todoListTags, setTodoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
-    const { title, setTitle, color, setColor, createTodoListTag } = useCreateTodoListTag({ todoListUuid: todoListUuid })
+    const { title, setTitle, color, setColor, createTodoListTag, errorMessage } = useCreateTodoListTag({ todoListUuid: todoListUuid })
     const [updatingTag, setUpdatingTag] = useState<TodoListTag | null>(null);
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -34,7 +34,7 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
 
     const handleCreateTag = async () => {
         const newTag = await createTodoListTag()
-        if (newTag !== undefined) {
+        if (newTag && errorMessage === null) {
             onTagSelected(newTag)
             onClose()
         }

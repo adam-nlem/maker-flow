@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { TodoList, type TodoListJSON } from "../../models/TodoList";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
@@ -32,9 +32,16 @@ export function useListTodoLists({ userModuleUuid }: { userModuleUuid: string })
         listTodoLists()
     }, [userModuleUuid])
 
+    const addTodoListInList = useCallback((newTodoList: TodoList) => {
+        if (!todoLists.find((todoList) => todoList.uuid === newTodoList.uuid)) {
+            setTodoLists(prev => [...prev, newTodoList])
+        }
+    }, [])
+
     return {
         todoLists,
         isLoading,
-        errorMessage
+        errorMessage,
+        addTodoListInList
     }
 }
