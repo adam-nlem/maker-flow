@@ -22,9 +22,10 @@ export default function UpdateTodoListTagDropdown({ tag, onClose, onTagUpdated, 
         color,
         setColor,
         isSubmitting,
+        errorMessage: updateErrorMessage,
         updateTodoListTag } = useUpdateTodoListTag({ tag });
     const {
-        errorMessage, isLoading, deleteTodoListTag
+        errorMessage: deleteErrorMessage, isLoading, deleteTodoListTag
     } = useDeleteTodoListTag({ tagUuid: tag.uuid });
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -35,7 +36,7 @@ export default function UpdateTodoListTagDropdown({ tag, onClose, onTagUpdated, 
 
     const handleSave = async () => {
         const updatedTag = await updateTodoListTag();
-        if (updatedTag) {
+        if (updatedTag && updateErrorMessage === null) {
             onTagUpdated(updatedTag);
             onClose();
         }

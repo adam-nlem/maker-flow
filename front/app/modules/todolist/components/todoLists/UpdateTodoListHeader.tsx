@@ -10,7 +10,7 @@ interface UpdateTodoListHeaderProps {
     isLastTodoList: boolean;
     onGoToPrevious: () => void;
     onGoToNext: () => void;
-    onRequestCreateMode: () => void;
+    onShowCreateTodoListModal: () => void;
 }
 
 export default function UpdateTodoListHeader({
@@ -19,7 +19,7 @@ export default function UpdateTodoListHeader({
     isLastTodoList,
     onGoToPrevious,
     onGoToNext,
-    onRequestCreateMode,
+    onShowCreateTodoListModal: onShowCreateTodoListModal,
 }: UpdateTodoListHeaderProps) {
     const { title, setTitle } = useUpdateTodoList({ todoList });
 
@@ -45,7 +45,7 @@ export default function UpdateTodoListHeader({
             />
             {isLastTodoList ? (
                 <PlusCircleIcon
-                    onClick={onRequestCreateMode}
+                    onClick={onShowCreateTodoListModal}
                     className="size-4 text-gray cursor-pointer hover:text-dark"
                     strokeWidth={2}
                 />

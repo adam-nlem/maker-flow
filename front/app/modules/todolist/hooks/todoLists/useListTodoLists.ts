@@ -32,11 +32,14 @@ export function useListTodoLists({ userModuleUuid }: { userModuleUuid: string })
         listTodoLists()
     }, [userModuleUuid])
 
-    const addTodoListInList = useCallback((newTodoList: TodoList) => {
-        if (!todoLists.find((todoList) => todoList.uuid === newTodoList.uuid)) {
-            setTodoLists(prev => [...prev, newTodoList])
-        }
-    }, [])
+    function addTodoListInList(newTodoList: TodoList) {
+        setTodoLists(prev =>
+            prev.some(todoList => todoList.uuid === newTodoList.uuid)
+                ? prev
+                : [...prev, newTodoList],
+        );
+    }
+
 
     return {
         todoLists,

@@ -9,8 +9,8 @@ import type { TodoListTask } from "../models/TodoListTask";
 import { TodoListStatus } from "../models/enums/TodoListStatus";
 import DetailTodoListTaskModal from "./todoListTasks/DetailTodoListTaskModal";
 import TodoListTasksBoard from "./todoListTasks/TodoListTasksBoard";
-import CreateTodoListHeader from "./todoLists/CreateTodoListHeader";
 import UpdateTodoListHeader from "./todoLists/UpdateTodoListHeader";
+import CreateTodoListModal from "./todoLists/CreateTodoListModal";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists, addTodoListInList } = useListTodoLists({ userModuleUuid })
@@ -33,30 +33,21 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
 
     const [selectedTask, setSelectedTask] = useState<TodoListTask | null>(null)
 
-    const [showCreateTodoListInput, setShowCreateTodoListInput] = useState(false)
+    const [showCreateTodoListModal, setShowCreateTodoListModal] = useState(false)
 
     const hideChevronLeft = (todoLists.length > 1 || !isLastTodoList)
 
     return (
         <div className="m-5 w-1/3 h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center shrink-0">
-                {showCreateTodoListInput ?
-                    <CreateTodoListHeader
-                        userModuleUuid={userModuleUuid}
-                        onCancel={() => setShowCreateTodoListInput(false)}
-                        onTodoListCreated={(newTodoList) => {
-                            addTodoListInList(newTodoList)
-                            setShowCreateTodoListInput(false)
-                        }}
-                    /> :
-                    <UpdateTodoListHeader
-                        todoList={currentTodoList}
-                        hideChevronLeft={hideChevronLeft}
-                        isLastTodoList={isLastTodoList}
-                        onGoToPrevious={goToPrevious}
-                        onGoToNext={goToNext}
-                        onRequestCreateMode={() => setShowCreateTodoListInput(true)}
-                    />}
+                <UpdateTodoListHeader
+                    todoList={currentTodoList}
+                    hideChevronLeft={hideChevronLeft}
+                    isLastTodoList={isLastTodoList}
+                    onGoToPrevious={goToPrevious}
+                    onGoToNext={goToNext}
+                    onShowCreateTodoListModal={() => setShowCreateTodoListModal(true)}
+                />
             </div>
 
             <div className="flex flex-row gap-1.5 flex-1 min-h-0">
@@ -72,6 +63,17 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                     onTaskMoved={handleTaskMoved}
                 />
             </div>
+
+            {showCreateTodoListModal && <CreateTodoListModal
+                userModuleUuid={userModuleUuid}
+                showModal={showCreateTodoListModal}
+                onClose={() => setShowCreateTodoListModal(false)}
+                onTodoListCreated={(todoList) => {
+                    addTodoListInList(todoList)
+                    //! The new todo list is added at the end of the list
+                    //! so this works for now
+                    goToNext()
+                }} />}
 
             {selectedTask && currentTodoList && (
                 <DetailTodoListTaskModal

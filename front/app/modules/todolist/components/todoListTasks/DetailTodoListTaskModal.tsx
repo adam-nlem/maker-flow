@@ -73,7 +73,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
     }
 
     return (
-        <ModalOverlay isOpen={showModal} onClose={handleClose} className="justify-center items-center ">
+        <ModalOverlay isOpen={showModal} onClose={handleClose} className="justify-center items-center">
             <div className="border rounded-xl border-light-gray w-1/2 h-3/4 flex flex-col min-h-0 min-w-0 gap-5 shadow-lg bg-white"
                 onClick={(e) => e.stopPropagation()}
                 onMouseDown={(e) => e.stopPropagation()}>
