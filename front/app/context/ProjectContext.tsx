@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import { Project } from "~/models/Project";
 import { useListPaginatedProjects } from "~/hooks/projects/useListPaginatedProjects";
@@ -8,31 +8,52 @@ interface ProjectContextType {
     projects: Project[];
     isLoadingProjects: boolean;
     errorMessage: string | null;
-    setFocusedProject: (project: Project) => void;
+    setFocusedProject: (project: Project | null) => void;
     addProjectInList: (project: Project) => void;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
 
+const LOCAL_STORAGE_KEY = "app:project:focused";
+
 export function ProjectProvider({ children }: { children: ReactNode }) {
+
     const { projects, isLoading: isLoadingProjects, errorMessage, addProjectInList } = useListPaginatedProjects();
     const [focusedProject, setFocusedProject] = useState<Project | null>(null);
 
-    // Set the first project as current when projects are loaded
     useEffect(() => {
-        if (projects.length > 0 && !focusedProject) {
-            setFocusedProject(projects[0]);
-        }
-    }, [projects, focusedProject]);
+        if (!projects.length || focusedProject) return;
 
-    const value = {
-        focusedProject,
-        projects,
-        isLoadingProjects,
-        errorMessage,
-        setFocusedProject,
-        addProjectInList
-    };
+        // Guard against SSR/hydration
+        const isBrowser = typeof window !== "undefined";
+
+        const focusedProjectUuid = isBrowser ? localStorage.getItem(LOCAL_STORAGE_KEY) : null;
+
+        const project = projects.find((project) => project.uuid === focusedProjectUuid) ?? projects[0]
+
+        setFocusedProject(project);
+    }, [projects]);
+
+    useEffect(() => {
+        if (typeof window === "undefined") return;
+
+        if (focusedProject) {
+            localStorage.setItem(LOCAL_STORAGE_KEY, focusedProject.uuid)
+        }
+    }, [focusedProject])
+
+    const value = useMemo(
+        () => ({
+            focusedProject,
+            projects,
+            isLoadingProjects,
+            errorMessage,
+            setFocusedProject,
+            addProjectInList
+        }),
+        [focusedProject, projects, isLoadingProjects, errorMessage, addProjectInList]
+    );
+
 
     return <ProjectContext.Provider value={value}>{children}</ProjectContext.Provider>;
 }

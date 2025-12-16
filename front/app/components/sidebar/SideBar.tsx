@@ -1,4 +1,4 @@
-import { ChevronDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, PlusCircleIcon, Square3Stack3DIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, PlusCircleIcon, Square3Stack3DIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { HomeIcon as HomeIconSolid, Square3Stack3DIcon as Square3Stack3DIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
 import { useAuth } from "~/context/AuthContext";
 import { useProject } from "~/context/ProjectContext";
@@ -7,12 +7,13 @@ import { Button } from "../ui/Button";
 import { useState, useEffect } from "react";
 import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
-import SelectFocusedProjectModal from "../projects/SelectFocusedProjectModal";
 import NavigationTile from "./NavigationTile";
 import ModuleTile from "./ModuleTile";
 import Shimmer from "../ui/Shimmer";
 
 import type { UserModule } from "~/models/UserModule";
+import SelectItemModal from "../ui/SelectItemModal";
+import type { Project } from "~/models/Project";
 
 interface SideBarProps {
     isExpanded: boolean;
@@ -155,18 +156,30 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
                 </div>
             </div>
 
+
             {/* Modals */}
-            <SelectFocusedProjectModal
+            <SelectItemModal<Project>
                 showModal={showSelectFocusedProjectModal}
+                items={projects}
+                selectedItemId={focusedProject?.uuid}
+                getItemId={(project) => project.uuid}
+                onSelect={setFocusedProject}
                 onClose={() => {
                     setShowSelectFocusedProjectModal(false);
                     setIsExpanded(false);
                 }}
-                projects={projects}
-                focusedProject={focusedProject}
-                setFocusedProject={setFocusedProject}
-                onClickCreateProjectButton={() => setShowCreateProjectModal(!showCreateProjectModal)}
+                onClickCreateButton={() => setShowCreateProjectModal(!showCreateProjectModal)}
+                createButtonLabel="Créer un nouveau Projet"
+                renderItem={({ item, isSelected, onSelect }) => (
+                    <ProjectTile
+                        project={item}
+                        showCreatedAt={true}
+                        rightIcon={isSelected ? <CheckIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} /> : null}
+                        onClick={onSelect}
+                    />
+                )}
             />
+
             <CreateProjectModal
                 showModal={showCreateProjectModal}
                 onProjectCreated={(project) => addProjectInList(project)}

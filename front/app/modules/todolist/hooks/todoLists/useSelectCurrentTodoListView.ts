@@ -4,7 +4,7 @@ import type { TodoList } from "../../models/TodoList";
 export default function useSelectCurrentTodoListView({ todoLists }: { todoLists: TodoList[]; }) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    const currentTodoList = useMemo(
+    const focusedTodoList = useMemo(
         () => todoLists[currentIndex],
         [todoLists, currentIndex]
     );
@@ -25,7 +25,7 @@ export default function useSelectCurrentTodoListView({ todoLists }: { todoLists:
 
     return {
         currentIndex,
-        currentTodoList,
+        focusedTodoList,
         isLastTodoList,
         goToPrevious,
         goToNext,
