@@ -1,5 +1,5 @@
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, PlusCircleIcon, Square3Stack3DIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { HomeIcon as HomeIconSolid, Square3Stack3DIcon as Square3Stack3DIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
+import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, PlusCircleIcon, PuzzlePieceIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { HomeIcon as HomeIconSolid, PuzzlePieceIcon as PuzzlePieceIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
 import { useAuth } from "~/context/AuthContext";
 import { useProject } from "~/context/ProjectContext";
 import { useNavigate, useLocation } from "react-router";
@@ -60,10 +60,7 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
                                 moduleCount={userModules.length}
                                 isExpanded={isExpanded}
                                 rightIcon={
-                                    isExpanded && <div className="flex flex-col justify-center leading-none">
-                                        <ChevronUpIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} />
-                                        <ChevronDownIcon className="size-3.5 text-gray -mt-0.5" strokeWidth={2} />
-                                    </div>
+                                    isExpanded && <ChevronUpDownIcon className="size-5 text-gray -mb-0.5" strokeWidth={2} />
                                 }
                                 onClick={() => {
                                     setShowSelectFocusedProjectModal(true)
@@ -94,7 +91,7 @@ export default function SideBar({ isExpanded, setIsExpanded, userModules }: Side
                     {/* NAVIGATION SECTION */}
                     <div className={`mt-10 flex flex-col ${isExpanded ? '' : 'items-center'}`}>
                         <NavigationTile isExpanded={isExpanded} isBold={true} route="/" outlineIcon={HomeIcon} solidIcon={HomeIconSolid} label="Accueil" />
-                        <NavigationTile isExpanded={isExpanded} isBold={true} route="/library" outlineIcon={Square3Stack3DIcon} solidIcon={Square3Stack3DIconSolid} label="Bibliothèque" />
+                        <NavigationTile isExpanded={isExpanded} isBold={true} route="/library" outlineIcon={PuzzlePieceIcon} solidIcon={PuzzlePieceIconSolid} label="Bibliothèque" />
                     </div>
 
                     <div className="mt-5 border-t border-light-gray rounded px-2 w-full"></div>

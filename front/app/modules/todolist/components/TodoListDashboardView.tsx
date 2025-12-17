@@ -12,7 +12,7 @@ import TodoListTasksBoard from "./todoListTasks/TodoListTasksBoard";
 import UpdateTodoListHeader from "./todoLists/UpdateTodoListHeader";
 import CreateTodoListModal from "./todoLists/CreateTodoListModal";
 import TodoListTile from "./todoLists/TodoListTile";
-import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
 import { TodoList } from "../models/TodoList";
 import SelectItemModal from "~/components/ui/SelectItemModal";
 import useSelectFocusedTodoList from "../hooks/todoLists/useSelectFocusedTodoList";
@@ -45,10 +45,7 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
         <div className="m-5 w-1/3 h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center shrink-0">
                 {focusedTodoList && <TodoListTile todoList={focusedTodoList} rightIcon={
-                    <div className="flex flex-col justify-center leading-none">
-                        <ChevronUpIcon className="size-4 text-dark -mb-0.5" strokeWidth={2} />
-                        <ChevronDownIcon className="size-4 text-dark -mt-0.5" strokeWidth={2} />
-                    </div>
+                    <ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />
                 }
                     onClick={() => setShowSelectFocusedTodoListModal(true)} />}
                 {/* <UpdateTodoListHeader

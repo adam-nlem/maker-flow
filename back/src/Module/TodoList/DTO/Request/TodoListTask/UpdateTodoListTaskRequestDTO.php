@@ -17,7 +17,7 @@ class UpdateTodoListTaskRequestDTO extends AbstractRequestDTO
     private ?TodoListStatus $status;
     private ?\DateTimeImmutable $dueDate;
     /** @var string[] */
-    private array $tagUuids;
+    private ?array $tagUuids;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -33,7 +33,7 @@ class UpdateTodoListTaskRequestDTO extends AbstractRequestDTO
         $this->priority = TodoListPriority::tryFrom($payload["priority"] ?? "");
         $this->status = TodoListStatus::tryFrom($payload["status"] ?? "");
         $this->dueDate = isset($payload["dueDate"]) ? new \DateTimeImmutable($payload["dueDate"]) : null;
-        $this->tagUuids = $payload["tagUuids"] ?? [];
+        $this->tagUuids = $payload["tagUuids"] ?? null;
     }
 
     protected function buildObject(): TodoListTask
@@ -73,10 +73,7 @@ class UpdateTodoListTaskRequestDTO extends AbstractRequestDTO
         return $this->dueDate;
     }
 
-    /**
-     * @return string[]
-     */
-    public function getTagUuids(): array
+    public function getTagUuids(): ?array
     {
         return $this->tagUuids;
     }

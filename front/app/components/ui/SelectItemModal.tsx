@@ -35,7 +35,7 @@ export default function SelectItemModal<T>({
 
     return (
         <ModalOverlay isOpen={showModal} onClose={onClose}>
-            <div className="border rounded-xl border-light-gray w-fit h-min flex flex-col gap-3 p-3 shadow-lg bg-white" onClick={(e) => e.stopPropagation()}>
+            <div className="border rounded-xl border-light-gray w-fit min-h-fit flex flex-col gap-3 p-3 shadow-lg bg-white overflow-y-auto scrollbar-none scroll-pb-5" onClick={(e) => e.stopPropagation()}>
                 {items.map((item) => {
                     const itemId = getItemId(item);
                     const isSelected = selectedItemId ? selectedItemId === itemId : false;
@@ -48,7 +48,7 @@ export default function SelectItemModal<T>({
                                 onSelect: () => handleSelect(item),
                             })}
                         </div>
-                    );
+                    ); 
                 })}
 
                 <Button
