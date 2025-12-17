@@ -35,7 +35,7 @@ export default function SelectItemModal<T>({
 
     return (
         <ModalOverlay isOpen={showModal} onClose={onClose}>
-            <div className="border rounded-xl border-light-gray w-fit min-h-fit flex flex-col gap-3 p-3 shadow-lg bg-white overflow-y-auto scrollbar-none scroll-pb-5" onClick={(e) => e.stopPropagation()}>
+            <div className="self-start border rounded-xl border-light-gray w-fit max-h-full flex flex-col gap-3 p-3 shadow-lg bg-white overflow-y-auto scrollbar-none scroll-pb-5" onClick={(e) => e.stopPropagation()}>
                 {items.map((item) => {
                     const itemId = getItemId(item);
                     const isSelected = selectedItemId ? selectedItemId === itemId : false;
@@ -57,6 +57,7 @@ export default function SelectItemModal<T>({
                     size="lg"
                     variant="secondary"
                     onClick={onClickCreateButton}
+                    className="shrink-0" // Prevents the button from being compressed
                 >
                     <div className="flex flex-row justify-center items-center gap-3">
                         <p className="text-sm">{createButtonLabel}</p>
