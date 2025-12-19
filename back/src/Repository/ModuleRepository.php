@@ -46,5 +46,14 @@ class ModuleRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    
+    public function getAllPaginated(int $page, int $limit): array
+    {
+        $query = $this->createQueryBuilder('m')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->orderBy('m.createdAt', 'DESC')
+            ->getQuery();
+        $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
+        return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\QueryParam\Project\ListProjectsQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\Project\CreateProjectRequestDTO;
 use App\DTO\Request\Project\UpdateProjectRequestDTO;
@@ -20,7 +21,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/projects')]
 final class ProjectController extends AbstractController
 {
-    #[Route('', name: 'api_project_create', methods: ['POST'])]
+    #[Route('', name: 'api_projects_create', methods: ['POST'])]
     public function create(CreateProjectRequestDTO $dto, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
@@ -40,7 +41,7 @@ final class ProjectController extends AbstractController
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_create']]);
     }
 
-    #[Route('/{projectUuid}', name: 'api_project_update', methods: ['PATCH'])]
+    #[Route('/{projectUuid}', name: 'api_projects_update', methods: ['PATCH'])]
     public function update(string $projectUuid, UpdateProjectRequestDTO $dto, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
     {
         /** @var User $user */
@@ -73,8 +74,8 @@ final class ProjectController extends AbstractController
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_update']]);
     }
 
-    #[Route('/{projectUuid}', name: 'api_project_get_by_uuid', methods: ['GET'])]
-    public function getByUuid(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
+    #[Route('/{projectUuid}', name: 'api_projects_show', methods: ['GET'])]
+    public function show(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -88,7 +89,7 @@ final class ProjectController extends AbstractController
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_get_by_uuid']]);
     }
 
-    #[Route('/{projectUuid}/finish', name: 'api_project_finish', methods: ['POST'])]
+    #[Route('/{projectUuid}/finish', name: 'api_projects_finish', methods: ['POST'])]
     public function finish(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
@@ -111,7 +112,7 @@ final class ProjectController extends AbstractController
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_finish']]);
     }
 
-    #[Route('/{projectUuid}/reopen', name: 'api_project_reopen', methods: ['POST'])]
+    #[Route('/{projectUuid}/reopen', name: 'api_projects_reopen', methods: ['POST'])]
     public function reopen(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
@@ -134,7 +135,7 @@ final class ProjectController extends AbstractController
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_reopen']]);
     }
 
-    #[Route('/{projectUuid}/user-modules', name: 'api_project_get_user_modules', methods: ['GET'])]
+    #[Route('/{projectUuid}/user-modules', name: 'api_projects_get_user_modules', methods: ['GET'])]
     public function getUserModules(
         string $projectUuid,
         ProjectRepository $projectRepository,
@@ -161,13 +162,13 @@ final class ProjectController extends AbstractController
         );
     }
 
-    #[Route('/{page}/{limit}', name: 'api_projects_get_paginated', methods: ['GET'])]
-    public function getPaginated(int $page, int $limit, ProjectRepository $projectRepository): JsonResponse
+    #[Route('', name: 'api_projects_list', methods: ['GET'])]
+    public function list(ListProjectsQueryParamDTO $queryParamDto, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $projects = $projectRepository->getByUserPaginated($user, $page, $limit);
+        $projects = $projectRepository->getByUserPaginated($user, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(data: $projects, status: Response::HTTP_OK, context: ['groups' => ['api_projects_get_paginated']]);
     }

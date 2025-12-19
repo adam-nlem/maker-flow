@@ -1,4 +1,4 @@
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import type { ReactNode } from "react";
 import { Button } from "~/components/ui/Button";
 import ModalOverlay from "~/components/ui/ModalOverlay";
@@ -61,7 +61,7 @@ export default function SelectItemModal<T>({
                 >
                     <div className="flex flex-row justify-center items-center gap-3">
                         <p className="text-sm">{createButtonLabel}</p>
-                        <PlusCircleIcon className="size-4 text-clear" strokeWidth={2} />
+                        <PlusIcon className="size-4 text-clear" strokeWidth={2} />
                     </div>
                 </Button>
             </div>

@@ -22,6 +22,7 @@ class Module
 
     #[ORM\Column(type: Types::GUID, unique: true)]
     #[Groups([
+        'api_modules_list',
         'api_project_get_user_modules',
         'api_user_modules_create',
     ])]
@@ -29,6 +30,7 @@ class Module
 
     #[ORM\Column(length: 255)]
     #[Groups([
+        'api_modules_list',
         'api_project_get_user_modules',
         'api_user_modules_create',
     ])]
@@ -36,6 +38,7 @@ class Module
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
+        'api_modules_list',
         'api_project_get_user_modules',
         'api_user_modules_create',
     ])]
@@ -43,6 +46,7 @@ class Module
 
     #[ORM\Column]
     #[Groups([
+        'api_modules_list',
         'api_project_get_user_modules',
         'api_user_modules_create',
     ])]
@@ -50,6 +54,7 @@ class Module
 
     #[ORM\Column]
     #[Groups([
+        'api_modules_list',
         'api_project_get_user_modules',
         'api_user_modules_create',
     ])]
@@ -57,6 +62,7 @@ class Module
 
     #[ORM\Column]
     #[Groups([
+        'api_modules_list',
         'api_project_get_user_modules',
         'api_user_modules_create',
     ])]
@@ -64,6 +70,7 @@ class Module
 
     #[ORM\Column(nullable: true)]
     #[Groups([
+        'api_modules_list',
         'api_project_get_user_modules',
         'api_user_modules_create',
     ])]
@@ -71,6 +78,7 @@ class Module
 
     #[ORM\Column(enumType: ModuleIdentifier::class)]
     #[Groups([
+        'api_modules_list',
         'api_project_get_user_modules',
         'api_user_modules_create',
     ])]

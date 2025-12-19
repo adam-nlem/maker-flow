@@ -22,7 +22,7 @@ export default function Home({ loaderData }: Route.ComponentProps) {
 
   return (
     <div className="w-full">
-      <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} userModules={userModules} />
+      <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
       <div className="w-full pl-16 flex flex-row flex-wrap">
         {isLoading && <p>Chargement...</p>}
         {userModules

@@ -1,5 +1,5 @@
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/solid";
-import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { Input } from "~/components/ui/Input";
 import { useUpdateTodoList } from "../../hooks/todoLists/useUpdateTodoList";
 import type { TodoList } from "../../models/TodoList";
@@ -49,7 +49,7 @@ export default function UpdateTodoListHeader({
                 className="inline-block w-auto min-w-32 max-w-50"
             />
             {isLastTodoList ? (
-                <PlusCircleIcon
+                <PlusIcon
                     onClick={onShowCreateTodoListModal}
                     className="size-4 text-gray cursor-pointer hover:text-dark"
                     strokeWidth={2}

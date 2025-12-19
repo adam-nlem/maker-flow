@@ -23,9 +23,17 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     ...props },
     ref) => {
 
+    const hasIcon = Boolean(icon);
+    let spacingClasses = '';
+    if (simple) {
+      spacingClasses = hasIcon ? 'pl-8' : 'p-0';
+    } else {
+      spacingClasses = `py-1.5 ${hasIcon ? 'pl-10 pr-3' : 'px-3'}`;
+    }
+
     const inputElement = <input ref={ref} autoComplete={autoComplete} className={`
       block bg-transparent placeholder-gray-400 ${textStyle}
-      ${!simple ? 'rounded-xl border border-light-gray px-3 py-1.5 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary' : 'border-0 shadow-none outline-none focus:outline-none focus:ring-0 p-0'}
+      ${!simple ? `rounded-xl border border-light-gray shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary ${spacingClasses}` : `border-0 shadow-none outline-none focus:outline-none focus:ring-0 ${spacingClasses}`}
       ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
       ${fullWidth ? 'w-full' : ''}
       ${className}
@@ -43,10 +51,8 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
         )}
         {icon ? (
           <div className={`relative ${fullWidth ? 'w-full' : ''}`}>
-            <div className="absolute inset-y-0 left-0 flex items-center">
-              <div className="flex items-center px-3 text-gray-500">
+            <div className="absolute inset-y-0 left-3 flex items-center">
                 {icon}
-              </div>
             </div>
             {inputElement}
           </div>

@@ -1,17 +1,17 @@
 import { useState, useEffect, useCallback } from "react";
-import { Project } from "~/models/Project";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
+import { Module } from "~/models/Module";
 
-export function useListPaginatedProjects(limit: number = 10) {
-    const [projects, setProjects] = useState<Project[]>([]);
+export function useListPaginatedModules(limit: number = 10) {
+    const [modules, setModules] = useState<Module[]>([]);
     const [page, setPage] = useState(1);
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const listPaginatedProjects = useCallback(async (pageToFetch: number, append: boolean = false) => {
+    const listPaginatedModules = useCallback(async (pageToFetch: number, append: boolean = false) => {
         if (append) {
             setIsLoadingMore(true);
         } else {
@@ -19,23 +19,22 @@ export function useListPaginatedProjects(limit: number = 10) {
         }
 
         try {
-            const res = await httpClient.get(`/projects`, {
+            const res = await httpClient.get(`/modules`, {
                 params: {
-
                     page: pageToFetch,
-                    limit,
+                    limit: limit
                 }
             });
-            const projectsData = res.data.map((json: any) => Project.fromJSON(json));
+            const modulesData = res.data.map((json: any) => Module.fromJSON(json));
 
             if (append) {
-                setProjects(prev => [...prev, ...projectsData]);
+                setModules(prev => [...prev, ...modulesData]);
             } else {
-                setProjects(projectsData);
+                setModules(modulesData);
             }
 
             // If we received fewer items than the limit, there are no more pages
-            setHasMore(projectsData.length === limit);
+            setHasMore(modulesData.length === limit);
             setErrorMessage(null);
         } catch (err) {
             setErrorMessage(err instanceof CustomHttpException ? err.errorMessage : "Une erreur est survenue");
@@ -46,31 +45,31 @@ export function useListPaginatedProjects(limit: number = 10) {
     }, [limit]);
 
     useEffect(() => {
-        listPaginatedProjects(1, false);
-    }, [listPaginatedProjects]);
+        listPaginatedModules(1, false);
+    }, [listPaginatedModules]);
 
     const listMore = useCallback(() => {
         if (!isLoadingMore && hasMore) {
             const nextPage = page + 1;
             setPage(nextPage);
-            listPaginatedProjects(nextPage, true);
+            listPaginatedModules(nextPage, true);
         }
-    }, [page, isLoadingMore, hasMore, listPaginatedProjects]);
+    }, [page, isLoadingMore, hasMore, listPaginatedModules]);
 
-    function addProjectInList(newProject: Project) {
-        setProjects(prev =>
-            prev.some(project => project.uuid === newProject.uuid)
+    function addModuleInList(newModule: Module) {
+        setModules(prev =>
+            prev.some(module => module.uuid === newModule.uuid)
                 ? prev
-                : [...prev, newProject],
+                : [...prev, newModule],
         );
     }
     return {
-        projects,
+        modules,
         isLoading,
         isLoadingMore,
         hasMore,
         errorMessage,
         listMore,
-        addProjectInList,
+        addModuleInList,
     };
 }
