@@ -11,9 +11,9 @@ class ModuleService
         private readonly string $moduleIconPath,
     ) {}
 
-    public function getModuleIcon(string $moduleUuid): File
+    public function getModuleIcon(string $moduleIdentifier): File
     {
-        $filePath = sprintf('%s/%s.svg', $this->moduleIconPath, $moduleUuid);
+        $filePath = sprintf('%s/%s.svg', $this->moduleIconPath, $moduleIdentifier);
         if (!file_exists($filePath)) {
             $filePath = sprintf('%s/placeholder.svg', $this->moduleIconPath);
         }

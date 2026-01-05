@@ -46,6 +46,16 @@ class ModuleRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    public function getByModuleIdentifier(string $moduleIdentifier): ?Module
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.moduleIdentifier = :moduleIdentifier')
+            ->setParameter('moduleIdentifier', $moduleIdentifier)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     public function getAllPaginated(int $page, int $limit): array
     {
         $query = $this->createQueryBuilder('m')

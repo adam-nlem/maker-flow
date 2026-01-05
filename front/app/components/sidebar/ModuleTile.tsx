@@ -9,7 +9,7 @@ interface ModuleTileProps {
 export default function ModuleTile({ isExpanded, userModule }: ModuleTileProps) {
     const module = userModule.module;
     const navigate = useNavigate();
-    const { iconUrl } = useShowModuleIcon(module.uuid);
+    const { iconUrl } = useShowModuleIcon(module.moduleIdentifier);
 
     return <div
         key={userModule.uuid}

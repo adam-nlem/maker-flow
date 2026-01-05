@@ -2,13 +2,13 @@ import { useEffect, useState } from "react";
 import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
 
-export function useShowModuleIcon(moduleUuid?: string) {
+export function useShowModuleIcon(moduleIdentifier?: string) {
     const [iconUrl, setIconUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
     useEffect(() => {
-        if (!moduleUuid) {
+        if (!moduleIdentifier) {
             setIconUrl(null);
             setIsLoading(false);
             return;
@@ -17,7 +17,7 @@ export function useShowModuleIcon(moduleUuid?: string) {
         const showIcon = async () => {
             setIsLoading(true);
             try {
-                const res = await httpClient.get(`/modules/${moduleUuid}/icon`, {
+                const res = await httpClient.get(`/modules/${moduleIdentifier}/icon`, {
                     responseType: 'blob'
                 });
                 const url = URL.createObjectURL(res.data);
@@ -34,7 +34,7 @@ export function useShowModuleIcon(moduleUuid?: string) {
         return () => {
             if (url) URL.revokeObjectURL(url);
         };
-    }, [moduleUuid]);
+    }, [moduleIdentifier]);
 
     return {
         iconUrl,

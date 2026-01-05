@@ -15,7 +15,7 @@ interface ModuleCardProps {
 }
 export default function ModuleCard({ module, userModule, project, onUserModuleCreated }: ModuleCardProps) {
   const { createUserModule, errorMessage, isSubmitting } = useCreateUserModule({ moduleUuid: module.uuid, projectUuid: project.uuid });
-  const { iconUrl } = useShowModuleIcon(module.uuid);
+  const { iconUrl } = useShowModuleIcon(module.moduleIdentifier);
 
   return <div className="border border-light-gray rounded-md p-3 basis-1/5 min-h-[220px] cursor-pointer">
     <div className="flex flex-row justify-between">

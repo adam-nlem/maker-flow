@@ -26,16 +26,16 @@ final class ModuleController extends AbstractController
         return $this->json(data: $modules, status: Response::HTTP_OK, context: ['groups' => ['api_modules_list']]);
     }
 
-    #[Route('/{moduleUuid}/icon', name: 'api_modules_get_icon', methods: ['GET'])]
-    public function getIcon(string $moduleUuid, ModuleRepository $moduleRepository, ModuleService $moduleService)
+    #[Route('/{moduleIdentifier}/icon', name: 'api_modules_get_icon', methods: ['GET'])]
+    public function getIcon(string $moduleIdentifier, ModuleRepository $moduleRepository, ModuleService $moduleService)
     {
-        $module = $moduleRepository->getByUuid($moduleUuid);
+        $module = $moduleRepository->getByModuleIdentifier($moduleIdentifier);
 
         if ($module === null) {
-            return $this->json(data: ["message" => "No module with this uuid has been found"], status: Response::HTTP_NOT_FOUND);
+            return $this->json(data: ["message" => "No module with this identifier has been found"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $iconFile = $moduleService->getModuleIcon($moduleUuid);
+        $iconFile = $moduleService->getModuleIcon($moduleIdentifier);
 
         return new BinaryFileResponse(
             $iconFile,
