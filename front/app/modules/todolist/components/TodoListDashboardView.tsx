@@ -9,10 +9,9 @@ import type { TodoListTask } from "../models/TodoListTask";
 import { TodoListStatus } from "../models/enums/TodoListStatus";
 import DetailTodoListTaskModal from "./todoListTasks/DetailTodoListTaskModal";
 import TodoListTasksBoard from "./todoListTasks/TodoListTasksBoard";
-import UpdateTodoListHeader from "./todoLists/UpdateTodoListHeader";
 import CreateTodoListModal from "./todoLists/CreateTodoListModal";
 import TodoListTile from "./todoLists/TodoListTile";
-import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { TodoList } from "../models/TodoList";
 import SelectItemModal from "~/components/ui/SelectItemModal";
 import useSelectFocusedTodoList from "../hooks/todoLists/useSelectFocusedTodoList";
@@ -86,7 +85,8 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                     <TodoListTile
                         todoList={item}
                         showCreatedAt={true}
-                        rightIcon={isSelected ? <CheckIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} /> : null}
+                        //rightIcon={isSelected ? <CheckIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} /> : null}
+                        rightIcon={<PencilSquareIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} />}
                         onClick={onSelect}
                     />
                 )}

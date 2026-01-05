@@ -25,14 +25,9 @@ export default function TodoListTile({
             <div className="flex flex-row gap-3 ">
                 <div className="flex flex-col">
                     <h1 className="text-heading-sm whitespace-nowrap">{todoList.title}</h1>
-                    {showCreatedAt ? (
+                    {showCreatedAt && (
                         <p className="text-body-xs text-gray whitespace-nowrap">Créé le {formatToFrenchDateShort(todoList.createdAt)}</p>
-                    ) :
-                        // moduleCount !== undefined ? <p className="text-body-xs whitespace-nowrap">
-                        //     {moduleCount} Module{moduleCount !== 1 ? 's' : ''} Actif{moduleCount !== 1 ? 's' : ''}</p> : null
-                        <></>
-
-                    }
+                    )}
                 </div>
             </div>
             {rightIcon}

@@ -11,7 +11,7 @@ export default function AddDueDateDropdown({ selectedDueDate, onClose, onDueDate
         <>
             {/* Backdrop to close dropdown when clicking outside */}
             <div className="fixed inset-0 z-0" onClick={onClose} />
-            <div className="absolute top-14 left-0 mt-1 z-10">
+            <div className="absolute top-30 left-0 mt-1 z-10">
                 <DatePicker
                     selectedDate={selectedDueDate}
                     onDateSelected={(date) => {

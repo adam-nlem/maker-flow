@@ -35,7 +35,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
     const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
 
     return (
-        <div className="border border-light-gray rounded-lg p-2 flex flex-col gap-3 relative">
+        <div className="border border-light-gray rounded-lg p-2 flex flex-col gap-3">
             <Input
                 placeholder="Titre"
                 id="title"
@@ -95,7 +95,10 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                     selectedValue={priority}
                     options={selectTodoListPriorityDropdownOptions}
                     onClose={() => setShowPriorityDropdown(false)}
-                    onSelect={(selectedPriority) => setPriority(selectedPriority)}
+                    onSelect={(selectedPriority) => {
+                        setPriority(selectedPriority);
+                        setShowPriorityDropdown(false);
+                    }}
                 />
             )}
             {dueDate ? (

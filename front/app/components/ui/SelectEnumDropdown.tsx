@@ -28,7 +28,7 @@ export default function SelectEnumDropdown<T extends string>({
         <>
             {/* Backdrop to close dropdown when clicking outside */}
             <div className="fixed inset-0 z-0" onClick={onClose} />
-            <div className="absolute top-full left-0 mt-1 z-10 bg-white border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center">
+            <div className="absolute top-22 left-0 mt-1 z-10 bg-white border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center">
                 <div className="flex flex-col gap-1">
                     {options.map((option) => {
                         if (selectedValue !== option.value)
