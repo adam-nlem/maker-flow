@@ -1,75 +1,64 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
-import { Module } from "~/models/Module";
+import { Module, type ModuleJSON } from "~/models/Module";
+import { moduleQueryKeys } from "./moduleQueryKeys";
 
 export function useListPaginatedModules(limit: number = 10) {
-    const [modules, setModules] = useState<Module[]>([]);
     const [page, setPage] = useState(1);
+    const [additionalModules, setAdditionalModules] = useState<Module[]>([]);
     const [hasMore, setHasMore] = useState(true);
-    const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const listPaginatedModules = useCallback(async (pageToFetch: number, append: boolean = false) => {
-        if (append) {
-            setIsLoadingMore(true);
-        } else {
-            setIsLoading(true);
-        }
+    const query = useQuery({
+        queryKey: moduleQueryKeys.list(1, limit),
+        queryFn: async () => {
+            const res = await httpClient.get(`/modules`, {
+                params: {
+                    page: 1,
+                    limit: limit
+                }
+            });
+            const modulesData: Module[] = res.data.map((json: ModuleJSON) => Module.fromJSON(json));
+            setHasMore(modulesData.length === limit);
+            setAdditionalModules([]);
+            setPage(1);
+            return modulesData;
+        },
+    })
+
+    const modules = useMemo(() => {
+        return [...(query.data ?? []), ...additionalModules];
+    }, [query.data, additionalModules]);
+
+    const listMore = useCallback(async () => {
+        if (isLoadingMore || !hasMore) return;
+
+        setIsLoadingMore(true);
+        const nextPage = page + 1;
 
         try {
             const res = await httpClient.get(`/modules`, {
                 params: {
-                    page: pageToFetch,
+                    page: nextPage,
                     limit: limit
                 }
             });
-            const modulesData = res.data.map((json: any) => Module.fromJSON(json));
-
-            if (append) {
-                setModules(prev => [...prev, ...modulesData]);
-            } else {
-                setModules(modulesData);
-            }
-
-            // If we received fewer items than the limit, there are no more pages
+            const modulesData: Module[] = res.data.map((json: ModuleJSON) => Module.fromJSON(json));
+            setAdditionalModules(prev => [...prev, ...modulesData]);
             setHasMore(modulesData.length === limit);
-            setErrorMessage(null);
-        } catch (err) {
-            setErrorMessage(err instanceof CustomHttpException ? err.errorMessage : "Une erreur est survenue");
+            setPage(nextPage);
         } finally {
-            setIsLoading(false);
             setIsLoadingMore(false);
         }
-    }, [limit]);
+    }, [page, isLoadingMore, hasMore, limit]);
 
-    useEffect(() => {
-        listPaginatedModules(1, false);
-    }, [listPaginatedModules]);
-
-    const listMore = useCallback(() => {
-        if (!isLoadingMore && hasMore) {
-            const nextPage = page + 1;
-            setPage(nextPage);
-            listPaginatedModules(nextPage, true);
-        }
-    }, [page, isLoadingMore, hasMore, listPaginatedModules]);
-
-    function addModuleInList(newModule: Module) {
-        setModules(prev =>
-            prev.some(module => module.uuid === newModule.uuid)
-                ? prev
-                : [...prev, newModule],
-        );
-    }
     return {
         modules,
-        isLoading,
+        isLoading: query.isLoading,
         isLoadingMore,
         hasMore,
-        errorMessage,
+        error: query.error,
         listMore,
-        addModuleInList,
     };
 }

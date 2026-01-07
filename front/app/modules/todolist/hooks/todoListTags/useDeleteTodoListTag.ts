@@ -1,39 +1,24 @@
-import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { CustomHttpException, NotFoundException } from "~/services/httpClient/customHttpExceptions";
-import { TodoListTag, type TodoListTagJSON } from "../../models/TodoListTag";
+import { todoListTagQueryKeys } from "./todoListTagQueryKeys";
 
-export function useDeleteTodoListTag({ tagUuid }: { tagUuid: string }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [isLoading, setIsLoading] = useState(false)
 
-    async function deleteTodoListTag(): Promise<void> {
-        setErrorMessage(null)
-        setIsLoading(true)
+export function useDeleteTodoListTag() {
+    const queryClient = useQueryClient()
 
-        try {
+    const mutation = useMutation({
+        mutationFn: async (tagUuid: string) => {
             await httpClient.delete(`/modules/todo-lists/tags/${tagUuid}`)
-
-            setErrorMessage(null)
-            setIsLoading(false)
-
-
-        } catch (err) {
-            let message
-            if (err instanceof NotFoundException) {
-                message = "Vous n'avez pas de tag avec cet identifiant"
-            }
-            else {
-                message = "Une erreur est survenue lors de la suppression de votre tag"
-            }
-            setErrorMessage(err instanceof Error ? err.message : message)
-            setIsLoading(false)
-        }
-    }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: todoListTagQueryKeys.all })
+        },
+    })
 
     return {
-        errorMessage, setErrorMessage,
-        isLoading,
-        deleteTodoListTag
+        deleteTodoListTag: mutation.mutateAsync,
+        isPending: mutation.isPending,
+        error: mutation.error,
+        reset: mutation.reset,
     }
 }

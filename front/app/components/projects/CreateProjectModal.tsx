@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Input } from "~/components/ui/Input";
 import { ProjectType, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
 import { Button } from "~/components/ui/Button";
@@ -7,32 +8,32 @@ import { StepBadge } from "~/components/ui/StepBadge";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useCreateProject } from "~/hooks/projects/useCreateProject";
 import ModalOverlay from "~/components/ui/ModalOverlay";
-import type { Project } from "~/models/Project";
 
 interface CreateProjectModalProps {
     showModal: boolean;
     showStepHeader?: boolean;
     onClose: () => void;
-    onProjectCreated: (project: Project) => void;
+    onProjectCreated: () => void;
 }
 
 export default function CreateProjectModal({ showModal, showStepHeader = false, onClose, onProjectCreated }: CreateProjectModalProps) {
-    const {
-        name, setName,
-        description, setDescription,
-        types, setTypes,
-        errorMessage, setErrorMessage,
-        isSubmitting,
-        createProject
-    } = useCreateProject()
+    const [name, setName] = useState("");
+    const [description, setDescription] = useState("");
+    const [types, setTypes] = useState<ProjectType[]>([]);
+
+    const { createProject, isPending } = useCreateProject()
+
+    const resetForm = () => {
+        setName("");
+        setDescription("");
+        setTypes([]);
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        const project = await createProject();
-        if (project && errorMessage === null) {
-            onProjectCreated(project)
-            onClose();
-        }
+        await createProject({ name, description, types });
+        resetForm();
+        onProjectCreated();
     }
 
     if (!showModal) return null;
@@ -99,8 +100,8 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
                     <Button
                         type="submit"
                         className="mt-5"
-                        isLoading={isSubmitting}
-                        disabled={isSubmitting}
+                        isLoading={isPending}
+                        disabled={isPending}
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
                             <p className="text-sm">Créer le projet</p>

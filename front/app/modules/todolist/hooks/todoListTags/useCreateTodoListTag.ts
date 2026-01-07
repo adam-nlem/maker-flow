@@ -1,54 +1,35 @@
-import { useState } from "react";
-import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { Color } from "~/models/enums/Color";
+import type { Color } from "~/models/enums/Color";
 import { TodoListTag } from "../../models/TodoListTag";
+import { todoListTagQueryKeys } from "./todoListTagQueryKeys";
+
+interface CreateTodoListTagData {
+    title: string;
+    color: Color;
+}
 
 export function useCreateTodoListTag({ todoListUuid }: { todoListUuid: string }) {
-    const [title, setTitle] = useState("")
-    const [color, setColor] = useState(Color.Purple)
+    const queryClient = useQueryClient()
 
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    function resetForm() {
-        setTitle("")
-        setColor(Color.Purple)
-        setErrorMessage(null)
-    }
-
-    async function createTodoListTag(): Promise<TodoListTag | undefined> {
-        setErrorMessage(null)
-        setIsSubmitting(true)
-
-        try {
+    const mutation = useMutation({
+        mutationFn: async (data: CreateTodoListTagData) => {
             const res = await httpClient.post('/modules/todo-lists/tags', {
                 "todoListUuid": todoListUuid,
-                "title": title,
-                "color": color,
+                "title": data.title,
+                "color": data.color,
             })
-
-            resetForm()
-
             return TodoListTag.fromJSON(res.data);
-        } catch (err) {
-            let message
-            if (err instanceof NotFoundException) {
-                message = "Vous n'avez pas de tag avec cet identifiant"
-            } else {
-                message = "Une erreur est survenue lors de la création de votre tag"
-            }
-            setErrorMessage(err instanceof Error ? err.message : message)
-        } finally {
-            setIsSubmitting(false)
-        }
-    }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: todoListTagQueryKeys.all })
+        },
+    })
 
     return {
-        title, setTitle,
-        color, setColor,
-        errorMessage, setErrorMessage,
-        isSubmitting,
-        createTodoListTag,
+        createTodoListTag: mutation.mutateAsync,
+        isPending: mutation.isPending,
+        error: mutation.error,
+        reset: mutation.reset,
     }
 }

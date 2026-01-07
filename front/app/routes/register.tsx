@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import { Button } from '~/components/ui/Button';
@@ -8,25 +8,16 @@ import { useRegister } from "~/hooks/users/useRegister";
 
 export default function Register() {
     const navigate = useNavigate();
-    const { user, isLoading: authLoading } = useAuth();
+    const { user, isLoading: authLoading, login } = useAuth();
 
-    const {
-        firstName,
-        setFirstName,
-        lastName,
-        setLastName,
-        email,
-        setEmail,
-        password,
-        setPassword,
-        confirmPassword,
-        setConfirmPassword,
-        errorMessage,
-        isSubmitting,
-        register
-    } = useRegister();
+    const [firstName, setFirstName] = useState("");
+    const [lastName, setLastName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [validationError, setValidationError] = useState<string | null>(null);
 
-    const { login } = useAuth();
+    const { register, isPending, error } = useRegister();
 
     useEffect(() => {
         if (authLoading === false && user) {
@@ -34,11 +25,43 @@ export default function Register() {
         }
     }, [user, authLoading, navigate])
 
+    const validateForm = () => {
+        if (!firstName.trim()) {
+            setValidationError("Le prénom est requis");
+            return false;
+        }
+        if (!lastName.trim()) {
+            setValidationError("Le nom est requis");
+            return false;
+        }
+        if (!email.trim()) {
+            setValidationError("L'email est requis");
+            return false;
+        }
+        if (!password.trim()) {
+            setValidationError("Le mot de passe est requis");
+            return false;
+        }
+        if (!confirmPassword.trim()) {
+            setValidationError("La confirmation du mot de passe est requise");
+            return false;
+        }
+        if (password !== confirmPassword) {
+            setValidationError("Les mots de passe ne correspondent pas");
+            return false;
+        }
+        setValidationError(null);
+        return true;
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await register();
+        if (!validateForm()) return;
+        await register({ firstName, lastName, email, password });
         await login(email, password);
     }
+
+    const errorMessage = validationError || (error?.message ?? null);
 
 
     return (
@@ -123,8 +146,8 @@ export default function Register() {
                         <Button
                             type="submit"
                             style="primary"
-                            isLoading={isSubmitting}
-                            disabled={isSubmitting}
+                            isLoading={isPending}
+                            disabled={isPending}
                         >
                             Créer mon compte
                         </Button>

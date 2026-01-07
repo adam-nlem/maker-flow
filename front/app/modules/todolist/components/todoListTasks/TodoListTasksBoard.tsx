@@ -13,7 +13,6 @@ interface TodoListTasksBoardProps {
     isLoading: boolean;
     onLoadMore: (status: TodoListStatus) => void;
     onTaskClick: (task: TodoListTask) => void;
-    onTaskCreated: (task: TodoListTask) => void;
     getTaskByUuid: (taskUuid: string) => TodoListTask | undefined;
     onTaskMoved: (taskUuid: string, status: TodoListStatus) => Promise<void> | void;
 }
@@ -25,7 +24,6 @@ export default function TodoListTasksBoard({
     isLoading,
     onLoadMore,
     onTaskClick,
-    onTaskCreated,
     getTaskByUuid,
     onTaskMoved,
 }: TodoListTasksBoardProps) {
@@ -66,7 +64,6 @@ export default function TodoListTasksBoard({
                     todoListUuid={todoListUuid}
                     onLoadMore={() => onLoadMore(status)}
                     onTaskClick={onTaskClick}
-                    onTaskCreated={onTaskCreated}
                 />
             ))}
             <DragOverlay dropAnimation={null}>

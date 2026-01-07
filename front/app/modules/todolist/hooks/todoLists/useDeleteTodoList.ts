@@ -1,38 +1,23 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
+import { todoListQueryKeys } from "./todoListQueryKeys";
 
-export function useDeleteTodoList({ todoListUuid }: { todoListUuid: string }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [isLoading, setIsLoading] = useState(false)
+export function useDeleteTodoList() {
+    const queryClient = useQueryClient()
 
-    async function deleteTodoList(): Promise<void> {
-        setErrorMessage(null)
-        setIsLoading(true)
-
-        try {
+    const mutation = useMutation({
+        mutationFn: async (todoListUuid: string) => {
             await httpClient.delete(`/modules/todo-lists/${todoListUuid}`)
-
-            setErrorMessage(null)
-            setIsLoading(false)
-
-
-        } catch (err) {
-            let message
-            if (err instanceof NotFoundException) {
-                message = "Vous n'avez pas de todo list avec cet identifiant"
-            }
-            else {
-                message = "Une erreur est survenue lors de la suppression de votre todo list"
-            }
-            setErrorMessage(err instanceof Error ? err.message : message)
-            setIsLoading(false)
-        }
-    }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: todoListQueryKeys.all })
+        },
+    })
 
     return {
-        errorMessage, setErrorMessage,
-        isLoading,
-        deleteTodoList
+        deleteTodoList: mutation.mutateAsync,
+        isPending: mutation.isPending,
+        error: mutation.error,
+        reset: mutation.reset,
     }
 }

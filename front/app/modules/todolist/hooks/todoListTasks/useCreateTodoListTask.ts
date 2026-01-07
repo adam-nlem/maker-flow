@@ -1,72 +1,45 @@
-import { useState } from "react";
-import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import type { TodoListPriority } from "../../models/enums/TodoListPriority";
 import type { TodoListStatus } from "../../models/enums/TodoListStatus";
 import type { TodoListTag } from "../../models/TodoListTag";
 import { TodoListTask } from "../../models/TodoListTask";
+import { todoListTaskQueryKeys } from "./todoListTaskQueryKeys";
+
+
+interface CreateTodoListTaskData {
+    title: string;
+    content?: string;
+    priority?: TodoListPriority;
+    status?: TodoListStatus;
+    dueDate?: Date;
+    tags?: TodoListTag[];
+}
 
 export function useCreateTodoListTask({ todoListUuid }: { todoListUuid: string }) {
-    const [title, setTitle] = useState("");
-    const [content, setContent] = useState<string | undefined>(undefined);
-    const [priority, setPriority] = useState<TodoListPriority | undefined>(undefined);
-    const [status, setStatus] = useState<TodoListStatus | undefined>(undefined);
-    const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
-    const [tags, setTags] = useState<TodoListTag[]>([]);
+    const queryClient = useQueryClient()
 
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-
-    function resetForm() {
-        setTitle("")
-        setContent(undefined)
-        setPriority(undefined)
-        setStatus(undefined)
-        setDueDate(undefined)
-        setTags([])
-        setErrorMessage(null)
-    }
-
-    async function createTodoListTask(): Promise<TodoListTask | undefined> {
-        setErrorMessage(null)
-        setIsSubmitting(true)
-
-        try {
-            const res = await httpClient.post('/modules/todo-lists/tasks', {
+    const mutation = useMutation({
+        mutationFn: async (data: CreateTodoListTaskData) => {
+            await httpClient.post('/modules/todo-lists/tasks', {
                 "todoListUuid": todoListUuid,
-                "title": title,
-                "content": content,
-                "priority": priority,
-                "status": status,
-                "dueDate": dueDate ? dueDate.toLocaleDateString('sv-SE') : undefined, // 'sv-SE' outputs YYYY-MM-DD
-                "tagUuids": tags.map((tag) => tag.uuid),
+                "title": data.title,
+                "content": data.content,
+                "priority": data.priority,
+                "status": data.status,
+                "dueDate": data.dueDate ? data.dueDate.toLocaleDateString('sv-SE') : undefined,
+                "tagUuids": data.tags?.map((tag) => tag.uuid),
             })
-
-            resetForm()
-
-            return TodoListTask.fromJSON(res.data);
-        } catch (err) {
-            let message
-            if (err instanceof NotFoundException) {
-                message = "Vous n'avez pas de tâche avec cet identifiant"
-            } else {
-                message = "Une erreur est survenue lors de la création de votre tâche"
-            }
-            setErrorMessage(err instanceof Error ? err.message : message)
-        } finally {
-            setIsSubmitting(false)
-        }
-    }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: todoListTaskQueryKeys.list(todoListUuid) })
+        },
+    })
 
     return {
-        title, setTitle,
-        content, setContent,
-        priority, setPriority,
-        status, setStatus,
-        dueDate, setDueDate,
-        tags, setTags,
-        errorMessage, setErrorMessage,
-        isSubmitting,
-        createTodoListTask,
+        createTodoListTask: mutation.mutateAsync,
+        isPending: mutation.isPending,
+        error: mutation.error,
+        reset: mutation.reset,
     }
 }

@@ -7,9 +7,8 @@ interface ProjectContextType {
     focusedProject: Project | null;
     projects: Project[];
     isLoadingProjects: boolean;
-    errorMessage: string | null;
+    error: Error | null;
     setFocusedProject: (project: Project | null) => void;
-    addProjectInList: (project: Project) => void;
 }
 
 const ProjectContext = createContext<ProjectContextType | undefined>(undefined);
@@ -18,7 +17,7 @@ const LOCAL_STORAGE_KEY = "app:project:focused";
 
 export function ProjectProvider({ children }: { children: ReactNode }) {
 
-    const { projects, isLoading: isLoadingProjects, errorMessage, addProjectInList } = useListPaginatedProjects();
+    const { projects, isLoading: isLoadingProjects, error } = useListPaginatedProjects();
     const [focusedProject, setFocusedProject] = useState<Project | null>(null);
 
     useEffect(() => {
@@ -47,11 +46,10 @@ export function ProjectProvider({ children }: { children: ReactNode }) {
             focusedProject,
             projects,
             isLoadingProjects,
-            errorMessage,
+            error,
             setFocusedProject,
-            addProjectInList
         }),
-        [focusedProject, projects, isLoadingProjects, errorMessage, addProjectInList]
+        [focusedProject, projects, isLoadingProjects, error]
     );
 
 

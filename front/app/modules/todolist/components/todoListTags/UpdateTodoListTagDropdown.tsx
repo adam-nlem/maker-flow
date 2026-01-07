@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
 import { Color, colorToBgClass } from "~/models/enums/Color";
@@ -11,22 +11,16 @@ import { useDeleteTodoListTag } from "../../hooks/todoListTags/useDeleteTodoList
 interface UpdateTodoListTagDropdownProps {
     tag: TodoListTag;
     onClose: () => void;
-    onTagUpdated: (updatedTag: TodoListTag) => void;
+    onTagUpdated: () => void;
     onTagDeleted: (deletedTagUuid: string) => void;
 }
 
 export default function UpdateTodoListTagDropdown({ tag, onClose, onTagUpdated, onTagDeleted }: UpdateTodoListTagDropdownProps) {
-    const {
-        title,
-        setTitle,
-        color,
-        setColor,
-        isSubmitting,
-        errorMessage: updateErrorMessage,
-        updateTodoListTag } = useUpdateTodoListTag({ tag });
-    const {
-        errorMessage: deleteErrorMessage, isLoading, deleteTodoListTag
-    } = useDeleteTodoListTag({ tagUuid: tag.uuid });
+    const [title, setTitle] = useState(tag.title);
+    const [color, setColor] = useState(tag.color);
+
+    const { updateTodoListTag, isPending: isUpdating } = useUpdateTodoListTag();
+    const { deleteTodoListTag, isPending: isDeleting } = useDeleteTodoListTag();
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -35,11 +29,9 @@ export default function UpdateTodoListTagDropdown({ tag, onClose, onTagUpdated, 
     }, []);
 
     const handleSave = async () => {
-        const updatedTag = await updateTodoListTag();
-        if (updatedTag && updateErrorMessage === null) {
-            onTagUpdated(updatedTag);
-            onClose();
-        }
+        await updateTodoListTag({ tagUuid: tag.uuid, title, color });
+        onTagUpdated();
+        onClose();
     };
 
     return (
@@ -69,13 +61,13 @@ export default function UpdateTodoListTagDropdown({ tag, onClose, onTagUpdated, 
 
             <Button
                 onClick={handleSave}
-                disabled={isSubmitting || title.trim() === ""}
+                disabled={isUpdating || title.trim() === ""}
             >
                 Enregistrer
             </Button>
 
             <SimpleTextButton onClick={async () => {
-                await deleteTodoListTag();
+                await deleteTodoListTag(tag.uuid);
                 onTagDeleted(tag.uuid);
                 onClose();
             }}

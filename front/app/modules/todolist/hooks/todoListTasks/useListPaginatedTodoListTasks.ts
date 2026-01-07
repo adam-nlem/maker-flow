@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
 import { TodoListStatus } from "../../models/enums/TodoListStatus";
 import { TodoListTasksGroupedByStatusDTO, type TodoListTasksGroupedByStatusDTOJSON } from "../../dtos/TodoListTasksGroupedByStatusDTO";
 import type { TodoListTask } from "../../models/TodoListTask";
+import { todoListTaskQueryKeys } from "./todoListTaskQueryKeys";
 
 interface UseListPaginatedTodoListTasksProps {
     todoListUuid: string | undefined;
@@ -16,20 +17,21 @@ interface PaginationState {
 }
 
 export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseListPaginatedTodoListTasksProps) {
-    const [todoListTasksGroupedByStatus, setTodoListTasksGroupedByStatus] = useState<TodoListTasksGroupedByStatusDTO[]>([]);
     const [paginationByStatus, setPaginationByStatus] = useState<Record<TodoListStatus, PaginationState>>({
         [TodoListStatus.Pending]: { page: 1, hasMore: true },
         [TodoListStatus.InProgress]: { page: 1, hasMore: true },
         [TodoListStatus.Completed]: { page: 1, hasMore: true },
     });
-    const [isLoading, setIsLoading] = useState(true);
+    const [additionalTasksByStatus, setAdditionalTasksByStatus] = useState<Record<TodoListStatus, TodoListTask[]>>({
+        [TodoListStatus.Pending]: [],
+        [TodoListStatus.InProgress]: [],
+        [TodoListStatus.Completed]: [],
+    });
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const listInitialTasks = useCallback(async () => {
-        setIsLoading(true);
-
-        try {
+    const query = useQuery({
+        queryKey: todoListTaskQueryKeys.list(todoListUuid ?? ''),
+        queryFn: async () => {
             const res = await httpClient.get(`/modules/todo-lists/tasks`, {
                 params: {
                     todoListUuid,
@@ -38,11 +40,9 @@ export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseL
                 }
             });
 
-            const groupedData = res.data.map((json: TodoListTasksGroupedByStatusDTOJSON) =>
+            const groupedData: TodoListTasksGroupedByStatusDTO[] = res.data.map((json: TodoListTasksGroupedByStatusDTOJSON) =>
                 TodoListTasksGroupedByStatusDTO.fromJSON(json)
             );
-
-            setTodoListTasksGroupedByStatus(groupedData);
 
             setPaginationByStatus({
                 [TodoListStatus.Pending]: { page: 1, hasMore: groupedData.find((g: TodoListTasksGroupedByStatusDTO) => g.status === TodoListStatus.Pending)?.todoListTasks.length === limit },
@@ -50,13 +50,27 @@ export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseL
                 [TodoListStatus.Completed]: { page: 1, hasMore: groupedData.find((g: TodoListTasksGroupedByStatusDTO) => g.status === TodoListStatus.Completed)?.todoListTasks.length === limit },
             });
 
-            setErrorMessage(null);
-        } catch (err) {
-            setErrorMessage(err instanceof CustomHttpException ? err.errorMessage : "Une erreur est survenue");
-        } finally {
-            setIsLoading(false);
-        }
-    }, [todoListUuid, limit]);
+            setAdditionalTasksByStatus({
+                [TodoListStatus.Pending]: [],
+                [TodoListStatus.InProgress]: [],
+                [TodoListStatus.Completed]: [],
+            });
+
+            return groupedData;
+        },
+        enabled: !!todoListUuid,
+    })
+
+    const todoListTasksGroupedByStatus = useMemo(() => {
+        if (!query.data) return [];
+        return query.data.map(group => {
+            const additional = additionalTasksByStatus[group.status] ?? [];
+            return new TodoListTasksGroupedByStatusDTO(
+                group.status,
+                [...group.todoListTasks, ...additional]
+            );
+        });
+    }, [query.data, additionalTasksByStatus]);
 
     const listMoreForStatus = useCallback(async (status: TodoListStatus) => {
         const currentPagination = paginationByStatus[status];
@@ -75,79 +89,37 @@ export function useListPaginatedTodoListTasks({ todoListUuid, limit = 10 }: UseL
                 }
             });
 
-            const groupedData = res.data.map((json: TodoListTasksGroupedByStatusDTOJSON) =>
+            const groupedData: TodoListTasksGroupedByStatusDTO[] = res.data.map((json: TodoListTasksGroupedByStatusDTOJSON) =>
                 TodoListTasksGroupedByStatusDTO.fromJSON(json)
             );
 
             const newTasks = groupedData[0]?.todoListTasks ?? [];
 
-            setTodoListTasksGroupedByStatus(prev =>
-                prev.map(group => {
-                    if (group.status === status) {
-                        return new TodoListTasksGroupedByStatusDTO(
-                            group.status,
-                            [...group.todoListTasks, ...newTasks]
-                        );
-                    }
-                    return group;
-                })
-            );
+            setAdditionalTasksByStatus(prev => ({
+                ...prev,
+                [status]: [...prev[status], ...newTasks],
+            }));
 
             setPaginationByStatus(prev => ({
                 ...prev,
                 [status]: { page: nextPage, hasMore: newTasks.length === limit },
             }));
-
-            setErrorMessage(null);
-        } catch (err) {
-            setErrorMessage(err instanceof CustomHttpException ? err.errorMessage : "Une erreur est survenue");
         } finally {
             setIsLoadingMore(false);
         }
     }, [todoListUuid, limit, paginationByStatus, isLoadingMore]);
 
-    useEffect(() => {
-        if (todoListUuid) {
-            listInitialTasks();
-        }
-    }, [todoListUuid, listInitialTasks]);
-
     const getTaskByUuid = useCallback((taskUuid: string): TodoListTask | undefined => {
         return todoListTasksGroupedByStatus.flatMap(g => g.todoListTasks).find(t => t.uuid === taskUuid);
     }, [todoListTasksGroupedByStatus]);
 
-    const syncTaskInGroups = useCallback((task: TodoListTask) => {
-        setTodoListTasksGroupedByStatus(prev => {
-
-            return prev.map(group => {
-                const tasksWithoutMoved = group.todoListTasks.filter(t => t.uuid !== task.uuid);
-                const tasks = group.status === task.status
-                    ? [task, ...tasksWithoutMoved]
-                    : tasksWithoutMoved;
-
-                return new TodoListTasksGroupedByStatusDTO(group.status, tasks);
-            });
-        });
-    }, []);
-
-    const removeTaskFromGroups = useCallback((taskUuid: string) => {
-        setTodoListTasksGroupedByStatus(prev => {
-            return prev.map(group => {
-                const filteredTasks = group.todoListTasks.filter(t => t.uuid !== taskUuid);
-                return new TodoListTasksGroupedByStatusDTO(group.status, filteredTasks);
-            });
-        });
-    }, []);
-
     return {
         todoListTasksGroupedByStatus,
         paginationByStatus,
-        isLoading,
+        isLoading: query.isLoading,
         isLoadingMore,
-        errorMessage,
+        error: query.error,
         listMoreForStatus,
-        syncTaskInGroups,
-        removeTaskFromGroups,
         getTaskByUuid,
     };
 }

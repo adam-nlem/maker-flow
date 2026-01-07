@@ -1,5 +1,5 @@
 import { useSidebar } from "~/context/SidebarContext";
-import type { Route } from "../+types/library";
+
 import { useProject } from "~/context/ProjectContext";
 import SideBar from "~/components/sidebar/SideBar";
 import { Input } from "~/components/ui/Input";
@@ -7,6 +7,7 @@ import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 import { useListProjectUserModules } from "~/hooks/projects/useListProjectUserModules";
 import { useListPaginatedModules } from "~/hooks/modules/useListPaginatedModules";
 import ModuleCard from "~/components/sidebar/ModuleCard";
+import type { Route } from "./+types/library";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -22,7 +23,7 @@ export default function Library({ loaderData }: Route.ComponentProps) {
   const { isExpanded, setIsExpanded } = useSidebar()
   const { focusedProject } = useProject()
   const { modules } = useListPaginatedModules(12)
-  const { userModules, syncUserModuleInList, isLoading } = useListProjectUserModules(focusedProject?.uuid);
+  const { userModules, isLoading } = useListProjectUserModules(focusedProject?.uuid);
 
 
   return <div className="w-screen h-screen overflow-hidden">
@@ -39,7 +40,7 @@ export default function Library({ loaderData }: Route.ComponentProps) {
       <div className="flex-1 w-full overflow-hidden">
         <div className="flex flex-wrap items-center justify-center p-5 gap-5 h-full overflow-y-auto scrollbar-none scroll-pb-5">
 
-          {focusedProject && modules.map((module) => <ModuleCard project={focusedProject} onUserModuleCreated={syncUserModuleInList} module={module} userModule={userModules.find((userModule) => userModule.module.uuid === module.uuid)} />)}
+          {focusedProject && modules.map((module) => <ModuleCard key={module.uuid} project={focusedProject} onUserModuleCreated={() => {}} module={module} userModule={userModules.find((userModule) => userModule.module.uuid === module.uuid)} />)}
 
         </div>
       </div>

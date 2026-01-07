@@ -23,11 +23,10 @@ interface DetailTodoListTaskModalProps {
     task: TodoListTask;
     showModal: boolean;
     onClose: () => void;
-    onTaskUpdated?: (task: TodoListTask) => void;
-    onTaskDeleted: (deletedTaskUuid: string) => void;
+    onTaskDeleted: () => void;
 }
 
-export default function DetailTodoListTaskModal({ todoListUuid, task, showModal, onClose, onTaskUpdated, onTaskDeleted }: DetailTodoListTaskModalProps) {
+export default function DetailTodoListTaskModal({ todoListUuid, task, showModal, onClose, onTaskDeleted }: DetailTodoListTaskModalProps) {
     const [title, setTitle] = useState(task.title)
     const [content, setContent] = useState(task.content)
     const [status, setStatus] = useState(task.status)
@@ -41,7 +40,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
     const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
 
     const { updateTodoListTask } = useUpdateTodoListTask()
-    const { deleteTodoListTask } = useDeleteTodoListTask({ taskUuid: task.uuid })
+    const { deleteTodoListTask } = useDeleteTodoListTask()
 
     const hasChanges = () => {
         const tagsChanged = tags.length !== task.tags.length ||
@@ -57,17 +56,18 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
 
     const handleClose = async () => {
         if (hasChanges()) {
-            const updatedTask = await updateTodoListTask(task.uuid, {
-                title,
-                content,
-                status,
-                priority: priority ?? null,
-                dueDate: dueDate ?? null,
-                tags,
+            await updateTodoListTask({
+                taskUuid: task.uuid,
+                todoListUuid,
+                data: {
+                    title,
+                    content,
+                    status,
+                    priority: priority ?? null,
+                    dueDate: dueDate ?? null,
+                    tags,
+                }
             })
-            if (updatedTask && onTaskUpdated) {
-                onTaskUpdated(updatedTask)
-            }
         }
         onClose()
     }
@@ -92,9 +92,8 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                             onChange={(e) => setTitle(e.target.value)}
                         />
                         <SimpleTextButton onClick={async () => {
-                            await deleteTodoListTask();
-                            onTaskDeleted(task.uuid);
-                            onClose();
+                            await deleteTodoListTask({ taskUuid: task.uuid, todoListUuid });
+                            onTaskDeleted();
                         }}
                             hoverColor={"hover:text-danger"} children={
                                 <>

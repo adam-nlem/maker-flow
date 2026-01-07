@@ -1,5 +1,4 @@
 import ModalOverlay from "~/components/ui/ModalOverlay";
-import { useCreateTodoList } from "../../hooks/todoLists/useCreateTodoList";
 import type { TodoList } from "../../models/TodoList";
 import { ChevronRightIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
@@ -12,33 +11,23 @@ interface UpdateTodoListModalProps {
     showModal: boolean;
     todoList?: TodoList;
     onClose: () => void;
-    onTodoListUpdated: (todoList: TodoList) => void;
-    onTodoListDeleted: (todoList: TodoList) => void;
+    onTodoListUpdated: () => void;
+    onTodoListDeleted: () => void;
 }
 
 export default function UpdateTodoListModal({ showModal, todoList, onClose, onTodoListUpdated, onTodoListDeleted }: UpdateTodoListModalProps) {
+    const [title, setTitle] = useState(todoList?.title ?? "");
+    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
+
+    const { updateTodoList, isPending: isUpdating } = useUpdateTodoList();
+    const { deleteTodoList, isPending: isDeleting } = useDeleteTodoList();
 
     if (!todoList) return null;
 
-    const {
-        title,
-        setTitle,
-        errorMessage: updateErrorMessage,
-        isSubmitting,
-        updateTodoList
-    } = useUpdateTodoList({ todoList });
-
-    const { errorMessage: deleteErrorMessage, isLoading, deleteTodoList } = useDeleteTodoList({ todoListUuid: todoList.uuid });
-
-    const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
-
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        const todoList = await updateTodoList();
-        if (todoList && updateErrorMessage === null) {
-            onTodoListUpdated(todoList)
-            onClose()
-        }
+        await updateTodoList({ todoListUuid: todoList.uuid, title });
+        onTodoListUpdated();
     }
 
 
@@ -68,8 +57,8 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose, onTo
 
                     <Button
                         type="submit"
-                        isLoading={isSubmitting}
-                        disabled={isSubmitting}
+                        isLoading={isUpdating}
+                        disabled={isUpdating}
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
                             <p className="text-sm">Modifier la Todo List</p>
@@ -84,8 +73,8 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose, onTo
                             <div className="flex flex-row w-full justify-center items-center gap-3">
                                 <Button
                                     width="w-1/5"
-                                    isLoading={isLoading}
-                                    disabled={isLoading}
+                                    isLoading={isDeleting}
+                                    disabled={isDeleting}
                                     onClick={() => setShowDeleteConfirmation(false)}
                                 >
                                     Annuler
@@ -93,12 +82,11 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose, onTo
                                 <Button
                                     width="w-1/5"
                                     style="danger"
-                                    isLoading={isLoading}
-                                    disabled={isLoading}
-                                    onClick={() => {
-                                        deleteTodoList();
-                                        onTodoListDeleted(todoList);
-                                        onClose();
+                                    isLoading={isDeleting}
+                                    disabled={isDeleting}
+                                    onClick={async () => {
+                                        await deleteTodoList(todoList.uuid);
+                                        onTodoListDeleted();
                                     }}
                                 >
                                     Supprimer
@@ -107,8 +95,8 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose, onTo
                         </div> : <Button
                             width="w-1/2"
                             style="danger"
-                            isLoading={isLoading}
-                            disabled={isLoading}
+                            isLoading={isDeleting}
+                            disabled={isDeleting}
                             onClick={() => setShowDeleteConfirmation(true)}
                         >
                             <div className="flex flex-row justify-center items-center gap-3">

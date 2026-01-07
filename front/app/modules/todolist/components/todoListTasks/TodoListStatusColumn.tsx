@@ -16,10 +16,9 @@ interface TodoListStatusColumnProps {
     todoListUuid: string | undefined;
     onLoadMore: () => void;
     onTaskClick: (task: TodoListTask) => void;
-    onTaskCreated: (task: TodoListTask) => void;
 }
 
-export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskClick, onTaskCreated }: TodoListStatusColumnProps) {
+export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskClick }: TodoListStatusColumnProps) {
     const [showCreateTaskCard, setShowCreateTaskCard] = useState(false)
 
     const { isOver, setNodeRef } = useDroppable({ id: status });
@@ -43,7 +42,7 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
 
                             {status === TodoListStatus.Pending && todoListUuid && (
                                 showCreateTaskCard ?
-                                <CreateTodoListTaskCard todoListUuid={todoListUuid} onTaskCreated={onTaskCreated} /> :
+                                <CreateTodoListTaskCard todoListUuid={todoListUuid} onTaskCreated={() => setShowCreateTaskCard(false)} /> :
                                 <SimpleTextButton onClick={() => setShowCreateTaskCard(true)}>
                                     <PlusIcon className="size-3.5" strokeWidth={2} />
                                     <p>Nouvelle tâche</p>

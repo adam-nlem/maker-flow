@@ -1,59 +1,36 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ProjectType } from "~/models/enums/ProjectType";
 import { Project } from "~/models/Project";
-import { ConflictException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { projectQueryKeys } from "./projectQueryKeys";
+
+interface CreateProjectData {
+  name: string;
+  description: string;
+  types: ProjectType[];
+}
 
 export function useCreateProject() {
-  const [name, setName] = useState("")
-  const [description, setDescription] = useState("")
-  const [types, setTypes] = useState<ProjectType[]>([])
+  const queryClient = useQueryClient()
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
-  function resetForm() {
-    setName("")
-    setDescription("")
-    setTypes([])
-    setErrorMessage(null)
-    setIsSubmitting(false)
-  }
-
-  async function createProject(): Promise<Project | undefined> {
-    setErrorMessage(null)
-    setIsSubmitting(true)
-
-    try {
+  const mutation = useMutation({
+    mutationFn: async (data: CreateProjectData) => {
       const res = await httpClient.post('/projects', {
-        "name": name,
-        "description": description,
-        "types": types
+        "name": data.name,
+        "description": data.description,
+        "types": data.types
       })
-
-      resetForm()
       return Project.fromJSON(res.data)
-    } catch (err) {
-      let message
-      if (err instanceof ConflictException) {
-
-        message = "Vous avez déjà un Projet avec ce nom"
-      } else {
-        message = "Une erreur est survenue lors de la création du Projet"
-      }
-      setErrorMessage(err instanceof Error ? err.message : message)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: projectQueryKeys.all })
+    },
+  })
 
   return {
-    name, setName,
-    description, setDescription,
-    types, setTypes,
-    errorMessage, setErrorMessage,
-    isSubmitting,
-    createProject
+    createProject: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+    reset: mutation.reset,
   }
-
 }

@@ -1,47 +1,33 @@
-import { useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { UserModule } from "~/models/UserModule";
-import { ConflictException, NotFoundException } from "~/services/httpClient/customHttpExceptions";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { projectQueryKeys } from "../projects/projectQueryKeys";
 
-export function useCreateUserModule({ moduleUuid, projectUuid }: { moduleUuid: string, projectUuid: string }) {
+interface CreateUserModuleData {
+  moduleUuid: string;
+  projectUuid: string;
+}
 
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [isSubmitting, setIsSubmitting] = useState(false)
+export function useCreateUserModule() {
+  const queryClient = useQueryClient()
 
-  async function createUserModule(): Promise<UserModule | undefined> {
-    setErrorMessage(null)
-    setIsSubmitting(true)
-
-    try {
+  const mutation = useMutation({
+    mutationFn: async ({ moduleUuid, projectUuid }: CreateUserModuleData) => {
       const res = await httpClient.post('/user-modules', {
         "moduleUuid": moduleUuid,
         "projectUuid": projectUuid
       })
-
-      setErrorMessage(null)
-      setIsSubmitting(false)
-
       return UserModule.fromJSON(res.data)
-    } catch (err) {
-      let message
-      if (err instanceof ConflictException) {
-
-        message = "Vous avez déjà activé ce Module pour ce Projet"
-      } else if (err instanceof NotFoundException) {
-        message = "Ce Module ou Projet n'existe pas"
-      }
-      else {
-        message = "Une erreur est survenue lors de la création du Projet"
-      }
-      setErrorMessage(err instanceof Error ? err.message : message)
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
+    },
+    onSuccess: (_, { projectUuid }) => {
+      queryClient.invalidateQueries({ queryKey: projectQueryKeys.userModules(projectUuid) })
+    },
+  })
 
   return {
-    createUserModule,
-    errorMessage,
-    isSubmitting,
+    createUserModule: mutation.mutateAsync,
+    isPending: mutation.isPending,
+    error: mutation.error,
+    reset: mutation.reset,
   }
 }

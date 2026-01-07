@@ -9,30 +9,34 @@ import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import type { TodoListTag } from "../../models/TodoListTag";
 import { todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoListPriorityToTextClass, selectTodoListPriorityDropdownOptions } from "../../models/enums/TodoListPriority";
+import type { TodoListPriority } from "../../models/enums/TodoListPriority";
 import SelectEnumDropdown from "~/components/ui/SelectEnumDropdown";
 import AddDueDateDropdown from "./AddDueDateDropdown";
 import { Button } from "~/components/ui/Button";
-import type { TodoListTask } from "../../models/TodoListTask";
 
 interface CreateTodoListTaskCardProps {
     todoListUuid: string;
-    onTaskCreated: (task: TodoListTask) => void;
+    onTaskCreated: () => void;
 }
 
 export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: CreateTodoListTaskCardProps) {
-    const {
-        title, setTitle,
-        priority, setPriority,
-        dueDate, setDueDate,
-        tags, setTags,
-        errorMessage, setErrorMessage,
-        isSubmitting,
-        createTodoListTask,
-    } = useCreateTodoListTask({ todoListUuid: todoListUuid })
+    const [title, setTitle] = useState("");
+    const [priority, setPriority] = useState<TodoListPriority | undefined>(undefined);
+    const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
+    const [tags, setTags] = useState<TodoListTag[]>([]);
+
+    const { createTodoListTask, isPending } = useCreateTodoListTask({ todoListUuid })
 
     const [showTagsDropdown, setShowTagsDropdown] = useState(false);
     const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
     const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
+
+    const resetForm = () => {
+        setTitle("");
+        setPriority(undefined);
+        setDueDate(undefined);
+        setTags([]);
+    };
 
     return (
         <div className="border border-light-gray rounded-lg p-2 flex flex-col gap-3">
@@ -126,12 +130,11 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
 
             {title !== "" && <Button
                 onClick={async () => {
-                    const createdTask = await createTodoListTask()
-                    if (createdTask && errorMessage === null) {
-                        onTaskCreated(createdTask)
-                    }
+                    await createTodoListTask({ title, priority, dueDate, tags });
+                    resetForm();
+                    onTaskCreated();
                 }}
-                disabled={isSubmitting || title.trim() === ""}
+                disabled={isPending || title.trim() === ""}
             >
                 Créer
             </Button>}

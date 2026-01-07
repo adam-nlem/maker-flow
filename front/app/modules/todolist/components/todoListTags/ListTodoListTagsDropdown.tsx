@@ -4,11 +4,9 @@ import { useListTodoListTagsWithSearch } from "../../hooks/todoListTags/useListT
 import { TagIcon } from "@heroicons/react/16/solid";
 import { Color, colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import { Input } from "~/components/ui/Input";
-import { Button } from "~/components/ui/Button";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useCreateTodoListTag } from "../../hooks/todoListTags/useCreateTodoListTag";
 import type { TodoListTag } from "../../models/TodoListTag";
-import Shimmer from "~/components/ui/Shimmer";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import UpdateTodoListTagDropdown from "./UpdateTodoListTagDropdown";
 
@@ -21,8 +19,10 @@ interface ListTodoListTagsDropdownProps {
 }
 
 export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListTodoListTagsDropdownProps) {
-    const { searchTerm, setSearchTerm, todoListTags, setTodoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
-    const { title, setTitle, color, setColor, createTodoListTag, errorMessage } = useCreateTodoListTag({ todoListUuid: todoListUuid })
+    const { searchTerm, setSearchTerm, todoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
+    const [title, setTitle] = useState("");
+    const [color, setColor] = useState(Color.Purple);
+    const { createTodoListTag } = useCreateTodoListTag({ todoListUuid: todoListUuid })
     const [updatingTag, setUpdatingTag] = useState<TodoListTag | null>(null);
 
     const inputRef = useRef<HTMLInputElement>(null);
@@ -33,11 +33,9 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
     }, []);
 
     const handleCreateTag = async () => {
-        const newTag = await createTodoListTag()
-        if (newTag && errorMessage === null) {
-            onTagSelected(newTag)
-            onClose()
-        }
+        const newTag = await createTodoListTag({ title, color });
+        onTagSelected(newTag);
+        onClose();
     }
 
     const renderContent = () => {
@@ -62,11 +60,8 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
                                         <UpdateTodoListTagDropdown
                                             tag={tag}
                                             onClose={() => setUpdatingTag(null)}
-                                            onTagUpdated={(updatedTag) => {
-                                                setTodoListTags(todoListTags.map(t => t.uuid === updatedTag.uuid ? updatedTag : t));
-                                            }}
+                                            onTagUpdated={() => {}}
                                             onTagDeleted={(deletedTagUuid) => {
-                                                setTodoListTags(todoListTags.filter(t => t.uuid !== deletedTagUuid));
                                                 onTagDeleted?.(deletedTagUuid);
                                             }}
                                         />

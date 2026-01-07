@@ -1,63 +1,24 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { TodoList, type TodoListJSON } from "../../models/TodoList";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
+import { todoListQueryKeys } from "./todoListQueryKeys";
 
 export function useListTodoLists({ userModuleUuid }: { userModuleUuid: string }) {
-  const [todoLists, setTodoLists] = useState<TodoList[]>([])
-
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-
-  useEffect(() => {
-    const listTodoLists = async () => {
-      setIsLoading(true)
-
-      try {
-        const res = await httpClient.get('/modules/todo-lists', {
-          params: {
-            "userModuleUuid": userModuleUuid
-          }
-        })
-        const todoListsData = res.data.map((json: TodoListJSON) => TodoList.fromJSON(json))
-        setTodoLists(todoListsData)
-        setErrorMessage(null)
-      } catch (err) {
-        setErrorMessage(err instanceof CustomHttpException ? err.errorMessage : "Une erreur est survenue")
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    listTodoLists()
-  }, [userModuleUuid])
-
-  function syncTodoListInList(newTodoList: TodoList) {
-    setTodoLists(prev => {
-      let replaced = false;
-
-      const updated = prev.map(todo => {
-        if (todo.uuid === newTodoList.uuid) {
-          replaced = true;
-          return newTodoList;
+  const query = useQuery({
+    queryKey: todoListQueryKeys.list(userModuleUuid),
+    queryFn: async () => {
+      const res = await httpClient.get('/modules/todo-lists', {
+        params: {
+          "userModuleUuid": userModuleUuid
         }
-        return todo;
-      });
-
-      return replaced ? updated : [...updated, newTodoList];
-    });
-  }
-
-  const removeTodoListFromList = useCallback((deletedTodoList: TodoList) => {
-    setTodoLists(prev => prev.filter(todoList => todoList.uuid !== deletedTodoList.uuid));
-  }, []);
-
+      })
+      return res.data.map((json: TodoListJSON) => TodoList.fromJSON(json))
+    },
+  })
 
   return {
-    todoLists,
-    isLoading,
-    errorMessage,
-    syncTodoListInList,
-    removeTodoListFromList
+    todoLists: query.data ?? [],
+    isLoading: query.isLoading,
+    error: query.error,
   }
 }

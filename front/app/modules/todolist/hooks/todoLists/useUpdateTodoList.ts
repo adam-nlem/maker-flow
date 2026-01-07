@@ -1,49 +1,32 @@
-import { useEffect, useState } from "react";
-import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { TodoList } from "../../models/TodoList";
+import { todoListQueryKeys } from "./todoListQueryKeys";
 
-export function useUpdateTodoList({ todoList }: {
-    todoList?: TodoList
-}) {
-    const [title, setTitle] = useState(todoList?.title ?? "");
+interface UpdateTodoListData {
+    todoListUuid: string;
+    title: string;
+}
 
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
-    const [isSubmitting, setIsSubmitting] = useState(false);
+export function useUpdateTodoList() {
+    const queryClient = useQueryClient()
 
-    function resetForm() {
-        setTitle("")
-        setErrorMessage(null)
-    }
-
-    async function updateTodoList(): Promise<TodoList | undefined> {
-        setErrorMessage(null)
-        setIsSubmitting(true)
-
-        try {
-            const res = await httpClient.patch(
-                `/modules/todo-lists/${todoList!.uuid}`,
-                { title: title }
+    const mutation = useMutation({
+        mutationFn: async ({ todoListUuid, title }: UpdateTodoListData) => {
+            await httpClient.patch(
+                `/modules/todo-lists/${todoListUuid}`,
+                { title }
             );
-
-            resetForm()
-
-            return TodoList.fromJSON(res.data)
-        } catch (err) {
-            let message =
-                err instanceof NotFoundException
-                    ? "Vous n'avez pas de todo list avec cet identifiant"
-                    : "Une erreur est survenue lors de la mise à jour de votre todo list";
-            setErrorMessage(err instanceof Error ? err.message : message)
-        } finally {
-            setIsSubmitting(false)
-        }
-    }
+        },
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: todoListQueryKeys.all })
+        },
+    })
 
     return {
-        title, setTitle,
-        errorMessage,
-        isSubmitting,
-        updateTodoList,
+        updateTodoList: mutation.mutateAsync,
+        isPending: mutation.isPending,
+        error: mutation.error,
+        reset: mutation.reset,
     };
 }

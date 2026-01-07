@@ -1,4 +1,3 @@
-import { useNavigate } from "react-router";
 import { useShowModuleIcon } from "~/hooks/modules/useShowModuleIcon";
 import type { Module } from "~/models/Module";
 import type { UserModule } from "~/models/UserModule";
@@ -11,10 +10,10 @@ interface ModuleCardProps {
   project: Project,
   module: Module,
   userModule?: UserModule,
-  onUserModuleCreated: (userModule: UserModule) => void,
+  onUserModuleCreated: () => void,
 }
 export default function ModuleCard({ module, userModule, project, onUserModuleCreated }: ModuleCardProps) {
-  const { createUserModule, errorMessage, isSubmitting } = useCreateUserModule({ moduleUuid: module.uuid, projectUuid: project.uuid });
+  const { createUserModule, isPending } = useCreateUserModule();
   const { iconUrl } = useShowModuleIcon(module.moduleIdentifier);
 
   return <div className="border border-light-gray rounded-md p-3 basis-1/5 min-h-[220px] cursor-pointer">
@@ -23,13 +22,11 @@ export default function ModuleCard({ module, userModule, project, onUserModuleCr
         {iconUrl && <img className="" src={iconUrl} alt={`${module.title} Icon`} />}
       </div>
       <Button
-        disabled={!!userModule}
+        disabled={!!userModule || isPending}
         onClick={async () => {
           if (!userModule) {
-            const newUserModule = await createUserModule()
-            if (newUserModule && errorMessage === null) {
-              onUserModuleCreated(newUserModule)
-            }
+            await createUserModule({ moduleUuid: module.uuid, projectUuid: project.uuid });
+            onUserModuleCreated();
           }
         }
         }

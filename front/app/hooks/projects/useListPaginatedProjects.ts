@@ -1,76 +1,64 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { useQuery } from "@tanstack/react-query";
 import { Project } from "~/models/Project";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
+import { projectQueryKeys } from "./projectQueryKeys";
 
 export function useListPaginatedProjects(limit: number = 10) {
-    const [projects, setProjects] = useState<Project[]>([]);
     const [page, setPage] = useState(1);
+    const [additionalProjects, setAdditionalProjects] = useState<Project[]>([]);
     const [hasMore, setHasMore] = useState(true);
-    const [isLoading, setIsLoading] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const listPaginatedProjects = useCallback(async (pageToFetch: number, append: boolean = false) => {
-        if (append) {
-            setIsLoadingMore(true);
-        } else {
-            setIsLoading(true);
-        }
-
-        try {
+    const query = useQuery({
+        queryKey: projectQueryKeys.list(1, limit),
+        queryFn: async () => {
             const res = await httpClient.get(`/projects`, {
                 params: {
-
-                    page: pageToFetch,
+                    page: 1,
                     limit,
                 }
             });
             const projectsData = res.data.map((json: any) => Project.fromJSON(json));
-
-            if (append) {
-                setProjects(prev => [...prev, ...projectsData]);
-            } else {
-                setProjects(projectsData);
-            }
-
-            // If we received fewer items than the limit, there are no more pages
             setHasMore(projectsData.length === limit);
-            setErrorMessage(null);
-        } catch (err) {
-            setErrorMessage(err instanceof CustomHttpException ? err.errorMessage : "Une erreur est survenue");
+            setAdditionalProjects([]);
+            setPage(1);
+            return projectsData;
+        },
+    })
+
+    const projects = useMemo(() => {
+        return [...(query.data ?? []), ...additionalProjects];
+    }, [query.data, additionalProjects]);
+
+    const listMore = useCallback(async () => {
+        if (isLoadingMore || !hasMore) return;
+
+        setIsLoadingMore(true);
+        const nextPage = page + 1;
+
+        try {
+            const res = await httpClient.get(`/projects`, {
+                params: {
+                    page: nextPage,
+                    limit,
+                }
+            });
+            const projectsData = res.data.map((json: any) => Project.fromJSON(json));
+            setAdditionalProjects(prev => [...prev, ...projectsData]);
+            setHasMore(projectsData.length === limit);
+            setPage(nextPage);
         } finally {
-            setIsLoading(false);
             setIsLoadingMore(false);
         }
-    }, [limit]);
+    }, [page, isLoadingMore, hasMore, limit]);
 
-    useEffect(() => {
-        listPaginatedProjects(1, false);
-    }, [listPaginatedProjects]);
-
-    const listMore = useCallback(() => {
-        if (!isLoadingMore && hasMore) {
-            const nextPage = page + 1;
-            setPage(nextPage);
-            listPaginatedProjects(nextPage, true);
-        }
-    }, [page, isLoadingMore, hasMore, listPaginatedProjects]);
-
-    function addProjectInList(newProject: Project) {
-        setProjects(prev =>
-            prev.some(project => project.uuid === newProject.uuid)
-                ? prev
-                : [...prev, newProject],
-        );
-    }
     return {
         projects,
-        isLoading,
+        isLoading: query.isLoading,
         isLoadingMore,
         hasMore,
-        errorMessage,
+        error: query.error,
         listMore,
-        addProjectInList,
     };
 }

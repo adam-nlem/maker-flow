@@ -1,6 +1,6 @@
+import { useState } from "react";
 import ModalOverlay from "~/components/ui/ModalOverlay";
 import { useCreateTodoList } from "../../hooks/todoLists/useCreateTodoList";
-import type { TodoList } from "../../models/TodoList";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
 import { Input } from "~/components/ui/Input";
@@ -9,26 +9,20 @@ interface CreateTodoListModalProps {
     userModuleUuid: string
     showModal: boolean;
     onClose: () => void;
-    onTodoListCreated: (todoList: TodoList) => void;
+    onTodoListCreated: () => void;
 }
 
 export default function CreateTodoListModal({ userModuleUuid, showModal, onClose, onTodoListCreated }: CreateTodoListModalProps) {
-    const {
-        title,
-        setTitle,
-        createTodoList,
-        resetForm,
-        errorMessage,
-        isSubmitting
-    } = useCreateTodoList({ userModuleUuid });
+    const [title, setTitle] = useState("");
+
+    const { createTodoList, isPending, error, reset } = useCreateTodoList({ userModuleUuid });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        const todoList = await createTodoList();
-        if (todoList && errorMessage === null) {
-            onTodoListCreated(todoList)
-            onClose()
-        }
+        await createTodoList(title);
+        setTitle("");
+        reset();
+        onTodoListCreated();
     }
 
     if (!showModal) return null;
@@ -57,8 +51,8 @@ export default function CreateTodoListModal({ userModuleUuid, showModal, onClose
                     <Button
                         type="submit"
                         className="mt-5"
-                        isLoading={isSubmitting}
-                        disabled={isSubmitting}
+                        isLoading={isPending}
+                        disabled={isPending}
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
                             <p className="text-sm">Créer la Todo List</p>

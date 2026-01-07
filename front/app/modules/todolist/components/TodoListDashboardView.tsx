@@ -1,8 +1,7 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 import type { ModuleWidgetProps } from "~/modules/registry";
 import { useListTodoLists } from "../hooks/todoLists/useListTodoLists";
-import useSelectCurrentTodoListView from "../hooks/todoLists/useSelectFocusedTodoList";
 import { useListPaginatedTodoListTasks } from "../hooks/todoListTasks/useListPaginatedTodoListTasks";
 import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListTask";
 import type { TodoListTask } from "../models/TodoListTask";
@@ -11,14 +10,14 @@ import DetailTodoListTaskModal from "./todoListTasks/DetailTodoListTaskModal";
 import TodoListTasksBoard from "./todoListTasks/TodoListTasksBoard";
 import CreateTodoListModal from "./todoLists/CreateTodoListModal";
 import TodoListTile from "./todoLists/TodoListTile";
-import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
+import { ChevronUpDownIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { TodoList } from "../models/TodoList";
 import SelectItemModal from "~/components/ui/SelectItemModal";
 import useSelectFocusedTodoList from "../hooks/todoLists/useSelectFocusedTodoList";
 import UpdateTodoListModal from "./todoLists/UpdateTodoListModal";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
-    const { todoLists, syncTodoListInList, removeTodoListFromList } = useListTodoLists({ userModuleUuid })
+    const { todoLists } = useListTodoLists({ userModuleUuid })
 
     const { focusedTodoList, setFocusedTodoList } = useSelectFocusedTodoList({ todoLists: todoLists })
 
@@ -27,14 +26,12 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
         paginationByStatus,
         isLoading,
         isLoadingMore,
-        errorMessage,
+        error,
         listMoreForStatus,
-        syncTaskInGroups,
-        removeTaskFromGroups,
         getTaskByUuid
     } = useListPaginatedTodoListTasks({ todoListUuid: focusedTodoList?.uuid, limit: 10 })
 
-    const { updateTodoListTask, errorMessage: updateTaskErrorMessage } = useUpdateTodoListTask()
+    const { updateTodoListTask } = useUpdateTodoListTask()
 
     const [selectedTask, setSelectedTask] = useState<TodoListTask | null>(null)
 
@@ -68,7 +65,6 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                     isLoading={isLoading}
                     onLoadMore={listMoreForStatus}
                     onTaskClick={setSelectedTask}
-                    onTaskCreated={syncTaskInGroups}
                     getTaskByUuid={getTaskByUuid}
                     onTaskMoved={handleTaskMoved}
                 />
@@ -101,19 +97,14 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                 userModuleUuid={userModuleUuid}
                 showModal={showCreateTodoListModal}
                 onClose={() => setShowCreateTodoListModal(false)}
-                onTodoListCreated={(todoList) => {
-                    syncTodoListInList(todoList)
-                }} />
+                onTodoListCreated={() => setShowCreateTodoListModal(false)} />
 
-            <UpdateTodoListModal todoList={updatingTodoList!} showModal={updatingTodoList !== null} onClose={() => setUpdatingTodoList(null)} onTodoListUpdated={
-                (todoList) => {
-                    syncTodoListInList(todoList)
-                    setUpdatingTodoList(null)
-                }
-            } onTodoListDeleted={(deletedTodoList) => {
-                removeTodoListFromList(deletedTodoList)
-                setUpdatingTodoList(null)
-            }} />
+            <UpdateTodoListModal
+                todoList={updatingTodoList!}
+                showModal={updatingTodoList !== null}
+                onClose={() => setUpdatingTodoList(null)}
+                onTodoListUpdated={() => setUpdatingTodoList(null)}
+                onTodoListDeleted={() => setUpdatingTodoList(null)} />
 
             {selectedTask && focusedTodoList && (
                 <DetailTodoListTaskModal
@@ -121,20 +112,17 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                     task={selectedTask}
                     showModal={selectedTask !== null}
                     onClose={() => setSelectedTask(null)}
-                    onTaskUpdated={syncTaskInGroups}
-                    onTaskDeleted={(deletedTaskUuid) => {
-                        removeTaskFromGroups(deletedTaskUuid);
-                        setSelectedTask(null);
-                    }}
+                    onTaskDeleted={() => setSelectedTask(null)}
                 />
             )}
         </div>
     );
 
     async function handleTaskMoved(taskUuid: string, status: TodoListStatus) {
-        const updatedTask = await updateTodoListTask(taskUuid, { status });
-        if (updatedTask && updateTaskErrorMessage === null) {
-            syncTaskInGroups(updatedTask);
-        }
+        await updateTodoListTask({
+            taskUuid,
+            todoListUuid: focusedTodoList!.uuid,
+            data: { status }
+        });
     }
 }

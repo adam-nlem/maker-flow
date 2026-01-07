@@ -1,39 +1,28 @@
-import { useEffect, useState } from "react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { CustomHttpException, NotFoundException } from "~/services/httpClient/customHttpExceptions";
-import { TodoListTask, type TodoListTaskJSON } from "../../models/TodoListTask";
+import { todoListTaskQueryKeys } from "./todoListTaskQueryKeys";
 
-export function useDeleteTodoListTask({ taskUuid }: { taskUuid: string }) {
-    const [errorMessage, setErrorMessage] = useState<string | null>(null)
-    const [isLoading, setIsLoading] = useState(false)
+interface DeleteTodoListTaskParams {
+    taskUuid: string;
+    todoListUuid: string;
+}
 
-    async function deleteTodoListTask(): Promise<void> {
-        setErrorMessage(null)
-        setIsLoading(true)
+export function useDeleteTodoListTask() {
+    const queryClient = useQueryClient()
 
-        try {
+    const mutation = useMutation({
+        mutationFn: async ({ taskUuid }: DeleteTodoListTaskParams) => {
             await httpClient.delete(`/modules/todo-lists/tasks/${taskUuid}`)
-
-            setErrorMessage(null)
-            setIsLoading(false)
-
-
-        } catch (err) {
-            let message
-            if (err instanceof NotFoundException) {
-                message = "Vous n'avez pas de tâche avec cet identifiant"
-            }
-            else {
-                message = "Une erreur est survenue lors de la suppression de votre tâche"
-            }
-            setErrorMessage(err instanceof Error ? err.message : message)
-            setIsLoading(false)
-        }
-    }
+        },
+        onSuccess: (_, { todoListUuid }) => {
+            queryClient.invalidateQueries({ queryKey: todoListTaskQueryKeys.list(todoListUuid) })
+        },
+    })
 
     return {
-        errorMessage, setErrorMessage,
-        isLoading,
-        deleteTodoListTask
+        deleteTodoListTask: mutation.mutateAsync,
+        isPending: mutation.isPending,
+        error: mutation.error,
+        reset: mutation.reset,
     }
 }
