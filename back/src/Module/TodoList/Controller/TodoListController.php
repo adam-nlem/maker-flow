@@ -9,6 +9,8 @@ use App\Module\TodoList\DTO\Request\TodoList\CreateTodoListRequestDTO;
 use App\Module\TodoList\DTO\Request\TodoList\UpdateTodoListRequestDTO;
 use App\Module\TodoList\Entity\TodoList;
 use App\Module\TodoList\Repository\TodoListRepository;
+use App\Module\TodoList\Repository\TodoListTagRepository;
+use App\Module\TodoList\Repository\TodoListTaskRepository;
 use App\Repository\UserModuleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -111,6 +113,26 @@ class TodoListController extends AbstractController
         );
     }
 
-    // #[Route('/{uuid}', name: 'api_modules_todo_lists_delete', methods: ['DELETE'])]
-    // public function delete(string $uuid) {}
+    #[Route('/{todoListUuid}', name: 'api_modules_todo_lists_delete', methods: ['DELETE'])]
+    public function delete(
+        string $todoListUuid,
+        TodoListRepository $todoListRepository,
+        TodoListTagRepository $tagRepository,
+        TodoListTaskRepository $taskRepository
+    ) {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $todoList = $todoListRepository->getByUuidAndUser($todoListUuid, $user);
+
+        if ($todoList === null) {
+            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        $tagRepository->removeByTodoListAndUser($todoList, $user);
+        $taskRepository->removeByTodoListAndUser($todoList, $user);
+        $todoListRepository->remove($todoList, true);
+
+        return $this->json(data: ["message" => "Todo list deleted successfully"], status: Response::HTTP_OK);
+    }
 }

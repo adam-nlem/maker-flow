@@ -38,6 +38,18 @@ class TodoListTaskRepository extends ServiceEntityRepository
         }
     }
 
+    public function removeByTodoListAndUser(TodoList $todoList, User $user): void
+    {
+        $this->createQueryBuilder('t')
+            ->delete()
+            ->where('t.todoList = :todoList')
+            ->andWhere('t.user = :user')
+            ->setParameter('todoList', $todoList)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->execute();
+    }
+
     public function getByUuidAndUser(string $uuid, User $user): ?TodoListTask
     {
         return $this->createQueryBuilder('t')

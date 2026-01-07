@@ -70,9 +70,6 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
               :
               <Button
                 type="button"
-                fullWidth
-                size="lg"
-                variant="secondary"
                 onClick={() => {
                   setShowSelectFocusedProjectModal(!showSelectFocusedProjectModal)
                   setShowCreateProjectModal(!showCreateProjectModal)

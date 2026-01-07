@@ -3,9 +3,8 @@ import React from 'react';
 interface ButtonProps {
     children: React.ReactNode;
     type?: 'button' | 'submit' | 'reset';
-    variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-    size?: 'xs' | 'sm' | 'md' | 'lg';
-    fullWidth?: boolean;
+    style?: 'primary' | 'secondary' | 'danger';
+    width?: string;
     isLoading?: boolean;
     disabled?: boolean;
     onClick?: () => void;
@@ -15,38 +14,30 @@ interface ButtonProps {
 export function Button({
     children,
     type = 'button',
-    variant = 'primary',
-    size = 'md',
-    fullWidth = false,
+    style = 'secondary',
     isLoading = false,
     disabled = false,
     onClick,
+    width = 'w-full',
     className = '',
 }: ButtonProps) {
+
     const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
 
     const variantStyles = {
         primary: 'inline-flex items-center gap-x-1.5 bg-primary px-3 py-2 text-clear shadow-xs hover:bg-primary-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
         secondary: 'bg-dark text-clear hover:bg-gray',
+        danger: 'bg-danger text-clear hover:bg-danger-600',
         outline: 'border border-primary bg-transparent hover:bg-primary hover:text-clear text-primary',
-        ghost: 'bg-transparent hover:bg-gray-100',
     };
 
-    const sizeStyles = {
-        xs: 'h-7 px-2 text-xs rounded-md',
-        sm: 'h-9 px-3 text-sm rounded-xl text-heading-sm',
-        md: 'h-10 px-4 rounded-xl text-heading-sm',
-        lg: 'h-11 px-6 rounded-xl text-heading-sm',
-    };
-
-    const widthStyle = fullWidth ? 'w-full' : '';
 
     return (
         <button
             type={type}
             onClick={onClick}
             disabled={disabled || isLoading}
-            className={`${baseStyles} ${variantStyles[variant]} ${sizeStyles[size]} ${widthStyle} ${className} cursor-pointer`}
+            className={`${baseStyles} ${variantStyles[style]} ${width} ${className} h-10 px-4 rounded-xl text-heading-sm cursor-pointer`}
         >
             {isLoading ? (
                 <span className="mr-2">

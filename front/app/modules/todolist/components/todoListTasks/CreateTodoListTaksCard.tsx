@@ -132,8 +132,6 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                     }
                 }}
                 disabled={isSubmitting || title.trim() === ""}
-                size="xs"
-                fullWidth
             >
                 Créer
             </Button>}

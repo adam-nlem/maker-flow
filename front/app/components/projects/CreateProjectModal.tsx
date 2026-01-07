@@ -98,9 +98,6 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
 
                     <Button
                         type="submit"
-                        fullWidth
-                        size="sm"
-                        variant="secondary"
                         className="mt-5"
                         isLoading={isSubmitting}
                         disabled={isSubmitting}

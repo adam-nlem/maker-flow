@@ -56,9 +56,6 @@ export default function CreateTodoListModal({ userModuleUuid, showModal, onClose
 
                     <Button
                         type="submit"
-                        fullWidth
-                        size="sm"
-                        variant="secondary"
                         className="mt-5"
                         isLoading={isSubmitting}
                         disabled={isSubmitting}

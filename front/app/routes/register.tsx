@@ -122,7 +122,7 @@ export default function Register() {
                     <div>
                         <Button
                             type="submit"
-                            fullWidth
+                            style="primary"
                             isLoading={isSubmitting}
                             disabled={isSubmitting}
                         >

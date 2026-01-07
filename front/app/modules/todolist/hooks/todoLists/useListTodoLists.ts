@@ -48,11 +48,16 @@ export function useListTodoLists({ userModuleUuid }: { userModuleUuid: string })
     });
   }
 
+  const removeTodoListFromList = useCallback((deletedTodoList: TodoList) => {
+    setTodoLists(prev => prev.filter(todoList => todoList.uuid !== deletedTodoList.uuid));
+  }, []);
+
 
   return {
     todoLists,
     isLoading,
     errorMessage,
-    syncTodoListInList
+    syncTodoListInList,
+    removeTodoListFromList
   }
 }

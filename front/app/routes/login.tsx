@@ -78,8 +78,7 @@ export default function Login() {
                     <div>
                         <Button
                             type="submit"
-                            fullWidth
-                            size="sm"
+                            style="primary"
                             isLoading={isLoading}
                             disabled={isLoading}
                         >

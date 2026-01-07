@@ -23,8 +23,6 @@ export default function ModuleCard({ module, userModule, project, onUserModuleCr
         {iconUrl && <img className="" src={iconUrl} alt={`${module.title} Icon`} />}
       </div>
       <Button
-        size="sm"
-        variant="secondary"
         disabled={!!userModule}
         onClick={async () => {
           if (!userModule) {

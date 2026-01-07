@@ -53,9 +53,6 @@ export default function SelectItemModal<T>({
 
                 <Button
                     type="button"
-                    fullWidth
-                    size="lg"
-                    variant="secondary"
                     onClick={onClickCreateButton}
                     className="shrink-0" // Prevents the button from being compressed
                 >

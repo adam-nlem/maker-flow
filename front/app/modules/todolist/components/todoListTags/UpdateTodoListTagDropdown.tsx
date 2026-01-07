@@ -70,8 +70,6 @@ export default function UpdateTodoListTagDropdown({ tag, onClose, onTagUpdated, 
             <Button
                 onClick={handleSave}
                 disabled={isSubmitting || title.trim() === ""}
-                size="xs"
-                fullWidth
             >
                 Enregistrer
             </Button>
