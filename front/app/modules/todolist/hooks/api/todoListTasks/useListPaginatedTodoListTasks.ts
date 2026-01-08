@@ -1,9 +1,9 @@
 import { useCallback, useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { TodoListStatus } from "../../models/enums/TodoListStatus";
-import { TodoListTasksGroupedByStatusDTO, type TodoListTasksGroupedByStatusDTOJSON } from "../../dtos/TodoListTasksGroupedByStatusDTO";
-import type { TodoListTask } from "../../models/TodoListTask";
+import { TodoListStatus } from "../../../models/enums/TodoListStatus";
+import { TodoListTasksGroupedByStatusDTO, type TodoListTasksGroupedByStatusDTOJSON } from "../../../dtos/TodoListTasksGroupedByStatusDTO";
+import type { TodoListTask } from "../../../models/TodoListTask";
 import { todoListTaskQueryKeys } from "./todoListTaskQueryKeys";
 
 interface UseListPaginatedTodoListTasksProps {

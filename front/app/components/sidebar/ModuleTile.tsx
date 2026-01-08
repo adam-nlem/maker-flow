@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router";
-import { useShowModuleIcon } from "~/hooks/modules/useShowModuleIcon";
+import { useShowModuleIcon } from "~/hooks/api/modules/useShowModuleIcon";
 import type { UserModule } from "~/models/UserModule";
 
 interface ModuleTileProps {

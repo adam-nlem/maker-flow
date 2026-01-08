@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect, useMemo } from "react";
 import type { ReactNode } from "react";
 import { Project } from "~/models/Project";
-import { useListPaginatedProjects } from "~/hooks/projects/useListPaginatedProjects";
+import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 
 interface ProjectContextType {
     focusedProject: Project | null;

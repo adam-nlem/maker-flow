@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
 import { Color, colorToBgClass } from "~/models/enums/Color";
-import { useUpdateTodoListTag } from "../../hooks/todoListTags/useUpdateTodoListTag";
+import { useUpdateTodoListTag } from "../../hooks/api/todoListTags/useUpdateTodoListTag";
 import type { TodoListTag } from "../../models/TodoListTag";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import { useDeleteTodoListTag } from "../../hooks/todoListTags/useDeleteTodoListTag";
+import { useDeleteTodoListTag } from "../../hooks/api/todoListTags/useDeleteTodoListTag";
 
 interface UpdateTodoListTagDropdownProps {
     tag: TodoListTag;

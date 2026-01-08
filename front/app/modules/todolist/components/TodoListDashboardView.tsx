@@ -1,9 +1,8 @@
-import { useState } from "react";
 
 import type { ModuleWidgetProps } from "~/modules/registry";
-import { useListTodoLists } from "../hooks/todoLists/useListTodoLists";
-import { useListPaginatedTodoListTasks } from "../hooks/todoListTasks/useListPaginatedTodoListTasks";
-import { useUpdateTodoListTask } from "../hooks/todoListTasks/useUpdateTodoListTask";
+import { useListTodoLists } from "../hooks/api/todoLists/useListTodoLists";
+import { useListPaginatedTodoListTasks } from "../hooks/api/todoListTasks/useListPaginatedTodoListTasks";
+import { useUpdateTodoListTask } from "../hooks/api/todoListTasks/useUpdateTodoListTask";
 import type { TodoListTask } from "../models/TodoListTask";
 import { TodoListStatus } from "../models/enums/TodoListStatus";
 import DetailTodoListTaskModal from "./todoListTasks/DetailTodoListTaskModal";
@@ -13,8 +12,13 @@ import TodoListTile from "./todoLists/TodoListTile";
 import { ChevronUpDownIcon, PencilSquareIcon } from "@heroicons/react/24/outline";
 import { TodoList } from "../models/TodoList";
 import SelectItemModal from "~/components/ui/SelectItemModal";
-import useSelectFocusedTodoList from "../hooks/todoLists/useSelectFocusedTodoList";
+import useSelectFocusedTodoList from "../hooks/api/todoLists/useSelectFocusedTodoList";
 import UpdateTodoListModal from "./todoLists/UpdateTodoListModal";
+
+import { useTodoListTaskStore } from "~/modules/todoList/stores/todoListTasks/todoListTaskStore";
+import { useSelectTodoListModalStore } from "../stores/todoLists/selectTodoListModalStore";
+import { useCreateTodoListModalStore } from "../stores/todoLists/createTodoListModalStore";
+import { useUpdateTodoListStore } from "../stores/todoLists/updateTodoListStore";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists } = useListTodoLists({ userModuleUuid })
@@ -33,11 +37,19 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
 
     const { updateTodoListTask } = useUpdateTodoListTask()
 
-    const [selectedTask, setSelectedTask] = useState<TodoListTask | null>(null)
+    const selectedTaskUuid = useTodoListTaskStore((state) => state.selectedTaskUuid)
+    const setSelectedTaskUuid = useTodoListTaskStore((state) => state.setSelectedTaskUuid)
+    const selectedTask = todoListTasksGroupedByStatus
+        .flatMap((group) => group.todoListTasks)
+        .find((task) => task.uuid === selectedTaskUuid) ?? null
 
-    const [showSelectFocusedTodoListModal, setShowSelectFocusedTodoListModal] = useState(false);
-    const [showCreateTodoListModal, setShowCreateTodoListModal] = useState(false)
-    const [updatingTodoList, setUpdatingTodoList] = useState<TodoList | null>(null)
+    const isSelectTodoListModalOpen = useSelectTodoListModalStore((state) => state.isSelectModalOpen)
+    const setIsSelectTodoListModalOpen = useSelectTodoListModalStore((state) => state.setIsSelectModalOpen)
+    const isCreateTodoListModalOpen = useCreateTodoListModalStore((state) => state.isCreateModalOpen)
+    const setIsCreateTodoListModalOpen = useCreateTodoListModalStore((state) => state.setIsCreateModalOpen)
+    const updatingTodoListUuid = useUpdateTodoListStore((state) => state.updatingTodoListUuid)
+    const setUpdatingTodoListUuid = useUpdateTodoListStore((state) => state.setUpdatingTodoListUuid)
+    const updatingTodoList = todoLists.find((t) => t.uuid === updatingTodoListUuid) ?? null
 
     return (
         <div className="m-5 w-1/3 h-[50vh] flex flex-col gap-3">
@@ -45,7 +57,7 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                 {focusedTodoList && <TodoListTile todoList={focusedTodoList} rightIcon={
                     <ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />
                 }
-                    onClick={() => setShowSelectFocusedTodoListModal(true)} />}
+                    onClick={() => setIsSelectTodoListModalOpen(true)} />}
                 {/* <UpdateTodoListHeader
                     todoList={focusedTodoList}
                     hideChevronLeft={hideChevronLeft}
@@ -64,20 +76,20 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                     paginationByStatus={paginationByStatus}
                     isLoading={isLoading}
                     onLoadMore={listMoreForStatus}
-                    onTaskClick={setSelectedTask}
+                    onTaskClick={(task) => setSelectedTaskUuid(task.uuid)}
                     getTaskByUuid={getTaskByUuid}
                     onTaskMoved={handleTaskMoved}
                 />
             </div>
 
             <SelectItemModal<TodoList>
-                showModal={showSelectFocusedTodoListModal}
+                showModal={isSelectTodoListModalOpen}
                 items={todoLists}
                 selectedItemId={focusedTodoList?.uuid}
                 getItemId={(todoList) => todoList.uuid}
                 onSelect={setFocusedTodoList}
-                onClose={() => setShowSelectFocusedTodoListModal(false)}
-                onClickCreateButton={() => setShowCreateTodoListModal(!showCreateTodoListModal)}
+                onClose={() => setIsSelectTodoListModalOpen(false)}
+                onClickCreateButton={() => setIsCreateTodoListModalOpen(!isCreateTodoListModalOpen)}
                 createButtonLabel="Créer une nouvelle Todo List"
                 renderItem={({ item, isSelected, onSelect }) => (
                     <TodoListTile
@@ -86,7 +98,7 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                         showCreatedAt={true}
                         onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} onClick={(e) => {
                             e.stopPropagation() // Prevents the click event from bubbling up to the onSelect handler
-                            setUpdatingTodoList(item)
+                            setUpdatingTodoListUuid(item.uuid)
                         }} />}
                         onClick={onSelect}
                     />
@@ -95,24 +107,24 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
 
             <CreateTodoListModal
                 userModuleUuid={userModuleUuid}
-                showModal={showCreateTodoListModal}
-                onClose={() => setShowCreateTodoListModal(false)}
-                onTodoListCreated={() => setShowCreateTodoListModal(false)} />
+                showModal={isCreateTodoListModalOpen}
+                onClose={() => setIsCreateTodoListModalOpen(false)}
+                onTodoListCreated={() => setIsCreateTodoListModalOpen(false)} />
 
             <UpdateTodoListModal
                 todoList={updatingTodoList!}
-                showModal={updatingTodoList !== null}
-                onClose={() => setUpdatingTodoList(null)}
-                onTodoListUpdated={() => setUpdatingTodoList(null)}
-                onTodoListDeleted={() => setUpdatingTodoList(null)} />
+                showModal={updatingTodoListUuid !== null}
+                onClose={() => setUpdatingTodoListUuid(null)}
+                onTodoListUpdated={() => setUpdatingTodoListUuid(null)}
+                onTodoListDeleted={() => setUpdatingTodoListUuid(null)} />
 
             {selectedTask && focusedTodoList && (
                 <DetailTodoListTaskModal
                     todoListUuid={focusedTodoList.uuid}
                     task={selectedTask}
                     showModal={selectedTask !== null}
-                    onClose={() => setSelectedTask(null)}
-                    onTaskDeleted={() => setSelectedTask(null)}
+                    onClose={() => setSelectedTaskUuid(null)}
+                    onTaskDeleted={() => setSelectedTaskUuid(null)}
                 />
             )}
         </div>

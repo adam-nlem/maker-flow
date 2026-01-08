@@ -6,7 +6,7 @@ import { Badge } from "~/components/ui/Badge";
 import { useState } from "react";
 import { selectTodoListStatusDropdownOptions, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "../../models/enums/TodoListStatus";
 import { selectTodoListPriorityDropdownOptions, todoListPriorityToFrenchTranslation } from "../../models/enums/TodoListPriority";
-import { useUpdateTodoListTask } from "../../hooks/todoListTasks/useUpdateTodoListTask";
+import { useUpdateTodoListTask } from "../../hooks/api/todoListTasks/useUpdateTodoListTask";
 import { TagIcon, ExclamationTriangleIcon, CheckBadgeIcon, CalendarDateRangeIcon } from "@heroicons/react/24/solid";
 import { colorToTextClass, colorToBgClass } from "~/models/enums/Color";
 import { todoListPriorityToTextClass, todoListPriorityToBgClass } from "../../models/enums/TodoListPriority";
@@ -15,7 +15,7 @@ import SelectEnumDropdown from "~/components/ui/SelectEnumDropdown";
 import ListTodoListTagsDropdown from "../todoListTags/ListTodoListTagsDropdown";
 import type { TodoListTag } from "../../models/TodoListTag";
 import AddDueDateDropdown from "./AddDueDateDropdown";
-import { useDeleteTodoListTask } from "../../hooks/todoListTasks/useDeleteTodoListTask";
+import { useDeleteTodoListTask } from "../../hooks/api/todoListTasks/useDeleteTodoListTask";
 import { TrashIcon } from "@heroicons/react/24/outline";
 
 interface DetailTodoListTaskModalProps {

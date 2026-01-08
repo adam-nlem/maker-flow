@@ -11,7 +11,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import type { Route } from "./+types/root";
 import "./app.css";
 import { AuthProvider } from "./context/AuthContext";
-import { SidebarProvider } from "./context/SidebarContext";
 
 const queryClient = new QueryClient();
 
@@ -37,9 +36,7 @@ export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <SidebarProvider>
           <Outlet />
-        </SidebarProvider>
       </AuthProvider>
     </QueryClientProvider>
   );

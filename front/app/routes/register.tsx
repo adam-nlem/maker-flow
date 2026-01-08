@@ -4,7 +4,7 @@ import { Link, useNavigate } from "react-router";
 import { Button } from '~/components/ui/Button';
 import { Input } from '~/components/ui/Input';
 import { useAuth } from "~/context/AuthContext";
-import { useRegister } from "~/hooks/users/useRegister";
+import { useRegister } from "~/hooks/api/users/useRegister";
 
 export default function Register() {
     const navigate = useNavigate();

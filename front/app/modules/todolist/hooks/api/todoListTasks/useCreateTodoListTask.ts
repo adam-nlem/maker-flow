@@ -1,9 +1,9 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import type { TodoListPriority } from "../../models/enums/TodoListPriority";
-import type { TodoListStatus } from "../../models/enums/TodoListStatus";
-import type { TodoListTag } from "../../models/TodoListTag";
-import { TodoListTask } from "../../models/TodoListTask";
+import type { TodoListPriority } from "../../../models/enums/TodoListPriority";
+import type { TodoListStatus } from "../../../models/enums/TodoListStatus";
+import type { TodoListTag } from "../../../models/TodoListTag";
+import { TodoListTask } from "../../../models/TodoListTask";
 import { todoListTaskQueryKeys } from "./todoListTaskQueryKeys";
 
 

@@ -3,8 +3,8 @@ import type { TodoList } from "../../models/TodoList";
 import { ChevronRightIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
 import { Input } from "~/components/ui/Input";
-import { useUpdateTodoList } from "../../hooks/todoLists/useUpdateTodoList";
-import { useDeleteTodoList } from "../../hooks/todoLists/useDeleteTodoList";
+import { useUpdateTodoList } from "../../hooks/api/todoLists/useUpdateTodoList";
+import { useDeleteTodoList } from "../../hooks/api/todoLists/useDeleteTodoList";
 import { useState } from "react";
 
 interface UpdateTodoListModalProps {

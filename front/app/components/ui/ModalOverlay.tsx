@@ -1,6 +1,6 @@
 import { createPortal } from "react-dom";
 import { useEffect, useCallback } from "react";
-import { useSidebar } from "~/context/SidebarContext";
+import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 
 interface ModalOverlayProps {
     isOpen: boolean;
@@ -10,7 +10,7 @@ interface ModalOverlayProps {
 }
 
 export default function ModalOverlay({ isOpen, onClose, children, className = "" }: ModalOverlayProps) {
-    const { isExpanded } = useSidebar();
+    const isSidebarExpanded = useSidebarStore((state) => state.isExpanded);
 
     const handleEscape = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape') onClose();
@@ -38,7 +38,7 @@ export default function ModalOverlay({ isOpen, onClose, children, className = ""
             onClick={onClose}
         >
             {/* Sidebar spacer - adapts to sidebar state */}
-            <div className={`shrink-0 transition-all duration-300 ease-in-out ${isExpanded ? 'w-72' : 'w-16'}`} />
+            <div className={`shrink-0 transition-all duration-300 ease-in-out ${isSidebarExpanded ? 'w-72' : 'w-16'}`} />
 
             {/* Modal content area */}
             <div className={`flex-1 flex bg-black/5 pointer-events-auto p-3 ${className}`}>

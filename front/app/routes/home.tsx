@@ -1,9 +1,8 @@
 import type { Route } from "./+types/home";
 import SideBar from "~/components/sidebar/SideBar";
-import { useListProjectUserModules } from "~/hooks/projects/useListProjectUserModules";
+import { useListProjectUserModules } from "~/hooks/api/projects/useListProjectUserModules";
 import { getModuleWidget, hasModuleWidget } from "~/modules/registry";
 import { useProject } from "~/context/ProjectContext";
-import { useSidebar } from "~/context/SidebarContext";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -16,13 +15,12 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { isExpanded, setIsExpanded } = useSidebar();
   const { focusedProject } = useProject();
   const { userModules, isLoading } = useListProjectUserModules(focusedProject?.uuid);
 
   return (
     <div className="w-full">
-      <SideBar isExpanded={isExpanded} setIsExpanded={setIsExpanded} />
+      <SideBar />
       <div className="w-full pl-16 flex flex-row flex-wrap">
         {isLoading && <p>Chargement...</p>}
         {userModules

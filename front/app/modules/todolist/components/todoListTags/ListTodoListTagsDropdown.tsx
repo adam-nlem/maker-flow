@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Badge } from "~/components/ui/Badge";
-import { useListTodoListTagsWithSearch } from "../../hooks/todoListTags/useListTodoListTagsWithSearch";
+import { useListTodoListTagsWithSearch } from "../../hooks/api/todoListTags/useListTodoListTagsWithSearch";
 import { TagIcon } from "@heroicons/react/16/solid";
 import { Color, colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import { Input } from "~/components/ui/Input";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { useCreateTodoListTag } from "../../hooks/todoListTags/useCreateTodoListTag";
+import { useCreateTodoListTag } from "../../hooks/api/todoListTags/useCreateTodoListTag";
 import type { TodoListTag } from "../../models/TodoListTag";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import UpdateTodoListTagDropdown from "./UpdateTodoListTagDropdown";

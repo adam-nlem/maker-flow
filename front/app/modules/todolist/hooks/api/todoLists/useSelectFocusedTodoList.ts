@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import type { TodoList } from "../../models/TodoList";
+import type { TodoList } from "../../../models/TodoList";
 
 
 const LOCAL_STORAGE_KEY = "app:todo-list:focused";

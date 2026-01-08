@@ -6,7 +6,7 @@ import { TextArea } from "~/components/ui/TextArea";
 import { ToggleChip } from "~/components/ui/ToggleChip";
 import { StepBadge } from "~/components/ui/StepBadge";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
-import { useCreateProject } from "~/hooks/projects/useCreateProject";
+import { useCreateProject } from "~/hooks/api/projects/useCreateProject";
 import ModalOverlay from "~/components/ui/ModalOverlay";
 
 interface CreateProjectModalProps {

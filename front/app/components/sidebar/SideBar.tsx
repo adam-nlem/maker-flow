@@ -2,48 +2,50 @@ import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, Cog6Tooth
 import { HomeIcon as HomeIconSolid, PuzzlePieceIcon as PuzzlePieceIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
 import { useAuth } from "~/context/AuthContext";
 import { useProject } from "~/context/ProjectContext";
-import { useNavigate, useLocation } from "react-router";
 import { Button } from "../ui/Button";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
 import NavigationTile from "./NavigationTile";
 import ModuleTile from "./ModuleTile";
 import Shimmer from "../ui/Shimmer";
 
-import type { UserModule } from "~/models/UserModule";
 import SelectItemModal from "../ui/SelectItemModal";
 import type { Project } from "~/models/Project";
-import { useListProjectUserModules } from "~/hooks/projects/useListProjectUserModules";
+import { useListProjectUserModules } from "~/hooks/api/projects/useListProjectUserModules";
+import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 
-interface SideBarProps {
-  isExpanded: boolean;
-  setIsExpanded: (isExpanded: boolean) => void;
-}
+import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
+import { useSelectProjectModalStore } from "~/stores/project/selectProjectModalStore";
 
-export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
+export default function SideBar() {
   const { user } = useAuth();
   const { focusedProject, projects, isLoadingProjects, setFocusedProject } = useProject();
   const { userModules, isLoading } = useListProjectUserModules(focusedProject?.uuid);
 
-  const [showSelectFocusedProjectModal, setShowSelectFocusedProjectModal] = useState(false);
-  const [showCreateProjectModal, setShowCreateProjectModal] = useState(false);
+  const isExpanded = useSidebarStore((state) => state.isExpanded)
+  const setIsExpanded = useSidebarStore((state) => state.setIsExpanded)
+
+  const isSelectProjectModalOpen = useSelectProjectModalStore((state) => state.isSelectModalOpen)
+  const setIsSelectProjectModalOpen = useSelectProjectModalStore((state) => state.setIsSelectModalOpen)
+  const isCreateProjectModalOpen = useCreateProjectModalStore((state) => state.isCreateModalOpen)
+  const setIsCreateProjectModalOpen = useCreateProjectModalStore((state) => state.setIsCreateModalOpen)
 
   // Close modals when sidebar collapses
   useEffect(() => {
     if (!isExpanded) {
-      setShowSelectFocusedProjectModal(false);
-      setShowCreateProjectModal(false);
+      setIsSelectProjectModalOpen(false);
+      setIsCreateProjectModalOpen(false);
     }
-  }, [isExpanded]);
+  }, [isExpanded, setIsSelectProjectModalOpen, setIsCreateProjectModalOpen]);
 
   return (
     <div className="fixed inset-0 z-50 flex flex-row pointer-events-none">
       <div
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => {
-          if (!showSelectFocusedProjectModal &&
-            !showCreateProjectModal)
+          if (!isSelectProjectModalOpen &&
+            !isCreateProjectModalOpen)
             setIsExpanded(false)
         }}
         className={`h-full shrink-0 border-r border-light-gray bg-white flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out pointer-events-auto ${isExpanded ? 'w-72' : 'w-16'}`}
@@ -63,16 +65,16 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
                   isExpanded && <ChevronUpDownIcon className="size-5 text-gray -mb-0.5" strokeWidth={2} />
                 }
                 onClick={() => {
-                  setShowSelectFocusedProjectModal(true)
-                  setShowCreateProjectModal(false)
+                  setIsSelectProjectModalOpen(true)
+                  setIsCreateProjectModalOpen(false)
                 }}
               />
               :
               <Button
                 type="button"
                 onClick={() => {
-                  setShowSelectFocusedProjectModal(!showSelectFocusedProjectModal)
-                  setShowCreateProjectModal(!showCreateProjectModal)
+                  setIsSelectProjectModalOpen(!isSelectProjectModalOpen)
+                  setIsCreateProjectModalOpen(!isCreateProjectModalOpen)
                 }
                 }
               >
@@ -153,16 +155,16 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
 
       {/* Modals */}
       <SelectItemModal<Project>
-        showModal={showSelectFocusedProjectModal}
+        showModal={isSelectProjectModalOpen}
         items={projects}
         selectedItemId={focusedProject?.uuid}
         getItemId={(project) => project.uuid}
         onSelect={setFocusedProject}
         onClose={() => {
-          setShowSelectFocusedProjectModal(false);
+          setIsSelectProjectModalOpen(false);
           setIsExpanded(false);
         }}
-        onClickCreateButton={() => setShowCreateProjectModal(!showCreateProjectModal)}
+        onClickCreateButton={() => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
         createButtonLabel="Créer un nouveau Projet"
         renderItem={({ item, isSelected, onSelect }) => (
           <ProjectTile
@@ -175,10 +177,10 @@ export default function SideBar({ isExpanded, setIsExpanded }: SideBarProps) {
       />
 
       <CreateProjectModal
-        showModal={showCreateProjectModal}
-        onProjectCreated={() => setShowCreateProjectModal(false)}
+        showModal={isCreateProjectModalOpen}
+        onProjectCreated={() => setIsCreateProjectModalOpen(false)}
         onClose={() => {
-          setShowCreateProjectModal(false);
+          setIsCreateProjectModalOpen(false);
           setIsExpanded(false);
         }}
       />

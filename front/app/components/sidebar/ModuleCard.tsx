@@ -1,9 +1,9 @@
-import { useShowModuleIcon } from "~/hooks/modules/useShowModuleIcon";
+import { useShowModuleIcon } from "~/hooks/api/modules/useShowModuleIcon";
 import type { Module } from "~/models/Module";
 import type { UserModule } from "~/models/UserModule";
 import { Button } from "../ui/Button";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { useCreateUserModule } from "~/hooks/userModules/useCreateUserModule";
+import { useCreateUserModule } from "~/hooks/api/userModules/useCreateUserModule";
 import type { Project } from "~/models/Project";
 
 interface ModuleCardProps {

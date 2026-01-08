@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { TodoListTag, type TodoListTagJSON } from "../../models/TodoListTag";
+import { TodoListTag, type TodoListTagJSON } from "../../../models/TodoListTag";
 import { todoListTagQueryKeys } from "./todoListTagQueryKeys";
 
 
