@@ -1,10 +1,9 @@
 import { Outlet, useLocation, useNavigate } from "react-router";
-import { useAuth } from "~/context/AuthContext";
-import { ProjectProvider } from "~/context/ProjectContext";
+import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useRef, useEffect } from "react";
 
 export default function ProtectedLayout() {
-    const { user, isLoading } = useAuth();
+    const { user, isLoading } = useCurrentUser()
     const location = useLocation();
     const navigate = useNavigate();
     // Use ref to track if we've already initiated a redirect
@@ -28,11 +27,7 @@ export default function ProtectedLayout() {
 
     // If we're authenticated, render the outlet wrapped with ProjectProvider
     if (user) {
-        return (
-            <ProjectProvider>
-                <Outlet />
-            </ProjectProvider>
-        );
+        return <Outlet />;
     }
 
     // If we're not authenticated but already redirecting, show loading

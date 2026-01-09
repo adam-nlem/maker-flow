@@ -1,14 +1,21 @@
-import { useEffect, useState } from "react";
-import type { TodoList } from "../../../models/TodoList";
+import { useEffect } from "react"
+import type { TodoList } from "../../../models/TodoList"
+import { useFocusTodoListStore } from "~/modules/todoList/stores/todoLists/focusTodoListStore"
 
 
-const LOCAL_STORAGE_KEY = "app:todo-list:focused";
-
+/**
+ * This hook combines a Zustand store with validation logic.
+ * 
+ * - The store (focusedTodoListStore) holds the raw state and handles localStorage persistence.
+ * - This hook adds fallback logic: if the stored UUID is invalid or missing, 
+ *   it automatically selects the first available todo list.
+ * 
+ * This separation keeps the store pure (just state + persistence) while the hook
+ * handles business logic that depends on external data (the todoLists array).
+ */
 export default function useSelectFocusedTodoList({ todoLists }: { todoLists: TodoList[] }) {
-    const [focusedTodoListUuid, setFocusedTodoListUuid] = useState<string | null>(() => {
-        if (typeof window === "undefined") return null
-        return localStorage.getItem(LOCAL_STORAGE_KEY)
-    })
+    const focusedTodoListUuid = useFocusTodoListStore((state) => state.focusedTodoListUuid)
+    const setFocusedTodoListUuid = useFocusTodoListStore((state) => state.setFocusedTodoListUuid)
 
     useEffect(() => {
         if (todoLists.length === 0) return
@@ -18,17 +25,10 @@ export default function useSelectFocusedTodoList({ todoLists }: { todoLists: Tod
         if (!focusedTodoListUuid || !existsInList) {
             setFocusedTodoListUuid(todoLists[0].uuid)
         }
-    }, [todoLists, focusedTodoListUuid])
-
-    useEffect(() => {
-        if (typeof window === "undefined") return
-
-        if (focusedTodoListUuid) {
-            localStorage.setItem(LOCAL_STORAGE_KEY, focusedTodoListUuid)
-        }
-    }, [focusedTodoListUuid])
+    }, [todoLists, focusedTodoListUuid, setFocusedTodoListUuid])
 
     return {
-        focusedTodoListUuid, setFocusedTodoListUuid
+        focusedTodoListUuid,
+        setFocusedTodoListUuid
     }
 }

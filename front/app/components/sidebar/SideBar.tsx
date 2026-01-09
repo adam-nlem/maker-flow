@@ -1,7 +1,8 @@
 import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, PlusIcon, PuzzlePieceIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { HomeIcon as HomeIconSolid, PuzzlePieceIcon as PuzzlePieceIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
-import { useAuth } from "~/context/AuthContext";
-import { useProject } from "~/context/ProjectContext";
+import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
+import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
+import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { Button } from "../ui/Button";
 import { useEffect } from "react";
 import CreateProjectModal from "../projects/CreateProjectModal";
@@ -19,8 +20,11 @@ import { useCreateProjectModalStore } from "~/stores/project/createProjectModalS
 import { useSelectProjectModalStore } from "~/stores/project/selectProjectModalStore";
 
 export default function SideBar() {
-  const { user } = useAuth();
-  const { focusedProject, projects, isLoadingProjects, setFocusedProject } = useProject();
+  const { user } = useCurrentUser()
+
+  const { projects, isLoading: isLoadingProjects } = useListPaginatedProjects()
+  const { focusedProjectUuid, setFocusedProjectUuid } = useSelectFocusedProject({ projects })
+  const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
   const { userModules, isLoading } = useListProjectUserModules(focusedProject?.uuid);
 
   const isExpanded = useSidebarStore((state) => state.isExpanded)
@@ -159,7 +163,7 @@ export default function SideBar() {
         items={projects}
         selectedItemId={focusedProject?.uuid}
         getItemId={(project) => project.uuid}
-        onSelect={setFocusedProject}
+        onSelect={(project) => setFocusedProjectUuid(project.uuid)}
         onClose={() => {
           setIsSelectProjectModalOpen(false);
           setIsExpanded(false);

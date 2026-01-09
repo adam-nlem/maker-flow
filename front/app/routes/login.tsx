@@ -3,14 +3,18 @@ import { Link, useNavigate } from "react-router";
 
 import { Button } from '~/components/ui/Button';
 import { Input } from '~/components/ui/Input';
-import { useAuth } from "~/context/AuthContext";
+import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
+import { useLogin } from "~/hooks/api/users/useLogin";
 
 export default function Login() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const navigate = useNavigate();
 
-    const { user, login, errorMessage, isLoading } = useAuth();
+    const { user, isLoading } = useCurrentUser()
+    const { login, isPending, error } = useLogin()
+
+    const errorMessage = error?.message ?? null
 
     useEffect(() => {
         if (isLoading === false && user) {
@@ -20,7 +24,7 @@ export default function Login() {
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        login(email, password);
+        login({ email, password });
     }
 
 
@@ -79,8 +83,8 @@ export default function Login() {
                         <Button
                             type="submit"
                             style="primary"
-                            isLoading={isLoading}
-                            disabled={isLoading}
+                            isLoading={isPending}
+                            disabled={isPending}
                         >
                             Connexion
                         </Button>

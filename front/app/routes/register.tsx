@@ -3,12 +3,14 @@ import { Link, useNavigate } from "react-router";
 
 import { Button } from '~/components/ui/Button';
 import { Input } from '~/components/ui/Input';
-import { useAuth } from "~/context/AuthContext";
+import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
+import { useLogin } from "~/hooks/api/users/useLogin";
 import { useRegister } from "~/hooks/api/users/useRegister";
 
 export default function Register() {
     const navigate = useNavigate();
-    const { user, isLoading: authLoading, login } = useAuth();
+    const { user, isLoading: authLoading } = useCurrentUser()
+    const { login } = useLogin()
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -58,7 +60,7 @@ export default function Register() {
         e.preventDefault();
         if (!validateForm()) return;
         await register({ firstName, lastName, email, password });
-        await login(email, password);
+        await login({ email, password });
     }
 
     const errorMessage = validationError || (error?.message ?? null);

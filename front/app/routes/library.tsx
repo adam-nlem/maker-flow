@@ -1,4 +1,5 @@
-import { useProject } from "~/context/ProjectContext";
+import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
+import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import SideBar from "~/components/sidebar/SideBar";
 import { Input } from "~/components/ui/Input";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
@@ -18,7 +19,9 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Library({ loaderData }: Route.ComponentProps) {
-  const { focusedProject } = useProject()
+  const { projects } = useListPaginatedProjects()
+  const { focusedProjectUuid } = useSelectFocusedProject({ projects })
+  const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
   const { modules } = useListPaginatedModules(12)
   const { userModules, isLoading } = useListProjectUserModules(focusedProject?.uuid);
 

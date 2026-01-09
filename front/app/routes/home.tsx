@@ -2,7 +2,8 @@ import type { Route } from "./+types/home";
 import SideBar from "~/components/sidebar/SideBar";
 import { useListProjectUserModules } from "~/hooks/api/projects/useListProjectUserModules";
 import { getModuleWidget, hasModuleWidget } from "~/modules/registry";
-import { useProject } from "~/context/ProjectContext";
+import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
+import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -15,7 +16,9 @@ export function loader({ context }: Route.LoaderArgs) {
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { focusedProject } = useProject();
+  const { projects } = useListPaginatedProjects()
+  const { focusedProjectUuid } = useSelectFocusedProject({ projects })
+  const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
   const { userModules, isLoading } = useListProjectUserModules(focusedProject?.uuid);
 
   return (

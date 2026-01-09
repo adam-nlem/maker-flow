@@ -10,7 +10,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 import type { Route } from "./+types/root";
 import "./app.css";
-import { AuthProvider } from "./context/AuthContext";
 
 const queryClient = new QueryClient();
 
@@ -35,9 +34,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-          <Outlet />
-      </AuthProvider>
+      <Outlet />
     </QueryClientProvider>
   );
 }
