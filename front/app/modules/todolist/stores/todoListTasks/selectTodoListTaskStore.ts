@@ -1,14 +1,14 @@
 import { create } from 'zustand'
 
-type TodoListTaskState = {
+type SelectTodoListTaskState = {
     selectedTaskUuid: string | null
 }
 
-type TodoListTaskAction = {
+type SelectTodoListTaskAction = {
     setSelectedTaskUuid: (uuid: string | null) => void
 }
 
-export const useTodoListTaskStore = create<TodoListTaskState & TodoListTaskAction>((set) => ({
+export const useSelectTodoListTaskStore = create<SelectTodoListTaskState & SelectTodoListTaskAction>((set) => ({
     selectedTaskUuid: null,
     setSelectedTaskUuid: (uuid) => set({ selectedTaskUuid: uuid })
 }))

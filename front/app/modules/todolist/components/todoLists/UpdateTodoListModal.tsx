@@ -11,11 +11,10 @@ interface UpdateTodoListModalProps {
     showModal: boolean;
     todoList?: TodoList;
     onClose: () => void;
-    onTodoListUpdated: () => void;
-    onTodoListDeleted: () => void;
 }
 
-export default function UpdateTodoListModal({ showModal, todoList, onClose, onTodoListUpdated, onTodoListDeleted }: UpdateTodoListModalProps) {
+export default function UpdateTodoListModal({ showModal, todoList, onClose }: UpdateTodoListModalProps) {
+
     const [title, setTitle] = useState(todoList?.title ?? "");
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
 
@@ -27,7 +26,7 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose, onTo
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         await updateTodoList({ todoListUuid: todoList.uuid, title });
-        onTodoListUpdated();
+        onClose();
     }
 
 
@@ -86,7 +85,7 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose, onTo
                                     disabled={isDeleting}
                                     onClick={async () => {
                                         await deleteTodoList(todoList.uuid);
-                                        onTodoListDeleted();
+                                        onClose();
                                     }}
                                 >
                                     Supprimer

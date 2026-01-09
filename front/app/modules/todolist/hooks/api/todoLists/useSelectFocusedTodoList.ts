@@ -1,34 +1,34 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import type { TodoList } from "../../../models/TodoList";
 
 
 const LOCAL_STORAGE_KEY = "app:todo-list:focused";
 
-export default function useSelectFocusedTodoList({ todoLists }: { todoLists: TodoList[]; }) {
-    const [focusedTodoList, setFocusedTodoList] = useState<TodoList | null>(null)
+export default function useSelectFocusedTodoList({ todoLists }: { todoLists: TodoList[] }) {
+    const [focusedTodoListUuid, setFocusedTodoListUuid] = useState<string | null>(() => {
+        if (typeof window === "undefined") return null
+        return localStorage.getItem(LOCAL_STORAGE_KEY)
+    })
 
     useEffect(() => {
-        if (!todoLists.length || focusedTodoList) return;
+        if (todoLists.length === 0) return
 
-        const isBrowser = typeof window !== "undefined"
+        const existsInList = todoLists.some((t) => t.uuid === focusedTodoListUuid)
 
-        const focusedTodoListUuid = isBrowser ? localStorage.getItem(LOCAL_STORAGE_KEY) : null;
-
-
-        const todoList = todoLists.find((todoList) => todoList.uuid === focusedTodoListUuid) ?? todoLists[0]
-
-        setFocusedTodoList(todoList);
-    }, [todoLists]);
+        if (!focusedTodoListUuid || !existsInList) {
+            setFocusedTodoListUuid(todoLists[0].uuid)
+        }
+    }, [todoLists, focusedTodoListUuid])
 
     useEffect(() => {
         if (typeof window === "undefined") return
 
-        if (focusedTodoList) {
-            localStorage.setItem(LOCAL_STORAGE_KEY, focusedTodoList.uuid)
+        if (focusedTodoListUuid) {
+            localStorage.setItem(LOCAL_STORAGE_KEY, focusedTodoListUuid)
         }
-    }, [focusedTodoList])
+    }, [focusedTodoListUuid])
 
     return {
-        focusedTodoList, setFocusedTodoList
+        focusedTodoListUuid, setFocusedTodoListUuid
     }
 }

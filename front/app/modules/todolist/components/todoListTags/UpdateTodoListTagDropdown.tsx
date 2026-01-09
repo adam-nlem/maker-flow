@@ -11,11 +11,10 @@ import { useDeleteTodoListTag } from "../../hooks/api/todoListTags/useDeleteTodo
 interface UpdateTodoListTagDropdownProps {
     tag: TodoListTag;
     onClose: () => void;
-    onTagUpdated: () => void;
     onTagDeleted: (deletedTagUuid: string) => void;
 }
 
-export default function UpdateTodoListTagDropdown({ tag, onClose, onTagUpdated, onTagDeleted }: UpdateTodoListTagDropdownProps) {
+export default function UpdateTodoListTagDropdown({ tag, onClose, onTagDeleted }: UpdateTodoListTagDropdownProps) {
     const [title, setTitle] = useState(tag.title);
     const [color, setColor] = useState(tag.color);
 
@@ -30,7 +29,6 @@ export default function UpdateTodoListTagDropdown({ tag, onClose, onTagUpdated, 
 
     const handleSave = async () => {
         await updateTodoListTag({ tagUuid: tag.uuid, title, color });
-        onTagUpdated();
         onClose();
     };
 

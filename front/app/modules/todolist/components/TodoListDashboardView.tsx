@@ -14,16 +14,19 @@ import { TodoList } from "../models/TodoList";
 import SelectItemModal from "~/components/ui/SelectItemModal";
 import useSelectFocusedTodoList from "../hooks/api/todoLists/useSelectFocusedTodoList";
 import UpdateTodoListModal from "./todoLists/UpdateTodoListModal";
-
-import { useTodoListTaskStore } from "~/modules/todoList/stores/todoListTasks/todoListTaskStore";
 import { useSelectTodoListModalStore } from "../stores/todoLists/selectTodoListModalStore";
 import { useCreateTodoListModalStore } from "../stores/todoLists/createTodoListModalStore";
 import { useUpdateTodoListStore } from "../stores/todoLists/updateTodoListStore";
+import { useSelectTodoListTaskStore } from "../stores/todoListTasks/selectTodoListTaskStore";
 
 export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { todoLists } = useListTodoLists({ userModuleUuid })
 
-    const { focusedTodoList, setFocusedTodoList } = useSelectFocusedTodoList({ todoLists: todoLists })
+    console.log(todoLists)
+
+    const { focusedTodoListUuid, setFocusedTodoListUuid } = useSelectFocusedTodoList({ todoLists })
+
+    const focusedTodoList = todoLists.find((todoList) => todoList.uuid === focusedTodoListUuid) ?? null
 
     const {
         todoListTasksGroupedByStatus,
@@ -37,8 +40,8 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
 
     const { updateTodoListTask } = useUpdateTodoListTask()
 
-    const selectedTaskUuid = useTodoListTaskStore((state) => state.selectedTaskUuid)
-    const setSelectedTaskUuid = useTodoListTaskStore((state) => state.setSelectedTaskUuid)
+    const selectedTaskUuid = useSelectTodoListTaskStore((state) => state.selectedTaskUuid)
+    const setSelectedTaskUuid = useSelectTodoListTaskStore((state) => state.setSelectedTaskUuid)
     const selectedTask = todoListTasksGroupedByStatus
         .flatMap((group) => group.todoListTasks)
         .find((task) => task.uuid === selectedTaskUuid) ?? null
@@ -49,7 +52,7 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
     const setIsCreateTodoListModalOpen = useCreateTodoListModalStore((state) => state.setIsCreateModalOpen)
     const updatingTodoListUuid = useUpdateTodoListStore((state) => state.updatingTodoListUuid)
     const setUpdatingTodoListUuid = useUpdateTodoListStore((state) => state.setUpdatingTodoListUuid)
-    const updatingTodoList = todoLists.find((t) => t.uuid === updatingTodoListUuid) ?? null
+
 
     return (
         <div className="m-5 w-1/3 h-[50vh] flex flex-col gap-3">
@@ -87,7 +90,7 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                 items={todoLists}
                 selectedItemId={focusedTodoList?.uuid}
                 getItemId={(todoList) => todoList.uuid}
-                onSelect={setFocusedTodoList}
+                onSelect={(todoList) => setFocusedTodoListUuid(todoList.uuid)}
                 onClose={() => setIsSelectTodoListModalOpen(false)}
                 onClickCreateButton={() => setIsCreateTodoListModalOpen(!isCreateTodoListModalOpen)}
                 createButtonLabel="Créer une nouvelle Todo List"
@@ -111,13 +114,13 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                 onClose={() => setIsCreateTodoListModalOpen(false)}
                 onTodoListCreated={() => setIsCreateTodoListModalOpen(false)} />
 
-            <UpdateTodoListModal
-                todoList={updatingTodoList!}
-                showModal={updatingTodoListUuid !== null}
-                onClose={() => setUpdatingTodoListUuid(null)}
-                onTodoListUpdated={() => setUpdatingTodoListUuid(null)}
-                onTodoListDeleted={() => setUpdatingTodoListUuid(null)} />
-
+            {updatingTodoListUuid &&
+                <UpdateTodoListModal
+                    todoList={todoLists.find((todoList) => todoList.uuid === updatingTodoListUuid)}
+                    showModal={updatingTodoListUuid !== null}
+                    onClose={() => setUpdatingTodoListUuid(null)}
+                />
+            }
             {selectedTask && focusedTodoList && (
                 <DetailTodoListTaskModal
                     todoListUuid={focusedTodoList.uuid}

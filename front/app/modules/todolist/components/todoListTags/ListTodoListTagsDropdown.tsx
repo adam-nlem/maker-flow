@@ -60,7 +60,6 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
                                         <UpdateTodoListTagDropdown
                                             tag={tag}
                                             onClose={() => setUpdatingTag(null)}
-                                            onTagUpdated={() => {}}
                                             onTagDeleted={(deletedTagUuid) => {
                                                 onTagDeleted?.(deletedTagUuid);
                                             }}
