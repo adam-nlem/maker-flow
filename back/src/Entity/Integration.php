@@ -51,7 +51,7 @@ class Integration
     private ?\DateTimeImmutable $lastSyncedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'integrations')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
     #[ORM\Column(enumType: IntegrationStatus::class)]

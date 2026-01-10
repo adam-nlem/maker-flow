@@ -55,17 +55,17 @@ class TodoList
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?UserModule $userModule = null;
 
     /**
      * @var Collection<int, TodoListTask>
      */
-    #[ORM\OneToMany(targetEntity: TodoListTask::class, mappedBy: 'todoList')]
+    #[ORM\OneToMany(targetEntity: TodoListTask::class, mappedBy: 'todoList', cascade: ['remove'], orphanRemoval: true)]
 
     #[Groups([
         'api_modules_todo_lists_create',
@@ -75,7 +75,7 @@ class TodoList
     /**
      * @var Collection<int, TodoListTag>
      */
-    #[ORM\OneToMany(targetEntity: TodoListTag::class, mappedBy: 'todoList')]
+    #[ORM\OneToMany(targetEntity: TodoListTag::class, mappedBy: 'todoList', cascade: ['remove'], orphanRemoval: true)]
     private Collection $todoListTags;
 
     public function __construct()

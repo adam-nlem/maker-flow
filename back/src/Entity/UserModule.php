@@ -76,7 +76,7 @@ class UserModule
     private ?bool $isHidden = null;
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]
@@ -91,7 +91,7 @@ class UserModule
     private ?Integration $integration = null;
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Project $project = null;
 
     public function __construct()

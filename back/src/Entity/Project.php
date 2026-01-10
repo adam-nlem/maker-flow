@@ -101,13 +101,13 @@ class Project
     private array $types = [];
 
     #[ORM\ManyToOne(inversedBy: 'projects')]
-    #[ORM\JoinColumn(nullable: false)]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
     /**
      * @var Collection<int, UserModule>
      */
-    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'project')]
+    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
     private Collection $userModules;
 
     public function __construct()

@@ -117,8 +117,6 @@ class TodoListController extends AbstractController
     public function delete(
         string $todoListUuid,
         TodoListRepository $todoListRepository,
-        TodoListTagRepository $tagRepository,
-        TodoListTaskRepository $taskRepository
     ) {
         /** @var User $user */
         $user = $this->getUser();
@@ -129,8 +127,6 @@ class TodoListController extends AbstractController
             return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $tagRepository->removeByTodoListAndUser($todoList, $user);
-        $taskRepository->removeByTodoListAndUser($todoList, $user);
         $todoListRepository->remove($todoList, true);
 
         return $this->json(data: ["message" => "Todo list deleted successfully"], status: Response::HTTP_OK);

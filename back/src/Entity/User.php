@@ -59,25 +59,25 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var Collection<int, Token>
      */
-    #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
     private Collection $tokens;
 
     /**
      * @var Collection<int, Integration>
      */
-    #[ORM\OneToMany(targetEntity: Integration::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: Integration::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
     private Collection $integrations;
 
     /**
      * @var Collection<int, UserModule>
      */
-    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
     private Collection $userModules;
 
     /**
      * @var Collection<int, Project>
      */
-    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'user')]
+    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
     private Collection $projects;
 
     public function __construct()
