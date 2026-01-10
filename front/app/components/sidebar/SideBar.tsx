@@ -1,4 +1,4 @@
-import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, PlusIcon, PuzzlePieceIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, PencilSquareIcon, PlusIcon, PuzzlePieceIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { HomeIcon as HomeIconSolid, PuzzlePieceIcon as PuzzlePieceIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
@@ -18,6 +18,9 @@ import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 
 import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
 import { useSelectProjectModalStore } from "~/stores/project/selectProjectModalStore";
+import UpdateProjectModal from "../projects/UpdateProjectModal";
+import { useUpdateProject } from "~/hooks/api/projects/useUpdateProject";
+import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
 
 export default function SideBar() {
   const { user } = useCurrentUser()
@@ -32,8 +35,12 @@ export default function SideBar() {
 
   const isSelectProjectModalOpen = useSelectProjectModalStore((state) => state.isSelectModalOpen)
   const setIsSelectProjectModalOpen = useSelectProjectModalStore((state) => state.setIsSelectModalOpen)
+
   const isCreateProjectModalOpen = useCreateProjectModalStore((state) => state.isCreateModalOpen)
   const setIsCreateProjectModalOpen = useCreateProjectModalStore((state) => state.setIsCreateModalOpen)
+
+  const updatingProjectUuid = useUpdateProjectStore((state) => state.updatingProjectUuid)
+  const setUpdatingProjectUuid = useUpdateProjectStore((state) => state.setUpdatingProjectUuid)
 
   // Close modals when sidebar collapses
   useEffect(() => {
@@ -64,7 +71,6 @@ export default function SideBar() {
               <ProjectTile
                 project={focusedProject}
                 moduleCount={userModules.length}
-                isExpanded={isExpanded}
                 rightIcon={
                   isExpanded && <ChevronUpDownIcon className="size-5 text-gray -mb-0.5" strokeWidth={2} />
                 }
@@ -173,8 +179,12 @@ export default function SideBar() {
         renderItem={({ item, isSelected, onSelect }) => (
           <ProjectTile
             project={item}
+            isSelected={isSelected}
             showCreatedAt={true}
-            rightIcon={isSelected ? <CheckIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} /> : null}
+            onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} onClick={(e) => {
+              e.stopPropagation() // Prevents the click event from bubbling up to the onSelect handler
+              setUpdatingProjectUuid(item.uuid)
+            }} />}
             onClick={onSelect}
           />
         )}
@@ -188,6 +198,12 @@ export default function SideBar() {
           setIsExpanded(false);
         }}
       />
+
+      {updatingProjectUuid && <UpdateProjectModal
+        project={projects.find((project) => project.uuid === updatingProjectUuid)}
+        showModal
+        onClose={() => setUpdatingProjectUuid(null)}
+      />}
 
     </div>
   );

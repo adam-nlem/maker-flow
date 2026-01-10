@@ -31,7 +31,7 @@ export default function TodoListTile({
         >
 
             <div className="flex flex-row gap-3 items-center ">
-                {isSelected && <div className="h-1 w-1 rounded-full bg-primary"></div>}
+                {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>}
                 <div className="flex flex-col">
                     <h1 className="text-heading-sm whitespace-nowrap">{todoList.title}</h1>
                     {showCreatedAt && (
