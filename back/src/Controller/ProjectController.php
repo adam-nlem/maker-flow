@@ -173,5 +173,22 @@ final class ProjectController extends AbstractController
         return $this->json(data: $projects, status: Response::HTTP_OK, context: ['groups' => ['api_projects_get_paginated']]);
     }
 
-    //TODO: Maybe do a delete route here ? 
+    #[Route('/{projectUuid}', name: 'api_projects_delete', methods: ['DELETE'])]
+    public function delete(
+        string $projectUuid,
+        ProjectRepository $projectRepository,
+    ) {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+
+        if ($project === null) {
+            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        $projectRepository->remove($project, true);
+
+        return $this->json(data: ["message" => "Project deleted successfully"], status: Response::HTTP_OK);
+    }
 }
