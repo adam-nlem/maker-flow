@@ -151,13 +151,16 @@ class MakeModule extends AbstractMaker
                 $controllerClass,
                 $controllerTpl,
                 [
-                    'namespace'       => "$baseNamespace\\Controller",
-                    'entity'          => $entity,
-                    'entitySnake'     => $this->toSnakeCase($entity),
-                    'entityKebab'     => $this->toDashCase($entity),
-                    'moduleName'      => $moduleName,
-                    'moduleNameSnake' => $moduleNameSnake,
-                    'moduleNameDash'  => $moduleNameDash,
+                    'namespace'        => "$baseNamespace\\Controller",
+                    'entity'           => $entity,
+                    'entitySnake'      => $this->toSnakeCase($entity),
+                    'entitySnakePlural'=> $this->toSnakeCase($entity) . 's',
+                    'entityKebab'      => $this->toDashCase($entity),
+                    'entityKebabPlural'=> $this->toDashCase($entity) . 's',
+                    'entityCamel'      => lcfirst($entity),
+                    'moduleName'       => $moduleName,
+                    'moduleNameSnake'  => $moduleNameSnake,
+                    'moduleNameDash'   => $moduleNameDash,
                 ]
             );
 

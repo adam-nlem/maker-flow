@@ -2,42 +2,49 @@
 
 namespace <?= $namespace ?>;
 
+use App\Entity\User;
 use App\Module\<?= $moduleName ?>\Service\<?= $moduleName . $entity ?>Service;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\User;
 
-#[Route('/api/modules/<?= $moduleNameDash ?>/<?= $entityKebab ?>', name: 'api_module_<?= $moduleNameSnake ?>_<?= $entitySnake ?>_')]
+#[Route('/api/modules/<?= $moduleNameDash ?>/<?= $entityKebabPlural ?>')]
 class <?= $moduleName . $entity ?>Controller extends AbstractController
 {
-    public function __construct(private <?= $moduleName . $entity ?>Service $service) {}
+    public function __construct(private <?= $moduleName . $entity ?>Service $service)
+    {
+    }
 
-    #[Route('', name: 'list', methods: ['GET'])]
-    public function list() {
+    #[Route('', name: 'api_modules_<?= $moduleNameSnake ?>_<?= $entitySnakePlural ?>_list', methods: ['GET'])]
+    public function list()
+    {
         /** @var User $user */
         $user = $this->getUser();
     }
 
-    #[Route('', name: 'create', methods: ['POST'])]
-    public function create() {
+    #[Route('', name: 'api_modules_<?= $moduleNameSnake ?>_<?= $entitySnakePlural ?>_create', methods: ['POST'])]
+    public function create()
+    {
         /** @var User $user */
         $user = $this->getUser();
     }
 
-    #[Route('/{uuid}', name: 'show', methods: ['GET'])]
-    public function show(string $uuid) {
+    #[Route('/{<?= $entityCamel ?>Uuid}', name: 'api_modules_<?= $moduleNameSnake ?>_<?= $entitySnakePlural ?>_show', methods: ['GET'])]
+    public function show(string $<?= $entityCamel ?>Uuid)
+    {
         /** @var User $user */
         $user = $this->getUser();
     }
 
-    #[Route('/{uuid}', name: 'update', methods: ['PUT'])]
-    public function update(string $uuid) {
+    #[Route('/{<?= $entityCamel ?>Uuid}', name: 'api_modules_<?= $moduleNameSnake ?>_<?= $entitySnakePlural ?>_update', methods: ['PATCH'])]
+    public function update(string $<?= $entityCamel ?>Uuid)
+    {
         /** @var User $user */
         $user = $this->getUser();
     }
 
-    #[Route('/{uuid}', name: 'delete', methods: ['DELETE'])]
-    public function delete(string $uuid) {
+    #[Route('/{<?= $entityCamel ?>Uuid}', name: 'api_modules_<?= $moduleNameSnake ?>_<?= $entitySnakePlural ?>_delete', methods: ['DELETE'])]
+    public function delete(string $<?= $entityCamel ?>Uuid)
+    {
         /** @var User $user */
         $user = $this->getUser();
     }
