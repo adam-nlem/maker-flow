@@ -157,6 +157,84 @@ if ($project === null) {
 
 ---
 
+## Module Controllers
+
+Module controllers follow the same conventions as regular controllers but with specific naming patterns for routes.
+
+### Structure
+
+```php
+<?php
+
+namespace App\Module\TodoList\Controller;
+
+use App\Entity\User;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\Routing\Annotation\Route;
+
+#[Route('/api/modules/todo-lists')]
+class TodoListController extends AbstractController
+{
+    #[Route('', name: 'api_modules_todo_lists_list', methods: ['GET'])]
+    public function list()
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+    }
+
+    #[Route('', name: 'api_modules_todo_lists_create', methods: ['POST'])]
+    public function create()
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+    }
+
+    #[Route('/{todoListUuid}', name: 'api_modules_todo_lists_show', methods: ['GET'])]
+    public function show(string $todoListUuid)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+    }
+
+    #[Route('/{todoListUuid}', name: 'api_modules_todo_lists_update', methods: ['PATCH'])]
+    public function update(string $todoListUuid)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+    }
+
+    #[Route('/{todoListUuid}', name: 'api_modules_todo_lists_delete', methods: ['DELETE'])]
+    public function delete(string $todoListUuid)
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+    }
+}
+```
+
+### Module Controller Conventions
+
+1. **Base route** follows pattern: `/api/modules/{module-name}/{resource-plural}`
+   - Example: `/api/modules/todo-lists`, `/api/modules/social-analytics/profiles`
+2. **Route names** follow pattern: `api_modules_{module}_{resource_plural}_{action}`
+   - Example: `api_modules_todo_lists_list`, `api_modules_social_analytics_profiles_create`
+3. **No route name prefix** on class-level `#[Route]` attribute
+4. **Full route names** on each method (not using prefix concatenation)
+5. **UUID parameters** use resource name: `{resourceUuid}` (e.g., `{todoListUuid}`, `{profileUuid}`)
+6. **Resource paths** use plural form with kebab-case (e.g., `todo-lists`, `post-groups`, `metric-logs`)
+
+### Route Name Examples
+
+| Module | Resource | Action | Route Name |
+|--------|----------|--------|------------|
+| TodoList | TodoList | list | `api_modules_todo_lists_list` |
+| TodoList | TodoList | create | `api_modules_todo_lists_create` |
+| TodoList | TodoListTask | list | `api_modules_todo_lists_tasks_list` |
+| SocialAnalytics | Profile | list | `api_modules_social_analytics_profiles_list` |
+| SocialAnalytics | PostGroup | create | `api_modules_social_analytics_post_groups_create` |
+
+---
+
 ## Entities
 
 ### Structure
