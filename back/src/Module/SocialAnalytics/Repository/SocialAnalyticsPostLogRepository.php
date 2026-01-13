@@ -2,18 +2,18 @@
 
 namespace App\Module\SocialAnalytics\Repository;
 
-use App\Module\SocialAnalytics\Entity\SocialAnalyticsMetricLog;
+use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostLog;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
-class SocialAnalyticsMetricLogRepository extends ServiceEntityRepository
+class SocialAnalyticsPostLogRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, SocialAnalyticsMetricLog::class);
+        parent::__construct($registry, SocialAnalyticsPostLog::class);
     }
 
-    public function save(SocialAnalyticsMetricLog $entity, bool $flush = false): void
+    public function save(SocialAnalyticsPostLog $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -22,7 +22,7 @@ class SocialAnalyticsMetricLogRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(SocialAnalyticsMetricLog $entity, bool $flush = false): void
+    public function remove(SocialAnalyticsPostLog $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 

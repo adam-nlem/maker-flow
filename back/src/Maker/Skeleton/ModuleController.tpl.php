@@ -30,7 +30,7 @@ class <?= $moduleName . $entity ?>Controller extends AbstractController
 
     #[Route('/{<?= $entityCamel ?>Uuid}', name: 'api_modules_<?= $moduleNameSnake ?>_<?= $entitySnakePlural ?>_show', methods: ['GET'])]
     public function show(string $<?= $entityCamel ?>Uuid)
-    {
+    {   
         /** @var User $user */
         $user = $this->getUser();
     }

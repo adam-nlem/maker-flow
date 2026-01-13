@@ -7,6 +7,8 @@ use App\Entity\User;
 use App\Entity\UserModule;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsProfileRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
@@ -50,6 +52,12 @@ class SocialAnalyticsProfile
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?UserModule $userModule = null;
 
+    /**
+     * @var Collection<int, SocialAnalyticsPost>
+     */
+    #[ORM\OneToMany(targetEntity: SocialAnalyticsPost::class, mappedBy: 'socialAnalyticsProfile', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $posts;
+
     public function __construct()
     {
         if (null === $this->uuid) {
@@ -59,6 +67,8 @@ class SocialAnalyticsProfile
         if (null === $this->createdAt) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
+
+        $this->posts = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -176,6 +186,35 @@ class SocialAnalyticsProfile
     public function setUserModule(?UserModule $userModule): static
     {
         $this->userModule = $userModule;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SocialAnalyticsPost>
+     */
+    public function getPosts(): Collection
+    {
+        return $this->posts;
+    }
+
+    public function addPost(SocialAnalyticsPost $post): static
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->setSocialAnalyticsProfile($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(SocialAnalyticsPost $post): static
+    {
+        if ($this->posts->removeElement($post)) {
+            if ($post->getSocialAnalyticsProfile() === $this) {
+                $post->setSocialAnalyticsProfile(null);
+            }
+        }
 
         return $this;
     }

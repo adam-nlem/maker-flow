@@ -3,14 +3,14 @@
 namespace App\Module\SocialAnalytics\Entity;
 
 use App\Helper\DateHelper;
-use App\Module\SocialAnalytics\Repository\SocialAnalyticsMetricLogRepository;
+use App\Module\SocialAnalytics\Repository\SocialAnalyticsProfileLogRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: SocialAnalyticsMetricLogRepository::class)]
+#[ORM\Entity(repositoryClass: SocialAnalyticsProfileLogRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class SocialAnalyticsMetricLog
+class SocialAnalyticsProfileLog
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -25,6 +25,16 @@ class SocialAnalyticsMetricLog
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column]
+    private ?int $followerCount = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    private ?array $richeData = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?SocialAnalyticsProfile $socialAnalyticsProfile = null;
 
     public function __construct()
     {
@@ -80,6 +90,42 @@ class SocialAnalyticsMetricLog
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getFollowerCount(): ?int
+    {
+        return $this->followerCount;
+    }
+
+    public function setFollowerCount(int $followerCount): static
+    {
+        $this->followerCount = $followerCount;
+
+        return $this;
+    }
+
+    public function getRicheData(): ?array
+    {
+        return $this->richeData;
+    }
+
+    public function setRicheData(?array $richeData): static
+    {
+        $this->richeData = $richeData;
+
+        return $this;
+    }
+
+    public function getSocialAnalyticsProfile(): ?SocialAnalyticsProfile
+    {
+        return $this->socialAnalyticsProfile;
+    }
+
+    public function setSocialAnalyticsProfile(?SocialAnalyticsProfile $socialAnalyticsProfile): static
+    {
+        $this->socialAnalyticsProfile = $socialAnalyticsProfile;
 
         return $this;
     }

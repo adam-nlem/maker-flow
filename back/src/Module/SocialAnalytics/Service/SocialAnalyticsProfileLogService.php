@@ -2,7 +2,7 @@
 
 namespace App\Module\SocialAnalytics\Service;
 
-class SocialAnalyticsMetricLogService
+class SocialAnalyticsProfileLogService
 {
     // TODO: implement service logic
 }
