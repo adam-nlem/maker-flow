@@ -60,7 +60,7 @@ class Integration
     /**
       * @var Collection<int, UserModule>
       */
-    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'integration')]
+    #[ORM\ManyToMany(targetEntity: UserModule::class, mappedBy: 'integrations')]
     private Collection $userModules;
 
     public function __construct()
@@ -237,7 +237,7 @@ class Integration
     {
         if (!$this->userModules->contains($userModule)) {
             $this->userModules->add($userModule);
-            $userModule->setIntegration($this);
+            $userModule->addIntegration($this);
         }
 
         return $this;
@@ -246,10 +246,7 @@ class Integration
     public function removeUserModule(UserModule $userModule): static
     {
         if ($this->userModules->removeElement($userModule)) {
-            // set the owning side to null (unless already changed)
-            if ($userModule->getIntegration() === $this) {
-                $userModule->setIntegration(null);
-            }
+            $userModule->removeIntegration($this);
         }
 
         return $this;

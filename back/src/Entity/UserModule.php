@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Entity\Enum\ModuleSize;
 use App\Helper\DateHelper;
 use App\Repository\UserModuleRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -87,8 +89,11 @@ class UserModule
     ])]
     private ?Module $module = null;
 
-    #[ORM\ManyToOne(inversedBy: 'userModules')]
-    private ?Integration $integration = null;
+    /**
+      * @var Collection<int, Integration>
+      */
+    #[ORM\ManyToMany(targetEntity: Integration::class, inversedBy: 'userModules')]
+    private Collection $integrations;
 
     #[ORM\ManyToOne(inversedBy: 'userModules')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -111,6 +116,8 @@ class UserModule
         if ($this->isHidden === null) {
             $this->isHidden = false;
         }
+
+        $this->integrations = new ArrayCollection();
     }
     public function getId(): ?int
     {
@@ -237,14 +244,26 @@ class UserModule
         return $this;
     }
 
-    public function getIntegration(): ?Integration
+    /**
+     * @return Collection<int, Integration>
+     */
+    public function getIntegrations(): Collection
     {
-        return $this->integration;
+        return $this->integrations;
     }
 
-    public function setIntegration(?Integration $integration): static
+    public function addIntegration(Integration $integration): static
     {
-        $this->integration = $integration;
+        if (!$this->integrations->contains($integration)) {
+            $this->integrations->add($integration);
+        }
+
+        return $this;
+    }
+
+    public function removeIntegration(Integration $integration): static
+    {
+        $this->integrations->removeElement($integration);
 
         return $this;
     }

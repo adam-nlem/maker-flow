@@ -7,4 +7,5 @@ enum ModuleIdentifier: string
     case GithubStats = 'github_stats';
     case TodoList = 'todo_list';
     case Stripe = 'stripe';
+    case SocialAnalytics = 'social_analytics';
 }

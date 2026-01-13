@@ -90,7 +90,9 @@ Represents a user's instance of a module within a specific project.
 | `user` | ManyToOne | `User` | CASCADE | Owner of this module instance |
 | `module` | ManyToOne | `Module` | - | The module template |
 | `project` | ManyToOne | `Project` | CASCADE | Project this module belongs to |
-| `integration` | ManyToOne | `Integration` | - | Optional external integration |
+| `integrations` | ManyToMany | `Integration` | - | External integrations (multiple allowed per provider) |
+
+**Note:** A UserModule can have multiple integrations, including multiple integrations to the same provider (e.g., multiple GitHub accounts).
 
 #### Serialization Groups
 
