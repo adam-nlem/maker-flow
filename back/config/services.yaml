@@ -7,11 +7,15 @@ parameters:
     app.domain: "%env(string:APP_DOMAIN)%"
     app.frontend_url: "%env(string:FRONTEND_URL)%"
 
-    module.icon_path: "%kernel.project_dir%/private/uploads/module/icon"
+    app.module.icon_path: "%kernel.project_dir%/private/uploads/module/icon"
 
-    instagram.app_id: "%env(string:INSTAGRAM_APP_ID)%"
-    instagram.app_secret: "%env(string:INSTAGRAM_APP_SECRET)%"
-    instagram.redirect_uri: "%env(string:INSTAGRAM_REDIRECT_URI)%"
+    app.instagram.app_id: "%env(string:INSTAGRAM_APP_ID)%"
+    app.instagram.app_secret: "%env(string:INSTAGRAM_APP_SECRET)%"
+    app.instagram.redirect_uri: "%env(string:INSTAGRAM_REDIRECT_URI)%"
+
+    app.redis_store.scheme: "%env(string:REDIS_STORE_SCHEME)%"
+    app.redis_store.host: "%env(string:REDIS_STORE_HOST)%"
+    app.redis_store.port: "%env(string:REDIS_STORE_PORT)%"
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -28,13 +32,18 @@ services:
             $appDomain: "%app.domain%"
     App\Service\Module\ModuleService:
         arguments:
-            $moduleIconPath: "%module.icon_path%"
+            $moduleIconPath: "%app.module.icon_path%"
+    App\Service\RedisStore\RedisStoreService:
+        arguments:
+            $scheme: "%app.redis_store.scheme%"
+            $host: "%app.redis_store.host%"
+            $port: "%app.redis_store.port%"
 
     App\Service\Integration\InstagramOAuthService:
         arguments:
-            $instagramAppId: "%instagram.app_id%"
-            $instagramAppSecret: "%instagram.app_secret%"
-            $instagramRedirectUri: "%instagram.redirect_uri%"
+            $instagramAppId: "%app.instagram.app_id%"
+            $instagramAppSecret: "%app.instagram.app_secret%"
+            $instagramRedirectUri: "%app.instagram.redirect_uri%"
 
     App\Controller\IntegrationController:
         arguments:

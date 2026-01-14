@@ -37,6 +37,11 @@ services:
       DATABASE_NAME: ${MYSQL_DATABASE}
       DATABASE_HOST: ${MYSQL_DATABASE_HOST}
       DATABASE_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+
+      REDIS_STORE_HOST: ${REDIS_STORE_HOST}
+      REDIS_STORE_PORT: ${REDIS_STORE_PORT}
+      REDIS_STORE_SCHEME: ${REDIS_STORE_SCHEME}
+
       INSTAGRAM_APP_ID: ${INSTAGRAM_APP_ID}
       INSTAGRAM_APP_SECRET: ${INSTAGRAM_APP_SECRET}
       INSTAGRAM_REDIRECT_URI: ${INSTAGRAM_REDIRECT_URI}
@@ -75,6 +80,14 @@ services:
       - "8081:80"
     depends_on:
       - db
+    networks:
+      - maker_flow
+  
+  redis-store:
+    container_name: ${COMPOSE_PROJECT_NAME}_redis_store
+    image: redis:8.4.0
+    ports:
+      - "6379:6379"
     networks:
       - maker_flow
 

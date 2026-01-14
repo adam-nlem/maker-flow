@@ -8,7 +8,9 @@ use App\DTO\Response\Integration\InstagramAuthorizeIntegrationResponseDTO;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\User;
 use App\Repository\IntegrationRepository;
+use App\Repository\UserRepository;
 use App\Service\Integration\InstagramOAuthService;
+use App\Service\RedisStore\RedisStoreService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -21,6 +23,7 @@ final class IntegrationController extends AbstractController
     public function __construct(
         private readonly IntegrationRepository $integrationRepository,
         private readonly InstagramOAuthService $instagramOAuthService,
+        private readonly RedisStoreService $redisStoreService,
         private readonly string $frontendUrl,
     ) {}
 
@@ -52,8 +55,11 @@ final class IntegrationController extends AbstractController
         // CSRF protection: random state stored in session and validated in callback
         $state = bin2hex(random_bytes(16));
 
-        $request->getSession()->set('instagram_oauth_state', $state);
-        $request->getSession()->set('instagram_oauth_user_id', $user->getId());
+        $this->redisStoreService->set(
+            $this->redisStoreService->getIntegrationInstagramStateKey($state),
+            $user->getUuid(),
+            time() + 60 * 5 // 5 minutes
+        );
 
         $responseDto = (new InstagramAuthorizeIntegrationResponseDTO(
             $this->instagramOAuthService->getAuthorizationUrl($state)
@@ -66,8 +72,10 @@ final class IntegrationController extends AbstractController
     }
 
     #[Route('/instagram/callback', name: 'api_integrations_instagram_callback', methods: ['GET'])]
-    public function instagramCallback(Request $request, InstagramCallbackQueryParamDTO $queryParamDto): Response
-    {
+    public function instagramCallback(
+        UserRepository $userRepository,
+        InstagramCallbackQueryParamDTO $queryParamDto
+    ): Response {
         $code = $queryParamDto->getCode();
         $state = $queryParamDto->getState();
         $error = $queryParamDto->getError();
@@ -78,14 +86,15 @@ final class IntegrationController extends AbstractController
             );
         }
 
-        $sessionState = $request->getSession()->get('instagram_oauth_state');
-        $userId = $request->getSession()->get('instagram_oauth_user_id');
+        $userUuid  = $this->redisStoreService->get($this->redisStoreService->getIntegrationInstagramStateKey($state));
 
-        if ($state !== $sessionState) {
+        if ($userUuid === null) {
             return $this->redirect(
                 $this->frontendUrl . '/integrations/callback?status=error&provider=instagram&error=invalid_state'
             );
         }
+
+        $this->redisStoreService->delete($this->redisStoreService->getIntegrationInstagramStateKey($state));
 
         if ($code === null) {
             return $this->redirect(
@@ -98,8 +107,13 @@ final class IntegrationController extends AbstractController
             $longLivedTokenData = $this->instagramOAuthService->exchangeForLongLivedToken($shortLivedTokenData['access_token']);
             $profileData = $this->instagramOAuthService->getUserProfile($longLivedTokenData['access_token']);
 
-            /** @var User $user */
-            $user = $this->getUser();
+            $user = $userRepository->getByUuid($userUuid);
+
+            if ($user === null) {
+                return $this->redirect(
+                    $this->frontendUrl . '/integrations/callback?status=error&provider=instagram&error=user_not_found'
+                );
+            }
 
             $existingIntegration = $this->integrationRepository->getByUserAndProviderAndExternalAccountId(
                 $user,
@@ -112,9 +126,6 @@ final class IntegrationController extends AbstractController
             } else {
                 $integration = $this->instagramOAuthService->createIntegration($user, $longLivedTokenData, $profileData);
             }
-
-            $request->getSession()->remove('instagram_oauth_state');
-            $request->getSession()->remove('instagram_oauth_user_id');
 
             return $this->redirect(
                 $this->frontendUrl . '/integrations/callback?status=success&provider=instagram&integrationUuid=' . $integration->getUuid()
