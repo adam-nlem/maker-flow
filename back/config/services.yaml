@@ -5,8 +5,13 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app.domain: "%env(string:APP_DOMAIN)%"
+    app.frontend_url: "%env(string:FRONTEND_URL)%"
 
     module.icon_path: "%kernel.project_dir%/private/uploads/module/icon"
+
+    instagram.app_id: "%env(string:INSTAGRAM_APP_ID)%"
+    instagram.app_secret: "%env(string:INSTAGRAM_APP_SECRET)%"
+    instagram.redirect_uri: "%env(string:INSTAGRAM_REDIRECT_URI)%"
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -24,5 +29,15 @@ services:
     App\Service\Module\ModuleService:
         arguments:
             $moduleIconPath: "%module.icon_path%"
+
+    App\Service\Integration\InstagramOAuthService:
+        arguments:
+            $instagramAppId: "%instagram.app_id%"
+            $instagramAppSecret: "%instagram.app_secret%"
+            $instagramRedirectUri: "%instagram.redirect_uri%"
+
+    App\Controller\IntegrationController:
+        arguments:
+            $frontendUrl: "%app.frontend_url%"
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

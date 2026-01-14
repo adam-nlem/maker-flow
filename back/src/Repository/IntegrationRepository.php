@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Integration;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -16,28 +19,58 @@ class IntegrationRepository extends ServiceEntityRepository
         parent::__construct($registry, Integration::class);
     }
 
-    //    /**
-    //     * @return Integration[] Returns an array of Integration objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('i')
-    //            ->andWhere('i.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('i.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function save(Integration $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->persist($entity);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
 
-    //    public function findOneBySomeField($value): ?Integration
-    //    {
-    //        return $this->createQueryBuilder('i')
-    //            ->andWhere('i.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    public function remove(Integration $entity, bool $flush = false): void
+    {
+        $this->getEntityManager()->remove($entity);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function getByUuidAndUser(string $uuid, User $user): ?Integration
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.uuid = :uuid')
+            ->andWhere('i.user = :user')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUserPaginated(User $user, int $page, int $limit): array
+    {
+        $query = $this->createQueryBuilder('i')
+            ->where('i.user = :user')
+            ->setParameter('user', $user)
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->orderBy('i.createdAt', 'DESC')
+            ->getQuery();
+        $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
+        return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUserAndProviderAndExternalAccountId(User $user, IntegrationProvider $provider, string $externalAccountId): ?Integration
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.user = :user')
+            ->andWhere('i.provider = :provider')
+            ->andWhere('i.externalAccountId = :externalAccountId')
+            ->setParameter('user', $user)
+            ->setParameter('provider', $provider)
+            ->setParameter('externalAccountId', $externalAccountId)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

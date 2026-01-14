@@ -6,4 +6,5 @@ enum IntegrationProvider: string
 {
     case Github = 'github';
     case Youtube = 'youtube';
+    case Instagram = 'instagram';
 }
