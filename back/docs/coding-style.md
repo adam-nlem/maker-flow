@@ -12,6 +12,8 @@ This document describes the coding conventions, patterns, and best practices use
 back/src/
 ├── Controller/          # API Controllers
 ├── DTO/                 # Data Transfer Objects
+│   ├── External/        # External API response DTOs
+│   │   └── [Provider]/  # Provider-specific (Instagram, TikTok, etc.)
 │   ├── QueryParam/      # Query parameter DTOs
 │   ├── Request/         # Request body DTOs
 │   └── Response/        # Response DTOs
@@ -43,7 +45,9 @@ back/src/
 | Repository | `{Entity}Repository` | `ProjectRepository`, `UserRepository` |
 | Service | `{Domain}Service` | `ModuleService`, `CookieService` |
 | Request DTO | `{Action}{Resource}RequestDTO` | `CreateProjectRequestDTO`, `UpdateProjectRequestDTO` |
+| Response DTO | `{Action}{Resource}ResponseDTO` | `AuthorizeInstagramIntegrationResponseDTO` |
 | QueryParam DTO | `{Action}{Resource}QueryParamDTO` | `ListProjectsQueryParamDTO` |
+| External DTO | `{Provider}{DataType}DTO` | `InstagramTokenDTO`, `InstagramUserProfileDTO` |
 | Enum | Singular noun | `ProjectType`, `Color`, `TodoListStatus` |
 | Helper | `{Domain}Helper` | `DateHelper` |
 | Exception | `{Name}Exception` | `CustomValidationException`, `IconNotFoundException` |
@@ -420,6 +424,51 @@ class ListProjectsQueryParamDTO extends AbstractQueryParamDTO
 3. **Nullable properties** use `?` type hint
 4. **Validation constraints** as PHP attributes
 5. **`buildObject()`** returns the constructed entity or data
+
+### External DTOs
+
+External DTOs are used to type responses from third-party APIs (Instagram, TikTok, Stripe, etc.).
+
+```php
+<?php
+
+namespace App\DTO\External\Instagram;
+
+class InstagramTokenDTO
+{
+    public function __construct(
+        private readonly string $accessToken,
+        private readonly int $expiresIn,
+    ) {}
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            accessToken: $data['access_token'],
+            expiresIn: $data['expires_in'] ?? 5184000,
+        );
+    }
+
+    public function getAccessToken(): string
+    {
+        return $this->accessToken;
+    }
+
+    public function getExpiresIn(): int
+    {
+        return $this->expiresIn;
+    }
+}
+```
+
+### External DTO Conventions
+
+1. **Located in** `DTO/External/{Provider}/`
+2. **Immutable** - use `readonly` properties
+3. **Factory method** `fromArray()` for creating from API response
+4. **Default values** for optional fields in `fromArray()`
+5. **No validation** - trust external API response structure
+6. **Getters only** - no setters
 
 ---
 

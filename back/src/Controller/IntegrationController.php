@@ -4,8 +4,11 @@ namespace App\Controller;
 
 use App\DTO\QueryParam\Integration\InstagramCallbackQueryParamDTO;
 use App\DTO\QueryParam\Integration\ListIntegrationsQueryParamDTO;
-use App\DTO\Response\Integration\InstagramAuthorizeIntegrationResponseDTO;
+use App\DTO\Response\Integration\AuthorizeInstagramIntegrationResponseDTO;
+use App\DTO\Response\Integration\RedirectToFrontendCallbackResponseDTO;
 use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\OAuthCallbackStatus;
+use App\Entity\Enum\OAuthErrorCode;
 use App\Entity\User;
 use App\Repository\IntegrationRepository;
 use App\Repository\UserRepository;
@@ -61,7 +64,7 @@ final class IntegrationController extends AbstractController
             time() + 60 * 5 // 5 minutes
         );
 
-        $responseDto = (new InstagramAuthorizeIntegrationResponseDTO(
+        $responseDto = (new AuthorizeInstagramIntegrationResponseDTO(
             $this->instagramOAuthService->getAuthorizationUrl($state)
         ))->getData();
 
@@ -81,60 +84,64 @@ final class IntegrationController extends AbstractController
         $error = $queryParamDto->getError();
 
         if ($error !== null) {
-            return $this->redirect(
-                $this->frontendUrl . '/integrations/callback?status=error&provider=instagram&error=' . $error
-            );
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::ProviderError);
         }
 
-        $userUuid  = $this->redisStoreService->get($this->redisStoreService->getIntegrationInstagramStateKey($state));
+        $userUuid = $this->redisStoreService->get(
+            RedisStoreService::getIntegrationInstagramStateKey($state)
+        );
 
         if ($userUuid === null) {
-            return $this->redirect(
-                $this->frontendUrl . '/integrations/callback?status=error&provider=instagram&error=invalid_state'
-            );
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::InvalidState);
         }
 
-        $this->redisStoreService->delete($this->redisStoreService->getIntegrationInstagramStateKey($state));
+        $this->redisStoreService->delete(
+            RedisStoreService::getIntegrationInstagramStateKey($state)
+        );
 
         if ($code === null) {
-            return $this->redirect(
-                $this->frontendUrl . '/integrations/callback?status=error&provider=instagram&error=missing_code'
-            );
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::MissingCode);
         }
 
         try {
-            $shortLivedTokenData = $this->instagramOAuthService->exchangeCodeForToken($code);
-            $longLivedTokenData = $this->instagramOAuthService->exchangeForLongLivedToken($shortLivedTokenData['access_token']);
-            $profileData = $this->instagramOAuthService->getUserProfile($longLivedTokenData['access_token']);
+            $shortLivedToken = $this->instagramOAuthService->exchangeCodeForToken($code);
+            $longLivedToken = $this->instagramOAuthService->exchangeForLongLivedToken($shortLivedToken->getAccessToken());
+            $instagramUserProfile = $this->instagramOAuthService->getUserProfile($longLivedToken->getAccessToken());
 
             $user = $userRepository->getByUuid($userUuid);
 
             if ($user === null) {
-                return $this->redirect(
-                    $this->frontendUrl . '/integrations/callback?status=error&provider=instagram&error=user_not_found'
-                );
+                return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::UserNotFound);
             }
 
             $existingIntegration = $this->integrationRepository->getByUserAndProviderAndExternalAccountId(
                 $user,
                 IntegrationProvider::Instagram,
-                $profileData['user_id']
+                $instagramUserProfile->getUserId()
             );
 
             if ($existingIntegration !== null) {
-                $integration = $this->instagramOAuthService->updateIntegrationToken($existingIntegration, $longLivedTokenData);
+                $integration = $this->instagramOAuthService->updateIntegrationToken($existingIntegration, $longLivedToken);
             } else {
-                $integration = $this->instagramOAuthService->createIntegration($user, $longLivedTokenData, $profileData);
+                $integration = $this->instagramOAuthService->createIntegration($user, $longLivedToken, $instagramUserProfile);
             }
 
-            return $this->redirect(
-                $this->frontendUrl . '/integrations/callback?status=success&provider=instagram&integrationUuid=' . $integration->getUuid()
-            );
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, IntegrationProvider::Instagram, null, $integration->getUuid());
         } catch (\Exception $e) {
-            return $this->redirect(
-                $this->frontendUrl . '/integrations/callback?status=error&provider=instagram&error=token_exchange_failed'
-            );
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::TokenExchangeFailed);
         }
+    }
+
+    private function redirectToFrontendCallback(
+        OAuthCallbackStatus $status,
+        IntegrationProvider $provider,
+        ?OAuthErrorCode $errorCode = null,
+        ?string $integrationUuid = null
+    ): Response {
+        $dto = new RedirectToFrontendCallbackResponseDTO($status, $provider, $errorCode, $integrationUuid);
+        return $this->redirect(
+            $this->frontendUrl . '/integrations/callback?' . http_build_query($dto->getData())
+        );
     }
 
     #[Route('/instagram/{integrationUuid}/refresh', name: 'api_integrations_instagram_refresh', methods: ['POST'])]

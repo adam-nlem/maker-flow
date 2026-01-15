@@ -2,6 +2,8 @@
 
 namespace App\Service\Integration;
 
+use App\DTO\External\Instagram\InstagramTokenDTO;
+use App\DTO\External\Instagram\InstagramUserProfileDTO;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
@@ -37,7 +39,7 @@ class InstagramOAuthService
         return self::AUTHORIZATION_URL . '?' . http_build_query($params);
     }
 
-    public function exchangeCodeForToken(string $code): array
+    public function exchangeCodeForToken(string $code): InstagramTokenDTO
     {
         $response = $this->httpClient->request('POST', self::TOKEN_URL, [
             'body' => [
@@ -49,10 +51,10 @@ class InstagramOAuthService
             ],
         ]);
 
-        return $response->toArray();
+        return InstagramTokenDTO::fromArray($response->toArray());
     }
 
-    public function exchangeForLongLivedToken(string $shortLivedToken): array
+    public function exchangeForLongLivedToken(string $shortLivedToken): InstagramTokenDTO
     {
         $response = $this->httpClient->request('GET', self::GRAPH_URL . '/access_token', [
             'query' => [
@@ -62,10 +64,10 @@ class InstagramOAuthService
             ],
         ]);
 
-        return $response->toArray();
+        return InstagramTokenDTO::fromArray($response->toArray());
     }
 
-    public function refreshToken(string $longLivedToken): array
+    public function refreshToken(string $longLivedToken): InstagramTokenDTO
     {
         $response = $this->httpClient->request('GET', self::GRAPH_URL . '/refresh_access_token', [
             'query' => [
@@ -74,10 +76,10 @@ class InstagramOAuthService
             ],
         ]);
 
-        return $response->toArray();
+        return InstagramTokenDTO::fromArray($response->toArray());
     }
 
-    public function getUserProfile(string $accessToken): array
+    public function getUserProfile(string $accessToken): InstagramUserProfileDTO
     {
         $response = $this->httpClient->request('GET', self::GRAPH_URL . '/me', [
             'query' => [
@@ -86,21 +88,21 @@ class InstagramOAuthService
             ],
         ]);
 
-        return $response->toArray();
+        return InstagramUserProfileDTO::fromArray($response->toArray());
     }
 
-    public function createIntegration(User $user, array $tokenData, array $profileData): Integration
+    public function createIntegration(User $user, InstagramTokenDTO $tokenData, InstagramUserProfileDTO $instagramUserProfile): Integration
     {
         $expiresAt = DateHelper::createUtcDateTimeImmutable()
-            ->modify('+' . ($tokenData['expires_in'] ?? 5184000) . ' seconds');
+            ->modify('+' . $tokenData->getExpiresIn() . ' seconds');
 
         $integration = new Integration();
         $integration
             ->setUser($user)
             ->setProvider(IntegrationProvider::Instagram)
-            ->setAccessToken($tokenData['access_token'])
-            ->setExternalAccountId($profileData['user_id'])
-            ->setExternalAccountName($profileData['username'])
+            ->setAccessToken($tokenData->getAccessToken())
+            ->setExternalAccountId($instagramUserProfile->getUserId())
+            ->setExternalAccountName($instagramUserProfile->getUsername())
             ->setExpiresAt($expiresAt)
             ->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable())
             ->setStatus(IntegrationStatus::Active)
@@ -111,13 +113,13 @@ class InstagramOAuthService
         return $integration;
     }
 
-    public function updateIntegrationToken(Integration $integration, array $tokenData): Integration
+    public function updateIntegrationToken(Integration $integration, InstagramTokenDTO $tokenData): Integration
     {
         $expiresAt = DateHelper::createUtcDateTimeImmutable()
-            ->modify('+' . ($tokenData['expires_in'] ?? 5184000) . ' seconds');
+            ->modify('+' . $tokenData->getExpiresIn() . ' seconds');
 
         $integration
-            ->setAccessToken($tokenData['access_token'])
+            ->setAccessToken($tokenData->getAccessToken())
             ->setExpiresAt($expiresAt)
             ->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable())
             ->setStatus(IntegrationStatus::Active);
