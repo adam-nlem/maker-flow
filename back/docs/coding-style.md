@@ -707,6 +707,47 @@ api_{resource}_{action}
 
 ---
 
+## Redis Key Naming
+
+### Convention
+
+Redis keys follow the pattern: `{DOMAIN}/{SUBDOMAIN}/{TYPE}/{identifier}`
+
+- **UPPERCASE** for static segments
+- **Slash `/`** as separator
+- **Dynamic values** at the end (lowercase)
+
+### Examples
+
+| Purpose | Key Pattern | Example |
+|---------|-------------|---------|
+| OAuth state | `INTEGRATION/{PROVIDER}/STATE/{state}` | `INTEGRATION/INSTAGRAM/STATE/abc123` |
+
+### Key Generator Methods
+
+Define static methods in `RedisStoreService` for key generation:
+
+```php
+public static function getIntegrationInstagramStateKey(string $state): string
+{
+    return sprintf('INTEGRATION/INSTAGRAM/STATE/%s', $state);
+}
+
+public static function getIntegrationTikTokStateKey(string $state): string
+{
+    return sprintf('INTEGRATION/TIKTOK/STATE/%s', $state);
+}
+```
+
+### Conventions
+
+1. **Static key methods** in `RedisStoreService`
+2. **Method naming**: `get{Domain}{Subdomain}Key`
+3. **Use `sprintf`** for key construction
+4. **Document TTL** in comments where keys are used
+
+---
+
 ## Best Practices
 
 1. **Always validate user ownership** before operations
