@@ -26,7 +26,7 @@ security:
 
     access_control:
         - { path: ^/api/users/register, roles: PUBLIC_ACCESS }
-        - { path: ^/api/integrations/instagram/callback, roles: PUBLIC_ACCESS  }
+        - { path: ^/api/integrations/callback, roles: PUBLIC_ACCESS  }
         - { path: ^/api/, roles: ROLE_USER }
 
 when@test:

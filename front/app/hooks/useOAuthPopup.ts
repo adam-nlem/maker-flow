@@ -9,6 +9,7 @@ const POPUP_CHECK_INTERVAL_MS = 500;
 
 interface UseOAuthPopupProps {
     provider: IntegrationProvider;
+    onSuccess?: () => void;
 }
 
 /**
@@ -17,7 +18,7 @@ interface UseOAuthPopupProps {
  * @param provider - The integration provider (e.g., Instagram)
  * @returns Object with openPopup function, isOpen state, integrationUuid, oauthError, and reset function
  */
-export function useOAuthPopup({ provider }: UseOAuthPopupProps) {
+export function useOAuthPopup({ provider, onSuccess }: UseOAuthPopupProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [popupError, setPopupError] = useState<OAuthErrorCode | null>(null);
     const popupRef = useRef<Window | null>(null);
@@ -34,6 +35,12 @@ export function useOAuthPopup({ provider }: UseOAuthPopupProps) {
             popupRef.current = null;
         }
     }, [integrationUuid, messageError]);
+
+    useEffect(() => {
+        if (integrationUuid && onSuccess) {
+            onSuccess();
+        }
+    }, [integrationUuid, onSuccess]);
 
     const openPopup = useCallback((url: string) => {
         if (isOpen) return;

@@ -455,7 +455,14 @@ OAuth hooks are special because success/error comes from popup `postMessage`, no
 
 ```tsx
 // hooks/api/integrations/useAuthorizeInstagram.ts
-export function useAuthorizeInstagram() {
+interface UseCreateIntegrationProps {
+    userModuleUuid: string;
+    provider: IntegrationProvider;
+}
+
+export function useCreateIntegration({ userModuleUuid, provider }: UseCreateIntegrationProps) {
+    const queryClient = useQueryClient();
+
     const {
         openPopup,
         isOpen,
@@ -463,12 +470,18 @@ export function useAuthorizeInstagram() {
         oauthError,
         reset: resetOAuth,
     } = useOAuthPopup({
-        provider: IntegrationProvider.Instagram,
+        provider,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(userModuleUuid) });
+        },
     });
 
     const mutation = useMutation({
         mutationFn: async () => {
-            const res = await httpClient.get<AuthorizeInstagramResponse>('/integrations/instagram/authorize');
+            const res = await httpClient.post<CreateIntegrationResponse>('/integrations', {
+                userModuleUuid,
+                provider: provider,
+            });
             return res.data;
         },
         onSuccess: (data) => {
@@ -482,7 +495,7 @@ export function useAuthorizeInstagram() {
     }, [mutation, resetOAuth]);
 
     return {
-        authorize: mutation.mutate,
+        createIntegration: mutation.mutate,
         isPending: mutation.isPending || isOpen,
         integrationUuid,
         oauthError: oauthError ?? (mutation.error ? OAuthErrorCode.TokenExchangeFailed : null),
@@ -494,11 +507,13 @@ export function useAuthorizeInstagram() {
 
 ### OAuth Hook Conventions
 
-1. **Return state values** (`integrationUuid`, `oauthError`) instead of callbacks
-2. **Combine pending states** - `isPending` includes both mutation and popup open state
-3. **Combine errors** - `oauthError` includes both popup errors and mutation errors
-4. **Single reset function** - resets both mutation and OAuth state
-5. **Use `useOAuthPopup`** utility hook for popup management
+1. **Generic hook** - `useCreateIntegration` works with any provider via props
+2. **Return state values** (`integrationUuid`, `oauthError`) instead of callbacks
+3. **Combine pending states** - `isPending` includes both mutation and popup open state
+4. **Combine errors** - `oauthError` includes both popup errors and mutation errors
+5. **Single reset function** - resets both mutation and OAuth state
+6. **Use `useOAuthPopup`** utility hook for popup management with `onSuccess` callback
+7. **Invalidate queries** on success via `onSuccess` callback
 
 ---
 

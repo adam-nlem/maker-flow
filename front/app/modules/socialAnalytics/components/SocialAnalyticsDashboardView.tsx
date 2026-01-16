@@ -1,26 +1,33 @@
 import type { ModuleWidgetProps } from "~/modules/registry";
 import { Button } from "~/components/ui/Button";
-import { useAuthorizeInstagram } from "~/hooks/api/integrations/useAuthorizeInstagram";
+import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
 import { oAuthErrorCodeToFrenchTranslation } from "~/models/enums/OAuthErrorCode";
+import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
+import { IntegrationProvider } from "~/models/enums/IntegrationProvider";
+import SocialAnalyticsDashboardContent from "./SocialAnalyticsDashboardContent";
 
 export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleWidgetProps) {
-    const { authorize, isPending, integrationUuid, oauthError, reset } = useAuthorizeInstagram();
+    const { integrations, isLoading } = useListIntegrations({ userModuleUuid });
+    const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
+        userModuleUuid,
+        provider: IntegrationProvider.Instagram,
+    });
 
     const handleConnectInstagram = () => {
         reset();
-        authorize();
+        createIntegration();
     };
 
-    if (integrationUuid) {
+    if (isLoading) {
+        return null;
+    }
+
+    if (integrations.length > 0 || integrationUuid) {
         return (
-            <div className="flex flex-col items-center justify-center h-full gap-6">
-                <div className="text-center">
-                    <h2 className="text-heading-lg text-primary mb-2">Instagram Connected</h2>
-                    <p className="text-body-md text-secondary">
-                        Your Instagram account has been successfully connected.
-                    </p>
-                </div>
-            </div>
+            <SocialAnalyticsDashboardContent
+                userModuleUuid={userModuleUuid}
+                integrations={integrations}
+            />
         );
     }
 

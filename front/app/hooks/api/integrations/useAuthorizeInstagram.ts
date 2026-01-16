@@ -1,15 +1,23 @@
 import { useCallback } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { useOAuthPopup } from "~/hooks/useOAuthPopup";
 import { OAuthErrorCode } from "~/models/enums/OAuthErrorCode";
 import { IntegrationProvider } from "~/models/enums/IntegrationProvider";
+import { integrationQueryKeys } from "./integrationQueryKeys";
 
-interface AuthorizeInstagramResponse {
+interface CreateIntegrationResponse {
     authorization_url: string;
 }
 
-export function useAuthorizeInstagram() {
+interface UseCreateIntegrationProps {
+    userModuleUuid: string;
+    provider: IntegrationProvider;
+}
+
+export function useCreateIntegration({ userModuleUuid, provider }: UseCreateIntegrationProps) {
+    const queryClient = useQueryClient();
+
     const {
         openPopup,
         isOpen,
@@ -17,12 +25,18 @@ export function useAuthorizeInstagram() {
         oauthError,
         reset: resetOAuth,
     } = useOAuthPopup({
-        provider: IntegrationProvider.Instagram,
+        provider,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(userModuleUuid) });
+        },
     });
 
     const mutation = useMutation({
         mutationFn: async () => {
-            const res = await httpClient.get<AuthorizeInstagramResponse>('/integrations/instagram/authorize');
+            const res = await httpClient.post<CreateIntegrationResponse>('/integrations', {
+                userModuleUuid,
+                provider: provider,
+            });
             return res.data;
         },
         onSuccess: (data) => {
@@ -36,7 +50,7 @@ export function useAuthorizeInstagram() {
     }, [mutation, resetOAuth]);
 
     return {
-        authorize: mutation.mutate,
+        createIntegration: mutation.mutate,
         isPending: mutation.isPending || isOpen,
         integrationUuid,
         oauthError: oauthError ?? (mutation.error ? OAuthErrorCode.TokenExchangeFailed : null),

@@ -50,8 +50,10 @@ class RedisStoreService
         $this->client->del($key);
     }
 
-    public static function getIntegrationInstagramStateKey(string $state): string
+    
+
+    public static function getIntegrationStateKey(string $state): string
     {
-        return sprintf('INTEGRATION/INSTAGRAM/STATE/%s', $state);
+        return sprintf('INTEGRATION/STATE/%s', $state);
     }
 }

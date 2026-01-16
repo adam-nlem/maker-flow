@@ -45,17 +45,24 @@ This document describes the backend OAuth integration system used in MakerFlow f
 
 ### Backend Step-by-Step Flow
 
-1. **Frontend requests auth URL** - `GET /api/integrations/instagram/authorize`
-2. **Generate state** - Random token `bin2hex(random_bytes(16))`
-3. **Store state in Redis** - Key: `INTEGRATION/INSTAGRAM/STATE/{state}`, Value: user UUID, TTL: 5 min
-4. **Return Instagram OAuth URL** - With client_id, redirect_uri, scope, state
-5. **Instagram redirects to callback** - `GET /api/integrations/instagram/callback?code=xxx&state=xxx`
-6. **Validate state** - Check Redis for matching state, delete after use
-7. **Exchange code for short-lived token** - POST to Instagram token endpoint
-8. **Exchange for long-lived token** - GET to Instagram graph API
-9. **Fetch user profile** - GET Instagram user_id, username
-10. **Create/update Integration entity** - Store in database
-11. **Redirect to frontend callback** - `/integrations/callback?status=success&provider=instagram&integrationUuid=xxx`
+1. **Frontend requests integration creation** - `POST /api/integrations` with `userModuleUuid` and `provider`
+2. **Validate userModule** - Check userModule exists and belongs to user
+3. **Check existing integration** - Return error if userModule already has an integration for this provider
+4. **Generate state** - Random token `bin2hex(random_bytes(16))`
+5. **Store state in Redis** - Key: `INTEGRATION/STATE/{state}`, Value: JSON with userUuid, userModuleUuid, provider, TTL: 5 min
+6. **Return OAuth URL** - Provider-specific authorization URL with state
+7. **Provider redirects to callback** - `GET /api/integrations/callback?code=xxx&state=xxx`
+8. **Validate state** - Check Redis for matching state, extract userModuleUuid and provider, delete after use
+9. **Exchange code for tokens** - Provider-specific token exchange
+10. **Fetch user profile** - Provider-specific profile fetch
+11. **Create/update Integration entity** - Store in database
+12. **Link integration to userModule** - Add integration to userModule's integrations collection
+13. **Redirect to frontend callback** - `/integrations/callback?status=success&provider={provider}&integrationUuid=xxx`
+
+### Business Rules
+
+- **One integration per provider per userModule** - A userModule can only have one integration for each provider (e.g., one Instagram account per Social Analytics widget)
+- **Same integration can be linked to multiple userModules** - The same Instagram account can be used in different projects
 
 ---
 
@@ -214,10 +221,28 @@ class InstagramUserProfileDTO
 ### CSRF Protection (State Parameter)
 
 1. **Generate random state** - `bin2hex(random_bytes(16))`
-2. **Store in Redis** - Key: `INTEGRATION/INSTAGRAM/STATE/{state}`, Value: user UUID
+2. **Store in Redis** - Key: `INTEGRATION/STATE/{state}`, Value: `IntegrationStateRedisDTO` JSON
 3. **Short TTL** - 5 minutes expiration
 4. **Validate on callback** - Check state exists and matches
 5. **Delete after use** - Prevent replay attacks
+
+### Redis State DTO
+
+```php
+// DTO/Redis/Integration/IntegrationStateRedisDTO.php
+class IntegrationStateRedisDTO
+{
+    public function __construct(
+        private readonly string $userUuid,
+        private readonly string $userModuleUuid,
+        private readonly IntegrationProvider $provider,
+    ) {}
+
+    public static function fromJson(string $json): self { }
+    public function toJson(): string { }
+    // Getters...
+}
+```
 
 ### Token Storage
 
@@ -229,10 +254,18 @@ class InstagramUserProfileDTO
 
 ## API Endpoints
 
-### Authorization
+### Create Integration
 
 ```
-GET /api/integrations/instagram/authorize
+POST /api/integrations
+```
+
+**Request Body:**
+```json
+{
+    "userModuleUuid": "uuid-of-user-module",
+    "provider": "instagram"
+}
 ```
 
 **Response:**
@@ -242,25 +275,28 @@ GET /api/integrations/instagram/authorize
 }
 ```
 
+**Error Response (409 Conflict):**
+```json
+{
+    "message": "This user module already has an integration for this provider"
+}
+```
+
 ### Callback (Internal)
 
 ```
-GET /api/integrations/instagram/callback?code=xxx&state=xxx
+GET /api/integrations/callback?code=xxx&state=xxx
 ```
 
-Redirects to: `/integrations/callback?status=success&provider=instagram&integrationUuid=xxx`
-
-### Token Refresh
-
-```
-POST /api/integrations/instagram/{integrationUuid}/refresh
-```
+Redirects to: `/integrations/callback?status=success&provider={provider}&integrationUuid=xxx`
 
 ### List Integrations
 
 ```
-GET /api/integrations?page=1&limit=10
+GET /api/integrations?userModuleUuid=xxx
 ```
+
+**Response:** Flat array of integrations (one per provider per userModule)
 
 ### Show Integration
 
@@ -314,27 +350,31 @@ class TikTokOAuthService
 }
 ```
 
-#### Add Controller Routes
+#### Add Provider Case to Controller
+
+The generic `POST /api/integrations` route handles all providers. Add the new provider to the `match` statement:
 
 ```php
-#[Route('/tiktok/authorize', name: 'api_integrations_tiktok_authorize', methods: ['GET'])]
-public function tiktokAuthorize(): JsonResponse { }
+// In IntegrationController::create()
+$authorizationUrl = match ($dto->getProvider()) {
+    IntegrationProvider::Instagram => $this->instagramOAuthService->getAuthorizationUrl($state),
+    IntegrationProvider::TikTok => $this->tiktokOAuthService->getAuthorizationUrl($state),
+};
 
-#[Route('/tiktok/callback', name: 'api_integrations_tiktok_callback', methods: ['GET'])]
-public function tiktokCallback(): Response { }
-
-#[Route('/tiktok/{integrationUuid}/refresh', name: 'api_integrations_tiktok_refresh', methods: ['POST'])]
-public function tiktokRefresh(string $integrationUuid): JsonResponse { }
+// In IntegrationController::callback()
+$integration = match ($provider) {
+    IntegrationProvider::Instagram => $this->instagramOAuthService->handleCallback($code, $user, $userModule),
+    IntegrationProvider::TikTok => $this->tiktokOAuthService->handleCallback($code, $user, $userModule),
+};
 ```
 
-#### Add Redis State Key
+#### Create Redis State Model (if not exists)
+
+The generic `IntegrationStateRedisDTO` is already used for all providers:
 
 ```php
-// Service/RedisStore/RedisStoreService.php
-public static function getIntegrationTikTokStateKey(string $state): string
-{
-    return "INTEGRATION/TIKTOK/STATE/{$state}";
-}
+// DTO/Redis/Integration/IntegrationStateRedisDTO.php
+// Already handles all providers via the provider property
 ```
 
 ### 2. Environment Variables
@@ -343,16 +383,16 @@ public static function getIntegrationTikTokStateKey(string $state): string
 # .env
 TIKTOK_APP_ID=xxx
 TIKTOK_APP_SECRET=xxx
-TIKTOK_REDIRECT_URI=https://api.yourapp.com/api/integrations/tiktok/callback
+TIKTOK_REDIRECT_URI=https://api.yourapp.com/api/integrations/callback
 ```
 
 ### 3. Checklist
 
 - [ ] Add provider to `IntegrationProvider` enum
 - [ ] Create External DTOs for API responses
-- [ ] Create OAuth service with all methods
-- [ ] Add controller routes (authorize, callback, refresh)
-- [ ] Add Redis state key method
+- [ ] Create OAuth service with `handleCallback`, `getAuthorizationUrl`, and token methods
+- [ ] Add provider case to `IntegrationController::create()` match statement
+- [ ] Add provider case to `IntegrationController::callback()` match statement
 - [ ] Add environment variables
 - [ ] Test full flow end-to-end
 

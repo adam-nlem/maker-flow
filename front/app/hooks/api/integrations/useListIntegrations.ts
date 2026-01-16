@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { IntegrationsGroupedByProviderDTO, type IntegrationsGroupedByProviderDTOJSON } from "~/models/dtos/IntegrationsGroupedByProviderDTO";
+import { Integration, type IntegrationJSON } from "~/models/Integration";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { integrationQueryKeys } from "./integrationQueryKeys";
 
@@ -11,15 +11,15 @@ export function useListIntegrations({ userModuleUuid }: UseListIntegrationsProps
     const query = useQuery({
         queryKey: integrationQueryKeys.list(userModuleUuid),
         queryFn: async () => {
-            const res = await httpClient.get<IntegrationsGroupedByProviderDTOJSON[]>(`/integrations`, {
+            const res = await httpClient.get<IntegrationJSON[]>(`/integrations`, {
                 params: { userModuleUuid }
             });
-            return res.data.map((json) => IntegrationsGroupedByProviderDTO.fromJSON(json));
+            return res.data.map((json) => Integration.fromJSON(json));
         },
     });
 
     return {
-        integrationsByProvider: query.data ?? [],
+        integrations: query.data ?? [],
         isLoading: query.isLoading,
         error: query.error,
     };

@@ -8,8 +8,10 @@ use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
 use App\Entity\User;
+use App\Entity\UserModule;
 use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
+use App\Repository\UserModuleRepository;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class InstagramOAuthService
@@ -21,6 +23,7 @@ class InstagramOAuthService
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly IntegrationRepository $integrationRepository,
+        private readonly UserModuleRepository $userModuleRepository,
         private readonly string $instagramAppId,
         private readonly string $instagramAppSecret,
         private readonly string $instagramRedirectUri,
@@ -110,7 +113,7 @@ class InstagramOAuthService
             ->setStatus(IntegrationStatus::Active)
             ->setScope(['instagram_business_basic', 'instagram_business_manage_messages', 'instagram_business_manage_comments', 'instagram_business_content_publish']);
 
-        $this->integrationRepository->save($integration, true);
+        $this->integrationRepository->save($integration);
 
         return $integration;
     }
@@ -126,7 +129,31 @@ class InstagramOAuthService
             ->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable())
             ->setStatus(IntegrationStatus::Active);
 
-        $this->integrationRepository->save($integration, true);
+        $this->integrationRepository->save($integration);
+
+        return $integration;
+    }
+
+    public function handleCallback(string $code, User $user, UserModule $userModule): Integration
+    {
+        $shortLivedToken = $this->exchangeCodeForToken($code);
+        $longLivedToken = $this->exchangeForLongLivedToken($shortLivedToken->getAccessToken());
+        $instagramUserProfile = $this->getUserProfile($longLivedToken->getAccessToken());
+
+        $existingIntegration = $this->integrationRepository->getByUserAndProviderAndAccountId(
+            $user,
+            IntegrationProvider::Instagram,
+            $instagramUserProfile->getUserId()
+        );
+
+        if ($existingIntegration !== null) {
+            $integration = $this->updateIntegrationToken($existingIntegration, $longLivedToken);
+        } else {
+            $integration = $this->createIntegration($user, $longLivedToken, $instagramUserProfile);
+        }
+
+        $userModule->addIntegration($integration);
+        $this->userModuleRepository->save($userModule, true);
 
         return $integration;
     }

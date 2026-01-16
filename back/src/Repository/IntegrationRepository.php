@@ -61,32 +61,6 @@ class IntegrationRepository extends ServiceEntityRepository
         return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserModule(UserModule $userModule): array
-    {
-        return $this->createQueryBuilder('i')
-            ->innerJoin('i.userModules', 'um')
-            ->where('um = :userModule')
-            ->setParameter('userModule', $userModule)
-            ->orderBy('i.createdAt', 'DESC')
-            ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
-    }
-
-    public function getByUserModuleAndProvider(UserModule $userModule, IntegrationProvider $provider): array
-    {
-        return $this->createQueryBuilder('i')
-            ->innerJoin('i.userModules', 'um')
-            ->where('um = :userModule')
-            ->andWhere('i.provider = :provider')
-            ->setParameter('userModule', $userModule)
-            ->setParameter('provider', $provider)
-            ->orderBy('i.createdAt', 'DESC')
-            ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
-    }
-
     public function getByUserAndProviderAndAccountId(User $user, IntegrationProvider $provider, string $accountId): ?Integration
     {
         return $this->createQueryBuilder('i')
@@ -99,5 +73,35 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getOneByUserModuleAndProvider(UserModule $userModule, IntegrationProvider $provider): ?Integration
+    {
+        return $this->createQueryBuilder('i')
+            ->innerJoin('i.userModules', 'um')
+            ->where('um = :userModule')
+            ->andWhere('i.provider = :provider')
+            ->setParameter('userModule', $userModule)
+            ->setParameter('provider', $provider)
+            ->orderBy('i.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUserModule(UserModule $userModule): array
+    {
+        $providers = IntegrationProvider::cases();
+        $integrations = [];
+
+        foreach ($providers as $provider) {
+            $integration = $this->getOneByUserModuleAndProvider($userModule, $provider);
+            if ($integration !== null) {
+                $integrations[] = $integration;
+            }
+        }
+
+        return $integrations;
     }
 }

@@ -4,7 +4,7 @@ namespace App\DTO\Response\Integration;
 
 use App\DTO\Response\ResponseDTOInterface;
 
-class AuthorizeInstagramIntegrationResponseDTO implements ResponseDTOInterface
+class CreateIntegrationResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
         private string $authorizationUrl,

@@ -4,8 +4,9 @@ namespace App\Controller;
 
 use App\DTO\QueryParam\Integration\InstagramCallbackQueryParamDTO;
 use App\DTO\QueryParam\Integration\ListIntegrationsQueryParamDTO;
-use App\DTO\Response\Integration\AuthorizeInstagramIntegrationResponseDTO;
-use App\DTO\Response\Integration\ListIntegrationsGroupedByProviderResponseDTO;
+use App\DTO\Redis\Integration\IntegrationStateRedisDTO;
+use App\DTO\Request\Integration\CreateIntegrationRequestDTO;
+use App\DTO\Response\Integration\CreateIntegrationResponseDTO;
 use App\DTO\Response\Integration\OAuthCallbackResponseDTO;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\OAuthCallbackStatus;
@@ -49,41 +50,60 @@ final class IntegrationController extends AbstractController
             );
         }
 
-        $providers = IntegrationProvider::cases();
-
-        $result = array_map(
-            fn(IntegrationProvider $provider) => (new ListIntegrationsGroupedByProviderResponseDTO(
-                $provider,
-                $this->integrationRepository->getByUserModuleAndProvider($userModule, $provider)
-            ))->getData(),
-            $providers
-        );
+        $integrations = $this->integrationRepository->getByUserModule($userModule);
 
         return $this->json(
-            data: $result,
+            data: $integrations,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_integrations_list']]
         );
     }
 
-    #[Route('/instagram/authorize', name: 'api_integrations_instagram_authorize', methods: ['GET'])]
-    public function instagramAuthorize(): JsonResponse
-    {
+    #[Route('', name: 'api_integrations_create', methods: ['POST'])]
+    public function create(
+        CreateIntegrationRequestDTO $dto,
+        UserModuleRepository $userModuleRepository,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        // CSRF protection: random state stored in session and validated in callback
+        $userModule = $userModuleRepository->getByUuidAndUser($dto->getUserModuleUuid(), $user);
+
+        if ($userModule === null) {
+            return $this->json(
+                data: ["message" => "You don't have any user module with this uuid"],
+                status: Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $existingIntegration = $this->integrationRepository->getOneByUserModuleAndProvider($userModule, $dto->getProvider());
+
+        if ($existingIntegration !== null) {
+            return $this->json(
+                data: ["message" => "This user module already has an integration for this provider"],
+                status: Response::HTTP_CONFLICT
+            );
+        }
+
         $state = bin2hex(random_bytes(16));
 
-        $this->redisStoreService->set(
-            $this->redisStoreService->getIntegrationInstagramStateKey($state),
+        $stateModel = new IntegrationStateRedisDTO(
             $user->getUuid(),
-            time() + 60 * 5 // 5 minutes
+            $userModule->getUuid(),
+            $dto->getProvider(),
         );
 
-        $responseDto = (new AuthorizeInstagramIntegrationResponseDTO(
-            $this->instagramOAuthService->getAuthorizationUrl($state)
-        ))->getData();
+        $this->redisStoreService->set(
+            RedisStoreService::getIntegrationStateKey($state),
+            $stateModel->toJson(),
+            time() + 60 * 5
+        );
+
+        $authorizationUrl = match ($dto->getProvider()) {
+            IntegrationProvider::Instagram => $this->instagramOAuthService->getAuthorizationUrl($state),
+        };
+
+        $responseDto = (new CreateIntegrationResponseDTO($authorizationUrl))->getData();
 
         return $this->json(
             data: $responseDto,
@@ -91,62 +111,61 @@ final class IntegrationController extends AbstractController
         );
     }
 
-    #[Route('/instagram/callback', name: 'api_integrations_instagram_callback', methods: ['GET'])]
-    public function instagramCallback(
+    #[Route('/callback', name: 'api_integrations_callback', methods: ['GET'])]
+    public function callback(
         UserRepository $userRepository,
+        UserModuleRepository $userModuleRepository,
         InstagramCallbackQueryParamDTO $queryParamDto
     ): Response {
         $code = $queryParamDto->getCode();
         $state = $queryParamDto->getState();
         $error = $queryParamDto->getError();
 
-        if ($error !== null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::ProviderError);
-        }
-
-        $userUuid = $this->redisStoreService->get(
-            RedisStoreService::getIntegrationInstagramStateKey($state)
+        $stateDataJson = $this->redisStoreService->get(
+            RedisStoreService::getIntegrationStateKey($state)
         );
 
-        if ($userUuid === null) {
+        if ($stateDataJson === null) {
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::InvalidState);
         }
 
+        $stateModel = IntegrationStateRedisDTO::fromJson($stateDataJson);
+        
+    
+        $provider = $stateModel->getProvider();
+
         $this->redisStoreService->delete(
-            RedisStoreService::getIntegrationInstagramStateKey($state)
+            RedisStoreService::getIntegrationStateKey($state)
         );
 
+        if ($error !== null) {
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::ProviderError);
+        }
+
         if ($code === null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::MissingCode);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::MissingCode);
+        }
+
+        $user = $userRepository->getByUuid($stateModel->getUserUuid());
+
+        if ($user === null) {
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::UserNotFound);
+        }
+
+        $userModule = $userModuleRepository->getByUuidAndUser($stateModel->getUserModuleUuid(), $user);
+
+        if ($userModule === null) {
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::UserNotFound);
         }
 
         try {
-            $shortLivedToken = $this->instagramOAuthService->exchangeCodeForToken($code);
-            $longLivedToken = $this->instagramOAuthService->exchangeForLongLivedToken($shortLivedToken->getAccessToken());
-            $instagramUserProfile = $this->instagramOAuthService->getUserProfile($longLivedToken->getAccessToken());
+            $integration = match ($provider) {
+                IntegrationProvider::Instagram => $this->instagramOAuthService->handleCallback($code, $user, $userModule),
+            };
 
-            $user = $userRepository->getByUuid($userUuid);
-
-            if ($user === null) {
-                return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::UserNotFound);
-            }
-
-            $existingIntegration = $this->integrationRepository->getByUserAndProviderAndAccountId(
-                $user,
-                IntegrationProvider::Instagram,
-                $instagramUserProfile->getUserId()
-            );
-
-            if ($existingIntegration !== null) {
-                $integration = $this->instagramOAuthService->updateIntegrationToken($existingIntegration, $longLivedToken);
-            } else {
-                $integration = $this->instagramOAuthService->createIntegration($user, $longLivedToken, $instagramUserProfile);
-            }
-
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, IntegrationProvider::Instagram, null, $integration->getUuid());
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, $provider, null, $integration->getUuid());
         } catch (\Exception $e) {
-            dump($e);
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::TokenExchangeFailed);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::TokenExchangeFailed);
         }
     }
 
@@ -160,44 +179,6 @@ final class IntegrationController extends AbstractController
         return $this->redirect(
             $this->frontendUrl . '/integrations/callback?' . http_build_query($dto->getData())
         );
-    }
-
-    #[Route('/instagram/{integrationUuid}/refresh', name: 'api_integrations_instagram_refresh', methods: ['POST'])]
-    public function instagramRefresh(string $integrationUuid): JsonResponse
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $integration = $this->integrationRepository->getByUuidAndUser($integrationUuid, $user);
-
-        if ($integration === null) {
-            return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
-        }
-
-        if ($integration->getProvider() !== IntegrationProvider::Instagram) {
-            return $this->json(
-                data: ["message" => "This integration is not an Instagram integration"],
-                status: Response::HTTP_BAD_REQUEST
-            );
-        }
-
-        try {
-            $tokenData = $this->instagramOAuthService->refreshToken($integration->getAccessToken());
-            $this->instagramOAuthService->updateIntegrationToken($integration, $tokenData);
-
-            return $this->json(
-                data: ["message" => "Token refreshed successfully"],
-                status: Response::HTTP_OK
-            );
-        } catch (\Exception $e) {
-            return $this->json(
-                data: ["message" => "Failed to refresh token"],
-                status: Response::HTTP_INTERNAL_SERVER_ERROR
-            );
-        }
     }
 
     #[Route('/{integrationUuid}', name: 'api_integrations_show', methods: ['GET'])]

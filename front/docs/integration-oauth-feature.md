@@ -14,17 +14,18 @@ This document describes the frontend OAuth integration system used in MakerFlow 
 ┌─────────────────────────────────────────────────────────────────┐
 │                    Component (e.g., Dashboard)                   │
 │                                                                  │
-│  const { authorize, isPending, integrationUuid, oauthError }    │
-│      = useAuthorizeInstagram();                                  │
+│  const { createIntegration, isPending, integrationUuid, ... }   │
+│      = useCreateIntegration({ userModuleUuid, provider });       │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                    useAuthorizeInstagram                         │
+│                    useCreateIntegration                          │
 │                                                                  │
-│  - Calls API to get authorization URL                           │
+│  - Calls POST /api/integrations with userModuleUuid & provider  │
 │  - Uses useOAuthPopup for popup management                      │
 │  - Combines mutation state with OAuth state                     │
+│  - Invalidates integrations query on success                    │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            ▼
@@ -34,6 +35,7 @@ This document describes the frontend OAuth integration system used in MakerFlow 
 │  - Opens popup window with OAuth URL                            │
 │  - Manages popup lifecycle (open/close detection)               │
 │  - Uses useOAuthMessageListener for callback handling           │
+│  - Calls onSuccess callback when integration is created         │
 └──────────────────────────┬──────────────────────────────────────┘
                            │
                            ▼
@@ -52,12 +54,15 @@ This document describes the frontend OAuth integration system used in MakerFlow 
 front/app/
 ├── hooks/
 │   ├── api/integrations/
-│   │   └── useAuthorizeInstagram.ts    # API hook for Instagram OAuth
+│   │   ├── useAuthorizeInstagram.ts    # Contains useCreateIntegration hook
+│   │   ├── useListIntegrations.ts      # Hook to list integrations (flat list)
+│   │   └── integrationQueryKeys.ts     # Query keys for integrations
 │   ├── useOAuthPopup.ts                # Utility hook for popup management
 │   └── useOAuthMessageListener.ts      # Utility hook for message listening
 ├── models/
 │   ├── dtos/
-│   │   └── OAuthCallbackReponseDTO.ts  # DTO for callback response
+│   │   ├── OAuthCallbackReponseDTO.ts  # DTO for callback response
+│   │   └── IntegrationsGroupedByProviderDTO.ts  # @deprecated - kept for future use
 │   └── enums/
 │       ├── IntegrationProvider.ts      # Provider enum (Instagram, etc.)
 │       ├── OAuthCallbackStatus.ts      # Status enum (success, error)
@@ -115,31 +120,40 @@ front/app/
 
 ### Step-by-Step Flow
 
-1. **User clicks "Connect Instagram"** - Component calls `authorize()`
-2. **API request** - `useAuthorizeInstagram` calls `GET /api/integrations/instagram/authorize`
-3. **Backend returns auth URL** - Instagram OAuth URL with state parameter
-4. **Open popup** - `useOAuthPopup.openPopup(url)` opens centered popup window
-5. **User authorizes** - User logs into Instagram and grants permissions
-6. **Backend callback** - Instagram redirects to backend callback endpoint
-7. **Backend processes** - Exchanges code for token, creates integration
-8. **Frontend callback** - Backend redirects to `/integrations/callback?status=success&...`
-9. **postMessage** - Callback route sends message to opener window
-10. **Message received** - `useOAuthMessageListener` receives and validates message
-11. **State update** - `integrationUuid` or `oauthError` state is set
-12. **Component reacts** - Component renders success/error UI
+1. **User clicks "Connect Instagram"** - Component calls `createIntegration()`
+2. **API request** - `useCreateIntegration` calls `POST /api/integrations` with `userModuleUuid` and `provider`
+3. **Backend validates** - Checks userModule exists and no existing integration for this provider
+4. **Backend returns auth URL** - Instagram OAuth URL with state parameter
+5. **Open popup** - `useOAuthPopup.openPopup(url)` opens centered popup window
+6. **User authorizes** - User logs into Instagram and grants permissions
+7. **Backend callback** - Instagram redirects to backend callback endpoint (`/api/integrations/callback`)
+8. **Backend processes** - Exchanges code for token, creates integration, links to userModule
+9. **Frontend callback** - Backend redirects to `/integrations/callback?status=success&...`
+10. **postMessage** - Callback route sends message to opener window
+11. **Message received** - `useOAuthMessageListener` receives and validates message
+12. **State update** - `integrationUuid` or `oauthError` state is set
+13. **Query invalidation** - `useCreateIntegration` invalidates integrations query
+14. **Component reacts** - Component renders success/error UI
 
 ---
 
 ## Hooks
 
-### useAuthorizeInstagram
+### useCreateIntegration
 
-API hook that orchestrates the Instagram OAuth flow.
+Generic API hook that orchestrates the OAuth flow for any provider.
 
 ```typescript
 // Location: hooks/api/integrations/useAuthorizeInstagram.ts
 
-export function useAuthorizeInstagram() {
+interface UseCreateIntegrationProps {
+    userModuleUuid: string;
+    provider: IntegrationProvider;
+}
+
+export function useCreateIntegration({ userModuleUuid, provider }: UseCreateIntegrationProps) {
+    const queryClient = useQueryClient();
+
     const {
         openPopup,
         isOpen,
@@ -147,14 +161,18 @@ export function useAuthorizeInstagram() {
         oauthError,
         reset: resetOAuth,
     } = useOAuthPopup({
-        provider: IntegrationProvider.Instagram,
+        provider,
+        onSuccess: () => {
+            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(userModuleUuid) });
+        },
     });
 
     const mutation = useMutation({
         mutationFn: async () => {
-            const res = await httpClient.get<AuthorizeInstagramResponse>(
-                '/integrations/instagram/authorize'
-            );
+            const res = await httpClient.post<CreateIntegrationResponse>('/integrations', {
+                userModuleUuid,
+                provider: provider,
+            });
             return res.data;
         },
         onSuccess: (data) => {
@@ -168,7 +186,7 @@ export function useAuthorizeInstagram() {
     }, [mutation, resetOAuth]);
 
     return {
-        authorize: mutation.mutate,
+        createIntegration: mutation.mutate,
         isPending: mutation.isPending || isOpen,
         integrationUuid,
         oauthError: oauthError ?? (mutation.error ? OAuthErrorCode.TokenExchangeFailed : null),
@@ -178,10 +196,16 @@ export function useAuthorizeInstagram() {
 }
 ```
 
+**Props:**
+| Property | Type | Description |
+|----------|------|-------------|
+| `userModuleUuid` | `string` | UUID of the user module to link the integration to |
+| `provider` | `IntegrationProvider` | The integration provider (Instagram, etc.) |
+
 **Returns:**
 | Property | Type | Description |
 |----------|------|-------------|
-| `authorize` | `() => void` | Starts the OAuth flow |
+| `createIntegration` | `() => void` | Starts the OAuth flow |
 | `isPending` | `boolean` | True while API call or popup is active |
 | `integrationUuid` | `string \| null` | UUID of created integration on success |
 | `oauthError` | `OAuthErrorCode \| null` | Error code on failure |
@@ -197,14 +221,15 @@ Utility hook that manages the OAuth popup window lifecycle.
 ```typescript
 // Location: hooks/useOAuthPopup.ts
 
-const POPUP_WIDTH = 600;
-const POPUP_HEIGHT = 700;
-const POPUP_CHECK_INTERVAL_MS = 500;
+interface UseOAuthPopupProps {
+    provider: IntegrationProvider;
+    onSuccess?: () => void;
+}
 
 /**
  * Utility hook to manage OAuth popup window and listen for callback messages
  */
-export function useOAuthPopup({ provider }: UseOAuthPopupProps) {
+export function useOAuthPopup({ provider, onSuccess }: UseOAuthPopupProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [popupError, setPopupError] = useState<OAuthErrorCode | null>(null);
     const popupRef = useRef<Window | null>(null);
@@ -223,6 +248,13 @@ export function useOAuthPopup({ provider }: UseOAuthPopupProps) {
         }
     }, [integrationUuid, messageError]);
 
+    // Call onSuccess callback when integration is created
+    useEffect(() => {
+        if (integrationUuid && onSuccess) {
+            onSuccess();
+        }
+    }, [integrationUuid, onSuccess]);
+
     const openPopup = useCallback((url: string) => {
         // ... opens centered popup window
         // ... sets up interval to detect manual close
@@ -238,11 +270,18 @@ export function useOAuthPopup({ provider }: UseOAuthPopupProps) {
 }
 ```
 
+**Props:**
+| Property | Type | Description |
+|----------|------|-------------|
+| `provider` | `IntegrationProvider` | The integration provider |
+| `onSuccess` | `() => void` | Optional callback called when integration is created |
+
 **Features:**
 - Opens centered popup window (600x700)
 - Detects popup blocked by browser
 - Detects manual popup close
 - Combines popup errors with message listener errors
+- Calls `onSuccess` callback when integration is successfully created
 
 ---
 
@@ -449,20 +488,28 @@ export class OAuthCallbackReponseDTO {
 ### Basic Usage
 
 ```tsx
-export default function SocialAnalyticsDashboardView() {
-    const { authorize, isPending, integrationUuid, oauthError, reset } = useAuthorizeInstagram();
+export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleWidgetProps) {
+    const { integrations, isLoading } = useListIntegrations({ userModuleUuid });
+    const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
+        userModuleUuid,
+        provider: IntegrationProvider.Instagram,
+    });
 
     const handleConnectInstagram = () => {
         reset();
-        authorize();
+        createIntegration();
     };
 
-    if (integrationUuid) {
+    if (isLoading) {
+        return null;
+    }
+
+    if (integrations.length > 0 || integrationUuid) {
         return (
-            <div>
-                <h2>Instagram Connected</h2>
-                <p>Your Instagram account has been successfully connected.</p>
-            </div>
+            <SocialAnalyticsDashboardContent
+                userModuleUuid={userModuleUuid}
+                integrations={integrations}
+            />
         );
     }
 
@@ -494,42 +541,24 @@ export enum IntegrationProvider {
 }
 ```
 
-### 2. Create API Hook
+### 2. Use the Generic Hook
 
-```typescript
-// hooks/api/integrations/useAuthorizeTikTok.ts
-export function useAuthorizeTikTok() {
-    const {
-        openPopup,
-        isOpen,
-        integrationUuid,
-        oauthError,
-        reset: resetOAuth,
-    } = useOAuthPopup({
-        provider: IntegrationProvider.TikTok,
-    });
+The `useCreateIntegration` hook is generic and works with any provider. Simply pass the new provider:
 
-    const mutation = useMutation({
-        mutationFn: async () => {
-            const res = await httpClient.get<AuthorizeTikTokResponse>(
-                '/integrations/tiktok/authorize'
-            );
-            return res.data;
-        },
-        onSuccess: (data) => {
-            openPopup(data.authorization_url);
-        },
-    });
-
-    // ... same pattern as useAuthorizeInstagram
-}
+```tsx
+// In your component
+const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
+    userModuleUuid,
+    provider: IntegrationProvider.TikTok,
+});
 ```
+
+No new hook is needed - the generic `useCreateIntegration` handles all providers.
 
 ### 3. Checklist
 
-- [ ] Add provider to `IntegrationProvider` enum
-- [ ] Create `useAuthorize{Provider}` hook
-- [ ] Ensure backend has matching endpoints
+- [ ] Add provider to `IntegrationProvider` enum (frontend)
+- [ ] Ensure backend has matching provider case in controller
 - [ ] Test full flow end-to-end
 - [ ] Test error scenarios (popup blocked, user denies, etc.)
 
