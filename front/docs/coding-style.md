@@ -538,12 +538,13 @@ export const useSidebarStore = create<SidebarState & SidebarAction>((set) => ({
 }));
 ```
 
-### Store with localStorage
+### Persisted Store (Recommended)
+
+Use the `persist` middleware for stores that need to save state to localStorage. This is simpler and less error-prone than manual localStorage handling.
 
 ```tsx
 import { create } from 'zustand';
-
-const LOCAL_STORAGE_KEY = "app:project:focused";
+import { persist } from 'zustand/middleware';
 
 type FocusProjectState = {
     focusedProjectUuid: string | null;
@@ -553,26 +554,25 @@ type FocusProjectAction = {
     setFocusedProjectUuid: (uuid: string | null) => void;
 };
 
-export const useFocusProjectStore = create<FocusProjectState & FocusProjectAction>((set) => ({
-    focusedProjectUuid: typeof window !== "undefined" 
-        ? localStorage.getItem(LOCAL_STORAGE_KEY) 
-        : null,
-
-    setFocusedProjectUuid: (uuid) => {
-        if (typeof window !== "undefined" && uuid) {
-            localStorage.setItem(LOCAL_STORAGE_KEY, uuid);
+export const useFocusProjectStore = create<FocusProjectState & FocusProjectAction>()(
+    persist(
+        (set) => ({
+            focusedProjectUuid: null,
+            setFocusedProjectUuid: (uuid) => set({ focusedProjectUuid: uuid }),
+        }),
+        {
+            name: 'app:project:focused',
         }
-        set({ focusedProjectUuid: uuid });
-    },
-}));
+    )
+);
 ```
 
 ### Conventions
 
 1. **Separate State and Action types**
 2. **Combine types** with `&` in `create<State & Action>`
-3. **localStorage key pattern**: `app:{domain}:{key}`
-4. **Check `typeof window`** for SSR safety
+3. **Use `persist` middleware** for persistence
+4. **Namespace storage keys** with `app:{domain}`
 5. **Simple setters** for state updates
 
 ---

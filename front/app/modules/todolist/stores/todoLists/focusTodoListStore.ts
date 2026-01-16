@@ -1,6 +1,5 @@
 import { create } from 'zustand'
-
-const LOCAL_STORAGE_KEY = "app:todo-list:focused"
+import { persist } from 'zustand/middleware'
 
 type FocusTodoListState = {
     focusedTodoListUuid: string | null
@@ -10,13 +9,14 @@ type FocusTodoListAction = {
     setFocusedTodoListUuid: (uuid: string | null) => void
 }
 
-export const useFocusTodoListStore = create<FocusTodoListState & FocusTodoListAction>((set) => ({
-    focusedTodoListUuid: typeof window !== "undefined" ? localStorage.getItem(LOCAL_STORAGE_KEY) : null,
-
-    setFocusedTodoListUuid: (uuid) => {
-        if (typeof window !== "undefined" && uuid) {
-            localStorage.setItem(LOCAL_STORAGE_KEY, uuid)
+export const useFocusTodoListStore = create<FocusTodoListState & FocusTodoListAction>()(
+    persist(
+        (set) => ({
+            focusedTodoListUuid: null,
+            setFocusedTodoListUuid: (uuid) => set({ focusedTodoListUuid: uuid })
+        }),
+        {
+            name: "app:todo-list:focused",
         }
-        set({ focusedTodoListUuid: uuid })
-    }
-}))
+    )
+)
