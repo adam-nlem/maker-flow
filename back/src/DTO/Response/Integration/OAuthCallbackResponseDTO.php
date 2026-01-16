@@ -7,7 +7,7 @@ use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\OAuthCallbackStatus;
 use App\Entity\Enum\OAuthErrorCode;
 
-class RedirectToFrontendCallbackResponseDTO implements ResponseDTOInterface
+class OAuthCallbackResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
         private OAuthCallbackStatus $status,

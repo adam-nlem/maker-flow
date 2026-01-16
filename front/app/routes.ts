@@ -4,6 +4,7 @@ export default [
   // Public routes
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
+  route("integrations/callback", "routes/integrations.callback.tsx"),
 
   // Protected routes
   layout("routes/protected.tsx", [

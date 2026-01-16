@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\DTO\QueryParam\Integration\InstagramCallbackQueryParamDTO;
 use App\DTO\QueryParam\Integration\ListIntegrationsQueryParamDTO;
 use App\DTO\Response\Integration\AuthorizeInstagramIntegrationResponseDTO;
-use App\DTO\Response\Integration\RedirectToFrontendCallbackResponseDTO;
+use App\DTO\Response\Integration\OAuthCallbackResponseDTO;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\OAuthCallbackStatus;
 use App\Entity\Enum\OAuthErrorCode;
@@ -138,7 +138,7 @@ final class IntegrationController extends AbstractController
         ?OAuthErrorCode $errorCode = null,
         ?string $integrationUuid = null
     ): Response {
-        $dto = new RedirectToFrontendCallbackResponseDTO($status, $provider, $errorCode, $integrationUuid);
+        $dto = new OAuthCallbackResponseDTO($status, $provider, $errorCode, $integrationUuid);
         return $this->redirect(
             $this->frontendUrl . '/integrations/callback?' . http_build_query($dto->getData())
         );

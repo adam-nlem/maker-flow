@@ -232,6 +232,67 @@ export class Project {
 
 ---
 
+## DTOs
+
+DTOs (Data Transfer Objects) are **classes** used to represent data from API responses or other external sources.
+
+### Class-based DTO
+
+```tsx
+import { User } from '../User';
+
+interface AuthResponseJSON {
+    token: string;
+    user: any;
+}
+
+export class AuthResponseDTO {
+    constructor(
+        public readonly token: string,
+        public readonly user: User,
+    ) {}
+
+    static fromJSON(json: AuthResponseJSON): AuthResponseDTO {
+        return new AuthResponseDTO(
+            json.token,
+            User.fromJSON(json.user),
+        );
+    }
+}
+```
+
+### DTO with Custom Factory Method
+
+```tsx
+export class OAuthCallbackReponseDTO {
+    constructor(
+        public readonly status: OAuthCallbackStatus,
+        public readonly provider: IntegrationProvider,
+        public readonly errorCode?: OAuthErrorCode,
+        public readonly integrationUuid?: string,
+    ) {}
+
+    static fromSearchParams(params: URLSearchParams): OAuthCallbackReponseDTO {
+        return new OAuthCallbackReponseDTO(
+            params.get("status") as OAuthCallbackStatus,
+            params.get("provider") as IntegrationProvider,
+            (params.get("errorCode") as OAuthErrorCode) ?? undefined,
+            params.get("integrationUuid") ?? undefined,
+        );
+    }
+}
+```
+
+### Conventions
+
+1. **DTOs are classes**, not interfaces
+2. **`readonly` for all properties**
+3. **Static factory method** for parsing (`fromJSON`, `fromSearchParams`, etc.)
+4. **Factory method name** describes the data source
+5. **Transform nested objects** using their respective `fromJSON` methods
+
+---
+
 ## Enums
 
 ### Structure
@@ -347,6 +408,58 @@ export const projectQueryKeys = {
 5. **Default empty array** for list queries: `query.data ?? []`
 6. **Transform API response** using model's `fromJSON`
 7. **Interface for mutation data** defined above hook
+8. **No callbacks in hooks** - return state values instead, let components react with `useEffect` if needed
+
+### OAuth Hooks
+
+OAuth hooks are special because success/error comes from popup `postMessage`, not from the HTTP request. They follow the same state-based pattern.
+
+```tsx
+// hooks/api/integrations/useAuthorizeInstagram.ts
+export function useAuthorizeInstagram() {
+    const {
+        openPopup,
+        isOpen,
+        integrationUuid,
+        oauthError,
+        reset: resetOAuth,
+    } = useOAuthPopup({
+        provider: IntegrationProvider.Instagram,
+    });
+
+    const mutation = useMutation({
+        mutationFn: async () => {
+            const res = await httpClient.get<AuthorizeInstagramResponse>('/integrations/instagram/authorize');
+            return res.data;
+        },
+        onSuccess: (data) => {
+            openPopup(data.authorization_url);
+        },
+    });
+
+    const reset = useCallback(() => {
+        mutation.reset();
+        resetOAuth();
+    }, [mutation, resetOAuth]);
+
+    return {
+        authorize: mutation.mutate,
+        isPending: mutation.isPending || isOpen,
+        integrationUuid,
+        oauthError: oauthError ?? (mutation.error ? OAuthErrorCode.TokenExchangeFailed : null),
+        error: mutation.error,
+        reset,
+    };
+}
+```
+
+### OAuth Hook Conventions
+
+1. **Return state values** (`integrationUuid`, `oauthError`) instead of callbacks
+2. **Combine pending states** - `isPending` includes both mutation and popup open state
+3. **Combine errors** - `oauthError` includes both popup errors and mutation errors
+4. **Single reset function** - resets both mutation and OAuth state
+5. **Use `useOAuthPopup`** utility hook for popup management
 
 ---
 
