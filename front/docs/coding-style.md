@@ -283,6 +283,43 @@ export class OAuthCallbackReponseDTO {
 }
 ```
 
+### Grouped DTO Pattern
+
+When the API returns items grouped by an enum (e.g., tasks by status, integrations by provider), create a dedicated DTO class:
+
+```tsx
+import type { IntegrationProvider } from "../enums/IntegrationProvider";
+import { Integration, type IntegrationJSON } from "../Integration";
+
+export interface IntegrationsGroupedByProviderDTOJSON {
+    provider: IntegrationProvider;
+    integrations: IntegrationJSON[];
+}
+
+export class IntegrationsGroupedByProviderDTO {
+    constructor(
+        public readonly provider: IntegrationProvider,
+        public integrations: Integration[],
+    ) { }
+
+    static fromJSON(json: IntegrationsGroupedByProviderDTOJSON): IntegrationsGroupedByProviderDTO {
+        return new IntegrationsGroupedByProviderDTO(
+            json.provider,
+            json.integrations.map(integration => Integration.fromJSON(integration)),
+        );
+    }
+}
+```
+
+**Usage in hooks:**
+
+```tsx
+const res = await httpClient.get<IntegrationsGroupedByProviderDTOJSON[]>(`/integrations`, {
+    params: { userModuleUuid }
+});
+return res.data.map((json) => IntegrationsGroupedByProviderDTO.fromJSON(json));
+```
+
 ### Conventions
 
 1. **DTOs are classes**, not interfaces
@@ -290,6 +327,8 @@ export class OAuthCallbackReponseDTO {
 3. **Static factory method** for parsing (`fromJSON`, `fromSearchParams`, etc.)
 4. **Factory method name** describes the data source
 5. **Transform nested objects** using their respective `fromJSON` methods
+6. **Export JSON interface** from model files for use in DTOs
+7. **Grouped DTOs** follow naming: `{Resource}GroupedBy{Enum}DTO`
 
 ---
 

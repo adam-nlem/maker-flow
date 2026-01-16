@@ -748,6 +748,81 @@ public static function getIntegrationTikTokStateKey(string $state): string
 
 ---
 
+## Grouped Response Pattern
+
+When returning a list of items grouped by an enum (e.g., tasks by status, integrations by provider), use a dedicated Response DTO with `getData()` method.
+
+### Response DTO Structure
+
+```php
+<?php
+
+namespace App\DTO\Response\Integration;
+
+use App\DTO\Response\ResponseDTOInterface;
+use App\Entity\Enum\IntegrationProvider;
+use Symfony\Component\Serializer\Attribute\Groups;
+
+class ListIntegrationsGroupedByProviderResponseDTO implements ResponseDTOInterface
+{
+    public function __construct(
+        #[Groups(['api_integrations_list'])]
+        private IntegrationProvider $provider,
+        /** @var Integration[] $integrations */
+        #[Groups(['api_integrations_list'])]
+        private array $integrations,
+    ) {}
+
+    public function getData(): array
+    {
+        return [
+            'provider' => $this->getProvider()->value,
+            'integrations' => $this->getIntegrations(),
+        ];
+    }
+
+    public function getProvider(): IntegrationProvider
+    {
+        return $this->provider;
+    }
+
+    public function getIntegrations(): array
+    {
+        return $this->integrations;
+    }
+}
+```
+
+### Controller Usage
+
+```php
+$providers = IntegrationProvider::cases();
+
+$result = array_map(
+    fn(IntegrationProvider $provider) => (new ListIntegrationsGroupedByProviderResponseDTO(
+        $provider,
+        $this->integrationRepository->getByUserModuleAndProvider($userModule, $provider)
+    ))->getData(),
+    $providers
+);
+
+return $this->json(
+    data: $result,
+    status: Response::HTTP_OK,
+    context: ['groups' => ['api_integrations_list']]
+);
+```
+
+### Conventions
+
+1. **DTO naming**: `List{Resource}GroupedBy{Enum}ResponseDTO`
+2. **Implement `ResponseDTOInterface`** with `getData()` method
+3. **Use `array_map`** over enum cases to build grouped response
+4. **Call `getData()`** on each DTO instance to get serializable array
+5. **Enum value** returned as string via `->value`
+
+---
+
 ## Best Practices
 
 1. **Always validate user ownership** before operations

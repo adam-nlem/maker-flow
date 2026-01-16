@@ -10,12 +10,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ListIntegrationsQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
-    #[Assert\Positive]
-    private int $page;
-
-    #[Assert\NotBlank]
-    #[Assert\Positive]
-    private int $limit;
+    #[Assert\Uuid]
+    private string $userModuleUuid;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -26,17 +22,11 @@ class ListIntegrationsQueryParamDTO extends AbstractQueryParamDTO
 
     protected function fromQueryParams(array $queryParams): void
     {
-        $this->page = $queryParams["page"];
-        $this->limit = $queryParams["limit"];
+        $this->userModuleUuid = $queryParams["userModuleUuid"];
     }
 
-    public function getPage(): int
+    public function getUserModuleUuid(): string
     {
-        return $this->page;
-    }
-
-    public function getLimit(): int
-    {
-        return $this->limit;
+        return $this->userModuleUuid;
     }
 }

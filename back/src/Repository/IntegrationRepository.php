@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Integration;
 use App\Entity\User;
+use App\Entity\UserModule;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -58,6 +59,32 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getQuery();
         $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
         return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUserModule(UserModule $userModule): array
+    {
+        return $this->createQueryBuilder('i')
+            ->innerJoin('i.userModules', 'um')
+            ->where('um = :userModule')
+            ->setParameter('userModule', $userModule)
+            ->orderBy('i.createdAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUserModuleAndProvider(UserModule $userModule, IntegrationProvider $provider): array
+    {
+        return $this->createQueryBuilder('i')
+            ->innerJoin('i.userModules', 'um')
+            ->where('um = :userModule')
+            ->andWhere('i.provider = :provider')
+            ->setParameter('userModule', $userModule)
+            ->setParameter('provider', $provider)
+            ->orderBy('i.createdAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     public function getByUserAndProviderAndAccountId(User $user, IntegrationProvider $provider, string $accountId): ?Integration

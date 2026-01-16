@@ -5,12 +5,14 @@ namespace App\Controller;
 use App\DTO\QueryParam\Integration\InstagramCallbackQueryParamDTO;
 use App\DTO\QueryParam\Integration\ListIntegrationsQueryParamDTO;
 use App\DTO\Response\Integration\AuthorizeInstagramIntegrationResponseDTO;
+use App\DTO\Response\Integration\ListIntegrationsGroupedByProviderResponseDTO;
 use App\DTO\Response\Integration\OAuthCallbackResponseDTO;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\OAuthCallbackStatus;
 use App\Entity\Enum\OAuthErrorCode;
 use App\Entity\User;
 use App\Repository\IntegrationRepository;
+use App\Repository\UserModuleRepository;
 use App\Repository\UserRepository;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\RedisStore\RedisStoreService;
@@ -31,19 +33,34 @@ final class IntegrationController extends AbstractController
     ) {}
 
     #[Route('', name: 'api_integrations_list', methods: ['GET'])]
-    public function list(ListIntegrationsQueryParamDTO $queryParamDto): JsonResponse
-    {
+    public function list(
+        ListIntegrationsQueryParamDTO $queryParamDto,
+        UserModuleRepository $userModuleRepository,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $integrations = $this->integrationRepository->getByUserPaginated(
-            $user,
-            $queryParamDto->getPage(),
-            $queryParamDto->getLimit()
+        $userModule = $userModuleRepository->getByUuidAndUser($queryParamDto->getUserModuleUuid(), $user);
+
+        if ($userModule === null) {
+            return $this->json(
+                data: ["message" => "You don't have any user module with this uuid"],
+                status: Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $providers = IntegrationProvider::cases();
+
+        $result = array_map(
+            fn(IntegrationProvider $provider) => (new ListIntegrationsGroupedByProviderResponseDTO(
+                $provider,
+                $this->integrationRepository->getByUserModuleAndProvider($userModule, $provider)
+            ))->getData(),
+            $providers
         );
 
         return $this->json(
-            data: $integrations,
+            data: $result,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_integrations_list']]
         );
