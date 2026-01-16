@@ -20,6 +20,7 @@ export default function IntegrationsCallback() {
         // and the useOAuthMessageListener will handle it properly
         if (window.opener) {
             window.opener.postMessage(message, window.location.origin);
+            // Close the popup
             window.close();
             return;
         }

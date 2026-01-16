@@ -115,7 +115,7 @@ The `Integration` entity stores connected external accounts and their OAuth toke
 | `accountId` | `string` | No | Provider's user ID |
 | `userName` | `string` | No | Provider's username (e.g., @johndoe) |
 | `name` | `string` | Yes | User's display name |
-| `avatarUrl` | `string` | Yes | Profile picture URL |
+| `profilePictureUrl` | `text` | Yes | Profile picture URL |
 | `createdAt` | `DateTimeImmutable` | No | Creation timestamp |
 | `updatedAt` | `DateTimeImmutable` | Yes | Last update timestamp |
 | `expiresAt` | `DateTimeImmutable` | Yes | Token expiration timestamp |

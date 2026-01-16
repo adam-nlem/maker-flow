@@ -30,6 +30,8 @@ final class Version20260116075355 extends AbstractMigration
         $this->addSql('ALTER TABLE social_analytics_post_group ADD CONSTRAINT FK_B73CA5ADAF223875 FOREIGN KEY (user_module_id) REFERENCES user_module (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE social_analytics_post_log ADD CONSTRAINT FK_DF81AA0148A9F20 FOREIGN KEY (social_analytics_post_id) REFERENCES social_analytics_post (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE social_analytics_profile_log ADD CONSTRAINT FK_520C30149E82DDEA FOREIGN KEY (integration_id) REFERENCES integration (id) ON DELETE CASCADE');
+
+        $this->addSql("INSERT INTO module (uuid, title, description, is_active, is_premium, created_at, module_identifier) VALUES (UUID(), 'Social Analytics', 'Track and analyze your social media performance across platforms.', 1, 1, NOW(), 'social_analytics')");
     }
 
     public function down(Schema $schema): void

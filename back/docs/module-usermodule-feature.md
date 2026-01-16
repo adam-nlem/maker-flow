@@ -391,6 +391,31 @@ Returns all user modules for a specific project.
 
 ---
 
+## Module Seeding
+
+Modules are seeded via database migrations to ensure consistent data across all environments.
+
+### Seed Data Location
+
+Each module is inserted in the migration that creates its related tables:
+
+| Module | Migration | Premium |
+|--------|-----------|---------|
+| Todo List | `Version20260113105120` | No |
+| Social Analytics | `Version20260116075355` | Yes |
+
+### Adding a New Module
+
+When creating a new module, add an INSERT statement at the end of the migration's `up()` method:
+
+```php
+$this->addSql("INSERT INTO module (uuid, title, description, is_active, is_premium, created_at, module_identifier) VALUES (UUID(), 'Module Title', 'Module description.', 1, 0, NOW(), 'module_identifier')");
+```
+
+**Important:** Also add the corresponding case to the `ModuleIdentifier` enum in `src/Entity/Enum/ModuleIdentifier.php`.
+
+---
+
 ## Business Rules
 
 1. **One instance per project:** A user cannot add the same module twice to a single project

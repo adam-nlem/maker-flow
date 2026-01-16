@@ -44,8 +44,8 @@ class Integration
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $name = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    private ?string $avatarUrl = null;
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $profilePictureUrl = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
@@ -192,14 +192,14 @@ class Integration
         return $this;
     }
 
-    public function getAvatarUrl(): ?string
+    public function getProfilePictureUrl(): ?string
     {
-        return $this->avatarUrl;
+        return $this->profilePictureUrl;
     }
 
-    public function setAvatarUrl(?string $avatarUrl): static
+    public function setProfilePictureUrl(?string $profilePictureUrl): static
     {
-        $this->avatarUrl = $avatarUrl;
+        $this->profilePictureUrl = $profilePictureUrl;
 
         return $this;
     }

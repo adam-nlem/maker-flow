@@ -19,6 +19,8 @@ export function useOAuthMessageListener({ provider }: UseOAuthMessageListenerPro
     const [oauthError, setOauthError] = useState<OAuthErrorCode | null>(null);
 
     const handleMessage = useCallback((event: MessageEvent<OAuthCallbackMessage>) => {
+
+        console.log(event)
         if (event.origin !== window.location.origin) {
             return;
         }
@@ -37,7 +39,7 @@ export function useOAuthMessageListener({ provider }: UseOAuthMessageListenerPro
             setIntegrationUuid(payload.integrationUuid);
             setOauthError(null);
         } else if (payload.status === OAuthCallbackStatus.Error && payload.errorCode) {
-            setOauthError(payload.errorCode);
+            setOauthError(payload.errorCode ?? OAuthErrorCode.Unknown);
             setIntegrationUuid(null);
         }
     }, [provider]);

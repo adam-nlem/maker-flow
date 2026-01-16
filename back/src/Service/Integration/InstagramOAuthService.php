@@ -104,7 +104,7 @@ class InstagramOAuthService
             ->setAccountId($instagramUserProfile->getUserId())
             ->setUserName($instagramUserProfile->getUsername())
             ->setName($instagramUserProfile->getName())
-            ->setAvatarUrl($instagramUserProfile->getProfilePictureUrl())
+            ->setProfilePictureUrl($instagramUserProfile->getProfilePictureUrl())
             ->setExpiresAt($expiresAt)
             ->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable())
             ->setStatus(IntegrationStatus::Active)

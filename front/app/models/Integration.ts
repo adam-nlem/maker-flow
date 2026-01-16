@@ -6,7 +6,7 @@ export interface IntegrationJSON {
     accountId: string;
     userName: string;
     name: string | null;
-    avatarUrl: string | null;
+    profilePictureUrl: string | null;
     createdAt: string;
     updatedAt: string | null;
     expiresAt: string | null;
@@ -21,7 +21,7 @@ export class Integration {
         public readonly accountId: string,
         public readonly userName: string,
         public readonly name: string | null,
-        public readonly avatarUrl: string | null,
+        public readonly profilePictureUrl: string | null,
         public readonly createdAt: Date,
         public readonly updatedAt: Date | null,
         public readonly expiresAt: Date | null,
@@ -36,7 +36,7 @@ export class Integration {
             json.accountId,
             json.userName,
             json.name,
-            json.avatarUrl,
+            json.profilePictureUrl,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : null,
             json.expiresAt ? new Date(json.expiresAt) : null,

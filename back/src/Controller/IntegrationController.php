@@ -67,7 +67,7 @@ final class IntegrationController extends AbstractController
     }
 
     #[Route('/instagram/authorize', name: 'api_integrations_instagram_authorize', methods: ['GET'])]
-    public function instagramAuthorize(Request $request): JsonResponse
+    public function instagramAuthorize(): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -145,6 +145,7 @@ final class IntegrationController extends AbstractController
 
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, IntegrationProvider::Instagram, null, $integration->getUuid());
         } catch (\Exception $e) {
+            dump($e);
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::TokenExchangeFailed);
         }
     }

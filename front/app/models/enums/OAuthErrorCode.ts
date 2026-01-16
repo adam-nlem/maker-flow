@@ -5,6 +5,7 @@ export enum OAuthErrorCode {
     TokenExchangeFailed = 'token_exchange_failed',
     ProviderError = 'provider_error',
     PopupBlocked = 'popup_blocked',
+    Unknown = 'unknown',
 }
 
 export const oAuthErrorCodeToFrenchTranslation: Record<OAuthErrorCode, string> = {
@@ -14,4 +15,5 @@ export const oAuthErrorCodeToFrenchTranslation: Record<OAuthErrorCode, string> =
     [OAuthErrorCode.TokenExchangeFailed]: "Échec de la connexion, veuillez réessayer",
     [OAuthErrorCode.ProviderError]: "Erreur du fournisseur d'authentification",
     [OAuthErrorCode.PopupBlocked]: "La fenêtre popup a été bloquée par votre navigateur",
+    [OAuthErrorCode.Unknown]: "Une erreur est survenue, veuillez réessayer",
 };

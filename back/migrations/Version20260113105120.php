@@ -31,6 +31,8 @@ final class Version20260113105120 extends AbstractMigration
         $this->addSql('ALTER TABLE todo_list_task ADD CONSTRAINT FK_5A25B2DCE8A7DCFA FOREIGN KEY (todo_list_id) REFERENCES todo_list (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE todo_list_task_todo_list_tag ADD CONSTRAINT FK_C9CCC2897F251143 FOREIGN KEY (todo_list_task_id) REFERENCES todo_list_task (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE todo_list_task_todo_list_tag ADD CONSTRAINT FK_C9CCC2894BC2E842 FOREIGN KEY (todo_list_tag_id) REFERENCES todo_list_tag (id) ON DELETE CASCADE');
+
+        $this->addSql("INSERT INTO module (uuid, title, description, is_active, is_premium, created_at, module_identifier) VALUES (UUID(), 'Todo List', 'Manage your tasks with a simple and intuitive todo list.', 1, 0, NOW(), 'todo_list')");
     }
 
     public function down(Schema $schema): void
