@@ -36,13 +36,22 @@ class Integration
     private ?array $scope = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $externalAccountId = null;
+    private ?string $accountId = null;
 
     #[ORM\Column(length: 255)]
-    private ?string $externalAccountName = null;
+    private ?string $userName = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $name = null;
+
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatarUrl = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $expiresAt = null;
@@ -58,8 +67,8 @@ class Integration
     private ?IntegrationStatus $status = null;
 
     /**
-      * @var Collection<int, UserModule>
-      */
+     * @var Collection<int, UserModule>
+     */
     #[ORM\ManyToMany(targetEntity: UserModule::class, mappedBy: 'integrations')]
     private Collection $userModules;
 
@@ -74,6 +83,12 @@ class Integration
         }
 
         $this->userModules = new ArrayCollection();
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
     }
 
     public function getId(): ?int
@@ -141,26 +156,50 @@ class Integration
         return $this;
     }
 
-    public function getExternalAccountId(): ?string
+    public function getAccountId(): ?string
     {
-        return $this->externalAccountId;
+        return $this->accountId;
     }
 
-    public function setExternalAccountId(string $externalAccountId): static
+    public function setAccountId(string $accountId): static
     {
-        $this->externalAccountId = $externalAccountId;
+        $this->accountId = $accountId;
 
         return $this;
     }
 
-    public function getExternalAccountName(): ?string
+    public function getUserName(): ?string
     {
-        return $this->externalAccountName;
+        return $this->userName;
     }
 
-    public function setExternalAccountName(string $externalAccountName): static
+    public function setUserName(string $userName): static
     {
-        $this->externalAccountName = $externalAccountName;
+        $this->userName = $userName;
+
+        return $this;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->name;
+    }
+
+    public function setName(?string $name): static
+    {
+        $this->name = $name;
+
+        return $this;
+    }
+
+    public function getAvatarUrl(): ?string
+    {
+        return $this->avatarUrl;
+    }
+
+    public function setAvatarUrl(?string $avatarUrl): static
+    {
+        $this->avatarUrl = $avatarUrl;
 
         return $this;
     }
@@ -173,6 +212,18 @@ class Integration
     public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

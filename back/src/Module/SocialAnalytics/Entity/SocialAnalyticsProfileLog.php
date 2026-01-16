@@ -2,6 +2,7 @@
 
 namespace App\Module\SocialAnalytics\Entity;
 
+use App\Entity\Integration;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsProfileLogRepository;
 use Doctrine\DBAL\Types\Types;
@@ -34,7 +35,7 @@ class SocialAnalyticsProfileLog
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?SocialAnalyticsProfile $socialAnalyticsProfile = null;
+    private ?Integration $integration = null;
 
     public function __construct()
     {
@@ -118,14 +119,14 @@ class SocialAnalyticsProfileLog
         return $this;
     }
 
-    public function getSocialAnalyticsProfile(): ?SocialAnalyticsProfile
+    public function getIntegration(): ?Integration
     {
-        return $this->socialAnalyticsProfile;
+        return $this->integration;
     }
 
-    public function setSocialAnalyticsProfile(?SocialAnalyticsProfile $socialAnalyticsProfile): static
+    public function setIntegration(?Integration $integration): static
     {
-        $this->socialAnalyticsProfile = $socialAnalyticsProfile;
+        $this->integration = $integration;
 
         return $this;
     }

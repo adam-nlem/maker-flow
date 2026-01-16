@@ -60,15 +60,15 @@ class IntegrationRepository extends ServiceEntityRepository
         return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserAndProviderAndExternalAccountId(User $user, IntegrationProvider $provider, string $externalAccountId): ?Integration
+    public function getByUserAndProviderAndAccountId(User $user, IntegrationProvider $provider, string $accountId): ?Integration
     {
         return $this->createQueryBuilder('i')
             ->where('i.user = :user')
             ->andWhere('i.provider = :provider')
-            ->andWhere('i.externalAccountId = :externalAccountId')
+            ->andWhere('i.accountId = :accountId')
             ->setParameter('user', $user)
             ->setParameter('provider', $provider)
-            ->setParameter('externalAccountId', $externalAccountId)
+            ->setParameter('accountId', $accountId)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);

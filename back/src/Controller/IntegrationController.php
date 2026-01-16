@@ -114,7 +114,7 @@ final class IntegrationController extends AbstractController
                 return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::UserNotFound);
             }
 
-            $existingIntegration = $this->integrationRepository->getByUserAndProviderAndExternalAccountId(
+            $existingIntegration = $this->integrationRepository->getByUserAndProviderAndAccountId(
                 $user,
                 IntegrationProvider::Instagram,
                 $instagramUserProfile->getUserId()

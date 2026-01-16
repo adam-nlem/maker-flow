@@ -2,6 +2,7 @@
 
 namespace App\Module\SocialAnalytics\Entity;
 
+use App\Entity\Integration;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsMediaType;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
@@ -39,9 +40,9 @@ class SocialAnalyticsPost
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $caption = null;
 
-    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?SocialAnalyticsProfile $socialAnalyticsProfile = null;
+    private ?Integration $integration = null;
 
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
@@ -153,14 +154,14 @@ class SocialAnalyticsPost
         return $this;
     }
 
-    public function getSocialAnalyticsProfile(): ?SocialAnalyticsProfile
+    public function getIntegration(): ?Integration
     {
-        return $this->socialAnalyticsProfile;
+        return $this->integration;
     }
 
-    public function setSocialAnalyticsProfile(?SocialAnalyticsProfile $socialAnalyticsProfile): static
+    public function setIntegration(?Integration $integration): static
     {
-        $this->socialAnalyticsProfile = $socialAnalyticsProfile;
+        $this->integration = $integration;
 
         return $this;
     }

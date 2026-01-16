@@ -99,6 +99,44 @@ enum IntegrationProvider: string
 
 ---
 
+## Integration Entity
+
+The `Integration` entity stores connected external accounts and their OAuth tokens.
+
+### Properties
+
+| Property | Type | Nullable | Description |
+|----------|------|----------|-------------|
+| `uuid` | `GUID` | No | Unique identifier |
+| `provider` | `IntegrationProvider` | No | Provider enum (Instagram, etc.) |
+| `accessToken` | `string` | No | OAuth access token |
+| `refreshToken` | `string` | Yes | OAuth refresh token (if available) |
+| `scope` | `array` | Yes | Granted OAuth scopes |
+| `accountId` | `string` | No | Provider's user ID |
+| `userName` | `string` | No | Provider's username (e.g., @johndoe) |
+| `name` | `string` | Yes | User's display name |
+| `avatarUrl` | `string` | Yes | Profile picture URL |
+| `createdAt` | `DateTimeImmutable` | No | Creation timestamp |
+| `updatedAt` | `DateTimeImmutable` | Yes | Last update timestamp |
+| `expiresAt` | `DateTimeImmutable` | Yes | Token expiration timestamp |
+| `lastSyncedAt` | `DateTimeImmutable` | No | Last data sync timestamp |
+| `user` | `User` | No | Owner of the integration |
+| `status` | `IntegrationStatus` | No | Active, Expired, Revoked |
+
+### Relationships
+
+- **User** - `ManyToOne` - Each integration belongs to one user
+- **UserModules** - `ManyToMany` - Integration can be linked to multiple user modules
+
+### Usage in SocialAnalytics Module
+
+The `Integration` entity acts as a profile entity. Related entities now reference `Integration` directly:
+
+- `SocialAnalyticsPost` → `ManyToOne` → `Integration`
+- `SocialAnalyticsProfileLog` → `ManyToOne` → `Integration`
+
+---
+
 ## External DTOs
 
 External DTOs are used to type responses from third-party APIs. They are located in `DTO/External/{Provider}/`.
@@ -348,7 +386,7 @@ private function redirectToFrontendCallback(
     ?OAuthErrorCode $errorCode = null,
     ?string $integrationUuid = null
 ): Response {
-    $dto = new RedirectToFrontendCallbackResponseDTO($status, $provider, $errorCode, $integrationUuid);
+    $dto = new OAuthCallbackResponseDTO($status, $provider, $errorCode, $integrationUuid);
     return $this->redirect(
         $this->frontendUrl . '/integrations/callback?' . http_build_query($dto->getData())
     );
