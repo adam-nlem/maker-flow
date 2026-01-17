@@ -3,7 +3,7 @@ import React from 'react';
 interface ButtonProps {
     children: React.ReactNode;
     type?: 'button' | 'submit' | 'reset';
-    style?: 'primary' | 'secondary' | 'danger';
+    style?: 'primary' | 'secondary' | 'danger' | 'outline';
     width?: string;
     isLoading?: boolean;
     disabled?: boolean;

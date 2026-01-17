@@ -21,7 +21,7 @@ export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleW
     if (isLoading) {
         return null;
     }
-
+    
     if (integrations.length > 0 || integrationUuid) {
         return (
             <SocialAnalyticsDashboardContent

@@ -5,6 +5,7 @@ import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterSt
 import { SocialAnalyticsMetric, socialAnalyticsMetricToFrenchTranslation } from "../models/enums/SocialAnalyticsMetric"
 import { SocialAnalyticsTimePeriod, socialAnalyticsTimePeriodToFrenchTranslation } from "../models/enums/SocialAnalyticsTimePeriod"
 import FilterTile from "./FilterTile"
+import SocialAnalyticsProfileTile from "./SocialAnalyticsProfileTile"
 
 interface SocialAnalyticsDashboardContentProps {
     userModuleUuid: string
@@ -21,7 +22,7 @@ export default function SocialAnalyticsDashboardContent({
     const { metric, timePeriod, setMetric, setTimePeriod } = useSocialAnalyticsFilterStore()
 
     return (
-        <div className="m-5 w-1/3 h-[50vh] flex flex-col gap-3">
+        <div className="p-5 w-2/3 h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center shrink-0">
                 <SelectDropdown<SocialAnalyticsMetric>
                     items={metricOptions}
@@ -67,14 +68,15 @@ export default function SocialAnalyticsDashboardContent({
                 />
             </div>
 
-            <div className="flex flex-col items-center justify-center h-full gap-4">
-                <h2 className="text-heading-lg text-primary">Social Analytics</h2>
-                <p className="text-body-md text-secondary">
-                    {integrations.length} account(s) connected
-                </p>
-                <p className="text-body-sm text-gray">
-                    Dashboard content coming soon...
-                </p>
+            <div className="flex flex-row items-center justify-center h-full gap-4">
+                {integrations.map((integration) => (
+                    <SocialAnalyticsProfileTile
+                        key={integration.uuid}
+                        integration={integration}
+                        metric={metric}
+                        timePeriod={timePeriod}
+                    />
+                ))}
             </div>
         </div>
     )

@@ -16,11 +16,13 @@ use App\Repository\IntegrationRepository;
 use App\Repository\UserModuleRepository;
 use App\Repository\UserRepository;
 use App\Service\Integration\InstagramOAuthService;
+use App\Service\Integration\IntegrationService;
 use App\Service\RedisStore\RedisStoreService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 
 #[Route('/api/integrations')]
@@ -107,7 +109,8 @@ final class IntegrationController extends AbstractController
 
         return $this->json(
             data: $responseDto,
-            status: Response::HTTP_OK
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_integrations_create']]
         );
     }
 
@@ -223,6 +226,20 @@ final class IntegrationController extends AbstractController
         return $this->json(
             data: ["message" => "Integration deleted successfully"],
             status: Response::HTTP_OK
+        );
+    }
+
+    #[Route('/providers/{provider}/icon', name: 'api_integrations_provider_icon', methods: ['GET'])]
+    public function getProviderIcon(string $provider, IntegrationService $integrationService): Response
+    {
+        $iconFile = $integrationService->getIntegrationProviderIcon($provider);
+
+        return new BinaryFileResponse(
+            $iconFile,
+            Response::HTTP_OK,
+            ['Content-Type' => $iconFile->getMimeType()],
+            false,
+            ResponseHeaderBag::DISPOSITION_INLINE
         );
     }
 }

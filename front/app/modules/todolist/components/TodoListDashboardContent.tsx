@@ -50,7 +50,7 @@ export default function TodoListDashboardContent({
         .find((task) => task.uuid === selectedTaskUuid) ?? null
 
     return (
-        <div className="m-5 w-1/3 h-[50vh] flex flex-col gap-3">
+        <div className="p-5 w-1/3 h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center shrink-0">
                 <SelectDropdown<TodoList>
                     items={todoLists}

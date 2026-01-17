@@ -14,6 +14,8 @@ export function useListIntegrations({ userModuleUuid }: UseListIntegrationsProps
             const res = await httpClient.get<IntegrationJSON[]>(`/integrations`, {
                 params: { userModuleUuid }
             });
+
+            console.log(res)
             return res.data.map((json) => Integration.fromJSON(json));
         },
     });

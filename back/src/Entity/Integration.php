@@ -10,6 +10,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: IntegrationRepository::class)]
@@ -21,9 +22,11 @@ class Integration
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?string $uuid = null;
 
     #[ORM\Column(enumType: IntegrationProvider::class)]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?IntegrationProvider $provider = null;
 
     #[ORM\Column(length: 255)]
@@ -36,27 +39,35 @@ class Integration
     private ?array $scope = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?string $accountId = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?string $userName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?string $profilePictureUrl = null;
 
     #[ORM\Column]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?\DateTimeImmutable $expiresAt = null;
 
     #[ORM\Column]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?\DateTimeImmutable $lastSyncedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'integrations')]
@@ -64,6 +75,7 @@ class Integration
     private ?User $user = null;
 
     #[ORM\Column(enumType: IntegrationStatus::class)]
+    #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?IntegrationStatus $status = null;
 
     /**

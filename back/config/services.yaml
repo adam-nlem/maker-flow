@@ -8,6 +8,7 @@ parameters:
     app.frontend_url: "%env(string:FRONTEND_URL)%"
 
     app.module.icon_path: "%kernel.project_dir%/private/uploads/module/icon"
+    app.integration.provider.icon_path: "%kernel.project_dir%/private/uploads/integration/provider/icon"
 
     app.instagram.app_id: "%env(string:INSTAGRAM_APP_ID)%"
     app.instagram.app_secret: "%env(string:INSTAGRAM_APP_SECRET)%"
@@ -48,5 +49,8 @@ services:
     App\Controller\IntegrationController:
         arguments:
             $frontendUrl: "%app.frontend_url%"
+    App\Service\Integration\IntegrationService:
+        arguments:
+            $integrationProviderIconPath: "%app.integration.provider.icon_path%"
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

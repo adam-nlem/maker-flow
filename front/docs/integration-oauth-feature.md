@@ -56,6 +56,7 @@ front/app/
 │   ├── api/integrations/
 │   │   ├── useAuthorizeInstagram.ts    # Contains useCreateIntegration hook
 │   │   ├── useListIntegrations.ts      # Hook to list integrations (flat list)
+│   │   ├── useShowIntegrationProviderIcon.ts  # Hook to fetch provider icons
 │   │   └── integrationQueryKeys.ts     # Query keys for integrations
 │   ├── useOAuthPopup.ts                # Utility hook for popup management
 │   └── useOAuthMessageListener.ts      # Utility hook for message listening
@@ -630,3 +631,52 @@ if (payload.provider !== provider) {
 4. **User closes popup** - State resets correctly
 5. **Direct navigation** - Callback route redirects to home
 6. **Multiple providers** - Messages filtered correctly
+
+---
+
+## Integration Provider Icons
+
+### Overview
+
+Integration provider icons (e.g., Instagram logo) are served from the backend as SVG files. This system mirrors the module icon system.
+
+### API Endpoint
+
+`GET /api/integrations/providers/{provider}/icon`
+
+Returns the SVG icon file for the specified provider.
+
+### useShowIntegrationProviderIcon
+
+**Location:** `hooks/api/integrations/useShowIntegrationProviderIcon.ts`
+
+Fetches the icon for a specific integration provider.
+
+**Parameters:**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| `provider` | `string?` | The integration provider identifier |
+
+**Returns:**
+
+| Property | Type | Description |
+|----------|------|-------------|
+| `iconUrl` | `string \| null` | Blob URL for the icon |
+| `isLoading` | `boolean` | Loading state |
+| `error` | `Error \| null` | Error if any |
+
+**Notes:**
+- Returns a blob URL created from the SVG response
+- Uses `staleTime: Infinity` to cache icons permanently
+- Query is disabled if `provider` is undefine
+
+### Query Keys
+
+```typescript
+const integrationQueryKeys = {
+    all: ['integrations'] as const,
+    list: (userModuleUuid: string) => [...integrationQueryKeys.all, 'list', userModuleUuid] as const,
+    providerIcon: (provider: string) => [...integrationQueryKeys.all, 'providerIcon', provider] as const,
+};
+```
