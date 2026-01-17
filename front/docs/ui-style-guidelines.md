@@ -469,6 +469,19 @@ Toast notification component.
 
 ## Utility Classes
 
+### Width
+
+| Class | Usage |
+|-------|-------|
+| `w-fit` | Width adapts to content (shrink-wrap) |
+| `w-full` | Full width of parent |
+| `min-w-fit` | Minimum width adapts to content |
+
+**Example:**
+```tsx
+<div className="w-fit">Content determines width</div>
+```
+
 ### Scrollbar
 
 ```css

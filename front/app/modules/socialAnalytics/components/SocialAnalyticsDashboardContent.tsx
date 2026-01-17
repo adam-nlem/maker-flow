@@ -68,16 +68,16 @@ export default function SocialAnalyticsDashboardContent({
                 />
             </div>
 
-            <div className="flex flex-row items-center justify-center h-full gap-4">
-                {integrations.map((integration) => (
-                    <SocialAnalyticsProfileTile
-                        key={integration.uuid}
-                        integration={integration}
-                        metric={metric}
-                        timePeriod={timePeriod}
-                    />
-                ))}
-            </div>
+
+            {integrations.map((integration) => (
+                <SocialAnalyticsProfileTile
+                    key={integration.uuid}
+                    integration={integration}
+                    metric={metric}
+                    timePeriod={timePeriod}
+                />
+            ))}
+
         </div>
     )
 }

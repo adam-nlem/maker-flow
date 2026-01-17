@@ -22,7 +22,7 @@ export default function SocialAnalyticsProfileTile({
 
     return (
         <div
-            className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 min-w-0 cursor-pointer"
+            className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 w-fit cursor-pointer"
             onClick={onClick}
         >
             <div className="flex flex-row gap-10 justify-between">
