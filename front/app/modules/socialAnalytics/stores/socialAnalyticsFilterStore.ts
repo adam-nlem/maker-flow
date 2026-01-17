@@ -1,16 +1,16 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { SocialAnalyticsMetric } from '../../models/enums/SocialAnalyticsMetric';
-import { SocialAnalyticsTimePeriod } from '../../models/enums/SocialAnalyticsTimePeriod';
+import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
+import { SocialAnalyticsMetric } from '../models/enums/SocialAnalyticsMetric'
+import { SocialAnalyticsTimePeriod } from '../models/enums/SocialAnalyticsTimePeriod'
 
 type SocialAnalyticsFilterState = {
-    metric: SocialAnalyticsMetric;
-    timePeriod: SocialAnalyticsTimePeriod;
+    metric: SocialAnalyticsMetric
+    timePeriod: SocialAnalyticsTimePeriod
 }
 
 type SocialAnalyticsFilterAction = {
-    setMetric: (metric: SocialAnalyticsMetric) => void;
-    setTimePeriod: (timePeriod: SocialAnalyticsTimePeriod) => void;
+    setMetric: (metric: SocialAnalyticsMetric) => void
+    setTimePeriod: (timePeriod: SocialAnalyticsTimePeriod) => void
 }
 
 export const useSocialAnalyticsFilterStore = create<SocialAnalyticsFilterState & SocialAnalyticsFilterAction>()(
@@ -22,7 +22,7 @@ export const useSocialAnalyticsFilterStore = create<SocialAnalyticsFilterState &
             setTimePeriod: (timePeriod) => set({ timePeriod }),
         }),
         {
-            name: 'app:social-analytics:filter-store',
+            name: "app:social-analytics:filter-store",
         }
     )
-);
+)

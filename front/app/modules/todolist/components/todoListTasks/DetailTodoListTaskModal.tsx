@@ -4,14 +4,14 @@ import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { Badge } from "~/components/ui/Badge";
 import { useState } from "react";
-import { selectTodoListStatusDropdownOptions, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "../../models/enums/TodoListStatus";
-import { selectTodoListPriorityDropdownOptions, todoListPriorityToFrenchTranslation } from "../../models/enums/TodoListPriority";
+import { TodoListStatus, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "../../models/enums/TodoListStatus";
+import { TodoListPriority, todoListPriorityToFrenchTranslation } from "../../models/enums/TodoListPriority";
 import { useUpdateTodoListTask } from "../../hooks/api/todoListTasks/useUpdateTodoListTask";
 import { TagIcon, ExclamationTriangleIcon, CheckBadgeIcon, CalendarDateRangeIcon } from "@heroicons/react/24/solid";
 import { colorToTextClass, colorToBgClass } from "~/models/enums/Color";
 import { todoListPriorityToTextClass, todoListPriorityToBgClass } from "../../models/enums/TodoListPriority";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import SelectEnumDropdown from "~/components/ui/SelectEnumDropdown";
+import SelectDropdown from "~/components/ui/SelectDropdown";
 import ListTodoListTagsDropdown from "../todoListTags/ListTodoListTagsDropdown";
 import type { TodoListTag } from "../../models/TodoListTag";
 import AddDueDateDropdown from "./AddDueDateDropdown";
@@ -35,8 +35,6 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
     const [tags, setTags] = useState(task.tags)
 
     const [showTagsDropdown, setShowTagsDropdown] = useState(false);
-    const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
-    const [showStatusDropdown, setShowStatusDropdown] = useState(false);
     const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
 
     const { updateTodoListTask } = useUpdateTodoListTask()
@@ -112,7 +110,6 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                 <TagIcon className="size-3.5" strokeWidth={2} />
                                 <p>Ajouter un tag</p>
                             </SimpleTextButton>
-
                             {showTagsDropdown && <ListTodoListTagsDropdown
                                 todoListUuid={todoListUuid}
                                 selectedTags={tags}
@@ -139,54 +136,68 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                     <div>
                         <h2 className="text-heading-sm mb-1.5">Priorité</h2>
                         <div className="relative flex flex-col gap-1">
-                            {priority ? (
-                                <Badge
-                                    icon={ExclamationTriangleIcon}
-                                    label={todoListPriorityToFrenchTranslation[priority]}
-                                    textColor={todoListPriorityToTextClass[priority]}
-                                    bgColor={todoListPriorityToBgClass[priority]}
-                                    onRemoveClick={() => setPriority(undefined)}
-                                    onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
-                                />
-                            ) : (
-                                <SimpleTextButton onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}>
-                                    <ExclamationTriangleIcon className="size-3.5" strokeWidth={2} />
-                                    <p>Ajouter une priorité</p>
-                                </SimpleTextButton>
-                            )}
-
-                            {showPriorityDropdown && (
-                                <SelectEnumDropdown
-                                    selectedValue={priority}
-                                    options={selectTodoListPriorityDropdownOptions}
-                                    onClose={() => setShowPriorityDropdown(false)}
-                                    onSelect={(selectedPriority) => setPriority(selectedPriority)}
-                                />
-                            )}
+                            <SelectDropdown<TodoListPriority>
+                                items={Object.values(TodoListPriority)}
+                                selectedItemId={priority}
+                                getItemId={(item) => item}
+                                onSelect={(item) => setPriority(item)}
+                                renderTrigger={({ onClick }) => (
+                                    priority ? (
+                                        <Badge
+                                            icon={ExclamationTriangleIcon}
+                                            label={todoListPriorityToFrenchTranslation[priority]}
+                                            textColor={todoListPriorityToTextClass[priority]}
+                                            bgColor={todoListPriorityToBgClass[priority]}
+                                            onRemoveClick={() => setPriority(undefined)}
+                                            onClick={onClick}
+                                        />
+                                    ) : (
+                                        <SimpleTextButton onClick={onClick}>
+                                            <ExclamationTriangleIcon className="size-3.5" strokeWidth={2} />
+                                            <p>Ajouter une priorité</p>
+                                        </SimpleTextButton>
+                                    )
+                                )}
+                                renderItem={({ item, isSelected, onSelect }) => (
+                                    <Badge
+                                        icon={ExclamationTriangleIcon}
+                                        label={todoListPriorityToFrenchTranslation[item]}
+                                        textColor={todoListPriorityToTextClass[item]}
+                                        bgColor={todoListPriorityToBgClass[item]}
+                                        onClick={onSelect}
+                                    />
+                                )}
+                            />
                         </div>
                     </div>
 
                     <div>
                         <h2 className="text-heading-sm mb-1.5">Statut</h2>
                         <div className="relative flex flex-col gap-1">
-
-                            <Badge
-                                icon={CheckBadgeIcon}
-                                label={todoListStatusToFrenchTranslation[status]}
-                                textColor={todoListStatusToTextClass[status]}
-                                bgColor={todoListStatusToBgClass[status]}
-                                onClick={() => setShowStatusDropdown(!showStatusDropdown)}
+                            <SelectDropdown<TodoListStatus>
+                                items={Object.values(TodoListStatus)}
+                                selectedItemId={status}
+                                getItemId={(item) => item}
+                                onSelect={(item) => setStatus(item)}
+                                renderTrigger={({ onClick }) => (
+                                    <Badge
+                                        icon={CheckBadgeIcon}
+                                        label={todoListStatusToFrenchTranslation[status]}
+                                        textColor={todoListStatusToTextClass[status]}
+                                        bgColor={todoListStatusToBgClass[status]}
+                                        onClick={onClick}
+                                    />
+                                )}
+                                renderItem={({ item, isSelected, onSelect }) => (
+                                    <Badge
+                                        icon={CheckBadgeIcon}
+                                        label={todoListStatusToFrenchTranslation[item]}
+                                        textColor={todoListStatusToTextClass[item]}
+                                        bgColor={todoListStatusToBgClass[item]}
+                                        onClick={onSelect}
+                                    />
+                                )}
                             />
-
-
-                            {showStatusDropdown && (
-                                <SelectEnumDropdown
-                                    selectedValue={status}
-                                    options={selectTodoListStatusDropdownOptions}
-                                    onClose={() => setShowStatusDropdown(false)}
-                                    onSelect={(selectedStatus) => setStatus(selectedStatus)}
-                                />
-                            )}
                         </div>
                     </div>
 

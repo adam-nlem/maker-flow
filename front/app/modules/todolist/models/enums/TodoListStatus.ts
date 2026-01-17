@@ -1,6 +1,3 @@
-import { ExclamationTriangleIcon } from "@heroicons/react/16/solid";
-import { CheckBadgeIcon } from "@heroicons/react/24/solid";
-
 export enum TodoListStatus {
     Pending = 'pending',
     InProgress = 'in_progress',
@@ -24,11 +21,3 @@ export const todoListStatusToBgClass: Record<TodoListStatus, string> = {
     [TodoListStatus.InProgress]: "bg-yellow/30",
     [TodoListStatus.Completed]: "bg-purple/30",
 }
-
-export const selectTodoListStatusDropdownOptions = Object.values(TodoListStatus).map((status) => ({
-    value: status,
-    icon: CheckBadgeIcon,
-    label: todoListStatusToFrenchTranslation[status],
-    textColor: todoListStatusToTextClass[status],
-    bgColor: todoListStatusToBgClass[status],
-}));

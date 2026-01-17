@@ -11,13 +11,12 @@ import NavigationTile from "./NavigationTile";
 import ModuleTile from "./ModuleTile";
 import Shimmer from "../ui/Shimmer";
 
-import SelectItemModal from "../ui/SelectItemModal";
-import type { Project } from "~/models/Project";
+import SelectDropdown from "../ui/SelectDropdown"
+import type { Project } from "~/models/Project"
 import { useListProjectUserModules } from "~/hooks/api/projects/useListProjectUserModules";
 import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 
 import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
-import { useSelectProjectModalStore } from "~/stores/project/selectProjectModalStore";
 import UpdateProjectModal from "../projects/UpdateProjectModal";
 import { useUpdateProject } from "~/hooks/api/projects/useUpdateProject";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
@@ -33,9 +32,6 @@ export default function SideBar() {
   const isExpanded = useSidebarStore((state) => state.isExpanded)
   const setIsExpanded = useSidebarStore((state) => state.setIsExpanded)
 
-  const isSelectProjectModalOpen = useSelectProjectModalStore((state) => state.isSelectModalOpen)
-  const setIsSelectProjectModalOpen = useSelectProjectModalStore((state) => state.setIsSelectModalOpen)
-
   const isCreateProjectModalOpen = useCreateProjectModalStore((state) => state.isCreateModalOpen)
   const setIsCreateProjectModalOpen = useCreateProjectModalStore((state) => state.setIsCreateModalOpen)
 
@@ -45,18 +41,16 @@ export default function SideBar() {
   // Close modals when sidebar collapses
   useEffect(() => {
     if (!isExpanded) {
-      setIsSelectProjectModalOpen(false);
-      setIsCreateProjectModalOpen(false);
+      setIsCreateProjectModalOpen(false)
     }
-  }, [isExpanded, setIsSelectProjectModalOpen, setIsCreateProjectModalOpen]);
+  }, [isExpanded, setIsCreateProjectModalOpen])
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-row pointer-events-none">
+    <div className="fixed inset-0 z-10 flex flex-row pointer-events-none">
       <div
         onMouseEnter={() => setIsExpanded(true)}
         onMouseLeave={() => {
-          if (!isSelectProjectModalOpen &&
-            !isCreateProjectModalOpen)
+          if (!isCreateProjectModalOpen)
             setIsExpanded(false)
         }}
         className={`h-full shrink-0 border-r border-light-gray bg-white flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out pointer-events-auto ${isExpanded ? 'w-72' : 'w-16'}`}
@@ -68,25 +62,44 @@ export default function SideBar() {
           {isLoadingProjects ? <Shimmer width="w-10" height="h-10" /> :
 
             focusedProject ?
-              <ProjectTile
-                project={focusedProject}
-                moduleCount={userModules.length}
-                rightIcon={
-                  isExpanded && <ChevronUpDownIcon className="size-5 text-gray -mb-0.5" strokeWidth={2} />
-                }
-                onClick={() => {
-                  setIsSelectProjectModalOpen(true)
-                  setIsCreateProjectModalOpen(false)
+              <SelectDropdown<Project>
+                items={projects}
+                selectedItemId={focusedProject?.uuid}
+                getItemId={(project) => project.uuid}
+                onSelect={(project) => {
+                  setFocusedProjectUuid(project.uuid)
                 }}
+                onClickCreateButton={() => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
+                createButtonLabel="Créer un nouveau Projet"
+                renderTrigger={({ onClick }) => (
+                  <ProjectTile
+                    project={focusedProject}
+                    moduleCount={userModules.length}
+                    rightIcon={
+                      isExpanded && <ChevronUpDownIcon className="size-5 text-gray -mb-0.5" strokeWidth={2} />
+                    }
+                    onClick={onClick}
+                  />
+                )}
+                renderItem={({ item, isSelected, onSelect }) => (
+                  <ProjectTile
+                    project={item}
+                    isSelected={isSelected}
+                    showCreatedAt={true}
+                    onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} onClick={(e) => {
+                      e.stopPropagation()
+                      setUpdatingProjectUuid(item.uuid)
+                    }} />}
+                    onClick={onSelect}
+                  />
+                )}
               />
               :
               <Button
                 type="button"
                 onClick={() => {
-                  setIsSelectProjectModalOpen(!isSelectProjectModalOpen)
                   setIsCreateProjectModalOpen(!isCreateProjectModalOpen)
-                }
-                }
+                }}
               >
                 <div className="flex flex-row justify-center items-center gap-3 shrink-0 ">
                   {isExpanded && <p className="text-sm ">Créer un nouveau Projet</p>}
@@ -164,32 +177,6 @@ export default function SideBar() {
 
 
       {/* Modals */}
-      <SelectItemModal<Project>
-        showModal={isSelectProjectModalOpen}
-        items={projects}
-        selectedItemId={focusedProject?.uuid}
-        getItemId={(project) => project.uuid}
-        onSelect={(project) => setFocusedProjectUuid(project.uuid)}
-        onClose={() => {
-          setIsSelectProjectModalOpen(false);
-          setIsExpanded(false);
-        }}
-        onClickCreateButton={() => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
-        createButtonLabel="Créer un nouveau Projet"
-        renderItem={({ item, isSelected, onSelect }) => (
-          <ProjectTile
-            project={item}
-            isSelected={isSelected}
-            showCreatedAt={true}
-            onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} onClick={(e) => {
-              e.stopPropagation() // Prevents the click event from bubbling up to the onSelect handler
-              setUpdatingProjectUuid(item.uuid)
-            }} />}
-            onClick={onSelect}
-          />
-        )}
-      />
-
       <CreateProjectModal
         showModal={isCreateProjectModalOpen}
         onProjectCreated={() => setIsCreateProjectModalOpen(false)}
