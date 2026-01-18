@@ -140,7 +140,7 @@ The `Integration` entity stores connected external accounts and their OAuth toke
 The `Integration` entity acts as a profile entity. Related entities now reference `Integration` directly:
 
 - `SocialAnalyticsPost` → `ManyToOne` → `Integration`
-- `SocialAnalyticsProfileLog` → `ManyToOne` → `Integration`
+- `SocialAnalyticsInsights` → `ManyToOne` → `Integration`
 
 ---
 

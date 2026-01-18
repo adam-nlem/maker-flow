@@ -2,65 +2,44 @@ import { ChartBarSquareIcon, CalendarDaysIcon, ChevronUpDownIcon } from "@heroic
 import type { Integration } from "~/models/Integration"
 import SelectDropdown from "~/components/ui/SelectDropdown"
 import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterStore"
-import { SocialAnalyticsMetric, socialAnalyticsMetricToFrenchTranslation } from "../models/enums/SocialAnalyticsMetric"
+import { SocialAnalyticsInsightType, socialAnalyticsInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsInsightType"
 import { SocialAnalyticsTimePeriod, socialAnalyticsTimePeriodToFrenchTranslation } from "../models/enums/SocialAnalyticsTimePeriod"
 import FilterTile from "./FilterTile"
 import SocialAnalyticsProfileTile from "./SocialAnalyticsProfileTile"
+import IntegrationTile from "./IntegrationTile"
 
 interface SocialAnalyticsDashboardContentProps {
     userModuleUuid: string
     integrations: Integration[]
 }
 
-const metricOptions = Object.values(SocialAnalyticsMetric)
-const timePeriodOptions = Object.values(SocialAnalyticsTimePeriod)
+const insightTypeOptions = Object.values(SocialAnalyticsInsightType)
 
 export default function SocialAnalyticsDashboardContent({
     userModuleUuid,
     integrations,
 }: SocialAnalyticsDashboardContentProps) {
-    const { metric, timePeriod, setMetric, setTimePeriod } = useSocialAnalyticsFilterStore()
+    const { insightType, setInsightType } = useSocialAnalyticsFilterStore()
 
     return (
         <div className="p-5 w-2/3 h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center shrink-0">
-                <SelectDropdown<SocialAnalyticsMetric>
-                    items={metricOptions}
-                    selectedItemId={metric}
+                <SelectDropdown<SocialAnalyticsInsightType>
+                    items={insightTypeOptions}
+                    selectedItemId={insightType}
                     getItemId={(item) => item}
-                    onSelect={(item) => setMetric(item)}
+                    onSelect={(item) => setInsightType(item)}
                     renderTrigger={({ onClick }) => (
                         <FilterTile
                             icon={ChartBarSquareIcon}
-                            label={socialAnalyticsMetricToFrenchTranslation[metric]}
+                            label={socialAnalyticsInsightTypeToFrenchTranslation[insightType]}
                             rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
                             onClick={onClick}
                         />
                     )}
                     renderItem={({ item, isSelected, onSelect }) => (
                         <FilterTile
-                            label={socialAnalyticsMetricToFrenchTranslation[item]}
-                            isSelected={isSelected}
-                            onClick={onSelect}
-                        />
-                    )}
-                />
-                <SelectDropdown<SocialAnalyticsTimePeriod>
-                    items={timePeriodOptions}
-                    selectedItemId={timePeriod}
-                    getItemId={(item) => item}
-                    onSelect={(item) => setTimePeriod(item)}
-                    renderTrigger={({ onClick }) => (
-                        <FilterTile
-                            icon={CalendarDaysIcon}
-                            label={socialAnalyticsTimePeriodToFrenchTranslation[timePeriod]}
-                            rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
-                            onClick={onClick}
-                        />
-                    )}
-                    renderItem={({ item, isSelected, onSelect }) => (
-                        <FilterTile
-                            label={socialAnalyticsTimePeriodToFrenchTranslation[item]}
+                            label={socialAnalyticsInsightTypeToFrenchTranslation[item]}
                             isSelected={isSelected}
                             onClick={onSelect}
                         />
@@ -70,11 +49,11 @@ export default function SocialAnalyticsDashboardContent({
 
 
             {integrations.map((integration) => (
-                <SocialAnalyticsProfileTile
+                <IntegrationTile
                     key={integration.uuid}
                     integration={integration}
-                    metric={metric}
-                    timePeriod={timePeriod}
+
+                    insightType={insightType}
                 />
             ))}
 

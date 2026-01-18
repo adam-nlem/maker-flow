@@ -27,7 +27,6 @@ class TodoListController extends AbstractController
         ListTodoListsQueryParamDTO $queryParamDto,
         TodoListRepository $todoListRepository,
         UserModuleRepository $userModuleRepository,
-        Request $request,
     ) {
         /** @var User $user */
         $user = $this->getUser();

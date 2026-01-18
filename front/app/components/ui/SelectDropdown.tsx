@@ -47,7 +47,9 @@ export default function SelectDropdown<T>({
                                     {renderItem({
                                         item,
                                         isSelected,
-                                        onSelect: () => onSelect(item),
+                                        onSelect: () => { 
+                                            onSelect(item) 
+                                            setIsOpen(false) },
                                     })}
                                 </div>
                             )

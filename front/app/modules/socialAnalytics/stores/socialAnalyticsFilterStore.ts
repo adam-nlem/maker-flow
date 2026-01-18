@@ -1,25 +1,20 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { SocialAnalyticsMetric } from '../models/enums/SocialAnalyticsMetric'
-import { SocialAnalyticsTimePeriod } from '../models/enums/SocialAnalyticsTimePeriod'
+import { SocialAnalyticsInsightType } from '../models/enums/SocialAnalyticsInsightType'
 
 type SocialAnalyticsFilterState = {
-    metric: SocialAnalyticsMetric
-    timePeriod: SocialAnalyticsTimePeriod
+    insightType: SocialAnalyticsInsightType
 }
 
 type SocialAnalyticsFilterAction = {
-    setMetric: (metric: SocialAnalyticsMetric) => void
-    setTimePeriod: (timePeriod: SocialAnalyticsTimePeriod) => void
+    setInsightType: (insightType: SocialAnalyticsInsightType) => void
 }
 
 export const useSocialAnalyticsFilterStore = create<SocialAnalyticsFilterState & SocialAnalyticsFilterAction>()(
     persist(
         (set) => ({
-            metric: SocialAnalyticsMetric.Views,
-            timePeriod: SocialAnalyticsTimePeriod.Last30Days,
-            setMetric: (metric) => set({ metric }),
-            setTimePeriod: (timePeriod) => set({ timePeriod }),
+            insightType: SocialAnalyticsInsightType.Views,
+            setInsightType: (insightType) => set({ insightType }),
         }),
         {
             name: "app:social-analytics:filter-store",

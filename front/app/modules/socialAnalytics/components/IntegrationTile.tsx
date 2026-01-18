@@ -1,44 +1,27 @@
 import type { Integration } from "~/models/Integration"
 import { useShowIntegrationProviderIcon } from "~/hooks/api/integrations/useShowIntegrationProviderIcon"
-import { socialAnalyticsInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsInsightType"
-import type { SocialAnalyticsInsightType } from "../models/enums/SocialAnalyticsInsightType"
+import { SocialAnalyticsInsightType, socialAnalyticsInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsInsightType"
 import type { SocialAnalyticsTimePeriod } from "../models/enums/SocialAnalyticsTimePeriod"
 import { socialAnalyticsTimePeriodToFrenchTranslation } from "../models/enums/SocialAnalyticsTimePeriod"
-import { useSelectLogMetric } from "../hooks/useSelectLogMetric"
+import { useListSocialAnalyticsInsights } from "../hooks/api/socialAnalyticsInsight/useListSocialAnalyticsInsights"
 
-interface SocialAnalyticsProfileTileProps {
+interface IntegrationTileProps {
     integration: Integration
-    metric: SocialAnalyticsInsightType
-    timePeriod: SocialAnalyticsTimePeriod
+    insightType: SocialAnalyticsInsightType
     onClick?: () => void
 }
 
-function formatMetricValue(value: number): string {
-    if (value >= 1_000_000) {
-        return `${(value / 1_000_000).toFixed(1)}M`;
-    }
-    if (value >= 1_000) {
-        return `${(value / 1_000).toFixed(1)}k`;
-    }
-    return value.toString();
-}
-
-export default function SocialAnalyticsProfileTile({
+export default function IntegrationTile({
     integration,
-    metric,
-    timePeriod,
+    insightType,
     onClick,
-}: SocialAnalyticsProfileTileProps) {
+}: IntegrationTileProps) {
     const { iconUrl } = useShowIntegrationProviderIcon(integration.provider)
-    const { value, isLoading } = useSelectLogMetric({
-        integrationUuid: integration.uuid,
-        metric,
-        timePeriod,
-    })
+    const { socialAnalyticsInsights, isLoading, error } = useListSocialAnalyticsInsights({ integrationUuid: integration.uuid })
 
     return (
         <div
-            className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 w-fit cursor-pointer"
+            className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 min-w-0 cursor-pointer"
             onClick={onClick}
         >
             <div className="flex flex-row gap-10 justify-between">
@@ -67,11 +50,9 @@ export default function SocialAnalyticsProfileTile({
             <div className="border-t border-light-gray rounded w-full"></div>
 
             <div>
-                <h1 className="text-heading-sm">
-                    {isLoading ? '...' : value !== null ? formatMetricValue(value) : '-'}
-                </h1>
+                <h1 className="text-heading-sm">{socialAnalyticsInsights.map((insight) => insight.type === insightType ? insight.value : '')}</h1>
                 <p className="text-body-sm text-gray whitespace-nowrap">
-                    {socialAnalyticsInsightTypeToFrenchTranslation[metric]} ({socialAnalyticsTimePeriodToFrenchTranslation[timePeriod]})
+                    {socialAnalyticsInsightTypeToFrenchTranslation[insightType]}
                 </p>
             </div>
         </div>
