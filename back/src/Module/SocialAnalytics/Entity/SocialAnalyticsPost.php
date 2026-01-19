@@ -3,6 +3,7 @@
 namespace App\Module\SocialAnalytics\Entity;
 
 use App\Entity\Integration;
+use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsMediaType;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
@@ -47,6 +48,10 @@ class SocialAnalyticsPost
     #[ORM\ManyToOne(inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?SocialAnalyticsPostGroup $socialAnalyticsPostGroup = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -174,6 +179,18 @@ class SocialAnalyticsPost
     public function setSocialAnalyticsPostGroup(?SocialAnalyticsPostGroup $socialAnalyticsPostGroup): static
     {
         $this->socialAnalyticsPostGroup = $socialAnalyticsPostGroup;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

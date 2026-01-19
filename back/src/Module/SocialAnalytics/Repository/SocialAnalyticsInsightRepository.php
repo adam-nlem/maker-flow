@@ -41,7 +41,7 @@ class SocialAnalyticsInsightRepository extends ServiceEntityRepository
     public function getLatestByUserAndByIntegration(
         User $user,
         Integration $integration,
-    ): ?SocialAnalyticsInsight {
+    ): array {
 
         $subQuery = $this->createQueryBuilder('si')
             ->select('MAX(si.id)')

@@ -3,9 +3,7 @@ import type { Integration } from "~/models/Integration"
 import SelectDropdown from "~/components/ui/SelectDropdown"
 import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterStore"
 import { SocialAnalyticsInsightType, socialAnalyticsInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsInsightType"
-import { SocialAnalyticsTimePeriod, socialAnalyticsTimePeriodToFrenchTranslation } from "../models/enums/SocialAnalyticsTimePeriod"
 import FilterTile from "./FilterTile"
-import SocialAnalyticsProfileTile from "./SocialAnalyticsProfileTile"
 import IntegrationTile from "./IntegrationTile"
 
 interface SocialAnalyticsDashboardContentProps {

@@ -19,9 +19,10 @@ export default function IntegrationTile({
     const { iconUrl } = useShowIntegrationProviderIcon(integration.provider)
     const { socialAnalyticsInsights, isLoading, error } = useListSocialAnalyticsInsights({ integrationUuid: integration.uuid })
 
+    console.log(socialAnalyticsInsights)
     return (
         <div
-            className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 min-w-0 cursor-pointer"
+            className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 w-fit cursor-pointer"
             onClick={onClick}
         >
             <div className="flex flex-row gap-10 justify-between">
@@ -50,7 +51,7 @@ export default function IntegrationTile({
             <div className="border-t border-light-gray rounded w-full"></div>
 
             <div>
-                <h1 className="text-heading-sm">{socialAnalyticsInsights.map((insight) => insight.type === insightType ? insight.value : '')}</h1>
+                <h1 className="text-heading-sm">{socialAnalyticsInsights.find((insight) => insight.type === insightType)?.value}</h1>
                 <p className="text-body-sm text-gray whitespace-nowrap">
                     {socialAnalyticsInsightTypeToFrenchTranslation[insightType]}
                 </p>

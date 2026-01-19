@@ -3,6 +3,7 @@
 namespace App\Module\SocialAnalytics\Entity;
 
 use App\Entity\Integration;
+use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsInsightType;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsInsightRepository;
@@ -43,6 +44,10 @@ class SocialAnalyticsInsight
     #[ORM\ManyToOne(targetEntity: Integration::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?Integration $integration = null;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -132,6 +137,18 @@ class SocialAnalyticsInsight
     public function setIntegration(?Integration $integration): self
     {
         $this->integration = $integration;
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
         return $this;
     }
 }
