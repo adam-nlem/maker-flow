@@ -34,6 +34,7 @@ class SocialAnalyticsInsightController extends AbstractController
         }
 
         $insightService->fetchInstagramProfileInsights($integration);
+        $insightService->fetchInstagramMediaInsights($integration);
 
         $insights = $insightRepository->getLatestByUserAndByIntegration($user, $integration);
 

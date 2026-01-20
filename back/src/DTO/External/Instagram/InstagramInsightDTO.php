@@ -8,25 +8,20 @@ class InstagramInsightDTO
         private readonly string $name,
         private readonly string $period,
         private readonly int $value,
-        private readonly ?string $endTime,
     ) {}
 
     public static function fromArray(array $data): self
     {
         $value = 0;
-        $endTime = null;
 
-        if (isset($data['values']) && is_array($data['values']) && count($data['values']) > 0) {
-            $latestValue = $data['values'][count($data['values']) - 1];
-            $value = $latestValue['value'] ?? 0;
-            $endTime = $latestValue['end_time'] ?? null;
+        if (isset($data['total_value']['value'])) {
+            $value = $data['total_value']['value'];
         }
 
         return new self(
             name: $data['name'],
             period: $data['period'],
             value: $value,
-            endTime: $endTime,
         );
     }
 
@@ -56,10 +51,5 @@ class InstagramInsightDTO
     public function getValue(): int
     {
         return $this->value;
-    }
-
-    public function getEndTime(): ?string
-    {
-        return $this->endTime;
     }
 }
