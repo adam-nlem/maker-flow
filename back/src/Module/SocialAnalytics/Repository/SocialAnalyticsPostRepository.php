@@ -2,9 +2,11 @@
 
 namespace App\Module\SocialAnalytics\Repository;
 
+use App\Entity\Integration;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 class SocialAnalyticsPostRepository extends ServiceEntityRepository
 {
@@ -31,5 +33,15 @@ class SocialAnalyticsPostRepository extends ServiceEntityRepository
         }
     }
 
-    // Add custom queries here if needed
+    public function getByExternalIdAndIntegration(string $externalId, Integration $integration): ?SocialAnalyticsPost
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.externalId = :externalId')
+            ->andWhere('p.integration = :integration')
+            ->setParameter('externalId', $externalId)
+            ->setParameter('integration', $integration)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

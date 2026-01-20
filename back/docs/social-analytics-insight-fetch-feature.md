@@ -59,7 +59,7 @@ InstagramOAuthService
 ## Files
 
 - **Service:** `src/Module/SocialAnalytics/Service/SocialAnalyticsInsightService.php`
-- **DTO:** `src/DTO/External/Instagram/InstagramInsightDTO.php`
+- **DTO:** `src/DTO/External/Instagram/InstagramIntegrationInsightDTO.php`
 - **OAuth Service:** `src/Service/Integration/InstagramOAuthService.php`
 
 ## Usage

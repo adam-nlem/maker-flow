@@ -40,6 +40,9 @@ class SocialAnalyticsPost
     #[ORM\Column]
     private ?int $duration = null;
 
+    #[ORM\Column]
+    private ?\DateTimeImmutable $publishedAt = null;
+
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $caption = null;
 
@@ -153,6 +156,18 @@ class SocialAnalyticsPost
     public function setDuration(int $duration): static
     {
         $this->duration = $duration;
+
+        return $this;
+    }
+
+    public function getPublishedAt(): ?\DateTimeImmutable
+    {
+        return $this->publishedAt;
+    }
+
+    public function setPublishedAt(\DateTimeImmutable $publishedAt): static
+    {
+        $this->publishedAt = $publishedAt;
 
         return $this;
     }

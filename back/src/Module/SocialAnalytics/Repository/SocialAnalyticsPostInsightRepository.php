@@ -2,9 +2,12 @@
 
 namespace App\Module\SocialAnalytics\Repository;
 
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
+use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostInsight;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 /**
  * @extends ServiceEntityRepository<SocialAnalyticsPostInsight>
@@ -34,5 +37,21 @@ class SocialAnalyticsPostInsightRepository extends ServiceEntityRepository
         }
     }
 
-    // TODO: Add custom queries here if needed
+    public function getLatestByPostAndByTypeAndByValue(
+        SocialAnalyticsPost $post,
+        SocialAnalyticsPostInsightType $type,
+        int $value,
+    ): ?SocialAnalyticsPostInsight {
+        return $this->createQueryBuilder('pi')
+            ->where('pi.socialAnalyticsPost = :post')
+            ->andWhere('pi.type = :type')
+            ->andWhere('pi.value = :value')
+            ->setParameter('post', $post)
+            ->setParameter('type', $type)
+            ->setParameter('value', $value)
+            ->orderBy('pi.createdAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

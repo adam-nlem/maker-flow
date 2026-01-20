@@ -16,14 +16,16 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class InstagramOAuthService
 {
-    private const AUTHORIZATION_URL = 'https://www.instagram.com/oauth/authorize';
-    private const TOKEN_URL = 'https://api.instagram.com/oauth/access_token';
-    private const GRAPH_URL = 'https://graph.instagram.com';
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly IntegrationRepository $integrationRepository,
         private readonly UserModuleRepository $userModuleRepository,
+
+        private readonly string $instagramGraphUrl,
+        private readonly string $instagramAuthorizationUrl,
+        private readonly string $instagramTokenUrl,
+
         private readonly string $instagramAppId,
         private readonly string $instagramAppSecret,
         private readonly string $instagramRedirectUri,
@@ -39,12 +41,12 @@ class InstagramOAuthService
             'state' => $state,
         ];
 
-        return self::AUTHORIZATION_URL . '?' . http_build_query($params);
+        return sprintf('%s?%s', $this->instagramAuthorizationUrl, http_build_query($params));
     }
 
     public function exchangeCodeForToken(string $code): InstagramTokenDTO
     {
-        $response = $this->httpClient->request('POST', self::TOKEN_URL, [
+        $response = $this->httpClient->request('POST', $this->instagramTokenUrl, [
             'body' => [
                 'client_id' => $this->instagramAppId,
                 'client_secret' => $this->instagramAppSecret,
@@ -59,7 +61,7 @@ class InstagramOAuthService
 
     public function exchangeForLongLivedToken(string $shortLivedToken): InstagramTokenDTO
     {
-        $response = $this->httpClient->request('GET', self::GRAPH_URL . '/access_token', [
+        $response = $this->httpClient->request('GET', sprintf('%s/access_token', $this->instagramGraphUrl), [
             'query' => [
                 'grant_type' => 'ig_exchange_token',
                 'client_secret' => $this->instagramAppSecret,
@@ -72,7 +74,7 @@ class InstagramOAuthService
 
     public function refreshToken(string $longLivedToken): InstagramTokenDTO
     {
-        $response = $this->httpClient->request('GET', self::GRAPH_URL . '/refresh_access_token', [
+        $response = $this->httpClient->request('GET', sprintf('%s/refresh_access_token', $this->instagramGraphUrl), [
             'query' => [
                 'grant_type' => 'ig_refresh_token',
                 'access_token' => $longLivedToken,
@@ -84,7 +86,7 @@ class InstagramOAuthService
 
     public function getUserProfile(string $accessToken): InstagramUserProfileDTO
     {
-        $response = $this->httpClient->request('GET', self::GRAPH_URL . '/me', [
+        $response = $this->httpClient->request('GET', sprintf('%s/me', $this->instagramGraphUrl), [
             'query' => [
                 'fields' => 'user_id,username,name,profile_picture_url,account_type',
                 'access_token' => $accessToken,

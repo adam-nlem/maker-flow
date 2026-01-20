@@ -1,9 +1,23 @@
 <?php
 
-namespace App\DTO\External\Instagram;
+namespace App\Module\SocialAnalytics\DTO\External\Instagram;
 
-class InstagramInsightDTO
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
+
+class InstagramIntegrationInsightDTO
 {
+
+    private const INSTAGRAM_METRIC_MAPPING = [
+        'reach' => SocialAnalyticsIntegrationInsightType::Reach,
+        'views' => SocialAnalyticsIntegrationInsightType::Views,
+        'follower_count' => SocialAnalyticsIntegrationInsightType::Followers,
+        'profile_links_taps' => SocialAnalyticsIntegrationInsightType::ProfileLinksTaps,
+        'comments' => SocialAnalyticsIntegrationInsightType::Comments,
+        'shares' => SocialAnalyticsIntegrationInsightType::Shares,
+        'saves' => SocialAnalyticsIntegrationInsightType::Saves,
+        'likes' => SocialAnalyticsIntegrationInsightType::Likes,
+    ];
+
     public function __construct(
         private readonly string $name,
         private readonly string $period,
@@ -51,5 +65,10 @@ class InstagramInsightDTO
     public function getValue(): int
     {
         return $this->value;
+    }
+
+    public static function getMetricNames(): array
+    {
+        return array_keys(self::INSTAGRAM_METRIC_MAPPING);
     }
 }

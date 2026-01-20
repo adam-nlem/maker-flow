@@ -10,6 +10,10 @@ parameters:
     app.module.icon_path: "%kernel.project_dir%/private/uploads/module/icon"
     app.integration.provider.icon_path: "%kernel.project_dir%/private/uploads/integration/provider/icon"
 
+    app.instagram.graph_url: "https://graph.instagram.com"
+    app.instagram.authorization_url: "https://www.instagram.com/oauth/authorize"
+    app.instagram.token_url: "https://api.instagram.com/oauth/access_token"
+
     app.instagram.app_id: "%env(string:INSTAGRAM_APP_ID)%"
     app.instagram.app_secret: "%env(string:INSTAGRAM_APP_SECRET)%"
     app.instagram.redirect_uri: "%env(string:INSTAGRAM_REDIRECT_URI)%"
@@ -42,6 +46,9 @@ services:
 
     App\Service\Integration\InstagramOAuthService:
         arguments:
+            $instagramGraphUrl: "%app.instagram.graph_url%"
+            $instagramAuthorizationUrl: "%app.instagram.authorization_url%"
+            $instagramTokenUrl: "%app.instagram.token_url%"
             $instagramAppId: "%app.instagram.app_id%"
             $instagramAppSecret: "%app.instagram.app_secret%"
             $instagramRedirectUri: "%app.instagram.redirect_uri%"

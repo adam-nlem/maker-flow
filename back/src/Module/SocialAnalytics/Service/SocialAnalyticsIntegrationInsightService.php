@@ -2,38 +2,32 @@
 
 namespace App\Module\SocialAnalytics\Service;
 
-use App\DTO\External\Instagram\InstagramInsightDTO;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Integration;
 use App\Helper\DateHelper;
-use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
+use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramIntegrationInsightDTO;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Repository\IntegrationRepository;
 use App\Service\Integration\InstagramOAuthService;
+use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SocialAnalyticsIntegrationInsightService
 {
-    private const INSTAGRAM_GRAPH_URL = 'https://graph.instagram.com';
-
-    private const INSTAGRAM_METRIC_MAPPING = [
-        'reach' => SocialAnalyticsIntegrationInsightType::Reach,
-        'views' => SocialAnalyticsIntegrationInsightType::Views,
-        'follower_count' => SocialAnalyticsIntegrationInsightType::Followers,
-        'profile_links_taps' => SocialAnalyticsIntegrationInsightType::ProfileLinksTaps,
-        'comments' => SocialAnalyticsIntegrationInsightType::Comments,
-        'shares' => SocialAnalyticsIntegrationInsightType::Shares,
-        'saves' => SocialAnalyticsIntegrationInsightType::Saves,
-        'likes' => SocialAnalyticsIntegrationInsightType::Likes,
-    ];
+    private string $instagramGraphUrl;
 
     public function __construct(
         private readonly SocialAnalyticsIntegrationInsightRepository $repository,
         private readonly IntegrationRepository $integrationRepository,
         private readonly InstagramOAuthService $instagramOAuthService,
         private readonly HttpClientInterface $httpClient,
-    ) {}
+        private readonly ParameterBagInterface $parameterBag,
+    ) {
+        // We can't inject this property in the service.yaml like we did for the OAuthService
+        // because we need yo limit the parent to children dependence
+        $this->instagramGraphUrl = $this->parameterBag->get('app.instagram.graph_url');
+    }
 
     /**
      * Fetches today's metrics and stores them in db
@@ -46,9 +40,9 @@ class SocialAnalyticsIntegrationInsightService
 
         $integration = $this->instagramOAuthService->refreshTokenIfNeeded($integration);
 
-        $metrics = implode(',', array_keys(self::INSTAGRAM_METRIC_MAPPING));
+        $metrics = implode(',', InstagramIntegrationInsightDTO::getMetricNames());
 
-        $response = $this->httpClient->request('GET', sprintf('%s/%s/insights', self::INSTAGRAM_GRAPH_URL, $integration->getAccountId()), [
+        $response = $this->httpClient->request('GET', sprintf('%s/%s/insights', $this->instagramGraphUrl, $integration->getAccountId()), [
             'query' => [
                 'metric' => $metrics,
                 'period' => 'day',
@@ -57,7 +51,7 @@ class SocialAnalyticsIntegrationInsightService
             ],
         ]);
 
-        $insightDTOs = InstagramInsightDTO::fromApiResponse($response->toArray());
+        $insightDTOs = InstagramIntegrationInsightDTO::fromApiResponse($response->toArray());
 
         $insights = $this->createInsightEntities($integration, $insightDTOs);
 
@@ -72,7 +66,7 @@ class SocialAnalyticsIntegrationInsightService
         $insights = [];
 
         foreach ($insightDTOs as $dto) {
-            $insightType = self::INSTAGRAM_METRIC_MAPPING[$dto->getName()] ?? null;
+            $insightType = InstagramIntegrationInsightDTO::getMetricNames()[$dto->getName()] ?? null;
 
             if ($insightType === null) {
                 continue;

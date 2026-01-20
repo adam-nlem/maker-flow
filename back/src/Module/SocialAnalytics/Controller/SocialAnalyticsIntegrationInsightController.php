@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\QueryParam\ListSocialAnalyticsIntegrationInsightQueryParamDTO;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
+use App\Module\SocialAnalytics\Service\SocialAnalyticsPostInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -19,7 +20,8 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
         ListSocialAnalyticsIntegrationInsightQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
         SocialAnalyticsIntegrationInsightRepository $insightRepository,
-        SocialAnalyticsIntegrationInsightService $insightService,
+        SocialAnalyticsIntegrationInsightService $integrationInsightService,
+        SocialAnalyticsPostInsightService $postInsightService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -33,10 +35,11 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
             );
         }
 
-        $insightService->fetchInstagramProfileInsights($integration);
-
         $insights = $insightRepository->getLatestByUserAndByIntegration($user, $integration);
 
+        $integrationInsightService->fetchInstagramProfileInsights($integration);
+        $postInsightService->fetchInstagramPostInsights($integration);
+        
         return $this->json(
             data: $insights,
             status: Response::HTTP_OK
