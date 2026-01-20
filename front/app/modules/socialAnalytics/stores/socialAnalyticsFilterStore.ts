@@ -1,19 +1,19 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import { SocialAnalyticsInsightType } from '../models/enums/SocialAnalyticsInsightType'
+import { SocialAnalyticsIntegrationInsightType } from '../models/enums/SocialAnalyticsIntegrationInsightType'
 
 type SocialAnalyticsFilterState = {
-    insightType: SocialAnalyticsInsightType
+    insightType: SocialAnalyticsIntegrationInsightType
 }
 
 type SocialAnalyticsFilterAction = {
-    setInsightType: (insightType: SocialAnalyticsInsightType) => void
+    setInsightType: (insightType: SocialAnalyticsIntegrationInsightType) => void
 }
 
 export const useSocialAnalyticsFilterStore = create<SocialAnalyticsFilterState & SocialAnalyticsFilterAction>()(
     persist(
         (set) => ({
-            insightType: SocialAnalyticsInsightType.Views,
+            insightType: SocialAnalyticsIntegrationInsightType.Views,
             setInsightType: (insightType) => set({ insightType }),
         }),
         {

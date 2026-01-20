@@ -1,24 +1,25 @@
-import type { SocialAnalyticsInsightType } from "./enums/SocialAnalyticsInsightType";
+import type { SocialAnalyticsPostInsightType } from "./enums/SocialAnalyticsPostInsightType";
 
-export interface SocialAnalyticsInsightJSON {
+
+export interface SocialAnalyticsPostInsightJSON {
     uuid: string,
-    type: SocialAnalyticsInsightType,
+    type: SocialAnalyticsPostInsightType,
     value: number,
     createdAt: string;
     updatedAt?: string;
 }
 
-export class SocialAnalyticsInsight {
+export class SocialAnalyticsPostInsight {
     constructor(
         public readonly uuid: string,
-        public readonly type: SocialAnalyticsInsightType,
+        public readonly type: SocialAnalyticsPostInsightType,
         public readonly value: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
     ) { }
 
-    static fromJSON(json: SocialAnalyticsInsightJSON): SocialAnalyticsInsight {
-        return new SocialAnalyticsInsight(
+    static fromJSON(json: SocialAnalyticsPostInsightJSON): SocialAnalyticsPostInsight {
+        return new SocialAnalyticsPostInsight(
             json.uuid,
             json.type,
             json.value,
@@ -27,7 +28,7 @@ export class SocialAnalyticsInsight {
         )
     }
 
-    toJSON(): SocialAnalyticsInsightJSON {
+    toJSON(): SocialAnalyticsPostInsightJSON {
         return {
             uuid: this.uuid,
             type: this.type,

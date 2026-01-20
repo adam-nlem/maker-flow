@@ -7,6 +7,8 @@ use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsMediaType;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
@@ -53,6 +55,12 @@ class SocialAnalyticsPost
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
+    /**
+     * @var Collection<int, SocialAnalyticsPostInsight>
+     */
+    #[ORM\OneToMany(targetEntity: SocialAnalyticsPostInsight::class, mappedBy: 'socialAnalyticsPost', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $postInsights;
+
     public function __construct()
     {
         if (null === $this->uuid) {
@@ -62,6 +70,8 @@ class SocialAnalyticsPost
         if (null === $this->createdAt) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
+
+        $this->postInsights = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -191,6 +201,35 @@ class SocialAnalyticsPost
     public function setUser(?User $user): static
     {
         $this->user = $user;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, SocialAnalyticsPostInsight>
+     */
+    public function getPostInsights(): Collection
+    {
+        return $this->postInsights;
+    }
+
+    public function addPostInsight(SocialAnalyticsPostInsight $postInsight): static
+    {
+        if (!$this->postInsights->contains($postInsight)) {
+            $this->postInsights->add($postInsight);
+            $postInsight->setSocialAnalyticsPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removePostInsight(SocialAnalyticsPostInsight $postInsight): static
+    {
+        if ($this->postInsights->removeElement($postInsight)) {
+            if ($postInsight->getSocialAnalyticsPost() === $this) {
+                $postInsight->setSocialAnalyticsPost(null);
+            }
+        }
 
         return $this;
     }

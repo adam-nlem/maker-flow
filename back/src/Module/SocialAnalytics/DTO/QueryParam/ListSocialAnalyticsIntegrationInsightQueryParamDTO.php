@@ -8,14 +8,10 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ListSocialAnalyticsInsightQueryParamDTO extends AbstractQueryParamDTO
+class ListSocialAnalyticsIntegrationInsightQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
     private string $integrationUuid;
-
-    // We list the total Insights when requested for now
-    // #[Assert\NotBlank]
-    // private SocialAnalyticsTimePeriod $timePeriod;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -27,16 +23,10 @@ class ListSocialAnalyticsInsightQueryParamDTO extends AbstractQueryParamDTO
     protected function fromQueryParams(array $queryParams): void
     {
         $this->integrationUuid = $queryParams["integrationUuid"] ?? "";
-        // $this->timePeriod = SocialAnalyticsTimePeriod::tryFrom($queryParams["timePeriod"] ?? "") ?? SocialAnalyticsTimePeriod::Last7Days;
     }
 
     public function getIntegrationUuid(): string
     {
         return $this->integrationUuid;
     }
-
-    // public function getTimePeriod(): SocialAnalyticsTimePeriod
-    // {
-    //     return $this->timePeriod;
-    // }
 }

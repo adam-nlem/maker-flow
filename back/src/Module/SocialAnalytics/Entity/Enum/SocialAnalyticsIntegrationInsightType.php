@@ -2,7 +2,7 @@
 
 namespace App\Module\SocialAnalytics\Entity\Enum;
 
-enum SocialAnalyticsInsightType: string
+enum SocialAnalyticsIntegrationInsightType: string
 {
     case Views = 'views';
     case Likes = 'likes';

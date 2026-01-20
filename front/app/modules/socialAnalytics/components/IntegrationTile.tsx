@@ -1,13 +1,13 @@
 import type { Integration } from "~/models/Integration"
 import { useShowIntegrationProviderIcon } from "~/hooks/api/integrations/useShowIntegrationProviderIcon"
-import { SocialAnalyticsInsightType, socialAnalyticsInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsInsightType"
+import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
 import type { SocialAnalyticsTimePeriod } from "../models/enums/SocialAnalyticsTimePeriod"
 import { socialAnalyticsTimePeriodToFrenchTranslation } from "../models/enums/SocialAnalyticsTimePeriod"
-import { useListSocialAnalyticsInsights } from "../hooks/api/socialAnalyticsInsight/useListSocialAnalyticsInsights"
+import { useListSocialAnalyticsIntegrationInsights } from "../hooks/api/socialAnalyticsIntegrationInsight/useListSocialAnalyticsIntegrationInsights"
 
 interface IntegrationTileProps {
     integration: Integration
-    insightType: SocialAnalyticsInsightType
+    insightType: SocialAnalyticsIntegrationInsightType
     onClick?: () => void
 }
 
@@ -17,9 +17,9 @@ export default function IntegrationTile({
     onClick,
 }: IntegrationTileProps) {
     const { iconUrl } = useShowIntegrationProviderIcon(integration.provider)
-    const { socialAnalyticsInsights, isLoading, error } = useListSocialAnalyticsInsights({ integrationUuid: integration.uuid })
+    const { socialAnalyticsIntegrationInsights, isLoading, error } = useListSocialAnalyticsIntegrationInsights({ integrationUuid: integration.uuid })
 
-    console.log(socialAnalyticsInsights)
+    console.log(socialAnalyticsIntegrationInsights)
     return (
         <div
             className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 w-fit cursor-pointer"
@@ -51,9 +51,9 @@ export default function IntegrationTile({
             <div className="border-t border-light-gray rounded w-full"></div>
 
             <div>
-                <h1 className="text-heading-sm">{socialAnalyticsInsights.find((insight) => insight.type === insightType)?.value}</h1>
+                <h1 className="text-heading-sm">{socialAnalyticsIntegrationInsights.find((insight) => insight.type === insightType)?.value}</h1>
                 <p className="text-body-sm text-gray whitespace-nowrap">
-                    {socialAnalyticsInsightTypeToFrenchTranslation[insightType]}
+                    {socialAnalyticsIntegrationInsightTypeToFrenchTranslation[insightType]}
                 </p>
             </div>
         </div>

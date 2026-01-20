@@ -2,20 +2,17 @@
 
 namespace App\Module\SocialAnalytics\Entity;
 
-use App\Entity\Integration;
 use App\Entity\User;
 use App\Helper\DateHelper;
-use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsInsightType;
-use App\Module\SocialAnalytics\Repository\SocialAnalyticsInsightRepository;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
+use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
-use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
-#[ORM\Entity(repositoryClass: SocialAnalyticsInsightRepository::class)]
+#[ORM\Entity(repositoryClass: SocialAnalyticsPostInsightRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class SocialAnalyticsInsight
+class SocialAnalyticsPostInsight
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -31,19 +28,15 @@ class SocialAnalyticsInsight
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(enumType: SocialAnalyticsInsightType::class)]
-    private ?SocialAnalyticsInsightType $type = null;
+    #[ORM\Column(enumType: SocialAnalyticsPostInsightType::class)]
+    private ?SocialAnalyticsPostInsightType $type = null;
 
     #[ORM\Column]
     private ?int $value = null;
 
-    #[ORM\ManyToOne(targetEntity: SocialAnalyticsPost::class)]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    #[ORM\ManyToOne(targetEntity: SocialAnalyticsPost::class, inversedBy: 'postInsights')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?SocialAnalyticsPost $socialAnalyticsPost = null;
-
-    #[ORM\ManyToOne(targetEntity: Integration::class)]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    private ?Integration $integration = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -66,16 +59,6 @@ class SocialAnalyticsInsight
         $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
     }
 
-    #[Assert\Callback]
-    public function validateOneRelationshipSet(ExecutionContextInterface $context): void
-    {
-        if (null === $this->socialAnalyticsPost && null === $this->integration) {
-            $context->buildViolation('Either socialAnalyticsPost or integration must be set.')
-                ->atPath('socialAnalyticsPost')
-                ->addViolation();
-        }
-    }
-
     public function getId(): ?int
     {
         return $this->id;
@@ -96,12 +79,12 @@ class SocialAnalyticsInsight
         return $this->updatedAt;
     }
 
-    public function getType(): ?SocialAnalyticsInsightType
+    public function getType(): ?SocialAnalyticsPostInsightType
     {
         return $this->type;
     }
 
-    public function setType(SocialAnalyticsInsightType $type): self
+    public function setType(SocialAnalyticsPostInsightType $type): self
     {
         $this->type = $type;
         return $this;
@@ -126,17 +109,6 @@ class SocialAnalyticsInsight
     public function setSocialAnalyticsPost(?SocialAnalyticsPost $socialAnalyticsPost): self
     {
         $this->socialAnalyticsPost = $socialAnalyticsPost;
-        return $this;
-    }
-
-    public function getIntegration(): ?Integration
-    {
-        return $this->integration;
-    }
-
-    public function setIntegration(?Integration $integration): self
-    {
-        $this->integration = $integration;
         return $this;
     }
 

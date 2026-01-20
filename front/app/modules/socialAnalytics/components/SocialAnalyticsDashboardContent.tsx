@@ -2,7 +2,7 @@ import { ChartBarSquareIcon, CalendarDaysIcon, ChevronUpDownIcon } from "@heroic
 import type { Integration } from "~/models/Integration"
 import SelectDropdown from "~/components/ui/SelectDropdown"
 import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterStore"
-import { SocialAnalyticsInsightType, socialAnalyticsInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsInsightType"
+import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
 import FilterTile from "./FilterTile"
 import IntegrationTile from "./IntegrationTile"
 
@@ -11,7 +11,7 @@ interface SocialAnalyticsDashboardContentProps {
     integrations: Integration[]
 }
 
-const insightTypeOptions = Object.values(SocialAnalyticsInsightType)
+const insightTypeOptions = Object.values(SocialAnalyticsIntegrationInsightType)
 
 export default function SocialAnalyticsDashboardContent({
     userModuleUuid,
@@ -22,7 +22,7 @@ export default function SocialAnalyticsDashboardContent({
     return (
         <div className="p-5 w-2/3 h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center shrink-0">
-                <SelectDropdown<SocialAnalyticsInsightType>
+                <SelectDropdown<SocialAnalyticsIntegrationInsightType>
                     items={insightTypeOptions}
                     selectedItemId={insightType}
                     getItemId={(item) => item}
@@ -30,14 +30,14 @@ export default function SocialAnalyticsDashboardContent({
                     renderTrigger={({ onClick }) => (
                         <FilterTile
                             icon={ChartBarSquareIcon}
-                            label={socialAnalyticsInsightTypeToFrenchTranslation[insightType]}
+                            label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[insightType]}
                             rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
                             onClick={onClick}
                         />
                     )}
                     renderItem={({ item, isSelected, onSelect }) => (
                         <FilterTile
-                            label={socialAnalyticsInsightTypeToFrenchTranslation[item]}
+                            label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[item]}
                             isSelected={isSelected}
                             onClick={onSelect}
                         />

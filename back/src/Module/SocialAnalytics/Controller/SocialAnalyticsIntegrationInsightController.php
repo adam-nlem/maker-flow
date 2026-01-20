@@ -3,23 +3,23 @@
 namespace App\Module\SocialAnalytics\Controller;
 
 use App\Entity\User;
-use App\Module\SocialAnalytics\DTO\QueryParam\ListSocialAnalyticsInsightQueryParamDTO;
-use App\Module\SocialAnalytics\Repository\SocialAnalyticsInsightRepository;
-use App\Module\SocialAnalytics\Service\SocialAnalyticsInsightService;
+use App\Module\SocialAnalytics\DTO\QueryParam\ListSocialAnalyticsIntegrationInsightQueryParamDTO;
+use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
+use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/api/modules/social-analytics/insights')]
-class SocialAnalyticsInsightController extends AbstractController
+#[Route('/api/modules/social-analytics/integration-insights')]
+class SocialAnalyticsIntegrationInsightController extends AbstractController
 {
-    #[Route('', name: 'api_modules_social_analytics_insights_list', methods: ['GET'])]
+    #[Route('', name: 'api_modules_social_analytics_integration_insights_list', methods: ['GET'])]
     public function list(
-        ListSocialAnalyticsInsightQueryParamDTO $queryParamDto,
+        ListSocialAnalyticsIntegrationInsightQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
-        SocialAnalyticsInsightRepository $insightRepository,
-        SocialAnalyticsInsightService $insightService,
+        SocialAnalyticsIntegrationInsightRepository $insightRepository,
+        SocialAnalyticsIntegrationInsightService $insightService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -34,7 +34,6 @@ class SocialAnalyticsInsightController extends AbstractController
         }
 
         $insightService->fetchInstagramProfileInsights($integration);
-        $insightService->fetchInstagramMediaInsights($integration);
 
         $insights = $insightRepository->getLatestByUserAndByIntegration($user, $integration);
 

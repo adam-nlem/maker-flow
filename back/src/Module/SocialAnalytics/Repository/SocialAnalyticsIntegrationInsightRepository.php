@@ -4,23 +4,23 @@ namespace App\Module\SocialAnalytics\Repository;
 
 use App\Entity\Integration;
 use App\Entity\User;
-use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsInsightType;
-use App\Module\SocialAnalytics\Entity\SocialAnalyticsInsight;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
+use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 
 /**
- * @extends ServiceEntityRepository<SocialAnalyticsInsight>
+ * @extends ServiceEntityRepository<SocialAnalyticsIntegrationInsight>
  */
-class SocialAnalyticsInsightRepository extends ServiceEntityRepository
+class SocialAnalyticsIntegrationInsightRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, SocialAnalyticsInsight::class);
+        parent::__construct($registry, SocialAnalyticsIntegrationInsight::class);
     }
 
-    public function save(SocialAnalyticsInsight $entity, bool $flush = false): void
+    public function save(SocialAnalyticsIntegrationInsight $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -29,7 +29,7 @@ class SocialAnalyticsInsightRepository extends ServiceEntityRepository
         }
     }
 
-    public function remove(SocialAnalyticsInsight $entity, bool $flush = false): void
+    public function remove(SocialAnalyticsIntegrationInsight $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
