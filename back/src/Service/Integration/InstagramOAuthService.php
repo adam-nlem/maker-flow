@@ -134,6 +134,26 @@ class InstagramOAuthService
         return $integration;
     }
 
+    public function refreshTokenIfNeeded(Integration $integration): Integration
+    {
+        $now = DateHelper::createUtcDateTimeImmutable();
+        $expiresAt = $integration->getExpiresAt();
+
+        if ($expiresAt === null) {
+            return $integration;
+        }
+
+        $refreshThreshold = $expiresAt->modify('-7 days');
+
+        if ($now < $refreshThreshold) {
+            return $integration;
+        }
+
+        $newToken = $this->refreshToken($integration->getAccessToken());
+
+        return $this->updateIntegrationToken($integration, $newToken);
+    }
+
     public function handleCallback(string $code, User $user, UserModule $userModule): Integration
     {
         $shortLivedToken = $this->exchangeCodeForToken($code);

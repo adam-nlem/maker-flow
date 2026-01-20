@@ -5,6 +5,7 @@ namespace App\Module\SocialAnalytics\Controller;
 use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\QueryParam\ListSocialAnalyticsInsightQueryParamDTO;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsInsightRepository;
+use App\Module\SocialAnalytics\Service\SocialAnalyticsInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,7 @@ class SocialAnalyticsInsightController extends AbstractController
         ListSocialAnalyticsInsightQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
         SocialAnalyticsInsightRepository $insightRepository,
+        SocialAnalyticsInsightService $insightService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -30,6 +32,8 @@ class SocialAnalyticsInsightController extends AbstractController
                 status: Response::HTTP_NOT_FOUND
             );
         }
+
+        $insightService->fetchInstagramProfileInsights($integration);
 
         $insights = $insightRepository->getLatestByUserAndByIntegration($user, $integration);
 
