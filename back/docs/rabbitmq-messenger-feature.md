@@ -18,7 +18,7 @@ This document describes the RabbitMQ message queue integration using Symfony Mes
 
 ### Docker Services
 
-- `rabbitmq` - RabbitMQ server with management UI
+- `rabbitmq` - RabbitMQ server with management UI (port 15672)
 - `back` - Main backend container (also runs the messenger worker)
 
 ---
@@ -51,13 +51,22 @@ framework:
                     delay: 1000
                     multiplier: 2
                     max_delay: 0
+                options:
+                    exchange:
+                        name: messages
+                        type: direct
+                    queues:
+                        messages:
+                            binding_keys: [messages]
 
             failed:
                 dsn: 'doctrine://default?queue_name=failed'
 
         routing:
-            # 'App\Message\YourMessage': async
+            # Messages are routed via #[AsMessage('async')] attribute on message classes
 ```
+
+Messages are routed via the `#[AsMessage('async')]` attribute on each message class, eliminating the need for manual routing configuration.
 
 ---
 
@@ -65,80 +74,93 @@ framework:
 
 ### Creating a Message
 
-Messages are simple PHP classes that hold data:
+Messages are simple PHP classes that hold data. Place them in `src/Module/{ModuleName}/Message/`.
+
+Use the `#[AsMessage('async')]` attribute to automatically route messages to the async transport:
 
 ```php
 <?php
 
-namespace App\Module\YourModule\Message;
+namespace App\Module\SocialAnalytics\Message;
 
-final class YourMessage
+use Symfony\Component\Messenger\Attribute\AsMessage;
+
+#[AsMessage('async')]
+class FetchIntegrationInsightsMessage
 {
     public function __construct(
-        private readonly string $entityUuid,
+        private int $integrationId,
     ) {}
 
-    public function getEntityUuid(): string
+    public function getIntegrationId(): int
     {
-        return $this->entityUuid;
+        return $this->integrationId;
     }
 }
 ```
+
+This eliminates the need to manually add routing entries in `messenger.yaml`.
 
 ### Creating a Message Handler
 
-Handlers process messages:
+Handlers process messages. Place them in `src/Module/{ModuleName}/Message/Handler/`:
 
 ```php
 <?php
 
-namespace App\Module\YourModule\MessageHandler;
+namespace App\Module\SocialAnalytics\Message\Handler;
 
-use App\Module\YourModule\Message\YourMessage;
+use App\Module\SocialAnalytics\Message\FetchIntegrationInsightsMessage;
+use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
+use App\Repository\IntegrationRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
 #[AsMessageHandler]
-final class YourMessageHandler
+class FetchIntegrationInsightsHandler
 {
     public function __construct(
-        private readonly YourService $yourService,
+        private readonly IntegrationRepository $integrationRepository,
+        private readonly SocialAnalyticsIntegrationInsightService $integrationInsightService,
     ) {}
 
-    public function __invoke(YourMessage $message): void
+    public function __invoke(FetchIntegrationInsightsMessage $message): void
     {
-        // Process the message
-        $this->yourService->process($message->getEntityUuid());
+        $integration = $this->integrationRepository->getById($message->getIntegrationId());
+
+        if ($integration === null) {
+            return;
+        }
+
+        $this->integrationInsightService->fetchInstagramProfileInsights($integration);
     }
 }
-```
-
-### Routing Messages to Transport
-
-Add routing in `config/packages/messenger.yaml`:
-
-```yaml
-framework:
-    messenger:
-        routing:
-            'App\Module\YourModule\Message\YourMessage': async
 ```
 
 ### Dispatching Messages
 
+Inject `MessageBusInterface` and dispatch messages:
+
 ```php
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class YourController
+class FetchIntegrationInsightsCommand extends Command
 {
     public function __construct(
-        private readonly MessageBusInterface $messageBus,
-    ) {}
+        private readonly IntegrationRepository $integrationRepository,
+        private readonly MessageBusInterface $bus,
+    ) {
+        parent::__construct();
+    }
 
-    public function someAction(): Response
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $this->messageBus->dispatch(new YourMessage($entityUuid));
-        
-        return $this->json(['status' => 'queued']);
+        $integrations = $this->integrationRepository->getByProvider(IntegrationProvider::Instagram);
+
+        foreach ($integrations as $integration) {
+            $this->bus->dispatch(new FetchIntegrationInsightsMessage($integration->getId()));
+        }
+
+        return Command::SUCCESS;
     }
 }
 ```
@@ -250,12 +272,19 @@ docker compose logs -f back
 back/
 ├── config/
 │   └── packages/
-│       └── messenger.yaml          # Messenger configuration
+│       └── messenger.yaml              # Messenger configuration
 └── src/
     └── Module/
-        └── [ModuleName]/
-            ├── Message/            # Message classes
-            │   └── YourMessage.php
-            └── MessageHandler/     # Message handlers
-                └── YourMessageHandler.php
+        └── SocialAnalytics/
+            ├── Command/
+            │   ├── FetchIntegrationInsightsCommand.php
+            │   └── FetchPostInsightsCommand.php
+            └── Message/
+                ├── FetchIntegrationInsightsMessage.php
+                ├── FetchPostInsightsMessage.php
+                └── Handler/
+                    ├── FetchIntegrationInsightsHandler.php
+                    └── FetchPostInsightsHandler.php
 ```
+
+

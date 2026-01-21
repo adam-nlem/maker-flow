@@ -36,6 +36,17 @@ class IntegrationRepository extends ServiceEntityRepository
         }
     }
 
+    public function getById(int $id): ?Integration
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+
     public function getByUuidAndUser(string $uuid, User $user): ?Integration
     {
         return $this->createQueryBuilder('i')

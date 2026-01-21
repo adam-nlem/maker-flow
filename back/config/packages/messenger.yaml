@@ -1,9 +1,7 @@
 framework:
     messenger:
-        failure_transport: failed
-
         transports:
-            async:
+            messages: 
                 dsn: '%env(MESSENGER_TRANSPORT_DSN)%'
                 retry_strategy:
                     max_retries: 3
@@ -12,14 +10,9 @@ framework:
                     max_delay: 0
                 options:
                     exchange:
-                        name: messages
-                        type: direct
+                        name: amqp
                     queues:
-                        messages:
-                            binding_keys: [messages]
-
-            failed:
-                dsn: 'doctrine://default?queue_name=failed'
+                        messages: ~
 
         routing:
-            'App\Module\*\Message\*': async
+            # Messages are routed via #[AsMessage('async')] attribute on message classes
