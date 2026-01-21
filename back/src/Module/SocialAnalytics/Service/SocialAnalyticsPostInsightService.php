@@ -39,7 +39,14 @@ class SocialAnalyticsPostInsightService
         $integration = $this->instagramOAuthService->refreshTokenIfNeeded($integration);
 
         $url = sprintf('%s/%s/media', $this->instagramGraphUrl, $integration->getAccountId());
-        $queryParams = $this->buildQueryParams($integration);
+        
+        $metrics = implode(',', InstagramPostInsightDTO::getMetricNames());
+
+        $queryParams =  [
+            'fields' => sprintf('id,media_type,timestamp,thumbnail_url,caption,insights.metric(%s)', $metrics),
+            'limit' => 100,
+            'access_token' => $integration->getAccessToken(),
+        ];
 
         do {
             $response = $this->httpClient->request('GET', $url, ['query' => $queryParams]);
@@ -54,18 +61,7 @@ class SocialAnalyticsPostInsightService
         } while ($url !== null);
 
         $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
-        $this->integrationRepository->save($integration,true);
-    }
-
-    private function buildQueryParams(Integration $integration): array
-    {
-        $metrics = implode(',', InstagramPostInsightDTO::getMetricNames());
-
-        return [
-            'fields' => sprintf('id,media_type,timestamp,thumbnail_url,caption,insights.metric(%s)', $metrics),
-            'limit' => 100,
-            'access_token' => $integration->getAccessToken(),
-        ];
+        $this->integrationRepository->save($integration, true);
     }
 
     private function processPostData(Integration $integration, array $postData): void

@@ -58,4 +58,22 @@ class SocialAnalyticsIntegrationInsightRepository extends ServiceEntityRepositor
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    public function getLatestByIntegrationAndByTypeAndByValue(
+        Integration $integration,
+        SocialAnalyticsIntegrationInsightType $type,
+        int $value,
+    ): ?SocialAnalyticsIntegrationInsight {
+        return $this->createQueryBuilder('ii')
+            ->where('ii.integration = :integration')
+            ->andWhere('ii.type = :type')
+            ->andWhere('ii.value = :value')
+            ->setParameter('integration', $integration)
+            ->setParameter('type', $type)
+            ->setParameter('value', $value)
+            ->orderBy('ii.createdAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

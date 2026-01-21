@@ -104,4 +104,14 @@ class IntegrationRepository extends ServiceEntityRepository
 
         return $integrations;
     }
+
+    public function getByProvider(IntegrationProvider $provider): array
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.provider = :provider')
+            ->setParameter('provider', $provider)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

@@ -6,6 +6,7 @@ use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Integration;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramIntegrationInsightDTO;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Repository\IntegrationRepository;
@@ -18,21 +19,16 @@ class SocialAnalyticsIntegrationInsightService
     private string $instagramGraphUrl;
 
     public function __construct(
-        private readonly SocialAnalyticsIntegrationInsightRepository $repository,
+        private readonly SocialAnalyticsIntegrationInsightRepository $integrationInsightRepository,
         private readonly IntegrationRepository $integrationRepository,
         private readonly InstagramOAuthService $instagramOAuthService,
         private readonly HttpClientInterface $httpClient,
         private readonly ParameterBagInterface $parameterBag,
     ) {
-        // We can't inject this property in the service.yaml like we did for the OAuthService
-        // because we need yo limit the parent to children dependence
         $this->instagramGraphUrl = $this->parameterBag->get('app.instagram.graph_url');
     }
 
-    /**
-     * Fetches today's metrics and stores them in db
-     */
-    public function fetchInstagramProfileInsights(Integration $integration): array
+    public function fetchInstagramProfileInsights(Integration $integration): void
     {
         if ($integration->getProvider() !== IntegrationProvider::Instagram) {
             throw new \InvalidArgumentException('Integration must be an Instagram integration');
@@ -53,38 +49,44 @@ class SocialAnalyticsIntegrationInsightService
 
         $insightDTOs = InstagramIntegrationInsightDTO::fromApiResponse($response->toArray());
 
-        $insights = $this->createInsightEntities($integration, $insightDTOs);
+        $this->createInsightEntities($integration, $insightDTOs);
 
         $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
         $this->integrationRepository->save($integration, true);
-
-        return $insights;
     }
 
-    private function createInsightEntities(Integration $integration, array $insightDTOs): array
+    private function createInsightEntities(Integration $integration, array $insightDTOs): void
     {
-        $insights = [];
-
+        /** @var InstagramIntegrationInsightDTO $dto */
         foreach ($insightDTOs as $dto) {
-            $insightType = InstagramIntegrationInsightDTO::getMetricNames()[$dto->getName()] ?? null;
+            $insightType = InstagramIntegrationInsightDTO::getMetricMapping()[$dto->getName()] ?? null;
 
             if ($insightType === null) {
                 continue;
             }
 
-            $insight = new SocialAnalyticsIntegrationInsight();
-            $insight
-                ->setType($insightType)
-                ->setValue($dto->getValue())
-                ->setIntegration($integration)
-                ->setUser($integration->getUser());
+            if ($this->shouldCreateInsight($integration, $insightType, $dto->getValue())) {
+                $insight = new SocialAnalyticsIntegrationInsight();
+                $insight
+                    ->setType($insightType)
+                    ->setValue($dto->getValue())
+                    ->setIntegration($integration)
+                    ->setUser($integration->getUser());
 
-            $this->repository->save($insight);
-            $insights[] = $insight;
+                $this->integrationInsightRepository->save($insight);
+            }
         }
+    }
 
-        $this->repository->getEntityManager()->flush();
-
-        return $insights;
+    private function shouldCreateInsight(
+        Integration $integration,
+        SocialAnalyticsIntegrationInsightType $type,
+        int $value,
+    ): bool {
+        return $this->integrationInsightRepository->getLatestByIntegrationAndByTypeAndByValue(
+            integration: $integration,
+            type: $type,
+            value: $value
+        ) === null;
     }
 }

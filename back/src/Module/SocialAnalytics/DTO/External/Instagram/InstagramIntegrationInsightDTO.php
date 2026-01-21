@@ -71,4 +71,9 @@ class InstagramIntegrationInsightDTO
     {
         return array_keys(self::INSTAGRAM_METRIC_MAPPING);
     }
+
+    public static function getMetricMapping(): array
+    {
+        return self::INSTAGRAM_METRIC_MAPPING;
+    }
 }
