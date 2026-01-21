@@ -15,6 +15,8 @@ RUN apt-get update && apt-get install -y \
 
 RUN docker-php-ext-install pdo pdo_mysql sodium intl curl fileinfo gd zip
 
+RUN pecl install amqp && docker-php-ext-enable amqp
+
 RUN apt clean && rm -rf /var/lib/apt/lists/*
 
 RUN a2enmod rewrite

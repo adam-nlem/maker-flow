@@ -42,6 +42,8 @@ services:
       REDIS_STORE_PORT: ${REDIS_STORE_PORT}
       REDIS_STORE_SCHEME: ${REDIS_STORE_SCHEME}
 
+      MESSENGER_TRANSPORT_DSN: amqp://${RABBITMQ_USER}:${RABBITMQ_PASSWORD}@rabbitmq:5672/${RABBITMQ_VHOST}/messages
+
       INSTAGRAM_APP_ID: ${INSTAGRAM_APP_ID}
       INSTAGRAM_APP_SECRET: ${INSTAGRAM_APP_SECRET}
       INSTAGRAM_REDIRECT_URI: ${INSTAGRAM_REDIRECT_URI}
@@ -52,6 +54,7 @@ services:
       - maker_flow
     depends_on:
       - db
+      - rabbitmq
 
   db:
     image: mysql:8.0
@@ -91,8 +94,31 @@ services:
     networks:
       - maker_flow
 
+  rabbitmq:
+    image: rabbitmq:4.2.2-management-alpine
+    container_name: ${COMPOSE_PROJECT_NAME}_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    volumes:
+      - maker_flow_rabbitmq_data:/var/lib/rabbitmq
+    networks:
+      - maker_flow
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+
 volumes:
   maker_flow_db_data:
+  maker_flow_rabbitmq_data:
 
 networks:
   maker_flow:
