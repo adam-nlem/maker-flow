@@ -9,9 +9,11 @@ use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
 use App\Entity\User;
 use App\Entity\UserModule;
+use App\Event\IntegrationCreatedEvent;
 use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
 use App\Repository\UserModuleRepository;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class InstagramOAuthService
@@ -21,6 +23,8 @@ class InstagramOAuthService
         private readonly HttpClientInterface $httpClient,
         private readonly IntegrationRepository $integrationRepository,
         private readonly UserModuleRepository $userModuleRepository,
+        private readonly EventDispatcherInterface $eventDispatcher,
+
 
         private readonly string $instagramGraphUrl,
         private readonly string $instagramAuthorizationUrl,
@@ -177,6 +181,11 @@ class InstagramOAuthService
         $userModule->addIntegration($integration);
         $this->userModuleRepository->save($userModule, true);
 
+
+        if ($existingIntegration === null) {
+            $this->eventDispatcher->dispatch(new IntegrationCreatedEvent($integration), IntegrationCreatedEvent::NAME);
+        }
+        
         return $integration;
     }
 }
