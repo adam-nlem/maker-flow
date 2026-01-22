@@ -5,6 +5,8 @@ import { oAuthErrorCodeToFrenchTranslation } from "~/models/enums/OAuthErrorCode
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
 import { IntegrationProvider } from "~/models/enums/IntegrationProvider";
 import SocialAnalyticsDashboardContent from "./SocialAnalyticsDashboardContent";
+import Shimmer from "~/components/ui/Shimmer";
+import IntegrationProviderTile from "./CreateIntegrationTile";
 
 export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { integrations, isLoading } = useListIntegrations({ userModuleUuid });
@@ -21,23 +23,32 @@ export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleW
     if (isLoading) {
         return null;
     }
-    
-    if (integrations.length > 0 || integrationUuid) {
-        return (
-            <SocialAnalyticsDashboardContent
-                userModuleUuid={userModuleUuid}
-                integrations={integrations}
-            />
-        );
-    }
+
+    // if (integrations.length > 0 || integrationUuid) {
+    //     return (
+    //         <SocialAnalyticsDashboardContent
+    //             userModuleUuid={userModuleUuid}
+    //             integrations={integrations}
+    //         />
+    //     );
+    // }
+
+    const integrationProviderTypeOptions = Object.values(IntegrationProvider)
 
     return (
-        <div className="flex flex-col items-center justify-center h-full gap-6">
-            <div className="text-center">
-                <h2 className="text-heading-lg text-primary mb-2">Social Analytics</h2>
-                <p className="text-body-md text-secondary">
-                    Connect your Instagram account to start tracking your analytics
-                </p>
+        <div className="p-5 w-2/3 h-[50vh] flex flex-col gap-3">
+            <div className="border border-light-gray rounded-xl bg-primary/30 text-center py-5">
+                <h1 className="text-heading-lg">Connectez-vous à vos réseaux sociaux</h1>
+                <p className="text-body-sm">Liez vos comptes afin d'acceder à vos statistiques</p>
+            </div>
+
+            <div className="flex flex-row justify-between gap-3">
+                {integrationProviderTypeOptions.map((integrationProviderType) => (
+                    <IntegrationProviderTile
+                        key={integrationProviderType}
+                        provider={integrationProviderType}
+                    />
+                ))}
             </div>
             {oauthError && (
                 <p className="text-body-sm text-danger">{oAuthErrorCodeToFrenchTranslation[oauthError]}</p>

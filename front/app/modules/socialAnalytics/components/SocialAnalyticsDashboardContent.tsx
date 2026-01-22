@@ -50,7 +50,6 @@ export default function SocialAnalyticsDashboardContent({
                 <IntegrationTile
                     key={integration.uuid}
                     integration={integration}
-
                     insightType={insightType}
                 />
             ))}

@@ -5,6 +5,7 @@ interface ButtonProps {
     type?: 'button' | 'submit' | 'reset';
     style?: 'primary' | 'secondary' | 'danger' | 'outline';
     width?: string;
+    height?: string;
     isLoading?: boolean;
     disabled?: boolean;
     onClick?: () => void;
@@ -19,6 +20,7 @@ export function Button({
     disabled = false,
     onClick,
     width = 'w-full',
+    height = 'h-10',
     className = '',
 }: ButtonProps) {
 
@@ -37,7 +39,7 @@ export function Button({
             type={type}
             onClick={onClick}
             disabled={disabled || isLoading}
-            className={`${baseStyles} ${variantStyles[style]} ${width} ${className} h-10 px-4 rounded-xl text-heading-sm cursor-pointer`}
+            className={`${baseStyles} ${variantStyles[style]} ${width} ${height} ${className}  px-4 rounded-xl text-heading-sm cursor-pointer`}
         >
             {isLoading ? (
                 <span className="mr-2">
