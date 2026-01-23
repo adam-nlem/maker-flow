@@ -10,6 +10,7 @@ use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepos
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: SocialAnalyticsIntegrationInsightRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -21,18 +22,33 @@ class SocialAnalyticsIntegrationInsight
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
+    #[Groups([
+        'api_modules_social_analytics_integration_insights_list',
+    ])]
     private ?string $uuid = null;
 
     #[ORM\Column]
+    #[Groups([
+        'api_modules_social_analytics_integration_insights_list',
+    ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups([
+        'api_modules_social_analytics_integration_insights_list',
+    ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: SocialAnalyticsIntegrationInsightType::class)]
+    #[Groups([
+        'api_modules_social_analytics_integration_insights_list',
+    ])]
     private ?SocialAnalyticsIntegrationInsightType $type = null;
 
     #[ORM\Column]
+    #[Groups([
+        'api_modules_social_analytics_integration_insights_list',
+    ])]
     private ?int $value = null;
 
     #[ORM\ManyToOne(targetEntity: Integration::class)]

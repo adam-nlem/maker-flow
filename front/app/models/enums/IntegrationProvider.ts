@@ -3,3 +3,6 @@ export enum IntegrationProvider {
     Youtube = 'youtube',
     Tiktok = 'tiktok',
 }
+
+
+export const integrationProviderTypeOptions = Object.values(IntegrationProvider)

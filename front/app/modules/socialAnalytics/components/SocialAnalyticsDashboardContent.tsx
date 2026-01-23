@@ -2,16 +2,16 @@ import { ChartBarSquareIcon, CalendarDaysIcon, ChevronUpDownIcon } from "@heroic
 import type { Integration } from "~/models/Integration"
 import SelectDropdown from "~/components/ui/SelectDropdown"
 import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterStore"
-import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
+import { insightTypeOptions, SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
 import FilterTile from "./FilterTile"
 import IntegrationTile from "./IntegrationTile"
+import { integrationProviderTypeOptions } from "~/models/enums/IntegrationProvider"
+import CreateIntegrationTile from "./CreateIntegrationTile"
 
 interface SocialAnalyticsDashboardContentProps {
     userModuleUuid: string
     integrations: Integration[]
 }
-
-const insightTypeOptions = Object.values(SocialAnalyticsIntegrationInsightType)
 
 export default function SocialAnalyticsDashboardContent({
     userModuleUuid,
@@ -45,15 +45,28 @@ export default function SocialAnalyticsDashboardContent({
                 />
             </div>
 
+            <div className="flex flex-row justify-between gap-3">
+                {integrations.map((integration) => (
+                    <IntegrationTile
+                        key={integration.uuid}
+                        integration={integration}
+                        insightType={insightType}
+                    />
+                ))}
 
-            {integrations.map((integration) => (
-                <IntegrationTile
-                    key={integration.uuid}
-                    integration={integration}
-                    insightType={insightType}
-                />
-            ))}
+                {integrationProviderTypeOptions.map((integrationProviderType) => {
+                    if (integrations.find((integration) => integration.provider !== integrationProviderType)) {
+                        return <CreateIntegrationTile
+                            key={integrationProviderType}
+                            userModuleUuid={userModuleUuid}
+                            provider={integrationProviderType}
+                        />;
+                    }
 
-        </div>
+                })}
+
+            </div>
+
+        </div >
     )
 }

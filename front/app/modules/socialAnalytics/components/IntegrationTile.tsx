@@ -19,10 +19,9 @@ export default function IntegrationTile({
     const { iconUrl } = useShowIntegrationProviderIcon(integration.provider)
     const { socialAnalyticsIntegrationInsights, isLoading, error } = useListSocialAnalyticsIntegrationInsights({ integrationUuid: integration.uuid })
 
-    console.log(socialAnalyticsIntegrationInsights)
     return (
         <div
-            className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 w-fit cursor-pointer"
+            className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 w-full cursor-pointer"
             onClick={onClick}
         >
             <div className="flex flex-row gap-10 justify-between">

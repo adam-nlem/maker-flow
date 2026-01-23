@@ -1,4 +1,4 @@
-export enum SocialAnalyticsIntegrationInsightType {
+export enum  SocialAnalyticsIntegrationInsightType {
     Views = 'views',
     Likes = 'likes',
     Saves = 'saves',
@@ -25,3 +25,5 @@ export const socialAnalyticsIntegrationInsightTypeToFrenchTranslation: Record<So
     [SocialAnalyticsIntegrationInsightType.Reach]: "Portée",
     [SocialAnalyticsIntegrationInsightType.Videos]: "Vidéos",
 };
+
+export const insightTypeOptions = Object.values(SocialAnalyticsIntegrationInsightType)

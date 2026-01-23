@@ -35,7 +35,8 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
 
         return $this->json(
             data: $insights,
-            status: Response::HTTP_OK
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_modules_social_analytics_integration_insights_list']],
         );
     }
 }

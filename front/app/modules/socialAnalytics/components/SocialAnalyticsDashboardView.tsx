@@ -3,10 +3,11 @@ import { Button } from "~/components/ui/Button";
 import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
 import { oAuthErrorCodeToFrenchTranslation } from "~/models/enums/OAuthErrorCode";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
-import { IntegrationProvider } from "~/models/enums/IntegrationProvider";
+import { IntegrationProvider, integrationProviderTypeOptions } from "~/models/enums/IntegrationProvider";
 import SocialAnalyticsDashboardContent from "./SocialAnalyticsDashboardContent";
 import Shimmer from "~/components/ui/Shimmer";
-import IntegrationProviderTile from "./CreateIntegrationTile";
+import CreateIntegrationTile from "./CreateIntegrationTile";
+
 
 export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleWidgetProps) {
     const { integrations, isLoading } = useListIntegrations({ userModuleUuid });
@@ -24,16 +25,16 @@ export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleW
         return null;
     }
 
-    // if (integrations.length > 0 || integrationUuid) {
-    //     return (
-    //         <SocialAnalyticsDashboardContent
-    //             userModuleUuid={userModuleUuid}
-    //             integrations={integrations}
-    //         />
-    //     );
-    // }
+    if (integrations.length > 0 || integrationUuid) {
+        return (
+            <SocialAnalyticsDashboardContent
+                userModuleUuid={userModuleUuid}
+                integrations={integrations}
+            />
+        );
+    }
 
-    const integrationProviderTypeOptions = Object.values(IntegrationProvider)
+    
 
     return (
         <div className="p-5 w-2/3 h-[50vh] flex flex-col gap-3">
@@ -44,8 +45,9 @@ export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleW
 
             <div className="flex flex-row justify-between gap-3">
                 {integrationProviderTypeOptions.map((integrationProviderType) => (
-                    <IntegrationProviderTile
+                    <CreateIntegrationTile
                         key={integrationProviderType}
+                        userModuleUuid={userModuleUuid}
                         provider={integrationProviderType}
                     />
                 ))}
@@ -53,14 +55,6 @@ export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleW
             {oauthError && (
                 <p className="text-body-sm text-danger">{oAuthErrorCodeToFrenchTranslation[oauthError]}</p>
             )}
-            <Button
-                style="primary"
-                width="w-auto"
-                onClick={handleConnectInstagram}
-                isLoading={isPending}
-            >
-                Connect Instagram
-            </Button>
         </div>
     );
 }
