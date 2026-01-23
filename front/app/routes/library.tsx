@@ -18,7 +18,7 @@ export function loader({ context }: Route.LoaderArgs) {
   return { message: context.VALUE_FROM_EXPRESS };
 }
 
-export default function Library({ loaderData }: Route.ComponentProps) {
+export default function LibraryPage({ loaderData }: Route.ComponentProps) {
   const { projects } = useListPaginatedProjects()
   const { focusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null

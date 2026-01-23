@@ -7,7 +7,7 @@ import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useLogin } from "~/hooks/api/users/useLogin";
 import { useRegister } from "~/hooks/api/users/useRegister";
 
-export default function Register() {
+export default function RegisterPage() {
     const navigate = useNavigate();
     const { user, isLoading: authLoading } = useCurrentUser()
     const { login } = useLogin()

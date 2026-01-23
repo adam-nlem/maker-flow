@@ -26,4 +26,4 @@ export const socialAnalyticsIntegrationInsightTypeToFrenchTranslation: Record<So
     [SocialAnalyticsIntegrationInsightType.Videos]: "Vidéos",
 };
 
-export const insightTypeOptions = Object.values(SocialAnalyticsIntegrationInsightType)
+export const socialAnalyticsIntegrationInsightTypeOptions = Object.values(SocialAnalyticsIntegrationInsightType)

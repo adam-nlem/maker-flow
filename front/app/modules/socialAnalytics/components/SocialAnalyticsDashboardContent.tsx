@@ -2,11 +2,11 @@ import { ChartBarSquareIcon, CalendarDaysIcon, ChevronUpDownIcon } from "@heroic
 import type { Integration } from "~/models/Integration"
 import SelectDropdown from "~/components/ui/SelectDropdown"
 import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterStore"
-import { insightTypeOptions, SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
+import { socialAnalyticsIntegrationInsightTypeOptions, SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
 import FilterTile from "./FilterTile"
-import IntegrationTile from "./IntegrationTile"
+import IntegrationCard from "./IntegrationCard"
 import { integrationProviderTypeOptions } from "~/models/enums/IntegrationProvider"
-import CreateIntegrationTile from "./CreateIntegrationTile"
+import CreateIntegrationCard from "./CreateIntegrationCard"
 
 interface SocialAnalyticsDashboardContentProps {
     userModuleUuid: string
@@ -17,20 +17,20 @@ export default function SocialAnalyticsDashboardContent({
     userModuleUuid,
     integrations,
 }: SocialAnalyticsDashboardContentProps) {
-    const { insightType, setInsightType } = useSocialAnalyticsFilterStore()
+    const { integrationInsightType, setIntegrationInsightType } = useSocialAnalyticsFilterStore()
 
     return (
         <div className="p-5 w-2/3 h-[50vh] flex flex-col gap-3">
             <div className="flex flex-row gap-3 items-center shrink-0">
                 <SelectDropdown<SocialAnalyticsIntegrationInsightType>
-                    items={insightTypeOptions}
-                    selectedItemId={insightType}
+                    items={socialAnalyticsIntegrationInsightTypeOptions}
+                    selectedItemId={integrationInsightType}
                     getItemId={(item) => item}
-                    onSelect={(item) => setInsightType(item)}
+                    onSelect={(item) => setIntegrationInsightType(item)}
                     renderTrigger={({ onClick }) => (
                         <FilterTile
                             icon={ChartBarSquareIcon}
-                            label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[insightType]}
+                            label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[integrationInsightType]}
                             rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
                             onClick={onClick}
                         />
@@ -47,16 +47,16 @@ export default function SocialAnalyticsDashboardContent({
 
             <div className="flex flex-row justify-between gap-3">
                 {integrations.map((integration) => (
-                    <IntegrationTile
+                    <IntegrationCard
                         key={integration.uuid}
                         integration={integration}
-                        insightType={insightType}
+                        insightType={integrationInsightType}
                     />
                 ))}
 
                 {integrationProviderTypeOptions.map((integrationProviderType) => {
                     if (integrations.find((integration) => integration.provider !== integrationProviderType)) {
-                        return <CreateIntegrationTile
+                        return <CreateIntegrationCard
                             key={integrationProviderType}
                             userModuleUuid={userModuleUuid}
                             provider={integrationProviderType}

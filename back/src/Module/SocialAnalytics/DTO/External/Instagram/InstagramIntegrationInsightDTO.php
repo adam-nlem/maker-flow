@@ -10,7 +10,7 @@ class InstagramIntegrationInsightDTO
     private const INSTAGRAM_METRIC_MAPPING = [
         'reach' => SocialAnalyticsIntegrationInsightType::Reach,
         'views' => SocialAnalyticsIntegrationInsightType::Views,
-        'follower_count' => SocialAnalyticsIntegrationInsightType::Followers,
+        'followers_count' => SocialAnalyticsIntegrationInsightType::Followers,
         'profile_links_taps' => SocialAnalyticsIntegrationInsightType::ProfileLinksTaps,
         'comments' => SocialAnalyticsIntegrationInsightType::Comments,
         'shares' => SocialAnalyticsIntegrationInsightType::Shares,

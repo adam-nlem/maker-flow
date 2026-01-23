@@ -1,21 +1,19 @@
 import type { Integration } from "~/models/Integration"
 import { useShowIntegrationProviderIcon } from "~/hooks/api/integrations/useShowIntegrationProviderIcon"
 import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
-import type { SocialAnalyticsTimePeriod } from "../models/enums/SocialAnalyticsTimePeriod"
-import { socialAnalyticsTimePeriodToFrenchTranslation } from "../models/enums/SocialAnalyticsTimePeriod"
 import { useListSocialAnalyticsIntegrationInsights } from "../hooks/api/socialAnalyticsIntegrationInsight/useListSocialAnalyticsIntegrationInsights"
 
-interface IntegrationTileProps {
+interface IntegrationCardProps {
     integration: Integration
     insightType: SocialAnalyticsIntegrationInsightType
     onClick?: () => void
 }
 
-export default function IntegrationTile({
+export default function IntegrationCard({
     integration,
     insightType,
     onClick,
-}: IntegrationTileProps) {
+}: IntegrationCardProps) {
     const { iconUrl } = useShowIntegrationProviderIcon(integration.provider)
     const { socialAnalyticsIntegrationInsights, isLoading, error } = useListSocialAnalyticsIntegrationInsights({ integrationUuid: integration.uuid })
 
@@ -42,7 +40,7 @@ export default function IntegrationTile({
                 {iconUrl && (
                     <img
                         src={iconUrl}
-                        alt={integration.displayName}
+                        alt={integration.provider}
                         className="ml-20 size-7 rounded-md object-cover"
                     />
                 )}

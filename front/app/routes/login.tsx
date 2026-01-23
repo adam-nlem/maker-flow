@@ -6,7 +6,7 @@ import { Input } from '~/components/ui/Input';
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useLogin } from "~/hooks/api/users/useLogin";
 
-export default function Login() {
+export default function LoginPage() {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     const navigate = useNavigate();

@@ -14,7 +14,7 @@ export default function ModuleTile({ isExpanded, userModule }: ModuleTileProps) 
     return <div
         key={userModule.uuid}
         className={`flex flex-row items-center gap-3 hover:bg-light-gray cursor-pointer rounded-lg p-2 ${isExpanded ? '' : 'justify-center'}`}
-        onClick={() => navigate(`/modules/${module.uuid}`)}
+        onClick={() => navigate(`/modules/${module.moduleIdentifier}`)}
     >
         <div className="w-6 h-6 rounded-md shrink-0">
             {iconUrl && <img src={iconUrl} alt={`${module.title} Icon`} />}

@@ -47,7 +47,20 @@ class SocialAnalyticsIntegrationInsightService
             ],
         ]);
 
+        // $followersCountResponse = $this->httpClient->request('GET', sprintf('%s/%s', $this->instagramGraphUrl, $integration->getAccountId()), [
+        //     'query' => [
+        //         'fields' => 'followers_count',
+        //         'access_token' => $integration->getAccessToken(),
+        //     ],
+        // ]);
+
         $insightDTOs = InstagramIntegrationInsightDTO::fromApiResponse($response->toArray());
+
+        // $insightDTOs[] = InstagramIntegrationInsightDTO::fromArray([
+        //     'name' => 'followers_count',
+        //     'period' => 'day',
+        //     'value' => $followersCountResponse->toArray()['followers_count'],
+        // ]);
 
         $this->createInsightEntities($integration, $insightDTOs);
 

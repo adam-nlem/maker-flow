@@ -4,12 +4,12 @@ import Shimmer from "~/components/ui/Shimmer";
 import { Button } from "~/components/ui/Button";
 import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
 
-interface CreateIntegrationTileProps {
+interface CreateIntegrationCardProps {
     userModuleUuid: string;
     provider: IntegrationProvider;
 }
 
-export default function CreateIntegrationTile({ userModuleUuid, provider }: CreateIntegrationTileProps) {
+export default function CreateIntegrationCard({ userModuleUuid, provider }: CreateIntegrationCardProps) {
     const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
         userModuleUuid,
         provider: provider,

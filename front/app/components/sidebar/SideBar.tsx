@@ -7,7 +7,8 @@ import { Button } from "../ui/Button";
 import { useEffect } from "react";
 import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
-import NavigationTile from "./NavigationTile";
+import IconWithTextTile from "../ui/IconWithTextTile";
+import { useLocation, useNavigate } from "react-router";
 import ModuleTile from "./ModuleTile";
 import Shimmer from "../ui/Shimmer";
 
@@ -22,6 +23,8 @@ import { useUpdateProject } from "~/hooks/api/projects/useUpdateProject";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
 
 export default function SideBar() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user } = useCurrentUser()
 
   const { projects, isLoading: isLoadingProjects } = useListPaginatedProjects()
@@ -112,8 +115,22 @@ export default function SideBar() {
 
           {/* NAVIGATION SECTION */}
           <div className={`mt-10 flex flex-col ${isExpanded ? '' : 'items-center'}`}>
-            <NavigationTile isExpanded={isExpanded} isBold={true} route="/" outlineIcon={HomeIcon} solidIcon={HomeIconSolid} label="Accueil" />
-            <NavigationTile isExpanded={isExpanded} isBold={true} route="/library" outlineIcon={PuzzlePieceIcon} solidIcon={PuzzlePieceIconSolid} label="Bibliothèque" />
+            <IconWithTextTile
+              icon={location.pathname === '/' ? HomeIconSolid : HomeIcon}
+              label="Accueil"
+              isExpanded={isExpanded}
+              isBold={true}
+              isSelected={location.pathname === '/'}
+              onClick={() => navigate('/')}
+            />
+            <IconWithTextTile
+              icon={location.pathname === '/library' ? PuzzlePieceIconSolid : PuzzlePieceIcon}
+              label="Bibliothèque"
+              isExpanded={isExpanded}
+              isBold={true}
+              isSelected={location.pathname === '/library'}
+              onClick={() => navigate('/library')}
+            />
           </div>
 
           <div className="mt-5 border-t border-light-gray rounded px-2 w-full"></div>
@@ -133,22 +150,22 @@ export default function SideBar() {
         <div className={isExpanded ? '' : 'flex flex-col items-center'}>
           {/* BOTTOM NAVIGATION */}
           <div className={`mb-5 flex flex-col p-3 ${isExpanded ? '' : 'items-center'}`}>
-            <NavigationTile
+            <IconWithTextTile
+              icon={location.pathname === '/settings' ? Cog6ToothIconSolid : Cog6ToothIcon}
+              label="Paramètres"
               isExpanded={isExpanded}
               isBold={false}
-              route="/settings"
-              outlineIcon={Cog6ToothIcon}
-              solidIcon={Cog6ToothIconSolid}
-              label="Paramètres" />
-
-            <NavigationTile
+              isSelected={location.pathname === '/settings'}
+              onClick={() => navigate('/settings')}
+            />
+            <IconWithTextTile
+              icon={location.pathname === '/help' ? LifebuoyIconSolid : LifebuoyIcon}
+              label="Aide"
               isExpanded={isExpanded}
               isBold={false}
-              route="/help"
-              outlineIcon={LifebuoyIcon}
-              solidIcon={LifebuoyIconSolid}
-              label="Aide" />
-
+              isSelected={location.pathname === '/help'}
+              onClick={() => navigate('/help')}
+            />
           </div>
 
           <div className="border-t border-light-gray rounded w-full"></div>
