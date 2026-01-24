@@ -4,9 +4,9 @@ import SelectDropdown from "~/components/ui/SelectDropdown"
 import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterStore"
 import { socialAnalyticsIntegrationInsightTypeOptions, SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
 import FilterTile from "./FilterTile"
-import IntegrationCard from "./IntegrationCard"
+import SocialAnalyticsIntegrationCard from "./integrations/SocialAnalyticsIntegrationCard"
 import { integrationProviderTypeOptions } from "~/models/enums/IntegrationProvider"
-import CreateIntegrationCard from "./CreateIntegrationCard"
+import CreateSocialAnalyticsIntegrationCard from "./integrations/CreateSocialAnalyticsIntegrationCard"
 
 interface SocialAnalyticsDashboardContentProps {
     userModuleUuid: string
@@ -47,7 +47,7 @@ export default function SocialAnalyticsDashboardContent({
 
             <div className="flex flex-row justify-between gap-3">
                 {integrations.map((integration) => (
-                    <IntegrationCard
+                    <SocialAnalyticsIntegrationCard
                         key={integration.uuid}
                         integration={integration}
                         insightType={integrationInsightType}
@@ -56,7 +56,7 @@ export default function SocialAnalyticsDashboardContent({
 
                 {integrationProviderTypeOptions.map((integrationProviderType) => {
                     if (integrations.find((integration) => integration.provider !== integrationProviderType)) {
-                        return <CreateIntegrationCard
+                        return <CreateSocialAnalyticsIntegrationCard
                             key={integrationProviderType}
                             userModuleUuid={userModuleUuid}
                             provider={integrationProviderType}

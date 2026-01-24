@@ -6,7 +6,7 @@ import { useListIntegrations } from "~/hooks/api/integrations/useListIntegration
 import { IntegrationProvider, integrationProviderTypeOptions } from "~/models/enums/IntegrationProvider";
 import SocialAnalyticsDashboardContent from "./SocialAnalyticsDashboardContent";
 import Shimmer from "~/components/ui/Shimmer";
-import CreateIntegrationCard from "./CreateIntegrationCard";
+import CreateSocialAnalyticsIntegrationCard from "./integrations/CreateSocialAnalyticsIntegrationCard";
 
 
 export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleWidgetProps) {
@@ -45,7 +45,7 @@ export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleW
 
             <div className="flex flex-row justify-between gap-3">
                 {integrationProviderTypeOptions.map((integrationProviderType) => (
-                    <CreateIntegrationCard
+                    <CreateSocialAnalyticsIntegrationCard
                         key={integrationProviderType}
                         userModuleUuid={userModuleUuid}
                         provider={integrationProviderType}

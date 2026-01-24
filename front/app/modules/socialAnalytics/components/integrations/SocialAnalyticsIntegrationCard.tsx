@@ -1,19 +1,19 @@
 import type { Integration } from "~/models/Integration"
 import { useShowIntegrationProviderIcon } from "~/hooks/api/integrations/useShowIntegrationProviderIcon"
-import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
-import { useListSocialAnalyticsIntegrationInsights } from "../hooks/api/socialAnalyticsIntegrationInsight/useListSocialAnalyticsIntegrationInsights"
+import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../../models/enums/SocialAnalyticsIntegrationInsightType"
+import { useListSocialAnalyticsIntegrationInsights } from "../../hooks/api/socialAnalyticsIntegrationInsight/useListSocialAnalyticsIntegrationInsights"
 
-interface IntegrationCardProps {
+interface SocialAnalyticsIntegrationCardProps {
     integration: Integration
     insightType: SocialAnalyticsIntegrationInsightType
     onClick?: () => void
 }
 
-export default function IntegrationCard({
+export default function SocialAnalyticsIntegrationCard({
     integration,
     insightType,
     onClick,
-}: IntegrationCardProps) {
+}: SocialAnalyticsIntegrationCardProps) {
     const { iconUrl } = useShowIntegrationProviderIcon(integration.provider)
     const { socialAnalyticsIntegrationInsights, isLoading, error } = useListSocialAnalyticsIntegrationInsights({ integrationUuid: integration.uuid })
 
