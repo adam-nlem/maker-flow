@@ -5,6 +5,7 @@ namespace App\Module\SocialAnalytics\Controller;
 use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\QueryParam\ListSocialAnalyticsIntegrationInsightQueryParamDTO;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
+use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,6 +19,7 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
         ListSocialAnalyticsIntegrationInsightQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
         SocialAnalyticsIntegrationInsightRepository $insightRepository,
+        SocialAnalyticsIntegrationInsightService $insightService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();

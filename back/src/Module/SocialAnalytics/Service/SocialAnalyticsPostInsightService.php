@@ -39,7 +39,7 @@ class SocialAnalyticsPostInsightService
         $integration = $this->instagramOAuthService->refreshTokenIfNeeded($integration);
 
         $url = sprintf('%s/%s/media', $this->instagramGraphUrl, $integration->getAccountId());
-        
+
         $metrics = implode(',', InstagramPostInsightDTO::getMetricNames());
 
         $queryParams =  [
@@ -53,7 +53,7 @@ class SocialAnalyticsPostInsightService
             $data = $response->toArray();
 
             foreach ($data['data'] as $postData) {
-                $this->processPostData(integration: $integration, postData: $postData);
+                $this->processPostData($integration, $postData);
             }
 
             $url = $data['paging']['next'] ?? null;

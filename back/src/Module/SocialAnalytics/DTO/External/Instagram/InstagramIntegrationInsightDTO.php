@@ -10,7 +10,8 @@ class InstagramIntegrationInsightDTO
     private const INSTAGRAM_METRIC_MAPPING = [
         'reach' => SocialAnalyticsIntegrationInsightType::Reach,
         'views' => SocialAnalyticsIntegrationInsightType::Views,
-        'followers_count' => SocialAnalyticsIntegrationInsightType::Followers,
+        'follower_count' => SocialAnalyticsIntegrationInsightType::Followers,
+        'followers_count' => SocialAnalyticsIntegrationInsightType::TotalFollowers,
         'profile_links_taps' => SocialAnalyticsIntegrationInsightType::ProfileLinksTaps,
         'comments' => SocialAnalyticsIntegrationInsightType::Comments,
         'shares' => SocialAnalyticsIntegrationInsightType::Shares,
@@ -39,19 +40,6 @@ class InstagramIntegrationInsightDTO
         );
     }
 
-    public static function fromApiResponse(array $response): array
-    {
-        $insights = [];
-
-        if (isset($response['data']) && is_array($response['data'])) {
-            foreach ($response['data'] as $insightData) {
-                $insights[] = self::fromArray($insightData);
-            }
-        }
-
-        return $insights;
-    }
-
     public function getName(): string
     {
         return $this->name;
@@ -67,9 +55,15 @@ class InstagramIntegrationInsightDTO
         return $this->value;
     }
 
-    public static function getMetricNames(): array
+    public static function getMetricNames(array $except = []): array
     {
-        return array_keys(self::INSTAGRAM_METRIC_MAPPING);
+        $metricNames = array_keys(self::INSTAGRAM_METRIC_MAPPING);
+
+        if (empty($except)) {
+            return $metricNames;
+        }
+
+        return array_values(array_diff($metricNames, $except));
     }
 
     public static function getMetricMapping(): array

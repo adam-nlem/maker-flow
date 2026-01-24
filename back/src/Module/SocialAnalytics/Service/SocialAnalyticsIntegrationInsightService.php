@@ -36,7 +36,7 @@ class SocialAnalyticsIntegrationInsightService
 
         $integration = $this->instagramOAuthService->refreshTokenIfNeeded($integration);
 
-        $metrics = implode(',', InstagramIntegrationInsightDTO::getMetricNames());
+        $metrics = implode(',', InstagramIntegrationInsightDTO::getMetricNames(except: ['followers_count']));
 
         $response = $this->httpClient->request('GET', sprintf('%s/%s/insights', $this->instagramGraphUrl, $integration->getAccountId()), [
             'query' => [
@@ -47,20 +47,21 @@ class SocialAnalyticsIntegrationInsightService
             ],
         ]);
 
-        // $followersCountResponse = $this->httpClient->request('GET', sprintf('%s/%s', $this->instagramGraphUrl, $integration->getAccountId()), [
-        //     'query' => [
-        //         'fields' => 'followers_count',
-        //         'access_token' => $integration->getAccessToken(),
-        //     ],
-        // ]);
+        $followersCountResponse = $this->httpClient->request('GET', sprintf('%s/%s', $this->instagramGraphUrl, $integration->getAccountId()), [
+            'query' => [
+                'fields' => 'followers_count',
+                'access_token' => $integration->getAccessToken(),
+            ],
+        ]);
 
-        $insightDTOs = InstagramIntegrationInsightDTO::fromApiResponse($response->toArray());
+        $data = $response->toArray();
+        $insightDTOs = [];
 
-        // $insightDTOs[] = InstagramIntegrationInsightDTO::fromArray([
-        //     'name' => 'followers_count',
-        //     'period' => 'day',
-        //     'value' => $followersCountResponse->toArray()['followers_count'],
-        // ]);
+        foreach ($data['data'] as $integrationData) {
+            $insightDTOs[] = InstagramIntegrationInsightDTO::fromArray($integrationData);
+        }
+
+        $insightDTOs[] = (new InstagramIntegrationInsightDTO('followers_count', 'day', $followersCountResponse->toArray()['followers_count']));
 
         $this->createInsightEntities($integration, $insightDTOs);
 
