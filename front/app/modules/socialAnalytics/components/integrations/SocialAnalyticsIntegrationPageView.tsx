@@ -1,20 +1,23 @@
 import type { Integration } from "~/models/Integration";
-import { useListSocialAnalyticsIntegrationInsights } from "../../hooks/api/socialAnalyticsIntegrationInsight/useListSocialAnalyticsIntegrationInsights";
+import { useShowSocialAnalyticsIntegrationOverview } from "../../hooks/api/socialAnalyticsIntegrationInsight/useShowSocialAnalyticsIntegrationOverview";
 import SocialAnalyticsInsightTile from "../SocialAnalyticsInsightTile";
 import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../../models/enums/SocialAnalyticsIntegrationInsightType";
-import { ArrowTrendingUpIcon, DocumentCheckIcon, UserIcon } from "@heroicons/react/24/solid";
+import { ArrowTrendingUpIcon, DocumentTextIcon, FireIcon, UserIcon } from "@heroicons/react/24/solid";
+import { useSocialAnalyticsFilterStore } from "../../stores/socialAnalyticsFilterStore";
 
 interface SocialAnalyticsIntegrationPageViewProps {
     integration: Integration
 }
 
 export default function SocialAnalyticsIntegrationPageView({ integration }: SocialAnalyticsIntegrationPageViewProps) {
+    const timePeriod = useSocialAnalyticsFilterStore((state) => state.timePeriod);
 
-    const { socialAnalyticsIntegrationInsights, isLoading, error } = useListSocialAnalyticsIntegrationInsights({ integrationUuid: integration.uuid })
+    const { overview, isLoading } = useShowSocialAnalyticsIntegrationOverview({
+        integrationUuid: integration.uuid,
+        timePeriod,
+    });
 
-    console.log(socialAnalyticsIntegrationInsights)
-
-    if (isLoading) {
+    if (isLoading || !overview) {
         return null;
     }
 
@@ -36,26 +39,27 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
 
         <div className="flex flex-row gap-3">
             <SocialAnalyticsInsightTile
-                insight={socialAnalyticsIntegrationInsights.find((insight) => insight.type === SocialAnalyticsIntegrationInsightType.TotalFollowers)!}
+                label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[SocialAnalyticsIntegrationInsightType.TotalFollowers]}
+                value={overview.totalFollowers}
                 Icon={UserIcon}
-                getLabel={(type) => socialAnalyticsIntegrationInsightTypeToFrenchTranslation[type]}
             />
             <SocialAnalyticsInsightTile
-                insight={socialAnalyticsIntegrationInsights.find((insight) => insight.type === SocialAnalyticsIntegrationInsightType.TotalFollowers)!}
-                Icon={DocumentCheckIcon}
-                getLabel={(type) => socialAnalyticsIntegrationInsightTypeToFrenchTranslation[type]}
+                label="Contenus"
+                value={overview.postCount}
+                Icon={DocumentTextIcon}
             />
             <SocialAnalyticsInsightTile
-                insight={socialAnalyticsIntegrationInsights.find((insight) => insight.type === SocialAnalyticsIntegrationInsightType.TotalFollowers)!}
+                label="Momentum"
+                value={overview.streak}
                 Icon={ArrowTrendingUpIcon}
-                getLabel={(type) => socialAnalyticsIntegrationInsightTypeToFrenchTranslation[type]}
+
             />
-            
+
         </div>
-        {socialAnalyticsIntegrationInsights.map((integrationInsight) => <SocialAnalyticsInsightTile
+        {/* {socialAnalyticsIntegrationInsights.map((integrationInsight) => <SocialAnalyticsInsightTile
             insight={integrationInsight}
             Icon={UserIcon}
             getLabel={(type) => socialAnalyticsIntegrationInsightTypeToFrenchTranslation[type]}
-        />)}
+        />)} */}
     </div>)
 }

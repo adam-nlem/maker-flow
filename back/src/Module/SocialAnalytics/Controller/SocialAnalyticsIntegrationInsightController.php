@@ -4,8 +4,10 @@ namespace App\Module\SocialAnalytics\Controller;
 
 use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\QueryParam\ListSocialAnalyticsIntegrationInsightQueryParamDTO;
+use App\Module\SocialAnalytics\DTO\QueryParam\ShowSocialAnalyticsIntegrationOverviewQueryParamDTO;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
+use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationOverviewService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -39,6 +41,37 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
             data: $insights,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_modules_social_analytics_integration_insights_list']],
+        );
+    }
+
+    #[Route('/overview', name: 'api_modules_social_analytics_integration_insights_overview', methods: ['GET'])]
+    public function overview(
+        ShowSocialAnalyticsIntegrationOverviewQueryParamDTO $queryParamDto,
+        IntegrationRepository $integrationRepository,
+        SocialAnalyticsIntegrationOverviewService $overviewService,
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
+
+        if ($integration === null) {
+            return $this->json(
+                data: ["message" => "You don't have any integration with this uuid"],
+                status: Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $overview = $overviewService->getOverview(
+            user: $user,
+            integration: $integration,
+            timePeriod: $queryParamDto->getTimePeriod(),
+        );
+
+        return $this->json(
+            data: $overview->getData(),
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_modules_social_analytics_integration_insights_overview']],
         );
     }
 }
