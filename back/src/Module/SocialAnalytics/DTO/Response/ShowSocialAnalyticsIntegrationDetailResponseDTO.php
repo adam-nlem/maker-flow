@@ -6,18 +6,18 @@ use App\DTO\Response\ResponseDTOInterface;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-class ShowSocialAnalyticsIntegrationOverviewResponseDTO implements ResponseDTOInterface
+class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
-        #[Groups(['api_modules_social_analytics_integration_insights_overview'])]
+        #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly int $totalFollowers,
-        #[Groups(['api_modules_social_analytics_integration_insights_overview'])]
+        #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly int $postCount,
-        #[Groups(['api_modules_social_analytics_integration_insights_overview'])]
+        #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly int $streak,
         // TODO: have two types of insights (the main ones with evolution in % and the data points per day)
         /** @var SocialAnalyticsIntegrationInsight[] */
-        #[Groups(['api_modules_social_analytics_integration_insights_overview'])]
+        #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly array $insights,
     ) {}
 

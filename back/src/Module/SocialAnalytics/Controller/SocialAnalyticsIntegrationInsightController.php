@@ -4,10 +4,10 @@ namespace App\Module\SocialAnalytics\Controller;
 
 use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\QueryParam\ListSocialAnalyticsIntegrationInsightQueryParamDTO;
-use App\Module\SocialAnalytics\DTO\QueryParam\ShowSocialAnalyticsIntegrationOverviewQueryParamDTO;
+use App\Module\SocialAnalytics\DTO\QueryParam\ShowSocialAnalyticsIntegrationDetailQueryParamDTO;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
-use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationOverviewService;
+use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationDetailService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,7 +21,6 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
         ListSocialAnalyticsIntegrationInsightQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
         SocialAnalyticsIntegrationInsightRepository $insightRepository,
-        SocialAnalyticsIntegrationInsightService $insightService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -44,11 +43,11 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
         );
     }
 
-    #[Route('/overview', name: 'api_modules_social_analytics_integration_insights_overview', methods: ['GET'])]
-    public function overview(
-        ShowSocialAnalyticsIntegrationOverviewQueryParamDTO $queryParamDto,
+    #[Route('/detail', name: 'api_modules_social_analytics_integration_insights_detail', methods: ['GET'])]
+    public function detail(
+        ShowSocialAnalyticsIntegrationDetailQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
-        SocialAnalyticsIntegrationOverviewService $overviewService,
+        SocialAnalyticsIntegrationDetailService $detailService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -62,16 +61,16 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
             );
         }
 
-        $overview = $overviewService->getOverview(
+        $detail = $detailService->getDetail(
             user: $user,
             integration: $integration,
             timePeriod: $queryParamDto->getTimePeriod(),
         );
 
         return $this->json(
-            data: $overview->getData(),
+            data: $detail->getData(),
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_modules_social_analytics_integration_insights_overview']],
+            context: ['groups' => ['api_modules_social_analytics_integration_insights_detail']],
         );
     }
 }

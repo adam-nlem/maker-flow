@@ -4,31 +4,31 @@ namespace App\Module\SocialAnalytics\Service;
 
 use App\Entity\Integration;
 use App\Entity\User;
-use App\Module\SocialAnalytics\DTO\Response\ShowSocialAnalyticsIntegrationOverviewResponseDTO;
+use App\Module\SocialAnalytics\DTO\Response\ShowSocialAnalyticsIntegrationDetailResponseDTO;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 
-class SocialAnalyticsIntegrationOverviewService
+class SocialAnalyticsIntegrationDetailService
 {
     public function __construct(
         private readonly SocialAnalyticsIntegrationInsightRepository $insightRepository,
         private readonly SocialAnalyticsPostRepository $postRepository,
     ) {}
 
-    public function getOverview(
+    public function getDetail(
         User $user,
         Integration $integration,
         SocialAnalyticsTimePeriod $timePeriod,
-    ): ShowSocialAnalyticsIntegrationOverviewResponseDTO {
+    ): ShowSocialAnalyticsIntegrationDetailResponseDTO {
         $insights = $this->insightRepository->getLatestByUserAndByIntegration($user, $integration);
 
         $totalFollowers = $this->extractTotalFollowers($insights);
         $postCount = $this->postRepository->countByIntegration($integration);
         $streak = $this->postRepository->calculateStreak($integration);
 
-        return new ShowSocialAnalyticsIntegrationOverviewResponseDTO(
+        return new ShowSocialAnalyticsIntegrationDetailResponseDTO(
             totalFollowers: $totalFollowers,
             postCount: $postCount,
             streak: $streak,

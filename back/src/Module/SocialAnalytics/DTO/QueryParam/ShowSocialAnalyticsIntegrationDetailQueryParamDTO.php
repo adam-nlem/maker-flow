@@ -8,7 +8,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ShowSocialAnalyticsIntegrationOverviewQueryParamDTO extends AbstractQueryParamDTO
+class ShowSocialAnalyticsIntegrationDetailQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
     private string $integrationUuid;
