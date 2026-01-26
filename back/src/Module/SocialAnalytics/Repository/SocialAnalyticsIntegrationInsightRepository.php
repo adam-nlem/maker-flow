@@ -44,14 +44,16 @@ class SocialAnalyticsIntegrationInsightRepository extends ServiceEntityRepositor
     ): array {
 
         $subQuery = $this->createQueryBuilder('si')
-            ->select('MAX(si.id)')
+            ->select('MAX(si.createdAt)')
             ->where('si.user = :user')
             ->andWhere('si.integration = :integration')
-            ->groupBy('si.type')
+            ->andWhere('si.type = i.type')
             ->getDQL();
 
         return $this->createQueryBuilder('i')
-            ->where("i.id IN ($subQuery)")
+            ->where('i.user = :user')
+            ->andWhere('i.integration = :integration')
+            ->andWhere("i.createdAt = ($subQuery)")
             ->setParameter('user', $user)
             ->setParameter('integration', $integration)
             ->getQuery()
@@ -75,5 +77,35 @@ class SocialAnalyticsIntegrationInsightRepository extends ServiceEntityRepositor
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUserAndIntegrationAndTimePeriod(
+        User $user,
+        Integration $integration,
+        \DateTimeImmutable $startDate,
+        \DateTimeImmutable $endDate,
+    ): array {
+        $subQuery = $this->createQueryBuilder('si')
+            ->select('MAX(si.createdAt)')
+            ->where('si.user = :user')
+            ->andWhere('si.integration = :integration')
+            ->andWhere('si.createdAt >= :startDate')
+            ->andWhere('si.createdAt <= :endDate')
+            ->andWhere('si.type = i.type')
+            ->getDQL();
+
+        return $this->createQueryBuilder('i')
+            ->where('i.user = :user')
+            ->andWhere('i.integration = :integration')
+            ->andWhere('i.createdAt >= :startDate')
+            ->andWhere('i.createdAt <= :endDate')
+            ->andWhere("i.createdAt = ($subQuery)")
+            ->setParameter('user', $user)
+            ->setParameter('integration', $integration)
+            ->setParameter('startDate', $startDate)
+            ->setParameter('endDate', $endDate)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 }

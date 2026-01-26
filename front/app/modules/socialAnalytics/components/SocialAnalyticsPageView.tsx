@@ -1,4 +1,4 @@
-import { ChartBarSquareIcon, ChevronUpDownIcon, RectangleStackIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, ChartBarSquareIcon, ChevronUpDownIcon, RectangleStackIcon } from "@heroicons/react/24/outline";
 import IntegrationTile from "~/components/integrations/IntegrationTile";
 import IconWithTextTile from "~/components/ui/IconWithTextTile";
 import SelectDropdown from "~/components/ui/SelectDropdown";
@@ -12,12 +12,16 @@ import SocialAnalyticsInsightTile from "./SocialAnalyticsInsightTile";
 import { UserIcon } from "@heroicons/react/24/solid";
 import { socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType";
 import SocialAnalyticsIntegrationPageView from "./integrations/SocialAnalyticsIntegrationPageView";
+import { SocialAnalyticsTimePeriod, socialAnalyticsTimePeriodOptions, socialAnalyticsTimePeriodToFrenchTranslation } from "../models/enums/SocialAnalyticsTimePeriod";
 
 export default function SocialAnalyticsPageView({ userModuleUuid }: ModuleWidgetProps) {
     const { integrations, isLoading } = useListIntegrations({ userModuleUuid });
 
     const insightType = useSocialAnalyticsFilterStore((state) => state.insightType);
     const setInsightType = useSocialAnalyticsFilterStore((state) => state.setInsightType);
+
+    const timePeriod = useSocialAnalyticsFilterStore((state) => state.timePeriod);
+    const setTimePeriod = useSocialAnalyticsFilterStore((state) => state.setTimePeriod);
 
     const focusedIntegrationUuid = useSocialAnalyticsFilterStore((state) => state.focusedIntegrationUuid)
     const setFocusedIntegrationUuid = useSocialAnalyticsFilterStore((state) => state.setFocusedIntegrationUuid)
@@ -55,6 +59,28 @@ export default function SocialAnalyticsPageView({ userModuleUuid }: ModuleWidget
                     renderItem={({ item, isSelected, onSelect }) => (
                         <FilterTile
                             label={socialAnalyticsInsightTypeToFrenchTranslation[item]}
+                            isSelected={isSelected}
+                            onClick={onSelect}
+                        />
+                    )}
+                />
+
+                <SelectDropdown<SocialAnalyticsTimePeriod>
+                    items={socialAnalyticsTimePeriodOptions}
+                    selectedItemId={timePeriod}
+                    getItemId={(item) => item}
+                    onSelect={(item) => setTimePeriod(item)}
+                    renderTrigger={({ onClick }) => (
+                        <FilterTile
+                            icon={CalendarDaysIcon}
+                            label={socialAnalyticsTimePeriodToFrenchTranslation[timePeriod]}
+                            rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
+                            onClick={onClick}
+                        />
+                    )}
+                    renderItem={({ item, isSelected, onSelect }) => (
+                        <FilterTile
+                            label={socialAnalyticsTimePeriodToFrenchTranslation[item]}
                             isSelected={isSelected}
                             onClick={onSelect}
                         />

@@ -20,4 +20,14 @@ enum SocialAnalyticsTimePeriod: string
             self::LastYear => $now->modify('-1 year'),
         };
     }
+
+    public function getDaysCount(): int
+    {
+        return match ($this) {
+            self::Last7Days => 7,
+            self::Last30Days => 30,
+            self::Last90Days => 90,
+            self::LastYear => 365,
+        };
+    }
 }

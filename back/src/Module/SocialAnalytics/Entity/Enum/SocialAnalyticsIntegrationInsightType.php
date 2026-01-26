@@ -18,4 +18,15 @@ enum SocialAnalyticsIntegrationInsightType: string
     case Reach = 'reach';
     case Videos = 'videos';
 
+    // Followers Demographics
+    case FollowersAge = 'followers_age';
+    case FollowersCity = 'followers_city';
+    case FollowersCountry = 'followers_country';
+    case FollowersGender = ' followers_gender';
+
+    // Engaged Audience Demograhpics
+    case EngagedAudienceAge = 'engaged_audience_age';
+    case EngagedAudienceCity = 'engaged_audience_city';
+    case EngagedAudienceCountry = 'engaged_audience_country';
+    case EngagedAudienceGender = 'engaged_audience_gender';
 }

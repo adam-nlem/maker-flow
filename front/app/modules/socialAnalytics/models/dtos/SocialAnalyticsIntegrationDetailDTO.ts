@@ -1,10 +1,10 @@
-import { SocialAnalyticsIntegrationInsight, type SocialAnalyticsIntegrationInsightJSON } from "../SocialAnalyticsIntegrationInsight";
+import { SocialAnalyticsIntegrationInsightWithEvolutionDTO, type SocialAnalyticsIntegrationInsightWithEvolutionDTOJSON } from "./SocialAnalyticsIntegrationInsightWithEvolutionDTO";
 
 export interface SocialAnalyticsIntegrationDetailDTOJSON {
     totalFollowers: number;
     postCount: number;
     streak: number;
-    insights: SocialAnalyticsIntegrationInsightJSON[];
+    insights: SocialAnalyticsIntegrationInsightWithEvolutionDTOJSON[];
 }
 
 export class SocialAnalyticsIntegrationDetailDTO {
@@ -12,7 +12,7 @@ export class SocialAnalyticsIntegrationDetailDTO {
         public readonly totalFollowers: number,
         public readonly postCount: number,
         public readonly streak: number,
-        public readonly insights: SocialAnalyticsIntegrationInsight[],
+        public readonly insights: SocialAnalyticsIntegrationInsightWithEvolutionDTO[],
     ) {}
 
     static fromJSON(json: SocialAnalyticsIntegrationDetailDTOJSON): SocialAnalyticsIntegrationDetailDTO {
@@ -20,7 +20,7 @@ export class SocialAnalyticsIntegrationDetailDTO {
             json.totalFollowers,
             json.postCount,
             json.streak,
-            json.insights.map((insight) => SocialAnalyticsIntegrationInsight.fromJSON(insight)),
+            json.insights.map((insight) => SocialAnalyticsIntegrationInsightWithEvolutionDTO.fromJSON(insight)),
         );
     }
 }

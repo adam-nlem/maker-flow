@@ -6,8 +6,8 @@ use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\QueryParam\ListSocialAnalyticsIntegrationInsightQueryParamDTO;
 use App\Module\SocialAnalytics\DTO\QueryParam\ShowSocialAnalyticsIntegrationDetailQueryParamDTO;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
-use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationDetailService;
+use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -35,7 +35,6 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
         }
 
         $insights = $insightRepository->getLatestByUserAndByIntegration($user, $integration);
-
         return $this->json(
             data: $insights,
             status: Response::HTTP_OK,

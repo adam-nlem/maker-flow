@@ -6,7 +6,6 @@ use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType
 
 class InstagramIntegrationInsightDTO
 {
-
     private const INSTAGRAM_METRIC_MAPPING = [
         'reach' => SocialAnalyticsIntegrationInsightType::Reach,
         'views' => SocialAnalyticsIntegrationInsightType::Views,
@@ -17,13 +16,15 @@ class InstagramIntegrationInsightDTO
         'shares' => SocialAnalyticsIntegrationInsightType::Shares,
         'saves' => SocialAnalyticsIntegrationInsightType::Saves,
         'likes' => SocialAnalyticsIntegrationInsightType::Likes,
+        'follower_demographics' => SocialAnalyticsIntegrationInsightType::EngagedAudienceAge,
     ];
 
     public function __construct(
         private readonly string $name,
         private readonly string $period,
         private readonly int $value,
-    ) {}
+    ) {
+    }
 
     public static function fromArray(array $data): self
     {

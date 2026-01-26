@@ -11,3 +11,5 @@ export const socialAnalyticsTimePeriodToFrenchTranslation: Record<SocialAnalytic
     [SocialAnalyticsTimePeriod.Last90Days]: "Ces 3 derniers mois",
     [SocialAnalyticsTimePeriod.LastYear]: "Cette dernière année",
 };
+
+export const socialAnalyticsTimePeriodOptions = Object.values(SocialAnalyticsTimePeriod)

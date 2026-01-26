@@ -27,7 +27,7 @@ class ShowSocialAnalyticsIntegrationDetailQueryParamDTO extends AbstractQueryPar
     {
         $this->integrationUuid = $queryParams["integrationUuid"] ?? "";
         $this->timePeriod = SocialAnalyticsTimePeriod::tryFrom($queryParams["timePeriod"] ?? "") 
-            ?? SocialAnalyticsTimePeriod::Last30Days;
+            ?? SocialAnalyticsTimePeriod::Last7Days;
     }
 
     public function getIntegrationUuid(): string

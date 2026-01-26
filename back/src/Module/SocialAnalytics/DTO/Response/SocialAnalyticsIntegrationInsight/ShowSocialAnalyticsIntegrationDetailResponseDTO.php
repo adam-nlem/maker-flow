@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Module\SocialAnalytics\DTO\Response;
+namespace App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight;
 
 use App\DTO\Response\ResponseDTOInterface;
-use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInterface
@@ -15,8 +14,7 @@ class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInte
         private readonly int $postCount,
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly int $streak,
-        // TODO: have two types of insights (the main ones with evolution in % and the data points per day)
-        /** @var SocialAnalyticsIntegrationInsight[] */
+        /** @var SocialAnalyticsIntegrationInsightWithEvolutionDTO[] */
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly array $insights,
     ) {}

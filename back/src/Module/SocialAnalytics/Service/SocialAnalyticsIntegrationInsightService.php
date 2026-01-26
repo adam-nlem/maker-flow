@@ -38,6 +38,9 @@ class SocialAnalyticsIntegrationInsightService
 
         $metrics = implode(',', InstagramIntegrationInsightDTO::getMetricNames(except: ['followers_count']));
 
+
+        // We can't get all the history at once because most of the insights can't be returned as time series
+        // This means that the API will always return the total values in the selected since-until time frame
         $response = $this->httpClient->request('GET', sprintf('%s/%s/insights', $this->instagramGraphUrl, $integration->getAccountId()), [
             'query' => [
                 'metric' => $metrics,

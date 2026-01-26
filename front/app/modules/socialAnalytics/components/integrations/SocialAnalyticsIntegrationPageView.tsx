@@ -1,7 +1,7 @@
 import type { Integration } from "~/models/Integration";
 import SocialAnalyticsInsightTile from "../SocialAnalyticsInsightTile";
 import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../../models/enums/SocialAnalyticsIntegrationInsightType";
-import { ArrowTrendingUpIcon, DocumentTextIcon, FireIcon, UserIcon } from "@heroicons/react/24/solid";
+import { ArrowTrendingUpIcon, DocumentTextIcon, EyeIcon, UserIcon } from "@heroicons/react/24/solid";
 import { useSocialAnalyticsFilterStore } from "../../stores/socialAnalyticsFilterStore";
 import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialAnalyticsIntegrationInsight/useShowSocialAnalyticsIntegrationDetail";
 
@@ -20,7 +20,6 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
     if (isLoading || !detail) {
         return null;
     }
-
 
     return (
         <div className="mt-5">
@@ -53,14 +52,20 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     label="Momentum"
                     value={detail.streak}
                     Icon={ArrowTrendingUpIcon}
-
                 />
-
             </div>
-            {/* {socialAnalyticsIntegrationInsights.map((integrationInsight) => <SocialAnalyticsInsightTile
-            insight={integrationInsight}
-            Icon={UserIcon}
-            getLabel={(type) => socialAnalyticsIntegrationInsightTypeToFrenchTranslation[type]}
-        />)} */}
-        </div>)
+
+            <div className="flex flex-row flex-wrap gap-3 mt-3">
+                {detail.insights.map((insight) => (
+                    <SocialAnalyticsInsightTile
+                        key={insight.type}
+                        label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[insight.type]}
+                        value={insight.value}
+                        Icon={EyeIcon}
+                        evolutionPercentage={insight.evolutionPercentage}
+                    />
+                ))}
+            </div>
+        </div>
+    );
 }
