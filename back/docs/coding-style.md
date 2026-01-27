@@ -823,6 +823,102 @@ return $this->json(
 
 ---
 
+## Pagination
+
+### QueryParam DTO
+
+Paginated endpoints use a QueryParam DTO with `page` and `limit` parameters:
+
+```php
+<?php
+
+namespace App\DTO\QueryParam\Project;
+
+use App\DTO\QueryParam\AbstractQueryParamDTO;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+class ListProjectsQueryParamDTO extends AbstractQueryParamDTO
+{
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private int $page;
+
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private int $limit;
+
+    public function __construct(
+        protected RequestStack $requestStack,
+        protected ValidatorInterface $validator,
+    ) {
+        parent::__construct($requestStack, $validator);
+    }
+
+    protected function fromQueryParams(array $queryParams): void
+    {
+        $this->page = $queryParams["page"];
+        $this->limit = $queryParams["limit"];
+    }
+
+    public function getPage(): int
+    {
+        return $this->page;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
+    }
+}
+```
+
+### Repository Method
+
+Repository methods for pagination follow this pattern:
+
+```php
+public function getByUserPaginated(User $user, int $page, int $limit): array
+{
+    return $this->createQueryBuilder('p')
+        ->where('p.user = :user')
+        ->setParameter('user', $user)
+        ->setFirstResult(($page - 1) * $limit)
+        ->setMaxResults($limit)
+        ->orderBy('p.createdAt', 'DESC')
+        ->getQuery()
+        ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+        ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+}
+```
+
+### Conventions
+
+1. **Method naming**: `getBy{Criteria}Paginated`
+2. **Parameters**: Always `int $page, int $limit` as the last parameters
+3. **Offset calculation**: `($page - 1) * $limit`
+4. **Default ordering**: By `createdAt DESC` unless otherwise specified
+5. **Return type**: `array` (not paginator object)
+6. **No metadata**: Response contains only the array of items (no total count, page info, etc.)
+
+### Controller Usage
+
+```php
+#[Route('', name: 'api_projects_list', methods: ['GET'])]
+public function list(ListProjectsQueryParamDTO $queryParamDto, ProjectRepository $projectRepository): JsonResponse
+{
+    /** @var User $user */
+    $user = $this->getUser();
+
+    $projects = $projectRepository->getByUserPaginated($user, $queryParamDto->getPage(), $queryParamDto->getLimit());
+
+    return $this->json(data: $projects, status: Response::HTTP_OK, context: ['groups' => ['api_projects_get_paginated']]);
+}
+```
+
+---
+
 ## Best Practices
 
 1. **Always validate user ownership** before operations

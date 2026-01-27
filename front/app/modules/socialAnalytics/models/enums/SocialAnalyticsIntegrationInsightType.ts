@@ -1,4 +1,7 @@
-export enum  SocialAnalyticsIntegrationInsightType {
+import { BookmarkIcon, ChatBubbleLeftIcon, EyeIcon, FilmIcon, HandThumbDownIcon, HandThumbUpIcon, LinkIcon, ShareIcon, SparklesIcon, UserPlusIcon, UsersIcon } from "@heroicons/react/24/solid";
+import type { ComponentType, SVGProps } from "react";
+
+export enum SocialAnalyticsIntegrationInsightType {
     Views = 'views',
     Likes = 'likes',
     Saves = 'saves',
@@ -12,6 +15,21 @@ export enum  SocialAnalyticsIntegrationInsightType {
     Reach = 'reach',
     Videos = 'videos',
 }
+
+export const socialAnalyticsIntegrationInsightTypeToIcon: Record<SocialAnalyticsIntegrationInsightType, ComponentType<SVGProps<SVGSVGElement>>> = {
+    [SocialAnalyticsIntegrationInsightType.Views]: EyeIcon,
+    [SocialAnalyticsIntegrationInsightType.Likes]: HandThumbUpIcon,
+    [SocialAnalyticsIntegrationInsightType.Saves]: BookmarkIcon,
+    [SocialAnalyticsIntegrationInsightType.Comments]: ChatBubbleLeftIcon,
+    [SocialAnalyticsIntegrationInsightType.Shares]: ShareIcon,
+    [SocialAnalyticsIntegrationInsightType.Followers]: UserPlusIcon,
+    [SocialAnalyticsIntegrationInsightType.TotalFollowers]: UsersIcon,
+    [SocialAnalyticsIntegrationInsightType.Impressions]: SparklesIcon,
+    [SocialAnalyticsIntegrationInsightType.Dislikes]: HandThumbDownIcon,
+    [SocialAnalyticsIntegrationInsightType.ProfileLinksTaps]: LinkIcon,
+    [SocialAnalyticsIntegrationInsightType.Reach]: UsersIcon,
+    [SocialAnalyticsIntegrationInsightType.Videos]: FilmIcon,
+};
 
 export const socialAnalyticsIntegrationInsightTypeToFrenchTranslation: Record<SocialAnalyticsIntegrationInsightType, string> = {
     [SocialAnalyticsIntegrationInsightType.Views]: "Vues",

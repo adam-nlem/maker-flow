@@ -3,11 +3,20 @@
 namespace App\Module\SocialAnalytics\Service;
 
 use App\Entity\Integration;
+use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramPostDTO;
+use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost\SocialAnalyticsPostInsightWithEvolutionDTO;
+use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost\SocialAnalyticsPostWithInsightsDTO;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
+use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostInsight;
+use App\Module\SocialAnalytics\Helper\InsightEvolutionHelper;
+use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SocialAnalyticsPostService
@@ -16,6 +25,7 @@ class SocialAnalyticsPostService
 
     public function __construct(
         private readonly SocialAnalyticsPostRepository $repository,
+        private readonly SocialAnalyticsPostInsightRepository $insightRepository,
         private readonly HttpClientInterface $httpClient,
         private readonly Filesystem $filesystem,
         private readonly ParameterBagInterface $parameterBag,
@@ -87,5 +97,161 @@ class SocialAnalyticsPostService
         $extension = pathinfo($path, PATHINFO_EXTENSION);
 
         return $extension ?: 'jpg';
+    }
+
+    //TODO: Add a placeholder
+    public function getPostThumbnail(SocialAnalyticsPost $post): ?\Symfony\Component\HttpFoundation\File\File
+    {
+        $provider = strtolower($post->getIntegration()->getProvider()->value);
+        $thumbnailDirectory = $this->getThumbnailDirectory($provider);
+
+        $possibleExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+        foreach ($possibleExtensions as $extension) {
+            $filePath = sprintf('%s/%s.%s', $thumbnailDirectory, $post->getUuid(), $extension);
+            if (file_exists($filePath)) {
+                return new File($filePath, false);
+            }
+        }
+
+        return null;
+    }
+
+    private const EXCLUDED_INSIGHT_TYPES = [
+        SocialAnalyticsPostInsightType::Reach,
+        SocialAnalyticsPostInsightType::TotalInteractions,
+    ];
+
+    /**
+     * @return SocialAnalyticsPostWithInsightsDTO[]
+     */
+    public function getPostsWithInsights(
+        User $user,
+        Integration $integration,
+        int $page,
+        int $limit,
+        SocialAnalyticsTimePeriod $timePeriod,
+    ): array {
+        $posts = $this->repository->getByUserAndIntegrationPaginated($user, $integration, $page, $limit);
+
+        if (empty($posts)) {
+            return [];
+        }
+
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+
+        $result = [];
+        foreach ($posts as $post) {
+            $postAgeInHours = $this->calculatePostAgeInHours($post, $now);
+            $insightsCreatedBefore = $post->getPublishedAt()->modify("+{$postAgeInHours} hours");
+            
+            $currentInsights = $this->getLatestInsightsByType(
+                $this->insightRepository->getByPostAndCreatedBeforeDate(
+                    $post,
+                    $insightsCreatedBefore,
+                    self::EXCLUDED_INSIGHT_TYPES,
+                )
+            );
+            
+            $previousPost = $this->repository->getSingleByIntegrationAndPublishedBeforeDate(
+                $post->getIntegration(),
+                $post->getPublishedAt(),
+            );
+            $previousInsights = [];
+            
+            if ($previousPost !== null) {
+                $previousInsightsCreatedBefore = $previousPost->getPublishedAt()->modify("+{$postAgeInHours} hours");
+                $previousInsights = $this->getLatestInsightsByType(
+                    $this->insightRepository->getByPostAndCreatedBeforeDate(
+                        $previousPost,
+                        $previousInsightsCreatedBefore,
+                        self::EXCLUDED_INSIGHT_TYPES,
+                    )
+                );
+            }
+
+            $insightsWithEvolution = $this->buildPostInsightsWithEvolution($currentInsights, $previousInsights);
+
+            $result[] = new SocialAnalyticsPostWithInsightsDTO(
+                uuid: $post->getUuid(),
+                externalId: $post->getExternalId(),
+                mediaType: $post->getMediaType(),
+                publishedAt: $post->getPublishedAt(),
+                caption: $post->getCaption(),
+                insights: $insightsWithEvolution,
+            );
+        }
+
+        return $result;
+    }
+
+    private function calculatePostAgeInHours(SocialAnalyticsPost $post, \DateTimeImmutable $now): int
+    {
+        $publishedAt = $post->getPublishedAt();
+        $interval = $publishedAt->diff($now);
+        
+        $hours = ($interval->days * 24) + $interval->h;
+        
+        return max(1, $hours);
+    }
+
+    /**
+     * @param SocialAnalyticsPostInsight[] $insights
+     * @return SocialAnalyticsPostInsight[]
+     */
+    private function getLatestInsightsByType(array $insights): array
+    {
+        $latestByType = [];
+        foreach ($insights as $insight) {
+            $typeValue = $insight->getType()->value;
+            if (!isset($latestByType[$typeValue])) {
+                $latestByType[$typeValue] = $insight;
+            }
+        }
+
+        return array_values($latestByType);
+    }
+
+    /**
+     * @param SocialAnalyticsPostInsight[] $currentInsights
+     * @param SocialAnalyticsPostInsight[] $previousInsights
+     * @return SocialAnalyticsPostInsightWithEvolutionDTO[]
+     */
+    private function buildPostInsightsWithEvolution(array $currentInsights, array $previousInsights): array
+    {
+        $previousByType = InsightEvolutionHelper::buildPreviousValuesByType($previousInsights);
+
+        $typeOrder = [
+            SocialAnalyticsPostInsightType::Views->value,
+            SocialAnalyticsPostInsightType::Likes->value,
+            SocialAnalyticsPostInsightType::Comments->value,
+            SocialAnalyticsPostInsightType::Shares->value,
+            SocialAnalyticsPostInsightType::Saved->value,
+            SocialAnalyticsPostInsightType::AverageWatchTime->value,
+            SocialAnalyticsPostInsightType::TotalWatchTime->value,
+        ];
+
+        usort($currentInsights, function ($a, $b) use ($typeOrder) {
+            $posA = array_search($a->getType()->value, $typeOrder);
+            $posB = array_search($b->getType()->value, $typeOrder);
+            return $posA - $posB;
+        });
+
+        $insightsWithEvolution = [];
+        foreach ($currentInsights as $insight) {
+            $type = $insight->getType();
+            $currentValue = $insight->getValue();
+            $previousValue = $previousByType[$type->value] ?? null;
+
+            $evolutionPercentage = InsightEvolutionHelper::calculateEvolutionPercentage($currentValue, $previousValue);
+
+            $insightsWithEvolution[] = new SocialAnalyticsPostInsightWithEvolutionDTO(
+                type: $type,
+                value: $currentValue,
+                evolutionPercentage: $evolutionPercentage,
+            );
+        }
+
+        return $insightsWithEvolution;
     }
 }

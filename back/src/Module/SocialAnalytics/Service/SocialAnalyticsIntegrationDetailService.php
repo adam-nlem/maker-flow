@@ -9,6 +9,7 @@ use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\So
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
+use App\Module\SocialAnalytics\Helper\InsightEvolutionHelper;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 
@@ -68,10 +69,7 @@ class SocialAnalyticsIntegrationDetailService
      */
     private function buildInsightsWithEvolution(array $currentInsights, array $previousInsights): array
     {
-        $previousByType = [];
-        foreach ($previousInsights as $insight) {
-            $previousByType[$insight->getType()->value] = $insight->getValue();
-        }
+        $previousByType = InsightEvolutionHelper::buildPreviousValuesByType($previousInsights);
 
         $insightsWithEvolution = [];
         foreach ($currentInsights as $insight) {
@@ -79,7 +77,7 @@ class SocialAnalyticsIntegrationDetailService
             $currentValue = $insight->getValue();
             $previousValue = $previousByType[$type->value] ?? null;
 
-            $evolutionPercentage = $this->calculateEvolutionPercentage($currentValue, $previousValue);
+            $evolutionPercentage = InsightEvolutionHelper::calculateEvolutionPercentage($currentValue, $previousValue);
 
             $insightsWithEvolution[] = new SocialAnalyticsIntegrationInsightWithEvolutionDTO(
                 type: $type,
@@ -89,15 +87,6 @@ class SocialAnalyticsIntegrationDetailService
         }
 
         return $insightsWithEvolution;
-    }
-
-    private function calculateEvolutionPercentage(int $currentValue, ?int $previousValue): ?float
-    {
-        if ($previousValue === null || $previousValue === 0) {
-            return null;
-        }
-
-        return round((($currentValue - $previousValue) / $previousValue) * 100, 1);
     }
 
     /**

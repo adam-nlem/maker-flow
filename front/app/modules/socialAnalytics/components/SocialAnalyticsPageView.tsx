@@ -7,10 +7,6 @@ import type { ModuleWidgetProps } from "~/modules/registry";
 import { socialAnalyticsInsightTypeOptions, socialAnalyticsInsightTypeToFrenchTranslation, type SocialAnalyticsInsightType } from "../models/enums/SocialAnalyticsInsightType";
 import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterStore";
 import FilterTile from "./FilterTile";
-import { useListSocialAnalyticsIntegrationInsights } from "../hooks/api/socialAnalyticsIntegrationInsight/useListSocialAnalyticsIntegrationInsights";
-import SocialAnalyticsInsightTile from "./SocialAnalyticsInsightTile";
-import { UserIcon } from "@heroicons/react/24/solid";
-import { socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType";
 import SocialAnalyticsIntegrationPageView from "./integrations/SocialAnalyticsIntegrationPageView";
 import { SocialAnalyticsTimePeriod, socialAnalyticsTimePeriodOptions, socialAnalyticsTimePeriodToFrenchTranslation } from "../models/enums/SocialAnalyticsTimePeriod";
 

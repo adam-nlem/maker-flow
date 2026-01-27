@@ -1,17 +1,18 @@
-import type { SocialAnalyticsIntegrationInsightType } from "../enums/SocialAnalyticsIntegrationInsightType";
+import type { SocialAnalyticsIntegrationInsightType } from "../../models/enums/SocialAnalyticsIntegrationInsightType";
+
 
 export interface SocialAnalyticsIntegrationInsightWithEvolutionDTOJSON {
     type: SocialAnalyticsIntegrationInsightType;
     value: number;
-    evolutionPercentage: number | null;
+    evolutionPercentage: string | null;
 }
 
 export class SocialAnalyticsIntegrationInsightWithEvolutionDTO {
     constructor(
         public readonly type: SocialAnalyticsIntegrationInsightType,
         public readonly value: number,
-        public readonly evolutionPercentage: number | null,
-    ) {}
+        public readonly evolutionPercentage: string | null,
+    ) { }
 
     static fromJSON(json: SocialAnalyticsIntegrationInsightWithEvolutionDTOJSON): SocialAnalyticsIntegrationInsightWithEvolutionDTO {
         return new SocialAnalyticsIntegrationInsightWithEvolutionDTO(

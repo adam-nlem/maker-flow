@@ -3,10 +3,11 @@
 namespace App\Module\SocialAnalytics\Repository;
 
 use App\Entity\Integration;
+use App\Entity\User;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
+use Doctrine\Persistence\ManagerRegistry;
 
 class SocialAnalyticsPostRepository extends ServiceEntityRepository
 {
@@ -52,7 +53,8 @@ class SocialAnalyticsPostRepository extends ServiceEntityRepository
             ->where('p.integration = :integration')
             ->setParameter('integration', $integration)
             ->getQuery()
-            ->getSingleScalarResult();
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getSingleScalarResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     public function calculateStreak(Integration $integration): int
@@ -99,5 +101,55 @@ class SocialAnalyticsPostRepository extends ServiceEntityRepository
         ])->fetchOne();
 
         return (int) ($result ?? 0);
+    }
+
+    /**
+     * @return SocialAnalyticsPost[]
+     */
+    public function getByUserAndIntegrationPaginated(
+        User $user,
+        Integration $integration,
+        int $page,
+        int $limit,
+    ): array {
+        return $this->createQueryBuilder('p')
+            ->where('p.user = :user')
+            ->andWhere('p.integration = :integration')
+            ->setParameter('user', $user)
+            ->setParameter('integration', $integration)
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->orderBy('p.publishedAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUuidAndUser(string $uuid, User $user): ?SocialAnalyticsPost
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.uuid = :uuid')
+            ->andWhere('p.user = :user')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getSingleByIntegrationAndPublishedBeforeDate(
+        Integration $integration,
+        \DateTimeImmutable $publishedBefore,
+    ): ?SocialAnalyticsPost {
+        return $this->createQueryBuilder('p')
+            ->where('p.integration = :integration')
+            ->andWhere('p.publishedAt < :publishedBefore')
+            ->setParameter('integration', $integration)
+            ->setParameter('publishedBefore', $publishedBefore)
+            ->orderBy('p.publishedAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 }

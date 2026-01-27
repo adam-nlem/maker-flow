@@ -3,11 +3,10 @@
 namespace App\Module\SocialAnalytics\Controller;
 
 use App\Entity\User;
-use App\Module\SocialAnalytics\DTO\QueryParam\ListSocialAnalyticsIntegrationInsightQueryParamDTO;
-use App\Module\SocialAnalytics\DTO\QueryParam\ShowSocialAnalyticsIntegrationDetailQueryParamDTO;
+use App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight\ListSocialAnalyticsIntegrationInsightsQueryParamDTO;
+use App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight\ShowSocialAnalyticsIntegrationDetailQueryParamDTO;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationDetailService;
-use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,7 +17,7 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
 {
     #[Route('', name: 'api_modules_social_analytics_integration_insights_list', methods: ['GET'])]
     public function list(
-        ListSocialAnalyticsIntegrationInsightQueryParamDTO $queryParamDto,
+        ListSocialAnalyticsIntegrationInsightsQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
         SocialAnalyticsIntegrationInsightRepository $insightRepository,
     ): Response {

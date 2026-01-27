@@ -1,7 +1,7 @@
 import type { Integration } from "~/models/Integration"
 import { useShowIntegrationProviderIcon } from "~/hooks/api/integrations/useShowIntegrationProviderIcon"
 import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../../models/enums/SocialAnalyticsIntegrationInsightType"
-import { useListSocialAnalyticsIntegrationInsights } from "../../hooks/api/socialAnalyticsIntegrationInsight/useListSocialAnalyticsIntegrationInsights"
+import { useListSocialAnalyticsIntegrationInsights } from "../../hooks/api/socialAnalyticsIntegrationInsights/useListSocialAnalyticsIntegrationInsights"
 
 interface SocialAnalyticsIntegrationCardProps {
     integration: Integration

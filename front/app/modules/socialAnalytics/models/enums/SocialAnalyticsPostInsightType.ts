@@ -1,7 +1,40 @@
+import { BookmarkIcon, ChatBubbleLeftIcon, ClockIcon, EyeIcon, HandThumbUpIcon, HeartIcon, ShareIcon, SparklesIcon, UsersIcon } from "@heroicons/react/24/solid";
+import type { ComponentType, SVGProps } from "react";
+
 export enum SocialAnalyticsPostInsightType {
-    // TODO: Define post insight types
+    Reach = 'reach',
+    TotalInteractions = 'total_interactions',
+    Saved = 'saved',
+    Shares = 'shares',
+    Views = 'views',
+    Likes = 'likes',
+    Comments = 'comments',
+    AverageWatchTime = 'average_watch_time',
+    TotalWatchTime = 'total_watch_time',
 }
 
-export const socialAnalyticsPostInsightTypeToFrenchTranslation: Record<SocialAnalyticsPostInsightType, string> = {
-    // TODO: Add translations
+export const socialAnalyticsPostInsightTypeToIcon: Record<SocialAnalyticsPostInsightType, ComponentType<SVGProps<SVGSVGElement>>> = {
+    [SocialAnalyticsPostInsightType.Reach]: UsersIcon,
+    [SocialAnalyticsPostInsightType.TotalInteractions]: SparklesIcon,
+    [SocialAnalyticsPostInsightType.Saved]: BookmarkIcon,
+    [SocialAnalyticsPostInsightType.Shares]: ShareIcon,
+    [SocialAnalyticsPostInsightType.Views]: EyeIcon,
+    [SocialAnalyticsPostInsightType.Likes]: HeartIcon,
+    [SocialAnalyticsPostInsightType.Comments]: ChatBubbleLeftIcon,
+    [SocialAnalyticsPostInsightType.AverageWatchTime]: ClockIcon,
+    [SocialAnalyticsPostInsightType.TotalWatchTime]: ClockIcon,
 };
+
+export const socialAnalyticsPostInsightTypeToFrenchTranslation: Record<SocialAnalyticsPostInsightType, string> = {
+    [SocialAnalyticsPostInsightType.Reach]: "Portée",
+    [SocialAnalyticsPostInsightType.TotalInteractions]: "Interactions totales",
+    [SocialAnalyticsPostInsightType.Saved]: "Enregistrements",
+    [SocialAnalyticsPostInsightType.Shares]: "Partages",
+    [SocialAnalyticsPostInsightType.Views]: "Vues",
+    [SocialAnalyticsPostInsightType.Likes]: "J'aime",
+    [SocialAnalyticsPostInsightType.Comments]: "Commentaires",
+    [SocialAnalyticsPostInsightType.AverageWatchTime]: "Temps de visionnage moyen",
+    [SocialAnalyticsPostInsightType.TotalWatchTime]: "Temps de visionnage total",
+};
+
+export const socialAnalyticsPostInsightTypeOptions = Object.values(SocialAnalyticsPostInsightType);

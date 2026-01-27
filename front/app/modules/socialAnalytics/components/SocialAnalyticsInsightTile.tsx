@@ -6,7 +6,7 @@ interface SocialAnalyticsInsightTileProps {
   label: string;
   value: number;
   Icon: HeroIcon;
-  evolutionPercentage?: number | null;
+  evolutionPercentage?: string | null;
 }
 
 export default function SocialAnalyticsInsightTile({
@@ -15,10 +15,7 @@ export default function SocialAnalyticsInsightTile({
   Icon,
   evolutionPercentage,
 }: SocialAnalyticsInsightTileProps) {
-  const formatEvolution = (percentage: number) => {
-    const sign = percentage >= 0 ? "+" : "";
-    return `${sign}${percentage}%`;
-  };
+  
 
   return (
     <div className="flex flex-row gap-3 border border-light-gray rounded-lg p-2 w-fit">
@@ -32,13 +29,14 @@ export default function SocialAnalyticsInsightTile({
         <Icon className="size-5 text-dark" strokeWidth={2} />
         {evolutionPercentage !== undefined && evolutionPercentage !== null && (
           <span
-            className={`text-sm font-medium ${evolutionPercentage >= 0 ? "text-green-500" : "text-red-500"
+            className={`text-sm font-medium ${evolutionPercentage.startsWith('+') ? "text-green-500" : "text-red-500"
               }`}
           >
-            {formatEvolution(evolutionPercentage)}
+            {evolutionPercentage}
           </span>
         )}
       </div>
     </div>
   );
 }
+ 

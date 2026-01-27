@@ -1,16 +1,17 @@
 <?php
 
-namespace App\Module\SocialAnalytics\DTO\QueryParam;
+namespace App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight;
 
 use App\DTO\QueryParam\AbstractQueryParamDTO;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ListSocialAnalyticsPostInsightQueryParamDTO extends AbstractQueryParamDTO
+class ListSocialAnalyticsIntegrationInsightsQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
-    private string $postUuid;
+    private string $integrationUuid;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -21,11 +22,11 @@ class ListSocialAnalyticsPostInsightQueryParamDTO extends AbstractQueryParamDTO
 
     protected function fromQueryParams(array $queryParams): void
     {
-        $this->postUuid = $queryParams["postUuid"] ?? "";
+        $this->integrationUuid = $queryParams["integrationUuid"] ?? "";
     }
 
-    public function getPostUuid(): string
+    public function getIntegrationUuid(): string
     {
-        return $this->postUuid;
+        return $this->integrationUuid;
     }
 }

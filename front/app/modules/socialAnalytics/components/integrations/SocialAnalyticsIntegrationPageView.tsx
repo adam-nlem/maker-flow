@@ -3,7 +3,9 @@ import SocialAnalyticsInsightTile from "../SocialAnalyticsInsightTile";
 import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../../models/enums/SocialAnalyticsIntegrationInsightType";
 import { ArrowTrendingUpIcon, DocumentTextIcon, EyeIcon, UserIcon } from "@heroicons/react/24/solid";
 import { useSocialAnalyticsFilterStore } from "../../stores/socialAnalyticsFilterStore";
-import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialAnalyticsIntegrationInsight/useShowSocialAnalyticsIntegrationDetail";
+import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialAnalyticsIntegrationInsights/useShowSocialAnalyticsIntegrationDetail";
+import { useListPaginatedSocialAnalyticsPosts } from "../../hooks/api/socialAnalyticsPosts/useListPaginatedSocialAnalyticsPosts";
+import SocialAnalyticsPostWithInsightsCard from "../posts/SocialAnalyticsPostWithInsightsCard";
 
 interface SocialAnalyticsIntegrationPageViewProps {
     integration: Integration
@@ -17,9 +19,19 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
         timePeriod,
     });
 
+    const { posts, isLoadingMore, hasMore, listMore } = useListPaginatedSocialAnalyticsPosts({
+        integrationUuid: integration.uuid,
+        timePeriod,
+        limit: 10,
+    });
+
+
+
     if (isLoading || !detail) {
         return null;
     }
+
+    console.log(posts)
 
     return (
         <div className="mt-5">
@@ -63,6 +75,15 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                         value={insight.value}
                         Icon={EyeIcon}
                         evolutionPercentage={insight.evolutionPercentage}
+                    />
+                ))}
+            </div>
+
+             <div className="flex flex-row gap-3 mt-3 w-full overflow-auto scrollbar-none">
+                {posts.map((post) => (
+                    <SocialAnalyticsPostWithInsightsCard
+                        key={post.uuid}
+                        postWithInsights={post}
                     />
                 ))}
             </div>
