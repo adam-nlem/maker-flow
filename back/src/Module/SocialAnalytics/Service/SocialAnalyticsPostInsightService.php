@@ -7,6 +7,7 @@ use App\Entity\Integration;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramPostDTO;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramPostInsightDTO;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostInsight;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
@@ -81,10 +82,18 @@ class SocialAnalyticsPostInsightService
         /** @var InstagramPostInsightDTO $postInsightDTO */
         foreach ($postInsightDTOs as $postInsightDTO) {
             if ($this->shouldCreateInsight(post: $post, postInsightDTO: $postInsightDTO)) {
+
+                // The value returned by Instagram is in milliseconds, so we need to convert it to seconds
+                if ($postInsightDTO->getType() === SocialAnalyticsPostInsightType::AverageWatchTime || $postInsightDTO->getType() === SocialAnalyticsPostInsightType::TotalWatchTime) {
+                    $value = ($postInsightDTO->getValue() / 1000);
+                } else {
+                    $value = $postInsightDTO->getValue();
+                }
+
                 $insight = new SocialAnalyticsPostInsight();
                 $insight
                     ->setType($postInsightDTO->getType())
-                    ->setValue($postInsightDTO->getValue())
+                    ->setValue($value)
                     ->setSocialAnalyticsPost($post)
                     ->setUser($post->getUser());
 

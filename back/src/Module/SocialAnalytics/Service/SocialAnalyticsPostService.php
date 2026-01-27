@@ -4,6 +4,7 @@ namespace App\Module\SocialAnalytics\Service;
 
 use App\Entity\Integration;
 use App\Entity\User;
+use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramPostDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost\SocialAnalyticsPostInsightWithEvolutionDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost\SocialAnalyticsPostWithInsightsDTO;
@@ -138,13 +139,13 @@ class SocialAnalyticsPostService
             return [];
         }
 
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $now = DateHelper::createUtcDateTimeImmutable();
 
         $result = [];
         foreach ($posts as $post) {
-            $postAgeInHours = $this->calculatePostAgeInHours($post, $now);
-            $insightsCreatedBefore = $post->getPublishedAt()->modify("+{$postAgeInHours} hours");
-            
+            $postAgeDuration = $this->calculatePostAgeDuration($post, $now);
+            $insightsCreatedBefore = $post->getPublishedAt()->add($postAgeDuration);
+
             $currentInsights = $this->getLatestInsightsByType(
                 $this->insightRepository->getByPostAndCreatedBeforeDate(
                     $post,
@@ -152,15 +153,15 @@ class SocialAnalyticsPostService
                     self::EXCLUDED_INSIGHT_TYPES,
                 )
             );
-            
+
             $previousPost = $this->repository->getSingleByIntegrationAndPublishedBeforeDate(
                 $post->getIntegration(),
                 $post->getPublishedAt(),
             );
             $previousInsights = [];
-            
+
             if ($previousPost !== null) {
-                $previousInsightsCreatedBefore = $previousPost->getPublishedAt()->modify("+{$postAgeInHours} hours");
+                $previousInsightsCreatedBefore = $previousPost->getPublishedAt()->add($postAgeDuration);
                 $previousInsights = $this->getLatestInsightsByType(
                     $this->insightRepository->getByPostAndCreatedBeforeDate(
                         $previousPost,
@@ -185,14 +186,10 @@ class SocialAnalyticsPostService
         return $result;
     }
 
-    private function calculatePostAgeInHours(SocialAnalyticsPost $post, \DateTimeImmutable $now): int
+    private function calculatePostAgeDuration(SocialAnalyticsPost $post, \DateTimeImmutable $now): \DateInterval
     {
         $publishedAt = $post->getPublishedAt();
-        $interval = $publishedAt->diff($now);
-        
-        $hours = ($interval->days * 24) + $interval->h;
-        
-        return max(1, $hours);
+        return $publishedAt->diff($now);
     }
 
     /**

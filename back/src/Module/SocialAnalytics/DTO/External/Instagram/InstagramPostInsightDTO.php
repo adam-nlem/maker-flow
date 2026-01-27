@@ -13,6 +13,10 @@ class InstagramPostInsightDTO
         'views' => SocialAnalyticsPostInsightType::Views,
         'likes' => SocialAnalyticsPostInsightType::Likes,
         'comments' => SocialAnalyticsPostInsightType::Comments,
+        'shares' => SocialAnalyticsPostInsightType::Shares,
+        'ig_reels_avg_watch_time' => SocialAnalyticsPostInsightType::AverageWatchTime,
+        'ig_reels_video_view_total_time' => SocialAnalyticsPostInsightType::TotalWatchTime,
+
     ];
 
     public function __construct(

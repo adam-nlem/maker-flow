@@ -17,9 +17,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/api/modules/social-analytics/posts')]
 class SocialAnalyticsPostController extends AbstractController
 {
-    public function __construct(private SocialAnalyticsPostService $service)
-    {
-    }
+    public function __construct(private SocialAnalyticsPostService $service) {}
 
     #[Route('', name: 'api_modules_social_analytics_posts_list', methods: ['GET'])]
     public function list(
@@ -45,7 +43,6 @@ class SocialAnalyticsPostController extends AbstractController
             limit: $queryParamDto->getLimit(),
             timePeriod: $queryParamDto->getTimePeriod(),
         );
-
         return $this->json(
             data: $posts,
             status: Response::HTTP_OK,
