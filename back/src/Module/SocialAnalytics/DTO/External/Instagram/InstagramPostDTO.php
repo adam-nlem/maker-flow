@@ -18,6 +18,7 @@ class InstagramPostDTO
         private readonly \DateTimeImmutable $publishedAt,
         private readonly ?string $caption,
         private readonly ?string $thumbnailUrl,
+        private readonly string $externalUrl,
         /** @var InstagramPostInsightDTO $postInsights */
         private readonly array $postInsights,
     ) {}
@@ -36,6 +37,7 @@ class InstagramPostDTO
             publishedAt: new \DateTimeImmutable($data['timestamp']),
             caption: $data['caption'] ?? null,
             thumbnailUrl: $data['thumbnail_url'] ?? null,
+            externalUrl: $data['permalink'],
             postInsights: $postInsightDTOs,
         );
     }
@@ -63,6 +65,11 @@ class InstagramPostDTO
     public function getThumbnailUrl(): ?string
     {
         return $this->thumbnailUrl;
+    }
+
+    public function getExternalUrl(): string
+    {
+        return $this->externalUrl;
     }
 
     public function getPostInsights(): array

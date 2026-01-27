@@ -49,6 +49,7 @@ class SocialAnalyticsPostService
             ->setPublishedAt($postDTO->getPublishedAt())
             ->setDuration(0)
             ->setCaption($postDTO->getCaption())
+            ->setExternalUrl($postDTO->getExternalUrl())
             ->setIntegration($integration)
             ->setUser($integration->getUser());
 

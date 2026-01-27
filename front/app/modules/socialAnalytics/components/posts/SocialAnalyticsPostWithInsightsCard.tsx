@@ -4,13 +4,14 @@ import { useShowSocialAnalyticsPostThumbnail } from "../../hooks/api/socialAnaly
 import { SocialAnalyticsPostInsightType, socialAnalyticsPostInsightTypeToIcon } from "../../models/enums/SocialAnalyticsPostInsightType";
 import { formatToFrenchRelative } from "~/utils/dateFormatters";
 import { formatDurationToFrenchHumanReadable } from "~/utils/durationFormatters";
+import Shimmer from "~/components/ui/Shimmer";
 
 interface SocialAnalyticsPostWithInsightsCardProps {
     postWithInsights: SocialAnalyticsPostWithInsightsDTO
 }
 
 export default function SocialAnalyticsPostWithInsightsCard({ postWithInsights }: SocialAnalyticsPostWithInsightsCardProps) {
-    const { thumbnailUrl } = useShowSocialAnalyticsPostThumbnail(postWithInsights.uuid);
+    const { thumbnailUrl, isLoading } = useShowSocialAnalyticsPostThumbnail(postWithInsights.uuid);
 
     const viewsInsight = postWithInsights.insights.find((insight) => insight.type === SocialAnalyticsPostInsightType.Views);
 
@@ -18,7 +19,7 @@ export default function SocialAnalyticsPostWithInsightsCard({ postWithInsights }
         <div className="flex flex-col gap-1 w-fit shrink-0">
 
             <div className="flex flex-row gap-1">
-                {thumbnailUrl && <img src={thumbnailUrl} alt="" className="w-20 rounded" />}
+                {thumbnailUrl ? <img src={thumbnailUrl} alt="" className="w-20 rounded" /> : <Shimmer height="h-full" width="w-20" />}
                 <div className="flex flex-col gap-1">
                     {postWithInsights.insights.map(function (insight) {
                         const Icon = socialAnalyticsPostInsightTypeToIcon[insight.type];

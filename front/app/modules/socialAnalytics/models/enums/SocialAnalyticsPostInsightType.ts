@@ -1,4 +1,4 @@
-import { BookmarkIcon, ChatBubbleLeftIcon, ClockIcon, EyeIcon, HandThumbUpIcon, HeartIcon, ShareIcon, SparklesIcon, UsersIcon } from "@heroicons/react/24/solid";
+import { ArrowUpOnSquareIcon, BookmarkIcon, ChatBubbleLeftIcon, ClockIcon, EyeIcon, HeartIcon, SparklesIcon, UsersIcon } from "@heroicons/react/24/solid";
 import type { ComponentType, SVGProps } from "react";
 
 export enum SocialAnalyticsPostInsightType {
@@ -17,7 +17,7 @@ export const socialAnalyticsPostInsightTypeToIcon: Record<SocialAnalyticsPostIns
     [SocialAnalyticsPostInsightType.Reach]: UsersIcon,
     [SocialAnalyticsPostInsightType.TotalInteractions]: SparklesIcon,
     [SocialAnalyticsPostInsightType.Saved]: BookmarkIcon,
-    [SocialAnalyticsPostInsightType.Shares]: ShareIcon,
+    [SocialAnalyticsPostInsightType.Shares]: ArrowUpOnSquareIcon,
     [SocialAnalyticsPostInsightType.Views]: EyeIcon,
     [SocialAnalyticsPostInsightType.Likes]: HeartIcon,
     [SocialAnalyticsPostInsightType.Comments]: ChatBubbleLeftIcon,

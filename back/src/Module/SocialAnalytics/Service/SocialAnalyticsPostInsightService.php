@@ -44,7 +44,7 @@ class SocialAnalyticsPostInsightService
         $metrics = implode(',', InstagramPostInsightDTO::getMetricNames());
 
         $queryParams =  [
-            'fields' => sprintf('id,media_type,timestamp,thumbnail_url,caption,insights.metric(%s)', $metrics),
+            'fields' => sprintf('id,media_type,timestamp,thumbnail_url,caption,permalink,insights.metric(%s)', $metrics),
             'limit' => 100,
             'access_token' => $integration->getAccessToken(),
         ];

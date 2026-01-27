@@ -46,6 +46,9 @@ class SocialAnalyticsPost
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $caption = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $externalUrl = null;
+
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Integration $integration = null;
@@ -181,6 +184,17 @@ class SocialAnalyticsPost
     {
         $this->caption = $caption;
 
+        return $this;
+    }
+
+    public function getExternalUrl(): ?string
+    {
+        return $this->externalUrl;
+    }
+
+    public function setExternalUrl(string $externalUrl): static
+    {
+        $this->externalUrl = $externalUrl;
         return $this;
     }
 

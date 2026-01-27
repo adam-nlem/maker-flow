@@ -6,6 +6,8 @@ import { useSocialAnalyticsFilterStore } from "../../stores/socialAnalyticsFilte
 import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialAnalyticsIntegrationInsights/useShowSocialAnalyticsIntegrationDetail";
 import { useListPaginatedSocialAnalyticsPosts } from "../../hooks/api/socialAnalyticsPosts/useListPaginatedSocialAnalyticsPosts";
 import SocialAnalyticsPostWithInsightsCard from "../posts/SocialAnalyticsPostWithInsightsCard";
+import SimpleTextButton from "~/components/ui/SimpleTextButton";
+import { ArrowPathIcon } from "@heroicons/react/24/outline";
 
 interface SocialAnalyticsIntegrationPageViewProps {
     integration: Integration
@@ -79,13 +81,18 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                 ))}
             </div>
 
-             <div className="flex flex-row gap-3 mt-3 w-full overflow-auto scrollbar-none">
+            <div className="flex flex-row gap-3 mt-3 w-full overflow-auto scrollbar-none">
                 {posts.map((post) => (
                     <SocialAnalyticsPostWithInsightsCard
                         key={post.uuid}
                         postWithInsights={post}
                     />
                 ))}
+
+                {hasMore && <SimpleTextButton onClick={listMore}>
+                    <ArrowPathIcon className="size-3.5" strokeWidth={2} />
+                    <p>Charger plus de contenus</p>
+                </SimpleTextButton>}
             </div>
         </div>
     );
