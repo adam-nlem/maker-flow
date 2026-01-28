@@ -5,6 +5,7 @@ namespace App\Module\SocialAnalytics\Service;
 use App\Entity\Integration;
 use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\ShowSocialAnalyticsIntegrationDetailResponseDTO;
+use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightDailyPointsDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightWithEvolutionDTO;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
@@ -15,6 +16,18 @@ use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 
 class SocialAnalyticsIntegrationDetailService
 {
+    private const GRAPH_INSIGHT_TYPES = [
+        SocialAnalyticsIntegrationInsightType::TotalFollowers,
+        SocialAnalyticsIntegrationInsightType::Comments,
+        SocialAnalyticsIntegrationInsightType::Shares,
+        SocialAnalyticsIntegrationInsightType::Saves,
+        SocialAnalyticsIntegrationInsightType::Views,
+        SocialAnalyticsIntegrationInsightType::Reach,
+        SocialAnalyticsIntegrationInsightType::Likes,
+    ];
+
+    private const GRAPH_DAYS_LIMIT = 365;
+
     public function __construct(
         private readonly SocialAnalyticsIntegrationInsightRepository $insightRepository,
         private readonly SocialAnalyticsPostRepository $postRepository,
@@ -54,12 +67,54 @@ class SocialAnalyticsIntegrationDetailService
         $postCount = $this->postRepository->countByIntegration($integration);
         $streak = $this->postRepository->calculateStreak($integration);
 
+        $dailyPoints = $this->buildDailyPoints($user, $integration, $now);
+
         return new ShowSocialAnalyticsIntegrationDetailResponseDTO(
             totalFollowers: $totalFollowers,
             postCount: $postCount,
             streak: $streak,
             insights: $insightsWithEvolution,
+            dailyPoints: $dailyPoints,
         );
+    }
+
+    /**
+     * @return SocialAnalyticsInsightGraphDTO[]
+     */
+    private function buildDailyPoints(
+        User $user,
+        Integration $integration,
+        \DateTimeImmutable $now,
+    ): array {
+        $startDate = $now->modify('-' . self::GRAPH_DAYS_LIMIT . ' days');
+
+        $insights = $this->insightRepository->getDailyByUserAndIntegrationAndTypes(
+            $user,
+            $integration,
+            self::GRAPH_INSIGHT_TYPES,
+            $startDate,
+        );
+
+        $insightsByType = [];
+        foreach ($insights as $insight) {
+            $typeValue = $insight->getType()->value;
+            if (!isset($insightsByType[$typeValue])) {
+                $insightsByType[$typeValue] = [];
+            }
+            $insightsByType[$typeValue][] = $insight;
+        }
+
+        $graphs = [];
+        foreach (self::GRAPH_INSIGHT_TYPES as $type) {
+            $typeInsights = $insightsByType[$type->value] ?? [];
+
+            $graphs[] = new SocialAnalyticsIntegrationInsightDailyPointsDTO(
+                type: $type,
+                insights: $typeInsights,
+            );
+        }
+
+        return $graphs;
     }
 
     /**

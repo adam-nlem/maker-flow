@@ -43,6 +43,7 @@ class SocialAnalyticsPostController extends AbstractController
             limit: $queryParamDto->getLimit(),
             timePeriod: $queryParamDto->getTimePeriod(),
         );
+        
         return $this->json(
             data: $posts,
             status: Response::HTTP_OK,

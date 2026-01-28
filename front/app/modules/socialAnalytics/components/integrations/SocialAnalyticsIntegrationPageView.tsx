@@ -33,7 +33,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
         return null;
     }
 
-    console.log(posts)
+    console.log(detail)
 
     return (
         <div className="mt-5">

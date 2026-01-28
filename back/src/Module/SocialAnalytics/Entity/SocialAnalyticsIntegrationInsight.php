@@ -24,30 +24,35 @@ class SocialAnalyticsIntegrationInsight
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
         'api_modules_social_analytics_integration_insights_list',
+        'api_modules_social_analytics_integration_insights_detail',
     ])]
     private ?string $uuid = null;
 
     #[ORM\Column]
     #[Groups([
         'api_modules_social_analytics_integration_insights_list',
+        'api_modules_social_analytics_integration_insights_detail',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups([
         'api_modules_social_analytics_integration_insights_list',
+        'api_modules_social_analytics_integration_insights_detail',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: SocialAnalyticsIntegrationInsightType::class)]
     #[Groups([
         'api_modules_social_analytics_integration_insights_list',
+        'api_modules_social_analytics_integration_insights_detail',
     ])]
     private ?SocialAnalyticsIntegrationInsightType $type = null;
 
     #[ORM\Column]
     #[Groups([
         'api_modules_social_analytics_integration_insights_list',
+        'api_modules_social_analytics_integration_insights_detail',
     ])]
     private ?int $value = null;
 

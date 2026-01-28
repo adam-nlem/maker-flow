@@ -22,17 +22,7 @@ class SocialAnalyticsPostInsightController extends AbstractController
         IntegrationRepository $integrationRepository,
         SocialAnalyticsPostInsightRepository $insightRepository,
     ) {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
-
-        if ($integration === null) {
-            return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
-        }
+        
 
         // TODO: Implement list logic
     }

@@ -13,6 +13,8 @@ use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostInsight;
 use App\Module\SocialAnalytics\Helper\InsightEvolutionHelper;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
+use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
@@ -27,6 +29,7 @@ class SocialAnalyticsPostService
     public function __construct(
         private readonly SocialAnalyticsPostRepository $repository,
         private readonly SocialAnalyticsPostInsightRepository $insightRepository,
+        private readonly SocialAnalyticsIntegrationInsightRepository $integrationInsightRepository,
         private readonly HttpClientInterface $httpClient,
         private readonly Filesystem $filesystem,
         private readonly ParameterBagInterface $parameterBag,
@@ -141,18 +144,23 @@ class SocialAnalyticsPostService
         }
 
         $now = DateHelper::createUtcDateTimeImmutable();
+        $totalFollowers = $this->integrationInsightRepository->getLatestByUserAndByIntegrationAndByType($user, $integration, SocialAnalyticsIntegrationInsightType::TotalFollowers);
 
         $result = [];
         foreach ($posts as $post) {
             $postAgeDuration = $this->calculatePostAgeDuration($post, $now);
             $insightsCreatedBefore = $post->getPublishedAt()->add($postAgeDuration);
 
-            $currentInsights = $this->getLatestInsightsByType(
+            $allInsights = $this->getLatestInsightsByType(
                 $this->insightRepository->getByPostAndCreatedBeforeDate(
                     $post,
                     $insightsCreatedBefore,
-                    self::EXCLUDED_INSIGHT_TYPES,
                 )
+            );
+
+            $currentInsights = array_filter(
+                $allInsights,
+                fn(SocialAnalyticsPostInsight $insight) => !in_array($insight->getType(), self::EXCLUDED_INSIGHT_TYPES),
             );
 
             $previousPost = $this->repository->getSingleByIntegrationAndPublishedBeforeDate(
@@ -174,6 +182,9 @@ class SocialAnalyticsPostService
 
             $insightsWithEvolution = $this->buildPostInsightsWithEvolution($currentInsights, $previousInsights);
 
+            $totalInteractions = $this->getInsightValueByType($allInsights, SocialAnalyticsPostInsightType::TotalInteractions);
+            $reach = $this->getInsightValueByType($allInsights, SocialAnalyticsPostInsightType::Reach);
+
             $result[] = new SocialAnalyticsPostWithInsightsDTO(
                 uuid: $post->getUuid(),
                 externalId: $post->getExternalId(),
@@ -181,10 +192,35 @@ class SocialAnalyticsPostService
                 publishedAt: $post->getPublishedAt(),
                 caption: $post->getCaption(),
                 insights: $insightsWithEvolution,
+                engagementByFollowers: $this->calculateEngagement($totalInteractions, $totalFollowers->getValue()),
+                engagementByReach: $this->calculateEngagement($totalInteractions, $reach),
             );
         }
 
         return $result;
+    }
+
+    /**
+     * @param SocialAnalyticsPostInsight[] $insights
+     */
+    private function getInsightValueByType(array $insights, SocialAnalyticsPostInsightType $type): ?int
+    {
+        foreach ($insights as $insight) {
+            if ($insight->getType() === $type) {
+                return $insight->getValue();
+            }
+        }
+
+        return null;
+    }
+
+    private function calculateEngagement(?int $interactions, ?int $divisor): ?float
+    {
+        if ($interactions === null || $divisor === null || $divisor === 0) {
+            return null;
+        }
+
+        return round(($interactions / $divisor) * 100, 2);
     }
 
     private function calculatePostAgeDuration(SocialAnalyticsPost $post, \DateTimeImmutable $now): \DateInterval

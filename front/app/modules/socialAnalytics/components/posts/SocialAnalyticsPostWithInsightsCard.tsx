@@ -1,4 +1,4 @@
-import { EyeIcon } from "@heroicons/react/24/solid";
+import { ArrowDownCircleIcon, ArrowTrendingDownIcon, ArrowTrendingUpIcon, ArrowUpCircleIcon, EyeIcon } from "@heroicons/react/24/solid";
 import type { SocialAnalyticsPostWithInsightsDTO } from "../../dtos/socialAnalyticsPosts/SocialAnalyticsPostWithInsightsDTO";
 import { useShowSocialAnalyticsPostThumbnail } from "../../hooks/api/socialAnalyticsPosts/useShowSocialAnalyticsPostThumbnail";
 import { SocialAnalyticsPostInsightType, socialAnalyticsPostInsightTypeToIcon } from "../../models/enums/SocialAnalyticsPostInsightType";
@@ -33,12 +33,16 @@ export default function SocialAnalyticsPostWithInsightsCard({ postWithInsights }
                                 )}
 
                                 {insight.evolutionPercentage !== undefined && insight.evolutionPercentage !== null && (
-                                    <span title="Évolution par rapport au contenu précédent à la même durée après publication"
-                                        className={`text-heading-xs ${insight.evolutionPercentage.startsWith('+') ? "text-green-500" : "text-red-500"
-                                            }`}
-                                    >
-                                        {insight.evolutionPercentage}
-                                    </span>
+                                    <div className="flex flex-row items-center">
+
+                                        <p title="Évolution par rapport au contenu précédent à la même durée après publication"
+                                            className={`text-heading-xs ${insight.evolutionPercentage.startsWith('+') ? "text-green-500" : "text-red-500"
+                                                }`}
+                                        >
+                                            {insight.evolutionPercentage}
+                                        </p>
+                                        {insight.evolutionPercentage.startsWith('+') ? <ArrowTrendingUpIcon className="size-4 text-green-500" strokeWidth={2} /> : <ArrowTrendingDownIcon className="size-4 text-red-500" strokeWidth={2} />}
+                                    </div>
                                 )}
                             </div>);
                     })}

@@ -79,6 +79,25 @@ class SocialAnalyticsIntegrationInsightRepository extends ServiceEntityRepositor
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    public function getLatestByUserAndByIntegrationAndByType(
+        User $user,
+        Integration $integration,
+        SocialAnalyticsIntegrationInsightType $type,
+    ): ?SocialAnalyticsIntegrationInsight {
+        return $this->createQueryBuilder('ii')
+            ->where('ii.user = :user')
+            ->andWhere('ii.integration = :integration')
+            ->andWhere('ii.type = :type')
+            ->setParameter('user', $user)
+            ->setParameter('integration', $integration)
+            ->setParameter('type', $type)
+            ->orderBy('ii.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     public function getByUserAndIntegrationAndTimePeriod(
         User $user,
         Integration $integration,
@@ -104,6 +123,31 @@ class SocialAnalyticsIntegrationInsightRepository extends ServiceEntityRepositor
             ->setParameter('integration', $integration)
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @param SocialAnalyticsIntegrationInsightType[] $types
+     * @return SocialAnalyticsIntegrationInsight[]
+     */
+    public function getDailyByUserAndIntegrationAndTypes(
+        User $user,
+        Integration $integration,
+        array $types,
+        \DateTimeImmutable $startDate,
+    ): array {
+        return $this->createQueryBuilder('i')
+            ->where('i.user = :user')
+            ->andWhere('i.integration = :integration')
+            ->andWhere('i.type IN (:types)')
+            ->andWhere('i.createdAt >= :startDate')
+            ->setParameter('user', $user)
+            ->setParameter('integration', $integration)
+            ->setParameter('types', $types)
+            ->setParameter('startDate', $startDate)
+            ->orderBy('i.createdAt', 'ASC')
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);

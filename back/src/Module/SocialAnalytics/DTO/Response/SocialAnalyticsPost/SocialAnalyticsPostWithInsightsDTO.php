@@ -22,6 +22,10 @@ class SocialAnalyticsPostWithInsightsDTO implements ResponseDTOInterface
         /** @var SocialAnalyticsPostInsightWithEvolutionDTO[] */
         #[Groups(['api_modules_social_analytics_posts_list'])]
         private readonly array $insights,
+        #[Groups(['api_modules_social_analytics_posts_list'])]
+        private readonly ?float $engagementByFollowers,
+        #[Groups(['api_modules_social_analytics_posts_list'])]
+        private readonly ?float $engagementByReach,
     ) {}
 
     public function getData(): array
@@ -33,6 +37,8 @@ class SocialAnalyticsPostWithInsightsDTO implements ResponseDTOInterface
             'publishedAt' => $this->publishedAt->format(\DateTimeInterface::ATOM),
             'caption' => $this->caption,
             'insights' => $this->insights,
+            'engagementByFollowers' => $this->engagementByFollowers,
+            'engagementByReach' => $this->engagementByReach,
         ];
     }
 
@@ -64,5 +70,15 @@ class SocialAnalyticsPostWithInsightsDTO implements ResponseDTOInterface
     public function getInsights(): array
     {
         return $this->insights;
+    }
+
+    public function getEngagementByFollowers(): ?float
+    {
+        return $this->engagementByFollowers;
+    }
+
+    public function getEngagementByReach(): ?float
+    {
+        return $this->engagementByReach;
     }
 }

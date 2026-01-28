@@ -9,6 +9,8 @@ export interface SocialAnalyticsPostWithInsightsDTOJSON {
     publishedAt: string;
     caption: string | null;
     insights: SocialAnalyticsPostInsightWithEvolutionDTOJSON[];
+    engagementByFollowers: number | null;
+    engagementByReach: number | null;
 }
 
 export class SocialAnalyticsPostWithInsightsDTO {
@@ -19,7 +21,8 @@ export class SocialAnalyticsPostWithInsightsDTO {
         public readonly publishedAt: Date,
         public readonly caption: string | null,
         public readonly insights: SocialAnalyticsPostInsightWithEvolutionDTO[],
-
+        public readonly engagementByFollowers: number | null,
+        public readonly engagementByReach: number | null,
     ) { }
 
     static fromJSON(json: SocialAnalyticsPostWithInsightsDTOJSON): SocialAnalyticsPostWithInsightsDTO {
@@ -30,6 +33,8 @@ export class SocialAnalyticsPostWithInsightsDTO {
             new Date(json.publishedAt),
             json.caption,
             json.insights.map((insight) => SocialAnalyticsPostInsightWithEvolutionDTO.fromJSON(insight)),
+            json.engagementByFollowers,
+            json.engagementByReach,
         );
     }
 }
