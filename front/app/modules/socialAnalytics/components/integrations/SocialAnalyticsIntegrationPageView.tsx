@@ -7,7 +7,13 @@ import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialA
 import { useListPaginatedSocialAnalyticsPosts } from "../../hooks/api/socialAnalyticsPosts/useListPaginatedSocialAnalyticsPosts";
 import SocialAnalyticsPostWithInsightsCard from "../posts/SocialAnalyticsPostWithInsightsCard";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
+import SparklineChart from "~/components/ui/AreaChart";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { useMemo } from "react";
+import { fillDailyDataPoints } from "~/utils/chartDataHelpers";
+import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
+
+
 
 interface SocialAnalyticsIntegrationPageViewProps {
     integration: Integration
@@ -27,13 +33,41 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
         limit: 10,
     });
 
+    const followersChartData = useMemo(() => {
+        const dailyPoint = detail?.dailyPoints.find(
+            (dp) => dp.type === SocialAnalyticsIntegrationInsightType.TotalFollowers
+        );
+        if (!dailyPoint) {
+            return [];
+        }
+        return fillDailyDataPoints(
+            dailyPoint.insights.map((insight) => ({
+                date: insight.createdAt,
+                value: insight.value,
+            }))
+        );
+    }, [detail?.dailyPoints]);
 
+    const viewsChartData = useMemo(() => {
+        const dailyPoint = detail?.dailyPoints.find(
+            (dp) => dp.type === SocialAnalyticsIntegrationInsightType.Views
+        );
+        if (!dailyPoint) {
+            return [];
+        }
+        return fillDailyDataPoints(
+            dailyPoint.insights.map((insight) => ({
+                date: insight.createdAt,
+                value: insight.value,
+            }))
+        );
+    }, [detail?.dailyPoints]);
 
     if (isLoading || !detail) {
         return null;
     }
 
-    console.log(detail)
+    console.log(detail.dailyPoints)
 
     return (
         <div className="mt-5">
@@ -56,6 +90,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[SocialAnalyticsIntegrationInsightType.TotalFollowers]}
                     value={detail.totalFollowers}
                     Icon={UserIcon}
+                    chart={<SparklineChart color="var(--color-primary)" data={followersChartData} />}
                 />
                 <SocialAnalyticsInsightTile
                     label="Contenus"
@@ -67,6 +102,8 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     value={detail.streak}
                     Icon={ArrowTrendingUpIcon}
                 />
+
+                <CalendarHeatMap data={viewsChartData} />
             </div>
 
             <div className="flex flex-row flex-wrap gap-3 mt-3">
