@@ -32,6 +32,12 @@ services:
     App\:
         resource: "../src/"
 
+    ### Normalizers ###
+    App\Serializer\UserTimezoneDateTimeNormalizer:
+        arguments:
+            $dateTimeNormalizer: '@serializer.normalizer.datetime'
+        tags: ['serializer.normalizer']
+
     App\Service\Cookie\CookieService:
         arguments:
             $appDomain: "%app.domain%"

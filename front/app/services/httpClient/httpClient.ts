@@ -7,7 +7,7 @@ export const httpClient = axios.create(
         baseURL: import.meta.env.VITE_API_URL + "/api" || '',
         withCredentials: true, // Sends cookies at each request
         headers: {
-            // Find a way to send the real pneuser TZ
+            // Find a way to send the real user TZ
             "X-Timezone": "Europe/Paris",
         }
     }

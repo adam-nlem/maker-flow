@@ -26,8 +26,6 @@ class SocialAnalyticsIntegrationDetailService
         SocialAnalyticsIntegrationInsightType::Likes,
     ];
 
-    private const GRAPH_DAYS_LIMIT = 365;
-
     public function __construct(
         private readonly SocialAnalyticsIntegrationInsightRepository $insightRepository,
         private readonly SocialAnalyticsPostRepository $postRepository,
@@ -67,7 +65,7 @@ class SocialAnalyticsIntegrationDetailService
         $postCount = $this->postRepository->countByIntegration($integration);
         $streak = $this->postRepository->calculateStreak($integration);
 
-        $dailyPoints = $this->buildDailyPoints($user, $integration, $now);
+        $dailyPoints = $this->buildDailyPoints($user, $integration, $currentPeriodStart);
 
         return new ShowSocialAnalyticsIntegrationDetailResponseDTO(
             totalFollowers: $totalFollowers,
@@ -84,15 +82,13 @@ class SocialAnalyticsIntegrationDetailService
     private function buildDailyPoints(
         User $user,
         Integration $integration,
-        \DateTimeImmutable $now,
+        \DateTimeImmutable $periodStart,
     ): array {
-        $startDate = $now->modify('-' . self::GRAPH_DAYS_LIMIT . ' days');
-
         $insights = $this->insightRepository->getDailyByUserAndIntegrationAndTypes(
             $user,
             $integration,
             self::GRAPH_INSIGHT_TYPES,
-            $startDate,
+            $periodStart,
         );
 
         $insightsByType = [];

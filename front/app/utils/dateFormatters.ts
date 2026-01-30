@@ -55,3 +55,7 @@ export function formatToFrenchRelative(date: Date): string {
     return new Intl.RelativeTimeFormat('fr-FR', { numeric: 'auto' })
         .format(Math.round(diffInSec / match.seconds), match.unit);
 }
+
+export function formatToIso8601Tz(date: Date): string {
+    return new Intl.DateTimeFormat('sv-SE').format(date);
+}

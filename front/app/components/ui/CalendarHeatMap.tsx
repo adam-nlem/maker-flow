@@ -1,24 +1,23 @@
 import type { ChartDataPoint } from "~/utils/chartDataHelpers";
+import { formatToIso8601Tz } from "~/utils/dateFormatters";
 
 
 interface CalendarHeatMapProps {
     data: ChartDataPoint[];
-    weeks?: number; // default: 52
+    daysToDisplay: number;
 }
-
-const dayKey = (date: Date) => date.toISOString().slice(0, 10);
 
 export function CalendarHeatMap({
     data,
-    weeks = 52,
+    daysToDisplay,
 }: CalendarHeatMapProps) {
     const today = new Date();
-    const startDate = new Date(today);
-    startDate.setDate(today.getDate() - weeks * 7);
+    const startDate = data[0].date;
+    startDate.setDate(today.getDate() - daysToDisplay);
 
     // Normalize data into a map for O(1) access
     const dataMap = new Map(
-        data.map((d) => [dayKey(d.date), d.value])
+        data.map((d) => [formatToIso8601Tz(d.date), d.value])
     );
 
     const days: { date: Date | null; value: number }[] = [];
@@ -28,7 +27,7 @@ export function CalendarHeatMap({
         d <= today;
         d.setDate(d.getDate() + 1)
     ) {
-        const key = dayKey(d);
+        const key = formatToIso8601Tz(d);
         days.push({
             date: new Date(d),
             value: dataMap.get(key) ?? 0,
@@ -58,7 +57,7 @@ export function CalendarHeatMap({
                             key={j}
                             title={
                                 day.date
-                                    ? `${dayKey(day.date)} – ${day.value}`
+                                    ? `${formatToIso8601Tz(day.date)} – ${day.value}`
                                     : ""
                             }
                             className={`h-3 w-3 rounded-sm ${getColor(day.value)}`}

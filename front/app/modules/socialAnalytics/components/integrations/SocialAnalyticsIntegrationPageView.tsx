@@ -7,11 +7,12 @@ import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialA
 import { useListPaginatedSocialAnalyticsPosts } from "../../hooks/api/socialAnalyticsPosts/useListPaginatedSocialAnalyticsPosts";
 import SocialAnalyticsPostWithInsightsCard from "../posts/SocialAnalyticsPostWithInsightsCard";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import SparklineChart from "~/components/ui/AreaChart";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import { useMemo } from "react";
 import { fillDailyDataPoints } from "~/utils/chartDataHelpers";
 import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
+import AreaChart from "~/components/ui/AreaChart";
+import { socialAnalyticsTimePeriodToDays } from "../../models/enums/SocialAnalyticsTimePeriod";
 
 
 
@@ -67,7 +68,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
         return null;
     }
 
-    console.log(detail.dailyPoints)
+    console.log(viewsChartData)
 
     return (
         <div className="mt-5">
@@ -90,7 +91,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[SocialAnalyticsIntegrationInsightType.TotalFollowers]}
                     value={detail.totalFollowers}
                     Icon={UserIcon}
-                    chart={<SparklineChart color="var(--color-primary)" data={followersChartData} />}
+                    chart={<AreaChart color="var(--color-primary)" data={followersChartData} />}
                 />
                 <SocialAnalyticsInsightTile
                     label="Contenus"
@@ -103,7 +104,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     Icon={ArrowTrendingUpIcon}
                 />
 
-                <CalendarHeatMap data={viewsChartData} />
+                <CalendarHeatMap data={viewsChartData} daysToDisplay={socialAnalyticsTimePeriodToDays[timePeriod]} />
             </div>
 
             <div className="flex flex-row flex-wrap gap-3 mt-3">

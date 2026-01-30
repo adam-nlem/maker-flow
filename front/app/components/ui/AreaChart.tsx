@@ -1,5 +1,5 @@
 import { Area, AreaChart as RechartsAreaChart, ResponsiveContainer, Tooltip } from "recharts";
-import { formatToFrenchRelative } from "~/utils/dateFormatters";
+import { formatToFrenchDateLong, formatToFrenchRelative } from "~/utils/dateFormatters";
 
 interface AreaChartDataPoint {
     value: number;
@@ -28,7 +28,7 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
     return (
         <div className="bg-white border border-light-gray rounded-md p-2 shadow-sm">
             <p className="text-heading-xs">{dataPoint.value.toLocaleString("fr-FR")}</p>
-            <p className="text-xs text-gray">{formatToFrenchRelative(dataPoint.date)}</p>
+            <p className="text-xs text-gray">{formatToFrenchDateLong(dataPoint.date)}</p>
         </div>
     );
 }

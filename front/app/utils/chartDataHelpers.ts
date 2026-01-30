@@ -15,7 +15,7 @@ export function fillDailyDataPoints(dataPoints: ChartDataPoint[]): ChartDataPoin
         return [];
     }
 
-    const sorted = [...dataPoints].sort((a, b) => a.date.getTime() - b.date.getTime());
+    const sorted = [...dataPoints].sort((a, b) => a.date.getDate() - b.date.getDate());
 
     const dataByDate = new Map<string, number>();
     for (const point of sorted) {

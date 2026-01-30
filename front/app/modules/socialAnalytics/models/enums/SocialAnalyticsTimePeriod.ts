@@ -13,3 +13,10 @@ export const socialAnalyticsTimePeriodToFrenchTranslation: Record<SocialAnalytic
 };
 
 export const socialAnalyticsTimePeriodOptions = Object.values(SocialAnalyticsTimePeriod)
+
+export const socialAnalyticsTimePeriodToDays: Record<SocialAnalyticsTimePeriod, number> = {
+    [SocialAnalyticsTimePeriod.Last7Days]: 7,
+    [SocialAnalyticsTimePeriod.Last30Days]: 30,
+    [SocialAnalyticsTimePeriod.Last90Days]: 90,
+    [SocialAnalyticsTimePeriod.LastYear]: 365,
+};
