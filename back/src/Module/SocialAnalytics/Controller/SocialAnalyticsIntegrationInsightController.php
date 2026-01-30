@@ -5,6 +5,7 @@ namespace App\Module\SocialAnalytics\Controller;
 use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight\ListSocialAnalyticsIntegrationInsightsQueryParamDTO;
 use App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight\ShowSocialAnalyticsIntegrationDetailQueryParamDTO;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationDetailService;
 use App\Repository\IntegrationRepository;
@@ -62,7 +63,7 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
         $detail = $detailService->getDetail(
             user: $user,
             integration: $integration,
-            timePeriod: $queryParamDto->getTimePeriod(),
+            timePeriod: SocialAnalyticsTimePeriod::LastYear,
         );
 
         return $this->json(

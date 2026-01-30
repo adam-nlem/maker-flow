@@ -1,55 +1,28 @@
 import type { ChartDataPoint } from "~/utils/chartDataHelpers";
 import { formatToIso8601Tz } from "~/utils/dateFormatters";
 
-
 interface CalendarHeatMapProps {
     data: ChartDataPoint[];
     daysToDisplay: number;
+}
+
+interface HeatMapCell {
+    date: Date | null;
+    value: number;
 }
 
 export function CalendarHeatMap({
     data,
     daysToDisplay,
 }: CalendarHeatMapProps) {
-    const today = new Date();
-    const startDate = data[0].date;
-    startDate.setDate(today.getDate() - daysToDisplay);
+    const weeksGrid = buildWeeksGrid(data, daysToDisplay);
 
-    // Normalize data into a map for O(1) access
-    const dataMap = new Map(
-        data.map((d) => [formatToIso8601Tz(d.date), d.value])
-    );
-
-    const days: { date: Date | null; value: number }[] = [];
-
-    for (
-        let d = new Date(startDate);
-        d <= today;
-        d.setDate(d.getDate() + 1)
-    ) {
-        const key = formatToIso8601Tz(d);
-        days.push({
-            date: new Date(d),
-            value: dataMap.get(key) ?? 0,
-        });
-    }
-
-    // Pad start so weeks align (Sunday first)
-    const firstDay = days[0].date!.getDay(); // 0 = Sunday
-    for (let i = 0; i < firstDay; i++) {
-        days.unshift({
-            date: null,
-            value: 0,
-        });
-    }
-
-    const weeksGrid: typeof days[] = [];
-    for (let i = 0; i < days.length; i += 7) {
-        weeksGrid.push(days.slice(i, i + 7));
+    if (weeksGrid.length === 0) {
+        return null;
     }
 
     return (
-        <div className="flex gap-1">
+        <div className="flex gap-1 border border-light-gray">
             {weeksGrid.map((week, i) => (
                 <div key={i} className="flex flex-col gap-1">
                     {week.map((day, j) => (
@@ -67,6 +40,45 @@ export function CalendarHeatMap({
             ))}
         </div>
     );
+}
+
+function buildWeeksGrid(data: ChartDataPoint[], daysToDisplay: number): HeatMapCell[][] {
+    if (data.length === 0) {
+        return [];
+    }
+
+    const today = new Date();
+    const startDate = new Date(today);
+    startDate.setDate(today.getDate() - daysToDisplay);
+
+    const dataMap = new Map(
+        data.map((d) => [formatToIso8601Tz(d.date), d.value])
+    );
+
+    const days: HeatMapCell[] = [];
+    for (
+        let d = new Date(startDate);
+        d <= today;
+        d.setDate(d.getDate() + 1)
+    ) {
+        days.push({
+            date: new Date(d),
+            value: dataMap.get(formatToIso8601Tz(d)) ?? 0,
+        });
+    }
+
+    // Pad start so weeks align (Sunday first)
+    const firstDay = days[0].date!.getDay();
+    for (let i = 0; i < firstDay; i++) {
+        days.unshift({ date: null, value: 0 });
+    }
+
+    const weeks: HeatMapCell[][] = [];
+    for (let i = 0; i < days.length; i += 7) {
+        weeks.push(days.slice(i, i + 7));
+    }
+
+    return weeks;
 }
 
 function getColor(count: number) {

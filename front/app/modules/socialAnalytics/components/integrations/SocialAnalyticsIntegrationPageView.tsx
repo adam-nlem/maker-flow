@@ -8,11 +8,11 @@ import { useListPaginatedSocialAnalyticsPosts } from "../../hooks/api/socialAnal
 import SocialAnalyticsPostWithInsightsCard from "../posts/SocialAnalyticsPostWithInsightsCard";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
-import { useMemo } from "react";
-import { fillDailyDataPoints } from "~/utils/chartDataHelpers";
 import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
 import AreaChart from "~/components/ui/AreaChart";
-import { socialAnalyticsTimePeriodToDays } from "../../models/enums/SocialAnalyticsTimePeriod";
+import { SocialAnalyticsTimePeriod, socialAnalyticsTimePeriodToDays } from "../../models/enums/SocialAnalyticsTimePeriod";
+import { computeEvolutionPercentage } from "../../helpers/insightEvolutionHelper";
+import { getChartDataForInsightType } from "../../helpers/insightChartDataHelper";
 
 
 
@@ -25,7 +25,6 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
 
     const { detail, isLoading } = useShowSocialAnalyticsIntegrationDetail({
         integrationUuid: integration.uuid,
-        timePeriod,
     });
 
     const { posts, isLoadingMore, hasMore, listMore } = useListPaginatedSocialAnalyticsPosts({
@@ -34,41 +33,11 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
         limit: 10,
     });
 
-    const followersChartData = useMemo(() => {
-        const dailyPoint = detail?.dailyPoints.find(
-            (dp) => dp.type === SocialAnalyticsIntegrationInsightType.TotalFollowers
-        );
-        if (!dailyPoint) {
-            return [];
-        }
-        return fillDailyDataPoints(
-            dailyPoint.insights.map((insight) => ({
-                date: insight.createdAt,
-                value: insight.value,
-            }))
-        );
-    }, [detail?.dailyPoints]);
-
-    const viewsChartData = useMemo(() => {
-        const dailyPoint = detail?.dailyPoints.find(
-            (dp) => dp.type === SocialAnalyticsIntegrationInsightType.Views
-        );
-        if (!dailyPoint) {
-            return [];
-        }
-        return fillDailyDataPoints(
-            dailyPoint.insights.map((insight) => ({
-                date: insight.createdAt,
-                value: insight.value,
-            }))
-        );
-    }, [detail?.dailyPoints]);
+    const days = socialAnalyticsTimePeriodToDays[timePeriod];
 
     if (isLoading || !detail) {
         return null;
     }
-
-    console.log(viewsChartData)
 
     return (
         <div className="mt-5">
@@ -91,7 +60,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[SocialAnalyticsIntegrationInsightType.TotalFollowers]}
                     value={detail.totalFollowers}
                     Icon={UserIcon}
-                    chart={<AreaChart color="var(--color-primary)" data={followersChartData} />}
+                    chart={<AreaChart color="var(--color-primary)" data={getChartDataForInsightType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.TotalFollowers, days)} />}
                 />
                 <SocialAnalyticsInsightTile
                     label="Contenus"
@@ -104,7 +73,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     Icon={ArrowTrendingUpIcon}
                 />
 
-                <CalendarHeatMap data={viewsChartData} daysToDisplay={socialAnalyticsTimePeriodToDays[timePeriod]} />
+                <CalendarHeatMap data={getChartDataForInsightType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.Views, days)} daysToDisplay={socialAnalyticsTimePeriodToDays[timePeriod]} />
             </div>
 
             <div className="flex flex-row flex-wrap gap-3 mt-3">
@@ -114,7 +83,11 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                         label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[insight.type]}
                         value={insight.value}
                         Icon={EyeIcon}
-                        evolutionPercentage={insight.evolutionPercentage}
+                        evolutionPercentage={
+                            timePeriod === SocialAnalyticsTimePeriod.LastYear
+                                ? insight.evolutionPercentage
+                                : computeEvolutionPercentage(detail.dailyPoints, insight.type, days)
+                        }
                     />
                 ))}
             </div>
