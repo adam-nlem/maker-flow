@@ -18,10 +18,5 @@ export function getChartDataForInsightType(
             value: insight.value,
         }))
     );
-
-    console.log("filled data", filled)
-
-    const filtered = filterDataPointsByDays(filled, days);
-    console.log("filtered data", filtered)
-    return filtered;
+    return filterDataPointsByDays(filled, days);
 }

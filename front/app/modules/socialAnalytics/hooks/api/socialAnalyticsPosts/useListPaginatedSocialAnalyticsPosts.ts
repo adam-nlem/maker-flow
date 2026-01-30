@@ -3,27 +3,24 @@ import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { SocialAnalyticsPostWithInsightsDTO, type SocialAnalyticsPostWithInsightsDTOJSON } from "~/modules/socialAnalytics/dtos/socialAnalyticsPosts/SocialAnalyticsPostWithInsightsDTO";
 import { socialAnalyticsPostQueryKeys } from "./socialAnalyticsPostQueryKeys";
-import type { SocialAnalyticsTimePeriod } from "~/modules/socialAnalytics/models/enums/SocialAnalyticsTimePeriod";
 
 interface UseListPaginatedSocialAnalyticsPostsProps {
     limit?: number;
     integrationUuid: string;
-    timePeriod: SocialAnalyticsTimePeriod;
 }
 
-export function useListPaginatedSocialAnalyticsPosts({ limit = 10, integrationUuid, timePeriod }: UseListPaginatedSocialAnalyticsPostsProps) {
+export function useListPaginatedSocialAnalyticsPosts({ limit = 10, integrationUuid }: UseListPaginatedSocialAnalyticsPostsProps) {
     const [page, setPage] = useState(1);
     const [additionalPosts, setAdditionalPosts] = useState<SocialAnalyticsPostWithInsightsDTO[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const query = useQuery({
-        queryKey: socialAnalyticsPostQueryKeys.list(integrationUuid, timePeriod),
+        queryKey: socialAnalyticsPostQueryKeys.list(integrationUuid),
         queryFn: async () => {
             const res = await httpClient.get<SocialAnalyticsPostWithInsightsDTOJSON[]>(`/modules/social-analytics/posts`, {
                 params: {
                     integrationUuid,
-                    timePeriod,
                     page: 1,
                     limit,
                 }
@@ -50,7 +47,6 @@ export function useListPaginatedSocialAnalyticsPosts({ limit = 10, integrationUu
             const res = await httpClient.get<SocialAnalyticsPostWithInsightsDTOJSON[]>(`/modules/social-analytics/posts`, {
                 params: {
                     integrationUuid,
-                    timePeriod,
                     page: nextPage,
                     limit,
                 }
@@ -62,7 +58,7 @@ export function useListPaginatedSocialAnalyticsPosts({ limit = 10, integrationUu
         } finally {
             setIsLoadingMore(false);
         }
-    }, [page, isLoadingMore, hasMore, limit, integrationUuid, timePeriod]);
+    }, [page, isLoadingMore, hasMore, limit, integrationUuid]);
 
     return {
         posts,

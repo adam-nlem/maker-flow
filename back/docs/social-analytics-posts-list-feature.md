@@ -17,7 +17,7 @@ This feature provides a paginated endpoint to list all posts for an integration 
 | `integrationUuid` | string | Yes | - | UUID of the integration to fetch posts for |
 | `page` | int | Yes | - | Page number (1-indexed) |
 | `limit` | int | Yes | - | Number of posts per page |
-| `timePeriod` | string | No | `last_7_days` | Time period for insights (`last_7_days`, `last_30_days`, `last_90_days`, `last_year`) |
+| `timePeriod` | string | No | `last_7_days` | Time period — filters posts by `publishedAt` and scopes insight evolution (`last_7_days`, `last_30_days`, `last_90_days`, `last_year`) |
 
 ### Response
 
@@ -96,7 +96,7 @@ src/Module/SocialAnalytics/
 ├── Helper/
 │   └── InsightEvolutionHelper.php                 # Shared evolution calculation logic
 ├── Repository/
-│   ├── SocialAnalyticsPostRepository.php          # getByUserAndIntegrationPaginated()
+│   ├── SocialAnalyticsPostRepository.php          # getByUserAndIntegrationAndPublishedAfterPaginated()
 │   └── SocialAnalyticsPostInsightRepository.php   # getLatestByPostsAndTimePeriod()
 └── Service/
     └── SocialAnalyticsPostService.php             # getPostsWithInsights()
@@ -111,6 +111,6 @@ src/Module/SocialAnalytics/
 
 ## Notes
 
-- Posts are sorted by `publishedAt` DESC (most recent first)
+- Posts are filtered by `publishedAt >= now - timePeriod` and sorted by `publishedAt` DESC (most recent first)
 - Only the latest insight value per type within the time period is returned
 - The `InsightEvolutionHelper` is shared with `SocialAnalyticsIntegrationDetailService` to avoid code duplication

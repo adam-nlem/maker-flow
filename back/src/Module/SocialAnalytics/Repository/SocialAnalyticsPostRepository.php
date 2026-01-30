@@ -125,6 +125,31 @@ class SocialAnalyticsPostRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    /**
+     * @return SocialAnalyticsPost[]
+     */
+    public function getByUserAndIntegrationAndPublishedAfterPaginated(
+        User $user,
+        Integration $integration,
+        \DateTimeImmutable $publishedAfter,
+        int $page,
+        int $limit,
+    ): array {
+        return $this->createQueryBuilder('p')
+            ->where('p.user = :user')
+            ->andWhere('p.integration = :integration')
+            ->andWhere('p.publishedAt >= :publishedAfter')
+            ->setParameter('user', $user)
+            ->setParameter('integration', $integration)
+            ->setParameter('publishedAfter', $publishedAfter)
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->orderBy('p.publishedAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     public function getByUuidAndUser(string $uuid, User $user): ?SocialAnalyticsPost
     {
         return $this->createQueryBuilder('p')

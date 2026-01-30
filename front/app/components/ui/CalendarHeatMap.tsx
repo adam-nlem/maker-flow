@@ -22,7 +22,7 @@ export function CalendarHeatMap({
     }
 
     return (
-        <div className="flex gap-1 border border-light-gray">
+        <div className="flex gap-1 border border-light-gray rounded-lg p-2">
             {weeksGrid.map((week, i) => (
                 <div key={i} className="flex flex-col gap-1">
                     {week.map((day, j) => (

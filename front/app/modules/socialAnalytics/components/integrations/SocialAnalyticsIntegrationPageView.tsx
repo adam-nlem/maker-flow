@@ -7,12 +7,13 @@ import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialA
 import { useListPaginatedSocialAnalyticsPosts } from "../../hooks/api/socialAnalyticsPosts/useListPaginatedSocialAnalyticsPosts";
 import SocialAnalyticsPostWithInsightsCard from "../posts/SocialAnalyticsPostWithInsightsCard";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
 import AreaChart from "~/components/ui/AreaChart";
 import { SocialAnalyticsTimePeriod, socialAnalyticsTimePeriodToDays } from "../../models/enums/SocialAnalyticsTimePeriod";
 import { computeEvolutionPercentage } from "../../helpers/insightEvolutionHelper";
 import { getChartDataForInsightType } from "../../helpers/insightChartDataHelper";
+import { filterPostsByDays } from "../../helpers/postFilterHelper";
 
 
 
@@ -29,7 +30,6 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
 
     const { posts, isLoadingMore, hasMore, listMore } = useListPaginatedSocialAnalyticsPosts({
         integrationUuid: integration.uuid,
-        timePeriod,
         limit: 10,
     });
 
@@ -39,44 +39,57 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
         return null;
     }
 
-    return (
-        <div className="mt-5">
-            <div className="flex flex-row gap-1 items-center">
-                {integration.profilePictureUrl && (
-                    <img
-                        src={integration.profilePictureUrl}
-                        alt="profile picture"
-                        className="size-10 rounded-full object-cover"
-                    />
-                )}
-                <div className="flex flex-col">
-                    <h1 className="text-heading-sm">{integration.name}</h1>
-                    <p className="text-body-sm text-gray">{integration.userName}</p>
-                </div>
-            </div>
+    console.log(detail)
 
-            <div className="flex flex-row gap-3 mt-3">
-                <SocialAnalyticsInsightTile
-                    label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[SocialAnalyticsIntegrationInsightType.TotalFollowers]}
-                    value={detail.totalFollowers}
-                    Icon={UserIcon}
-                    chart={<AreaChart color="var(--color-primary)" data={getChartDataForInsightType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.TotalFollowers, days)} />}
-                />
-                <SocialAnalyticsInsightTile
-                    label="Contenus"
-                    value={detail.postCount}
-                    Icon={DocumentTextIcon}
-                />
-                <SocialAnalyticsInsightTile
-                    label="Momentum"
-                    value={detail.streak}
-                    Icon={ArrowTrendingUpIcon}
-                />
+    return (
+        <div className="flex flex-col gap-3 mt-5">
+            <div className="flex flex-row items-center bg-amber-300/10 p-3 gap-3 rounded-lg border border-amber-300">
+                <ExclamationTriangleIcon className="size-5 text-amber-500" strokeWidth={2} />
+                <p className="text-xs text-amber-500">
+                    Instagram ne nous permet pas d'acceder à l'historique de vos comptes Instagram. Nous construisons cet historique en interne à partir des données disponibles.
+                    Donc, plus votre compte est connecté depuis longtemps, plus l'historique sera complet.
+                </p>
+            </div>
+            <div className="flex flex-row gap-3 items-center">
+                <div className="flex flex-col gap-3">
+                    <div className="flex flex-row gap-1 items-center">
+                        {integration.profilePictureUrl && (
+                            <img
+                                src={integration.profilePictureUrl}
+                                alt="profile picture"
+                                className="size-10 rounded-full object-cover"
+                            />
+                        )}
+                        <div className="flex flex-col">
+                            <h1 className="text-heading-sm">{integration.name}</h1>
+                            <p className="text-body-sm text-gray">{integration.userName}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex flex-row gap-3">
+                        <SocialAnalyticsInsightTile
+                            label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[SocialAnalyticsIntegrationInsightType.TotalFollowers]}
+                            value={detail.totalFollowers}
+                            Icon={UserIcon}
+                            chart={<AreaChart color="var(--color-primary)" data={getChartDataForInsightType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.TotalFollowers, days)} />}
+                        />
+                        <SocialAnalyticsInsightTile
+                            label="Contenus"
+                            value={detail.postCount}
+                            Icon={DocumentTextIcon}
+                        />
+                        <SocialAnalyticsInsightTile
+                            label="Momentum"
+                            value={detail.streak}
+                            Icon={ArrowTrendingUpIcon}
+                        />
+                    </div>
+                </div>
 
                 <CalendarHeatMap data={getChartDataForInsightType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.Views, days)} daysToDisplay={socialAnalyticsTimePeriodToDays[timePeriod]} />
             </div>
 
-            <div className="flex flex-row flex-wrap gap-3 mt-3">
+            <div className="flex flex-row flex-wrap gap-3">
                 {detail.insights.map((insight) => (
                     <SocialAnalyticsInsightTile
                         key={insight.type}
@@ -92,8 +105,8 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                 ))}
             </div>
 
-            <div className="flex flex-row gap-3 mt-3 w-full overflow-auto scrollbar-none">
-                {posts.map((post) => (
+            <div className="flex flex-row gap-3 w-full overflow-auto scrollbar-none">
+                {filterPostsByDays(posts, days).map((post) => (
                     <SocialAnalyticsPostWithInsightsCard
                         key={post.uuid}
                         postWithInsights={post}

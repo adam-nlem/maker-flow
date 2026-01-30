@@ -137,13 +137,14 @@ class SocialAnalyticsPostService
         int $limit,
         SocialAnalyticsTimePeriod $timePeriod,
     ): array {
-        $posts = $this->repository->getByUserAndIntegrationPaginated($user, $integration, $page, $limit);
+        $now = DateHelper::createUtcDateTimeImmutable();
+        $periodStart = $now->modify("-{$timePeriod->getDaysCount()} days");
+
+        $posts = $this->repository->getByUserAndIntegrationAndPublishedAfterPaginated($user, $integration, $periodStart, $page, $limit);
 
         if (empty($posts)) {
             return [];
         }
-
-        $now = DateHelper::createUtcDateTimeImmutable();
         $totalFollowers = $this->integrationInsightRepository->getLatestByUserAndByIntegrationAndByType($user, $integration, SocialAnalyticsIntegrationInsightType::TotalFollowers);
 
         $result = [];

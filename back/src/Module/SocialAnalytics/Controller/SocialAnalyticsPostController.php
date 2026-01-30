@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\QueryParam\Post\ListSocialAnalyticsPostsQueryParamDTO;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsPostService;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -41,7 +42,7 @@ class SocialAnalyticsPostController extends AbstractController
             integration: $integration,
             page: $queryParamDto->getPage(),
             limit: $queryParamDto->getLimit(),
-            timePeriod: $queryParamDto->getTimePeriod(),
+            timePeriod: SocialAnalyticsTimePeriod::LastYear,
         );
         
         return $this->json(
