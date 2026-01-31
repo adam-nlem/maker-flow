@@ -39,6 +39,9 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 | `SocialAnalyticsIntegrationPageView` | `components/integrations/SocialAnalyticsIntegrationPageView.tsx` | Integration detail: profile, insight tiles, posts table |
 | `ListSocialAnalyticsPostsTable` | `components/posts/ListSocialAnalyticsPostsTable.tsx` | Scrollable posts table with sticky headers and infinite scroll |
 | `SocialAnalyticsPostsTableRow` | `components/posts/SocialAnalyticsPostsTableRow.tsx` | Individual post row |
+| `SocialAnalyticsPostNumericCell` | `components/posts/SocialAnalyticsPostNumericCell.tsx` | Numeric metric cell with optional tooltip |
+| `SocialAnalyticsPostDurationCell` | `components/posts/SocialAnalyticsPostDurationCell.tsx` | Duration metric cell (formatted in French) |
+| `SocialAnalyticsPostEvolutionBadge` | `components/posts/SocialAnalyticsPostEvolutionBadge.tsx` | Evolution percentage badge (green/red) |
 | `SocialAnalyticsInsightTile` | `components/SocialAnalyticsInsightTile.tsx` | Metric tile with optional area chart |
 | `FilterTile` | `components/FilterTile.tsx` | Filter chip used in dropdowns |
 

@@ -31,7 +31,7 @@ export const socialAnalyticsPostInsightTypeToFrenchTranslation: Record<SocialAna
     [SocialAnalyticsPostInsightType.Saved]: "Enregistrements",
     [SocialAnalyticsPostInsightType.Shares]: "Partages",
     [SocialAnalyticsPostInsightType.Views]: "Vues",
-    [SocialAnalyticsPostInsightType.Likes]: "J'aime",
+    [SocialAnalyticsPostInsightType.Likes]: "Likes",
     [SocialAnalyticsPostInsightType.Comments]: "Commentaires",
     [SocialAnalyticsPostInsightType.AverageWatchTime]: "Temps de visionnage moyen",
     [SocialAnalyticsPostInsightType.TotalWatchTime]: "Temps de visionnage total",
