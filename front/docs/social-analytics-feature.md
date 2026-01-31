@@ -16,13 +16,13 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
   SocialAnalyticsIntegrationPageView   flex-1 min-h-0, flex flex-col
     [warning banner]             fixed height
     [profile + insight tiles]    fixed height
-    SocialAnalyticsPostsTable    flex-1 min-h-0, flex flex-col
+    ListSocialAnalyticsPostsTable  flex-1 min-h-0, flex flex-col
       <h1>                       fixed height
       [table wrapper]            flex-1 min-h-0 overflow-auto
         <table>
           <thead>                sticky top-0 bg-white z-10
           <tbody>                scrollable content
-      [load more button]         fixed height (conditional)
+        [sentinel div]           h-1, IntersectionObserver trigger
 ```
 
 ### Key patterns
@@ -37,7 +37,7 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 |-----------|------|------|
 | `SocialAnalyticsPageView` | `components/SocialAnalyticsPageView.tsx` | Page root with filters and integration selector |
 | `SocialAnalyticsIntegrationPageView` | `components/integrations/SocialAnalyticsIntegrationPageView.tsx` | Integration detail: profile, insight tiles, posts table |
-| `SocialAnalyticsPostsTable` | `components/posts/SocialAnalyticsPostsTable.tsx` | Scrollable posts table with sticky headers |
+| `ListSocialAnalyticsPostsTable` | `components/posts/ListSocialAnalyticsPostsTable.tsx` | Scrollable posts table with sticky headers and infinite scroll |
 | `SocialAnalyticsPostsTableRow` | `components/posts/SocialAnalyticsPostsTableRow.tsx` | Individual post row |
 | `SocialAnalyticsInsightTile` | `components/SocialAnalyticsInsightTile.tsx` | Metric tile with optional area chart |
 | `FilterTile` | `components/FilterTile.tsx` | Filter chip used in dropdowns |
@@ -49,4 +49,8 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 ## API Hooks
 
 - `useShowSocialAnalyticsIntegrationDetail` — Fetches integration detail (followers, daily points, post count, streak).
-- `useListPaginatedSocialAnalyticsPosts` — Paginated post list with `hasMore` / `listMore` for load-more.
+- `useListPaginatedSocialAnalyticsPosts` — Paginated post list with `hasMore` / `listMore` for infinite scroll.
+
+## Infinite Scroll
+
+`ListSocialAnalyticsPostsTable` uses an `IntersectionObserver` on a sentinel `<div>` placed after the `<table>` inside the scrollable wrapper. When the sentinel enters the viewport (with a 200px bottom margin), the next page is fetched automatically via `listMore()`. The component reads `timePeriod` from `useSocialAnalyticsFilterStore` and applies `filterPostsByDays` locally.

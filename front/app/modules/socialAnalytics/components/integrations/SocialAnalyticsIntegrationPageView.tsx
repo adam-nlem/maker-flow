@@ -4,14 +4,12 @@ import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsigh
 import { ArrowTrendingUpIcon, DocumentTextIcon, UserIcon } from "@heroicons/react/24/solid";
 import { useSocialAnalyticsFilterStore } from "../../stores/socialAnalyticsFilterStore";
 import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialAnalyticsIntegrationInsights/useShowSocialAnalyticsIntegrationDetail";
-import { useListPaginatedSocialAnalyticsPosts } from "../../hooks/api/socialAnalyticsPosts/useListPaginatedSocialAnalyticsPosts";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
 import AreaChart from "~/components/ui/AreaChart";
 import { socialAnalyticsTimePeriodToDays } from "../../models/enums/SocialAnalyticsTimePeriod";
 import { computeTotalValue, getChartDataForInsightType, getFilteredInsightsForType } from "../../helpers/insightChartDataHelper";
-import { filterPostsByDays } from "../../helpers/postFilterHelper";
-import SocialAnalyticsPostsTable from "../posts/SocialAnalyticsPostsTable";
+import ListSocialAnalyticsPostsTable from "../posts/ListSocialAnalyticsPostsTable";
 
 
 
@@ -24,11 +22,6 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
 
     const { detail, isLoading } = useShowSocialAnalyticsIntegrationDetail({
         integrationUuid: integration.uuid,
-    });
-
-    const { posts, isLoadingMore, hasMore, listMore } = useListPaginatedSocialAnalyticsPosts({
-        integrationUuid: integration.uuid,
-        limit: 10,
     });
 
     const days = socialAnalyticsTimePeriodToDays[timePeriod];
@@ -100,11 +93,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
             </div>
 
 
-            <SocialAnalyticsPostsTable
-                posts={filterPostsByDays(posts, days)}
-                hasMore={hasMore}
-                onLoadMore={listMore}
-            />
+            <ListSocialAnalyticsPostsTable integrationUuid={integration.uuid} />
         </div>
     );
 }
