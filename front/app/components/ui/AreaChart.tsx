@@ -44,7 +44,7 @@ export default function AreaChart({
             <ResponsiveContainer width="100%" height="100%">
                 <RechartsAreaChart
                     data={data}
-                    margin={{ top: 1, right: 0, left: 0, bottom: 0 }}
+                    margin={{ top: 1, right: 1, left: 1, bottom: 1 }}
                 >
                     <Tooltip content={<CustomTooltip />} />
                     <Area

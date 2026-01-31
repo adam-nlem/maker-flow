@@ -11,6 +11,7 @@ use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Repository\IntegrationRepository;
 use App\Service\Integration\InstagramOAuthService;
+use DateInterval;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -37,7 +38,6 @@ class SocialAnalyticsIntegrationInsightService
         $integration = $this->instagramOAuthService->refreshTokenIfNeeded($integration);
 
         $metrics = implode(',', InstagramIntegrationInsightDTO::getMetricNames(except: ['followers_count']));
-
 
         // We can't get all the history at once because most of the insights can't be returned as time series
         // This means that the API will always return the total values in the selected since-until time frame

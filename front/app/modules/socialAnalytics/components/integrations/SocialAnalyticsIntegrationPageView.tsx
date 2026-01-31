@@ -1,6 +1,6 @@
 import type { Integration } from "~/models/Integration";
 import SocialAnalyticsInsightTile from "../SocialAnalyticsInsightTile";
-import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../../models/enums/SocialAnalyticsIntegrationInsightType";
+import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation, socialAnalyticsIntegrationInsightTypeToIcon } from "../../models/enums/SocialAnalyticsIntegrationInsightType";
 import { ArrowTrendingUpIcon, DocumentTextIcon, EyeIcon, UserIcon } from "@heroicons/react/24/solid";
 import { useSocialAnalyticsFilterStore } from "../../stores/socialAnalyticsFilterStore";
 import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialAnalyticsIntegrationInsights/useShowSocialAnalyticsIntegrationDetail";
@@ -12,8 +12,9 @@ import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
 import AreaChart from "~/components/ui/AreaChart";
 import { SocialAnalyticsTimePeriod, socialAnalyticsTimePeriodToDays } from "../../models/enums/SocialAnalyticsTimePeriod";
 import { computeEvolutionPercentage } from "../../helpers/insightEvolutionHelper";
-import { getChartDataForInsightType } from "../../helpers/insightChartDataHelper";
+import { computeTotalValue, getChartDataForInsightType, getFilteredInsightsForType } from "../../helpers/insightChartDataHelper";
 import { filterPostsByDays } from "../../helpers/postFilterHelper";
+import { SocialAnalyticsPostInsightType, socialAnalyticsPostInsightTypeToFrenchTranslation } from "../../models/enums/SocialAnalyticsPostInsightType";
 
 
 
@@ -39,8 +40,6 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
         return null;
     }
 
-    console.log(detail)
-
     return (
         <div className="flex flex-col gap-3 mt-5">
             <div className="flex flex-row items-center bg-amber-300/10 p-3 gap-3 rounded-lg border border-amber-300">
@@ -50,7 +49,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     Donc, plus votre compte est connecté depuis longtemps, plus l'historique sera complet.
                 </p>
             </div>
-            <div className="flex flex-row gap-3 items-center">
+            <div className="flex flex-wrap gap-3 items-center">
                 <div className="flex flex-col gap-3">
                     <div className="flex flex-row gap-1 items-center">
                         {integration.profilePictureUrl && (
@@ -66,7 +65,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                         </div>
                     </div>
 
-                    <div className="flex flex-row gap-3">
+                    <div className="flex flex-wrap wrap-break-word gap-3">
                         <SocialAnalyticsInsightTile
                             label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[SocialAnalyticsIntegrationInsightType.TotalFollowers]}
                             value={detail.totalFollowers}
@@ -83,29 +82,48 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                             value={detail.streak}
                             Icon={ArrowTrendingUpIcon}
                         />
+                        {detail.dailyPoints.map((detailPoint) => {
+                            if (detailPoint.type !== SocialAnalyticsIntegrationInsightType.TotalFollowers) {
+                                return <SocialAnalyticsInsightTile
+                                    key={detailPoint.type}
+                                    label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[detailPoint.type]}
+                                    value={computeTotalValue(getFilteredInsightsForType(detail.dailyPoints, detailPoint.type, days))}
+                                    Icon={socialAnalyticsIntegrationInsightTypeToIcon[detailPoint.type]}
+                                    chart={<AreaChart color="var(--color-primary)" data={getChartDataForInsightType(detail.dailyPoints, detailPoint.type, days)} />}
+                                />
+                            }
+                            return null;
+                        })
+                        }
                     </div>
                 </div>
 
-                <CalendarHeatMap data={getChartDataForInsightType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.Views, days)} daysToDisplay={socialAnalyticsTimePeriodToDays[timePeriod]} />
+                <CalendarHeatMap totalValue={computeTotalValue(getFilteredInsightsForType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.Reach, days))} data={getChartDataForInsightType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.Reach, days)} daysToDisplay={socialAnalyticsTimePeriodToDays[timePeriod]} />
+
             </div>
 
-            <div className="flex flex-row flex-wrap gap-3">
-                {detail.insights.map((insight) => (
-                    <SocialAnalyticsInsightTile
-                        key={insight.type}
-                        label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[insight.type]}
-                        value={insight.value}
-                        Icon={EyeIcon}
-                        evolutionPercentage={
-                            timePeriod === SocialAnalyticsTimePeriod.LastYear
-                                ? insight.evolutionPercentage
-                                : computeEvolutionPercentage(detail.dailyPoints, insight.type, days)
-                        }
-                    />
+
+            <table className="flex flex-col border border-light-gray rounded-lg p-2">
+                <h1 className="text-heading-sm">Derniers contenus</h1>
+                <tr>
+                    <th className="text-sm">Description</th>
+                    <th className="text-sm">{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.Views]}</th>
+                    <th className="text-sm">{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.TotalInteractions]}</th>
+                    <th className="text-sm">{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.AverageWatchTime]}</th>
+                    <th className="text-sm">{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.TotalWatchTime]}</th>
+                    <th className="text-sm">Engagement (par abonnés)</th>
+                    <th className="text-sm">Engagement (par portée)</th>
+                </tr>
+                {posts.map((post) => (
+                    <tr>
+                        <td></td>
+                    </tr>
                 ))}
-            </div>
 
-            <div className="flex flex-row gap-3 w-full overflow-auto scrollbar-none">
+
+            </table>
+
+            {/* <div className="flex flex-row gap-3 w-full overflow-auto scrollbar-none">
                 {filterPostsByDays(posts, days).map((post) => (
                     <SocialAnalyticsPostWithInsightsCard
                         key={post.uuid}
@@ -117,7 +135,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     <ArrowPathIcon className="size-3.5" strokeWidth={2} />
                     <p>Charger plus de contenus</p>
                 </SimpleTextButton>}
-            </div>
+            </div> */}
         </div>
     );
 }

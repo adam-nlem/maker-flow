@@ -3,6 +3,7 @@ import { formatToIso8601Tz } from "~/utils/dateFormatters";
 
 interface CalendarHeatMapProps {
     data: ChartDataPoint[];
+    totalValue: number;
     daysToDisplay: number;
 }
 
@@ -13,6 +14,7 @@ interface HeatMapCell {
 
 export function CalendarHeatMap({
     data,
+    totalValue,
     daysToDisplay,
 }: CalendarHeatMapProps) {
     const weeksGrid = buildWeeksGrid(data, daysToDisplay);
@@ -22,22 +24,29 @@ export function CalendarHeatMap({
     }
 
     return (
-        <div className="flex gap-1 border border-light-gray rounded-lg p-2">
-            {weeksGrid.map((week, i) => (
-                <div key={i} className="flex flex-col gap-1">
-                    {week.map((day, j) => (
-                        <div
-                            key={j}
-                            title={
-                                day.date
-                                    ? `${formatToIso8601Tz(day.date)} – ${day.value}`
-                                    : ""
-                            }
-                            className={`h-3 w-3 rounded-sm ${getColor(day.value)}`}
-                        />
-                    ))}
-                </div>
-            ))}
+        <div className="flex flex-col gap-1 border border-light-gray rounded-lg p-2">
+            <h1 className="text-heading-xs">Comptes uniques touchés</h1>
+            <h2 className="text-heading-sm">{totalValue}</h2>
+            <div className="flex gap-1 p-2">
+
+
+                
+                {weeksGrid.map((week, i) => (
+                    <div key={i} className="flex flex-col gap-1">
+                        {week.map((day, j) => (
+                            <div
+                                key={j}
+                                title={
+                                    day.date
+                                        ? `${formatToIso8601Tz(day.date)} – ${day.value}`
+                                        : ""
+                                }
+                                className={`h-3 w-3 rounded-sm ${getColor(day.value)}`}
+                            />
+                        ))}
+                    </div>
+                ))}
+            </div>
         </div>
     );
 }
@@ -82,7 +91,7 @@ function buildWeeksGrid(data: ChartDataPoint[], daysToDisplay: number): HeatMapC
 }
 
 function getColor(count: number) {
-    if (count === 0) return "bg-zinc-200 dark:bg-zinc-800";
+    if (count === 0) return "bg-zinc-200";
     if (count < 1000) return "bg-emerald-200";
     if (count < 5000) return "bg-emerald-400";
     if (count < 10000) return "bg-emerald-600";

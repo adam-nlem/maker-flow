@@ -1,4 +1,5 @@
-import { BookmarkIcon, ChatBubbleLeftIcon, EyeIcon, FilmIcon, HandThumbDownIcon, HandThumbUpIcon, LinkIcon, ShareIcon, SparklesIcon, UserPlusIcon, UsersIcon } from "@heroicons/react/24/solid";
+
+import { BookmarkIcon, ArrowUpOnSquareIcon, ChatBubbleLeftIcon, EyeIcon, FilmIcon, HandThumbDownIcon, HandThumbUpIcon, LinkIcon, ShareIcon, SparklesIcon, UserPlusIcon, UsersIcon, HeartIcon } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
 
 export enum SocialAnalyticsIntegrationInsightType {
@@ -18,10 +19,10 @@ export enum SocialAnalyticsIntegrationInsightType {
 
 export const socialAnalyticsIntegrationInsightTypeToIcon: Record<SocialAnalyticsIntegrationInsightType, ComponentType<SVGProps<SVGSVGElement>>> = {
     [SocialAnalyticsIntegrationInsightType.Views]: EyeIcon,
-    [SocialAnalyticsIntegrationInsightType.Likes]: HandThumbUpIcon,
+    [SocialAnalyticsIntegrationInsightType.Likes]: HeartIcon,
     [SocialAnalyticsIntegrationInsightType.Saves]: BookmarkIcon,
     [SocialAnalyticsIntegrationInsightType.Comments]: ChatBubbleLeftIcon,
-    [SocialAnalyticsIntegrationInsightType.Shares]: ShareIcon,
+    [SocialAnalyticsIntegrationInsightType.Shares]: ArrowUpOnSquareIcon,
     [SocialAnalyticsIntegrationInsightType.Followers]: UserPlusIcon,
     [SocialAnalyticsIntegrationInsightType.TotalFollowers]: UsersIcon,
     [SocialAnalyticsIntegrationInsightType.Impressions]: SparklesIcon,

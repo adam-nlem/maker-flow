@@ -21,12 +21,12 @@ export default function SocialAnalyticsInsightTile({
     <div className="flex flex-row gap-3 border border-light-gray rounded-lg p-2 w-fit items-center">
       <div>
         <p className="text-xs whitespace-nowrap">{label}</p>
-        <h1 className="text-heading-sm">{value.toLocaleString("fr-FR")}</h1>
+        <h1 className="text-heading-sm">{value}</h1>
       </div>
       {chart && <div>{chart}</div>}
       {!chart && (
         <div className="flex flex-col items-end">
-          <Icon className="size-5 text-dark" strokeWidth={2} />
+          <Icon className="size-4 text-dark" strokeWidth={2} />
           {evolutionPercentage !== undefined && evolutionPercentage !== null && (
             <span
               className={`text-sm font-medium ${evolutionPercentage.startsWith('+') ? "text-green-500" : "text-red-500"

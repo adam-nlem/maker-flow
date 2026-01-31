@@ -97,5 +97,6 @@ src/Module/SocialAnalytics/
 ## Notes
 
 - Daily points are returned for these insight types: TotalFollowers, Comments, Shares, Saves, Views, Reach, Likes
-- The `totalValue` on each daily points entry is the sum of all daily insight values for that type within the selected time period
+- The backend always returns a **full year** of `dailyPoints` data regardless of the selected time period
+- **Insight tile values are computed on the frontend**: the dynamic insight tiles display the sum of daily values within the selected time period, computed via `computeTotalValue(getFilteredInsightsForType(...))` in `insightChartDataHelper.ts`. This means tile values update reactively when the user changes the time period filter, without an additional API call.
 - The `InsightEvolutionHelper` is shared with `SocialAnalyticsPostService` to avoid code duplication

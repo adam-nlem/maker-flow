@@ -8,6 +8,7 @@ use App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight\ShowSocialAnaly
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationDetailService;
+use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
@@ -21,6 +22,7 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
         ListSocialAnalyticsIntegrationInsightsQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
         SocialAnalyticsIntegrationInsightRepository $insightRepository,
+        SocialAnalyticsIntegrationInsightService $s,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
