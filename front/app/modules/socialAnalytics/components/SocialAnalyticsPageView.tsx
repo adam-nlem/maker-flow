@@ -29,7 +29,7 @@ export default function SocialAnalyticsPageView({ userModuleUuid }: ModuleWidget
         return null;
     }
 
-    return <div className="p-5 flex flex-col gap-3">
+    return <div className="p-5 flex flex-col gap-3 h-screen overflow-hidden">
         <div className="flex flex-row justify-between">
             <div className="flex flex-row flex-wrap gap-3">
                 {integrations.map((integration) => (

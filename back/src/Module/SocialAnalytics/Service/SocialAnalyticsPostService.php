@@ -124,7 +124,6 @@ class SocialAnalyticsPostService
 
     private const EXCLUDED_INSIGHT_TYPES = [
         SocialAnalyticsPostInsightType::Reach,
-        SocialAnalyticsPostInsightType::TotalInteractions,
     ];
 
     /**
