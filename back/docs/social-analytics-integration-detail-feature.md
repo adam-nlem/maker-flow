@@ -63,9 +63,10 @@ This feature provides a detail endpoint that returns aggregated Instagram integr
 
 ```
 Controller
-    └── SocialAnalyticsIntegrationDetailService
+    └── SocialAnalyticsIntegrationInsightService
         ├── SocialAnalyticsIntegrationInsightRepository (insights by time period)
         │   └── InsightEvolutionHelper (evolution calculation)
+        ├── InsightHelper (extracting insight values)
         └── SocialAnalyticsPostRepository (post count, streak)
 ```
 
@@ -84,12 +85,13 @@ src/Module/SocialAnalytics/
 │           ├── SocialAnalyticsIntegrationInsightDailyPointsDTO.php
 │           └── SocialAnalyticsIntegrationInsightWithEvolutionDTO.php
 ├── Helper/
-│   └── InsightEvolutionHelper.php
+│   ├── InsightEvolutionHelper.php
+│   └── InsightHelper.php
 ├── Repository/
 │   ├── SocialAnalyticsIntegrationInsightRepository.php
 │   └── SocialAnalyticsPostRepository.php
 └── Service/
-    └── SocialAnalyticsIntegrationDetailService.php
+    └── SocialAnalyticsIntegrationInsightService.php
 ```
 
 ---
@@ -99,4 +101,5 @@ src/Module/SocialAnalytics/
 - Daily points are returned for these insight types: TotalFollowers, Comments, Shares, Saves, Views, Reach, Likes
 - The backend always returns a **full year** of `dailyPoints` data regardless of the selected time period
 - **Insight tile values are computed on the frontend**: the dynamic insight tiles display the sum of daily values within the selected time period, computed via `computeTotalValue(getFilteredInsightsForType(...))` in `insightChartDataHelper.ts`. This means tile values update reactively when the user changes the time period filter, without an additional API call.
-- The `InsightEvolutionHelper` is shared with `SocialAnalyticsPostService` to avoid code duplication
+- The `InsightEvolutionHelper` and `InsightHelper` are shared with `SocialAnalyticsPostService` and `SocialAnalyticsPostInsightService` to avoid code duplication
+- The detail logic lives in `SocialAnalyticsIntegrationInsightService` alongside the Instagram fetch logic (one service per domain)

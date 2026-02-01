@@ -7,7 +7,6 @@ use App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight\ListSocialAnaly
 use App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight\ShowSocialAnalyticsIntegrationDetailQueryParamDTO;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
-use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationDetailService;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -48,7 +47,7 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
     public function detail(
         ShowSocialAnalyticsIntegrationDetailQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
-        SocialAnalyticsIntegrationDetailService $detailService,
+        SocialAnalyticsIntegrationInsightService $insightService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -62,7 +61,7 @@ class SocialAnalyticsIntegrationInsightController extends AbstractController
             );
         }
 
-        $detail = $detailService->getDetail(
+        $detail = $insightService->getDetail(
             user: $user,
             integration: $integration,
             timePeriod: SocialAnalyticsTimePeriod::LastYear,

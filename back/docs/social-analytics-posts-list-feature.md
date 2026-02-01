@@ -113,4 +113,4 @@ src/Module/SocialAnalytics/
 
 - Posts are filtered by `publishedAt >= now - timePeriod` and sorted by `publishedAt` DESC (most recent first)
 - Only the latest insight value per type within the time period is returned
-- The `InsightEvolutionHelper` is shared with `SocialAnalyticsIntegrationDetailService` to avoid code duplication
+- The `InsightEvolutionHelper` and `InsightHelper` are shared with `SocialAnalyticsIntegrationInsightService` and `SocialAnalyticsPostInsightService` to avoid code duplication

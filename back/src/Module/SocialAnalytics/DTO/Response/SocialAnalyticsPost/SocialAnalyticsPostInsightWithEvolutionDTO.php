@@ -3,27 +3,21 @@
 namespace App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost;
 
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
+use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostInsight;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 class SocialAnalyticsPostInsightWithEvolutionDTO
 {
     public function __construct(
-        #[Groups(['api_modules_social_analytics_posts_list'])]
-        private readonly SocialAnalyticsPostInsightType $type,
-        #[Groups(['api_modules_social_analytics_posts_list'])]
-        private readonly int $value,
-        #[Groups(['api_modules_social_analytics_posts_list'])]
+        #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
+        private readonly SocialAnalyticsPostInsight $insight,
+        #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
         private readonly ?string $evolutionPercentage,
     ) {}
 
-    public function getType(): SocialAnalyticsPostInsightType
+    public function getInsight(): SocialAnalyticsPostInsight
     {
-        return $this->type;
-    }
-
-    public function getValue(): int
-    {
-        return $this->value;
+        return $this->insight;
     }
 
     public function getEvolutionPercentage(): ?string

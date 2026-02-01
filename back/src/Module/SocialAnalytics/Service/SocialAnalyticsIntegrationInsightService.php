@@ -4,11 +4,19 @@ namespace App\Module\SocialAnalytics\Service;
 
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Integration;
+use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramIntegrationInsightDTO;
+use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\ShowSocialAnalyticsIntegrationDetailResponseDTO;
+use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightDailyPointsDTO;
+use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightWithEvolutionDTO;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
+use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
+use App\Module\SocialAnalytics\Helper\InsightEvolutionHelper;
+use App\Module\SocialAnalytics\Helper\InsightHelper;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
+use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 use App\Repository\IntegrationRepository;
 use App\Service\Integration\InstagramOAuthService;
 use DateInterval;
@@ -17,10 +25,21 @@ use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class SocialAnalyticsIntegrationInsightService
 {
+    private const GRAPH_INSIGHT_TYPES = [
+        SocialAnalyticsIntegrationInsightType::TotalFollowers,
+        SocialAnalyticsIntegrationInsightType::Comments,
+        SocialAnalyticsIntegrationInsightType::Shares,
+        SocialAnalyticsIntegrationInsightType::Saves,
+        SocialAnalyticsIntegrationInsightType::Views,
+        SocialAnalyticsIntegrationInsightType::Reach,
+        SocialAnalyticsIntegrationInsightType::Likes,
+    ];
+
     private string $instagramGraphUrl;
 
     public function __construct(
         private readonly SocialAnalyticsIntegrationInsightRepository $integrationInsightRepository,
+        private readonly SocialAnalyticsPostRepository $postRepository,
         private readonly IntegrationRepository $integrationRepository,
         private readonly InstagramOAuthService $instagramOAuthService,
         private readonly HttpClientInterface $httpClient,
@@ -105,5 +124,114 @@ class SocialAnalyticsIntegrationInsightService
             type: $type,
             value: $value
         ) === null;
+    }
+
+    public function getDetail(
+        User $user,
+        Integration $integration,
+        SocialAnalyticsTimePeriod $timePeriod,
+    ): ShowSocialAnalyticsIntegrationDetailResponseDTO {
+        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+        $daysCount = $timePeriod->getDaysCount();
+
+        $currentPeriodStart = $now->modify("-{$daysCount} days");
+        $currentPeriodEnd = $now;
+
+        $previousPeriodStart = $currentPeriodStart->modify("-{$daysCount} days");
+        $previousPeriodEnd = $currentPeriodStart;
+
+        $currentInsights = $this->integrationInsightRepository->getByUserAndIntegrationAndTimePeriod(
+            $user,
+            $integration,
+            $currentPeriodStart,
+            $currentPeriodEnd,
+        );
+
+        $previousInsights = $this->integrationInsightRepository->getByUserAndIntegrationAndTimePeriod(
+            $user,
+            $integration,
+            $previousPeriodStart,
+            $previousPeriodEnd,
+        );
+
+        $insightsWithEvolution = $this->buildInsightsWithEvolution($currentInsights, $previousInsights);
+
+        $totalFollowers = InsightHelper::getInsightValueByType($currentInsights, SocialAnalyticsIntegrationInsightType::TotalFollowers) ?? 0;
+        $postCount = $this->postRepository->countByIntegration($integration);
+        $streak = $this->postRepository->calculateStreak($integration);
+
+        $dailyPoints = $this->buildDailyPoints($user, $integration, $currentPeriodStart);
+
+        return new ShowSocialAnalyticsIntegrationDetailResponseDTO(
+            totalFollowers: $totalFollowers,
+            postCount: $postCount,
+            streak: $streak,
+            insights: $insightsWithEvolution,
+            dailyPoints: $dailyPoints,
+        );
+    }
+
+    /**
+     * @return SocialAnalyticsIntegrationInsightDailyPointsDTO[]
+     */
+    private function buildDailyPoints(
+        User $user,
+        Integration $integration,
+        \DateTimeImmutable $periodStart,
+    ): array {
+        $insights = $this->integrationInsightRepository->getDailyByUserAndIntegrationAndTypes(
+            $user,
+            $integration,
+            self::GRAPH_INSIGHT_TYPES,
+            $periodStart,
+        );
+
+        $insightsByType = [];
+        foreach ($insights as $insight) {
+            $typeValue = $insight->getType()->value;
+            if (!isset($insightsByType[$typeValue])) {
+                $insightsByType[$typeValue] = [];
+            }
+            $insightsByType[$typeValue][] = $insight;
+        }
+
+        $graphs = [];
+        foreach (self::GRAPH_INSIGHT_TYPES as $type) {
+            $typeInsights = $insightsByType[$type->value] ?? [];
+
+            $graphs[] = new SocialAnalyticsIntegrationInsightDailyPointsDTO(
+                type: $type,
+                insights: $typeInsights,
+            );
+        }
+
+        return $graphs;
+    }
+
+    /**
+     * @param SocialAnalyticsIntegrationInsight[] $currentInsights
+     * @param SocialAnalyticsIntegrationInsight[] $previousInsights
+     * @return SocialAnalyticsIntegrationInsightWithEvolutionDTO[]
+     */
+    private function buildInsightsWithEvolution(array $currentInsights, array $previousInsights): array
+    {
+        $previousByType = InsightEvolutionHelper::buildPreviousValuesByType($previousInsights);
+
+        $insightsWithEvolution = [];
+        foreach ($currentInsights as $insight) {
+            $type = $insight->getType();
+            $currentValue = $insight->getValue();
+            $previousValue = $previousByType[$type->value] ?? null;
+
+            $evolutionPercentage = InsightEvolutionHelper::calculateEvolutionPercentage($currentValue, $previousValue);
+
+            $insightsWithEvolution[] = new SocialAnalyticsIntegrationInsightWithEvolutionDTO(
+                type: $type,
+                value: $currentValue,
+                evolutionPercentage: $evolutionPercentage,
+            );
+        }
+
+        return $insightsWithEvolution;
     }
 }

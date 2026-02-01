@@ -162,6 +162,29 @@ class SocialAnalyticsPostRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    /**
+     * @return SocialAnalyticsPost[]
+     */
+    public function getByUserAndIntegrationAndPublishedBeforeLimited(
+        User $user,
+        Integration $integration,
+        \DateTimeImmutable $publishedBefore,
+        int $limit,
+    ): array {
+        return $this->createQueryBuilder('p')
+            ->where('p.user = :user')
+            ->andWhere('p.integration = :integration')
+            ->andWhere('p.publishedAt < :publishedBefore')
+            ->setParameter('user', $user)
+            ->setParameter('integration', $integration)
+            ->setParameter('publishedBefore', $publishedBefore)
+            ->orderBy('p.publishedAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     public function getSingleByIntegrationAndPublishedBeforeDate(
         Integration $integration,
         \DateTimeImmutable $publishedBefore,

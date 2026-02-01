@@ -6,7 +6,6 @@ use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostInsight;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 
@@ -89,24 +88,93 @@ class SocialAnalyticsPostInsightRepository extends ServiceEntityRepository
     }
 
     /**
+     * Returns one insight per type (the most recent) for a given post.
+     *
+     * @return SocialAnalyticsPostInsight[]
+     */
+    public function getLatestByPostGroupedByType(SocialAnalyticsPost $post): array
+    {
+        $sub = $this->createQueryBuilder('sub')
+            ->select('MAX(sub.id)')
+            ->where('sub.socialAnalyticsPost = :post')
+            ->groupBy('sub.type')
+            ->getDQL();
+
+        return $this->createQueryBuilder('pi')
+            ->where('pi.id IN (' . $sub . ')')
+            ->setParameter('post', $post)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * Returns all insights for a single post filtered to specific types, ordered by createdAt ASC.
+     *
+     * @param SocialAnalyticsPostInsightType[] $types
+     * @return SocialAnalyticsPostInsight[]
+     */
+    public function getByPostAndTypes(SocialAnalyticsPost $post, array $types): array
+    {
+        return $this->createQueryBuilder('pi')
+            ->where('pi.socialAnalyticsPost = :post')
+            ->andWhere('pi.type IN (:types)')
+            ->setParameter('post', $post)
+            ->setParameter('types', $types)
+            ->orderBy('pi.createdAt', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * Returns all insights for multiple posts filtered to specific types, ordered by createdAt ASC.
+     *
+     * @param int[] $postIds
+     * @param SocialAnalyticsPostInsightType[] $types
+     * @return SocialAnalyticsPostInsight[]
+     */
+    public function getByPostIdsAndTypes(array $postIds, array $types): array
+    {
+        return $this->createQueryBuilder('pi')
+            ->where('pi.socialAnalyticsPost IN (:postIds)')
+            ->andWhere('pi.type IN (:types)')
+            ->setParameter('postIds', $postIds)
+            ->setParameter('types', $types)
+            ->orderBy('pi.createdAt', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * Returns one insight per type (the most recent before the given date) for a given post.
+     *
      * @param SocialAnalyticsPostInsightType[] $excludedTypes
      * @return SocialAnalyticsPostInsight[]
      */
-    public function getByPostAndCreatedBeforeDate(
+    public function getLatestByPostGroupedByTypeBeforeDate(
         SocialAnalyticsPost $post,
         \DateTimeImmutable $createdBefore,
         array $excludedTypes = [],
     ): array {
-        $qb = $this->createQueryBuilder('pi')
-            ->where('pi.socialAnalyticsPost = :post')
-            ->andWhere('pi.createdAt <= :createdBefore')
-            ->setParameter('post', $post)
-            ->setParameter('createdBefore', $createdBefore)
-            ->orderBy('pi.createdAt', 'DESC');
+        $subQb = $this->createQueryBuilder('sub')
+            ->select('MAX(sub.id)')
+            ->where('sub.socialAnalyticsPost = :post')
+            ->andWhere('sub.createdAt <= :createdBefore')
+            ->groupBy('sub.type');
 
         if (!empty($excludedTypes)) {
-            $qb->andWhere('pi.type NOT IN (:excludedTypes)')
-                ->setParameter('excludedTypes', $excludedTypes);
+            $subQb->andWhere('sub.type NOT IN (:excludedTypes)');
+        }
+
+        $qb = $this->createQueryBuilder('pi')
+            ->where('pi.id IN (' . $subQb->getDQL() . ')')
+            ->setParameter('post', $post)
+            ->setParameter('createdBefore', $createdBefore);
+
+        if (!empty($excludedTypes)) {
+            $qb->setParameter('excludedTypes', $excludedTypes);
         }
 
         return $qb->getQuery()

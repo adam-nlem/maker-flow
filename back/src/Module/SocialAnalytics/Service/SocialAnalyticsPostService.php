@@ -6,13 +6,13 @@ use App\Entity\Integration;
 use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramPostDTO;
-use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost\SocialAnalyticsPostInsightWithEvolutionDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost\SocialAnalyticsPostWithInsightsDTO;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostInsight;
 use App\Module\SocialAnalytics\Helper\InsightEvolutionHelper;
+use App\Module\SocialAnalytics\Helper\InsightHelper;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
@@ -151,11 +151,9 @@ class SocialAnalyticsPostService
             $postAgeDuration = $this->calculatePostAgeDuration($post, $now);
             $insightsCreatedBefore = $post->getPublishedAt()->add($postAgeDuration);
 
-            $allInsights = $this->getLatestInsightsByType(
-                $this->insightRepository->getByPostAndCreatedBeforeDate(
-                    $post,
-                    $insightsCreatedBefore,
-                )
+            $allInsights = $this->insightRepository->getLatestByPostGroupedByTypeBeforeDate(
+                $post,
+                $insightsCreatedBefore,
             );
 
             $currentInsights = array_filter(
@@ -171,19 +169,29 @@ class SocialAnalyticsPostService
 
             if ($previousPost !== null) {
                 $previousInsightsCreatedBefore = $previousPost->getPublishedAt()->add($postAgeDuration);
-                $previousInsights = $this->getLatestInsightsByType(
-                    $this->insightRepository->getByPostAndCreatedBeforeDate(
-                        $previousPost,
-                        $previousInsightsCreatedBefore,
-                        self::EXCLUDED_INSIGHT_TYPES,
-                    )
+                $previousInsights = $this->insightRepository->getLatestByPostGroupedByTypeBeforeDate(
+                    $previousPost,
+                    $previousInsightsCreatedBefore,
+                    self::EXCLUDED_INSIGHT_TYPES,
                 );
             }
 
-            $insightsWithEvolution = $this->buildPostInsightsWithEvolution($currentInsights, $previousInsights);
+            $insightsWithEvolution = InsightEvolutionHelper::buildPostInsightsWithEvolution(
+                $currentInsights,
+                $previousInsights,
+                [
+                    SocialAnalyticsPostInsightType::Views->value,
+                    SocialAnalyticsPostInsightType::Likes->value,
+                    SocialAnalyticsPostInsightType::Comments->value,
+                    SocialAnalyticsPostInsightType::Shares->value,
+                    SocialAnalyticsPostInsightType::Saved->value,
+                    SocialAnalyticsPostInsightType::AverageWatchTime->value,
+                    SocialAnalyticsPostInsightType::TotalWatchTime->value,
+                ],
+            );
 
-            $totalInteractions = $this->getInsightValueByType($allInsights, SocialAnalyticsPostInsightType::TotalInteractions);
-            $reach = $this->getInsightValueByType($allInsights, SocialAnalyticsPostInsightType::Reach);
+            $totalInteractions = InsightHelper::getInsightValueByType($allInsights, SocialAnalyticsPostInsightType::TotalInteractions);
+            $reach = InsightHelper::getInsightValueByType($allInsights, SocialAnalyticsPostInsightType::Reach);
 
             $result[] = new SocialAnalyticsPostWithInsightsDTO(
                 uuid: $post->getUuid(),
@@ -192,35 +200,12 @@ class SocialAnalyticsPostService
                 publishedAt: $post->getPublishedAt(),
                 caption: $post->getCaption(),
                 insights: $insightsWithEvolution,
-                engagementByFollowers: $this->calculateEngagement($totalInteractions, $totalFollowers->getValue()),
-                engagementByReach: $this->calculateEngagement($totalInteractions, $reach),
+                engagementByFollowers: InsightHelper::calculateEngagement($totalInteractions, $totalFollowers->getValue()),
+                engagementByReach: InsightHelper::calculateEngagement($totalInteractions, $reach),
             );
         }
 
         return $result;
-    }
-
-    /**
-     * @param SocialAnalyticsPostInsight[] $insights
-     */
-    private function getInsightValueByType(array $insights, SocialAnalyticsPostInsightType $type): ?int
-    {
-        foreach ($insights as $insight) {
-            if ($insight->getType() === $type) {
-                return $insight->getValue();
-            }
-        }
-
-        return null;
-    }
-
-    private function calculateEngagement(?int $interactions, ?int $divisor): ?float
-    {
-        if ($interactions === null || $divisor === null || $divisor === 0) {
-            return null;
-        }
-
-        return round(($interactions / $divisor) * 100, 2);
     }
 
     private function calculatePostAgeDuration(SocialAnalyticsPost $post, \DateTimeImmutable $now): \DateInterval
@@ -229,63 +214,4 @@ class SocialAnalyticsPostService
         return $publishedAt->diff($now);
     }
 
-    /**
-     * @param SocialAnalyticsPostInsight[] $insights
-     * @return SocialAnalyticsPostInsight[]
-     */
-    private function getLatestInsightsByType(array $insights): array
-    {
-        $latestByType = [];
-        foreach ($insights as $insight) {
-            $typeValue = $insight->getType()->value;
-            if (!isset($latestByType[$typeValue])) {
-                $latestByType[$typeValue] = $insight;
-            }
-        }
-
-        return array_values($latestByType);
-    }
-
-    /**
-     * @param SocialAnalyticsPostInsight[] $currentInsights
-     * @param SocialAnalyticsPostInsight[] $previousInsights
-     * @return SocialAnalyticsPostInsightWithEvolutionDTO[]
-     */
-    private function buildPostInsightsWithEvolution(array $currentInsights, array $previousInsights): array
-    {
-        $previousByType = InsightEvolutionHelper::buildPreviousValuesByType($previousInsights);
-
-        $typeOrder = [
-            SocialAnalyticsPostInsightType::Views->value,
-            SocialAnalyticsPostInsightType::Likes->value,
-            SocialAnalyticsPostInsightType::Comments->value,
-            SocialAnalyticsPostInsightType::Shares->value,
-            SocialAnalyticsPostInsightType::Saved->value,
-            SocialAnalyticsPostInsightType::AverageWatchTime->value,
-            SocialAnalyticsPostInsightType::TotalWatchTime->value,
-        ];
-
-        usort($currentInsights, function ($a, $b) use ($typeOrder) {
-            $posA = array_search($a->getType()->value, $typeOrder);
-            $posB = array_search($b->getType()->value, $typeOrder);
-            return $posA - $posB;
-        });
-
-        $insightsWithEvolution = [];
-        foreach ($currentInsights as $insight) {
-            $type = $insight->getType();
-            $currentValue = $insight->getValue();
-            $previousValue = $previousByType[$type->value] ?? null;
-
-            $evolutionPercentage = InsightEvolutionHelper::calculateEvolutionPercentage($currentValue, $previousValue);
-
-            $insightsWithEvolution[] = new SocialAnalyticsPostInsightWithEvolutionDTO(
-                type: $type,
-                value: $currentValue,
-                evolutionPercentage: $evolutionPercentage,
-            );
-        }
-
-        return $insightsWithEvolution;
-    }
 }
