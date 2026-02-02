@@ -24,9 +24,11 @@ The Module system enables users to add functionality to their projects through m
             ▼                    ▼                    ▼
 ┌─────────────────────────────────────────────────────────────────┐
 │                      Module Registry                             │
-│  moduleRegistry: Record<ModuleIdentifier, WidgetComponent>       │
-│  - getModuleWidget(identifier) → Component                       │
-│  - hasModuleWidget(identifier) → boolean                         │
+│  moduleRegistry: Record<ModuleIdentifier, ModuleRegistryItem>    │
+│  - getDashboardView(identifier) → Component                      │
+│  - getPageView(identifier) → Component (may be a router)         │
+│  - getRouter(identifier) → Component                             │
+│  - hasDashboardView(identifier) → boolean                        │
 └─────────────────────────────────────────────────────────────────┘
             │
             ▼
@@ -151,6 +153,7 @@ enum ModuleIdentifier {
     GithubStats = 'github_stats',
     TodoList = 'todo_list',
     Stripe = 'stripe',
+    SocialAnalytics = 'social_analytics',
 }
 ```
 
@@ -350,30 +353,61 @@ All module widgets receive `userModuleUuid` as their only prop. This UUID is use
 ### Registry Structure
 
 ```typescript
-const moduleRegistry: Record<ModuleIdentifier, ModuleWidgetComponent | null> = {
-    [ModuleIdentifier.TodoList]: TodoListDashboardView,
-    [ModuleIdentifier.GithubStats]: null,  // Not implemented
-    [ModuleIdentifier.Stripe]: null,       // Not implemented
+interface ModuleRegistryItem {
+    dashboardView: ModuleWidgetComponent;  // Widget for the dashboard grid
+    pageView: ModuleWidgetComponent;       // Full-page view (may be a router)
+    router: ModuleWidgetComponent;         // Module router for sub-routes
+}
+
+const moduleRegistry: Record<ModuleIdentifier, ModuleRegistryItem | null> = {
+    [ModuleIdentifier.TodoList]: {
+        dashboardView: TodoListDashboardView,
+        pageView: TodoListDashboardView,
+        router: TodoListDashboardView,
+    },
+    [ModuleIdentifier.GithubStats]: null,
+    [ModuleIdentifier.Stripe]: null,
+    [ModuleIdentifier.SocialAnalytics]: {
+        dashboardView: SocialAnalyticsDashboardView,
+        pageView: SocialAnalyticsRouter,      // Module router handles sub-routes
+        router: SocialAnalyticsRouter,
+    },
 };
 ```
 
 ### Functions
 
-#### `getModuleWidget`
+#### `getDashboardView`
 
 ```typescript
-function getModuleWidget(identifier: ModuleIdentifier): ModuleWidgetComponent | null
+function getDashboardView(identifier: ModuleIdentifier): ModuleWidgetComponent | null
 ```
 
-Returns the widget component for a module, or `null` if not implemented.
+Returns the dashboard widget component for a module.
 
-#### `hasModuleWidget`
+#### `getPageView`
 
 ```typescript
-function hasModuleWidget(identifier: ModuleIdentifier): boolean
+function getPageView(identifier: ModuleIdentifier): ModuleWidgetComponent | null
 ```
 
-Returns `true` if the module has a widget implementation.
+Returns the full-page component for a module. For modules with sub-routes, this returns the module router.
+
+#### `getRouter`
+
+```typescript
+function getRouter(identifier: ModuleIdentifier): ModuleWidgetComponent | null
+```
+
+Returns the module router component.
+
+#### `hasDashboardView`
+
+```typescript
+function hasDashboardView(identifier: ModuleIdentifier): boolean
+```
+
+Returns `true` if the module has a dashboard widget implementation.
 
 ---
 
@@ -388,15 +422,15 @@ export default function Home() {
     const { projects } = useListPaginatedProjects();
     const { focusedProjectUuid } = useSelectFocusedProject({ projects });
     const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null;
-    
+
     const { userModules, isLoading } = useListProjectUserModules(focusedProject?.uuid);
 
     return (
         <div className="w-full pl-16 flex flex-row flex-wrap">
             {userModules
-                .filter((um) => hasModuleWidget(um.module.moduleIdentifier))
+                .filter((um) => hasDashboardView(um.module.moduleIdentifier))
                 .map((userModule) => {
-                    const Widget = getModuleWidget(userModule.module.moduleIdentifier);
+                    const Widget = getDashboardView(userModule.module.moduleIdentifier);
                     if (!Widget) return null;
                     return <Widget key={userModule.uuid} userModuleUuid={userModule.uuid} />;
                 })}
@@ -421,9 +455,26 @@ export default function Home() {
 
 ## Feature Module Structure
 
-Each module has its own self-contained folder with all related code.
+Each module has its own self-contained folder with all related code. Modules with multiple pages include a router and a `pages/` folder.
 
-### Example: TodoList Module
+### Example: SocialAnalytics Module (multi-page with router)
+
+```
+front/app/modules/socialAnalytics/
+├── SocialAnalyticsRouter.tsx          # Module router (registered as pageView/router)
+├── pages/
+│   └── SocialAnalyticsPostDetailPage.tsx  # Page component (extracts params)
+├── components/
+│   ├── SocialAnalyticsPageView.tsx    # Main page view
+│   ├── SocialAnalyticsDashboardView.tsx  # Dashboard widget
+│   └── posts/                         # Post-related components
+├── dtos/                              # Module-specific DTOs
+├── hooks/api/                         # API hooks
+├── models/                            # Module-specific models
+└── stores/                            # Module-specific Zustand stores
+```
+
+### Example: TodoList Module (single page)
 
 ```
 front/app/modules/todoList/
@@ -511,8 +562,8 @@ export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetPr
                     ┌──────────────────┐
                     │ For each         │
                     │ userModule:      │
-                    │ - getModuleWidget│
-                    │ - render Widget  │
+                    │ - getDashboardView│
+                    │ - render Widget   │
                     └──────────────────┘
                              │
                              ▼
@@ -543,15 +594,20 @@ To add a new module to the system:
 2. Create feature module folder in `modules/{moduleName}/`
 3. Create widget entry point: `{ModuleName}DashboardView.tsx`
 4. Implement `ModuleWidgetProps` interface
-5. Register in `registry.tsx`:
+5. If the module has multiple pages, create a `{ModuleName}Router.tsx` at the module root with `<Routes>` / `<Route>` for sub-routing, and put page components in `modules/{moduleName}/pages/`
+6. Register in `registry.tsx`:
 
 ```typescript
 import NewModuleDashboardView from "./newModule/components/NewModuleDashboardView";
+import NewModuleRouter from "./newModule/NewModuleRouter";
 
-const moduleRegistry: Record<ModuleIdentifier, ModuleWidgetComponent | null> = {
-    [ModuleIdentifier.TodoList]: TodoListDashboardView,
-    [ModuleIdentifier.NewModule]: NewModuleDashboardView,  // Add here
+const moduleRegistry: Record<ModuleIdentifier, ModuleRegistryItem | null> = {
     // ...
+    [ModuleIdentifier.NewModule]: {
+        dashboardView: NewModuleDashboardView,
+        pageView: NewModuleRouter,     // or NewModuleDashboardView if single page
+        router: NewModuleRouter,       // or NewModuleDashboardView if single page
+    },
 };
 ```
 

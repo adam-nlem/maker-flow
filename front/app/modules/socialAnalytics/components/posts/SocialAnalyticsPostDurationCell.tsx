@@ -1,5 +1,5 @@
 import type { SocialAnalyticsPostInsightWithEvolutionDTO } from "../../dtos/socialAnalyticsPosts/SocialAnalyticsPostInsightWithEvolutionDTO";
-import { formatDurationToFrenchHumanReadable } from "~/utils/durationFormatters";
+import { formatDurationToFrench } from "~/utils/durationFormatters";
 import SocialAnalyticsPostEvolutionBadge from "./SocialAnalyticsPostEvolutionBadge";
 
 interface SocialAnalyticsPostDurationCellProps {
@@ -12,7 +12,7 @@ export default function SocialAnalyticsPostDurationCell({ insight }: SocialAnaly
     return (
         <td className="px-3 py-2 text-left text-sm ">
             <div className="flex flex-row items-center gap-1">
-                {formatDurationToFrenchHumanReadable(insight.value)}
+                {formatDurationToFrench(insight.insight.value)}
                 <SocialAnalyticsPostEvolutionBadge evolutionPercentage={insight.evolutionPercentage} />
             </div>
         </td>

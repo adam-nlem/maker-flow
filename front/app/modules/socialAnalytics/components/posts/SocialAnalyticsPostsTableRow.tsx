@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router";
 import type { SocialAnalyticsPostWithInsightsDTO } from "../../dtos/socialAnalyticsPosts/SocialAnalyticsPostWithInsightsDTO";
 import { useShowSocialAnalyticsPostThumbnail } from "../../hooks/api/socialAnalyticsPosts/useShowSocialAnalyticsPostThumbnail";
 import { SocialAnalyticsPostInsightType, socialAnalyticsPostInsightTypeToFrenchTranslation } from "../../models/enums/SocialAnalyticsPostInsightType";
@@ -15,12 +16,14 @@ function findInsight(
     insights: SocialAnalyticsPostInsightWithEvolutionDTO[],
     type: SocialAnalyticsPostInsightType,
 ): SocialAnalyticsPostInsightWithEvolutionDTO | undefined {
-    return insights.find((insight) => insight.type === type);
+    return insights.find((insight) => insight.insight.type === type);
 }
 
 export default function SocialAnalyticsPostsTableRow({ post }: SocialAnalyticsPostsTableRowProps) {
+    const navigate = useNavigate();
     const { thumbnailUrl } = useShowSocialAnalyticsPostThumbnail(post.uuid);
-
+    
+    console.log(post)
     const viewsInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.Views);
     const totalInteractionsInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.TotalInteractions);
     const likesInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.Likes);
@@ -29,7 +32,7 @@ export default function SocialAnalyticsPostsTableRow({ post }: SocialAnalyticsPo
     const avgWatchTimeInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.AverageWatchTime);
 
     return (
-        <tr className="border-t border-light-gray hover:bg-gray-50 cursor-pointer">
+        <tr className="border-t border-light-gray hover:bg-gray-50 cursor-pointer" onClick={() => navigate(`/modules/social_analytics/posts/${post.uuid}`)}>
             <td className="px-3 py-2">
                 <div className="flex flex-row items-center gap-2">
                     {thumbnailUrl
@@ -52,9 +55,9 @@ export default function SocialAnalyticsPostsTableRow({ post }: SocialAnalyticsPo
                 insight={totalInteractionsInsight}
                 tooltip={
                     <div className="flex flex-col gap-1">
-                        <p>{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.Likes]}: {likesInsight?.value ?? "—"}</p>
-                        <p>{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.Comments]}: {commentsInsight?.value ?? "—"}</p>
-                        <p>{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.Shares]}: {sharesInsight?.value ?? "—"}</p>
+                        <p>{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.Likes]}: {likesInsight?.insight.value ?? "—"}</p>
+                        <p>{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.Comments]}: {commentsInsight?.insight.value ?? "—"}</p>
+                        <p>{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.Shares]}: {sharesInsight?.insight.value ?? "—"}</p>
                     </div>
                 }
             />

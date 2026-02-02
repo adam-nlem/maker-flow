@@ -3,7 +3,7 @@ import SideBar from "~/components/sidebar/SideBar";
 import { useListProjectUserModules } from "~/hooks/api/projects/useListProjectUserModules";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import { getDashboardView, getPageView } from "~/modules/registry";
+import { getRouter } from "~/modules/registry";
 import { ModuleIdentifier } from "~/models/enums/ModuleIdentifier";
 
 export default function ModulePage() {
@@ -25,9 +25,9 @@ export default function ModulePage() {
     }
 
     const identifier = moduleIdentifier as ModuleIdentifier;
-    const Page = getPageView(identifier);
+    const Router = getRouter(identifier);
 
-    if (!Page) {
+    if (!Router) {
         return (
             <div className="w-full">
                 <SideBar />
@@ -66,7 +66,7 @@ export default function ModulePage() {
         <div className="w-full">
             <SideBar />
             <div className="w-full pl-16">
-                <Page userModuleUuid={userModule.uuid} />
+                <Router userModuleUuid={userModule.uuid} />
             </div>
         </div>
     );

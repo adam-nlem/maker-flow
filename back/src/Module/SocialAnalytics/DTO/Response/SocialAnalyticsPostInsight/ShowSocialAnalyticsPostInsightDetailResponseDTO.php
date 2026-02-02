@@ -4,7 +4,6 @@ namespace App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPostInsight;
 
 use App\DTO\Response\ResponseDTOInterface;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost\SocialAnalyticsPostInsightWithEvolutionDTO;
-use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsMediaType;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -23,7 +22,10 @@ class ShowSocialAnalyticsPostInsightDetailResponseDTO implements ResponseDTOInte
         /** @var SocialAnalyticsPostInsightTimelineDTO[] */
         #[Groups(['api_modules_social_analytics_post_insights_detail'])]
         private readonly array $timelines,
-    ) {}
+
+    ) {
+
+    }
 
     public function getData(): array
     {

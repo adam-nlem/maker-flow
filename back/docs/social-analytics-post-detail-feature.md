@@ -12,13 +12,20 @@ Provides a detail endpoint for a single post, returning insight stats with evolu
 
 ```json
 {
-    "uuid": "...",
-    "externalId": "...",
-    "mediaType": "video",
-    "publishedAt": "2025-01-01T12:00:00+00:00",
-    "caption": "...",
-    "insights": [
-        { "type": "views", "value": 1234, "evolutionPercentage": "+12.5%" }
+    "post": {
+        "uuid": "...",
+        "externalId": "...",
+        "mediaType": "video",
+        "publishedAt": "2025-01-01T12:00:00+00:00",
+        "caption": "...",
+        "externalUrl": "https://www.instagram.com/p/...",
+        "duration": 30
+    },
+    "insightsWithEvolution": [
+        {
+            "insight": { "uuid": "...", "type": "views", "value": 1234, "createdAt": "..." },
+            "evolutionPercentage": "+12.5%"
+        }
     ],
     "engagementByFollowers": 5.2,
     "engagementByReach": 8.1,
@@ -72,14 +79,11 @@ The detail logic lives in `SocialAnalyticsPostInsightService` alongside the Inst
 
 | DTO | Purpose |
 |-----|---------|
-| `ShowSocialAnalyticsPostInsightDetailResponseDTO` | Main response DTO |
+| `ShowSocialAnalyticsPostInsightDetailResponseDTO` | Main response DTO — contains nested `post` (SocialAnalyticsPost), `insightsWithEvolution`, engagement rates, and timelines |
+| `SocialAnalyticsPostInsightWithEvolutionDTO` | Wraps a `SocialAnalyticsPostInsight` entity with `evolutionPercentage` |
 | `SocialAnalyticsPostInsightTimelineDTO` | Timeline for one insight type |
 | `SocialAnalyticsPostInsightTimelinePointDTO` | Single data point (hours, value, averageValue) |
 | `ShowSocialAnalyticsPostInsightDetailQueryParamDTO` | Query parameter (`postUuid`) |
-
-### Existing DTOs Modified
-
-- `SocialAnalyticsPostInsightWithEvolutionDTO` — added `api_modules_social_analytics_post_insights_detail` to Groups attribute
 
 ### Shared Helpers
 

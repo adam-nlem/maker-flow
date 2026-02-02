@@ -1,8 +1,9 @@
 import type { ComponentType } from "react";
 import { ModuleIdentifier } from "~/models/enums/ModuleIdentifier";
 import SocialAnalyticsDashboardView from "./socialAnalytics/components/SocialAnalyticsDashboardView";
+import SocialAnalyticsRouter from "./socialAnalytics/SocialAnalyticsRouter";
 import TodoListDashboardView from "./todoList/components/TodoListDashboardView";
-import SocialAnalyticsPageView from "./socialAnalytics/components/SocialAnalyticsPageView";
+import TodoListRouter from "./todoList/TodoListRouter";
 
 export interface ModuleWidgetProps {
     userModuleUuid: string;
@@ -12,19 +13,19 @@ type ModuleWidgetComponent = ComponentType<ModuleWidgetProps>;
 
 interface ModuleRegistryItem {
     dashboardView: ModuleWidgetComponent;
-    pageView: ModuleWidgetComponent;
+    router: ModuleWidgetComponent;
 }
 
 const moduleRegistry: Record<ModuleIdentifier, ModuleRegistryItem | null> = {
     [ModuleIdentifier.TodoList]: {
         dashboardView: TodoListDashboardView,
-        pageView: TodoListDashboardView,
+        router: TodoListRouter,
     },
     [ModuleIdentifier.GithubStats]: null,
     [ModuleIdentifier.Stripe]: null,
     [ModuleIdentifier.SocialAnalytics]: {
         dashboardView: SocialAnalyticsDashboardView,
-        pageView: SocialAnalyticsPageView,
+        router: SocialAnalyticsRouter,
     },
 };
 
@@ -32,8 +33,8 @@ export function getDashboardView(identifier: ModuleIdentifier): ModuleWidgetComp
     return moduleRegistry[identifier]?.dashboardView ?? null;
 }
 
-export function getPageView(identifier: ModuleIdentifier): ModuleWidgetComponent | null {
-    return moduleRegistry[identifier]?.pageView ?? null;
+export function getRouter(identifier: ModuleIdentifier): ModuleWidgetComponent | null {
+    return moduleRegistry[identifier]?.router ?? null;
 }
 
 export function hasDashboardView(identifier: ModuleIdentifier): boolean {

@@ -3,7 +3,7 @@ import type { SocialAnalyticsPostWithInsightsDTO } from "../../dtos/socialAnalyt
 import { useShowSocialAnalyticsPostThumbnail } from "../../hooks/api/socialAnalyticsPosts/useShowSocialAnalyticsPostThumbnail";
 import { SocialAnalyticsPostInsightType, socialAnalyticsPostInsightTypeToIcon } from "../../models/enums/SocialAnalyticsPostInsightType";
 import { formatToFrenchRelative } from "~/utils/dateFormatters";
-import { formatDurationToFrenchHumanReadable } from "~/utils/durationFormatters";
+import { formatDurationToFrench } from "~/utils/durationFormatters";
 import Shimmer from "~/components/ui/Shimmer";
 
 interface SocialAnalyticsPostWithInsightsCardProps {
@@ -13,7 +13,7 @@ interface SocialAnalyticsPostWithInsightsCardProps {
 export default function SocialAnalyticsPostWithInsightsCard({ postWithInsights }: SocialAnalyticsPostWithInsightsCardProps) {
     const { thumbnailUrl, isLoading } = useShowSocialAnalyticsPostThumbnail(postWithInsights.uuid);
 
-    const viewsInsight = postWithInsights.insights.find((insight) => insight.type === SocialAnalyticsPostInsightType.Views);
+    const viewsInsight = postWithInsights.insights.find((insight) => insight.insight.type === SocialAnalyticsPostInsightType.Views);
 
     return (
         <div className="flex flex-col gap-1 w-fit shrink-0">
@@ -22,14 +22,14 @@ export default function SocialAnalyticsPostWithInsightsCard({ postWithInsights }
                 {thumbnailUrl ? <img src={thumbnailUrl} alt="" className="w-20 rounded" /> : <Shimmer height="h-full" width="w-20" />}
                 <div className="flex flex-col gap-1">
                     {postWithInsights.insights.map(function (insight) {
-                        const Icon = socialAnalyticsPostInsightTypeToIcon[insight.type];
+                        const Icon = socialAnalyticsPostInsightTypeToIcon[insight.insight.type];
                         return (
                             <div className="flex flex-row items-center gap-1">
                                 <Icon className="size-3 text-dark" />
-                                {insight.type === SocialAnalyticsPostInsightType.TotalWatchTime || insight.type === SocialAnalyticsPostInsightType.AverageWatchTime ? (
-                                    <p className="text-xs">{formatDurationToFrenchHumanReadable(insight.value)}</p>
+                                {insight.insight.type === SocialAnalyticsPostInsightType.TotalWatchTime || insight.insight.type === SocialAnalyticsPostInsightType.AverageWatchTime ? (
+                                    <p className="text-xs">{formatDurationToFrench(insight.insight.value)}</p>
                                 ) : (
-                                    <p className="text-xs">{insight.value}</p>
+                                    <p className="text-xs">{insight.insight.value}</p>
                                 )}
 
                                 {insight.evolutionPercentage !== undefined && insight.evolutionPercentage !== null && (

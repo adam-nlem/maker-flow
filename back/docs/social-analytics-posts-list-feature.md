@@ -33,18 +33,15 @@ Returns an array of posts with their insights and evolution data:
     "caption": "Check out this amazing content!",
     "insights": [
       {
-        "type": "reach",
-        "value": 1500,
+        "insight": { "uuid": "...", "type": "reach", "value": 1500, "createdAt": "..." },
         "evolutionPercentage": 12.5
       },
       {
-        "type": "likes",
-        "value": 200,
+        "insight": { "uuid": "...", "type": "likes", "value": 200, "createdAt": "..." },
         "evolutionPercentage": -5.2
       },
       {
-        "type": "comments",
-        "value": 45,
+        "insight": { "uuid": "...", "type": "comments", "value": 45, "createdAt": "..." },
         "evolutionPercentage": null
       }
     ]

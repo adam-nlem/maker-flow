@@ -10,6 +10,6 @@ export default [
   layout("routes/protected.tsx", [
     index("routes/home.tsx"),
     route("library", "routes/library.tsx"),
-    route("modules/:moduleIdentifier", "routes/modules.$moduleIdentifier.tsx"),
+    route("modules/:moduleIdentifier/*", "routes/modules.$moduleIdentifier.tsx"),
   ]),
 ] satisfies RouteConfig;

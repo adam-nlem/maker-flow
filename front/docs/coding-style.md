@@ -671,12 +671,36 @@ export default function ProtectedLayout() {
 }
 ```
 
+### Module Routing
+
+Modules that have multiple pages use a **module-level router** registered in the module registry. The generic route `modules/:moduleIdentifier/*` renders the module's router, which handles internal sub-routes using React Router's `<Routes>` / `<Route>` pattern.
+
+```tsx
+// modules/socialAnalytics/SocialAnalyticsRouter.tsx
+import { Routes, Route } from "react-router";
+import type { ModuleWidgetProps } from "~/modules/registry";
+import SocialAnalyticsPageView from "./components/SocialAnalyticsPageView";
+import SocialAnalyticsPostDetailPage from "./pages/SocialAnalyticsPostDetailPage";
+
+export default function SocialAnalyticsRouter(props: ModuleWidgetProps) {
+    return (
+        <Routes>
+            <Route index element={<SocialAnalyticsPageView {...props} />} />
+            <Route path="posts/:postUuid" element={<SocialAnalyticsPostDetailPage {...props} />} />
+        </Routes>
+    );
+}
+```
+
+Module page components live in `modules/{moduleName}/pages/` and receive `ModuleWidgetProps`. They extract route params and render the corresponding view component.
+
 ### Conventions
 
 1. **Layout components** for shared UI (sidebar, auth checks)
 2. **Protected routes** wrapped in auth-checking layout
 3. **Redirect to login** if not authenticated
 4. **Show loading** while checking auth state
+5. **Module routers** for modules with multiple pages — registered as `pageView` and `router` in the registry
 
 ---
 
@@ -798,7 +822,16 @@ Feature modules are self-contained packages that encapsulate all code related to
 ```
 front/app/modules/
 ├── registry.tsx              # Module registry and widget lookup
-└── todoList/                 # Example module
+├── socialAnalytics/          # Module with multi-page routing
+│   ├── SocialAnalyticsRouter.tsx  # Module router (pageView entry point)
+│   ├── pages/                # Module page components (extract params, render views)
+│   │   └── SocialAnalyticsPostDetailPage.tsx
+│   ├── components/           # Module-specific components
+│   ├── dtos/                 # Module-specific DTOs
+│   ├── hooks/api/            # API hooks for this module
+│   ├── models/               # Module-specific models
+│   └── stores/               # Module-specific Zustand stores
+└── todoList/                 # Simple module (single page)
     ├── components/           # Module-specific components
     │   ├── TodoListDashboardView.tsx    # Main widget entry point
     │   ├── TodoListDashboardContent.tsx # Dashboard content
@@ -823,11 +856,13 @@ front/app/modules/
 
 ### Module Registry
 
-The registry maps module identifiers to their widget components:
+The registry maps module identifiers to their component implementations:
 
 ```tsx
 import type { ComponentType } from "react";
 import { ModuleIdentifier } from "~/models/enums/ModuleIdentifier";
+import SocialAnalyticsDashboardView from "./socialAnalytics/components/SocialAnalyticsDashboardView";
+import SocialAnalyticsRouter from "./socialAnalytics/SocialAnalyticsRouter";
 import TodoListDashboardView from "./todoList/components/TodoListDashboardView";
 
 export interface ModuleWidgetProps {
@@ -836,20 +871,31 @@ export interface ModuleWidgetProps {
 
 type ModuleWidgetComponent = ComponentType<ModuleWidgetProps>;
 
-const moduleRegistry: Record<ModuleIdentifier, ModuleWidgetComponent | null> = {
-    [ModuleIdentifier.TodoList]: TodoListDashboardView,
-    [ModuleIdentifier.GithubStats]: null,  // Not implemented yet
-    [ModuleIdentifier.Stripe]: null,       // Not implemented yet
+interface ModuleRegistryItem {
+    dashboardView: ModuleWidgetComponent;  // Widget for the dashboard grid
+    pageView: ModuleWidgetComponent;       // Full-page view (may be a router)
+    router: ModuleWidgetComponent;         // Module router for sub-routes
+}
+
+const moduleRegistry: Record<ModuleIdentifier, ModuleRegistryItem | null> = {
+    [ModuleIdentifier.TodoList]: {
+        dashboardView: TodoListDashboardView,
+        pageView: TodoListDashboardView,
+        router: TodoListDashboardView,
+    },
+    [ModuleIdentifier.GithubStats]: null,
+    [ModuleIdentifier.Stripe]: null,
+    [ModuleIdentifier.SocialAnalytics]: {
+        dashboardView: SocialAnalyticsDashboardView,
+        pageView: SocialAnalyticsRouter,
+        router: SocialAnalyticsRouter,
+    },
 };
-
-export function getModuleWidget(identifier: ModuleIdentifier): ModuleWidgetComponent | null {
-    return moduleRegistry[identifier] ?? null;
-}
-
-export function hasModuleWidget(identifier: ModuleIdentifier): boolean {
-    return moduleRegistry[identifier] !== null;
-}
 ```
+
+- **`dashboardView`** — Widget component rendered on the dashboard grid
+- **`pageView`** — Full-page component rendered at `/modules/:moduleIdentifier`. For modules with sub-routes, this is the module router.
+- **`router`** — Module router component using `<Routes>`/`<Route>` for internal sub-routing
 
 ### Module Widget Entry Point
 
@@ -902,10 +948,12 @@ export default function Home() {
 4. **Own stores** - module-specific Zustand stores in `modules/{moduleName}/stores/`
 5. **Own components** - module-specific components in `modules/{moduleName}/components/`
 6. **Widget entry point** - `{ModuleName}DashboardView.tsx` implements `ModuleWidgetProps`
-7. **Register in registry** - add widget to `moduleRegistry` in `registry.tsx`
-8. **Use relative imports** within module, `~` alias for app-level imports
-9. **API routes** follow pattern: `/modules/{module-name}/...`
-10. **localStorage keys** follow pattern: `app:{module-name}:{key}`
+7. **Module router** - modules with multiple pages use a `{ModuleName}Router.tsx` at the module root, registered as `pageView` and `router`
+8. **Module pages** - page components live in `modules/{moduleName}/pages/`, extract route params and render views
+9. **Register in registry** - add `dashboardView`, `pageView`, and `router` to `moduleRegistry` in `registry.tsx`
+10. **Use relative imports** within module, `~` alias for app-level imports
+11. **API routes** follow pattern: `/modules/{module-name}/...`
+12. **localStorage keys** follow pattern: `app:{module-name}:{key}`
 
 ### Module Imports
 

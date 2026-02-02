@@ -8,6 +8,7 @@ use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: SocialAnalyticsPostInsightRepository::class)]
@@ -20,18 +21,23 @@ class SocialAnalyticsPostInsight
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: SocialAnalyticsPostInsightType::class)]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?SocialAnalyticsPostInsightType $type = null;
 
     #[ORM\Column]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?int $value = null;
 
     #[ORM\ManyToOne(targetEntity: SocialAnalyticsPost::class, inversedBy: 'postInsights')]
