@@ -1,42 +1,42 @@
 import { type ChartDataPoint, fillDailyDataPoints, filterDataPointsByDays } from "~/utils/chartDataHelpers";
-import type { SocialAnalyticsIntegrationInsightDailyPointsDTO } from "../dtos/socialAnalyticsIntegrationInsights/SocialAnalyticsIntegrationInsightDailyPointsDTO";
-import type { SocialAnalyticsIntegrationInsight } from "../models/SocialAnalyticsIntegrationInsight";
+import type { SocialAnalyticsIntegrationInsightTimelineDTO } from "../dtos/socialAnalyticsIntegrationInsights/SocialAnalyticsIntegrationInsightTimelineDTO";
+import type { SocialAnalyticsIntegrationInsightTimelinePointDTO } from "../dtos/socialAnalyticsIntegrationInsights/SocialAnalyticsIntegrationInsightTimelinePointDTO";
 import type { SocialAnalyticsIntegrationInsightType } from "../models/enums/SocialAnalyticsIntegrationInsightType";
 
 export function getChartDataForInsightType(
-    dailyPoints: SocialAnalyticsIntegrationInsightDailyPointsDTO[],
+    timelines: SocialAnalyticsIntegrationInsightTimelineDTO[],
     type: SocialAnalyticsIntegrationInsightType,
     days: number,
 ): ChartDataPoint[] {
-    const dailyPoint = dailyPoints.find((dp) => dp.type === type);
-    if (!dailyPoint) {
+    const timeline = timelines.find((t) => t.type === type);
+    if (!timeline) {
         return [];
     }
 
     const filled = fillDailyDataPoints(
-        dailyPoint.insights.map((insight) => ({
-            date: insight.createdAt,
-            value: insight.value,
+        timeline.points.map((point) => ({
+            date: point.createdAt,
+            value: point.value,
         }))
     );
     return filterDataPointsByDays(filled, days);
 }
 
-export function getFilteredInsightsForType(
-    dailyPoints: SocialAnalyticsIntegrationInsightDailyPointsDTO[],
+export function getFilteredPointsForType(
+    timelines: SocialAnalyticsIntegrationInsightTimelineDTO[],
     type: SocialAnalyticsIntegrationInsightType,
     days: number,
-): SocialAnalyticsIntegrationInsight[] {
-    const dailyPoint = dailyPoints.find((dp) => dp.type === type);
-    if (!dailyPoint) return [];
+): SocialAnalyticsIntegrationInsightTimelinePointDTO[] {
+    const timeline = timelines.find((t) => t.type === type);
+    if (!timeline) return [];
 
     const cutoff = new Date();
     cutoff.setHours(0, 0, 0, 0);
     cutoff.setDate(cutoff.getDate() - days);
 
-    return dailyPoint.insights.filter((i) => i.createdAt >= cutoff);
+    return timeline.points.filter((p) => p.createdAt >= cutoff);
 }
 
-export function computeTotalValue(insights: SocialAnalyticsIntegrationInsight[]): number {
-    return insights.reduce((sum, i) => sum + i.value, 0);
+export function computeTotalValue(points: SocialAnalyticsIntegrationInsightTimelinePointDTO[]): number {
+    return points.reduce((sum, p) => sum + p.value, 0);
 }

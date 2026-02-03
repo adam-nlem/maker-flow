@@ -32,21 +32,27 @@ export function formatToNumericDate(date: Date): string {
 }
 
 export function formatToFrenchRelative(date: Date): string {
+
+
+    if (isNaN(date.getTime())) {
+        return "Date invalide"; // Or return an empty string/fallback
+    }
+
     const diffInMs = date.getTime() - Date.now();
     const diffInSec = Math.round(diffInMs / 1000);
-    
+
     const units: { unit: Intl.RelativeTimeFormatUnit; seconds: number }[] = [
-        { unit: 'year',   seconds: 31536000 },
-        { unit: 'month',  seconds: 2592000 },
-        { unit: 'day',    seconds: 86400 },
-        { unit: 'hour',   seconds: 3600 },
+        { unit: 'year', seconds: 31536000 },
+        { unit: 'month', seconds: 2592000 },
+        { unit: 'day', seconds: 86400 },
+        { unit: 'hour', seconds: 3600 },
         { unit: 'minute', seconds: 60 },
         { unit: 'second', seconds: 1 }
     ];
 
     // Find the first unit where the difference is larger than the unit's value
     const match = units.find(u => Math.abs(diffInSec) >= u.seconds) || units[units.length - 1];
-    
+
     // If older than a week, use your existing short date format
     if (Math.abs(diffInSec) >= 604800) {
         return `le ${formatToFrenchDateShort(date).replace(/ \d{4}$/, '')}`;

@@ -1,4 +1,4 @@
-import { SocialAnalyticsIntegrationInsightDailyPointsDTO, type SocialAnalyticsIntegrationInsightDailyPointsDTOJSON } from "./SocialAnalyticsIntegrationInsightDailyPointsDTO";
+import { SocialAnalyticsIntegrationInsightTimelineDTO, type SocialAnalyticsIntegrationInsightTimelineDTOJSON } from "./SocialAnalyticsIntegrationInsightTimelineDTO";
 import { SocialAnalyticsIntegrationInsightWithEvolutionDTO, type SocialAnalyticsIntegrationInsightWithEvolutionDTOJSON } from "./SocialAnalyticsIntegrationInsightWithEvolutionDTO";
 
 export interface SocialAnalyticsIntegrationDetailDTOJSON {
@@ -6,7 +6,7 @@ export interface SocialAnalyticsIntegrationDetailDTOJSON {
     postCount: number;
     streak: number;
     insights: SocialAnalyticsIntegrationInsightWithEvolutionDTOJSON[];
-    dailyPoints: SocialAnalyticsIntegrationInsightDailyPointsDTOJSON[];
+    timelines: SocialAnalyticsIntegrationInsightTimelineDTOJSON[];
 }
 
 export class SocialAnalyticsIntegrationDetailDTO {
@@ -15,7 +15,7 @@ export class SocialAnalyticsIntegrationDetailDTO {
         public readonly postCount: number,
         public readonly streak: number,
         public readonly insights: SocialAnalyticsIntegrationInsightWithEvolutionDTO[],
-        public readonly dailyPoints: SocialAnalyticsIntegrationInsightDailyPointsDTO[],
+        public readonly timelines: SocialAnalyticsIntegrationInsightTimelineDTO[],
     ) {}
 
     static fromJSON(json: SocialAnalyticsIntegrationDetailDTOJSON): SocialAnalyticsIntegrationDetailDTO {
@@ -24,7 +24,7 @@ export class SocialAnalyticsIntegrationDetailDTO {
             json.postCount,
             json.streak,
             json.insights.map((insight) => SocialAnalyticsIntegrationInsightWithEvolutionDTO.fromJSON(insight)),
-            json.dailyPoints.map((dailyPoints) => SocialAnalyticsIntegrationInsightDailyPointsDTO.fromJSON(dailyPoints)),
+            json.timelines.map((timeline) => SocialAnalyticsIntegrationInsightTimelineDTO.fromJSON(timeline)),
         );
     }
 }

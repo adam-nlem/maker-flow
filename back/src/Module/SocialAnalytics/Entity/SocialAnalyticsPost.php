@@ -11,6 +11,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: SocialAnalyticsPostRepository::class)]
@@ -23,30 +24,39 @@ class SocialAnalyticsPost
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
+    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
+    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
     private ?string $externalId = null;
 
     #[ORM\Column(length: 255, enumType: SocialAnalyticsMediaType::class)]
+    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
     private ?SocialAnalyticsMediaType $mediaType = null;
 
     #[ORM\Column]
+    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
     private ?int $duration = null;
 
     #[ORM\Column]
+    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
     private ?\DateTimeImmutable $publishedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
     private ?string $caption = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
     private ?string $externalUrl = null;
 
     #[ORM\ManyToOne]

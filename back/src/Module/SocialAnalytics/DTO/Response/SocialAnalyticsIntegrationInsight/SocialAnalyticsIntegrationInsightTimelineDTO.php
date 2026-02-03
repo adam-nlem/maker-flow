@@ -3,17 +3,16 @@
 namespace App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight;
 
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
-use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-class SocialAnalyticsIntegrationInsightDailyPointsDTO
+class SocialAnalyticsIntegrationInsightTimelineDTO
 {
     public function __construct(
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly SocialAnalyticsIntegrationInsightType $type,
-        /** @var SocialAnalyticsIntegrationInsight[] */
+        /** @var SocialAnalyticsIntegrationInsightTimelinePointDTO[] */
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
-        private readonly array $insights,
+        private readonly array $points,
     ) {}
 
     public function getType(): SocialAnalyticsIntegrationInsightType
@@ -22,10 +21,10 @@ class SocialAnalyticsIntegrationInsightDailyPointsDTO
     }
 
     /**
-     * @return SocialAnalyticsIntegrationInsight[]
+     * @return SocialAnalyticsIntegrationInsightTimelinePointDTO[]
      */
-    public function getInsights(): array
+    public function getPoints(): array
     {
-        return $this->insights;
+        return $this->points;
     }
 }

@@ -17,9 +17,9 @@ class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInte
         /** @var SocialAnalyticsIntegrationInsightWithEvolutionDTO[] */
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly array $insights,
-        /** @var SocialAnalyticsIntegrationInsightDailyPointsDTO[] */
+        /** @var SocialAnalyticsIntegrationInsightTimelineDTO[] */
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
-        private readonly array $dailyPoints,
+        private readonly array $timelines,
 
     ) {}
 
@@ -30,17 +30,16 @@ class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInte
             'postCount' => $this->postCount,
             'streak' => $this->streak,
             'insights' => $this->insights,
-            'dailyPoints' => $this->dailyPoints,
+            'timelines' => $this->timelines,
         ];
     }
 
     /**
-     * @return SocialAnalyticsIntegrationInsightDailyPointsDTO[]
+     * @return SocialAnalyticsIntegrationInsightTimelineDTO[]
      */
-
-    public function getDailyPoints(): array
+    public function getTimelines(): array
     {
-        return $this->dailyPoints;
+        return $this->timelines;
     }
 
     public function getTotalFollowers(): int

@@ -4,6 +4,13 @@
 
 Provides a detail endpoint for a single post, returning insight stats with evolution percentages, engagement rates, and timeline data comparing the post's metrics over time against the average of the 10 previous posts.
 
+### Gap Filling
+
+The system stores insight data points but skips storage when the value is unchanged from the previous point (to save space). This creates gaps in the timeline data that are filled automatically using `TimelineGapFillerHelper`:
+
+- **Hourly gaps** (`fillPostInsightTimelinePointsHourlyGaps`): For post timelines, missing hourly data points between existing points are filled by copying the value from the previous point.
+- **Daily gaps** (`fillIntegrationInsightTimelinePointsDailyGaps`): For integration timelines, missing daily data points between existing points are filled by copying the value from the previous day.
+
 ## Endpoint
 
 `GET /api/modules/social-analytics/post-insights/detail?postUuid={uuid}`
@@ -90,3 +97,5 @@ The detail logic lives in `SocialAnalyticsPostInsightService` alongside the Inst
 - `InsightHelper::getInsightValueByType` — extracts a single insight value by enum type from an array of insight entities
 - `InsightHelper::calculateEngagement` — computes engagement rate as `(interactions / divisor) * 100`
 - `InsightEvolutionHelper::buildPostInsightsWithEvolution` — sorts insights by a given type order and computes evolution percentages vs. previous insights
+- `TimelineGapFillerHelper::fillPostInsightTimelinePointsHourlyGaps` — fills missing hourly points between existing data points by copying values from the previous point
+- `TimelineGapFillerHelper::fillIntegrationInsightTimelinePointsDailyGaps` — fills missing daily points between existing data points by copying values from the previous day

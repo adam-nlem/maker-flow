@@ -8,7 +8,7 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
 import AreaChart from "~/components/ui/AreaChart";
 import { socialAnalyticsTimePeriodToDays } from "../../models/enums/SocialAnalyticsTimePeriod";
-import { computeTotalValue, getChartDataForInsightType, getFilteredInsightsForType } from "../../helpers/insightChartDataHelper";
+import { computeTotalValue, getChartDataForInsightType, getFilteredPointsForType } from "../../helpers/insightChartDataHelper";
 import ListSocialAnalyticsPostsTable from "../posts/ListSocialAnalyticsPostsTable";
 
 
@@ -60,7 +60,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                             label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[SocialAnalyticsIntegrationInsightType.TotalFollowers]}
                             value={detail.totalFollowers}
                             Icon={UserIcon}
-                            chart={<AreaChart color="var(--color-primary)" data={getChartDataForInsightType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.TotalFollowers, days)} />}
+                            chart={<AreaChart color="var(--color-primary)" data={getChartDataForInsightType(detail.timelines, SocialAnalyticsIntegrationInsightType.TotalFollowers, days)} />}
                         />
                         <SocialAnalyticsInsightTile
                             label="Contenus"
@@ -72,14 +72,14 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                             value={detail.streak}
                             Icon={ArrowTrendingUpIcon}
                         />
-                        {detail.dailyPoints.map((detailPoint) => {
-                            if (detailPoint.type !== SocialAnalyticsIntegrationInsightType.TotalFollowers) {
+                        {detail.timelines.map((timeline) => {
+                            if (timeline.type !== SocialAnalyticsIntegrationInsightType.TotalFollowers) {
                                 return <SocialAnalyticsInsightTile
-                                    key={detailPoint.type}
-                                    label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[detailPoint.type]}
-                                    value={computeTotalValue(getFilteredInsightsForType(detail.dailyPoints, detailPoint.type, days))}
-                                    Icon={socialAnalyticsIntegrationInsightTypeToIcon[detailPoint.type]}
-                                    chart={<AreaChart color="var(--color-primary)" data={getChartDataForInsightType(detail.dailyPoints, detailPoint.type, days)} />}
+                                    key={timeline.type}
+                                    label={socialAnalyticsIntegrationInsightTypeToFrenchTranslation[timeline.type]}
+                                    value={computeTotalValue(getFilteredPointsForType(detail.timelines, timeline.type, days))}
+                                    Icon={socialAnalyticsIntegrationInsightTypeToIcon[timeline.type]}
+                                    chart={<AreaChart color="var(--color-primary)" data={getChartDataForInsightType(detail.timelines, timeline.type, days)} />}
                                 />
                             }
                             return null;
@@ -88,7 +88,7 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
                     </div>
                 </div>
 
-                {/* <CalendarHeatMap totalValue={computeTotalValue(getFilteredInsightsForType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.Reach, days))} data={getChartDataForInsightType(detail.dailyPoints, SocialAnalyticsIntegrationInsightType.Reach, days)} daysToDisplay={socialAnalyticsTimePeriodToDays[timePeriod]} /> */}
+                {/* <CalendarHeatMap totalValue={computeTotalValue(getFilteredPointsForType(detail.timelines, SocialAnalyticsIntegrationInsightType.Reach, days))} data={getChartDataForInsightType(detail.timelines, SocialAnalyticsIntegrationInsightType.Reach, days)} daysToDisplay={socialAnalyticsTimePeriodToDays[timePeriod]} /> */}
 
             </div>
 

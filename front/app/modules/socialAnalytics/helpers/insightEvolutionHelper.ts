@@ -1,13 +1,13 @@
-import type { SocialAnalyticsIntegrationInsightDailyPointsDTO } from "../dtos/socialAnalyticsIntegrationInsights/SocialAnalyticsIntegrationInsightDailyPointsDTO";
+import type { SocialAnalyticsIntegrationInsightTimelineDTO } from "../dtos/socialAnalyticsIntegrationInsights/SocialAnalyticsIntegrationInsightTimelineDTO";
 import type { SocialAnalyticsIntegrationInsightType } from "../models/enums/SocialAnalyticsIntegrationInsightType";
 
 export function computeEvolutionPercentage(
-    dailyPoints: SocialAnalyticsIntegrationInsightDailyPointsDTO[],
+    timelines: SocialAnalyticsIntegrationInsightTimelineDTO[],
     type: SocialAnalyticsIntegrationInsightType,
     days: number,
 ): string | null {
-    const typeData = dailyPoints.find((dp) => dp.type === type);
-    if (!typeData || typeData.insights.length === 0) {
+    const timeline = timelines.find((t) => t.type === type);
+    if (!timeline || timeline.points.length === 0) {
         return null;
     }
 
@@ -21,24 +21,24 @@ export function computeEvolutionPercentage(
     const previousPeriodStart = new Date(currentPeriodStart);
     previousPeriodStart.setDate(previousPeriodStart.getDate() - days);
 
-    const currentInsights = typeData.insights.filter(
-        (i) => i.createdAt >= currentPeriodStart && i.createdAt <= now
+    const currentPoints = timeline.points.filter(
+        (p) => p.createdAt >= currentPeriodStart && p.createdAt <= now
     );
-    const previousInsights = typeData.insights.filter(
-        (i) => i.createdAt >= previousPeriodStart && i.createdAt < currentPeriodStart
+    const previousPoints = timeline.points.filter(
+        (p) => p.createdAt >= previousPeriodStart && p.createdAt < currentPeriodStart
     );
 
-    if (currentInsights.length === 0) {
+    if (currentPoints.length === 0) {
         return null;
     }
 
-    const currentValue = currentInsights[currentInsights.length - 1].value;
+    const currentValue = currentPoints[currentPoints.length - 1].value;
 
-    if (previousInsights.length === 0) {
+    if (previousPoints.length === 0) {
         return null;
     }
 
-    const previousValue = previousInsights[previousInsights.length - 1].value;
+    const previousValue = previousPoints[previousPoints.length - 1].value;
 
     if (previousValue === 0) {
         return null;

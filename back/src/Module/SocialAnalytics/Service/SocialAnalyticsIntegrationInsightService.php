@@ -8,13 +8,15 @@ use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramIntegrationInsightDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\ShowSocialAnalyticsIntegrationDetailResponseDTO;
-use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightDailyPointsDTO;
+use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightTimelineDTO;
+use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightTimelinePointDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightWithEvolutionDTO;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsIntegrationInsight;
 use App\Module\SocialAnalytics\Helper\InsightEvolutionHelper;
 use App\Module\SocialAnalytics\Helper\InsightHelper;
+use App\Module\SocialAnalytics\Helper\TimelineGapFillerHelper;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 use App\Repository\IntegrationRepository;
@@ -160,21 +162,21 @@ class SocialAnalyticsIntegrationInsightService
         $postCount = $this->postRepository->countByIntegration($integration);
         $streak = $this->postRepository->calculateStreak($integration);
 
-        $dailyPoints = $this->buildDailyPoints($user, $integration, $currentPeriodStart);
+        $timelines = $this->buildTimelines($user, $integration, $currentPeriodStart);
 
         return new ShowSocialAnalyticsIntegrationDetailResponseDTO(
             totalFollowers: $totalFollowers,
             postCount: $postCount,
             streak: $streak,
             insights: $insightsWithEvolution,
-            dailyPoints: $dailyPoints,
+            timelines: $timelines,
         );
     }
 
     /**
-     * @return SocialAnalyticsIntegrationInsightDailyPointsDTO[]
+     * @return SocialAnalyticsIntegrationInsightTimelineDTO[]
      */
-    private function buildDailyPoints(
+    private function buildTimelines(
         User $user,
         Integration $integration,
         \DateTimeImmutable $periodStart,
@@ -195,17 +197,29 @@ class SocialAnalyticsIntegrationInsightService
             $insightsByType[$typeValue][] = $insight;
         }
 
-        $graphs = [];
+        $timelines = [];
         foreach (self::GRAPH_INSIGHT_TYPES as $type) {
             $typeInsights = $insightsByType[$type->value] ?? [];
 
-            $graphs[] = new SocialAnalyticsIntegrationInsightDailyPointsDTO(
+            // Convert entities to DTOs first
+            $points = array_map(
+                fn($insight) => new SocialAnalyticsIntegrationInsightTimelinePointDTO(
+                    createdAt: $insight->getCreatedAt(),
+                    value: $insight->getValue(),
+                ),
+                $typeInsights,
+            );
+
+            // Fill gaps using DTOs
+            $filledPoints = TimelineGapFillerHelper::fillIntegrationInsightTimelinePointsDailyGaps($points);
+
+            $timelines[] = new SocialAnalyticsIntegrationInsightTimelineDTO(
                 type: $type,
-                insights: $typeInsights,
+                points: $filledPoints,
             );
         }
 
-        return $graphs;
+        return $timelines;
     }
 
     /**

@@ -17,6 +17,7 @@ use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostInsight;
 use App\Module\SocialAnalytics\Helper\InsightEvolutionHelper;
 use App\Module\SocialAnalytics\Helper\InsightHelper;
+use App\Module\SocialAnalytics\Helper\TimelineGapFillerHelper;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
@@ -224,9 +225,11 @@ class SocialAnalyticsPostInsightService
                 );
             }
 
+            $filledPoints = TimelineGapFillerHelper::fillPostInsightTimelinePointsHourlyGaps($points);
+
             $timelines[] = new SocialAnalyticsPostInsightTimelineDTO(
                 type: $type,
-                points: $points,
+                points: $filledPoints,
             );
         }
 
