@@ -1,4 +1,4 @@
-import { Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
+import { Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, CartesianGrid } from "recharts";
 import { formatDurationToFrench } from "~/utils/durationFormatters";
 
 function formatHoursToFrench(hours: number): string {
@@ -28,13 +28,16 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
     }
 
     return (
-        <div className="bg-white border border-light-gray rounded-md p-2 shadow-sm">
-            <p className="text-body-xs text-gray mb-1">{formatHoursToFrench(label)}</p>
+        <div className="bg-white border border-light-gray rounded-md p-2 shadow-sm flex flex-col gap-1">
+            <p className="text-body-xs text-gray mb-1">Durée après publication: {formatHoursToFrench(label)}</p>
             {payload.map((entry) => (
-                <p key={entry.dataKey} className="text-xs" style={{ color: entry.color }}>
-                    {entry.dataKey === "value" ? "Ce contenu" : "Moyenne (10 derniers)"}:{" "}
-                    <span className="text-heading-xs">{entry.value?.toLocaleString("fr-FR") ?? "—"}</span>
-                </p>
+                <div className="flex flex-row gap-1">
+                    <div className={`rounded-full p-1 ${entry.dataKey === "value" ? 'bg-primary' : 'bg-light-gray'}`}></div>
+                    <p key={entry.dataKey} className="text-xs">
+                        {entry.dataKey === "value" ? "Valeur de ce contenu" : "Valeur de la moyenne des 10 derniers contenus"}:{" "}
+                        <span className="text-heading-xs">{entry.value?.toLocaleString("fr-FR") ?? "—"}</span>
+                    </p>
+                </div>
             ))}
         </div>
     );
@@ -46,32 +49,26 @@ export default function LineChart({ data, formatValue }: LineChartProps) {
     return (
         <div className="w-full h-64">
             <ResponsiveContainer width="100%" height="100%">
-                <RechartsLineChart
-                    data={data}
-                    margin={{ top: 5, right: 20, left: 10, bottom: 5 }}
-                >
-                    <XAxis
-                        dataKey="hoursAfterPublication"
+                <RechartsLineChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="hoursAfterPublication"
                         tickFormatter={formatHoursToFrench}
                         tick={{ fontSize: 12 }}
-                        stroke="#D9D9D9"
-                    />
-                    <YAxis
-                        tickFormatter={tickFormatter}
+                        interval="preserveEnd"
+                        minTickGap={30} // Ensures at least 30px between labels
+                        stroke="var(--color-light-gray)" />
+                    <YAxis width="auto" tickFormatter={tickFormatter}
                         tick={{ fontSize: 12 }}
-                        stroke="#D9D9D9"
-                        width={50}
-                    />
+                        tickCount={5}
+                        domain={['dataMin', 'auto']} // Ensure the axis starts at the minimum data value (or averageValue)
+                        allowDecimals={false}
+
+                        stroke="var(--color-light-gray)" />
                     <Tooltip content={<CustomTooltip />} />
-                    <Legend
-                        formatter={(value: string) =>
-                            value === "value" ? "Ce contenu" : "Moyenne (10 derniers)"
-                        }
-                    />
                     <Line
                         type="monotone"
                         dataKey="value"
-                        stroke="#43CEA9"
+                        stroke="var(--color-primary)"
                         strokeWidth={2}
                         dot={false}
                         isAnimationActive={false}
@@ -79,7 +76,7 @@ export default function LineChart({ data, formatValue }: LineChartProps) {
                     <Line
                         type="monotone"
                         dataKey="averageValue"
-                        stroke="#9ca3af"
+                        stroke="var(--color-gray-400)"
                         strokeWidth={2}
                         strokeDasharray="5 5"
                         dot={false}

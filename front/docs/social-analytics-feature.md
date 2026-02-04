@@ -67,6 +67,7 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 | `SocialAnalyticsPostEvolutionBadge` | `components/posts/SocialAnalyticsPostEvolutionBadge.tsx` | Evolution percentage badge (green/red) |
 | `SocialAnalyticsInsightTile` | `components/SocialAnalyticsInsightTile.tsx` | Metric tile with optional area chart |
 | `SocialAnalyticsPostDetailPageView` | `components/posts/SocialAnalyticsPostDetailPageView.tsx` | Post detail page with insight tiles and timeline charts |
+| `SocialAnalyticsPostInsightSummaryCard` | `components/posts/SocialAnalyticsPostInsightSummaryCard.tsx` | Visibility summary grid card (Views, Reach, AvgWatchTime, TotalWatchTime) with evolution badges; formats watch time values with `formatDurationToFrench` |
 | `SocialAnalyticsPostDetailPage` | `pages/SocialAnalyticsPostDetailPage.tsx` | Page wrapper that extracts `postUuid` param |
 | `FilterTile` | `components/FilterTile.tsx` | Filter chip used in dropdowns |
 | `LineChart` | `~/components/ui/LineChart.tsx` | Recharts line chart with current vs average lines |

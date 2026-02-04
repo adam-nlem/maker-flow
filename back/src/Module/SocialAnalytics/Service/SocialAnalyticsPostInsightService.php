@@ -37,10 +37,6 @@ class SocialAnalyticsPostInsightService
         SocialAnalyticsPostInsightType::TotalWatchTime,
     ];
 
-    private const EXCLUDED_INSIGHT_TYPES = [
-        SocialAnalyticsPostInsightType::Reach,
-    ];
-
     private string $instagramGraphUrl;
 
     public function __construct(
@@ -113,7 +109,7 @@ class SocialAnalyticsPostInsightService
             $previousInsights = $this->postInsightRepository->getLatestByPostGroupedByTypeBeforeDate(
                 $previousPost,
                 $previousInsightsCreatedBefore,
-                self::EXCLUDED_INSIGHT_TYPES,
+
             );
         }
 
