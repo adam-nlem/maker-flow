@@ -14,6 +14,7 @@ import SelectDropdown from "~/components/ui/SelectDropdown";
 import SocialAnalyticsPostInsightSummaryCard from "./SocialAnalyticsPostInsightSummaryCard";
 import { getWidthClassFromPercentage } from "~/helpers/percentageHelper";
 import { BreadCrumbNavbar } from "~/components/ui/BreadCrumbNavBar";
+import { PercentageProgressBar } from "~/components/ui/PercentageProgressBar";
 
 interface SocialAnalyticsPostDetailPageViewProps {
   postUuid: string;
@@ -111,53 +112,50 @@ export default function SocialAnalyticsPostDetailPageView({ postUuid }: SocialAn
 
 
       <div className="flex flex-row gap-3 w-full">
+
+        {/* Visibility */}
         <SocialAnalyticsPostInsightSummaryCard title="Résumé de la visibilité" insights={visibilitySummaryInsights} />
         <SocialAnalyticsPostInsightSummaryCard title="Résumé des intéractions" insights={engagementSummaryInsights} />
 
+        {/* Engagement */}
         <div className="flex flex-col gap-1 w-1/3 border border-light-gray rounded-xl p-3">
           <h1 className="text-heading-md mb-3">Résumé de l'engagement</h1>
-          <h2 className="text-body-sm">Par Abonnés</h2>
-          <h3 className="text-heading-md">{detail.engagementByFollowers}%</h3>
-          <div className="w-full h-2 bg-zinc-200 rounded-full mb-3" >
-            <div className={`${getWidthClassFromPercentage(detail.engagementByFollowers!)} h-full bg-primary rounded-full`}></div>
-          </div>
-
-          <h2 className="text-body-sm">Par comptes touchés Abonnés</h2>
-          <h3 className="text-heading-md">{detail.engagementByReach}%</h3>
-          <div className="w-full h-2 bg-zinc-200 rounded-full">
-            <div className={`${getWidthClassFromPercentage(detail.engagementByReach!)} h-full bg-primary rounded-full`}></div>
-          </div>
+          <PercentageProgressBar name="Par abonnés" percentage={detail.engagementByFollowers!} />
+          <PercentageProgressBar name="Par comptes touchés" percentage={detail.engagementByReach!} />
         </div>
       </div>
-
-      <div className="w-2/3 p-3 border border-light-gray rounded-lg flex flex-col gap-3">
-        <div className="flex flex-row justify-between">
-          <p className="text-heading-sm">Contenu actuel en fonction de la moyenne des 10 contenus précédents</p>
-          <SelectDropdown<SocialAnalyticsPostInsightType>
-            items={detail.timelines.map((tl) => tl.type)}
-            selectedItemId={lineChartInsightType}
-            getItemId={(item) => item}
-            onSelect={(item) => setLineChartInsightType(item)}
-            renderTrigger={({ onClick }) => (
-              <FilterTile
-                icon={ChartBarSquareIcon}
-                label={socialAnalyticsPostInsightTypeToFrenchTranslation[lineChartInsightType]}
-                rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
-                onClick={onClick}
-              />
-            )}
-            renderItem={({ item, isSelected, onSelect }) => (
-              <FilterTile
-                label={socialAnalyticsPostInsightTypeToFrenchTranslation[item]}
-                isSelected={isSelected}
-                onClick={onSelect}
-              />
-            )}
+      <div className="flex flex-row gap-3">
+        <div className="w-2/3 p-3 border border-light-gray rounded-lg flex flex-col gap-3">
+          <div className="flex flex-row justify-between">
+            <p className="text-heading-sm">Contenu actuel en fonction de la moyenne des 10 contenus précédents</p>
+            <SelectDropdown<SocialAnalyticsPostInsightType>
+              items={detail.timelines.map((tl) => tl.type)}
+              selectedItemId={lineChartInsightType}
+              getItemId={(item) => item}
+              onSelect={(item) => setLineChartInsightType(item)}
+              renderTrigger={({ onClick }) => (
+                <FilterTile
+                  icon={ChartBarSquareIcon}
+                  label={socialAnalyticsPostInsightTypeToFrenchTranslation[lineChartInsightType]}
+                  rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
+                  onClick={onClick}
+                />
+              )}
+              renderItem={({ item, isSelected, onSelect }) => (
+                <FilterTile
+                  label={socialAnalyticsPostInsightTypeToFrenchTranslation[item]}
+                  isSelected={isSelected}
+                  onClick={onSelect}
+                />
+              )}
+            />
+          </div>
+          <LineChart
+            data={findTimeline(detail.timelines, lineChartInsightType)!.points}
           />
         </div>
-        <LineChart
-          data={findTimeline(detail.timelines, lineChartInsightType)!.points}
-        />
+
+        <div className="w-1/3 border border-light-gray rounded-xl p-3"></div>
       </div>
 
     </div>
