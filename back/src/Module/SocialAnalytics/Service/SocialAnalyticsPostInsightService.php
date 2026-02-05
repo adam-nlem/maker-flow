@@ -11,6 +11,7 @@ use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramPostInsightDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPostInsight\ShowSocialAnalyticsPostInsightDetailResponseDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPostInsight\SocialAnalyticsPostInsightTimelineDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPostInsight\SocialAnalyticsPostInsightTimelinePointDTO;
+use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPostInsight\SocialAnalyticsPostRankingItemDTO;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
@@ -35,6 +36,14 @@ class SocialAnalyticsPostInsightService
         SocialAnalyticsPostInsightType::Shares,
         SocialAnalyticsPostInsightType::AverageWatchTime,
         SocialAnalyticsPostInsightType::TotalWatchTime,
+    ];
+
+    private const RANKING_WEIGHTS = [
+        SocialAnalyticsPostInsightType::Views->value => 0.30,
+        SocialAnalyticsPostInsightType::Reach->value => 0.25,
+        SocialAnalyticsPostInsightType::TotalInteractions->value => 0.25,
+        SocialAnalyticsPostInsightType::AverageWatchTime->value => 0.10,
+        SocialAnalyticsPostInsightType::TotalWatchTime->value => 0.10,
     ];
 
     private string $instagramGraphUrl;
@@ -157,12 +166,17 @@ class SocialAnalyticsPostInsightService
         );
         $totalFollowers = $totalFollowersInsight?->getValue();
 
+        // 8. Build ranking (current post + up to 9 previous posts)
+        $rankingPosts = array_slice($previousPosts, 0, 9);
+        $ranking = $this->buildRanking($post, $latestInsightsByType, $rankingPosts);
+
         return new ShowSocialAnalyticsPostInsightDetailResponseDTO(
             post: $post,
             insightsWithEvolution: $insightsWithEvolution,
             engagementByFollowers: InsightHelper::calculateEngagement($totalInteractions, $totalFollowers),
             engagementByReach: InsightHelper::calculateEngagement($totalInteractions, $reach),
             timelines: $timelines,
+            ranking: $ranking,
         );
     }
 
@@ -283,6 +297,65 @@ class SocialAnalyticsPostInsightService
         }
 
         return round(array_sum($values) / count($values), 1);
+    }
+
+    /**
+     * @param SocialAnalyticsPostInsight[] $currentPostInsights
+     * @param SocialAnalyticsPost[] $previousPosts
+     * @return SocialAnalyticsPostRankingItemDTO[]
+     */
+    private function buildRanking(
+        SocialAnalyticsPost $currentPost,
+        array $currentPostInsights,
+        array $previousPosts,
+    ): array {
+        // Fetch latest insights per type for all previous posts in one query
+        $previousPostIds = array_map(fn(SocialAnalyticsPost $p) => $p->getId(), $previousPosts);
+        $allPreviousInsights = $this->postInsightRepository->getLatestByPostIdsGroupedByPostAndType($previousPostIds);
+
+        // Group previous insights by post ID
+        $insightsByPostId = [];
+        foreach ($allPreviousInsights as $insight) {
+            $postId = $insight->getSocialAnalyticsPost()->getId();
+            $insightsByPostId[$postId][] = $insight;
+        }
+
+        // Calculate score for the current post
+        $items = [];
+        $items[] = new SocialAnalyticsPostRankingItemDTO(
+            post: $currentPost,
+            score: $this->calculateRankingScore($currentPostInsights),
+        );
+
+        // Calculate score for each previous post
+        foreach ($previousPosts as $prevPost) {
+            $insights = $insightsByPostId[$prevPost->getId()] ?? [];
+            $items[] = new SocialAnalyticsPostRankingItemDTO(
+                post: $prevPost,
+                score: $this->calculateRankingScore($insights),
+            );
+        }
+
+        // Sort descending by score
+        usort($items, fn(SocialAnalyticsPostRankingItemDTO $a, SocialAnalyticsPostRankingItemDTO $b) => $b->getScore() <=> $a->getScore());
+
+        return $items;
+    }
+
+    /**
+     * @param SocialAnalyticsPostInsight[] $insights
+     */
+    private function calculateRankingScore(array $insights): float
+    {
+        $score = 0.0;
+
+        foreach (self::RANKING_WEIGHTS as $typeValue => $weight) {
+            $type = SocialAnalyticsPostInsightType::from($typeValue);
+            $value = InsightHelper::getInsightValueByType($insights, $type);
+            $score += ($value ?? 0) * $weight;
+        }
+
+        return round($score, 2);
     }
 
     private function processPostData(Integration $integration, array $postData): void

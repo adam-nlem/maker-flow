@@ -148,6 +148,32 @@ class SocialAnalyticsPostInsightRepository extends ServiceEntityRepository
     }
 
     /**
+     * Returns one insight per type per post (the most recent) for multiple posts.
+     *
+     * @param int[] $postIds
+     * @return SocialAnalyticsPostInsight[]
+     */
+    public function getLatestByPostIdsGroupedByPostAndType(array $postIds): array
+    {
+        if (empty($postIds)) {
+            return [];
+        }
+
+        $sub = $this->createQueryBuilder('sub')
+            ->select('MAX(sub.id)')
+            ->where('sub.socialAnalyticsPost IN (:postIds)')
+            ->groupBy('sub.socialAnalyticsPost, sub.type')
+            ->getDQL();
+
+        return $this->createQueryBuilder('pi')
+            ->where('pi.id IN (' . $sub . ')')
+            ->setParameter('postIds', $postIds)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
      * Returns one insight per type (the most recent before the given date) for a given post.
      *
      * @param SocialAnalyticsPostInsightType[] $excludedTypes

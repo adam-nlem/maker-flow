@@ -1,6 +1,7 @@
 import { SocialAnalyticsPost, type SocialAnalyticsPostJSON } from "../../models/SocialAnalyticsPost";
 import { SocialAnalyticsPostInsightWithEvolutionDTO, type SocialAnalyticsPostInsightWithEvolutionDTOJSON } from "../socialAnalyticsPosts/SocialAnalyticsPostInsightWithEvolutionDTO";
 import { SocialAnalyticsPostInsightTimelineDTO, type SocialAnalyticsPostInsightTimelineDTOJSON } from "./SocialAnalyticsPostInsightTimelineDTO";
+import { SocialAnalyticsPostRankingItemDTO, type SocialAnalyticsPostRankingItemDTOJSON } from "./SocialAnalyticsPostRankingItemDTO";
 
 export interface SocialAnalyticsPostInsightDetailDTOJSON {
     post: SocialAnalyticsPostJSON;
@@ -8,6 +9,7 @@ export interface SocialAnalyticsPostInsightDetailDTOJSON {
     engagementByFollowers: number | null;
     engagementByReach: number | null;
     timelines: SocialAnalyticsPostInsightTimelineDTOJSON[];
+    ranking: SocialAnalyticsPostRankingItemDTOJSON[];
 }
 
 export class SocialAnalyticsPostInsightDetailDTO {
@@ -17,6 +19,7 @@ export class SocialAnalyticsPostInsightDetailDTO {
         public readonly engagementByFollowers: number | null,
         public readonly engagementByReach: number | null,
         public readonly timelines: SocialAnalyticsPostInsightTimelineDTO[],
+        public readonly ranking: SocialAnalyticsPostRankingItemDTO[],
     ) {}
 
     static fromJSON(json: SocialAnalyticsPostInsightDetailDTOJSON): SocialAnalyticsPostInsightDetailDTO {
@@ -26,6 +29,7 @@ export class SocialAnalyticsPostInsightDetailDTO {
             json.engagementByFollowers,
             json.engagementByReach,
             json.timelines.map((timeline) => SocialAnalyticsPostInsightTimelineDTO.fromJSON(timeline)),
+            json.ranking.map((item) => SocialAnalyticsPostRankingItemDTO.fromJSON(item)),
         );
     }
 }

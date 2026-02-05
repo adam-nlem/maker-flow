@@ -22,9 +22,10 @@ class ShowSocialAnalyticsPostInsightDetailResponseDTO implements ResponseDTOInte
         /** @var SocialAnalyticsPostInsightTimelineDTO[] */
         #[Groups(['api_modules_social_analytics_post_insights_detail'])]
         private readonly array $timelines,
-
+        /** @var SocialAnalyticsPostRankingItemDTO[] */
+        #[Groups(['api_modules_social_analytics_post_insights_detail'])]
+        private readonly array $ranking,
     ) {
-
     }
 
     public function getData(): array
@@ -35,6 +36,7 @@ class ShowSocialAnalyticsPostInsightDetailResponseDTO implements ResponseDTOInte
             'engagementByFollowers' => $this->engagementByFollowers,
             'engagementByReach' => $this->engagementByReach,
             'timelines' => $this->timelines,
+            'ranking' => $this->ranking,
         ];
     }
 
@@ -67,5 +69,13 @@ class ShowSocialAnalyticsPostInsightDetailResponseDTO implements ResponseDTOInte
     public function getTimelines(): array
     {
         return $this->timelines;
+    }
+
+    /**
+     * @return SocialAnalyticsPostRankingItemDTO[]
+     */
+    public function getRanking(): array
+    {
+        return $this->ranking;
     }
 }

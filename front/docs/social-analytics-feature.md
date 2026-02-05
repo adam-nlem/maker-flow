@@ -86,9 +86,10 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 
 ### Post Detail DTOs
 
-- `SocialAnalyticsPostInsightDetailDTO` — Main detail response with nested `post` (SocialAnalyticsPost), `insightsWithEvolution`, engagement rates, and `timelines`
+- `SocialAnalyticsPostInsightDetailDTO` — Main detail response with nested `post` (SocialAnalyticsPost), `insightsWithEvolution`, engagement rates, `timelines`, and `ranking`
 - `SocialAnalyticsPostInsightTimelineDTO` — Timeline per insight type
 - `SocialAnalyticsPostInsightTimelinePointDTO` — Individual data point with `hoursAfterPublication`, `value`, `averageValue`
+- `SocialAnalyticsPostRankingItemDTO` — Ranking entry wrapping a `SocialAnalyticsPost` and a combined `score`
 
 ## Stores
 
@@ -98,7 +99,7 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 
 - `useShowSocialAnalyticsIntegrationDetail` — Fetches integration detail (followers, daily points, post count, streak).
 - `useListPaginatedSocialAnalyticsPosts` — Paginated post list with `hasMore` / `listMore` for infinite scroll.
-- `useShowSocialAnalyticsPostInsightDetail` — Fetches post detail with insight tiles, evolution, engagement rates, and timeline data for charts.
+- `useShowSocialAnalyticsPostInsightDetail` — Fetches post detail with insight tiles, evolution, engagement rates, timeline data for charts, and ranking data.
 
 ## Infinite Scroll
 
