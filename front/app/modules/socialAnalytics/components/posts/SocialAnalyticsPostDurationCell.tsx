@@ -7,14 +7,12 @@ interface SocialAnalyticsPostDurationCellProps {
 }
 
 export default function SocialAnalyticsPostDurationCell({ insight }: SocialAnalyticsPostDurationCellProps) {
-    if (!insight) return <td className="px-3 py-2 text-center text-sm">—</td>;
+    if (!insight) return <span>—</span>;
 
     return (
-        <td className="px-3 py-2 text-left text-sm ">
-            <div className="flex flex-row items-center gap-1">
-                {formatDurationToFrench(insight.insight.value)}
-                <SocialAnalyticsPostEvolutionBadge evolutionPercentage={insight.evolutionPercentage} />
-            </div>
-        </td>
+        <div className="flex flex-row items-center gap-1">
+            {formatDurationToFrench(insight.insight.value)}
+            <SocialAnalyticsPostEvolutionBadge evolutionPercentage={insight.evolutionPercentage} />
+        </div>
     );
 }

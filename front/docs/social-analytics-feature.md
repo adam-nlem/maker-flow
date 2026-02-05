@@ -40,11 +40,11 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
     [profile + insight tiles]    fixed height
     ListSocialAnalyticsPostsTable  flex-1 min-h-0, flex flex-col
       <h1>                       fixed height
-      [table wrapper]            flex-1 min-h-0 overflow-auto
+      DataTable                  flex-1 min-h-0 (generic reusable table)
         <table>
           <thead>                sticky top-0 bg-white z-10
           <tbody>                scrollable content
-        [sentinel div]           h-1, IntersectionObserver trigger
+        [sentinel div]           h-1, afterTable slot, IntersectionObserver trigger
 ```
 
 ### Key patterns
@@ -60,10 +60,10 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 | `SocialAnalyticsRouter` | `SocialAnalyticsRouter.tsx` | Module router handling internal sub-routes |
 | `SocialAnalyticsPageView` | `components/SocialAnalyticsPageView.tsx` | Page root with filters and integration selector |
 | `SocialAnalyticsIntegrationPageView` | `components/integrations/SocialAnalyticsIntegrationPageView.tsx` | Integration detail: profile, insight tiles, posts table |
-| `ListSocialAnalyticsPostsTable` | `components/posts/ListSocialAnalyticsPostsTable.tsx` | Scrollable posts table with sticky headers and infinite scroll |
-| `SocialAnalyticsPostsTableRow` | `components/posts/SocialAnalyticsPostsTableRow.tsx` | Individual post row |
-| `SocialAnalyticsPostNumericCell` | `components/posts/SocialAnalyticsPostNumericCell.tsx` | Numeric metric cell with optional tooltip |
-| `SocialAnalyticsPostDurationCell` | `components/posts/SocialAnalyticsPostDurationCell.tsx` | Duration metric cell (formatted in French) |
+| `ListSocialAnalyticsPostsTable` | `components/posts/ListSocialAnalyticsPostsTable.tsx` | Posts table using `DataTable` with column definitions and infinite scroll |
+| `SocialAnalyticsPostDescriptionCell` | `components/posts/SocialAnalyticsPostDescriptionCell.tsx` | Thumbnail + caption + relative date cell (uses `useShowSocialAnalyticsPostThumbnail` hook) |
+| `SocialAnalyticsPostNumericCell` | `components/posts/SocialAnalyticsPostNumericCell.tsx` | Numeric metric content with optional tooltip (no `<td>` wrapper) |
+| `SocialAnalyticsPostDurationCell` | `components/posts/SocialAnalyticsPostDurationCell.tsx` | Duration metric content formatted in French (no `<td>` wrapper) |
 | `SocialAnalyticsPostEvolutionBadge` | `components/posts/SocialAnalyticsPostEvolutionBadge.tsx` | Evolution percentage badge (green/red) |
 | `SocialAnalyticsInsightTile` | `components/SocialAnalyticsInsightTile.tsx` | Metric tile with optional area chart |
 | `SocialAnalyticsPostDetailPageView` | `components/posts/SocialAnalyticsPostDetailPageView.tsx` | Post detail page with insight tiles and timeline charts |
@@ -103,7 +103,7 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 
 ## Infinite Scroll
 
-`ListSocialAnalyticsPostsTable` uses an `IntersectionObserver` on a sentinel `<div>` placed after the `<table>` inside the scrollable wrapper. When the sentinel enters the viewport (with a 200px bottom margin), the next page is fetched automatically via `listMore()`. The component reads `timePeriod` from `useSocialAnalyticsFilterStore` and applies `filterPostsByDays` locally.
+`ListSocialAnalyticsPostsTable` uses an `IntersectionObserver` on a sentinel `<div>` passed via DataTable's `afterTable` prop. The sentinel is placed after the `<table>` inside the scrollable wrapper. When it enters the viewport (with a 200px bottom margin), the next page is fetched automatically via `listMore()`. The component reads `timePeriod` from `useSocialAnalyticsFilterStore` and applies `filterPostsByDays` locally.
 
 ## Post Detail Page
 
