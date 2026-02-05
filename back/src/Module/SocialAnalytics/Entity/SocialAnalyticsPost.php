@@ -24,7 +24,7 @@ class SocialAnalyticsPost
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
@@ -36,27 +36,27 @@ class SocialAnalyticsPost
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?string $externalId = null;
 
     #[ORM\Column(length: 255, enumType: SocialAnalyticsMediaType::class)]
-    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?SocialAnalyticsMediaType $mediaType = null;
 
     #[ORM\Column]
-    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?int $duration = null;
 
     #[ORM\Column]
-    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?\DateTimeImmutable $publishedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?string $caption = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_modules_social_analytics_post_insights_detail'])]
+    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?string $externalUrl = null;
 
     #[ORM\ManyToOne]

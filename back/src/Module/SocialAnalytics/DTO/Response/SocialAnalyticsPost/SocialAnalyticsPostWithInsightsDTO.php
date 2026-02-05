@@ -3,22 +3,14 @@
 namespace App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost;
 
 use App\DTO\Response\ResponseDTOInterface;
-use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsMediaType;
+use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 class SocialAnalyticsPostWithInsightsDTO implements ResponseDTOInterface
 {
     public function __construct(
         #[Groups(['api_modules_social_analytics_posts_list'])]
-        private readonly string $uuid,
-        #[Groups(['api_modules_social_analytics_posts_list'])]
-        private readonly string $externalId,
-        #[Groups(['api_modules_social_analytics_posts_list'])]
-        private readonly SocialAnalyticsMediaType $mediaType,
-        #[Groups(['api_modules_social_analytics_posts_list'])]
-        private readonly \DateTimeImmutable $publishedAt,
-        #[Groups(['api_modules_social_analytics_posts_list'])]
-        private readonly ?string $caption,
+        private readonly SocialAnalyticsPost $post,
         /** @var SocialAnalyticsPostInsightWithEvolutionDTO[] */
         #[Groups(['api_modules_social_analytics_posts_list'])]
         private readonly array $insights,
@@ -31,40 +23,16 @@ class SocialAnalyticsPostWithInsightsDTO implements ResponseDTOInterface
     public function getData(): array
     {
         return [
-            'uuid' => $this->uuid,
-            'externalId' => $this->externalId,
-            'mediaType' => $this->mediaType->value,
-            'publishedAt' => $this->publishedAt->format(\DateTimeInterface::ATOM),
-            'caption' => $this->caption,
+            'post' => $this->post,
             'insights' => $this->insights,
             'engagementByFollowers' => $this->engagementByFollowers,
             'engagementByReach' => $this->engagementByReach,
         ];
     }
 
-    public function getUuid(): string
+    public function getPost(): SocialAnalyticsPost
     {
-        return $this->uuid;
-    }
-
-    public function getExternalId(): string
-    {
-        return $this->externalId;
-    }
-
-    public function getMediaType(): SocialAnalyticsMediaType
-    {
-        return $this->mediaType;
-    }
-
-    public function getPublishedAt(): \DateTimeImmutable
-    {
-        return $this->publishedAt;
-    }
-
-    public function getCaption(): ?string
-    {
-        return $this->caption;
+        return $this->post;
     }
 
     public function getInsights(): array

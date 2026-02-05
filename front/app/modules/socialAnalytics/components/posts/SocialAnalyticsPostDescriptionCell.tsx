@@ -1,10 +1,10 @@
-import type { SocialAnalyticsPostWithInsightsDTO } from "../../dtos/socialAnalyticsPosts/SocialAnalyticsPostWithInsightsDTO";
+import type { SocialAnalyticsPost } from "../../models/SocialAnalyticsPost";
 import { useShowSocialAnalyticsPostThumbnail } from "../../hooks/api/socialAnalyticsPosts/useShowSocialAnalyticsPostThumbnail";
 import { formatToFrenchRelative } from "~/utils/dateFormatters";
 import Shimmer from "~/components/ui/Shimmer";
 
 interface SocialAnalyticsPostDescriptionCellProps {
-    post: SocialAnalyticsPostWithInsightsDTO;
+    post: SocialAnalyticsPost;
 }
 
 export default function SocialAnalyticsPostDescriptionCell({ post }: SocialAnalyticsPostDescriptionCellProps) {

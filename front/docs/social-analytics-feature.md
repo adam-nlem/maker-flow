@@ -81,7 +81,7 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 
 ### Post List DTOs
 
-- `SocialAnalyticsPostWithInsightsDTO` — Post with flat properties (`uuid`, `externalId`, `mediaType`, `publishedAt`, `caption`) + `insights` array + engagement rates
+- `SocialAnalyticsPostWithInsightsDTO` — Wraps a nested `SocialAnalyticsPost` (under `post` key) + `insights` array + engagement rates (`engagementByFollowers`, `engagementByReach`)
 - `SocialAnalyticsPostInsightWithEvolutionDTO` — Wraps a nested `SocialAnalyticsPostInsight` (`insight.type`, `insight.value`) with `evolutionPercentage`
 
 ### Post Detail DTOs

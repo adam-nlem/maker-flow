@@ -8,5 +8,5 @@ export function filterPostsByDays(
     cutoff.setHours(0, 0, 0, 0);
     cutoff.setDate(cutoff.getDate() - days);
 
-    return posts.filter((post) => post.publishedAt >= cutoff);
+    return posts.filter((post) => post.post.publishedAt >= cutoff);
 }

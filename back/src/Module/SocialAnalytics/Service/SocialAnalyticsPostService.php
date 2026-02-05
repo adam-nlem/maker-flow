@@ -194,11 +194,7 @@ class SocialAnalyticsPostService
             $reach = InsightHelper::getInsightValueByType($allInsights, SocialAnalyticsPostInsightType::Reach);
 
             $result[] = new SocialAnalyticsPostWithInsightsDTO(
-                uuid: $post->getUuid(),
-                externalId: $post->getExternalId(),
-                mediaType: $post->getMediaType(),
-                publishedAt: $post->getPublishedAt(),
-                caption: $post->getCaption(),
+                post: $post,
                 insights: $insightsWithEvolution,
                 engagementByFollowers: InsightHelper::calculateEngagement($totalInteractions, $totalFollowers?->getValue()),
                 engagementByReach: InsightHelper::calculateEngagement($totalInteractions, $reach),

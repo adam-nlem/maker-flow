@@ -26,11 +26,15 @@ Returns an array of posts with their insights and evolution data:
 ```json
 [
   {
-    "uuid": "550e8400-e29b-41d4-a716-446655440000",
-    "externalId": "17895695668004550",
-    "mediaType": "video",
-    "publishedAt": "2026-01-20T10:00:00+00:00",
-    "caption": "Check out this amazing content!",
+    "post": {
+      "uuid": "550e8400-e29b-41d4-a716-446655440000",
+      "externalId": "17895695668004550",
+      "mediaType": "video",
+      "duration": 0,
+      "publishedAt": "2026-01-20T10:00:00+00:00",
+      "caption": "Check out this amazing content!",
+      "externalUrl": "https://www.instagram.com/p/..."
+    },
     "insights": [
       {
         "insight": { "uuid": "...", "type": "reach", "value": 1500, "createdAt": "..." },
@@ -44,7 +48,9 @@ Returns an array of posts with their insights and evolution data:
         "insight": { "uuid": "...", "type": "comments", "value": 45, "createdAt": "..." },
         "evolutionPercentage": null
       }
-    ]
+    ],
+    "engagementByFollowers": 0.045,
+    "engagementByReach": 0.12
   }
 ]
 ```

@@ -22,24 +22,24 @@ function findInsight(
 const columns: DataTableColumn<SocialAnalyticsPostWithInsightsDTO>[] = [
     {
         header: "Description",
-        render: (post) => <SocialAnalyticsPostDescriptionCell post={post} />,
+        render: (postWithInsights) => <SocialAnalyticsPostDescriptionCell post={postWithInsights.post} />,
     },
     {
         header: socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.Views],
-        render: (post) => (
-            <SocialAnalyticsPostNumericCell insight={findInsight(post.insights, SocialAnalyticsPostInsightType.Views)} />
+        render: (postWithInsights) => (
+            <SocialAnalyticsPostNumericCell insight={findInsight(postWithInsights.insights, SocialAnalyticsPostInsightType.Views)} />
         ),
     },
     {
         header: socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.TotalInteractions],
-        render: (post) => {
-            const likesInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.Likes);
-            const commentsInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.Comments);
-            const sharesInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.Shares);
+        render: (postWithInsights) => {
+            const likesInsight = findInsight(postWithInsights.insights, SocialAnalyticsPostInsightType.Likes);
+            const commentsInsight = findInsight(postWithInsights.insights, SocialAnalyticsPostInsightType.Comments);
+            const sharesInsight = findInsight(postWithInsights.insights, SocialAnalyticsPostInsightType.Shares);
 
             return (
                 <SocialAnalyticsPostNumericCell
-                    insight={findInsight(post.insights, SocialAnalyticsPostInsightType.TotalInteractions)}
+                    insight={findInsight(postWithInsights.insights, SocialAnalyticsPostInsightType.TotalInteractions)}
                     tooltip={
                         <div className="flex flex-col gap-1">
                             <p>{socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.Likes]}: {likesInsight?.insight.value ?? "—"}</p>
@@ -53,8 +53,8 @@ const columns: DataTableColumn<SocialAnalyticsPostWithInsightsDTO>[] = [
     },
     {
         header: socialAnalyticsPostInsightTypeToFrenchTranslation[SocialAnalyticsPostInsightType.AverageWatchTime],
-        render: (post) => (
-            <SocialAnalyticsPostDurationCell insight={findInsight(post.insights, SocialAnalyticsPostInsightType.AverageWatchTime)} />
+        render: (postWithInsights) => (
+            <SocialAnalyticsPostDurationCell insight={findInsight(postWithInsights.insights, SocialAnalyticsPostInsightType.AverageWatchTime)} />
         ),
     },
 ];
@@ -103,8 +103,8 @@ export default function ListSocialAnalyticsPostsTable({ integrationUuid }: ListS
             <DataTable<SocialAnalyticsPostWithInsightsDTO>
                 columns={columns}
                 data={filteredPosts}
-                getRowKey={(post) => post.uuid}
-                onRowClick={(post) => navigate(`/modules/social_analytics/posts/${post.uuid}`)}
+                getRowKey={(postWithInsights) => postWithInsights.post.uuid}
+                onRowClick={(postWithInsights) => navigate(`/modules/social_analytics/posts/${postWithInsights.post.uuid}`)}
                 afterTable={<div ref={sentinelRef} className="h-1" />}
                 className="flex-1 min-h-0"
             />
