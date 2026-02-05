@@ -45,7 +45,7 @@ export default function SocialAnalyticsPostInsightSummaryCard({ title, insights 
                                 </h2>
 
                                 {hasEvolution && (
-                                    <div className={`flex items-center text-sm ${isPositive ? "text-green-500" : "text-red-500"}`}>
+                                    <div className={`flex items-center text-sm ${isPositive ? "text-green" : "text-danger"}`}>
                                         <span className="mr-1">{percentage}</span>
                                         {isPositive ? <ArrowUpIcon className="size-5" /> : <ArrowDownIcon className="size-5" />}
                                     </div>

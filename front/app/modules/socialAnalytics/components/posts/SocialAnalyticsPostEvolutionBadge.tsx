@@ -11,7 +11,7 @@ export default function SocialAnalyticsPostEvolutionBadge({ evolutionPercentage 
 
     return (
         <div
-            className={`${isPositive ? "text-green-500 bg-green-100" : "text-red-500 bg-red-100"} w-fit h-fit p-0.5 rounded flex flex-row items-center gap-1`}
+            className={`${isPositive ? "text-green bg-pastel-green" : "text-danger bg-danger/10"} w-fit h-fit p-0.5 rounded flex flex-row items-center gap-1`}
             title="Évolution par rapport au contenu précédent à la même durée après publication"
         >
             {isPositive

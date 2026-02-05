@@ -8,7 +8,7 @@ use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: SocialAnalyticsPostInsightRepository::class)]
@@ -90,7 +90,7 @@ class SocialAnalyticsPostInsight
         return $this->type;
     }
 
-    public function setType(SocialAnalyticsPostInsightType $type): self
+    public function setType(SocialAnalyticsPostInsightType $type): static
     {
         $this->type = $type;
         return $this;
@@ -101,7 +101,7 @@ class SocialAnalyticsPostInsight
         return $this->value;
     }
 
-    public function setValue(int $value): self
+    public function setValue(int $value): static
     {
         $this->value = $value;
         return $this;
@@ -112,7 +112,7 @@ class SocialAnalyticsPostInsight
         return $this->socialAnalyticsPost;
     }
 
-    public function setSocialAnalyticsPost(?SocialAnalyticsPost $socialAnalyticsPost): self
+    public function setSocialAnalyticsPost(?SocialAnalyticsPost $socialAnalyticsPost): static
     {
         $this->socialAnalyticsPost = $socialAnalyticsPost;
         return $this;

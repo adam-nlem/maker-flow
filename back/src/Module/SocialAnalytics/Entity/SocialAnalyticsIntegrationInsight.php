@@ -106,7 +106,7 @@ class SocialAnalyticsIntegrationInsight
         return $this->type;
     }
 
-    public function setType(SocialAnalyticsIntegrationInsightType $type): self
+    public function setType(SocialAnalyticsIntegrationInsightType $type): static
     {
         $this->type = $type;
         return $this;
@@ -117,7 +117,7 @@ class SocialAnalyticsIntegrationInsight
         return $this->value;
     }
 
-    public function setValue(int $value): self
+    public function setValue(int $value): static
     {
         $this->value = $value;
         return $this;
@@ -128,7 +128,7 @@ class SocialAnalyticsIntegrationInsight
         return $this->integration;
     }
 
-    public function setIntegration(?Integration $integration): self
+    public function setIntegration(?Integration $integration): static
     {
         $this->integration = $integration;
         return $this;

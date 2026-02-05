@@ -29,7 +29,7 @@ export default function SocialAnalyticsInsightTile({
           <Icon className="size-4 text-dark" strokeWidth={2} />
           {evolutionPercentage !== undefined && evolutionPercentage !== null && (
             <span
-              className={`text-sm font-medium ${evolutionPercentage.startsWith('+') ? "text-green-500" : "text-red-500"
+              className={`text-sm font-medium ${evolutionPercentage.startsWith('+') ? "text-green" : "text-danger"
                 }`}
             >
               {evolutionPercentage}

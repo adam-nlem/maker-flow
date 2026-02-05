@@ -143,3 +143,13 @@ Each chart is a `LineChart` component (Recharts) showing two lines:
 - **Average line** (dashed, gray): average of the 10 previous posts at the same hours-after-publication offset
 
 X-axis uses `formatDurationToFrench()` (via a local helper converting hours to seconds) to display "2h", "1j 5h", etc.
+
+## Thumbnail Hook
+
+`useShowSocialAnalyticsPostThumbnail` fetches post thumbnails as blobs and creates object URLs for display. The hook stores the raw `Blob` in React Query's cache (not the object URL), then creates the object URL via `useMemo` and revokes it on cleanup via `useEffect`. This prevents memory leaks from unreleased object URLs accumulating over time.
+
+## Cleanup Notes
+
+- **Design system colors**: Evolution badges and insight tiles use `text-green` / `bg-pastel-green` (positive) and `text-danger` / `bg-danger/10` (negative) from the design system instead of hardcoded Tailwind color classes.
+- **Dashboard logic fix**: `SocialAnalyticsDashboardContent` now correctly checks whether an integration for a given provider already exists before showing the create card (uses `integration.provider === providerType` instead of `!==`).
+- **Post detail safe rendering**: The timeline chart renders conditionally when the selected timeline exists. Engagement progress bars use `?? 0` fallback for nullable values. The empty placeholder div was removed and the chart section takes full width.

@@ -14,14 +14,13 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/modules/social-analytics/integration-insights')]
-class SocialAnalyticsIntegrationInsightController extends AbstractController
+final class SocialAnalyticsIntegrationInsightController extends AbstractController
 {
     #[Route('', name: 'api_modules_social_analytics_integration_insights_list', methods: ['GET'])]
     public function list(
         ListSocialAnalyticsIntegrationInsightsQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
         SocialAnalyticsIntegrationInsightRepository $insightRepository,
-        SocialAnalyticsIntegrationInsightService $s,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();

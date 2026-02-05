@@ -1,6 +1,4 @@
 import { useState } from "react";
-import { Link } from "react-router";
-import { ArrowLeftIcon } from "@heroicons/react/24/solid";
 import { useShowSocialAnalyticsPostInsightDetail } from "../../hooks/api/socialAnalyticsPostInsights/useShowSocialAnalyticsPostInsightDetail";
 import { useShowSocialAnalyticsPostThumbnail } from "../../hooks/api/socialAnalyticsPosts/useShowSocialAnalyticsPostThumbnail";
 import { SocialAnalyticsPostInsightType, socialAnalyticsPostInsightTypeToFrenchTranslation } from "../../models/enums/SocialAnalyticsPostInsightType";
@@ -9,10 +7,9 @@ import LineChart from "~/components/ui/LineChart";
 import Shimmer from "~/components/ui/Shimmer";
 import type { SocialAnalyticsPostInsightTimelineDTO } from "../../dtos/socialAnalyticsPostInsights/SocialAnalyticsPostInsightTimelineDTO";
 import FilterTile from "../FilterTile";
-import { CalendarDaysIcon, ChartBarSquareIcon, ChevronRightIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, ChartBarSquareIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import SocialAnalyticsPostInsightSummaryCard from "./SocialAnalyticsPostInsightSummaryCard";
-import { getWidthClassFromPercentage } from "~/helpers/percentageHelper";
 import { BreadCrumbNavbar } from "~/components/ui/BreadCrumbNavBar";
 import { PercentageProgressBar } from "~/components/ui/PercentageProgressBar";
 
@@ -74,6 +71,8 @@ export default function SocialAnalyticsPostDetailPageView({ postUuid }: SocialAn
     (i) => engagementSummaryInsightTypes.includes(i.insight.type)
   );
 
+  const selectedTimeline = findTimeline(detail.timelines, lineChartInsightType);
+
   return (
     <div className="h-screen overflow-auto p-6 flex flex-col gap-5">
       <BreadCrumbNavbar pages={
@@ -120,12 +119,12 @@ export default function SocialAnalyticsPostDetailPageView({ postUuid }: SocialAn
         {/* Engagement */}
         <div className="flex flex-col gap-1 w-1/3 border border-light-gray rounded-xl p-3">
           <h1 className="text-heading-md mb-3">Résumé de l'engagement</h1>
-          <PercentageProgressBar name="Par abonnés" percentage={detail.engagementByFollowers!} />
-          <PercentageProgressBar name="Par comptes touchés" percentage={detail.engagementByReach!} />
+          <PercentageProgressBar name="Par abonnés" percentage={detail.engagementByFollowers ?? 0} />
+          <PercentageProgressBar name="Par comptes touchés" percentage={detail.engagementByReach ?? 0} />
         </div>
       </div>
       <div className="flex flex-row gap-3">
-        <div className="w-2/3 p-3 border border-light-gray rounded-lg flex flex-col gap-3">
+        <div className="w-full p-3 border border-light-gray rounded-lg flex flex-col gap-3">
           <div className="flex flex-row justify-between">
             <p className="text-heading-sm">Contenu actuel en fonction de la moyenne des 10 contenus précédents</p>
             <SelectDropdown<SocialAnalyticsPostInsightType>
@@ -150,12 +149,12 @@ export default function SocialAnalyticsPostDetailPageView({ postUuid }: SocialAn
               )}
             />
           </div>
-          <LineChart
-            data={findTimeline(detail.timelines, lineChartInsightType)!.points}
-          />
+          {selectedTimeline && (
+            <LineChart
+              data={selectedTimeline.points}
+            />
+          )}
         </div>
-
-        <div className="w-1/3 border border-light-gray rounded-xl p-3"></div>
       </div>
 
     </div>

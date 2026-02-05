@@ -200,7 +200,7 @@ class SocialAnalyticsPostService
                 publishedAt: $post->getPublishedAt(),
                 caption: $post->getCaption(),
                 insights: $insightsWithEvolution,
-                engagementByFollowers: InsightHelper::calculateEngagement($totalInteractions, $totalFollowers->getValue()),
+                engagementByFollowers: InsightHelper::calculateEngagement($totalInteractions, $totalFollowers?->getValue()),
                 engagementByReach: InsightHelper::calculateEngagement($totalInteractions, $reach),
             );
         }

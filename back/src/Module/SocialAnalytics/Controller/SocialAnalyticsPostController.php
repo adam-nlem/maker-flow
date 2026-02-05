@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 
 #[Route('/api/modules/social-analytics/posts')]
-class SocialAnalyticsPostController extends AbstractController
+final class SocialAnalyticsPostController extends AbstractController
 {
     public function __construct(private SocialAnalyticsPostService $service) {}
 
@@ -44,40 +44,12 @@ class SocialAnalyticsPostController extends AbstractController
             limit: $queryParamDto->getLimit(),
             timePeriod: SocialAnalyticsTimePeriod::LastYear,
         );
-        
+
         return $this->json(
             data: $posts,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_modules_social_analytics_posts_list']],
         );
-    }
-
-    #[Route('', name: 'api_modules_social_analytics_posts_create', methods: ['POST'])]
-    public function create()
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-    }
-
-    #[Route('/{postUuid}', name: 'api_modules_social_analytics_posts_show', methods: ['GET'])]
-    public function show(string $postUuid)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-    }
-
-    #[Route('/{postUuid}', name: 'api_modules_social_analytics_posts_update', methods: ['PATCH'])]
-    public function update(string $postUuid)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-    }
-
-    #[Route('/{postUuid}', name: 'api_modules_social_analytics_posts_delete', methods: ['DELETE'])]
-    public function delete(string $postUuid)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
     }
 
     #[Route('/{postUuid}/thumbnail', name: 'api_modules_social_analytics_posts_thumbnail', methods: ['GET'])]

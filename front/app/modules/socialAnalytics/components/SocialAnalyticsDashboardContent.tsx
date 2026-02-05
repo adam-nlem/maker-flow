@@ -1,4 +1,4 @@
-import { ChartBarSquareIcon, CalendarDaysIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline"
+import { ChartBarSquareIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline"
 import type { Integration } from "~/models/Integration"
 import SelectDropdown from "~/components/ui/SelectDropdown"
 import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterStore"
@@ -55,7 +55,7 @@ export default function SocialAnalyticsDashboardContent({
                 ))}
 
                 {integrationProviderTypeOptions.map((integrationProviderType) => {
-                    if (integrations.find((integration) => integration.provider !== integrationProviderType)) {
+                    if (!integrations.find((integration) => integration.provider === integrationProviderType)) {
                         return <CreateSocialAnalyticsIntegrationCard
                             key={integrationProviderType}
                             userModuleUuid={userModuleUuid}
@@ -63,6 +63,7 @@ export default function SocialAnalyticsDashboardContent({
                         />;
                     }
 
+                    return null;
                 })}
 
             </div>

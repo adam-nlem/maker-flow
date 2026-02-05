@@ -22,8 +22,7 @@ function findInsight(
 export default function SocialAnalyticsPostsTableRow({ post }: SocialAnalyticsPostsTableRowProps) {
     const navigate = useNavigate();
     const { thumbnailUrl } = useShowSocialAnalyticsPostThumbnail(post.uuid);
-    
-    console.log(post)
+
     const viewsInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.Views);
     const totalInteractionsInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.TotalInteractions);
     const likesInsight = findInsight(post.insights, SocialAnalyticsPostInsightType.Likes);

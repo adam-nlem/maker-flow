@@ -111,3 +111,10 @@ The detail logic lives in `SocialAnalyticsPostInsightService` alongside the Inst
 - `InsightEvolutionHelper::buildPostInsightsWithEvolution` — sorts insights by a given type order and computes evolution percentages vs. previous insights
 - `TimelineGapFillerHelper::fillPostInsightTimelinePointsHourlyGaps` — fills missing hourly points between existing data points by copying values from the previous point
 - `TimelineGapFillerHelper::fillIntegrationInsightTimelinePointsDailyGaps` — fills missing daily points between existing data points by copying values from the previous day
+
+## Cleanup Notes
+
+- **Stub controller methods removed**: `SocialAnalyticsPostInsightController` previously had unimplemented stub methods (`list`, `create`, `show`, `update`, `delete`) that exposed reachable API routes returning `null`/`200`. These were removed, keeping only the implemented `detail` endpoint.
+- **`SocialAnalyticsPostController`** stubs (`create`, `show`, `update`, `delete`) were also removed — only `list` and `getThumbnail` remain.
+- **Null safety**: `SocialAnalyticsPostService::getPostsWithInsights` now uses null-safe operator (`?->`) when accessing `$totalFollowers->getValue()`, preventing crashes when no TotalFollowers insight exists for an integration.
+- **All controllers marked `final`** per coding style conventions.

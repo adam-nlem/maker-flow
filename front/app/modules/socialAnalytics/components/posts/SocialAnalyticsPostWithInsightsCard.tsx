@@ -24,7 +24,7 @@ export default function SocialAnalyticsPostWithInsightsCard({ postWithInsights }
                     {postWithInsights.insights.map(function (insight) {
                         const Icon = socialAnalyticsPostInsightTypeToIcon[insight.insight.type];
                         return (
-                            <div className="flex flex-row items-center gap-1">
+                            <div key={insight.insight.type} className="flex flex-row items-center gap-1">
                                 <Icon className="size-3 text-dark" />
                                 {insight.insight.type === SocialAnalyticsPostInsightType.TotalWatchTime || insight.insight.type === SocialAnalyticsPostInsightType.AverageWatchTime ? (
                                     <p className="text-xs">{formatDurationToFrench(insight.insight.value)}</p>
@@ -36,12 +36,12 @@ export default function SocialAnalyticsPostWithInsightsCard({ postWithInsights }
                                     <div className="flex flex-row items-center">
 
                                         <p title="Évolution par rapport au contenu précédent à la même durée après publication"
-                                            className={`text-heading-xs ${insight.evolutionPercentage.startsWith('+') ? "text-green-500" : "text-red-500"
+                                            className={`text-heading-xs ${insight.evolutionPercentage.startsWith('+') ? "text-green" : "text-danger"
                                                 }`}
                                         >
                                             {insight.evolutionPercentage}
                                         </p>
-                                        {insight.evolutionPercentage.startsWith('+') ? <ArrowTrendingUpIcon className="size-4 text-green-500" strokeWidth={2} /> : <ArrowTrendingDownIcon className="size-4 text-red-500" strokeWidth={2} />}
+                                        {insight.evolutionPercentage.startsWith('+') ? <ArrowTrendingUpIcon className="size-4 text-green" strokeWidth={2} /> : <ArrowTrendingDownIcon className="size-4 text-danger" strokeWidth={2} />}
                                     </div>
                                 )}
                             </div>);
