@@ -12,6 +12,7 @@ import SelectDropdown from "~/components/ui/SelectDropdown";
 import SocialAnalyticsPostInsightSummaryCard from "./SocialAnalyticsPostInsightSummaryCard";
 import { BreadCrumbNavbar } from "~/components/ui/BreadCrumbNavBar";
 import { PercentageProgressBar } from "~/components/ui/PercentageProgressBar";
+import SocialAnalyticsPostsRankingCard from "./SocialAnalyticsPostsRankingCard";
 
 interface SocialAnalyticsPostDetailPageViewProps {
   postUuid: string;
@@ -123,8 +124,8 @@ export default function SocialAnalyticsPostDetailPageView({ postUuid }: SocialAn
           <PercentageProgressBar name="Par comptes touchés" percentage={detail.engagementByReach ?? 0} />
         </div>
       </div>
-      <div className="flex flex-row gap-3">
-        <div className="w-full p-3 border border-light-gray rounded-lg flex flex-col gap-3">
+      <div className="flex flex-row gap-3 min-h-0">
+        <div className="w-2/3 max-h-fit p-3 border border-light-gray rounded-lg flex flex-col gap-3">
           <div className="flex flex-row justify-between">
             <p className="text-heading-sm">Contenu actuel en fonction de la moyenne des 10 contenus précédents</p>
             <SelectDropdown<SocialAnalyticsPostInsightType>
@@ -149,12 +150,14 @@ export default function SocialAnalyticsPostDetailPageView({ postUuid }: SocialAn
               )}
             />
           </div>
+
           {selectedTimeline && (
             <LineChart
               data={selectedTimeline.points}
             />
           )}
         </div>
+        <SocialAnalyticsPostsRankingCard items={detail.ranking} />
       </div>
 
     </div>
