@@ -42,6 +42,11 @@ class SocialAnalyticsPostService
         $existingPost = $this->repository->getByExternalIdAndIntegration($postDTO->getExternalId(), $integration);
 
         if ($existingPost !== null) {
+            if ($existingPost->getCaption() !== $postDTO->getCaption()) {
+                $existingPost->setCaption($postDTO->getCaption());
+                $this->repository->save($existingPost);
+            }
+
             return $existingPost;
         }
 
