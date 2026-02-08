@@ -60,32 +60,34 @@ class SocialAnalyticsIntegrationInsightService
 
         $metrics = implode(',', InstagramIntegrationInsightDTO::getMetricNames(except: ['followers_count']));
 
-        // We can't get all the history at once because most of the insights can't be returned as time series
-        // This means that the API will always return the total values in the selected since-until time frame
-        $response = $this->httpClient->request('GET', sprintf('%s/%s/insights', $this->instagramGraphUrl, $integration->getAccountId()), [
+        // Single API call with nested insights to reduce API calls
+        // Also fetches profile_picture_url to refresh it on each sync (prevents expiration issues)
+        $response = $this->httpClient->request('GET', sprintf('%s/%s', $this->instagramGraphUrl, $integration->getAccountId()), [
             'query' => [
-                'metric' => $metrics,
-                'period' => 'day',
-                'metric_type' => 'total_value',
-                'access_token' => $integration->getAccessToken(),
-            ],
-        ]);
-
-        $followersCountResponse = $this->httpClient->request('GET', sprintf('%s/%s', $this->instagramGraphUrl, $integration->getAccountId()), [
-            'query' => [
-                'fields' => 'followers_count',
+                'fields' => sprintf('followers_count,profile_picture_url,insights.metric(%s).period(day).metric_type(total_value)', $metrics),
                 'access_token' => $integration->getAccessToken(),
             ],
         ]);
 
         $data = $response->toArray();
-        $insightDTOs = [];
 
-        foreach ($data['data'] as $integrationData) {
-            $insightDTOs[] = InstagramIntegrationInsightDTO::fromArray($integrationData);
+        // Update profile picture URL on the integration to prevent expiration issues
+        if (isset($data['profile_picture_url'])) {
+            $integration->setProfilePictureUrl($data['profile_picture_url']);
         }
 
-        $insightDTOs[] = (new InstagramIntegrationInsightDTO('followers_count', 'day', $followersCountResponse->toArray()['followers_count']));
+        // Process insights from nested response
+        $insightDTOs = [];
+        if (isset($data['insights']['data'])) {
+            foreach ($data['insights']['data'] as $integrationData) {
+                $insightDTOs[] = InstagramIntegrationInsightDTO::fromArray($integrationData);
+            }
+        }
+
+        // Add followers_count as an insight DTO
+        if (isset($data['followers_count'])) {
+            $insightDTOs[] = new InstagramIntegrationInsightDTO('followers_count', 'day', $data['followers_count']);
+        }
 
         $this->createInsightEntities($integration, $insightDTOs);
 

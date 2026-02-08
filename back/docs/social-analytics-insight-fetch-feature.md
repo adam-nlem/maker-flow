@@ -84,13 +84,17 @@ Console Command
 
 ### Integration Insights
 
-**Endpoint:** `GET https://graph.instagram.com/{user_id}/insights`
+**Endpoint:** `GET https://graph.instagram.com/{user_id}`
 
 **Query Parameters:**
-- `metric`: `reach,views,follower_count,profile_links_taps,comments,shares,saves,likes`
-- `period`: `day`
-- `metric_type`: `total_value`
+- `fields`: `followers_count,profile_picture_url,insights.metric(reach,views,comments,shares,saves,likes).period(day).metric_type(total_value)`
 - `access_token`: Integration's access token
+
+This single request fetches:
+- User fields: `followers_count`, `profile_picture_url`
+- Nested insights with `total_value` metric type
+
+The `profile_picture_url` is refreshed on each sync to prevent expiration issues (Instagram CDN URLs expire after some time).
 
 ### Post Insights
 
