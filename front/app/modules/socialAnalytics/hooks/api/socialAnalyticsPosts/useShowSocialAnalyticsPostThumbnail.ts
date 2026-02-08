@@ -1,9 +1,11 @@
-import { useEffect, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { socialAnalyticsPostQueryKeys } from "./socialAnalyticsPostQueryKeys";
 
 export function useShowSocialAnalyticsPostThumbnail(postUuid?: string) {
+    const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+
     const query = useQuery({
         queryKey: socialAnalyticsPostQueryKeys.thumbnail(postUuid ?? ''),
         queryFn: async () => {
@@ -16,16 +18,19 @@ export function useShowSocialAnalyticsPostThumbnail(postUuid?: string) {
         staleTime: Infinity,
     });
 
-    const thumbnailUrl = useMemo(() => {
-        if (!query.data) return null;
-        return URL.createObjectURL(query.data);
-    }, [query.data]);
-
     useEffect(() => {
+        if (!query.data) {
+            setThumbnailUrl(null);
+            return;
+        }
+
+        const url = URL.createObjectURL(query.data);
+        setThumbnailUrl(url);
+
         return () => {
-            if (thumbnailUrl) URL.revokeObjectURL(thumbnailUrl);
+            URL.revokeObjectURL(url);
         };
-    }, [thumbnailUrl]);
+    }, [query.data]);
 
     return {
         thumbnailUrl,

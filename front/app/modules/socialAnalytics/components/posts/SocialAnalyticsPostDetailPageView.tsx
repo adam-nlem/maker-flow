@@ -125,7 +125,7 @@ export default function SocialAnalyticsPostDetailPageView({ postUuid }: SocialAn
         </div>
       </div>
       <div className="flex flex-row gap-3 min-h-0">
-        <div className="w-2/3 max-h-fit p-3 border border-light-gray rounded-lg flex flex-col gap-3">
+        <div className="w-2/3 min-h-0 p-3 border border-light-gray rounded-lg flex flex-col gap-3">
           <div className="flex flex-row justify-between">
             <p className="text-heading-sm">Contenu actuel en fonction de la moyenne des 10 contenus précédents</p>
             <SelectDropdown<SocialAnalyticsPostInsightType>
