@@ -21,6 +21,15 @@ parameters:
     app.redis_store.scheme: "%env(string:REDIS_STORE_SCHEME)%"
     app.redis_store.host: "%env(string:REDIS_STORE_HOST)%"
     app.redis_store.port: "%env(string:REDIS_STORE_PORT)%"
+
+    app.youtube.client_id: "%env(string:YOUTUBE_CLIENT_ID)%"
+    app.youtube.project_id: "%env(string:YOUTUBE_PROJECT_ID)%"
+    app.youtube.auth_uri: "%env(string:YOUTUBE_AUTH_URI)%"
+    app.youtube.token_uri: "%env(string:YOUTUBE_TOKEN_URI)%"
+    app.youtube.auth_provider_x509_cert_url: "%env(string:YOUTUBE_AUTH_PROVIDER_X509_CERT_URL)%"
+    app.youtube.client_secret: "%env(string:YOUTUBE_CLIENT_SECRET)%"
+    app.youtube.redirect_uri: "%env(string:YOUTUBE_REDIRECT_URI)%"
+    app.youtube.javascript_origin: "%env(string:YOUTUBE_JAVASCRIPT_ORIGIN)%"
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -58,6 +67,20 @@ services:
             $instagramAppId: "%app.instagram.app_id%"
             $instagramAppSecret: "%app.instagram.app_secret%"
             $instagramRedirectUri: "%app.instagram.redirect_uri%"
+
+    Google\Client:
+        autowire: false
+
+    App\Service\Integration\YoutubeOAuthService:
+        arguments:
+            $youtubeClientId: "%app.youtube.client_id%"
+            $youtubeProjectId: "%app.youtube.project_id%"
+            $youtubeAuthUri: "%app.youtube.auth_uri%"
+            $youtubeTokenUri: "%app.youtube.token_uri%"
+            $youtubeAuthProviderX509CertUrl: "%app.youtube.auth_provider_x509_cert_url%"
+            $youtubeClientSecret: "%app.youtube.client_secret%"
+            $youtubeRedirectUri: "%app.youtube.redirect_uri%"
+            $youtubeJavascriptOrigin: "%app.youtube.javascript_origin%"
 
     App\Controller\IntegrationController:
         arguments:

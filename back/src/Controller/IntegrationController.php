@@ -17,6 +17,7 @@ use App\Repository\UserModuleRepository;
 use App\Repository\UserRepository;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\IntegrationService;
+use App\Service\Integration\YoutubeOAuthService;
 use App\Service\RedisStore\RedisStoreService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -29,16 +30,15 @@ use Symfony\Component\Routing\Attribute\Route;
 final class IntegrationController extends AbstractController
 {
     public function __construct(
-        private readonly IntegrationRepository $integrationRepository,
-        private readonly InstagramOAuthService $instagramOAuthService,
-        private readonly RedisStoreService $redisStoreService,
         private readonly string $frontendUrl,
-    ) {}
+    ) {
+    }
 
     #[Route('', name: 'api_integrations_list', methods: ['GET'])]
     public function list(
         ListIntegrationsQueryParamDTO $queryParamDto,
         UserModuleRepository $userModuleRepository,
+        IntegrationRepository $integrationRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -52,7 +52,7 @@ final class IntegrationController extends AbstractController
             );
         }
 
-        $integrations = $this->integrationRepository->getByUserModule($userModule);
+        $integrations = $integrationRepository->getByUserModule($userModule);
 
         return $this->json(
             data: $integrations,
@@ -65,6 +65,10 @@ final class IntegrationController extends AbstractController
     public function create(
         CreateIntegrationRequestDTO $dto,
         UserModuleRepository $userModuleRepository,
+        IntegrationRepository $integrationRepository,
+        RedisStoreService $redisStoreService,
+        InstagramOAuthService $instagramOAuthService,
+        YoutubeOAuthService $youtubeOAuthService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -78,7 +82,7 @@ final class IntegrationController extends AbstractController
             );
         }
 
-        $existingIntegration = $this->integrationRepository->getOneByUserModuleAndProvider($userModule, $dto->getProvider());
+        $existingIntegration = $integrationRepository->getOneByUserModuleAndProvider($userModule, $dto->getProvider());
 
         if ($existingIntegration !== null) {
             return $this->json(
@@ -95,14 +99,15 @@ final class IntegrationController extends AbstractController
             $dto->getProvider(),
         );
 
-        $this->redisStoreService->set(
+        $redisStoreService->set(
             RedisStoreService::getIntegrationStateKey($state),
             $stateModel->toJson(),
             time() + 60 * 5
         );
 
         $authorizationUrl = match ($dto->getProvider()) {
-            IntegrationProvider::Instagram => $this->instagramOAuthService->getAuthorizationUrl($state),
+            IntegrationProvider::Instagram => $instagramOAuthService->getAuthorizationUrl($state),
+            IntegrationProvider::Youtube => $youtubeOAuthService->getAuthorizationUrl($state),
         };
 
         $responseDto = (new CreateIntegrationResponseDTO($authorizationUrl))->getData();
@@ -114,61 +119,67 @@ final class IntegrationController extends AbstractController
         );
     }
 
-    #[Route('/callback', name: 'api_integrations_callback', methods: ['GET'])]
+    #[Route('/{integrationProvider}/callback', name: 'api_integrations_callback', methods: ['GET'])]
     public function callback(
+        IntegrationProvider $integrationProvider,
+        InstagramCallbackQueryParamDTO $queryParamDto,
         UserRepository $userRepository,
         UserModuleRepository $userModuleRepository,
-        InstagramCallbackQueryParamDTO $queryParamDto
+        RedisStoreService $redisStoreService,
+        InstagramOAuthService $instagramOAuthService,
+        YoutubeOAuthService $youtubeOAuthService,
     ): Response {
         $code = $queryParamDto->getCode();
         $state = $queryParamDto->getState();
         $error = $queryParamDto->getError();
 
-        $stateDataJson = $this->redisStoreService->get(
+        $stateDataJson = $redisStoreService->get(
             RedisStoreService::getIntegrationStateKey($state)
         );
 
         if ($stateDataJson === null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, IntegrationProvider::Instagram, OAuthErrorCode::InvalidState);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::InvalidState);
         }
 
         $stateModel = IntegrationStateRedisDTO::fromJson($stateDataJson);
-        
-    
-        $provider = $stateModel->getProvider();
 
-        $this->redisStoreService->delete(
+        if ($stateModel->getProvider() !== $integrationProvider) {
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::InvalidState);
+        }
+
+        $redisStoreService->delete(
             RedisStoreService::getIntegrationStateKey($state)
         );
 
         if ($error !== null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::ProviderError);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::ProviderError);
         }
 
         if ($code === null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::MissingCode);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::MissingCode);
         }
 
         $user = $userRepository->getByUuid($stateModel->getUserUuid());
 
         if ($user === null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::UserNotFound);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::UserNotFound);
         }
 
         $userModule = $userModuleRepository->getByUuidAndUser($stateModel->getUserModuleUuid(), $user);
 
         if ($userModule === null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::UserNotFound);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::UserNotFound);
         }
 
         try {
-            $integration = match ($provider) {
-                IntegrationProvider::Instagram => $this->instagramOAuthService->handleCallback($code, $user, $userModule),
+            $integration = match ($integrationProvider) {
+                IntegrationProvider::Instagram => $instagramOAuthService->handleCallback($code, $user, $userModule),
+                IntegrationProvider::Youtube => $youtubeOAuthService->handleCallback($code, $user, $userModule),
             };
 
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, $provider, null, $integration->getUuid());
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, $integrationProvider, null, $integration->getUuid());
         } catch (\Exception $e) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $provider, OAuthErrorCode::TokenExchangeFailed);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::TokenExchangeFailed);
         }
     }
 
@@ -185,12 +196,12 @@ final class IntegrationController extends AbstractController
     }
 
     #[Route('/{integrationUuid}', name: 'api_integrations_show', methods: ['GET'])]
-    public function show(string $integrationUuid): JsonResponse
+    public function show(string $integrationUuid, IntegrationRepository $integrationRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $integration = $this->integrationRepository->getByUuidAndUser($integrationUuid, $user);
+        $integration = $integrationRepository->getByUuidAndUser($integrationUuid, $user);
 
         if ($integration === null) {
             return $this->json(
@@ -207,12 +218,12 @@ final class IntegrationController extends AbstractController
     }
 
     #[Route('/{integrationUuid}', name: 'api_integrations_delete', methods: ['DELETE'])]
-    public function delete(string $integrationUuid): JsonResponse
+    public function delete(string $integrationUuid, IntegrationRepository $integrationRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $integration = $this->integrationRepository->getByUuidAndUser($integrationUuid, $user);
+        $integration = $integrationRepository->getByUuidAndUser($integrationUuid, $user);
 
         if ($integration === null) {
             return $this->json(
@@ -221,7 +232,7 @@ final class IntegrationController extends AbstractController
             );
         }
 
-        $this->integrationRepository->remove($integration, true);
+        $integrationRepository->remove($integration, true);
 
         return $this->json(
             data: ["message" => "Integration deleted successfully"],
