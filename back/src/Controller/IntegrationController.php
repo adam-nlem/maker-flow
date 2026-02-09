@@ -144,6 +144,7 @@ final class IntegrationController extends AbstractController
         $stateModel = IntegrationStateRedisDTO::fromJson($stateDataJson);
 
         if ($stateModel->getProvider() !== $integrationProvider) {
+            dd($stateModel->getProvider(), $integrationProvider);
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::InvalidState);
         }
 
@@ -179,6 +180,7 @@ final class IntegrationController extends AbstractController
 
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, $integrationProvider, null, $integration->getUuid());
         } catch (\Exception $e) {
+            dd($e);
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::TokenExchangeFailed);
         }
     }

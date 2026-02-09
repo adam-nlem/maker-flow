@@ -29,10 +29,10 @@ class Integration
     #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?IntegrationProvider $provider = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $accessToken = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $refreshToken = null;
 
     #[ORM\Column(nullable: true)]
@@ -65,6 +65,9 @@ class Integration
     #[ORM\Column(nullable: true)]
     #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?\DateTimeImmutable $expiresAt = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $refreshTokenExpiresAt = null;
 
     #[ORM\Column]
     #[Groups(['api_integrations_list', 'api_integrations_show'])]
@@ -248,6 +251,18 @@ class Integration
     public function setExpiresAt(?\DateTimeImmutable $expiresAt): static
     {
         $this->expiresAt = $expiresAt;
+
+        return $this;
+    }
+
+    public function getRefreshTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->refreshTokenExpiresAt;
+    }
+
+    public function setRefreshTokenExpiresAt(?\DateTimeImmutable $refreshTokenExpiresAt): static
+    {
+        $this->refreshTokenExpiresAt = $refreshTokenExpiresAt;
 
         return $this;
     }

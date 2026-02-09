@@ -99,8 +99,9 @@ enum OAuthErrorCode: string
 // App\Entity\Enum\IntegrationProvider
 enum IntegrationProvider: string
 {
+    case Github = 'github';
+    case Youtube = 'youtube';
     case Instagram = 'instagram';
-    // Future: TikTok, YouTube, etc.
 }
 ```
 
@@ -126,6 +127,7 @@ The `Integration` entity stores connected external accounts and their OAuth toke
 | `createdAt` | `DateTimeImmutable` | No | Creation timestamp |
 | `updatedAt` | `DateTimeImmutable` | Yes | Last update timestamp |
 | `expiresAt` | `DateTimeImmutable` | Yes | Token expiration timestamp |
+| `refreshTokenExpiresAt` | `DateTimeImmutable` | Yes | Refresh token expiration (YouTube) |
 | `lastSyncedAt` | `DateTimeImmutable` | No | Last data sync timestamp |
 | `user` | `User` | No | Owner of the integration |
 | `status` | `IntegrationStatus` | No | Active, Expired, Revoked |
@@ -207,6 +209,74 @@ class InstagramUserProfileDTO
             name: $data['name'] ?? null,
             profilePictureUrl: $data['profile_picture_url'] ?? null,
             accountType: $data['account_type'] ?? null,
+        );
+    }
+
+    // Getters...
+}
+```
+
+### YoutubeTokenDTO
+
+```php
+<?php
+
+namespace App\DTO\External\Youtube;
+
+class YoutubeTokenDTO
+{
+    public function __construct(
+        private readonly string $accessToken,
+        private readonly int $expiresIn,
+        private readonly ?string $refreshToken,
+        private readonly string $scope,
+        private readonly ?int $refreshTokenExpiresIn,
+    ) {}
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            accessToken: $data['access_token'],
+            expiresIn: $data['expires_in'],
+            refreshToken: $data['refresh_token'] ?? null,
+            scope: $data['scope'],
+            refreshTokenExpiresIn: $data['refresh_token_expires_in'] ?? null,
+        );
+    }
+
+    // Getters...
+}
+```
+
+### YoutubeChannelDTO
+
+```php
+<?php
+
+namespace App\DTO\External\Youtube;
+
+use Google\Service\YouTube\Channel;
+
+class YoutubeChannelDTO
+{
+    public function __construct(
+        private readonly string $channelId,
+        private readonly string $title,
+        private readonly ?string $customUrl,
+        private readonly ?string $thumbnailUrl,
+    ) {}
+
+    public static function fromGoogleChannel(Channel $channel): self
+    {
+        $snippet = $channel->getSnippet();
+        $thumbnails = $snippet?->getThumbnails();
+        $defaultThumbnail = $thumbnails?->getDefault();
+
+        return new self(
+            channelId: $channel->getId(),
+            title: $snippet?->getTitle() ?? '',
+            customUrl: $snippet?->getCustomUrl(),
+            thumbnailUrl: $defaultThumbnail?->getUrl(),
         );
     }
 
