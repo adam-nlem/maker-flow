@@ -972,6 +972,56 @@ import { ModalOverlay } from "~/components/ui/ModalOverlay";
 
 ---
 
+## Global API Error Handling
+
+### Architecture
+
+All mutation errors are caught globally by `MutationCache.onError` in `root.tsx` and routed through a centralized handler. No per-hook or per-component error display is needed for mutations.
+
+```
+MutationCache.onError (root.tsx)
+  → handleMutationError (apiErrorHandler.ts)
+    → 401? redirect to /login
+    → Other? useToastStore.getState().addToast(...)
+      → ToastContainer renders toasts (auto-dismiss 5s)
+```
+
+### Files
+
+| File | Purpose |
+|------|---------|
+| `services/apiErrorHandler/apiErrorHandler.ts` | `handleMutationError()` — maps errors to French messages and dispatches toasts |
+| `stores/toast/toastStore.ts` | Zustand store managing the toast list |
+| `components/ui/ToastContainer.tsx` | Renders active toasts in a fixed top-right stack |
+
+### How It Works
+
+1. **401 Unauthorized** → redirects to `/login` via `window.location.href` (hard redirect clears client state). Skips redirect if already on `/login`.
+2. **Other `CustomHttpException`** → maps `statusCode` to a French error message. For 400 and 409, uses the backend message from `error.data.message` if available.
+3. **Unknown errors** → shows a generic "Une erreur est survenue" toast.
+
+### Adding Success Toasts
+
+For success feedback, call `addToast` from `onSuccess` in mutation hooks:
+
+```tsx
+import { useToastStore } from '~/stores/toast/toastStore'
+
+onSuccess: () => {
+    useToastStore.getState().addToast('success', 'Projet créé avec succès')
+    queryClient.invalidateQueries({ queryKey: projectQueryKeys.all })
+}
+```
+
+### Conventions
+
+1. **Error toasts are automatic** — do not add per-hook error toast logic
+2. **Success toasts are opt-in** — add them in `onSuccess` callbacks where user feedback is needed
+3. **Use `useToastStore.getState()`** to access the store outside React components (e.g., in callbacks or services)
+4. **Messages are in French** — all user-facing error messages use French
+
+---
+
 ## Best Practices
 
 1. **Use TypeScript strictly** - avoid `any` when possible

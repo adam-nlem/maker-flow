@@ -134,7 +134,6 @@ class SocialAnalyticsIntegrationInsightService
         $endDate = $now->format('Y-m-d');
 
         $metrics = implode(',', YoutubeIntegrationInsightDTO::getAnalyticsMetrics());
-
         $analyticsResponse = $analytics->reports->query([
             'ids' => 'channel==MINE',
             'startDate' => $startDate,

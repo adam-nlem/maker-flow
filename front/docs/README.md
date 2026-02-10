@@ -6,7 +6,7 @@ Index of all available documentation for the frontend codebase (React, TypeScrip
 
 | File | Description | Scope |
 |------|-------------|-------|
-| [coding-style.md](coding-style.md) | Coding standards and conventions | Project structure, naming conventions, component patterns, models, DTOs, enums, API hooks (React Query), Zustand stores, HTTP client, routes, styling, form handling, module registry pattern, best practices |
+| [coding-style.md](coding-style.md) | Coding standards and conventions | Project structure, naming conventions, component patterns, models, DTOs, enums, API hooks (React Query), Zustand stores, HTTP client, routes, styling, form handling, module registry pattern, global API error handling (MutationCache, toast store), best practices |
 | [data-table.md](data-table.md) | DataTable component | Generic reusable table with column definitions, render functions, row click, sticky headers, `afterTable` slot for infinite scroll |
 | [integration-oauth-feature.md](integration-oauth-feature.md) | OAuth integration system | OAuth popup flow, hooks (`useCreateIntegration`, `useOAuthPopup`, `useOAuthMessageListener`), callback route, security validation, error handling, adding new providers |
 | [module-usermodule-feature.md](module-usermodule-feature.md) | Module system architecture | Module templates vs UserModule instances, `ModuleIdentifier` and `ModuleSize` enums, module registry, dashboard rendering flow, widget entry point pattern, API hooks |

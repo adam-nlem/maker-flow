@@ -197,3 +197,12 @@ input[type="number"]::-webkit-inner-spin-button {
     transform: translateX(110%);
   }
 }
+
+@keyframes toast-in {
+    0% { opacity: 0; transform: translateX(1rem); }
+    100% { opacity: 1; transform: translateX(0); }
+}
+
+@utility animate-toast-in {
+    animation: toast-in 0.3s ease-out;
+}

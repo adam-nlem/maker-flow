@@ -449,21 +449,36 @@ Loading placeholder with shimmer animation.
 
 ---
 
-### AppNotification
+### ToastContainer
 
-**Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/AppNotification.tsx`
+**Location:** `front/app/components/ui/ToastContainer.tsx`
 
-Toast notification component.
+Global toast notification system driven by a Zustand store. Renders active toasts as a fixed stack in the top-right corner.
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `isError` | `boolean` | Error or success state |
-| `message` | `string` | Notification message |
+**Store:** `useToastStore` (`front/app/stores/toast/toastStore.ts`)
+
+| Store Action | Signature | Description |
+|--------------|-----------|-------------|
+| `addToast` | `(type: 'success' \| 'error', message: string) => string` | Adds a toast, returns its id |
+| `removeToast` | `(id: string) => void` | Removes a toast by id |
 
 **Features:**
-- Animated entrance/exit (Headless UI Transition)
+- Auto-dismiss after 5 seconds
+- Slide-in animation from the right (`animate-toast-in`)
 - Dismissible with X button
-- Green checkmark for success, red icon for error
+- Error: `ExclamationCircleIcon` in `text-danger` / Success: `CheckCircleIcon` in `text-green`
+- Stacked vertically with `gap-3`, fixed `top-4 right-4 z-50`
+- Uses project design tokens: `rounded-xl`, `bg-clear`, `shadow-lg`, `ring-1 ring-dark/5`, `text-heading-sm`
+
+**Usage (success toast in a mutation hook):**
+```tsx
+import { useToastStore } from '~/stores/toast/toastStore'
+
+// Inside onSuccess callback:
+useToastStore.getState().addToast('success', 'Projet créé avec succès')
+```
+
+**Note:** Error toasts are handled automatically by the global `MutationCache.onError` handler — no per-hook error handling is needed.
 
 ---
 

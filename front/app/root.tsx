@@ -6,14 +6,30 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { handleMutationError } from "~/services/apiErrorHandler/apiErrorHandler";
+import ToastContainer from "~/components/ui/ToastContainer";
 
-import {Settings} from 'luxon';
+import { Settings } from 'luxon';
 
 import type { Route } from "./+types/root";
 import "./app.css";
 
-const queryClient = new QueryClient();
+const queryClient = new QueryClient({
+  queryCache: new QueryCache({
+    onError: (error: Error) => {
+      console.log("In the query cache")
+      handleMutationError(error)
+
+    }
+  }),
+  mutationCache: new MutationCache({
+    onError: (error) => {
+      console.log("In the mutation cache")
+      handleMutationError(error)
+    }
+  }),
+});
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -26,6 +42,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
       </head>
       <body className="h-full overflow-hidden bg-clear">
         {children}
+        <ToastContainer />
         <ScrollRestoration />
         <Scripts />
       </body>

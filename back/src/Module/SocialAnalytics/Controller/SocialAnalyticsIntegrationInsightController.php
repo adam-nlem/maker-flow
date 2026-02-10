@@ -45,6 +45,7 @@ final class SocialAnalyticsIntegrationInsightController extends AbstractControll
                 dd($e);
             }
         }
+
         return $this->json(
             data: $insights,
             status: Response::HTTP_OK,

@@ -5,21 +5,21 @@ import { SocialAnalyticsIntegrationInsight, type SocialAnalyticsIntegrationInsig
 
 
 export function useListSocialAnalyticsIntegrationInsights({ integrationUuid }: { integrationUuid: string }) {
-    const query = useQuery({
-        queryKey: socialAnalyticsIntegrationInsightQueryKeys.list(integrationUuid),
-        queryFn: async () => {
-            const res = await httpClient.get('/modules/social-analytics/integration-insights', {
-                params: {
-                    "integrationUuid": integrationUuid
-                }
-            })
-            return res.data.map((json: SocialAnalyticsIntegrationInsightJSON) => SocialAnalyticsIntegrationInsight.fromJSON(json)) as SocialAnalyticsIntegrationInsight[]
-        },
-    })
+  const query = useQuery({
+    queryKey: socialAnalyticsIntegrationInsightQueryKeys.list(integrationUuid),
+    queryFn: async () => {
+      const res = await httpClient.get('/modules/social-analytics/integration-insights', {
+        params: {
+          "integrationUuid": integrationUuid
+        }
+      })
+      return res.data.map((json: SocialAnalyticsIntegrationInsightJSON) => SocialAnalyticsIntegrationInsight.fromJSON(json)) as SocialAnalyticsIntegrationInsight[]
+    },
+  })
 
-    return {
-        socialAnalyticsIntegrationInsights: query.data ?? [],
-        isLoading: query.isLoading,
-        error: query.error,
-    }
+  return {
+    socialAnalyticsIntegrationInsights: query.data ?? [],
+    isLoading: query.isLoading,
+    error: query.error,
+  }
 }
