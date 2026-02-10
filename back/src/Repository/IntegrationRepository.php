@@ -125,4 +125,21 @@ class IntegrationRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    /**
+     * @param IntegrationProvider[] $providers
+     * @return Integration[]
+     */
+    public function getByProvidersNotSyncedSince(array $providers, \DateTimeImmutable $since): array
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.provider IN (:providers)')
+            ->andWhere('i.lastSyncedAt < :since')
+            ->setParameter('providers', $providers)
+            ->setParameter('since', $since)
+            ->orderBy('i.lastSyncedAt', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

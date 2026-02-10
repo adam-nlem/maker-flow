@@ -148,10 +148,6 @@ final class IntegrationController extends AbstractController
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::InvalidState);
         }
 
-        $redisStoreService->delete(
-            RedisStoreService::getIntegrationStateKey($state)
-        );
-
         if ($error !== null) {
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::ProviderError);
         }
@@ -178,9 +174,12 @@ final class IntegrationController extends AbstractController
                 IntegrationProvider::Youtube => $youtubeOAuthService->handleCallback($code, $user, $userModule),
             };
 
+            $redisStoreService->delete(
+                RedisStoreService::getIntegrationStateKey($state)
+            );
+
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, $integrationProvider, null, $integration->getUuid());
         } catch (\Exception $e) {
-            dd($e);
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::TokenExchangeFailed);
         }
     }

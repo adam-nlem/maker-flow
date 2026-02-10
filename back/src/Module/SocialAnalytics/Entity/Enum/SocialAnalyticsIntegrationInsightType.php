@@ -10,7 +10,7 @@ enum SocialAnalyticsIntegrationInsightType: string
     case Saves = 'saves';
     case Comments = 'comments';
     case Shares = 'shares';
-    case Followers = 'followers';
+    case GainedFollowers = 'gained_followers';
     case TotalFollowers = 'total_followers';
     case Impressions = 'impressions';
     case Dislikes = 'dislikes';

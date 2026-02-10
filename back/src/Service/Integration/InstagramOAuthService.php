@@ -100,16 +100,16 @@ class InstagramOAuthService
         return InstagramUserProfileDTO::fromArray($response->toArray());
     }
 
-    public function createIntegration(User $user, InstagramTokenDTO $tokenData, InstagramUserProfileDTO $instagramUserProfile): Integration
+    public function createIntegration(User $user, InstagramTokenDTO $tokenDTO, InstagramUserProfileDTO $instagramUserProfile): Integration
     {
         $expiresAt = DateHelper::createUtcDateTimeImmutable()
-            ->modify('+' . $tokenData->getExpiresIn() . ' seconds');
+            ->modify('+' . $tokenDTO->getExpiresIn() . ' seconds');
 
         $integration = new Integration();
         $integration
             ->setUser($user)
             ->setProvider(IntegrationProvider::Instagram)
-            ->setAccessToken($tokenData->getAccessToken())
+            ->setAccessToken($tokenDTO->getAccessToken())
             ->setAccountId($instagramUserProfile->getUserId())
             ->setUserName($instagramUserProfile->getUsername())
             ->setName($instagramUserProfile->getName())
@@ -124,13 +124,13 @@ class InstagramOAuthService
         return $integration;
     }
 
-    public function updateIntegrationToken(Integration $integration, InstagramTokenDTO $tokenData): Integration
+    public function updateIntegrationToken(Integration $integration, InstagramTokenDTO $tokenDTO): Integration
     {
         $expiresAt = DateHelper::createUtcDateTimeImmutable()
-            ->modify('+' . $tokenData->getExpiresIn() . ' seconds');
+            ->modify('+' . $tokenDTO->getExpiresIn() . ' seconds');
 
         $integration
-            ->setAccessToken($tokenData->getAccessToken())
+            ->setAccessToken($tokenDTO->getAccessToken())
             ->setExpiresAt($expiresAt)
             ->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable())
             ->setStatus(IntegrationStatus::Active);

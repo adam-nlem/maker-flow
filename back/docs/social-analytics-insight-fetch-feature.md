@@ -2,7 +2,7 @@
 
 ## Overview
 
-This feature fetches insights from Instagram's Graph API using an asynchronous message queue architecture. It supports two types of insights:
+This feature fetches insights from Instagram's Graph API and YouTube Analytics API using an asynchronous message queue architecture. It supports two types of insights:
 
 - **Integration Insights**: Profile-level metrics (followers, reach, views, etc.)
 - **Post Insights**: Individual post metrics (likes, comments, saves, etc.)
@@ -68,15 +68,23 @@ Console Command
 
 | Handler | Service Called |
 |---------|----------------|
-| `FetchIntegrationInsightsHandler` | `SocialAnalyticsIntegrationInsightService::fetchInstagramProfileInsights()` |
+| `FetchIntegrationInsightsHandler` | `SocialAnalyticsIntegrationInsightService::fetchInstagramProfileInsights()` or `fetchYoutubeProfileInsights()` |
 | `FetchPostInsightsHandler` | `SocialAnalyticsPostInsightService::fetchInstagramPostInsights()` |
 
 ### Commands
 
 | Command | Description |
 |---------|-------------|
-| `app:social-analytics:fetch-integration-insights` | Dispatches messages for all Instagram integrations to fetch profile insights |
+| `app:social-analytics:fetch-integration-insights` | Dispatches messages for Instagram and YouTube integrations not synced in the last 24 hours |
 | `app:social-analytics:fetch-post-insights` | Dispatches messages for all Instagram integrations to fetch post insights |
+
+#### Sync Threshold
+
+The `fetch-integration-insights` command only fetches insights for integrations whose `lastSyncedAt` is older than 24 hours. This prevents excessive API calls and respects rate limits.
+
+Supported providers are defined in the command's `SUPPORTED_PROVIDERS` constant:
+- `IntegrationProvider::Instagram`
+- `IntegrationProvider::Youtube`
 
 ---
 
@@ -107,20 +115,69 @@ The `profile_picture_url` is refreshed on each sync to prevent expiration issues
 
 ---
 
+## YouTube API Details
+
+### Integration Insights
+
+YouTube insights are fetched using two Google APIs:
+
+#### 1. YouTube Data API (for subscriber count)
+
+**Service:** `Google\Service\YouTube`
+**Method:** `channels->listChannels('statistics', ['mine' => true])`
+
+Returns channel statistics including:
+- `subscriberCount` - Total subscriber count (maps to `TotalFollowers`)
+
+#### 2. YouTube Analytics API (for daily metrics)
+
+**Service:** `Google\Service\YouTubeAnalytics`
+**Method:** `reports->query()`
+
+**Parameters:**
+- `ids`: `channel==MINE`
+- `startDate`: Previous day (YYYY-MM-DD)
+- `endDate`: Current day (YYYY-MM-DD)
+- `metrics`: `views,likes,dislikes,comments,shares,subscribersGained`
+
+The response contains `columnHeaders` (metric names) and `rows` (values).
+
+### Token Refresh
+
+YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNeeded()` method:
+1. Checks if `expiresAt` is within 20 minutes
+2. If yes, uses the refresh token to get a new access token
+3. Updates the integration with new token and expiry
+
+---
+
 ## Metric Mappings
 
-### Integration Insight Types
+### Instagram Integration Insight Types
 
 | Instagram API Metric | SocialAnalyticsIntegrationInsightType |
 |---------------------|---------------------------------------|
 | `reach` | `Reach` |
 | `views` | `Views` |
-| `follower_count` | `Followers` |
+| `follower_count` | `GainedFollowers` |
+| `followers_count` | `TotalFollowers` |
 | `profile_links_taps` | `ProfileLinksTaps` |
 | `comments` | `Comments` |
 | `shares` | `Shares` |
 | `saves` | `Saves` |
 | `likes` | `Likes` |
+
+### YouTube Integration Insight Types
+
+| YouTube API Metric | SocialAnalyticsIntegrationInsightType |
+|-------------------|---------------------------------------|
+| `views` | `Views` |
+| `likes` | `Likes` |
+| `dislikes` | `Dislikes` |
+| `comments` | `Comments` |
+| `shares` | `Shares` |
+| `subscribersGained` | `GainedFollowers` (daily gained) |
+| `subscriberCount` | `TotalFollowers` |
 
 ### Post Insight Types
 
@@ -144,10 +201,12 @@ src/Module/SocialAnalytics/
 │   └── FetchPostInsightsCommand.php
 ├── DTO/
 │   └── External/
-│       └── Instagram/
-│           ├── InstagramIntegrationInsightDTO.php
-│           ├── InstagramPostDTO.php
-│           └── InstagramPostInsightDTO.php
+│       ├── Instagram/
+│       │   ├── InstagramIntegrationInsightDTO.php
+│       │   ├── InstagramPostDTO.php
+│       │   └── InstagramPostInsightDTO.php
+│       └── Youtube/
+│           └── YoutubeIntegrationInsightDTO.php
 ├── Message/
 │   ├── FetchIntegrationInsightsMessage.php
 │   ├── FetchPostInsightsMessage.php
@@ -196,9 +255,17 @@ This prevents duplicate entries when values haven't changed between fetches.
 
 ## Token Refresh Logic
 
+### Instagram
 The `refreshTokenIfNeeded` method in `InstagramOAuthService`:
 1. Checks if `expiresAt` is within 7 days
 2. If yes, calls Instagram's refresh token endpoint
+3. Updates the integration with new token and expiry
+4. Persists changes to database
+
+### YouTube
+The `refreshTokenIfNeeded` method in `YoutubeOAuthService`:
+1. Checks if `expiresAt` is within 20 minutes (YouTube tokens expire after ~1 hour)
+2. If yes, uses Google Client to fetch new access token with refresh token
 3. Updates the integration with new token and expiry
 4. Persists changes to database
 
@@ -206,9 +273,9 @@ The `refreshTokenIfNeeded` method in `InstagramOAuthService`:
 
 ## Error Handling
 
-- **Invalid provider**: Throws `InvalidArgumentException` if integration is not Instagram
+- **Invalid provider**: Throws `InvalidArgumentException` if integration provider doesn't match the method
 - **Missing integration**: Handler silently returns if integration not found by ID
-- **API errors**: HTTP errors from Instagram API propagate as exceptions
+- **API errors**: HTTP errors from Instagram/YouTube APIs propagate as exceptions
 - **Failed messages**: Stored in `failed` transport for manual retry (see RabbitMQ documentation)
 
 ---

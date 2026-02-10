@@ -2,6 +2,7 @@
 
 namespace App\Module\SocialAnalytics\Controller;
 
+use App\Entity\Enum\IntegrationProvider;
 use App\Entity\User;
 use App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight\ListSocialAnalyticsIntegrationInsightsQueryParamDTO;
 use App\Module\SocialAnalytics\DTO\QueryParam\IntegrationInsight\ShowSocialAnalyticsIntegrationDetailQueryParamDTO;
@@ -21,6 +22,7 @@ final class SocialAnalyticsIntegrationInsightController extends AbstractControll
         ListSocialAnalyticsIntegrationInsightsQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
         SocialAnalyticsIntegrationInsightRepository $insightRepository,
+        SocialAnalyticsIntegrationInsightService $s,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -35,6 +37,14 @@ final class SocialAnalyticsIntegrationInsightController extends AbstractControll
         }
 
         $insights = $insightRepository->getLatestByUserAndByIntegration($user, $integration);
+
+        if ($integration->getProvider() === IntegrationProvider::Youtube) {
+            try {
+                $s->fetchYoutubeProfileInsights($integration);
+            } catch (\Exception $e) {
+                dd($e);
+            }
+        }
         return $this->json(
             data: $insights,
             status: Response::HTTP_OK,

@@ -7,6 +7,9 @@ use App\Entity\Integration;
 use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramIntegrationInsightDTO;
+use App\Module\SocialAnalytics\DTO\External\Youtube\YoutubeIntegrationInsightDTO;
+use Google\Service\YouTube;
+use Google\Service\YouTubeAnalytics;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\ShowSocialAnalyticsIntegrationDetailResponseDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightTimelineDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsIntegrationInsight\SocialAnalyticsIntegrationInsightTimelinePointDTO;
@@ -21,7 +24,9 @@ use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepos
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 use App\Repository\IntegrationRepository;
 use App\Service\Integration\InstagramOAuthService;
-use DateInterval;
+use App\Service\Integration\YoutubeOAuthService;
+use Google\Client;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -46,6 +51,9 @@ class SocialAnalyticsIntegrationInsightService
         private readonly InstagramOAuthService $instagramOAuthService,
         private readonly HttpClientInterface $httpClient,
         private readonly ParameterBagInterface $parameterBag,
+        private readonly Client $googleClient,
+        private readonly YoutubeOAuthService $youtubeOAuthService,
+        private LoggerInterface $log
     ) {
         $this->instagramGraphUrl = $this->parameterBag->get('app.instagram.graph_url');
     }
@@ -95,11 +103,76 @@ class SocialAnalyticsIntegrationInsightService
         $this->integrationRepository->save($integration, true);
     }
 
+    public function fetchYoutubeProfileInsights(Integration $integration): void
+    {
+        if ($integration->getProvider() !== IntegrationProvider::Youtube) {
+            throw new \InvalidArgumentException('Integration must be a YouTube integration');
+        }
+
+        $this->youtubeOAuthService->configureGoogleClient();
+        $integration = $this->youtubeOAuthService->refreshTokenIfNeeded($integration);
+
+        $this->googleClient->setAccessToken($integration->getAccessToken());
+
+        // Fetch subscriber count from YouTube Data API
+        $youtube = new YouTube($this->googleClient);
+        $channelResponse = $youtube->channels->listChannels('statistics', ['mine' => true]);
+        $channels = $channelResponse->getItems();
+        //dd($channelResponse);
+        $insightDTOs = [];
+
+        if (!empty($channels)) {
+            $statistics = $channels[0]->getStatistics();
+            $subscriberCount = (int) $statistics->getSubscriberCount();
+            $insightDTOs[] = new YoutubeIntegrationInsightDTO('subscriberCount', $subscriberCount);
+        }
+
+        // Fetch analytics metrics from YouTube Analytics API
+        $analytics = new YouTubeAnalytics($this->googleClient);
+        $now = DateHelper::createUtcDateTimeImmutable();
+        $startDate = $now->modify('-1 month')->format('Y-m-d');
+        $endDate = $now->format('Y-m-d');
+
+        $metrics = implode(',', YoutubeIntegrationInsightDTO::getAnalyticsMetrics());
+
+        $analyticsResponse = $analytics->reports->query([
+            'ids' => 'channel==MINE',
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'metrics' => $metrics,
+        ]);
+        $columnHeaders = $analyticsResponse->getColumnHeaders();
+        $rows = $analyticsResponse->getRows();
+
+        if (!empty($rows) && !empty($columnHeaders)) {
+            $row = $rows[0];
+            foreach ($columnHeaders as $index => $header) {
+                $metricName = $header->getName();
+                $value = (int) ($row[$index] ?? 0);
+                $insightDTOs[] = new YoutubeIntegrationInsightDTO($metricName, $value);
+            }
+        }
+
+        $this->createInsightEntitiesFromDTOs($integration, $insightDTOs, YoutubeIntegrationInsightDTO::getMetricMapping());
+
+        $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
+        $this->integrationRepository->save($integration, true);
+    }
+
     private function createInsightEntities(Integration $integration, array $insightDTOs): void
     {
-        /** @var InstagramIntegrationInsightDTO $dto */
+        $this->createInsightEntitiesFromDTOs($integration, $insightDTOs, InstagramIntegrationInsightDTO::getMetricMapping());
+    }
+
+    /**
+     * @param Integration $integration
+     * @param array<InstagramIntegrationInsightDTO|YoutubeIntegrationInsightDTO> $insightDTOs
+     * @param array<string, SocialAnalyticsIntegrationInsightType> $metricMapping
+     */
+    private function createInsightEntitiesFromDTOs(Integration $integration, array $insightDTOs, array $metricMapping): void
+    {
         foreach ($insightDTOs as $dto) {
-            $insightType = InstagramIntegrationInsightDTO::getMetricMapping()[$dto->getName()] ?? null;
+            $insightType = $metricMapping[$dto->getName()] ?? null;
 
             if ($insightType === null) {
                 continue;
@@ -205,7 +278,7 @@ class SocialAnalyticsIntegrationInsightService
 
             // Convert entities to DTOs first
             $points = array_map(
-                fn($insight) => new SocialAnalyticsIntegrationInsightTimelinePointDTO(
+                fn ($insight) => new SocialAnalyticsIntegrationInsightTimelinePointDTO(
                     createdAt: $insight->getCreatedAt(),
                     value: $insight->getValue(),
                 ),

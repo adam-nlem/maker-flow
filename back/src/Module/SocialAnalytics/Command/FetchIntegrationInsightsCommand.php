@@ -3,8 +3,8 @@
 namespace App\Module\SocialAnalytics\Command;
 
 use App\Entity\Enum\IntegrationProvider;
+use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\Message\FetchIntegrationInsightsMessage;
-use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
@@ -15,10 +15,18 @@ use Symfony\Component\Messenger\MessageBusInterface;
 
 #[AsCommand(
     name: 'app:social-analytics:fetch-integration-insights',
-    description: 'Fetches integration insights for all integrations',
+    description: 'Fetches integration insights for integrations not synced in the last 24 hours',
 )]
 class FetchIntegrationInsightsCommand extends Command
 {
+    private const SUPPORTED_PROVIDERS = [
+        IntegrationProvider::Instagram,
+        IntegrationProvider::Youtube,
+    ];
+
+    //TODO: Change this back to 24 horus
+    private const SYNC_THRESHOLD_HOURS = 0;
+
     public function __construct(
         private readonly IntegrationRepository $integrationRepository,
         private readonly MessageBusInterface $bus,
@@ -32,15 +40,26 @@ class FetchIntegrationInsightsCommand extends Command
 
         $io->title('Fetching integration insights');
 
-        $instagramIntegrations = $this->integrationRepository->getByProvider(IntegrationProvider::Instagram);
+        $since = DateHelper::createUtcDateTimeImmutable()
+            ->modify('-' . self::SYNC_THRESHOLD_HOURS . ' hours');
 
-        $io->info(sprintf('Found %d Instagram integrations', count($instagramIntegrations)));
+        $integrations = $this->integrationRepository->getByProvidersNotSyncedSince(
+            self::SUPPORTED_PROVIDERS,
+            $since
+        );
 
-        foreach ($instagramIntegrations as $integration) {
+        $io->info(sprintf('Found %d integrations needing sync (last synced > %d hours ago)', count($integrations), self::SYNC_THRESHOLD_HOURS));
+
+        foreach ($integrations as $integration) {
+            $io->text(sprintf(
+                '  - Dispatching: %s (%s)',
+                $integration->getUserName(),
+                $integration->getProvider()->value
+            ));
             $this->bus->dispatch(new FetchIntegrationInsightsMessage($integration->getId()));
         }
 
-        $io->success('Integration insights fetch completed');
+        $io->success('Integration insights fetch messages dispatched');
 
         return Command::SUCCESS;
     }

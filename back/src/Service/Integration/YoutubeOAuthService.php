@@ -36,7 +36,7 @@ class YoutubeOAuthService
     ) {
     }
 
-    private function configureClient(): void
+    public function configureGoogleClient(): void
     {
         $authConfig = [
             "web" => [
@@ -62,11 +62,14 @@ class YoutubeOAuthService
         ]);
         $this->googleClient->setRedirectUri($this->youtubeRedirectUri);
         $this->googleClient->setAccessType('offline');
+
+        // Force the consent screen (Critical to get the refresh token each time during DEV) TODO: Mayber remove this in PROD
+        $this->googleClient->setPrompt('consent');
     }
 
     public function getAuthorizationUrl(string $state): string
     {
-        $this->configureClient();
+        $this->configureGoogleClient();
 
         $this->googleClient->setState($state);
 
@@ -89,26 +92,26 @@ class YoutubeOAuthService
 
     public function createIntegration(
         User $user,
-        YoutubeTokenDTO $tokenData,
+        YoutubeTokenDTO $tokenDTO,
         YoutubeChannelDTO $channelData
     ): Integration {
         $expiresAt = DateHelper::createUtcDateTimeImmutable()
-            ->modify('+' . $tokenData->getExpiresIn() . ' seconds');
+            ->modify('+' . $tokenDTO->getExpiresIn() . ' seconds');
 
         $refreshTokenExpiresAt = null;
-        if ($tokenData->getRefreshTokenExpiresIn() !== null) {
+        if ($tokenDTO->getRefreshTokenExpiresIn() !== null) {
             $refreshTokenExpiresAt = DateHelper::createUtcDateTimeImmutable()
-                ->modify('+' . $tokenData->getRefreshTokenExpiresIn() . ' seconds');
+                ->modify('+' . $tokenDTO->getRefreshTokenExpiresIn() . ' seconds');
         }
 
-        $scopes = array_filter(explode(' ', $tokenData->getScope()));
+        $scopes = array_filter(explode(' ', $tokenDTO->getScope()));
 
         $integration = new Integration();
         $integration
             ->setUser($user)
             ->setProvider(IntegrationProvider::Youtube)
-            ->setAccessToken($tokenData->getAccessToken())
-            ->setRefreshToken($tokenData->getRefreshToken())
+            ->setAccessToken($tokenDTO->getAccessToken())
+            ->setRefreshToken($tokenDTO->getRefreshToken())
             ->setAccountId($channelData->getChannelId())
             ->setUserName($channelData->getCustomUrl() ?? $channelData->getChannelId())
             ->setName($channelData->getTitle())
@@ -120,29 +123,28 @@ class YoutubeOAuthService
             ->setScope($scopes);
 
         $this->integrationRepository->save($integration);
-
         return $integration;
     }
 
     public function updateIntegrationToken(
         Integration $integration,
-        YoutubeTokenDTO $tokenData
+        YoutubeTokenDTO $tokenDTO
     ): Integration {
         $expiresAt = DateHelper::createUtcDateTimeImmutable()
-            ->modify('+' . $tokenData->getExpiresIn() . ' seconds');
+            ->modify('+' . $tokenDTO->getExpiresIn() . ' seconds');
 
         $integration
-            ->setAccessToken($tokenData->getAccessToken())
+            ->setAccessToken($tokenDTO->getAccessToken())
             ->setExpiresAt($expiresAt)
             ->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable())
             ->setStatus(IntegrationStatus::Active);
 
-        if ($tokenData->getRefreshToken() !== null) {
-            $integration->setRefreshToken($tokenData->getRefreshToken());
+        if ($tokenDTO->getRefreshToken() !== null) {
+            $integration->setRefreshToken($tokenDTO->getRefreshToken());
 
-            if ($tokenData->getRefreshTokenExpiresIn() !== null) {
+            if ($tokenDTO->getRefreshTokenExpiresIn() !== null) {
                 $refreshTokenExpiresAt = DateHelper::createUtcDateTimeImmutable()
-                    ->modify('+' . $tokenData->getRefreshTokenExpiresIn() . ' seconds');
+                    ->modify('+' . $tokenDTO->getRefreshTokenExpiresIn() . ' seconds');
                 $integration->setRefreshTokenExpiresAt($refreshTokenExpiresAt);
             }
         }
@@ -152,15 +154,36 @@ class YoutubeOAuthService
         return $integration;
     }
 
+    public function refreshTokenIfNeeded(Integration $integration): Integration
+    {
+        $now = DateHelper::createUtcDateTimeImmutable();
+        $expiresAt = $integration->getExpiresAt();
+
+        if ($expiresAt === null) {
+            return $integration;
+        }
+
+        $refreshThreshold = $expiresAt->modify('-20 minutes');
+
+        if ($now < $refreshThreshold) {
+            return $integration;
+        }
+
+        $tokenArray = $this->googleClient->fetchAccessTokenWithRefreshToken($integration->getRefreshToken());
+        $tokenDTO = YoutubeTokenDTO::fromArray($tokenArray);
+
+        return $this->updateIntegrationToken($integration, $tokenDTO);
+    }
+
     public function handleCallback(
         string $code,
         User $user,
         UserModule $userModule,
     ): Integration {
-        $this->configureClient();
+        $this->configureGoogleClient();
 
         $tokenArray = $this->googleClient->fetchAccessTokenWithAuthCode($code);
-        $tokenData = YoutubeTokenDTO::fromArray($tokenArray);
+        $tokenDTO = YoutubeTokenDTO::fromArray($tokenArray);
 
         $this->googleClient->setAccessToken($tokenArray);
 
@@ -173,9 +196,9 @@ class YoutubeOAuthService
         );
 
         if ($existingIntegration !== null) {
-            $integration = $this->updateIntegrationToken($existingIntegration, $tokenData);
+            $integration = $this->updateIntegrationToken($existingIntegration, $tokenDTO);
         } else {
-            $integration = $this->createIntegration($user, $tokenData, $channelData);
+            $integration = $this->createIntegration($user, $tokenDTO, $channelData);
         }
 
         $userModule->addIntegration($integration);
