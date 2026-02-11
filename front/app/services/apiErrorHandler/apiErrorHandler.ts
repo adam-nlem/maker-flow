@@ -1,16 +1,14 @@
-import { CustomHttpException, UnauthorizedException } from '~/services/httpClient/customHttpExceptions'
+import {
+  BadRequestException,
+  ConflictException,
+  CustomHttpException,
+  ForbiddenException,
+  InternalServerException,
+  NotFoundException,
+  TimeoutException,
+  UnauthorizedException,
+} from '~/services/httpClient/customHttpExceptions'
 import { useToastStore } from '~/stores/toast/toastStore'
-
-const STATUS_MESSAGES: Record<number, string> = {
-  400: 'La requête est invalide',
-  403: "Vous n'avez pas les droits pour effectuer cette action",
-  404: 'Ressource introuvable',
-  408: 'Le serveur a mis trop longtemps à répondre',
-  409: 'Un conflit est survenu',
-  500: 'Une erreur interne est survenue',
-}
-
-const DEFAULT_MESSAGE = 'Une erreur est survenue'
 
 function extractBackendMessage(data: unknown): string | null {
   if (data && typeof data === 'object') {
@@ -23,6 +21,7 @@ function extractBackendMessage(data: unknown): string | null {
 
 export function handleMutationError(error: unknown): void {
   console.log(error);
+
   if (error instanceof UnauthorizedException) {
     if (window.location.pathname !== '/login') {
       window.location.href = '/login'
@@ -30,15 +29,29 @@ export function handleMutationError(error: unknown): void {
     return
   }
 
-  let message = DEFAULT_MESSAGE
+  let message: string
 
-  if (error instanceof CustomHttpException) {
-    const backendMessage = extractBackendMessage(error.data)
-    const statusHasBackendMessage = [400, 409].includes(error.statusCode)
-
-    message = (statusHasBackendMessage && backendMessage)
-      ? backendMessage
-      : (STATUS_MESSAGES[error.statusCode] ?? DEFAULT_MESSAGE)
+  switch (error.constructor) {
+    case BadRequestException:
+      message = extractBackendMessage((error as CustomHttpException).data) ?? 'La requête est invalide'
+      break
+    case ForbiddenException:
+      message = "Vous n'avez pas les droits pour effectuer cette action"
+      break
+    case NotFoundException:
+      message = 'Ressource introuvable'
+      break
+    case TimeoutException:
+      message = 'Le serveur a mis trop longtemps à répondre'
+      break
+    case ConflictException:
+      message = extractBackendMessage((error as CustomHttpException).data) ?? 'Un conflit est survenu'
+      break
+    case InternalServerException:
+      message = 'Une erreur interne est survenue'
+      break
+    default:
+      message = 'Une erreur est survenue'
   }
 
   useToastStore.getState().addToast('error', message)
