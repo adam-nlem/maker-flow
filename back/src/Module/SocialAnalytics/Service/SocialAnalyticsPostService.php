@@ -6,6 +6,7 @@ use App\Entity\Integration;
 use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\DTO\External\Instagram\InstagramPostDTO;
+use App\Module\SocialAnalytics\DTO\External\Youtube\YoutubePostDTO;
 use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost\SocialAnalyticsPostWithInsightsDTO;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsTimePeriod;
@@ -56,6 +57,41 @@ class SocialAnalyticsPostService
             ->setMediaType($postDTO->getMediaType())
             ->setPublishedAt($postDTO->getPublishedAt())
             ->setDuration(0)
+            ->setCaption($postDTO->getCaption())
+            ->setExternalUrl($postDTO->getExternalUrl())
+            ->setIntegration($integration)
+            ->setUser($integration->getUser());
+
+        if ($postDTO->getThumbnailUrl() !== null) {
+            $this->downloadAndStoreThumbnail($post, $postDTO->getThumbnailUrl());
+        }
+
+        $this->repository->save($post);
+
+        return $post;
+    }
+
+    public function createOrGetYoutubePost(
+        Integration $integration,
+        YoutubePostDTO $postDTO
+    ): SocialAnalyticsPost {
+        $existingPost = $this->repository->getByExternalIdAndIntegration($postDTO->getExternalId(), $integration);
+
+        if ($existingPost !== null) {
+            if ($existingPost->getCaption() !== $postDTO->getCaption()) {
+                $existingPost->setCaption($postDTO->getCaption());
+                $this->repository->save($existingPost);
+            }
+
+            return $existingPost;
+        }
+
+        $post = new SocialAnalyticsPost();
+        $post
+            ->setExternalId($postDTO->getExternalId())
+            ->setMediaType($postDTO->getMediaType())
+            ->setPublishedAt($postDTO->getPublishedAt())
+            ->setDuration($postDTO->getDuration())
             ->setCaption($postDTO->getCaption())
             ->setExternalUrl($postDTO->getExternalUrl())
             ->setIntegration($integration)

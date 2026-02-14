@@ -19,7 +19,7 @@ function extractBackendMessage(data: unknown): string | null {
   return null
 }
 
-export function handleMutationError(error: unknown): void {
+export function handleMutationError(error: CustomHttpException): void {
   console.log(error);
 
   if (error instanceof UnauthorizedException) {

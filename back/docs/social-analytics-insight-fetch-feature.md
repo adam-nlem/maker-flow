@@ -17,7 +17,7 @@ The system uses RabbitMQ with Symfony Messenger for asynchronous processing:
 Console Command
     └── Dispatches messages to RabbitMQ queue
         └── Message Handler (consumed by worker)
-            └── Service fetches data from Instagram API
+            └── Service fetches data from Instagram/YouTube API
                 └── Stores insights in database
 ```
 
@@ -49,7 +49,8 @@ Console Command
                   │ API call
                   ▼
 ┌─────────────────────────────────────┐
-│        Instagram Graph API          │
+│   Instagram Graph API / YouTube     │
+│   Data API + Analytics API          │
 └─────────────────────────────────────┘
 ```
 
@@ -69,14 +70,14 @@ Console Command
 | Handler | Service Called |
 |---------|----------------|
 | `FetchIntegrationInsightsHandler` | `SocialAnalyticsIntegrationInsightService::fetchInstagramProfileInsights()` or `fetchYoutubeProfileInsights()` |
-| `FetchPostInsightsHandler` | `SocialAnalyticsPostInsightService::fetchInstagramPostInsights()` |
+| `FetchPostInsightsHandler` | `SocialAnalyticsPostInsightService::fetchInstagramPostInsights()` or `fetchYoutubePostInsights()` |
 
 ### Commands
 
 | Command | Description |
 |---------|-------------|
 | `app:social-analytics:fetch-integration-insights` | Dispatches messages for Instagram and YouTube integrations not synced in the last 24 hours |
-| `app:social-analytics:fetch-post-insights` | Dispatches messages for all Instagram integrations to fetch post insights |
+| `app:social-analytics:fetch-post-insights` | Dispatches messages for all Instagram and YouTube integrations to fetch post insights |
 
 #### Sync Threshold
 
@@ -142,6 +143,47 @@ Returns channel statistics including:
 
 The response contains `columnHeaders` (metric names) and `rows` (values).
 
+### Post Insights
+
+YouTube post insights require multiple API calls to collect video metadata and analytics:
+
+#### API Call Strategy
+
+1. **`channels.list(part=contentDetails, mine=true)`** — get the uploads playlist ID (1 call)
+2. **`playlistItems.list(part=contentDetails, playlistId=..., maxResults=50)`** — get video IDs (paginated, 50 per page)
+3. **`videos.list(id=batch, part=snippet,statistics,contentDetails)`** — get full video details + Data API stats in batches of 50
+4. **`reports.query(dimensions=video, filters=video==ids)`** — get analytics-only metrics in batches of ~200
+
+**Total for N videos**: `2 + 2*ceil(N/50) + ceil(N/200)` calls. For 100 videos: ~7 calls.
+
+#### Data API Metrics (from `videos.list`)
+
+| YouTube Metric | SocialAnalyticsPostInsightType |
+|---|---|
+| `viewCount` | `Views` |
+| `likeCount` | `Likes` |
+| `commentCount` | `Comments` |
+
+#### Analytics API Metrics (from `reports.query`)
+
+| YouTube Metric | SocialAnalyticsPostInsightType | Notes |
+|---|---|---|
+| `shares` | `Shares` | |
+| `averageViewDuration` | `AverageWatchTime` | Already in seconds |
+| `estimatedMinutesWatched` | `TotalWatchTime` | Converted from minutes to seconds (x60) |
+
+#### Video Field Mapping to SocialAnalyticsPost
+
+| SocialAnalyticsPost field | YouTube source |
+|---|---|
+| `externalId` | Video ID |
+| `mediaType` | `SocialAnalyticsMediaType::Video` (all YouTube content) |
+| `publishedAt` | `snippet.publishedAt` |
+| `duration` | `contentDetails.duration` (ISO 8601 parsed to seconds) |
+| `caption` | Video title (`snippet.title`) |
+| `externalUrl` | `https://www.youtube.com/watch?v={videoId}` |
+| `thumbnailUrl` | `snippet.thumbnails.high.url` |
+
 ### Token Refresh
 
 YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNeeded()` method:
@@ -179,7 +221,7 @@ YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNee
 | `subscribersGained` | `GainedFollowers` (daily gained) |
 | `subscriberCount` | `TotalFollowers` |
 
-### Post Insight Types
+### Instagram Post Insight Types
 
 | Instagram API Metric | SocialAnalyticsPostInsightType |
 |---------------------|-------------------------------|
@@ -189,6 +231,20 @@ YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNee
 | `views` | `Views` |
 | `likes` | `Likes` |
 | `comments` | `Comments` |
+| `shares` | `Shares` |
+| `ig_reels_avg_watch_time` | `AverageWatchTime` (converted from ms to s) |
+| `ig_reels_video_view_total_time` | `TotalWatchTime` (converted from ms to s) |
+
+### YouTube Post Insight Types
+
+| YouTube API Metric | SocialAnalyticsPostInsightType | Source |
+|---|---|---|
+| `viewCount` | `Views` | Data API |
+| `likeCount` | `Likes` | Data API |
+| `commentCount` | `Comments` | Data API |
+| `shares` | `Shares` | Analytics API |
+| `averageViewDuration` | `AverageWatchTime` | Analytics API (already in seconds) |
+| `estimatedMinutesWatched` | `TotalWatchTime` | Analytics API (converted from minutes to seconds) |
 
 ---
 
@@ -206,7 +262,9 @@ src/Module/SocialAnalytics/
 │       │   ├── InstagramPostDTO.php
 │       │   └── InstagramPostInsightDTO.php
 │       └── Youtube/
-│           └── YoutubeIntegrationInsightDTO.php
+│           ├── YoutubeIntegrationInsightDTO.php
+│           ├── YoutubePostDTO.php
+│           └── YoutubePostInsightDTO.php
 ├── Message/
 │   ├── FetchIntegrationInsightsMessage.php
 │   ├── FetchPostInsightsMessage.php
@@ -228,7 +286,7 @@ src/Module/SocialAnalytics/
 # Fetch integration insights for all Instagram integrations
 dce back php bin/console app:social-analytics:fetch-integration-insights
 
-# Fetch post insights for all Instagram integrations
+# Fetch post insights for all Instagram and YouTube integrations
 dce back php bin/console app:social-analytics:fetch-post-insights
 ```
 

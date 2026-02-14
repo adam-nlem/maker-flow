@@ -33,14 +33,20 @@ class FetchPostInsightsCommand extends Command
         $io->title('Fetching post insights');
 
         $instagramIntegrations = $this->integrationRepository->getByProvider(IntegrationProvider::Instagram);
-
         $io->info(sprintf('Found %d Instagram integrations', count($instagramIntegrations)));
 
         foreach ($instagramIntegrations as $integration) {
             $this->bus->dispatch(new FetchPostInsightsMessage($integration->getId()));
         }
 
-        $io->success('Post insights fetch completed');
+        $youtubeIntegrations = $this->integrationRepository->getByProvider(IntegrationProvider::Youtube);
+        $io->info(sprintf('Found %d YouTube integrations', count($youtubeIntegrations)));
+
+        foreach ($youtubeIntegrations as $integration) {
+            $this->bus->dispatch(new FetchPostInsightsMessage($integration->getId()));
+        }
+
+        $io->success('Post insights fetch messages dispatched');
 
         return Command::SUCCESS;
     }
