@@ -3,7 +3,7 @@ import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outl
 import { XMarkIcon } from '@heroicons/react/20/solid'
 import { useToastStore, type Toast } from '~/stores/toast/toastStore'
 
-const AUTO_DISMISS_MS = 5000000
+const AUTO_DISMISS_MS = 5000
 
 function ToastItem({ toast }: { toast: Toast }) {
   const removeToast = useToastStore((state) => state.removeToast)
@@ -22,7 +22,7 @@ function ToastItem({ toast }: { toast: Toast }) {
           <div className="shrink-0">
             {isError
               ? <ExclamationCircleIcon aria-hidden="true" className="size-6 text-danger" />
-              : <CheckCircleIcon aria-hidden="true" className="size-6 text-green" />
+              : <CheckCircleIcon aria-hidden="true" className="size-6 text-green-500" />
             }
           </div>
           <div className="ml-3 w-0 flex-1 pt-0.5">
