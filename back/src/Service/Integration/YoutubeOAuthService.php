@@ -13,6 +13,7 @@ use App\Event\IntegrationCreatedEvent;
 use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
 use App\Repository\UserModuleRepository;
+use App\Service\Integration\Exception\OAuthTokenRevokedException;
 use Google\Client;
 use Google\Service\YouTube;
 use Google\Service\YouTubeAnalytics;
@@ -170,6 +171,13 @@ class YoutubeOAuthService
         }
 
         $tokenArray = $this->googleClient->fetchAccessTokenWithRefreshToken($integration->getRefreshToken());
+
+        if (isset($tokenArray['error']) && $tokenArray['error'] === 'invalid_grant') {
+            $integration->setStatus(IntegrationStatus::Revoked);
+            $this->integrationRepository->save($integration, true);
+
+            throw new OAuthTokenRevokedException($integration->getId());
+        }
         $tokenDTO = YoutubeTokenDTO::fromArray($tokenArray);
 
         return $this->updateIntegrationToken($integration, $tokenDTO);

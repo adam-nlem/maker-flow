@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
 use App\Entity\User;
 use App\Entity\UserModule;
@@ -86,14 +87,16 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getOneByUserModuleAndProvider(UserModule $userModule, IntegrationProvider $provider): ?Integration
+    public function getOneByUserModuleAndProviderAndStatus(UserModule $userModule, IntegrationProvider $provider, IntegrationStatus $status): ?Integration
     {
         return $this->createQueryBuilder('i')
             ->innerJoin('i.userModules', 'um')
             ->where('um = :userModule')
             ->andWhere('i.provider = :provider')
+            ->andWhere('i.status = :status')
             ->setParameter('userModule', $userModule)
             ->setParameter('provider', $provider)
+            ->setParameter('status', $status)
             ->orderBy('i.createdAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()
@@ -101,13 +104,13 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserModule(UserModule $userModule): array
+    public function getByUserModuleAndStatus(UserModule $userModule, IntegrationStatus $status): array
     {
         $providers = IntegrationProvider::cases();
         $integrations = [];
 
         foreach ($providers as $provider) {
-            $integration = $this->getOneByUserModuleAndProvider($userModule, $provider);
+            $integration = $this->getOneByUserModuleAndProviderAndStatus($userModule, $provider, $status);
             if ($integration !== null) {
                 $integrations[] = $integration;
             }

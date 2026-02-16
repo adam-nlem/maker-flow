@@ -45,12 +45,14 @@ Console Command
 ┌─────────────────────────────────────┐
 │  SocialAnalyticsIntegrationInsight  │
 │  Service / PostInsightService       │
+│  → YoutubePostInsightService        │
+│  → InstagramPostInsightService      │
 └─────────────────┬───────────────────┘
                   │ API call
                   ▼
 ┌─────────────────────────────────────┐
 │   Instagram Graph API / YouTube     │
-│   Data API + Analytics API          │
+│   Analytics API                     │
 └─────────────────────────────────────┘
 ```
 
@@ -110,7 +112,7 @@ The `profile_picture_url` is refreshed on each sync to prevent expiration issues
 **Endpoint:** `GET https://graph.instagram.com/{user_id}/media`
 
 **Query Parameters:**
-- `fields`: `id,media_type,timestamp,thumbnail_url,caption,insights.metric(reach,total_interactions,saved,views,likes,comments)`
+- `fields`: `id,media_type,timestamp,thumbnail_url,caption,permalink,insights.metric(reach,total_interactions,saved,views,likes,comments)`
 - `limit`: `100`
 - `access_token`: Integration's access token
 
@@ -145,32 +147,32 @@ The response contains `columnHeaders` (metric names) and `rows` (values).
 
 ### Post Insights
 
-YouTube post insights require multiple API calls to collect video metadata and analytics:
+YouTube post insights require multiple API calls to collect video metadata and analytics. All metrics are fetched from the YouTube Analytics API.
 
 #### API Call Strategy
 
 1. **`channels.list(part=contentDetails, mine=true)`** — get the uploads playlist ID (1 call)
 2. **`playlistItems.list(part=contentDetails, playlistId=..., maxResults=50)`** — get video IDs (paginated, 50 per page)
-3. **`videos.list(id=batch, part=snippet,statistics,contentDetails)`** — get full video details + Data API stats in batches of 50
-4. **`reports.query(dimensions=video, filters=video==ids)`** — get analytics-only metrics in batches of ~200
+3. **`videos.list(id=batch, part=snippet,contentDetails)`** — get video metadata (title, duration, thumbnail) in batches of 50
+4. **`reports.query(dimensions=day,video, filters=video==ids)`** — get all metrics from Analytics API in batches of 200 (Time-based report with `day,video` dimensions supports all 11 metrics with the `video` filter)
 
 **Total for N videos**: `2 + 2*ceil(N/50) + ceil(N/200)` calls. For 100 videos: ~7 calls.
-
-#### Data API Metrics (from `videos.list`)
-
-| YouTube Metric | SocialAnalyticsPostInsightType |
-|---|---|
-| `viewCount` | `Views` |
-| `likeCount` | `Likes` |
-| `commentCount` | `Comments` |
 
 #### Analytics API Metrics (from `reports.query`)
 
 | YouTube Metric | SocialAnalyticsPostInsightType | Notes |
 |---|---|---|
+| `views` | `Views` | |
+| `likes` | `Likes` | |
+| `dislikes` | `Dislikes` | |
+| `comments` | `Comments` | |
 | `shares` | `Shares` | |
 | `averageViewDuration` | `AverageWatchTime` | Already in seconds |
 | `estimatedMinutesWatched` | `TotalWatchTime` | Converted from minutes to seconds (x60) |
+| `videoThumbnailImpressions` | `ThumbnailImpressions` | |
+| `videoThumbnailImpressionsClickRate` | `ThumbnailImpressionsClickRate` | |
+| `subscribersGained` | `FollowersGained` | |
+| `subscribersLost` | `FollowersLost` | |
 
 #### Video Field Mapping to SocialAnalyticsPost
 
@@ -237,14 +239,31 @@ YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNee
 
 ### YouTube Post Insight Types
 
-| YouTube API Metric | SocialAnalyticsPostInsightType | Source |
+| YouTube Metric | SocialAnalyticsPostInsightType | Notes |
 |---|---|---|
-| `viewCount` | `Views` | Data API |
-| `likeCount` | `Likes` | Data API |
-| `commentCount` | `Comments` | Data API |
+| `views` | `Views` | Analytics API |
+| `likes` | `Likes` | Analytics API |
+| `dislikes` | `Dislikes` | Analytics API |
+| `comments` | `Comments` | Analytics API |
 | `shares` | `Shares` | Analytics API |
 | `averageViewDuration` | `AverageWatchTime` | Analytics API (already in seconds) |
 | `estimatedMinutesWatched` | `TotalWatchTime` | Analytics API (converted from minutes to seconds) |
+| `videoThumbnailImpressions` | `ThumbnailImpressions` | Analytics API |
+| `videoThumbnailImpressionsClickRate` | `ThumbnailImpressionsClickRate` | Analytics API |
+| `subscribersGained` | `FollowersGained` | Analytics API |
+| `subscribersLost` | `FollowersLost` | Analytics API |
+
+---
+
+## Platform Service Architecture
+
+Post insight fetching is split into platform-specific services for separation of concerns:
+
+- **`SocialAnalyticsPostInsightService`** — orchestrator that handles API authentication, pagination, and delegates to platform services. Also contains display logic (detail, timelines, ranking).
+- **`YoutubePostInsightService`** — YouTube-specific logic: fetching video IDs, building post DTOs, enriching with Analytics API data, and persisting insights.
+- **`InstagramPostInsightService`** — Instagram-specific logic: parsing post data and persisting insights (with ms→s watch time conversion).
+
+Each platform service has its own `createPostInsights` and `shouldCreateInsight` methods, specialized for the platform's needs.
 
 ---
 
@@ -273,7 +292,9 @@ src/Module/SocialAnalytics/
 │       └── FetchPostInsightsHandler.php
 └── Service/
     ├── SocialAnalyticsIntegrationInsightService.php
-    └── SocialAnalyticsPostInsightService.php
+    ├── SocialAnalyticsPostInsightService.php
+    ├── YoutubePostInsightService.php
+    └── InstagramPostInsightService.php
 ```
 
 ---
@@ -334,6 +355,7 @@ The `refreshTokenIfNeeded` method in `YoutubeOAuthService`:
 - **Invalid provider**: Throws `InvalidArgumentException` if integration provider doesn't match the method
 - **Missing integration**: Handler silently returns if integration not found by ID
 - **API errors**: HTTP errors from Instagram/YouTube APIs propagate as exceptions
+- **Revoked OAuth token (`invalid_grant`)**: When YouTube returns `invalid_grant` (user revoked access, refresh token expired, etc.), the integration status is set to `Revoked` and an `OAuthTokenRevokedException` is thrown. The user must re-authenticate to restore the integration. The exception is caught by message handlers, logged, and the worker continues processing other integrations.
 - **Failed messages**: Stored in `failed` transport for manual retry (see RabbitMQ documentation)
 
 ---

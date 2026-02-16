@@ -23,20 +23,6 @@ class YoutubePostDTO
     {
         $snippet = $video->getSnippet();
         $contentDetails = $video->getContentDetails();
-        $statistics = $video->getStatistics();
-
-        $postInsights = [];
-
-        foreach (YoutubePostInsightDTO::getDataApiMetrics() as $metric) {
-            $value = match ($metric) {
-                'viewCount' => (int) ($statistics->getViewCount() ?? 0),
-                'likeCount' => (int) ($statistics->getLikeCount() ?? 0),
-                'commentCount' => (int) ($statistics->getCommentCount() ?? 0),
-            };
-
-            $type = YoutubePostInsightDTO::getMetricMapping()[$metric] ?? null;
-            $postInsights[] = new YoutubePostInsightDTO(type: $type, value: $value);
-        }
 
         $thumbnailUrl = null;
         $thumbnails = $snippet->getThumbnails();
@@ -53,7 +39,7 @@ class YoutubePostDTO
             caption: $snippet->getTitle(),
             thumbnailUrl: $thumbnailUrl,
             externalUrl: sprintf('https://www.youtube.com/watch?v=%s', $video->getId()),
-            postInsights: $postInsights,
+            postInsights: [],
         );
     }
 

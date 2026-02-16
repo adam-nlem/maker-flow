@@ -9,6 +9,7 @@ use App\DTO\Request\Integration\CreateIntegrationRequestDTO;
 use App\DTO\Response\Integration\CreateIntegrationResponseDTO;
 use App\DTO\Response\Integration\OAuthCallbackResponseDTO;
 use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Enum\OAuthCallbackStatus;
 use App\Entity\Enum\OAuthErrorCode;
 use App\Entity\User;
@@ -52,7 +53,7 @@ final class IntegrationController extends AbstractController
             );
         }
 
-        $integrations = $integrationRepository->getByUserModule($userModule);
+        $integrations = $integrationRepository->getByUserModuleAndStatus($userModule, IntegrationStatus::Active);
 
         return $this->json(
             data: $integrations,
