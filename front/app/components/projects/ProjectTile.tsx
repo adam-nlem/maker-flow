@@ -3,7 +3,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { formatToFrenchDateShort } from "~/utils/dateFormatters";
 import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 import { createAvatar } from '@dicebear/core';
-import { glass, lorelei } from '@dicebear/collection';
+import { glass, lorelei, shapes } from '@dicebear/collection';
 
 interface ProjectTileProps {
   project: Project;
@@ -28,9 +28,10 @@ export default function ProjectTile({
   const [isHovered, setIsHovered] = useState(false)
 
   const avatar = useMemo(() => {
-    return createAvatar(glass, {
+    return createAvatar(shapes, {
       size: 128,
       seed: project.uuid,
+      backgroundType: ["gradientLinear"],
     }).toDataUri()
   }, [])
 
@@ -44,7 +45,7 @@ export default function ProjectTile({
     >
       <div className="flex flex-row gap-3 items-center">
         {(isExpanded && isSelected) && <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>}
-        <img src={avatar} alt="Project Avatar" className="rounded-md h-10 w-10" />
+        <img src={avatar} alt="Project Avatar" className="rounded-md h-10 w-10 shrink-0" />
         {isExpanded && <div className="flex flex-col">
           <h1 className="text-heading-sm whitespace-nowrap">{project.name}</h1>
           {showCreatedAt ? (
