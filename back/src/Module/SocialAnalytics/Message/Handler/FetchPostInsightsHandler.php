@@ -3,6 +3,7 @@
 namespace App\Module\SocialAnalytics\Message\Handler;
 
 use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationStatus;
 use App\Module\SocialAnalytics\Message\FetchPostInsightsMessage;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsPostInsightService;
 use App\Repository\IntegrationRepository;
@@ -16,11 +17,12 @@ class FetchPostInsightsHandler
         private readonly IntegrationRepository $integrationRepository,
         private readonly SocialAnalyticsPostInsightService $postInsightService,
         private LoggerInterface $log,
-    ) {}
+    ) {
+    }
 
     public function __invoke(FetchPostInsightsMessage $message): void
     {
-        $integration = $this->integrationRepository->getById($message->getIntegrationId());
+        $integration = $this->integrationRepository->getByIdAndStatus($message->getIntegrationId(), IntegrationStatus::Active);
 
         if ($integration === null) {
             return;

@@ -3,6 +3,7 @@
 namespace App\Module\SocialAnalytics\Command;
 
 use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationStatus;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\Message\FetchIntegrationInsightsMessage;
 use App\Repository\IntegrationRepository;
@@ -43,9 +44,10 @@ class FetchIntegrationInsightsCommand extends Command
         $since = DateHelper::createUtcDateTimeImmutable()
             ->modify('-' . self::SYNC_THRESHOLD_HOURS . ' hours');
 
-        $integrations = $this->integrationRepository->getByProvidersNotSyncedSince(
+        $integrations = $this->integrationRepository->getByProvidersNotSyncedSinceAndStatus(
             self::SUPPORTED_PROVIDERS,
-            $since
+            $since,
+            IntegrationStatus::Active
         );
 
         $io->info(sprintf('Found %d integrations needing sync (last synced > %d hours ago)', count($integrations), self::SYNC_THRESHOLD_HOURS));

@@ -65,7 +65,8 @@ front/app/
 │   │   ├── OAuthCallbackReponseDTO.ts  # DTO for callback response
 │   │   └── IntegrationsGroupedByProviderDTO.ts  # @deprecated - kept for future use
 │   └── enums/
-│       ├── IntegrationProvider.ts      # Provider enum (Instagram, etc.)
+│       ├── IntegrationProvider.ts      # Provider enum (Instagram, Youtube, etc.)
+│       ├── IntegrationStatus.ts        # Integration status enum (Active, Revoked, Error)
 │       ├── OAuthCallbackStatus.ts      # Status enum (success, error)
 │       ├── OAuthErrorCode.ts           # Error codes with translations
 │       └── WindowMessageType.ts        # Message type enum
@@ -405,9 +406,24 @@ export default function IntegrationsCallback() {
 
 export enum IntegrationProvider {
     Instagram = "instagram",
-    // Future: TikTok = "tiktok",
+    Youtube = "youtube",
+    Tiktok = "tiktok",
 }
 ```
+
+### IntegrationStatus
+
+```typescript
+// Location: models/enums/IntegrationStatus.ts
+
+export enum IntegrationStatus {
+    Active = "active",
+    Revoked = "revoked",
+    Error = "error",
+}
+```
+
+Used by the `Integration` model to represent the current state of an OAuth connection. The frontend uses this to decide rendering: Active integrations show data, Revoked integrations show the reconnect card (`CreateSocialAnalyticsIntegrationCard`).
 
 ### OAuthCallbackStatus
 
@@ -527,6 +543,27 @@ export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleW
     );
 }
 ```
+
+---
+
+## Re-Authentication Flow (Revoked Integrations)
+
+When an OAuth token is revoked (user revokes access in provider settings, token expires beyond renewal), the backend sets the integration status to `Revoked`. The frontend handles this gracefully:
+
+### How It Works
+
+1. **List endpoint returns all statuses** — `GET /api/integrations` returns Active and Revoked integrations
+2. **Dashboard routes by status** — `SocialAnalyticsDashboardContent` iterates over `integrationProviderTypeOptions` and checks the status:
+   - **Active** integration → `SocialAnalyticsIntegrationCard` (shows profile + insight data)
+   - **Revoked** or **missing** integration → `CreateSocialAnalyticsIntegrationCard` (shimmer placeholders + "Se connecter" button)
+3. **User clicks "Se connecter"** — Triggers the same `useCreateIntegration` hook / OAuth popup flow as initial setup
+4. **Backend allows re-auth** — `POST /api/integrations` checks for Active-only conflicts, so the revoked integration doesn't block the flow
+5. **Callback reactivates** — Backend's `handleCallback` finds the existing integration by `accountId`, calls `updateIntegrationToken` which resets status to `Active`
+6. **Query invalidation** — React Query refreshes the integration list, card updates to Active state
+
+### Key Point
+
+No separate re-auth UI or endpoint is needed. The existing `CreateSocialAnalyticsIntegrationCard` + `useCreateIntegration` hook handles both initial setup and re-authentication identically.
 
 ---
 

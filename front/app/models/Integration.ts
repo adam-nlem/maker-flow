@@ -1,4 +1,5 @@
 import { IntegrationProvider } from "./enums/IntegrationProvider";
+import { IntegrationStatus } from "./enums/IntegrationStatus";
 
 export interface IntegrationJSON {
     uuid: string;
@@ -11,7 +12,7 @@ export interface IntegrationJSON {
     updatedAt: string | null;
     expiresAt: string | null;
     lastSyncedAt: string;
-    status: string;
+    status: IntegrationStatus;
 }
 
 export class Integration {
@@ -26,7 +27,7 @@ export class Integration {
         public readonly updatedAt: Date | null,
         public readonly expiresAt: Date | null,
         public readonly lastSyncedAt: Date,
-        public readonly status: string,
+        public readonly status: IntegrationStatus,
     ) {}
 
     static fromJSON(json: IntegrationJSON): Integration {

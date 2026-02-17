@@ -47,6 +47,19 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    public function getByIdAndStatus(int $id, IntegrationStatus $status): ?Integration
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.id = :id')
+            ->andWhere('i.status = :status')
+            ->setParameter('id', $id)
+            ->setParameter('status', $status)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+
 
     public function getByUuidAndUser(string $uuid, User $user): ?Integration
     {
@@ -119,11 +132,53 @@ class IntegrationRepository extends ServiceEntityRepository
         return $integrations;
     }
 
+    public function getOneByUserModuleAndProvider(UserModule $userModule, IntegrationProvider $provider): ?Integration
+    {
+        return $this->createQueryBuilder('i')
+            ->innerJoin('i.userModules', 'um')
+            ->where('um = :userModule')
+            ->andWhere('i.provider = :provider')
+            ->setParameter('userModule', $userModule)
+            ->setParameter('provider', $provider)
+            ->orderBy('i.createdAt', 'DESC')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUserModule(UserModule $userModule): array
+    {
+        $providers = IntegrationProvider::cases();
+        $integrations = [];
+
+        foreach ($providers as $provider) {
+            $integration = $this->getOneByUserModuleAndProvider($userModule, $provider);
+            if ($integration !== null) {
+                $integrations[] = $integration;
+            }
+        }
+
+        return $integrations;
+    }
+
     public function getByProvider(IntegrationProvider $provider): array
     {
         return $this->createQueryBuilder('i')
             ->where('i.provider = :provider')
             ->setParameter('provider', $provider)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByProviderAndStatus(IntegrationProvider $provider, IntegrationStatus $status): array
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.provider = :provider')
+            ->andWhere('i.status = :status')
+            ->setParameter('provider', $provider)
+            ->setParameter('status', $status)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -140,6 +195,25 @@ class IntegrationRepository extends ServiceEntityRepository
             ->andWhere('i.lastSyncedAt < :since')
             ->setParameter('providers', $providers)
             ->setParameter('since', $since)
+            ->orderBy('i.lastSyncedAt', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @param IntegrationProvider[] $providers
+     * @return Integration[]
+     */
+    public function getByProvidersNotSyncedSinceAndStatus(array $providers, \DateTimeImmutable $since, IntegrationStatus $status): array
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.provider IN (:providers)')
+            ->andWhere('i.lastSyncedAt < :since')
+            ->andWhere('i.status = :status')
+            ->setParameter('providers', $providers)
+            ->setParameter('since', $since)
+            ->setParameter('status', $status)
             ->orderBy('i.lastSyncedAt', 'ASC')
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)

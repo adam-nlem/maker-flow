@@ -69,6 +69,9 @@ SocialAnalyticsPageView          h-screen overflow-hidden, flex flex-col
 | `SocialAnalyticsPostDetailPageView` | `components/posts/SocialAnalyticsPostDetailPageView.tsx` | Post detail page with insight tiles and timeline charts |
 | `SocialAnalyticsPostInsightSummaryCard` | `components/posts/SocialAnalyticsPostInsightSummaryCard.tsx` | Visibility summary grid card (Views, Reach, AvgWatchTime, TotalWatchTime) with evolution badges; formats watch time values with `formatDurationToFrench` |
 | `SocialAnalyticsPostDetailPage` | `pages/SocialAnalyticsPostDetailPage.tsx` | Page wrapper that extracts `postUuid` param |
+| `SocialAnalyticsDashboardContent` | `components/SocialAnalyticsDashboardContent.tsx` | Dashboard card grid: routes Active integrations to `SocialAnalyticsIntegrationCard`, Revoked/missing to `CreateSocialAnalyticsIntegrationCard` |
+| `SocialAnalyticsIntegrationCard` | `components/integrations/SocialAnalyticsIntegrationCard.tsx` | Active integration card: profile picture, name, provider icon, insight value for selected type |
+| `CreateSocialAnalyticsIntegrationCard` | `components/integrations/CreateSocialAnalyticsIntegrationCard.tsx` | Placeholder card with shimmer + "Se connecter" button. Used for both new connections and re-auth of revoked integrations |
 | `FilterTile` | `components/FilterTile.tsx` | Filter chip used in dropdowns |
 | `LineChart` | `~/components/ui/LineChart.tsx` | Recharts line chart with current vs average lines |
 
@@ -151,5 +154,5 @@ X-axis uses `formatDurationToFrench()` (via a local helper converting hours to s
 ## Cleanup Notes
 
 - **Design system colors**: Evolution badges and insight tiles use `text-green` / `bg-pastel-green` (positive) and `text-danger` / `bg-danger/10` (negative) from the design system instead of hardcoded Tailwind color classes.
-- **Dashboard logic fix**: `SocialAnalyticsDashboardContent` now correctly checks whether an integration for a given provider already exists before showing the create card (uses `integration.provider === providerType` instead of `!==`).
+- **Dashboard integration routing**: `SocialAnalyticsDashboardContent` iterates `integrationProviderTypeOptions` and renders `SocialAnalyticsIntegrationCard` for Active integrations or `CreateSocialAnalyticsIntegrationCard` for Revoked/missing integrations. This means revoked integrations show the same shimmer + "Se connecter" card as providers with no integration at all, reusing the existing OAuth flow for re-authentication.
 - **Post detail safe rendering**: The timeline chart renders conditionally when the selected timeline exists. Engagement progress bars use `?? 0` fallback for nullable values. The empty placeholder div was removed and the chart section takes full width.

@@ -53,7 +53,7 @@ final class IntegrationController extends AbstractController
             );
         }
 
-        $integrations = $integrationRepository->getByUserModuleAndStatus($userModule, IntegrationStatus::Active);
+        $integrations = $integrationRepository->getByUserModule($userModule);
 
         return $this->json(
             data: $integrations,
@@ -83,7 +83,7 @@ final class IntegrationController extends AbstractController
             );
         }
 
-        $existingIntegration = $integrationRepository->getOneByUserModuleAndProvider($userModule, $dto->getProvider());
+        $existingIntegration = $integrationRepository->getOneByUserModuleAndProviderAndStatus($userModule, $dto->getProvider(), IntegrationStatus::Active);
 
         if ($existingIntegration !== null) {
             return $this->json(
@@ -145,7 +145,6 @@ final class IntegrationController extends AbstractController
         $stateModel = IntegrationStateRedisDTO::fromJson($stateDataJson);
 
         if ($stateModel->getProvider() !== $integrationProvider) {
-            dd($stateModel->getProvider(), $integrationProvider);
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::InvalidState);
         }
 

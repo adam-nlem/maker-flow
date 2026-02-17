@@ -338,8 +338,8 @@ This prevents duplicate entries when values haven't changed between fetches.
 The `refreshTokenIfNeeded` method in `InstagramOAuthService`:
 1. Checks if `expiresAt` is within 7 days
 2. If yes, calls Instagram's refresh token endpoint
-3. Updates the integration with new token and expiry
-4. Persists changes to database
+3. On success: updates the integration with new token and expiry, persists changes
+4. On 4xx error (`ClientExceptionInterface`): sets integration status to `Revoked`, persists, throws `OAuthTokenRevokedException`
 
 ### YouTube
 The `refreshTokenIfNeeded` method in `YoutubeOAuthService`:
@@ -354,8 +354,11 @@ The `refreshTokenIfNeeded` method in `YoutubeOAuthService`:
 
 - **Invalid provider**: Throws `InvalidArgumentException` if integration provider doesn't match the method
 - **Missing integration**: Handler silently returns if integration not found by ID
+- **Revoked integration**: Handler silently returns if integration status is not `Active` (defense in depth)
 - **API errors**: HTTP errors from Instagram/YouTube APIs propagate as exceptions
-- **Revoked OAuth token (`invalid_grant`)**: When YouTube returns `invalid_grant` (user revoked access, refresh token expired, etc.), the integration status is set to `Revoked` and an `OAuthTokenRevokedException` is thrown. The user must re-authenticate to restore the integration. The exception is caught by message handlers, logged, and the worker continues processing other integrations.
+- **Revoked OAuth token (YouTube `invalid_grant`)**: When YouTube returns `invalid_grant` (user revoked access, refresh token expired, etc.), the integration status is set to `Revoked` and an `OAuthTokenRevokedException` is thrown. The exception is caught by message handlers, logged, and the worker continues processing other integrations.
+- **Revoked OAuth token (Instagram 4xx)**: When Instagram returns a 4xx error during token refresh (user revoked access, token expired beyond renewal, etc.), the `ClientExceptionInterface` is caught, the integration status is set to `Revoked`, and an `OAuthTokenRevokedException` is thrown. Same handling as YouTube.
+- **Commands skip revoked integrations**: Both `FetchPostInsightsCommand` and `FetchIntegrationInsightsCommand` use status-filtered repository queries (`getByProviderAndStatus`, `getByProvidersNotSyncedSinceAndStatus`) with `IntegrationStatus::Active`, preventing wasted API calls and repeated errors for revoked integrations.
 - **Failed messages**: Stored in `failed` transport for manual retry (see RabbitMQ documentation)
 
 ---

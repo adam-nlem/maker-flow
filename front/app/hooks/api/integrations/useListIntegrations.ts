@@ -15,7 +15,6 @@ export function useListIntegrations({ userModuleUuid }: UseListIntegrationsProps
                 params: { userModuleUuid }
             });
 
-            console.log(res)
             return res.data.map((json) => Integration.fromJSON(json));
         },
     });

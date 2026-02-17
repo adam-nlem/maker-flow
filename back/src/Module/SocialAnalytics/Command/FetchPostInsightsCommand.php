@@ -3,6 +3,7 @@
 namespace App\Module\SocialAnalytics\Command;
 
 use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationStatus;
 use App\Module\SocialAnalytics\Message\FetchPostInsightsMessage;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsPostInsightService;
 use App\Repository\IntegrationRepository;
@@ -32,15 +33,15 @@ class FetchPostInsightsCommand extends Command
 
         $io->title('Fetching post insights');
 
-        $instagramIntegrations = $this->integrationRepository->getByProvider(IntegrationProvider::Instagram);
-        $io->info(sprintf('Found %d Instagram integrations', count($instagramIntegrations)));
+        $instagramIntegrations = $this->integrationRepository->getByProviderAndStatus(IntegrationProvider::Instagram, IntegrationStatus::Active);
+        $io->info(sprintf('Found %d active Instagram integrations', count($instagramIntegrations)));
 
         foreach ($instagramIntegrations as $integration) {
             $this->bus->dispatch(new FetchPostInsightsMessage($integration->getId()));
         }
 
-        $youtubeIntegrations = $this->integrationRepository->getByProvider(IntegrationProvider::Youtube);
-        $io->info(sprintf('Found %d YouTube integrations', count($youtubeIntegrations)));
+        $youtubeIntegrations = $this->integrationRepository->getByProviderAndStatus(IntegrationProvider::Youtube, IntegrationStatus::Active);
+        $io->info(sprintf('Found %d active YouTube integrations', count($youtubeIntegrations)));
 
         foreach ($youtubeIntegrations as $integration) {
             $this->bus->dispatch(new FetchPostInsightsMessage($integration->getId()));

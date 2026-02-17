@@ -3,6 +3,7 @@
 namespace App\Module\SocialAnalytics\Message\Handler;
 
 use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationStatus;
 use App\Module\SocialAnalytics\Message\FetchIntegrationInsightsMessage;
 use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
 use App\Repository\IntegrationRepository;
@@ -21,14 +22,13 @@ class FetchIntegrationInsightsHandler
 
     public function __invoke(FetchIntegrationInsightsMessage $message): void
     {
-        $integration = $this->integrationRepository->getById($message->getIntegrationId());
+        $integration = $this->integrationRepository->getByIdAndStatus($message->getIntegrationId(), IntegrationStatus::Active);
 
         if ($integration === null) {
             return;
         }
+
         try {
-
-
             match ($integration->getProvider()) {
                 IntegrationProvider::Instagram => $this->integrationInsightService->fetchInstagramProfileInsights($integration),
                 IntegrationProvider::Youtube => $this->integrationInsightService->fetchYoutubeProfileInsights($integration),

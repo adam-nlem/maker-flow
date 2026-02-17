@@ -47,7 +47,7 @@ This document describes the backend OAuth integration system used in MakerFlow f
 
 1. **Frontend requests integration creation** - `POST /api/integrations` with `userModuleUuid` and `provider`
 2. **Validate userModule** - Check userModule exists and belongs to user
-3. **Check existing integration** - Return error if userModule already has an integration for this provider
+3. **Check existing Active integration** - Return 409 Conflict if userModule already has an **Active** integration for this provider (revoked integrations are ignored, enabling re-auth)
 4. **Generate state** - Random token `bin2hex(random_bytes(16))`
 5. **Store state in Redis** - Key: `INTEGRATION/STATE/{state}`, Value: JSON with userUuid, userModuleUuid, provider, TTL: 5 min
 6. **Return OAuth URL** - Provider-specific authorization URL with state
@@ -61,7 +61,7 @@ This document describes the backend OAuth integration system used in MakerFlow f
 
 ### Business Rules
 
-- **One integration per provider per userModule** - A userModule can only have one integration for each provider (e.g., one Instagram account per Social Analytics widget)
+- **One Active integration per provider per userModule** - A userModule can only have one Active integration for each provider (e.g., one Instagram account per Social Analytics widget). Revoked integrations don't block creating a new one (re-auth flow).
 - **Same integration can be linked to multiple userModules** - The same Instagram account can be used in different projects
 
 ---
@@ -104,6 +104,22 @@ enum IntegrationProvider: string
     case Instagram = 'instagram';
 }
 ```
+
+### IntegrationStatus
+
+```php
+// App\Entity\Enum\IntegrationStatus
+enum IntegrationStatus: string
+{
+    case Active = 'active';
+    case Revoked = 'revoked';
+    case Error = 'error';
+}
+```
+
+- **Active** — Integration is connected and tokens are valid. Commands process it, handlers execute API calls.
+- **Revoked** — OAuth token was revoked or expired beyond renewal. Commands skip it, handlers early-exit. Frontend shows reconnect UI.
+- **Error** — Reserved for future use (e.g., repeated API failures unrelated to auth).
 
 ---
 
@@ -366,7 +382,7 @@ Redirects to: `/integrations/callback?status=success&provider={provider}&integra
 GET /api/integrations?userModuleUuid=xxx
 ```
 
-**Response:** Flat array of integrations (one per provider per userModule)
+**Response:** Flat array of integrations (one per provider per userModule, **all statuses** — Active, Revoked, etc.). The frontend uses the `status` field to decide how to render each integration.
 
 ### Show Integration
 
@@ -465,6 +481,28 @@ TIKTOK_REDIRECT_URI=https://api.yourapp.com/api/integrations/callback
 - [ ] Add provider case to `IntegrationController::callback()` match statement
 - [ ] Add environment variables
 - [ ] Test full flow end-to-end
+
+---
+
+## Re-Authentication Flow
+
+When an OAuth token is revoked (user revokes access in provider settings, token expires beyond renewal, etc.), the system handles re-authentication through the existing OAuth flow:
+
+### How It Works
+
+1. **Token refresh fails** — The OAuth service (`InstagramOAuthService` or `YoutubeOAuthService`) catches the error during `refreshTokenIfNeeded()`, sets the integration status to `Revoked`, persists, and throws `OAuthTokenRevokedException`
+2. **Handler catches + logs** — The message handler catches the exception, logs it, and the worker continues processing other integrations
+3. **Commands skip revoked** — On next cron run, commands use status-filtered repository queries (`getByProviderAndStatus`, `getByProvidersNotSyncedSinceAndStatus`) with `IntegrationStatus::Active`, so revoked integrations are not dispatched
+4. **Frontend shows revoked state** — The list endpoint (`GET /api/integrations`) returns integrations of all statuses. The frontend card shows a "Déconnecté" pill and "Reconnecter" button for revoked integrations
+5. **User clicks "Reconnecter"** — Triggers `POST /api/integrations` which checks for Active-only conflicts via `getOneByUserModuleAndProviderAndStatus(..., Active)`. Since the existing integration is `Revoked`, the check passes and the OAuth popup opens
+6. **User authorizes** — Provider redirects to callback, `handleCallback` finds the existing integration by `accountId`, calls `updateIntegrationToken` which resets the status to `Active` and updates tokens
+7. **Frontend updates** — React Query invalidation refreshes the integration list, card updates to Active state with fresh data
+
+### Key Design Decisions
+
+- **No separate re-auth endpoint** — The existing `POST /api/integrations` + OAuth callback flow naturally handles re-auth by checking Active-only conflicts
+- **`updateIntegrationToken` always sets Active** — Both `InstagramOAuthService` and `YoutubeOAuthService` set `IntegrationStatus::Active` in `updateIntegrationToken()`, ensuring re-auth restores the integration
+- **Defense in depth** — Commands filter at query level, handlers guard at execution level, ensuring revoked integrations never trigger API calls even if a message was already queued
 
 ---
 

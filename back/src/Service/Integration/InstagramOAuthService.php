@@ -14,6 +14,8 @@ use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
 use App\Repository\UserModuleRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Service\Integration\Exception\OAuthTokenRevokedException;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class InstagramOAuthService
@@ -155,7 +157,14 @@ class InstagramOAuthService
             return $integration;
         }
 
-        $newToken = $this->refreshToken($integration->getAccessToken());
+        try {
+            $newToken = $this->refreshToken($integration->getAccessToken());
+        } catch (ClientExceptionInterface $e) {
+            $integration->setStatus(IntegrationStatus::Revoked);
+            $this->integrationRepository->save($integration, true);
+
+            throw new OAuthTokenRevokedException($integration->getId());
+        }
 
         return $this->updateIntegrationToken($integration, $newToken);
     }

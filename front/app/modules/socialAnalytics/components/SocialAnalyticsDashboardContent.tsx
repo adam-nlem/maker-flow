@@ -1,5 +1,6 @@
 import { ChartBarSquareIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline"
 import type { Integration } from "~/models/Integration"
+import { IntegrationStatus } from "~/models/enums/IntegrationStatus"
 import SelectDropdown from "~/components/ui/SelectDropdown"
 import { useSocialAnalyticsFilterStore } from "../stores/socialAnalyticsFilterStore"
 import { socialAnalyticsIntegrationInsightTypeOptions, SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsightTypeToFrenchTranslation } from "../models/enums/SocialAnalyticsIntegrationInsightType"
@@ -46,26 +47,23 @@ export default function SocialAnalyticsDashboardContent({
             </div>
 
             <div className="flex flex-row justify-between gap-3">
-                {integrations.map((integration) => (
-                    <SocialAnalyticsIntegrationCard
+                {integrationProviderTypeOptions.map((providerType) => {
+                    const integration = integrations.find((i) => i.provider === providerType)
+
+                    if (!integration || integration.status !== IntegrationStatus.Active) {
+                        return <CreateSocialAnalyticsIntegrationCard
+                            key={providerType}
+                            userModuleUuid={userModuleUuid}
+                            provider={providerType}
+                        />
+                    }
+
+                    return <SocialAnalyticsIntegrationCard
                         key={integration.uuid}
                         integration={integration}
                         insightType={integrationInsightType}
                     />
-                ))}
-
-                {integrationProviderTypeOptions.map((integrationProviderType) => {
-                    if (!integrations.find((integration) => integration.provider === integrationProviderType)) {
-                        return <CreateSocialAnalyticsIntegrationCard
-                            key={integrationProviderType}
-                            userModuleUuid={userModuleUuid}
-                            provider={integrationProviderType}
-                        />;
-                    }
-
-                    return null;
                 })}
-
             </div>
 
         </div >
