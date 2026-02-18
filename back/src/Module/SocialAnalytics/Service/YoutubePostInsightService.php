@@ -20,8 +20,7 @@ class YoutubePostInsightService
         private readonly Client $googleClient,
         private readonly SocialAnalyticsPostService $postService,
         private readonly SocialAnalyticsPostInsightRepository $postInsightRepository,
-    ) {
-    }
+    ) {}
 
     public function getUploadsPlaylistId(YouTube $youtube): ?string
     {
@@ -93,22 +92,33 @@ class YoutubePostInsightService
     public function enrichPostDTOsWithAnalytics(array $postDTOs, array $videoIds): void
     {
         $analytics = new YouTubeAnalytics($this->googleClient);
-        $analyticsMetrics = implode(',', YoutubePostInsightDTO::getMetricNames());
+        $videoAnalyticsMetrics = implode(',', YoutubePostInsightDTO::getVideoMetricNames());
+        $reachAnalyticsMetrics = implode(',', YoutubePostInsightDTO::getReachMetricNames());
 
         $endDate = DateHelper::createUtcDateTimeImmutable();
         $startDate = $endDate->modify("-1 day");
         foreach (array_chunk($videoIds, 200) as $batch) {
-            $analyticsResponse = $analytics->reports->query([
+            $videoAnalyticsResponse = $analytics->reports->query([
                 'ids' => 'channel==MINE',
                 'startDate' => $startDate->format('Y-m-d'),
                 'endDate' => $endDate->format('Y-m-d'),
-                'metrics' => $analyticsMetrics,
-                'dimensions' => 'day,video',
+                'metrics' => $videoAnalyticsMetrics,
+                'dimensions' => 'video',
                 'filters' => 'video==' . implode(',', $batch),
             ]);
 
-            $columnHeaders = $analyticsResponse->getColumnHeaders();
-            $rows = $analyticsResponse->getRows();
+            $reachAnalyticsResponse = $analytics->reports->query([
+                'ids' => 'channel==MINE',
+                'startDate' => $startDate->format('Y-m-d'),
+                'endDate' => $endDate->format('Y-m-d'),
+                'metrics' => $reachAnalyticsMetrics,
+                'dimensions' => 'video_id',
+                'filters' => 'video==' . implode(',', $batch),
+            ]);
+
+            dd($reachAnalyticsResponse);
+            $columnHeaders = $videoAnalyticsResponse->getColumnHeaders();
+            $rows = $videoAnalyticsResponse->getRows();
 
             if (empty($rows) || empty($columnHeaders)) {
                 continue;

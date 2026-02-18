@@ -6,7 +6,7 @@ use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
 
 class YoutubePostInsightDTO
 {
-    private const METRIC_MAPPING = [
+    private const VIDEO_METRIC_MAPPING = [
         'views' => SocialAnalyticsPostInsightType::Views,
         'likes' => SocialAnalyticsPostInsightType::Likes,
         'dislikes' => SocialAnalyticsPostInsightType::Dislikes,
@@ -14,10 +14,13 @@ class YoutubePostInsightDTO
         'shares' => SocialAnalyticsPostInsightType::Shares,
         'averageViewDuration' => SocialAnalyticsPostInsightType::AverageWatchTime,
         'estimatedMinutesWatched' => SocialAnalyticsPostInsightType::TotalWatchTime,
-        'videoThumbnailImpressions' => SocialAnalyticsPostInsightType::ThumbnailImpressions,
-        'videoThumbnailImpressionsClickRate' => SocialAnalyticsPostInsightType::ThumbnailImpressionsClickRate,
         'subscribersGained' => SocialAnalyticsPostInsightType::FollowersGained,
         'subscribersLost' => SocialAnalyticsPostInsightType::FollowersLost,
+    ];
+
+    private const REACH_METRIC_MAPPING = [
+      'videoThumbnailImpressions' => SocialAnalyticsPostInsightType::ThumbnailImpressions,
+      'videoThumbnailImpressionsClickRate' => SocialAnalyticsPostInsightType::ThumbnailImpressionsClickRate,
     ];
 
     public function __construct(
@@ -41,17 +44,22 @@ class YoutubePostInsightDTO
      */
     public static function getMetricMapping(): array
     {
-        return self::METRIC_MAPPING;
+        return self::VIDEO_METRIC_MAPPING + self::REACH_METRIC_MAPPING;
     }
 
-    public static function getMetricNames(): array
+    public static function getVideoMetricNames(): array
     {
-        return array_keys(self::METRIC_MAPPING);
+        return array_keys(self::VIDEO_METRIC_MAPPING);
+    }
+
+    public static function getReachMetricNames(): array
+    {
+        return array_keys(self::REACH_METRIC_MAPPING);
     }
 
     public static function fromAnalyticsMetric(string $metricName, int $rawValue): self
     {
-        $type = self::METRIC_MAPPING[$metricName] ?? null;
+        $type = self::VIDEO_METRIC_MAPPING[$metricName] ?? null;
         $value = $metricName === 'estimatedMinutesWatched' ? $rawValue * 60 : $rawValue;
 
         return new self(type: $type, value: $value);
