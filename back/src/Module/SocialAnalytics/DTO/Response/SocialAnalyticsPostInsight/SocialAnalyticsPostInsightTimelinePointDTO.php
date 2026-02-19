@@ -10,7 +10,7 @@ class SocialAnalyticsPostInsightTimelinePointDTO
         #[Groups(['api_modules_social_analytics_post_insights_detail'])]
         private readonly float $hoursAfterPublication,
         #[Groups(['api_modules_social_analytics_post_insights_detail'])]
-        private readonly int $value,
+        private readonly float $value,
         #[Groups(['api_modules_social_analytics_post_insights_detail'])]
         private readonly ?float $averageValue,
     ) {}
@@ -20,7 +20,7 @@ class SocialAnalyticsPostInsightTimelinePointDTO
         return $this->hoursAfterPublication;
     }
 
-    public function getValue(): int
+    public function getValue(): float
     {
         return $this->value;
     }

@@ -9,7 +9,7 @@ class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInte
 {
     public function __construct(
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
-        private readonly int $totalFollowers,
+        private readonly float $totalFollowers,
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly int $postCount,
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
@@ -42,7 +42,7 @@ class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInte
         return $this->timelines;
     }
 
-    public function getTotalFollowers(): int
+    public function getTotalFollowers(): float
     {
         return $this->totalFollowers;
     }

@@ -64,7 +64,7 @@ class SocialAnalyticsIntegrationInsightRepository extends ServiceEntityRepositor
     public function getLatestByIntegrationAndByTypeAndByValue(
         Integration $integration,
         SocialAnalyticsIntegrationInsightType $type,
-        int $value,
+        float $value,
     ): ?SocialAnalyticsIntegrationInsight {
         return $this->createQueryBuilder('ii')
             ->where('ii.integration = :integration')

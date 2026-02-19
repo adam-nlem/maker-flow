@@ -29,4 +29,11 @@ enum SocialAnalyticsIntegrationInsightType: string
     case EngagedAudienceCity = 'engaged_audience_city';
     case EngagedAudienceCountry = 'engaged_audience_country';
     case EngagedAudienceGender = 'engaged_audience_gender';
+
+    public function getValueFormat(): InsightValueFormat
+    {
+        return match ($this) {
+            default => InsightValueFormat::Integer,
+        };
+    }
 }

@@ -17,12 +17,14 @@ class FetchPostInsightsHandler
         private readonly IntegrationRepository $integrationRepository,
         private readonly SocialAnalyticsPostInsightService $postInsightService,
         private LoggerInterface $log,
-    ) {
-    }
+    ) {}
 
     public function __invoke(FetchPostInsightsMessage $message): void
     {
-        $integration = $this->integrationRepository->getByIdAndStatus($message->getIntegrationId(), IntegrationStatus::Active);
+        $integration = $this->integrationRepository->getByIdAndStatus(
+            $message->getIntegrationId(),
+            IntegrationStatus::Active
+        );
 
         if ($integration === null) {
             return;

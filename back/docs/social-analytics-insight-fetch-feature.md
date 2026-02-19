@@ -2,10 +2,11 @@
 
 ## Overview
 
-This feature fetches insights from Instagram's Graph API and YouTube Analytics API using an asynchronous message queue architecture. It supports two types of insights:
+This feature fetches insights from Instagram's Graph API and YouTube's Reporting API using an asynchronous message queue architecture. It supports two types of insights:
 
 - **Integration Insights**: Profile-level metrics (followers, reach, views, etc.)
 - **Post Insights**: Individual post metrics (likes, comments, saves, etc.)
+- **Post Insight Breakdowns**: Per-country/status/live dimensional data from YouTube Reporting API
 
 ---
 
@@ -46,13 +47,14 @@ Console Command
 │  SocialAnalyticsIntegrationInsight  │
 │  Service / PostInsightService       │
 │  → YoutubePostInsightService        │
+│  → YoutubeReportingService          │
 │  → InstagramPostInsightService      │
 └─────────────────┬───────────────────┘
                   │ API call
                   ▼
 ┌─────────────────────────────────────┐
 │   Instagram Graph API / YouTube     │
-│   Analytics API                     │
+│   Data API / Reporting API          │
 └─────────────────────────────────────┘
 ```
 
@@ -91,6 +93,23 @@ Supported providers are defined in the command's `SUPPORTED_PROVIDERS` constant:
 
 ---
 
+## Insight Value Storage
+
+### InsightValueFormat Enum
+
+All insight values are stored as `DOUBLE PRECISION` (float) in the database. The `InsightValueFormat` enum conveys the semantic meaning of each value:
+
+| Format | Description | Example Types |
+|--------|-------------|---------------|
+| `integer` | Count values (views, likes, etc.) | Views, Likes, Comments, Shares |
+| `float` | Generic decimal values | - |
+| `percentage` | Ratios stored as 0.0-1.0 (frontend multiplies by 100 for display) | ThumbnailImpressionsClickRate, AudienceWatchRatio |
+| `seconds` | Duration values in seconds | AverageWatchTime, TotalWatchTime |
+
+Each insight type enum (`SocialAnalyticsPostInsightType`, `SocialAnalyticsIntegrationInsightType`) has a `getValueFormat()` method that maps the type to its format. This is set automatically when creating insight entities.
+
+---
+
 ## Instagram API Details
 
 ### Integration Insights
@@ -122,7 +141,7 @@ The `profile_picture_url` is refreshed on each sync to prevent expiration issues
 
 ### Integration Insights
 
-YouTube insights are fetched using two Google APIs:
+YouTube integration insights are fetched using two Google APIs:
 
 #### 1. YouTube Data API (for subscriber count)
 
@@ -145,34 +164,93 @@ Returns channel statistics including:
 
 The response contains `columnHeaders` (metric names) and `rows` (values).
 
-### Post Insights
+### Post Insights (YouTube Reporting API)
 
-YouTube post insights require multiple API calls to collect video metadata and analytics. All metrics are fetched from the YouTube Analytics API.
+YouTube post insights use the **YouTube Reporting API** instead of the real-time Analytics API. The Reporting API provides bulk daily CSV reports with per-video breakdowns by country, subscriber status, and live/on-demand.
+
+#### Reporting API Flow
+
+```
+1. Ensure reporting jobs exist (lazy creation)
+   └── Check DB → Check Google → Create if missing
+2. Poll for new reports
+   └── List reports → Filter by lastProcessedReportDate
+3. Download CSV report
+4. Parse CSV → aggregate per video + store breakdowns
+5. Enrich PostDTOs with aggregated data
+6. Persist insights
+```
+
+#### Report Types
+
+| Report Type ID | Entity Enum | Description |
+|---|---|---|
+| `channel_basic_a3` | `YoutubeReportType::ChannelBasic` | Core engagement metrics (views, likes, comments, shares, watch time, subscribers) with country/status/live dimensions |
+| `channel_reach_basic_a1` | `YoutubeReportType::ChannelReach` | Reach metrics (thumbnail impressions, CTR) |
+
+#### YoutubeReportingJob Entity
+
+Tracks Reporting API jobs per integration:
+
+| Field | Description |
+|---|---|
+| `externalJobId` | Google's job ID |
+| `reportTypeId` | Report type (e.g., `channel_basic_a3`) |
+| `lastProcessedReportId` | ID of the last processed report (for incremental polling) |
+| `lastProcessedReportDate` | Creation time of the last processed report |
+| `integration` | ManyToOne → Integration |
+
+Unique constraint on `(integration_id, report_type_id)`.
+
+#### Initial Delay (24-48h)
+
+When Reporting API jobs are first created, reports are **not immediately available**. Google begins generating reports from the job creation time, and the first report typically appears 24-48 hours later. During this period:
+- Posts are created with metadata only (title, thumbnail, duration, etc.)
+- No insight data is available yet
+- On subsequent fetches, once reports are available, insights will be enriched
 
 #### API Call Strategy
 
 1. **`channels.list(part=contentDetails, mine=true)`** — get the uploads playlist ID (1 call)
 2. **`playlistItems.list(part=contentDetails, playlistId=..., maxResults=50)`** — get video IDs (paginated, 50 per page)
 3. **`videos.list(id=batch, part=snippet,contentDetails)`** — get video metadata (title, duration, thumbnail) in batches of 50
-4. **`reports.query(dimensions=day,video, filters=video==ids)`** — get all metrics from Analytics API in batches of 200 (Time-based report with `day,video` dimensions supports all 11 metrics with the `video` filter)
+4. **Reporting API: `jobs.list()` / `jobs.create()`** — ensure reporting jobs exist (1-2 calls, only on first run)
+5. **Reporting API: `jobs.reports.list()`** — poll for new reports (1 call per job)
+6. **Reporting API: download CSV** — download report content (1 call per report)
 
-**Total for N videos**: `2 + 2*ceil(N/50) + ceil(N/200)` calls. For 100 videos: ~7 calls.
+**Total for N videos (after initial setup)**: `1 + ceil(N/50) + ceil(N/50) + 2 + 2` calls. For 100 videos: ~10 calls.
 
-#### Analytics API Metrics (from `reports.query`)
+#### Reporting API Metrics (from CSV)
 
-| YouTube Metric | SocialAnalyticsPostInsightType | Notes |
+| CSV Column | SocialAnalyticsPostInsightType | Notes |
 |---|---|---|
 | `views` | `Views` | |
 | `likes` | `Likes` | |
 | `dislikes` | `Dislikes` | |
 | `comments` | `Comments` | |
 | `shares` | `Shares` | |
-| `averageViewDuration` | `AverageWatchTime` | Already in seconds |
-| `estimatedMinutesWatched` | `TotalWatchTime` | Converted from minutes to seconds (x60) |
-| `videoThumbnailImpressions` | `ThumbnailImpressions` | |
-| `videoThumbnailImpressionsClickRate` | `ThumbnailImpressionsClickRate` | |
-| `subscribersGained` | `FollowersGained` | |
-| `subscribersLost` | `FollowersLost` | |
+| `average_view_duration_seconds` | `AverageWatchTime` | Already in seconds |
+| `watch_time_minutes` | `TotalWatchTime` | Converted from minutes to seconds (x60) |
+| `subscribers_gained` | `FollowersGained` | |
+| `subscribers_lost` | `FollowersLost` | |
+| `annotation_impressions` | `ThumbnailImpressions` | |
+| `annotation_click_through_rate` | `ThumbnailImpressionsClickRate` | Stored as ratio 0.0-1.0 |
+
+#### SocialAnalyticsPostInsightBreakdown Entity
+
+Stores per-row dimensional data from Reporting API CSV reports. Each row in the CSV becomes multiple breakdown entities (one per metric).
+
+| Field | Description |
+|---|---|
+| `type` | `SocialAnalyticsPostInsightType` enum |
+| `value` | Float metric value |
+| `valueFormat` | `InsightValueFormat` enum |
+| `date` | Report date (from CSV `date` column) |
+| `countryCode` | ISO 3166-1 alpha-2 (e.g., "US", "FR"), nullable |
+| `subscribedStatus` | `YoutubeSubscribedStatus` enum (SUBSCRIBED/NOT_SUBSCRIBED), nullable |
+| `liveOrOnDemand` | `YoutubeLiveOrOnDemand` enum (LIVE/ON_DEMAND), nullable |
+| `socialAnalyticsPost` | ManyToOne → SocialAnalyticsPost |
+| `user` | ManyToOne → User |
 
 #### Video Field Mapping to SocialAnalyticsPost
 
@@ -239,19 +317,19 @@ YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNee
 
 ### YouTube Post Insight Types
 
-| YouTube Metric | SocialAnalyticsPostInsightType | Notes |
+| Reporting API CSV Column | SocialAnalyticsPostInsightType | Notes |
 |---|---|---|
-| `views` | `Views` | Analytics API |
-| `likes` | `Likes` | Analytics API |
-| `dislikes` | `Dislikes` | Analytics API |
-| `comments` | `Comments` | Analytics API |
-| `shares` | `Shares` | Analytics API |
-| `averageViewDuration` | `AverageWatchTime` | Analytics API (already in seconds) |
-| `estimatedMinutesWatched` | `TotalWatchTime` | Analytics API (converted from minutes to seconds) |
-| `videoThumbnailImpressions` | `ThumbnailImpressions` | Analytics API |
-| `videoThumbnailImpressionsClickRate` | `ThumbnailImpressionsClickRate` | Analytics API |
-| `subscribersGained` | `FollowersGained` | Analytics API |
-| `subscribersLost` | `FollowersLost` | Analytics API |
+| `views` | `Views` | Reporting API |
+| `likes` | `Likes` | Reporting API |
+| `dislikes` | `Dislikes` | Reporting API |
+| `comments` | `Comments` | Reporting API |
+| `shares` | `Shares` | Reporting API |
+| `average_view_duration_seconds` | `AverageWatchTime` | Reporting API (already in seconds) |
+| `watch_time_minutes` | `TotalWatchTime` | Reporting API (converted from minutes to seconds) |
+| `annotation_impressions` | `ThumbnailImpressions` | Reporting API |
+| `annotation_click_through_rate` | `ThumbnailImpressionsClickRate` | Reporting API (stored as 0.0-1.0 ratio) |
+| `subscribers_gained` | `FollowersGained` | Reporting API |
+| `subscribers_lost` | `FollowersLost` | Reporting API |
 
 ---
 
@@ -260,7 +338,8 @@ YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNee
 Post insight fetching is split into platform-specific services for separation of concerns:
 
 - **`SocialAnalyticsPostInsightService`** — orchestrator that handles API authentication, pagination, and delegates to platform services. Also contains display logic (detail, timelines, ranking).
-- **`YoutubePostInsightService`** — YouTube-specific logic: fetching video IDs, building post DTOs, enriching with Analytics API data, and persisting insights.
+- **`YoutubePostInsightService`** — YouTube-specific logic: fetching video IDs, building post DTOs, enriching from Reporting API data, and persisting insights.
+- **`YoutubeReportingService`** — YouTube Reporting API logic: job management, report polling, CSV download/parsing, breakdown storage, and data aggregation.
 - **`InstagramPostInsightService`** — Instagram-specific logic: parsing post data and persisting insights (with ms→s watch time conversion).
 
 Each platform service has its own `createPostInsights` and `shouldCreateInsight` methods, specialized for the platform's needs.
@@ -284,6 +363,17 @@ src/Module/SocialAnalytics/
 │           ├── YoutubeIntegrationInsightDTO.php
 │           ├── YoutubePostDTO.php
 │           └── YoutubePostInsightDTO.php
+├── Entity/
+│   ├── Enum/
+│   │   ├── InsightValueFormat.php
+│   │   ├── YoutubeLiveOrOnDemand.php
+│   │   ├── YoutubeReportType.php
+│   │   └── YoutubeSubscribedStatus.php
+│   ├── SocialAnalyticsPostInsightBreakdown.php
+│   └── YoutubeReportingJob.php
+├── Repository/
+│   ├── SocialAnalyticsPostInsightBreakdownRepository.php
+│   └── YoutubeReportingJobRepository.php
 ├── Message/
 │   ├── FetchIntegrationInsightsMessage.php
 │   ├── FetchPostInsightsMessage.php
@@ -294,6 +384,7 @@ src/Module/SocialAnalytics/
     ├── SocialAnalyticsIntegrationInsightService.php
     ├── SocialAnalyticsPostInsightService.php
     ├── YoutubePostInsightService.php
+    ├── YoutubeReportingService.php
     └── InstagramPostInsightService.php
 ```
 
@@ -359,6 +450,7 @@ The `refreshTokenIfNeeded` method in `YoutubeOAuthService`:
 - **Revoked OAuth token (YouTube `invalid_grant`)**: When YouTube returns `invalid_grant` (user revoked access, refresh token expired, etc.), the integration status is set to `Revoked` and an `OAuthTokenRevokedException` is thrown. The exception is caught by message handlers, logged, and the worker continues processing other integrations.
 - **Revoked OAuth token (Instagram 4xx)**: When Instagram returns a 4xx error during token refresh (user revoked access, token expired beyond renewal, etc.), the `ClientExceptionInterface` is caught, the integration status is set to `Revoked`, and an `OAuthTokenRevokedException` is thrown. Same handling as YouTube.
 - **Commands skip revoked integrations**: Both `FetchPostInsightsCommand` and `FetchIntegrationInsightsCommand` use status-filtered repository queries (`getByProviderAndStatus`, `getByProvidersNotSyncedSinceAndStatus`) with `IntegrationStatus::Active`, preventing wasted API calls and repeated errors for revoked integrations.
+- **No reports available**: During the initial 24-48h after job creation, the system gracefully handles the absence of reports — posts are created with metadata only, insights are enriched on subsequent fetches.
 - **Failed messages**: Stored in `failed` transport for manual retry (see RabbitMQ documentation)
 
 ---
@@ -366,6 +458,9 @@ The `refreshTokenIfNeeded` method in `YoutubeOAuthService`:
 ## Notes
 
 - Each fetch creates **new** insight entities only if values changed (for historical tracking)
+- All insight values are stored as `DOUBLE PRECISION` (float) with a `valueFormat` enum for semantic meaning
 - `lastSyncedAt` is updated on the integration after successful fetch
 - Posts are created only if they don't already exist (checked by `externalId`)
 - Thumbnail images are downloaded and stored locally when posts are created
+- YouTube Reporting API jobs are lazily created on first fetch — if Google already has a matching job, it's reused
+- Breakdown data (per-country, per-subscriber-status) is stored in `SocialAnalyticsPostInsightBreakdown` for future geo/audience analytics

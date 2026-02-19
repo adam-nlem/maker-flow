@@ -16,6 +16,8 @@ class DateHelper
 
     const FORMAT_ISO8601_TZ = 'Y-m-d\TH:i:sP';
 
+    const FORMAT_ISO8601_UTC = 'Y-m-d\TH:i:s\Z';
+
     public static function createUtcDateTimeImmutable(string $datetime = 'now'): \DateTimeImmutable
     {
         return new \DateTimeImmutable($datetime, new \DateTimeZone('UTC'));

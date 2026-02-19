@@ -22,16 +22,16 @@ class InstagramIntegrationInsightDTO
     public function __construct(
         private readonly string $name,
         private readonly string $period,
-        private readonly int $value,
+        private readonly float $value,
     ) {
     }
 
     public static function fromArray(array $data): self
     {
-        $value = 0;
+        $value = 0.0;
 
         if (isset($data['total_value']['value'])) {
-            $value = $data['total_value']['value'];
+            $value = (float) $data['total_value']['value'];
         }
 
         return new self(
@@ -51,7 +51,7 @@ class InstagramIntegrationInsightDTO
         return $this->period;
     }
 
-    public function getValue(): int
+    public function getValue(): float
     {
         return $this->value;
     }

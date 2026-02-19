@@ -21,14 +21,14 @@ class InstagramPostInsightDTO
 
     public function __construct(
         private readonly ?SocialAnalyticsPostInsightType $type,
-        private readonly int $value,
+        private readonly float $value,
     ) {}
 
     public static function fromArray(array $data): self
     {
         $metricName = $data['name'] ?? null;
         $type = self::METRIC_MAPPING[$metricName] ?? null;
-        $value = $data['values'][0]['value'] ?? 0;
+        $value = (float) ($data['values'][0]['value'] ?? 0);
 
         return new self(
             type: $type,
@@ -41,7 +41,7 @@ class InstagramPostInsightDTO
         return $this->type;
     }
 
-    public function getValue(): int
+    public function getValue(): float
     {
         return $this->value;
     }

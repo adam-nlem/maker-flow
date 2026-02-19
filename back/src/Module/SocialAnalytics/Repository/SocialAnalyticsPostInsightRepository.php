@@ -40,7 +40,7 @@ class SocialAnalyticsPostInsightRepository extends ServiceEntityRepository
     public function getLatestByPostAndByTypeAndByValue(
         SocialAnalyticsPost $post,
         SocialAnalyticsPostInsightType $type,
-        int $value,
+        float $value,
     ): ?SocialAnalyticsPostInsight {
         return $this->createQueryBuilder('pi')
             ->where('pi.socialAnalyticsPost = :post')

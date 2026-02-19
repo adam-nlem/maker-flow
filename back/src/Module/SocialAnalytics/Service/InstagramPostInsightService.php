@@ -44,13 +44,14 @@ class InstagramPostInsightService
 
                 // Instagram returns watch time in milliseconds, convert to seconds
                 if ($postInsightDTO->getType() === SocialAnalyticsPostInsightType::AverageWatchTime || $postInsightDTO->getType() === SocialAnalyticsPostInsightType::TotalWatchTime) {
-                    $value = (int) ($value / 1000);
+                    $value = $value / 1000;
                 }
 
                 $insight = new SocialAnalyticsPostInsight();
                 $insight
                     ->setType($postInsightDTO->getType())
                     ->setValue($value)
+                    ->setValueFormat($postInsightDTO->getType()->getValueFormat())
                     ->setSocialAnalyticsPost($post)
                     ->setUser($post->getUser());
 
@@ -59,7 +60,7 @@ class InstagramPostInsightService
         }
     }
 
-    private function shouldCreateInsight(SocialAnalyticsPost $post, ?SocialAnalyticsPostInsightType $type, int $value): bool
+    private function shouldCreateInsight(SocialAnalyticsPost $post, ?SocialAnalyticsPostInsightType $type, float $value): bool
     {
         if ($type === null) {
             return false;

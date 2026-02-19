@@ -6,15 +6,16 @@ use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\Entity\Enum\InsightValueFormat;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
-use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
+use App\Module\SocialAnalytics\Entity\Enum\YoutubeLiveOrOnDemand;
+use App\Module\SocialAnalytics\Entity\Enum\YoutubeSubscribedStatus;
+use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightBreakdownRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: SocialAnalyticsPostInsightRepository::class)]
+#[ORM\Entity(repositoryClass: SocialAnalyticsPostInsightBreakdownRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class SocialAnalyticsPostInsight
+class SocialAnalyticsPostInsightBreakdown
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,30 +23,36 @@ class SocialAnalyticsPostInsight
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
-    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: SocialAnalyticsPostInsightType::class)]
-    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?SocialAnalyticsPostInsightType $type = null;
 
     #[ORM\Column(type: Types::FLOAT)]
-    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?float $value = null;
 
     #[ORM\Column(enumType: InsightValueFormat::class)]
-    #[Groups(['api_modules_social_analytics_posts_list', 'api_modules_social_analytics_post_insights_detail'])]
     private ?InsightValueFormat $valueFormat = null;
 
-    #[ORM\ManyToOne(targetEntity: SocialAnalyticsPost::class, inversedBy: 'postInsights')]
+    #[ORM\Column]
+    private ?\DateTimeImmutable $date = null;
+
+    #[ORM\Column(length: 2, nullable: true)]
+    private ?string $countryCode = null;
+
+    #[ORM\Column(enumType: YoutubeSubscribedStatus::class, nullable: true)]
+    private ?YoutubeSubscribedStatus $subscribedStatus = null;
+
+    #[ORM\Column(enumType: YoutubeLiveOrOnDemand::class, nullable: true)]
+    private ?YoutubeLiveOrOnDemand $liveOrOnDemand = null;
+
+    #[ORM\ManyToOne(targetEntity: SocialAnalyticsPost::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?SocialAnalyticsPost $socialAnalyticsPost = null;
 
@@ -123,6 +130,50 @@ class SocialAnalyticsPostInsight
         return $this;
     }
 
+    public function getDate(): ?\DateTimeImmutable
+    {
+        return $this->date;
+    }
+
+    public function setDate(\DateTimeImmutable $date): static
+    {
+        $this->date = $date;
+        return $this;
+    }
+
+    public function getCountryCode(): ?string
+    {
+        return $this->countryCode;
+    }
+
+    public function setCountryCode(?string $countryCode): static
+    {
+        $this->countryCode = $countryCode;
+        return $this;
+    }
+
+    public function getSubscribedStatus(): ?YoutubeSubscribedStatus
+    {
+        return $this->subscribedStatus;
+    }
+
+    public function setSubscribedStatus(?YoutubeSubscribedStatus $subscribedStatus): static
+    {
+        $this->subscribedStatus = $subscribedStatus;
+        return $this;
+    }
+
+    public function getLiveOrOnDemand(): ?YoutubeLiveOrOnDemand
+    {
+        return $this->liveOrOnDemand;
+    }
+
+    public function setLiveOrOnDemand(?YoutubeLiveOrOnDemand $liveOrOnDemand): static
+    {
+        $this->liveOrOnDemand = $liveOrOnDemand;
+        return $this;
+    }
+
     public function getSocialAnalyticsPost(): ?SocialAnalyticsPost
     {
         return $this->socialAnalyticsPost;
@@ -142,7 +193,6 @@ class SocialAnalyticsPostInsight
     public function setUser(?User $user): static
     {
         $this->user = $user;
-
         return $this;
     }
 }

@@ -22,6 +22,7 @@ use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepos
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
 use App\Repository\IntegrationRepository;
+use App\Module\SocialAnalytics\Entity\Enum\YoutubeReportType;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
 use Google\Client;
@@ -59,6 +60,7 @@ class SocialAnalyticsPostInsightService
         private readonly YoutubeOAuthService $youtubeOAuthService,
         private readonly YoutubePostInsightService $youtubePostInsightService,
         private readonly InstagramPostInsightService $instagramPostInsightService,
+        private readonly YoutubeReportingService $youtubeReportingService,
         private readonly Client $googleClient,
         private readonly HttpClientInterface $httpClient,
         private readonly ParameterBagInterface $parameterBag,
@@ -112,21 +114,72 @@ class SocialAnalyticsPostInsightService
 
         $youtube = new YouTube($this->googleClient);
 
+        // Step 1: Get uploads playlist
         $uploadsPlaylistId = $this->youtubePostInsightService->getUploadsPlaylistId($youtube);
         if ($uploadsPlaylistId === null) {
             return;
         }
 
+        // Step 2: Get video IDs
         $videoIds = $this->youtubePostInsightService->fetchVideoIds($youtube, $uploadsPlaylistId);
         if (empty($videoIds)) {
             return;
         }
 
+        // Step 3: Build PostDTOs with metadata from Data API
         $postDTOs = $this->youtubePostInsightService->buildPostDTOs($youtube, $videoIds);
-        $this->youtubePostInsightService->enrichPostDTOsWithAnalytics($postDTOs, $videoIds);
 
+        // Step 4: Create/get posts first so we have SocialAnalyticsPost entities for the reporting service
         foreach ($postDTOs as $postDTO) {
             $this->youtubePostInsightService->processPostData($integration, $postDTO);
+        }
+
+        // Step 5: Ensure Reporting API jobs exist
+        $reportingJobs = $this->youtubeReportingService->ensureJobsExist($integration);
+
+        // Step 6: Build a map of externalId → SocialAnalyticsPost for breakdown storage
+        $posts = $this->postRepository->getByExternalIdsAndIntegration(
+            array_keys($postDTOs),
+            $integration,
+        );
+
+        // We create an array like this one in order to optimize the search in later methods
+        $postsByExternalId = [];
+        foreach ($posts as $post) {
+            $postsByExternalId[$post->getExternalId()] = $post;
+        }
+
+        // Step 7: Process reports from Reporting API
+        $aggregatedData = [];
+
+        foreach ($reportingJobs as $job) {
+            $report = $this->youtubeReportingService->getLatestUnprocessedReport($job);
+
+            if ($report === null) {
+                continue;
+            }
+
+            $csvContent = $this->youtubeReportingService->downloadReportCsv($report, $integration->getAccessToken());
+            $rows = $this->youtubeReportingService->parseCsvToRows($csvContent);
+
+            if ($job->getReportType() === YoutubeReportType::ChannelBasic) {
+                $aggregatedData = $this->youtubeReportingService->processBasicReportRows(
+                    $rows,
+                    $postsByExternalId,
+                    $integration,
+                );
+            }
+
+            $this->youtubeReportingService->markReportProcessed($job, $report);
+        }
+
+        // Step 8: Enrich PostDTOs with aggregated report data and persist insights
+        if (!empty($aggregatedData)) {
+            $this->youtubePostInsightService->enrichPostDTOsFromReports($postDTOs, $aggregatedData);
+
+            foreach ($postDTOs as $postDTO) {
+                $this->youtubePostInsightService->processPostData($integration, $postDTO);
+            }
         }
 
         $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
@@ -188,7 +241,7 @@ class SocialAnalyticsPostInsightService
         // 5. Timeline data for previous posts (DB-filtered by type)
         $previousPostsInsights = [];
         if (!empty($previousPosts)) {
-            $previousPostIds = array_map(fn (SocialAnalyticsPost $p) => $p->getId(), $previousPosts);
+            $previousPostIds = array_map(fn(SocialAnalyticsPost $p) => $p->getId(), $previousPosts);
             $previousPostsInsights = $this->postInsightRepository->getByPostIdsAndTypes($previousPostIds, self::TIMELINE_TYPES);
         }
 
@@ -248,7 +301,7 @@ class SocialAnalyticsPostInsightService
         foreach (self::TIMELINE_TYPES as $type) {
             $currentTypeInsights = array_filter(
                 $currentPostInsights,
-                fn (SocialAnalyticsPostInsight $i) => $i->getType() === $type,
+                fn(SocialAnalyticsPostInsight $i) => $i->getType() === $type,
             );
 
             $points = [];
@@ -347,7 +400,7 @@ class SocialAnalyticsPostInsightService
         array $previousPosts,
     ): array {
         // Fetch latest insights per type for all previous posts in one query
-        $previousPostIds = array_map(fn (SocialAnalyticsPost $p) => $p->getId(), $previousPosts);
+        $previousPostIds = array_map(fn(SocialAnalyticsPost $p) => $p->getId(), $previousPosts);
         $allPreviousInsights = $this->postInsightRepository->getLatestByPostIdsGroupedByPostAndType($previousPostIds);
 
         // Group previous insights by post ID
@@ -374,7 +427,7 @@ class SocialAnalyticsPostInsightService
         }
 
         // Sort descending by score
-        usort($items, fn (SocialAnalyticsPostRankingItemDTO $a, SocialAnalyticsPostRankingItemDTO $b) => $b->getScore() <=> $a->getScore());
+        usort($items, fn(SocialAnalyticsPostRankingItemDTO $a, SocialAnalyticsPostRankingItemDTO $b) => $b->getScore() <=> $a->getScore());
 
         return $items;
     }

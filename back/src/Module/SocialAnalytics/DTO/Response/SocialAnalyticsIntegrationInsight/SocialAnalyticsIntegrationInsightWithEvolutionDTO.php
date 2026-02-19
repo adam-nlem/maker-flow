@@ -11,7 +11,7 @@ class SocialAnalyticsIntegrationInsightWithEvolutionDTO
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly SocialAnalyticsIntegrationInsightType $type,
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
-        private readonly int $value,
+        private readonly float $value,
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly ?string $evolutionPercentage,
     ) {}
@@ -21,7 +21,7 @@ class SocialAnalyticsIntegrationInsightWithEvolutionDTO
         return $this->type;
     }
 
-    public function getValue(): int
+    public function getValue(): float
     {
         return $this->value;
     }

@@ -7,7 +7,7 @@ class InsightHelper
     /**
      * @param array $insights Array of insight entities with getType() and getValue() methods
      */
-    public static function getInsightValueByType(array $insights, \BackedEnum $type): ?int
+    public static function getInsightValueByType(array $insights, \BackedEnum $type): ?float
     {
         foreach ($insights as $insight) {
             if ($insight->getType() === $type) {
@@ -18,9 +18,9 @@ class InsightHelper
         return null;
     }
 
-    public static function calculateEngagement(?int $interactions, ?int $divisor): ?float
+    public static function calculateEngagement(?float $interactions, ?float $divisor): ?float
     {
-        if ($interactions === null || $divisor === null || $divisor === 0) {
+        if ($interactions === null || $divisor === null || $divisor == 0) {
             return null;
         }
 

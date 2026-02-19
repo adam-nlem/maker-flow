@@ -10,7 +10,7 @@ class SocialAnalyticsIntegrationInsightTimelinePointDTO
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly \DateTimeImmutable $createdAt,
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
-        private readonly int $value,
+        private readonly float $value,
     ) {}
 
     public function getCreatedAt(): \DateTimeImmutable
@@ -18,7 +18,7 @@ class SocialAnalyticsIntegrationInsightTimelinePointDTO
         return $this->createdAt;
     }
 
-    public function getValue(): int
+    public function getValue(): float
     {
         return $this->value;
     }

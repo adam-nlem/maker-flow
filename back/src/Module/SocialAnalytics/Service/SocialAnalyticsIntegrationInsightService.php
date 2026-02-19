@@ -94,7 +94,7 @@ class SocialAnalyticsIntegrationInsightService
 
         // Add followers_count as an insight DTO
         if (isset($data['followers_count'])) {
-            $insightDTOs[] = new InstagramIntegrationInsightDTO('followers_count', 'day', $data['followers_count']);
+            $insightDTOs[] = new InstagramIntegrationInsightDTO('followers_count', 'day', (float) $data['followers_count']);
         }
 
         $this->createInsightEntities($integration, $insightDTOs);
@@ -123,7 +123,7 @@ class SocialAnalyticsIntegrationInsightService
 
         if (!empty($channels)) {
             $statistics = $channels[0]->getStatistics();
-            $subscriberCount = (int) $statistics->getSubscriberCount();
+            $subscriberCount = (float) $statistics->getSubscriberCount();
             $insightDTOs[] = new YoutubeIntegrationInsightDTO('subscriberCount', $subscriberCount);
         }
 
@@ -147,7 +147,7 @@ class SocialAnalyticsIntegrationInsightService
             $row = $rows[0];
             foreach ($columnHeaders as $index => $header) {
                 $metricName = $header->getName();
-                $value = (int) ($row[$index] ?? 0);
+                $value = (float) ($row[$index] ?? 0);
                 $insightDTOs[] = new YoutubeIntegrationInsightDTO($metricName, $value);
             }
         }
@@ -182,6 +182,7 @@ class SocialAnalyticsIntegrationInsightService
                 $insight
                     ->setType($insightType)
                     ->setValue($dto->getValue())
+                    ->setValueFormat($insightType->getValueFormat())
                     ->setIntegration($integration)
                     ->setUser($integration->getUser());
 
@@ -193,7 +194,7 @@ class SocialAnalyticsIntegrationInsightService
     private function shouldCreateInsight(
         Integration $integration,
         SocialAnalyticsIntegrationInsightType $type,
-        int $value,
+        float $value,
     ): bool {
         return $this->integrationInsightRepository->getLatestByIntegrationAndByTypeAndByValue(
             integration: $integration,
@@ -232,7 +233,7 @@ class SocialAnalyticsIntegrationInsightService
 
         $insightsWithEvolution = $this->buildInsightsWithEvolution($currentInsights, $previousInsights);
 
-        $totalFollowers = InsightHelper::getInsightValueByType($currentInsights, SocialAnalyticsIntegrationInsightType::TotalFollowers) ?? 0;
+        $totalFollowers = InsightHelper::getInsightValueByType($currentInsights, SocialAnalyticsIntegrationInsightType::TotalFollowers) ?? 0.0;
         $postCount = $this->postRepository->countByIntegration($integration);
         $streak = $this->postRepository->calculateStreak($integration);
 

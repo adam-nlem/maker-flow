@@ -18,7 +18,7 @@ class YoutubeIntegrationInsightDTO
 
     public function __construct(
         private readonly string $name,
-        private readonly int $value,
+        private readonly float $value,
     ) {
     }
 
@@ -27,7 +27,7 @@ class YoutubeIntegrationInsightDTO
         return $this->name;
     }
 
-    public function getValue(): int
+    public function getValue(): float
     {
         return $this->value;
     }

@@ -6,9 +6,9 @@ use App\Module\SocialAnalytics\DTO\Response\SocialAnalyticsPost\SocialAnalyticsP
 
 class InsightEvolutionHelper
 {
-    public static function calculateEvolutionPercentage(int $currentValue, ?int $previousValue): ?string
+    public static function calculateEvolutionPercentage(float $currentValue, ?float $previousValue): ?string
     {
-        if ($previousValue === null || $previousValue === 0) {
+        if ($previousValue === null || $previousValue == 0) {
             return null;
         }
 
@@ -20,7 +20,7 @@ class InsightEvolutionHelper
 
     /**
      * @param array $previousInsights Array of insight entities with getType() and getValue() methods
-     * @return array<string, int> Map of type value to previous value
+     * @return array<string, float> Map of type value to previous value
      */
     public static function buildPreviousValuesByType(array $previousInsights): array
     {

@@ -19,4 +19,13 @@ enum SocialAnalyticsPostInsightType: string
     case FollowersGained = 'followers_gained';
     case FollowersLost = 'followers_lost';
     case AudienceWatchRatio = 'audience_watch_ratio';
+
+    public function getValueFormat(): InsightValueFormat
+    {
+        return match ($this) {
+            self::AverageWatchTime, self::TotalWatchTime => InsightValueFormat::Seconds,
+            self::ThumbnailImpressionsClickRate, self::AudienceWatchRatio => InsightValueFormat::Percentage,
+            default => InsightValueFormat::Integer,
+        };
+    }
 }

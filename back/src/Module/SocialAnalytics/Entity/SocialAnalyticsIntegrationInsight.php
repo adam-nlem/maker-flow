@@ -5,6 +5,7 @@ namespace App\Module\SocialAnalytics\Entity;
 use App\Entity\Integration;
 use App\Entity\User;
 use App\Helper\DateHelper;
+use App\Module\SocialAnalytics\Entity\Enum\InsightValueFormat;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsIntegrationInsightType;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use Doctrine\DBAL\Types\Types;
@@ -49,12 +50,19 @@ class SocialAnalyticsIntegrationInsight
     ])]
     private ?SocialAnalyticsIntegrationInsightType $type = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: Types::FLOAT)]
     #[Groups([
         'api_modules_social_analytics_integration_insights_list',
         'api_modules_social_analytics_integration_insights_detail',
     ])]
-    private ?int $value = null;
+    private ?float $value = null;
+
+    #[ORM\Column(enumType: InsightValueFormat::class)]
+    #[Groups([
+        'api_modules_social_analytics_integration_insights_list',
+        'api_modules_social_analytics_integration_insights_detail',
+    ])]
+    private ?InsightValueFormat $valueFormat = null;
 
     #[ORM\ManyToOne(targetEntity: Integration::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -112,14 +120,25 @@ class SocialAnalyticsIntegrationInsight
         return $this;
     }
 
-    public function getValue(): ?int
+    public function getValue(): ?float
     {
         return $this->value;
     }
 
-    public function setValue(int $value): static
+    public function setValue(float $value): static
     {
         $this->value = $value;
+        return $this;
+    }
+
+    public function getValueFormat(): ?InsightValueFormat
+    {
+        return $this->valueFormat;
+    }
+
+    public function setValueFormat(InsightValueFormat $valueFormat): static
+    {
+        $this->valueFormat = $valueFormat;
         return $this;
     }
 

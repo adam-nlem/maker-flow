@@ -185,6 +185,24 @@ class SocialAnalyticsPostRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    /**
+     * @param string[] $externalIds
+     * @return array<string, SocialAnalyticsPost> Indexed by externalId
+     */
+    public function getByExternalIdsAndIntegration(
+        array $externalIds,
+        Integration $integration
+    ): array {
+        return $this->createQueryBuilder('p')
+            ->where('p.externalId IN (:externalIds)')
+            ->andWhere('p.integration = :integration')
+            ->setParameter('externalIds', $externalIds)
+            ->setParameter('integration', $integration)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     public function getSingleByIntegrationAndPublishedBeforeDate(
         Integration $integration,
         \DateTimeImmutable $publishedBefore,

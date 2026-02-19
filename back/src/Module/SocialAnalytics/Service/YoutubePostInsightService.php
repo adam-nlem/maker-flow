@@ -3,21 +3,17 @@
 namespace App\Module\SocialAnalytics\Service;
 
 use App\Entity\Integration;
-use App\Helper\DateHelper;
 use App\Module\SocialAnalytics\DTO\External\Youtube\YoutubePostDTO;
 use App\Module\SocialAnalytics\DTO\External\Youtube\YoutubePostInsightDTO;
 use App\Module\SocialAnalytics\Entity\Enum\SocialAnalyticsPostInsightType;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPost;
 use App\Module\SocialAnalytics\Entity\SocialAnalyticsPostInsight;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostInsightRepository;
-use Google\Client;
 use Google\Service\YouTube;
-use Google\Service\YouTubeAnalytics;
 
 class YoutubePostInsightService
 {
     public function __construct(
-        private readonly Client $googleClient,
         private readonly SocialAnalyticsPostService $postService,
         private readonly SocialAnalyticsPostInsightRepository $postInsightRepository,
     ) {}
@@ -86,76 +82,23 @@ class YoutubePostInsightService
     }
 
     /**
+     * Enriches post DTOs with insight data from Reporting API reports.
+     *
      * @param array<string, YoutubePostDTO> $postDTOs
-     * @param string[] $videoIds
+     * @param array<string, array<string, float>> $aggregatedData Aggregated metrics per video_id from basic report
      */
-    public function enrichPostDTOsWithAnalytics(array $postDTOs, array $videoIds): void
+    public function enrichPostDTOsFromReports(array $postDTOs, array $aggregatedData): void
     {
-        $analytics = new YouTubeAnalytics($this->googleClient);
-        $videoAnalyticsMetrics = implode(',', YoutubePostInsightDTO::getVideoMetricNames());
-        $reachAnalyticsMetrics = implode(',', YoutubePostInsightDTO::getReachMetricNames());
-
-        $endDate = DateHelper::createUtcDateTimeImmutable();
-        $startDate = $endDate->modify("-1 day");
-        foreach (array_chunk($videoIds, 200) as $batch) {
-            $videoAnalyticsResponse = $analytics->reports->query([
-                'ids' => 'channel==MINE',
-                'startDate' => $startDate->format('Y-m-d'),
-                'endDate' => $endDate->format('Y-m-d'),
-                'metrics' => $videoAnalyticsMetrics,
-                'dimensions' => 'video',
-                'filters' => 'video==' . implode(',', $batch),
-            ]);
-
-            $reachAnalyticsResponse = $analytics->reports->query([
-                'ids' => 'channel==MINE',
-                'startDate' => $startDate->format('Y-m-d'),
-                'endDate' => $endDate->format('Y-m-d'),
-                'metrics' => $reachAnalyticsMetrics,
-                'dimensions' => 'video_id',
-                'filters' => 'video==' . implode(',', $batch),
-            ]);
-
-            dd($reachAnalyticsResponse);
-            $columnHeaders = $videoAnalyticsResponse->getColumnHeaders();
-            $rows = $videoAnalyticsResponse->getRows();
-
-            if (empty($rows) || empty($columnHeaders)) {
+        foreach ($aggregatedData as $videoId => $metrics) {
+            if (!isset($postDTOs[$videoId])) {
                 continue;
             }
 
-            $videoColumnIndex = null;
-            $dimensionColumns = [];
+            foreach ($metrics as $metricName => $rawValue) {
+                $dto = YoutubePostInsightDTO::fromReportingMetric($metricName, $rawValue);
 
-            foreach ($columnHeaders as $index => $header) {
-                if ($header->getColumnType() === 'DIMENSION') {
-                    $dimensionColumns[] = $index;
-
-                    if ($header->getName() === 'video') {
-                        $videoColumnIndex = $index;
-                    }
-                }
-            }
-
-            if ($videoColumnIndex === null) {
-                continue;
-            }
-
-            foreach ($rows as $row) {
-                $videoId = $row[$videoColumnIndex];
-
-                if (!isset($postDTOs[$videoId])) {
-                    continue;
-                }
-
-                foreach ($columnHeaders as $index => $header) {
-                    if (in_array($index, $dimensionColumns, true)) {
-                        continue;
-                    }
-
-                    $postDTOs[$videoId]->addPostInsight(
-                        YoutubePostInsightDTO::fromAnalyticsMetric($header->getName(), (int) ($row[$index] ?? 0))
-                    );
+                if ($dto->getType() !== null) {
+                    $postDTOs[$videoId]->addPostInsight($dto);
                 }
             }
         }
@@ -183,15 +126,16 @@ class YoutubePostInsightService
                 $insight
                     ->setType($postInsightDTO->getType())
                     ->setValue($postInsightDTO->getValue())
+                    ->setValueFormat($postInsightDTO->getType()->getValueFormat())
                     ->setSocialAnalyticsPost($post)
                     ->setUser($post->getUser());
 
-                $this->postInsightRepository->save(entity: $insight);
+                $this->postInsightRepository->save($insight);
             }
         }
     }
 
-    private function shouldCreateInsight(SocialAnalyticsPost $post, ?SocialAnalyticsPostInsightType $type, int $value): bool
+    private function shouldCreateInsight(SocialAnalyticsPost $post, ?SocialAnalyticsPostInsightType $type, float $value): bool
     {
         if ($type === null) {
             return false;
