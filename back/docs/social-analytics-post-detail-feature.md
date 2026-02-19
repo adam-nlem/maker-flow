@@ -90,7 +90,7 @@ The detail logic lives in `SocialAnalyticsPostInsightService` alongside the Inst
 - `getLatestByPostIdsGroupedByPostAndType(array)` — one insight per type per post (most recent) for multiple posts, DB-level dedup, for ranking score calculation
 
 **`SocialAnalyticsPostRepository`:**
-- `getPreviousByUserAndIntegration(User, Integration, DateTimeImmutable, int)` — N posts published before a date
+- `getByUserAndIntegrationAndPublishedBeforeLimited(User, Integration, DateTimeImmutable, int)` — N posts published before a date
 - `getSingleByIntegrationAndPublishedBeforeDate(Integration, DateTimeImmutable)` — single previous post for evolution
 
 ### DTOs

@@ -33,7 +33,7 @@ Console Command
                   ▼
 ┌─────────────────────────────────────┐
 │           RabbitMQ Queue            │
-│         (async transport)           │
+│       (messages transport)          │
 └─────────────────┬───────────────────┘
                   │ consume
                   ▼
@@ -158,7 +158,7 @@ Returns channel statistics including:
 
 **Parameters:**
 - `ids`: `channel==MINE`
-- `startDate`: Previous day (YYYY-MM-DD)
+- `startDate`: 1 month ago (YYYY-MM-DD)
 - `endDate`: Current day (YYYY-MM-DD)
 - `metrics`: `views,likes,dislikes,comments,shares,subscribersGained`
 
@@ -195,12 +195,12 @@ Tracks Reporting API jobs per integration:
 | Field | Description |
 |---|---|
 | `externalJobId` | Google's job ID |
-| `reportTypeId` | Report type (e.g., `channel_basic_a3`) |
+| `reportType` | `YoutubeReportType` enum (e.g., `ChannelBasic`) |
 | `lastProcessedReportId` | ID of the last processed report (for incremental polling) |
 | `lastProcessedReportDate` | Creation time of the last processed report |
 | `integration` | ManyToOne → Integration |
 
-Unique constraint on `(integration_id, report_type_id)`.
+Unique constraint on `(integration_id, report_type)`.
 
 #### Initial Delay (24-48h)
 
@@ -233,8 +233,8 @@ When Reporting API jobs are first created, reports are **not immediately availab
 | `watch_time_minutes` | `TotalWatchTime` | Converted from minutes to seconds (x60) |
 | `subscribers_gained` | `FollowersGained` | |
 | `subscribers_lost` | `FollowersLost` | |
-| `annotation_impressions` | `ThumbnailImpressions` | |
-| `annotation_click_through_rate` | `ThumbnailImpressionsClickRate` | Stored as ratio 0.0-1.0 |
+| `video_thumbnail_impressions` | `ThumbnailImpressions` | |
+| `video_thumbnail_impressions_ctr` | `ThumbnailImpressionsClickRate` | Stored as ratio 0.0-1.0 |
 
 #### SocialAnalyticsPostInsightBreakdown Entity
 
@@ -326,8 +326,8 @@ YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNee
 | `shares` | `Shares` | Reporting API |
 | `average_view_duration_seconds` | `AverageWatchTime` | Reporting API (already in seconds) |
 | `watch_time_minutes` | `TotalWatchTime` | Reporting API (converted from minutes to seconds) |
-| `annotation_impressions` | `ThumbnailImpressions` | Reporting API |
-| `annotation_click_through_rate` | `ThumbnailImpressionsClickRate` | Reporting API (stored as 0.0-1.0 ratio) |
+| `video_thumbnail_impressions` | `ThumbnailImpressions` | Reporting API |
+| `video_thumbnail_impressions_ctr` | `ThumbnailImpressionsClickRate` | Reporting API (stored as 0.0-1.0 ratio) |
 | `subscribers_gained` | `FollowersGained` | Reporting API |
 | `subscribers_lost` | `FollowersLost` | Reporting API |
 
@@ -407,7 +407,7 @@ dce back php bin/console app:social-analytics:fetch-post-insights
 Messages are processed asynchronously. Start the worker to consume messages:
 
 ```bash
-dce back php bin/console messenger:consume async -vv
+dce back php bin/console messenger:consume messages -vv
 ```
 
 ---

@@ -12,12 +12,13 @@ This feature provides a paginated endpoint to list all posts for an integration 
 
 ### Query Parameters
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `integrationUuid` | string | Yes | - | UUID of the integration to fetch posts for |
-| `page` | int | Yes | - | Page number (1-indexed) |
-| `limit` | int | Yes | - | Number of posts per page |
-| `timePeriod` | string | No | `last_7_days` | Time period — filters posts by `publishedAt` and scopes insight evolution (`last_7_days`, `last_30_days`, `last_90_days`, `last_year`) |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `integrationUuid` | string | Yes | UUID of the integration to fetch posts for |
+| `page` | int | Yes | Page number (1-indexed) |
+| `limit` | int | Yes | Number of posts per page |
+
+> **Note:** The time period is hardcoded to `LastYear` in the controller. There is no `timePeriod` query parameter. This period is used to filter posts by `publishedAt` and to scope insight evolution calculations.
 
 ### Response
 
@@ -59,8 +60,8 @@ Returns an array of posts with their insights and evolution data:
 
 Evolution percentage is calculated by comparing the current period's latest insight value with the previous period's latest value:
 
-- **Current Period**: From `now - timePeriod` to `now`
-- **Previous Period**: From `now - (2 * timePeriod)` to `now - timePeriod`
+- **Current Period**: From `now - 365 days` to `now` (hardcoded to `LastYear`)
+- **Previous Period**: From `now - 730 days` to `now - 365 days`
 
 Formula: `((currentValue - previousValue) / previousValue) * 100`
 
@@ -114,6 +115,6 @@ src/Module/SocialAnalytics/
 
 ## Notes
 
-- Posts are filtered by `publishedAt >= now - timePeriod` and sorted by `publishedAt` DESC (most recent first)
+- Posts are filtered by `publishedAt >= now - 365 days` (hardcoded `LastYear` period) and sorted by `publishedAt` DESC (most recent first)
 - Only the latest insight value per type within the time period is returned
 - The `InsightEvolutionHelper` and `InsightHelper` are shared with `SocialAnalyticsIntegrationInsightService` and `SocialAnalyticsPostInsightService` to avoid code duplication

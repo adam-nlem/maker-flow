@@ -12,10 +12,11 @@ This feature provides a detail endpoint that returns aggregated Instagram integr
 
 ### Query Parameters
 
-| Parameter | Type | Required | Default | Description |
-|-----------|------|----------|---------|-------------|
-| `integrationUuid` | string | Yes | - | UUID of the integration |
-| `timePeriod` | string | No | `last_7_days` | Time period filter (`last_7_days`, `last_30_days`, `last_90_days`, `last_year`) |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `integrationUuid` | string | Yes | UUID of the integration |
+
+> **Note:** The time period is hardcoded to `LastYear` in the controller. There is no `timePeriod` query parameter.
 
 ### Response
 
@@ -31,18 +32,15 @@ This feature provides a detail endpoint that returns aggregated Instagram integr
       "evolutionPercentage": 3.2
     }
   ],
-  "dailyPoints": [
+  "timelines": [
     {
       "type": "likes",
-      "insights": [
+      "points": [
         {
-          "uuid": "...",
-          "type": "likes",
-          "value": 150,
-          "date": "2026-01-28T00:00:00+00:00"
+          "createdAt": "2026-01-28T00:00:00+00:00",
+          "value": 150
         }
-      ],
-      "totalValue": 1200
+      ]
     }
   ]
 }
@@ -54,8 +52,7 @@ This feature provides a detail endpoint that returns aggregated Instagram integr
 - **postCount**: Total number of posts for the integration
 - **streak**: Current consecutive posting streak (days)
 - **insights**: Aggregated insight values with evolution percentage vs. previous period
-- **dailyPoints**: Daily insight data points grouped by type, used for charting
-  - **totalValue**: Sum of all `insights[].value` within the daily points for that type and selected time period
+- **timelines**: Insight data points grouped by type, used for charting. Each timeline has a `type` and an array of `points` (each with `createdAt` and `value`)
 
 ---
 
@@ -67,6 +64,7 @@ Controller
         ├── SocialAnalyticsIntegrationInsightRepository (insights by time period)
         │   └── InsightEvolutionHelper (evolution calculation)
         ├── InsightHelper (extracting insight values)
+        ├── TimelineGapFillerHelper (fills missing daily data points)
         └── SocialAnalyticsPostRepository (post count, streak)
 ```
 
@@ -82,11 +80,13 @@ src/Module/SocialAnalytics/
 │   └── Response/
 │       └── SocialAnalyticsIntegrationInsight/
 │           ├── ShowSocialAnalyticsIntegrationDetailResponseDTO.php
-│           ├── SocialAnalyticsIntegrationInsightDailyPointsDTO.php
+│           ├── SocialAnalyticsIntegrationInsightTimelineDTO.php
+│           ├── SocialAnalyticsIntegrationInsightTimelinePointDTO.php
 │           └── SocialAnalyticsIntegrationInsightWithEvolutionDTO.php
 ├── Helper/
 │   ├── InsightEvolutionHelper.php
-│   └── InsightHelper.php
+│   ├── InsightHelper.php
+│   └── TimelineGapFillerHelper.php
 ├── Repository/
 │   ├── SocialAnalyticsIntegrationInsightRepository.php
 │   └── SocialAnalyticsPostRepository.php
@@ -98,8 +98,8 @@ src/Module/SocialAnalytics/
 
 ## Notes
 
-- Daily points are returned for these insight types: TotalFollowers, Comments, Shares, Saves, Views, Reach, Likes
-- The backend always returns a **full year** of `dailyPoints` data regardless of the selected time period
+- Timelines are returned for these insight types: TotalFollowers, Comments, Shares, Saves, Views, Reach, Likes
+- The controller hardcodes the time period to `LastYear`, so the backend always returns a **full year** of `timelines` data
 - **Insight tile values are computed on the frontend**: the dynamic insight tiles display the sum of daily values within the selected time period, computed via `computeTotalValue(getFilteredInsightsForType(...))` in `insightChartDataHelper.ts`. This means tile values update reactively when the user changes the time period filter, without an additional API call.
 - The `InsightEvolutionHelper` and `InsightHelper` are shared with `SocialAnalyticsPostService` and `SocialAnalyticsPostInsightService` to avoid code duplication
 - The detail logic lives in `SocialAnalyticsIntegrationInsightService` alongside the Instagram fetch logic (one service per domain)

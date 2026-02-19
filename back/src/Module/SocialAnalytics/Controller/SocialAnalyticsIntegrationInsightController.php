@@ -22,7 +22,6 @@ final class SocialAnalyticsIntegrationInsightController extends AbstractControll
         ListSocialAnalyticsIntegrationInsightsQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
         SocialAnalyticsIntegrationInsightRepository $insightRepository,
-        SocialAnalyticsIntegrationInsightService $s,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -37,14 +36,6 @@ final class SocialAnalyticsIntegrationInsightController extends AbstractControll
         }
 
         $insights = $insightRepository->getLatestByUserAndByIntegration($user, $integration);
-
-        if ($integration->getProvider() === IntegrationProvider::Youtube) {
-            try {
-                $s->fetchYoutubeProfileInsights($integration);
-            } catch (\Exception $e) {
-                dd($e);
-            }
-        }
 
         return $this->json(
             data: $insights,
