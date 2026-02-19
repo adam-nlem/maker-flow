@@ -22,6 +22,7 @@ use App\Module\SocialAnalytics\Helper\InsightHelper;
 use App\Module\SocialAnalytics\Helper\TimelineGapFillerHelper;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsIntegrationInsightRepository;
 use App\Module\SocialAnalytics\Repository\SocialAnalyticsPostRepository;
+use App\Module\SocialAnalytics\Repository\YoutubeReportingJobRepository;
 use App\Repository\IntegrationRepository;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
@@ -53,6 +54,7 @@ class SocialAnalyticsIntegrationInsightService
         private readonly ParameterBagInterface $parameterBag,
         private readonly Client $googleClient,
         private readonly YoutubeOAuthService $youtubeOAuthService,
+        private readonly YoutubeReportingJobRepository $youtubeReportingJobRepository,
         private LoggerInterface $log
     ) {
         $this->instagramGraphUrl = $this->parameterBag->get('app.instagram.graph_url');
@@ -238,6 +240,7 @@ class SocialAnalyticsIntegrationInsightService
         $streak = $this->postRepository->calculateStreak($integration);
 
         $timelines = $this->buildTimelines($user, $integration, $currentPeriodStart);
+        $isYoutubeReportPending = $this->isYoutubeReportPending($integration);
 
         return new ShowSocialAnalyticsIntegrationDetailResponseDTO(
             totalFollowers: $totalFollowers,
@@ -245,6 +248,7 @@ class SocialAnalyticsIntegrationInsightService
             streak: $streak,
             insights: $insightsWithEvolution,
             timelines: $timelines,
+            isYoutubeReportPending: $isYoutubeReportPending,
         );
     }
 
@@ -322,5 +326,26 @@ class SocialAnalyticsIntegrationInsightService
         }
 
         return $insightsWithEvolution;
+    }
+
+    private function isYoutubeReportPending(Integration $integration): ?bool
+    {
+        if ($integration->getProvider() !== IntegrationProvider::Youtube) {
+            return null;
+        }
+
+        $jobs = $this->youtubeReportingJobRepository->getByIntegration($integration);
+
+        if (empty($jobs)) {
+            return true;
+        }
+
+        foreach ($jobs as $job) {
+            if ($job->getLastProcessedReportDate() === null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

@@ -7,6 +7,7 @@ export interface SocialAnalyticsIntegrationDetailDTOJSON {
     streak: number;
     insights: SocialAnalyticsIntegrationInsightWithEvolutionDTOJSON[];
     timelines: SocialAnalyticsIntegrationInsightTimelineDTOJSON[];
+    isYoutubeReportPending: boolean | null;
 }
 
 export class SocialAnalyticsIntegrationDetailDTO {
@@ -16,6 +17,7 @@ export class SocialAnalyticsIntegrationDetailDTO {
         public readonly streak: number,
         public readonly insights: SocialAnalyticsIntegrationInsightWithEvolutionDTO[],
         public readonly timelines: SocialAnalyticsIntegrationInsightTimelineDTO[],
+        public readonly isYoutubeReportPending: boolean | null,
     ) {}
 
     static fromJSON(json: SocialAnalyticsIntegrationDetailDTOJSON): SocialAnalyticsIntegrationDetailDTO {
@@ -25,6 +27,7 @@ export class SocialAnalyticsIntegrationDetailDTO {
             json.streak,
             json.insights.map((insight) => SocialAnalyticsIntegrationInsightWithEvolutionDTO.fromJSON(insight)),
             json.timelines.map((timeline) => SocialAnalyticsIntegrationInsightTimelineDTO.fromJSON(timeline)),
+            json.isYoutubeReportPending,
         );
     }
 }

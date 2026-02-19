@@ -20,6 +20,8 @@ class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInte
         /** @var SocialAnalyticsIntegrationInsightTimelineDTO[] */
         #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
         private readonly array $timelines,
+        #[Groups(['api_modules_social_analytics_integration_insights_detail'])]
+        private readonly ?bool $isYoutubeReportPending = null,
 
     ) {}
 
@@ -31,6 +33,7 @@ class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInte
             'streak' => $this->streak,
             'insights' => $this->insights,
             'timelines' => $this->timelines,
+            'isYoutubeReportPending' => $this->isYoutubeReportPending,
         ];
     }
 
@@ -60,5 +63,10 @@ class ShowSocialAnalyticsIntegrationDetailResponseDTO implements ResponseDTOInte
     public function getInsights(): array
     {
         return $this->insights;
+    }
+
+    public function getIsYoutubeReportPending(): ?bool
+    {
+        return $this->isYoutubeReportPending;
     }
 }

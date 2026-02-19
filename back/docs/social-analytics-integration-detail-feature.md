@@ -42,7 +42,8 @@ This feature provides a detail endpoint that returns aggregated Instagram integr
         }
       ]
     }
-  ]
+  ],
+  "isYoutubeReportPending": null
 }
 ```
 
@@ -53,6 +54,7 @@ This feature provides a detail endpoint that returns aggregated Instagram integr
 - **streak**: Current consecutive posting streak (days)
 - **insights**: Aggregated insight values with evolution percentage vs. previous period
 - **timelines**: Insight data points grouped by type, used for charting. Each timeline has a `type` and an array of `points` (each with `createdAt` and `value`)
+- **isYoutubeReportPending**: `null` for non-YouTube integrations, `true` if YouTube reporting jobs have not yet produced reports (24-48h after connection), `false` when all jobs have processed at least one report. Computed by checking `YoutubeReportingJob.lastProcessedReportDate` via `YoutubeReportingJobRepository::getByIntegration()`
 
 ---
 

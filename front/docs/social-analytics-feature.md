@@ -151,6 +151,13 @@ X-axis uses `formatDurationToFrench()` (via a local helper converting hours to s
 
 `useShowSocialAnalyticsPostThumbnail` fetches post thumbnails as blobs and creates object URLs for display. The hook stores the raw `Blob` in React Query's cache (not the object URL), then creates the object URL via `useMemo` and revokes it on cleanup via `useEffect`. This prevents memory leaks from unreleased object URLs accumulating over time.
 
+## Provider-Specific Banners
+
+`SocialAnalyticsIntegrationPageView` displays conditional info banners depending on the integration provider:
+
+- **Instagram** (amber): Explains that Instagram does not provide historical data, so analytics are built incrementally over time. Only shown when `integration.provider === IntegrationProvider.Instagram`.
+- **YouTube** (blue): Shown when `detail.isYoutubeReportPending === true`. Explains that YouTube reporting jobs take 24-48 hours to generate after initial connection. Displays a spinning `ArrowPathIcon` animation to indicate the process is ongoing. The banner disappears once all reporting jobs have processed at least one report.
+
 ## Cleanup Notes
 
 - **Design system colors**: Evolution badges and insight tiles use `text-green` / `bg-pastel-green` (positive) and `text-danger` / `bg-danger/10` (negative) from the design system instead of hardcoded Tailwind color classes.

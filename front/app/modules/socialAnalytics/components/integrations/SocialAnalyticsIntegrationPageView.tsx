@@ -4,7 +4,8 @@ import { SocialAnalyticsIntegrationInsightType, socialAnalyticsIntegrationInsigh
 import { ArrowTrendingUpIcon, DocumentTextIcon, UserIcon } from "@heroicons/react/24/solid";
 import { useSocialAnalyticsFilterStore } from "../../stores/socialAnalyticsFilterStore";
 import { useShowSocialAnalyticsIntegrationDetail } from "../../hooks/api/socialAnalyticsIntegrationInsights/useShowSocialAnalyticsIntegrationDetail";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { IntegrationProvider } from "~/models/enums/IntegrationProvider";
 import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
 import AreaChart from "~/components/ui/AreaChart";
 import { socialAnalyticsTimePeriodToDays } from "../../models/enums/SocialAnalyticsTimePeriod";
@@ -29,16 +30,26 @@ export default function SocialAnalyticsIntegrationPageView({ integration }: Soci
   if (isLoading || !detail) {
     return null;
   }
-  console.log(detail);
   return (
     <div className="flex flex-col gap-3 mt-5 flex-1 min-h-0">
-      <div className="flex flex-row items-center bg-amber-300/10 p-3 gap-3 rounded-lg border border-amber-300">
-        <ExclamationTriangleIcon className="size-5 text-amber-500" strokeWidth={2} />
-        <p className="text-xs text-amber-500">
-          Instagram ne nous permet pas d'acceder à l'historique de vos comptes Instagram. Nous construisons cet historique en interne à partir des données disponibles.
-          Donc, plus votre compte est connecté depuis longtemps, plus l'historique sera complet.
-        </p>
-      </div>
+      {integration.provider === IntegrationProvider.Instagram && (
+        <div className="flex flex-row items-center bg-amber-300/10 p-3 gap-3 rounded-lg border border-amber-300">
+          <ExclamationTriangleIcon className="size-5 text-amber-500" strokeWidth={2} />
+          <p className="text-xs text-amber-500">
+            Instagram ne nous permet pas d'acceder à l'historique de vos comptes Instagram. Nous construisons cet historique en interne à partir des données disponibles.
+            Donc, plus votre compte est connecté depuis longtemps, plus l'historique sera complet.
+          </p>
+        </div>
+      )}
+      {detail.isYoutubeReportPending === true && (
+        <div className="flex flex-row items-center bg-blue/10 p-3 gap-3 rounded-lg border border-blue">
+          <ArrowPathIcon className="size-5 text-blue animate-spin" strokeWidth={2} />
+          <p className="text-xs text-blue">
+            Les rapports YouTube sont en cours de génération. Ce processus peut prendre entre 24 et 48 heures après la connexion de votre compte.
+            Les données d'analyse seront disponibles automatiquement une fois les rapports prêts.
+          </p>
+        </div>
+      )}
       <div className="flex flex-wrap gap-3 items-center">
         <div className="flex flex-col gap-3">
           <div className="flex flex-row gap-1 items-center">
