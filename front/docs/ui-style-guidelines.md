@@ -87,6 +87,22 @@ Use these classes for body text. All use the **Outfit** font family with gray co
 | **Gray 400** | `--color-gray-400` | `#9ca3af` | Placeholder text |
 | **Light Gray** | `--color-light-gray` | `#D9D9D9` | Borders, dividers, hover states |
 
+### Dark Mode Palette
+
+In dark mode (`:root.dark`), the following tokens are overridden:
+
+| Token | Light Value | Dark Value |
+|-------|-------------|------------|
+| `--color-clear` | `#FFFFFF` | `#1a1a2e` |
+| `--color-dark` | `#141115` | `#F0F0F0` |
+| `--color-light-gray` | `#D9D9D9` | `#2d2d44` |
+| `--color-gray` | `#6b7280` | `#9ca3af` |
+| `--color-gray-400` | `#9ca3af` | `#6b7280` |
+| `--color-gray-900` | `#111827` | `#F0F0F0` |
+| `--color-surface-hover` | `#F9FAFB` | `#23233a` |
+
+See [dark-mode-feature.md](dark-mode-feature.md) for full details.
+
 ### Accent Colors
 
 | Name | Variable | Hex | Usage |
@@ -555,7 +571,7 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 ## Best Practices
 
 1. **Use typography classes** (`text-heading-*`, `text-body-*`) instead of raw Tailwind text classes
-2. **Use color variables** (`text-primary`, `bg-dark`, `border-light-gray`) for consistency
+2. **Always use design tokens** (`bg-clear`, `text-dark`, `border-light-gray`, `hover:bg-surface-hover`) — never use raw Tailwind colors (`bg-white`, `text-gray-900`, `border-gray-200`, `hover:bg-gray-50`) as they do not respond to dark mode
 3. **Use `rounded-xl`** for buttons and inputs, `rounded-full` for pills/chips
 4. **Always include focus states** on interactive elements
 5. **Use Heroicons** for all icons, prefer outline style for navigation

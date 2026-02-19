@@ -103,7 +103,7 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
         <>
             {/* Backdrop to close dropdown when clicking outside */}
             <div className="fixed inset-0 z-0" onClick={onClose} />
-            <div className="absolute top-14 left-0 mt-1 z-10 bg-white border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center">
+            <div className="absolute top-14 left-0 mt-1 z-10 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center">
                 <Input
                     ref={inputRef}
                     placeholder="Tag"

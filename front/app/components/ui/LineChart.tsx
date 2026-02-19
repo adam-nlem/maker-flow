@@ -28,7 +28,7 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
     }
 
     return (
-        <div className="bg-white border border-light-gray rounded-md p-2 shadow-sm flex flex-col gap-1">
+        <div className="bg-clear border border-light-gray rounded-md p-2 shadow-sm flex flex-col gap-1">
             <p className="text-body-xs text-gray mb-1">Durée après publication: {formatHoursToFrench(label)}</p>
             {payload.map((entry) => (
                 <div className="flex flex-row gap-1">

@@ -12,7 +12,7 @@ export default function SocialAnalyticsPostRankingItemTile({ item, index }: Soci
   const { thumbnailUrl } = useShowSocialAnalyticsPostThumbnail(item.post.uuid);
 
   return (
-    <div className="flex flex-row gap-3 hover:bg-gray-50 cursor-pointer p-1 overflow-auto border-t border-light-gray items-center">
+    <div className="flex flex-row gap-3 hover:bg-surface-hover cursor-pointer p-1 overflow-auto border-t border-light-gray items-center">
       <h1 className="text-heading-sm">{index + 1}</h1>
       {thumbnailUrl
         ? <img src={thumbnailUrl} alt="" className="w-10 h-10 rounded object-cover shrink-0" />

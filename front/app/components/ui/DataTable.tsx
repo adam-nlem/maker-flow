@@ -26,7 +26,7 @@ export default function DataTable<T>({
     return (
         <div className={`border border-light-gray rounded-lg overflow-auto scrollbar-none ${className ?? ""}`}>
             <table className="w-full table-auto">
-                <thead className="sticky top-0 bg-white z-10">
+                <thead className="sticky top-0 bg-clear z-10">
                     <tr className="border-b border-light-gray text-body-xs">
                         {columns.map((column) => (
                             <th
@@ -42,7 +42,7 @@ export default function DataTable<T>({
                     {data.map((item) => (
                         <tr
                             key={getRowKey(item)}
-                            className={`border-t border-light-gray ${onRowClick ? "hover:bg-gray-50 cursor-pointer" : ""}`}
+                            className={`border-t border-light-gray ${onRowClick ? "hover:bg-surface-hover cursor-pointer" : ""}`}
                             onClick={onRowClick ? () => onRowClick(item) : undefined}
                         >
                             {columns.map((column) => (

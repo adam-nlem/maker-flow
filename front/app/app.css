@@ -11,6 +11,7 @@ th {
 body {
   user-select: none;
   -webkit-user-select: none;
+  color: var(--color-dark);
 }
 
 .select-text,
@@ -41,6 +42,7 @@ body {
   --color-purple: #5346B6;
 
   --color-pastel-green: #BCD5AA;
+  --color-surface-hover: #F9FAFB;
 
   /* Custom text sizes with appropriate fonts */
   --font-size-xs: 0.75rem;
@@ -52,6 +54,21 @@ body {
   --font-size-2xl: 2rem;
   --font-size-3xl: 2.5rem;
   --font-size-4xl: 3rem;
+}
+
+:root {
+  --shimmer-highlight: rgba(255, 255, 255, 0.6);
+}
+
+:root.dark {
+  --color-clear: #141115;
+  --color-dark: #F0F0F0;
+  --color-light-gray: #2d2d44;
+  --color-gray: #9ca3af;
+  --color-gray-400: #6b7280;
+  --color-gray-900: #F0F0F0;
+  --color-surface-hover: #23233a;
+  --shimmer-highlight: rgba(255, 255, 255, 0.1);
 }
 
 /* Custom typography classes */

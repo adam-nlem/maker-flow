@@ -31,16 +31,16 @@ export default function LoginPage() {
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
             <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900">
+                <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-dark">
                     Connexion à votre compte
                 </h2>
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
                 {errorMessage && (
-                    <div className="mb-4 rounded-md bg-red-50 p-4">
+                    <div className="mb-4 rounded-md bg-danger/10 p-4">
                         <div className="flex">
-                            <div className="text-body-sm text-red-700">{errorMessage}</div>
+                            <div className="text-body-sm text-danger">{errorMessage}</div>
                         </div>
                     </div>
                 )}
@@ -93,7 +93,7 @@ export default function LoginPage() {
 
 
 
-                <p className="mt-10 text-center text-body-sm text-gray-500 dark:text-gray-400">
+                <p className="mt-10 text-center text-body-sm">
                     Vous n'avez pas de compte ?{' '}
                     <Link to="/register" className="font-semibold leading-6 text-primary">
                         Créer un compte

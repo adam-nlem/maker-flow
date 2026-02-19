@@ -46,7 +46,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
 
     return (
         <ModalOverlay isOpen={showModal} onClose={onClose} className="justify-center items-center">
-            <div className="border rounded-xl border-light-gray w-[500px] h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-white" onClick={(e) => e.stopPropagation()}>
+            <div className="border rounded-xl border-light-gray w-[500px] h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
                 <h1 className="text-heading-lg">
                     Modifier le Projet
                 </h1>

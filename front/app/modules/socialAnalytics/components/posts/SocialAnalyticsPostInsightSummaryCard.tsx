@@ -22,7 +22,7 @@ function formatInsightValue(type: SocialAnalyticsPostInsightType, value: number)
 
 export default function SocialAnalyticsPostInsightSummaryCard({ title, insights }: SocialAnalyticsPostInsightSummaryCardProps) {
     return (
-        <div className="bg-white border border-light-gray rounded-xl p-3 w-full">
+        <div className="bg-clear border border-light-gray rounded-xl p-3 w-full">
             
                 <h1 className="text-heading-md mb-3">{title}</h1>
 
@@ -37,7 +37,7 @@ export default function SocialAnalyticsPostInsightSummaryCard({ title, insights 
                     return (
                         <div
                             key={insight.insight.type}
-                            className={`flex flex-col justify-between ${isRightColumn ? 'md:border-l md:border-gray-200 md:pl-6' : ''}`}
+                            className={`flex flex-col justify-between ${isRightColumn ? 'md:border-l md:border-light-gray md:pl-6' : ''}`}
                         >
                             <div className="flex flex-row justify-between items-start mb-2">
                                 <h2 className="text-body-sm">

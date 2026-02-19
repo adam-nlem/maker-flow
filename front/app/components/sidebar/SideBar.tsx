@@ -1,4 +1,4 @@
-import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, PencilSquareIcon, PlusIcon, PuzzlePieceIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, PuzzlePieceIcon, SunIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { HomeIcon as HomeIconSolid, PuzzlePieceIcon as PuzzlePieceIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
@@ -16,6 +16,7 @@ import SelectDropdown from "../ui/SelectDropdown"
 import type { Project } from "~/models/Project"
 import { useListProjectUserModules } from "~/hooks/api/projects/useListProjectUserModules";
 import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
+import { useThemeStore } from "~/stores/theme/themeStore";
 
 import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
 import UpdateProjectModal from "../projects/UpdateProjectModal";
@@ -41,6 +42,9 @@ export default function SideBar() {
   const updatingProjectUuid = useUpdateProjectStore((state) => state.updatingProjectUuid)
   const setUpdatingProjectUuid = useUpdateProjectStore((state) => state.setUpdatingProjectUuid)
 
+  const isDark = useThemeStore((state) => state.isDark)
+  const toggleTheme = useThemeStore((state) => state.toggleTheme)
+
   // Close modals when sidebar collapses
   useEffect(() => {
     if (!isExpanded) {
@@ -56,7 +60,7 @@ export default function SideBar() {
           if (!isCreateProjectModalOpen)
             setIsExpanded(false)
         }}
-        className={`h-full shrink-0 border-r border-light-gray bg-white flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out pointer-events-auto ${isExpanded ? 'w-72' : 'w-16'}`}
+        className={`h-full shrink-0 border-r border-light-gray bg-clear flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out pointer-events-auto ${isExpanded ? 'w-72' : 'w-16'}`}
       >
         {/* TOP SECTION */}
         <div className={`p-3 ${isExpanded ? '' : 'flex flex-col items-center'}`}>
@@ -150,6 +154,13 @@ export default function SideBar() {
         <div className={isExpanded ? '' : 'flex flex-col items-center'}>
           {/* BOTTOM NAVIGATION */}
           <div className={`mb-5 flex flex-col p-3 ${isExpanded ? '' : 'items-center'}`}>
+            <IconWithTextTile
+              icon={isDark ? SunIcon : MoonIcon}
+              label={isDark ? 'Mode clair' : 'Mode sombre'}
+              isExpanded={isExpanded}
+              isBold={false}
+              onClick={toggleTheme}
+            />
             <IconWithTextTile
               icon={location.pathname === '/settings' ? Cog6ToothIconSolid : Cog6ToothIcon}
               label="Paramètres"

@@ -79,7 +79,7 @@ export function DatePicker({ selectedDate, onDateSelected, minDate }: DatePicker
     }
 
     return (
-        <div className="bg-white border border-light-gray rounded-lg shadow-md p-3 min-w-[280px]">
+        <div className="bg-clear border border-light-gray rounded-lg shadow-md p-3 min-w-[280px]">
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
                 <button

@@ -33,7 +33,7 @@ export default function UpdateTodoListTagDropdown({ tag, onClose, onTagDeleted }
     };
 
     return (
-        <div className="flex flex-col items-center gap-3 absolute left-full top-0 ml-2 z-20 bg-white border border-light-gray rounded-lg shadow-md min-w-max p-2">
+        <div className="flex flex-col items-center gap-3 absolute left-full top-0 ml-2 z-20 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2">
             <Input
                 ref={inputRef}
                 placeholder="Tag"

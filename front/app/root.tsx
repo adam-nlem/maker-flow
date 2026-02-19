@@ -39,8 +39,9 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
+        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var d=JSON.parse(localStorage.getItem('app:theme'));if(d&&d.state&&d.state.isDark)document.documentElement.classList.add('dark')}catch(e){}})()` }} />
       </head>
-      <body className="h-full overflow-hidden bg-clear">
+      <body className="h-full overflow-hidden bg-clear text-dark">
         {children}
         <ToastContainer />
         <ScrollRestoration />

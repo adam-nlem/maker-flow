@@ -40,12 +40,12 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
 
     return (
         <ModalOverlay isOpen={showModal} onClose={onClose}>
-            <div className="border rounded-xl border-light-gray w-[500px] h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-white" onClick={(e) => e.stopPropagation()}>
+            <div className="border rounded-xl border-light-gray w-[500px] h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
                 {showStepHeader && (
                     <div className="flex flex-row items-center gap-3">
                         <StepBadge label="Introduction" completed={true} />
 
-                        <ChevronRightIcon className="size-4 text-gray-400" strokeWidth={2} />
+                        <ChevronRightIcon className="size-4 text-gray" strokeWidth={2} />
 
                         <StepBadge label="Projet" completed={false} />
                     </div>
