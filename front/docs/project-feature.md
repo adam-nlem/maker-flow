@@ -34,7 +34,7 @@ The Project feature provides a complete UI for managing projects including creat
 | Value | French Translation |
 |-------|-------------------|
 | `saas` | SaaS |
-| `content_creation` | Création de contenu |
+| `content_creation` | Creation de contenu |
 | `mobile_app` | Application mobile |
 | `extension` | Extension |
 | `automation` | Automatisation |
@@ -172,7 +172,6 @@ Manages the currently focused/selected project.
 projectQueryKeys = {
   all: ['projects'],
   list: (page, limit) => ['projects', 'list', page, limit],
-  userModules: (projectUuid) => ['projects', 'userModules', projectUuid],
 }
 ```
 
@@ -282,7 +281,6 @@ Displays a project in a tile format (used in sidebar and selection modal).
 |------|------|----------|-------------|
 | `project` | `Project` | Yes | Project to display |
 | `isSelected` | `boolean` | No | Selection indicator (default: false) |
-| `moduleCount` | `number` | No | Number of active modules |
 | `showCreatedAt` | `boolean` | No | Show creation date (default: false) |
 | `rightIcon` | `ReactNode` | No | Icon on the right |
 | `onHoverRightIcon` | `ReactNode` | No | Icon shown on hover |
@@ -291,7 +289,7 @@ Displays a project in a tile format (used in sidebar and selection modal).
 **Display:**
 - Avatar with first letter of project name
 - Project name
-- Module count OR creation date (based on props)
+- Creation date (based on props)
 - Selection indicator dot when selected
 
 ---
@@ -307,6 +305,7 @@ The SideBar component integrates all project features:
 3. **Select Modal**: `SelectItemModal` with project list
 4. **Create Modal**: `CreateProjectModal` for new projects
 5. **Update Modal**: `UpdateProjectModal` triggered from selection modal
+6. **Navigation Links**: "Taches" and "Insights" links for built-in features
 
 **Behavior:**
 - Modals close when sidebar collapses
@@ -318,50 +317,50 @@ The SideBar component integrates all project features:
 ## Data Flow
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         SideBar                              │
-│  ┌─────────────────┐  ┌─────────────────┐                   │
-│  │  ProjectTile    │  │ SelectItemModal │                   │
-│  │  (focused)      │  │  (project list) │                   │
-│  └────────┬────────┘  └────────┬────────┘                   │
-│           │                    │                             │
-│           ▼                    ▼                             │
-│  ┌─────────────────────────────────────────┐                │
-│  │         useSelectFocusedProject         │                │
-│  │         useFocusProjectStore            │                │
-│  └─────────────────────────────────────────┘                │
-│                        │                                     │
-│                        ▼                                     │
-│  ┌─────────────────────────────────────────┐                │
-│  │       useListPaginatedProjects          │                │
-│  └─────────────────────────────────────────┘                │
-│                        │                                     │
-│                        ▼                                     │
-│  ┌─────────────────────────────────────────┐                │
-│  │            HTTP Client                   │                │
-│  │         GET /api/projects               │                │
-│  └─────────────────────────────────────────┘                │
-└─────────────────────────────────────────────────────────────┘
++-------------------------------------------------------------+
+|                         SideBar                              |
+|  +-----------------+  +-----------------+                    |
+|  |  ProjectTile    |  | SelectItemModal |                    |
+|  |  (focused)      |  |  (project list) |                    |
+|  +--------+--------+  +--------+--------+                    |
+|           |                    |                             |
+|           v                    v                             |
+|  +-----------------------------------------+                |
+|  |         useSelectFocusedProject         |                |
+|  |         useFocusProjectStore            |                |
+|  +-----------------------------------------+                |
+|                        |                                     |
+|                        v                                     |
+|  +-----------------------------------------+                |
+|  |       useListPaginatedProjects          |                |
+|  +-----------------------------------------+                |
+|                        |                                     |
+|                        v                                     |
+|  +-----------------------------------------+                |
+|  |            HTTP Client                   |                |
+|  |         GET /api/projects               |                |
+|  +-----------------------------------------+                |
++-------------------------------------------------------------+
 
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│ CreateProject   │     │ UpdateProject   │     │ DeleteProject   │
-│     Modal       │     │     Modal       │     │   (in Update)   │
-└────────┬────────┘     └────────┬────────┘     └────────┬────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────┐     ┌─────────────────┐     ┌─────────────────┐
-│ useCreateProject│     │ useUpdateProject│     │ useDeleteProject│
-└────────┬────────┘     └────────┬────────┘     └────────┬────────┘
-         │                       │                       │
-         ▼                       ▼                       ▼
-┌─────────────────────────────────────────────────────────────┐
-│                      HTTP Client                             │
-│  POST /api/projects  PATCH /api/projects/{uuid}  DELETE ... │
-└─────────────────────────────────────────────────────────────┘
-         │                       │                       │
-         └───────────────────────┼───────────────────────┘
-                                 │
-                                 ▼
++-----------------+     +-----------------+     +-----------------+
+| CreateProject   |     | UpdateProject   |     | DeleteProject   |
+|     Modal       |     |     Modal       |     |   (in Update)   |
++--------+--------+     +--------+--------+     +--------+--------+
+         |                       |                       |
+         v                       v                       v
++-----------------+     +-----------------+     +-----------------+
+| useCreateProject|     | useUpdateProject|     | useDeleteProject|
++--------+--------+     +--------+--------+     +--------+--------+
+         |                       |                       |
+         v                       v                       v
++-------------------------------------------------------------+
+|                      HTTP Client                             |
+|  POST /api/projects  PATCH /api/projects/{uuid}  DELETE ... |
++-------------------------------------------------------------+
+         |                       |                       |
+         +-----------------------+-----------------------+
+                                 |
+                                 v
                     invalidateQueries(['projects'])
 ```
 

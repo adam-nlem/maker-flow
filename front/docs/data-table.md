@@ -110,5 +110,5 @@ const sentinelRef = useRef<HTMLDivElement>(null);
 ## Related Files
 
 - `@/components/ui/SelectDropdown.tsx` — Same generic pattern with render props
-- `@/modules/socialAnalytics/components/posts/ListSocialAnalyticsPostsTable.tsx` — First consumer (posts table with infinite scroll)
-- `@/modules/socialAnalytics/components/posts/SocialAnalyticsPostDescriptionCell.tsx` — Example of a component-based cell render (uses hooks)
+- `@/components/insights/posts/ListPostsTable.tsx` -- First consumer (posts table with infinite scroll)
+- `@/components/insights/posts/PostDescriptionCell.tsx` -- Example of a component-based cell render (uses hooks)

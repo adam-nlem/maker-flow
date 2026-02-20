@@ -92,9 +92,9 @@ Use when selecting from a predefined list of options (e.g., enums, filters).
 import { ChartBarSquareIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline"
 import SelectDropdown from "~/components/ui/SelectDropdown"
 
-const metricOptions = Object.values(SocialAnalyticsMetric)
+const metricOptions = Object.values(InsightMetric)
 
-<SelectDropdown<SocialAnalyticsMetric>
+<SelectDropdown<InsightMetric>
     items={metricOptions}
     selectedItemId={metric}
     getItemId={(item) => item}
@@ -133,5 +133,5 @@ const metricOptions = Object.values(SocialAnalyticsMetric)
 ## Related Files
 
 - `@/components/ui/Button.tsx` - Button component for create action
-- `@/modules/todoList/components/todoLists/TodoListTile.tsx` - Entity tile pattern
-- `@/modules/socialAnalytics/components/FilterTile.tsx` - Filter tile pattern
+- `@/components/tasks/todoLists/TodoListTile.tsx` - Entity tile pattern
+- `@/components/insights/FilterTile.tsx` - Filter tile pattern

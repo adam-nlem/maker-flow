@@ -1,5 +1,5 @@
-import { CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, PuzzlePieceIcon, SunIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { HomeIcon as HomeIconSolid, PuzzlePieceIcon as PuzzlePieceIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
+import { ChartBarIcon, CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentListIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SunIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { HomeIcon as HomeIconSolid, ClipboardDocumentListIcon as ClipboardDocumentListIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
@@ -9,18 +9,15 @@ import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
 import IconWithTextTile from "../ui/IconWithTextTile";
 import { useLocation, useNavigate } from "react-router";
-import ModuleTile from "./ModuleTile";
 import Shimmer from "../ui/Shimmer";
 
 import SelectDropdown from "../ui/SelectDropdown"
 import type { Project } from "~/models/Project"
-import { useListProjectUserModules } from "~/hooks/api/projects/useListProjectUserModules";
 import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 import { useThemeStore } from "~/stores/theme/themeStore";
 
 import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
 import UpdateProjectModal from "../projects/UpdateProjectModal";
-import { useUpdateProject } from "~/hooks/api/projects/useUpdateProject";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
 
 export default function SideBar() {
@@ -31,7 +28,6 @@ export default function SideBar() {
   const { projects, isLoading: isLoadingProjects } = useListPaginatedProjects()
   const { focusedProjectUuid, setFocusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
-  const { userModules, isLoading } = useListProjectUserModules(focusedProject?.uuid);
 
   const isExpanded = useSidebarStore((state) => state.isExpanded)
   const setIsExpanded = useSidebarStore((state) => state.setIsExpanded)
@@ -81,7 +77,6 @@ export default function SideBar() {
                 renderTrigger={({ onClick }) => (
                   <ProjectTile
                     project={focusedProject}
-                    moduleCount={userModules.length}
                     rightIcon={
                       isExpanded && <ChevronUpDownIcon className="size-5 text-gray -mb-0.5" strokeWidth={2} />
                     }
@@ -128,26 +123,22 @@ export default function SideBar() {
               onClick={() => navigate('/')}
             />
             <IconWithTextTile
-              icon={location.pathname === '/library' ? PuzzlePieceIconSolid : PuzzlePieceIcon}
-              label="Bibliothèque"
+              icon={location.pathname === '/tasks' ? ClipboardDocumentListIconSolid : ClipboardDocumentListIcon}
+              label="Tâches"
               isExpanded={isExpanded}
               isBold={true}
-              isSelected={location.pathname === '/library'}
-              onClick={() => navigate('/library')}
+              isSelected={location.pathname === '/tasks'}
+              onClick={() => navigate('/tasks')}
+            />
+            <IconWithTextTile
+              icon={location.pathname.startsWith('/insights') ? ChartBarIconSolid : ChartBarIcon}
+              label="Insights"
+              isExpanded={isExpanded}
+              isBold={true}
+              isSelected={location.pathname.startsWith('/insights')}
+              onClick={() => navigate('/insights')}
             />
           </div>
-
-          <div className="mt-5 border-t border-light-gray rounded px-2 w-full"></div>
-
-          {/* MODULES SECTION */}
-          {userModules.length > 0 && (
-            <div className={`mt-5 flex flex-col ${isExpanded ? '' : 'items-center'}`}>
-              {isExpanded && <h1 className="text-heading-xs text-gray pl-2 pb-1">Modules Actifs</h1>}
-              {userModules.map((userModule) => (
-                <ModuleTile key={userModule.uuid} isExpanded={isExpanded} userModule={userModule} />
-              ))}
-            </div>
-          )}
         </div>
 
         {/* BOTTOM SECTION */}

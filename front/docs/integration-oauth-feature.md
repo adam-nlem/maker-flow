@@ -11,41 +11,41 @@ This document describes the frontend OAuth integration system used in MakerFlow 
 ### Component Hierarchy
 
 ```
-┌─────────────────────────────────────────────────────────────────┐
-│                    Component (e.g., Dashboard)                   │
-│                                                                  │
-│  const { createIntegration, isPending, integrationUuid, ... }   │
-│      = useCreateIntegration({ userModuleUuid, provider });       │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                    useCreateIntegration                          │
-│                                                                  │
-│  - Calls POST /api/integrations with userModuleUuid & provider  │
-│  - Uses useOAuthPopup for popup management                      │
-│  - Combines mutation state with OAuth state                     │
-│  - Invalidates integrations query on success                    │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                       useOAuthPopup                              │
-│                                                                  │
-│  - Opens popup window with OAuth URL                            │
-│  - Manages popup lifecycle (open/close detection)               │
-│  - Uses useOAuthMessageListener for callback handling           │
-│  - Calls onSuccess callback when integration is created         │
-└──────────────────────────┬──────────────────────────────────────┘
-                           │
-                           ▼
-┌─────────────────────────────────────────────────────────────────┐
-│                   useOAuthMessageListener                        │
-│                                                                  │
-│  - Listens for postMessage from popup                           │
-│  - Validates origin and message type                            │
-│  - Extracts integrationUuid or errorCode                        │
-└─────────────────────────────────────────────────────────────────┘
++------------------------------------------------------------------+
+|                    Component (e.g., Dashboard)                    |
+|                                                                   |
+|  const { createIntegration, isPending, integrationUuid, ... }    |
+|      = useCreateIntegration({ projectUuid, provider });           |
++----------------------------+-------------------------------------+
+                             |
+                             v
++------------------------------------------------------------------+
+|                    useCreateIntegration                            |
+|                                                                   |
+|  - Calls POST /api/integrations with projectUuid & provider      |
+|  - Uses useOAuthPopup for popup management                       |
+|  - Combines mutation state with OAuth state                      |
+|  - Invalidates integrations query on success                     |
++----------------------------+-------------------------------------+
+                             |
+                             v
++------------------------------------------------------------------+
+|                       useOAuthPopup                               |
+|                                                                   |
+|  - Opens popup window with OAuth URL                             |
+|  - Manages popup lifecycle (open/close detection)                |
+|  - Uses useOAuthMessageListener for callback handling            |
+|  - Calls onSuccess callback when integration is created          |
++----------------------------+-------------------------------------+
+                             |
+                             v
++------------------------------------------------------------------+
+|                   useOAuthMessageListener                         |
+|                                                                   |
+|  - Listens for postMessage from popup                            |
+|  - Validates origin and message type                             |
+|  - Extracts integrationUuid or errorCode                         |
++------------------------------------------------------------------+
 ```
 
 ### File Structure
@@ -81,55 +81,55 @@ front/app/
 ### Sequence Diagram
 
 ```
-┌──────────┐     ┌──────────────┐     ┌─────────┐     ┌───────────┐     ┌─────────┐
-│Component │     │useAuthorize  │     │useOAuth │     │ Callback  │     │ Backend │
-│          │     │Instagram     │     │Popup    │     │ Route     │     │         │
-└────┬─────┘     └──────┬───────┘     └────┬────┘     └─────┬─────┘     └────┬────┘
-     │                  │                  │                │                │
-     │ 1. authorize()   │                  │                │                │
-     │─────────────────>│                  │                │                │
-     │                  │                  │                │                │
-     │                  │ 2. GET /authorize│                │                │
-     │                  │─────────────────────────────────────────────────────>
-     │                  │                  │                │                │
-     │                  │ 3. auth_url      │                │                │
-     │                  │<─────────────────────────────────────────────────────
-     │                  │                  │                │                │
-     │                  │ 4. openPopup(url)│                │                │
-     │                  │─────────────────>│                │                │
-     │                  │                  │                │                │
-     │                  │                  │ 5. window.open │                │
-     │                  │                  │───────────────>│                │
-     │                  │                  │                │                │
-     │                  │                  │                │ 6. User auth   │
-     │                  │                  │                │───────────────>│
-     │                  │                  │                │                │
-     │                  │                  │                │ 7. Redirect    │
-     │                  │                  │                │<───────────────│
-     │                  │                  │                │                │
-     │                  │                  │ 8. postMessage │                │
-     │                  │                  │<───────────────│                │
-     │                  │                  │                │                │
-     │                  │                  │ 9. window.close│                │
-     │                  │                  │                │                │
-     │                  │ 10. state update │                │                │
-     │                  │<─────────────────│                │                │
-     │                  │                  │                │                │
-     │ 11. integrationUuid                 │                │                │
-     │<─────────────────│                  │                │                │
-     │                  │                  │                │                │
++----------+     +--------------+     +---------+     +-----------+     +---------+
+|Component |     |useAuthorize  |     |useOAuth |     | Callback  |     | Backend |
+|          |     |Instagram     |     |Popup    |     | Route     |     |         |
++----+-----+     +------+-------+     +----+----+     +-----+-----+     +----+----+
+     |                  |                  |                |                |
+     | 1. authorize()   |                  |                |                |
+     |----------------->|                  |                |                |
+     |                  |                  |                |                |
+     |                  | 2. GET /authorize|                |                |
+     |                  |-------------------------------------------------->|
+     |                  |                  |                |                |
+     |                  | 3. auth_url      |                |                |
+     |                  |<--------------------------------------------------|
+     |                  |                  |                |                |
+     |                  | 4. openPopup(url)|                |                |
+     |                  |----------------->|                |                |
+     |                  |                  |                |                |
+     |                  |                  | 5. window.open |                |
+     |                  |                  |--------------->|                |
+     |                  |                  |                |                |
+     |                  |                  |                | 6. User auth   |
+     |                  |                  |                |--------------->|
+     |                  |                  |                |                |
+     |                  |                  |                | 7. Redirect    |
+     |                  |                  |                |<---------------|
+     |                  |                  |                |                |
+     |                  |                  | 8. postMessage |                |
+     |                  |                  |<---------------|                |
+     |                  |                  |                |                |
+     |                  |                  | 9. window.close|                |
+     |                  |                  |                |                |
+     |                  | 10. state update |                |                |
+     |                  |<-----------------|                |                |
+     |                  |                  |                |                |
+     | 11. integrationUuid                 |                |                |
+     |<-----------------|                  |                |                |
+     |                  |                  |                |                |
 ```
 
 ### Step-by-Step Flow
 
 1. **User clicks "Connect Instagram"** - Component calls `createIntegration()`
-2. **API request** - `useCreateIntegration` calls `POST /api/integrations` with `userModuleUuid` and `provider`
-3. **Backend validates** - Checks userModule exists and no existing integration for this provider
+2. **API request** - `useCreateIntegration` calls `POST /api/integrations` with `projectUuid` and `provider`
+3. **Backend validates** - Checks project exists and no existing integration for this provider
 4. **Backend returns auth URL** - Instagram OAuth URL with state parameter
 5. **Open popup** - `useOAuthPopup.openPopup(url)` opens centered popup window
 6. **User authorizes** - User logs into Instagram and grants permissions
 7. **Backend callback** - Instagram redirects to backend callback endpoint (`/api/integrations/callback`)
-8. **Backend processes** - Exchanges code for token, creates integration, links to userModule
+8. **Backend processes** - Exchanges code for token, creates integration, links to project
 9. **Frontend callback** - Backend redirects to `/integrations/callback?status=success&...`
 10. **postMessage** - Callback route sends message to opener window
 11. **Message received** - `useOAuthMessageListener` receives and validates message
@@ -149,11 +149,11 @@ Generic API hook that orchestrates the OAuth flow for any provider.
 // Location: hooks/api/integrations/useAuthorizeInstagram.ts
 
 interface UseCreateIntegrationProps {
-    userModuleUuid: string;
+    projectUuid: string;
     provider: IntegrationProvider;
 }
 
-export function useCreateIntegration({ userModuleUuid, provider }: UseCreateIntegrationProps) {
+export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegrationProps) {
     const queryClient = useQueryClient();
 
     const {
@@ -165,14 +165,14 @@ export function useCreateIntegration({ userModuleUuid, provider }: UseCreateInte
     } = useOAuthPopup({
         provider,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(userModuleUuid) });
+            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
         },
     });
 
     const mutation = useMutation({
         mutationFn: async () => {
             const res = await httpClient.post<CreateIntegrationResponse>('/integrations', {
-                userModuleUuid,
+                projectUuid,
                 provider: provider,
             });
             return res.data;
@@ -201,7 +201,7 @@ export function useCreateIntegration({ userModuleUuid, provider }: UseCreateInte
 **Props:**
 | Property | Type | Description |
 |----------|------|-------------|
-| `userModuleUuid` | `string` | UUID of the user module to link the integration to |
+| `projectUuid` | `string` | UUID of the project to link the integration to |
 | `provider` | `IntegrationProvider` | The integration provider (Instagram, etc.) |
 
 **Returns:**
@@ -423,7 +423,7 @@ export enum IntegrationStatus {
 }
 ```
 
-Used by the `Integration` model to represent the current state of an OAuth connection. The frontend uses this to decide rendering: Active integrations show data, Revoked integrations show the reconnect card (`CreateSocialAnalyticsIntegrationCard`).
+Used by the `Integration` model to represent the current state of an OAuth connection. The frontend uses this to decide rendering: Active integrations show data, Revoked integrations show the reconnect card (`CreateIntegrationCard`).
 
 ### OAuthCallbackStatus
 
@@ -451,12 +451,12 @@ export enum OAuthErrorCode {
 }
 
 export const oAuthErrorCodeToFrenchTranslation: Record<OAuthErrorCode, string> = {
-    [OAuthErrorCode.InvalidState]: "La session a expiré. Veuillez réessayer.",
+    [OAuthErrorCode.InvalidState]: "La session a expire. Veuillez reessayer.",
     [OAuthErrorCode.MissingCode]: "Code d'autorisation manquant.",
-    [OAuthErrorCode.TokenExchangeFailed]: "Échec de la connexion. Veuillez réessayer.",
-    [OAuthErrorCode.UserNotFound]: "Utilisateur non trouvé.",
-    [OAuthErrorCode.ProviderError]: "Erreur du fournisseur. Veuillez réessayer.",
-    [OAuthErrorCode.PopupBlocked]: "Le popup a été bloqué. Veuillez autoriser les popups.",
+    [OAuthErrorCode.TokenExchangeFailed]: "Echec de la connexion. Veuillez reessayer.",
+    [OAuthErrorCode.UserNotFound]: "Utilisateur non trouve.",
+    [OAuthErrorCode.ProviderError]: "Erreur du fournisseur. Veuillez reessayer.",
+    [OAuthErrorCode.PopupBlocked]: "Le popup a ete bloque. Veuillez autoriser les popups.",
 };
 ```
 
@@ -505,10 +505,10 @@ export class OAuthCallbackReponseDTO {
 ### Basic Usage
 
 ```tsx
-export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleWidgetProps) {
-    const { integrations, isLoading } = useListIntegrations({ userModuleUuid });
+export default function DashboardContent({ projectUuid }: { projectUuid: string }) {
+    const { integrations, isLoading } = useListIntegrations({ projectUuid });
     const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
-        userModuleUuid,
+        projectUuid,
         provider: IntegrationProvider.Instagram,
     });
 
@@ -523,8 +523,8 @@ export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleW
 
     if (integrations.length > 0 || integrationUuid) {
         return (
-            <SocialAnalyticsDashboardContent
-                userModuleUuid={userModuleUuid}
+            <DashboardContent
+                projectUuid={projectUuid}
                 integrations={integrations}
             />
         );
@@ -532,7 +532,7 @@ export default function SocialAnalyticsDashboardView({ userModuleUuid }: ModuleW
 
     return (
         <div>
-            <h2>Social Analytics</h2>
+            <h2>Insights</h2>
             {oauthError && (
                 <p className="text-danger">{oAuthErrorCodeToFrenchTranslation[oauthError]}</p>
             )}
@@ -552,18 +552,18 @@ When an OAuth token is revoked (user revokes access in provider settings, token 
 
 ### How It Works
 
-1. **List endpoint returns all statuses** — `GET /api/integrations` returns Active and Revoked integrations
-2. **Dashboard routes by status** — `SocialAnalyticsDashboardContent` iterates over `integrationProviderTypeOptions` and checks the status:
-   - **Active** integration → `SocialAnalyticsIntegrationCard` (shows profile + insight data)
-   - **Revoked** or **missing** integration → `CreateSocialAnalyticsIntegrationCard` (shimmer placeholders + "Se connecter" button)
-3. **User clicks "Se connecter"** — Triggers the same `useCreateIntegration` hook / OAuth popup flow as initial setup
-4. **Backend allows re-auth** — `POST /api/integrations` checks for Active-only conflicts, so the revoked integration doesn't block the flow
-5. **Callback reactivates** — Backend's `handleCallback` finds the existing integration by `accountId`, calls `updateIntegrationToken` which resets status to `Active`
-6. **Query invalidation** — React Query refreshes the integration list, card updates to Active state
+1. **List endpoint returns all statuses** -- `GET /api/integrations` returns Active and Revoked integrations
+2. **Dashboard routes by status** -- `DashboardContent` iterates over `integrationProviderTypeOptions` and checks the status:
+   - **Active** integration -> `IntegrationCard` (shows profile + insight data)
+   - **Revoked** or **missing** integration -> `CreateIntegrationCard` (shimmer placeholders + "Se connecter" button)
+3. **User clicks "Se connecter"** -- Triggers the same `useCreateIntegration` hook / OAuth popup flow as initial setup
+4. **Backend allows re-auth** -- `POST /api/integrations` checks for Active-only conflicts, so the revoked integration doesn't block the flow
+5. **Callback reactivates** -- Backend's `handleCallback` finds the existing integration by `accountId`, calls `updateIntegrationToken` which resets status to `Active`
+6. **Query invalidation** -- React Query refreshes the integration list, card updates to Active state
 
 ### Key Point
 
-No separate re-auth UI or endpoint is needed. The existing `CreateSocialAnalyticsIntegrationCard` + `useCreateIntegration` hook handles both initial setup and re-authentication identically.
+No separate re-auth UI or endpoint is needed. The existing `CreateIntegrationCard` + `useCreateIntegration` hook handles both initial setup and re-authentication identically.
 
 ---
 
@@ -586,7 +586,7 @@ The `useCreateIntegration` hook is generic and works with any provider. Simply p
 ```tsx
 // In your component
 const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
-    userModuleUuid,
+    projectUuid,
     provider: IntegrationProvider.TikTok,
 });
 ```
@@ -675,7 +675,7 @@ if (payload.provider !== provider) {
 
 ### Overview
 
-Integration provider icons (e.g., Instagram logo) are served from the backend as SVG files. This system mirrors the module icon system.
+Integration provider icons (e.g., Instagram logo) are served from the backend as SVG files.
 
 ### API Endpoint
 
@@ -706,14 +706,14 @@ Fetches the icon for a specific integration provider.
 **Notes:**
 - Returns a blob URL created from the SVG response
 - Uses `staleTime: Infinity` to cache icons permanently
-- Query is disabled if `provider` is undefine
+- Query is disabled if `provider` is undefined
 
 ### Query Keys
 
 ```typescript
 const integrationQueryKeys = {
     all: ['integrations'] as const,
-    list: (userModuleUuid: string) => [...integrationQueryKeys.all, 'list', userModuleUuid] as const,
+    list: (projectUuid: string) => [...integrationQueryKeys.all, 'list', projectUuid] as const,
     providerIcon: (provider: string) => [...integrationQueryKeys.all, 'providerIcon', provider] as const,
 };
 ```

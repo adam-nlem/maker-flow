@@ -9,7 +9,8 @@ export default [
   // Protected routes
   layout("routes/protected.tsx", [
     index("routes/home.tsx"),
-    route("library", "routes/library.tsx"),
-    route("modules/:moduleIdentifier/*", "routes/modules.$moduleIdentifier.tsx"),
+    route("tasks", "routes/tasks.tsx"),
+    route("insights", "routes/insights.tsx"),
+    route("insights/posts/:postUuid", "routes/insights.post-detail.tsx"),
   ]),
 ] satisfies RouteConfig;

@@ -4,15 +4,15 @@ import { httpClient } from "~/services/httpClient/httpClient";
 import { integrationQueryKeys } from "./integrationQueryKeys";
 
 interface UseListIntegrationsProps {
-    userModuleUuid: string;
+    projectUuid: string;
 }
 
-export function useListIntegrations({ userModuleUuid }: UseListIntegrationsProps) {
+export function useListIntegrations({ projectUuid }: UseListIntegrationsProps) {
     const query = useQuery({
-        queryKey: integrationQueryKeys.list(userModuleUuid),
+        queryKey: integrationQueryKeys.list(projectUuid),
         queryFn: async () => {
             const res = await httpClient.get<IntegrationJSON[]>(`/integrations`, {
-                params: { userModuleUuid }
+                params: { projectUuid }
             });
 
             return res.data.map((json) => Integration.fromJSON(json));

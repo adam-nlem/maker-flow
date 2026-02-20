@@ -11,26 +11,28 @@ This document describes the coding conventions, patterns, and best practices use
 ```
 front/app/
 ├── components/           # Reusable UI components
-│   ├── projects/         # Feature-specific components
+│   ├── insights/         # Insights feature components
+│   ├── projects/         # Project feature components
 │   ├── sidebar/          # Sidebar components
+│   ├── tasks/            # Tasks feature components
 │   └── ui/               # Generic UI components
 ├── hooks/                # Custom React hooks
 │   └── api/              # API-related hooks (React Query)
-│       ├── modules/
+│       ├── integrations/
+│       ├── posts/
 │       ├── projects/
-│       ├── userModules/
+│       ├── todoLists/
 │       └── users/
 ├── models/               # Data models (classes)
 │   ├── dtos/             # DTO interfaces
 │   └── enums/            # TypeScript enums
-├── modules/              # Feature modules (widgets)
-│   └── todoList/
 ├── routes/               # Route components (pages)
 ├── services/             # External services
 │   └── httpClient/       # Axios HTTP client
 ├── stores/               # Zustand state stores
 │   ├── project/
-│   └── sidebar/
+│   ├── sidebar/
+│   └── insights/
 └── utils/                # Utility functions
 ```
 
@@ -54,7 +56,7 @@ front/app/
 
 | Type | Convention | Example |
 |------|------------|---------|
-| Page components | PascalCase noun | `Home`, `Library`, `Login` |
+| Page components | PascalCase noun | `Home`, `Login`, `Insights` |
 | Feature components | PascalCase descriptive | `CreateProjectModal`, `UpdateProjectModal` |
 | UI components | PascalCase noun | `Button`, `Input`, `ModalOverlay` |
 | Layout components | PascalCase with Layout suffix | `ProtectedLayout` |
@@ -100,10 +102,10 @@ interface ComponentNameProps {
     onAction: () => void;
 }
 
-export default function ComponentName({ 
-    requiredProp, 
-    optionalProp = false, 
-    onAction 
+export default function ComponentName({
+    requiredProp,
+    optionalProp = false,
+    onAction
 }: ComponentNameProps) {
     const [state, setState] = useState("");
 
@@ -315,7 +317,7 @@ export class IntegrationsGroupedByProviderDTO {
 
 ```tsx
 const res = await httpClient.get<IntegrationsGroupedByProviderDTOJSON[]>(`/integrations`, {
-    params: { userModuleUuid }
+    params: { projectUuid }
 });
 return res.data.map((json) => IntegrationsGroupedByProviderDTO.fromJSON(json));
 ```
@@ -345,7 +347,7 @@ export enum ProjectType {
 
 export const projectTypeToFrenchTranslation: Record<ProjectType, string> = {
     [ProjectType.Saas]: "SaaS",
-    [ProjectType.ContentCreation]: "Création de contenu",
+    [ProjectType.ContentCreation]: "Cr\u00e9ation de contenu",
     [ProjectType.MobileApp]: "Application mobile",
 };
 ```
@@ -434,7 +436,6 @@ export function useCreateProject() {
 export const projectQueryKeys = {
     all: ['projects'] as const,
     list: (page: number, limit: number) => [...projectQueryKeys.all, 'list', page, limit] as const,
-    userModules: (projectUuid: string) => [...projectQueryKeys.all, 'userModules', projectUuid] as const,
 };
 ```
 
@@ -456,11 +457,11 @@ OAuth hooks are special because success/error comes from popup `postMessage`, no
 ```tsx
 // hooks/api/integrations/useAuthorizeInstagram.ts
 interface UseCreateIntegrationProps {
-    userModuleUuid: string;
+    projectUuid: string;
     provider: IntegrationProvider;
 }
 
-export function useCreateIntegration({ userModuleUuid, provider }: UseCreateIntegrationProps) {
+export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegrationProps) {
     const queryClient = useQueryClient();
 
     const {
@@ -472,14 +473,14 @@ export function useCreateIntegration({ userModuleUuid, provider }: UseCreateInte
     } = useOAuthPopup({
         provider,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(userModuleUuid) });
+            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
         },
     });
 
     const mutation = useMutation({
         mutationFn: async () => {
             const res = await httpClient.post<CreateIntegrationResponse>('/integrations', {
-                userModuleUuid,
+                projectUuid,
                 provider: provider,
             });
             return res.data;
@@ -645,7 +646,9 @@ export default [
     // Protected routes
     layout("routes/protected.tsx", [
         index("routes/home.tsx"),
-        route("library", "routes/library.tsx"),
+        route("tasks", "routes/tasks.tsx"),
+        route("insights", "routes/insights.tsx"),
+        route("insights/posts/:postUuid", "routes/insights.postDetail.tsx"),
     ]),
 ] satisfies RouteConfig;
 ```
@@ -671,36 +674,13 @@ export default function ProtectedLayout() {
 }
 ```
 
-### Module Routing
-
-Modules that have multiple pages use a **module-level router** registered in the module registry. The generic route `modules/:moduleIdentifier/*` renders the module's router, which handles internal sub-routes using React Router's `<Routes>` / `<Route>` pattern.
-
-```tsx
-// modules/socialAnalytics/SocialAnalyticsRouter.tsx
-import { Routes, Route } from "react-router";
-import type { ModuleWidgetProps } from "~/modules/registry";
-import SocialAnalyticsPageView from "./components/SocialAnalyticsPageView";
-import SocialAnalyticsPostDetailPage from "./pages/SocialAnalyticsPostDetailPage";
-
-export default function SocialAnalyticsRouter(props: ModuleWidgetProps) {
-    return (
-        <Routes>
-            <Route index element={<SocialAnalyticsPageView {...props} />} />
-            <Route path="posts/:postUuid" element={<SocialAnalyticsPostDetailPage {...props} />} />
-        </Routes>
-    );
-}
-```
-
-Module page components live in `modules/{moduleName}/pages/` and receive `ModuleWidgetProps`. They extract route params and render the corresponding view component.
-
 ### Conventions
 
 1. **Layout components** for shared UI (sidebar, auth checks)
 2. **Protected routes** wrapped in auth-checking layout
 3. **Redirect to login** if not authenticated
 4. **Show loading** while checking auth state
-5. **Module routers** for modules with multiple pages — registered as `pageView` and `router` in the registry
+5. **Feature routes** are top-level paths under the protected layout (e.g., `/tasks`, `/insights`)
 
 ---
 
@@ -813,165 +793,6 @@ return (
 
 ---
 
-## Feature Modules
-
-Feature modules are self-contained packages that encapsulate all code related to a specific feature (e.g., TodoList). They mirror the backend module structure and are rendered as widgets on the dashboard.
-
-### Module Structure
-
-```
-front/app/modules/
-├── registry.tsx              # Module registry and widget lookup
-├── socialAnalytics/          # Module with multi-page routing
-│   ├── SocialAnalyticsRouter.tsx  # Module router (pageView entry point)
-│   ├── pages/                # Module page components (extract params, render views)
-│   │   └── SocialAnalyticsPostDetailPage.tsx
-│   ├── components/           # Module-specific components
-│   ├── dtos/                 # Module-specific DTOs
-│   ├── hooks/api/            # API hooks for this module
-│   ├── models/               # Module-specific models
-│   └── stores/               # Module-specific Zustand stores
-└── todoList/                 # Simple module (single page)
-    ├── components/           # Module-specific components
-    │   ├── TodoListDashboardView.tsx    # Main widget entry point
-    │   ├── TodoListDashboardContent.tsx # Dashboard content
-    │   ├── todoLists/        # Sub-feature components
-    │   ├── todoListTasks/    # Sub-feature components
-    │   └── todoListTags/     # Sub-feature components
-    ├── dtos/                 # Module-specific DTOs
-    ├── hooks/                # Module-specific hooks
-    │   └── api/              # API hooks for this module
-    │       ├── todoLists/
-    │       ├── todoListTasks/
-    │       └── todoListTags/
-    ├── models/               # Module-specific models
-    │   ├── TodoList.ts
-    │   ├── TodoListTask.ts
-    │   ├── TodoListTag.ts
-    │   └── enums/
-    └── stores/               # Module-specific Zustand stores
-        ├── todoLists/
-        └── todoListTasks/
-```
-
-### Module Registry
-
-The registry maps module identifiers to their component implementations:
-
-```tsx
-import type { ComponentType } from "react";
-import { ModuleIdentifier } from "~/models/enums/ModuleIdentifier";
-import SocialAnalyticsDashboardView from "./socialAnalytics/components/SocialAnalyticsDashboardView";
-import SocialAnalyticsRouter from "./socialAnalytics/SocialAnalyticsRouter";
-import TodoListDashboardView from "./todoList/components/TodoListDashboardView";
-
-export interface ModuleWidgetProps {
-    userModuleUuid: string;
-}
-
-type ModuleWidgetComponent = ComponentType<ModuleWidgetProps>;
-
-interface ModuleRegistryItem {
-    dashboardView: ModuleWidgetComponent;  // Widget for the dashboard grid
-    pageView: ModuleWidgetComponent;       // Full-page view (may be a router)
-    router: ModuleWidgetComponent;         // Module router for sub-routes
-}
-
-const moduleRegistry: Record<ModuleIdentifier, ModuleRegistryItem | null> = {
-    [ModuleIdentifier.TodoList]: {
-        dashboardView: TodoListDashboardView,
-        pageView: TodoListDashboardView,
-        router: TodoListDashboardView,
-    },
-    [ModuleIdentifier.GithubStats]: null,
-    [ModuleIdentifier.Stripe]: null,
-    [ModuleIdentifier.SocialAnalytics]: {
-        dashboardView: SocialAnalyticsDashboardView,
-        pageView: SocialAnalyticsRouter,
-        router: SocialAnalyticsRouter,
-    },
-};
-```
-
-- **`dashboardView`** — Widget component rendered on the dashboard grid
-- **`pageView`** — Full-page component rendered at `/modules/:moduleIdentifier`. For modules with sub-routes, this is the module router.
-- **`router`** — Module router component using `<Routes>`/`<Route>` for internal sub-routing
-
-### Module Widget Entry Point
-
-Each module has a main dashboard view component that receives `userModuleUuid`:
-
-```tsx
-import type { ModuleWidgetProps } from "~/modules/registry";
-
-export default function TodoListDashboardView({ userModuleUuid }: ModuleWidgetProps) {
-    const { todoLists } = useListTodoLists({ userModuleUuid });
-    const { focusedTodoListUuid } = useSelectFocusedTodoList({ todoLists });
-
-    const focusedTodoList = todoLists.find((tl) => tl.uuid === focusedTodoListUuid) ?? null;
-
-    if (todoLists.length === 0 || !focusedTodoList) {
-        return <CreateTodoListModal userModuleUuid={userModuleUuid} />;
-    }
-
-    return <TodoListDashboardContent focusedTodoList={focusedTodoList} />;
-}
-```
-
-### Module Usage in Routes
-
-Modules are rendered dynamically based on user's enabled modules:
-
-```tsx
-export default function Home() {
-    const { userModules } = useListProjectUserModules(focusedProject?.uuid);
-
-    return (
-        <div className="flex flex-row flex-wrap">
-            {userModules
-                .filter((um) => hasModuleWidget(um.module.moduleIdentifier))
-                .map((userModule) => {
-                    const Widget = getModuleWidget(userModule.module.moduleIdentifier);
-                    if (!Widget) return null;
-                    return <Widget key={userModule.uuid} userModuleUuid={userModule.uuid} />;
-                })}
-        </div>
-    );
-}
-```
-
-### Module Conventions
-
-1. **Self-contained** - all module code lives in `modules/{moduleName}/`
-2. **Own models** - module-specific models in `modules/{moduleName}/models/`
-3. **Own hooks** - module-specific API hooks in `modules/{moduleName}/hooks/api/`
-4. **Own stores** - module-specific Zustand stores in `modules/{moduleName}/stores/`
-5. **Own components** - module-specific components in `modules/{moduleName}/components/`
-6. **Widget entry point** - `{ModuleName}DashboardView.tsx` implements `ModuleWidgetProps`
-7. **Module router** - modules with multiple pages use a `{ModuleName}Router.tsx` at the module root, registered as `pageView` and `router`
-8. **Module pages** - page components live in `modules/{moduleName}/pages/`, extract route params and render views
-9. **Register in registry** - add `dashboardView`, `pageView`, and `router` to `moduleRegistry` in `registry.tsx`
-10. **Use relative imports** within module, `~` alias for app-level imports
-11. **API routes** follow pattern: `/modules/{module-name}/...`
-12. **localStorage keys** follow pattern: `app:{module-name}:{key}`
-
-### Module Imports
-
-Within a module, use relative imports for module-specific code:
-
-```tsx
-// Inside modules/todoList/components/TodoListDashboardView.tsx
-import { useListTodoLists } from "../hooks/api/todoLists/useListTodoLists";
-import { TodoList } from "../models/TodoList";
-import { useFocusTodoListStore } from "../stores/todoLists/focusTodoListStore";
-
-// For app-level imports, use ~ alias
-import { httpClient } from "~/services/httpClient/httpClient";
-import { ModalOverlay } from "~/components/ui/ModalOverlay";
-```
-
----
-
 ## Global API Error Handling
 
 ### Architecture
@@ -980,25 +801,25 @@ All mutation errors are caught globally by `MutationCache.onError` in `root.tsx`
 
 ```
 MutationCache.onError (root.tsx)
-  → handleMutationError (apiErrorHandler.ts)
-    → 401? redirect to /login
-    → Other? useToastStore.getState().addToast(...)
-      → ToastContainer renders toasts (auto-dismiss 5s)
+  -> handleMutationError (apiErrorHandler.ts)
+    -> 401? redirect to /login
+    -> Other? useToastStore.getState().addToast(...)
+      -> ToastContainer renders toasts (auto-dismiss 5s)
 ```
 
 ### Files
 
 | File | Purpose |
 |------|---------|
-| `services/apiErrorHandler/apiErrorHandler.ts` | `handleMutationError()` — maps errors to French messages and dispatches toasts |
+| `services/apiErrorHandler/apiErrorHandler.ts` | `handleMutationError()` -- maps errors to French messages and dispatches toasts |
 | `stores/toast/toastStore.ts` | Zustand store managing the toast list |
 | `components/ui/ToastContainer.tsx` | Renders active toasts in a fixed top-right stack |
 
 ### How It Works
 
-1. **401 Unauthorized** → redirects to `/login` via `window.location.href` (hard redirect clears client state). Skips redirect if already on `/login`.
-2. **Other `CustomHttpException`** → maps `statusCode` to a French error message. For 400 and 409, uses the backend message from `error.data.message` if available.
-3. **Unknown errors** → shows a generic "Une erreur est survenue" toast.
+1. **401 Unauthorized** -> redirects to `/login` via `window.location.href` (hard redirect clears client state). Skips redirect if already on `/login`.
+2. **Other `CustomHttpException`** -> maps `statusCode` to a French error message. For 400 and 409, uses the backend message from `error.data.message` if available.
+3. **Unknown errors** -> shows a generic "Une erreur est survenue" toast.
 
 ### Adding Success Toasts
 
@@ -1008,17 +829,17 @@ For success feedback, call `addToast` from `onSuccess` in mutation hooks:
 import { useToastStore } from '~/stores/toast/toastStore'
 
 onSuccess: () => {
-    useToastStore.getState().addToast('success', 'Projet créé avec succès')
+    useToastStore.getState().addToast('success', 'Projet cree avec succes')
     queryClient.invalidateQueries({ queryKey: projectQueryKeys.all })
 }
 ```
 
 ### Conventions
 
-1. **Error toasts are automatic** — do not add per-hook error toast logic
-2. **Success toasts are opt-in** — add them in `onSuccess` callbacks where user feedback is needed
+1. **Error toasts are automatic** -- do not add per-hook error toast logic
+2. **Success toasts are opt-in** -- add them in `onSuccess` callbacks where user feedback is needed
 3. **Use `useToastStore.getState()`** to access the store outside React components (e.g., in callbacks or services)
-4. **Messages are in French** — all user-facing error messages use French
+4. **Messages are in French** -- all user-facing error messages use French
 
 ---
 

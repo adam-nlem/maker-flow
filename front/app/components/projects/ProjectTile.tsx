@@ -8,7 +8,6 @@ import { glass, lorelei, shapes } from '@dicebear/collection';
 interface ProjectTileProps {
   project: Project;
   isSelected?: boolean;
-  moduleCount?: number;
   showCreatedAt?: boolean;
   rightIcon?: ReactNode;
   onHoverRightIcon?: ReactNode;
@@ -18,7 +17,6 @@ interface ProjectTileProps {
 export default function ProjectTile({
   project,
   isSelected = false,
-  moduleCount,
   showCreatedAt = false,
   rightIcon,
   onHoverRightIcon,
@@ -48,10 +46,9 @@ export default function ProjectTile({
         <img src={avatar} alt="Project Avatar" className="rounded-md h-10 w-10 shrink-0" />
         {isExpanded && <div className="flex flex-col">
           <h1 className="text-heading-sm whitespace-nowrap">{project.name}</h1>
-          {showCreatedAt ? (
+          {showCreatedAt && (
             <p className="text-body-xs text-gray whitespace-nowrap">Créé le {formatToFrenchDateShort(project.createdAt)}</p>
-          ) : moduleCount !== undefined ? <p className="text-body-xs whitespace-nowrap">
-            {moduleCount} Module{moduleCount !== 1 ? 's' : ''} Actif{moduleCount !== 1 ? 's' : ''}</p> : null}
+          )}
         </div>}
       </div>
       {isHovered && onHoverRightIcon}

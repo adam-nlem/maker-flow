@@ -11,11 +11,11 @@ interface CreateIntegrationResponse {
 }
 
 interface UseCreateIntegrationProps {
-    userModuleUuid: string;
+    projectUuid: string;
     provider: IntegrationProvider;
 }
 
-export function useCreateIntegration({ userModuleUuid, provider }: UseCreateIntegrationProps) {
+export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegrationProps) {
     const queryClient = useQueryClient();
 
     const {
@@ -27,14 +27,14 @@ export function useCreateIntegration({ userModuleUuid, provider }: UseCreateInte
     } = useOAuthPopup({
         provider,
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(userModuleUuid) });
+            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
         },
     });
 
     const mutation = useMutation({
         mutationFn: async () => {
             const res = await httpClient.post<CreateIntegrationResponse>('/integrations', {
-                userModuleUuid,
+                projectUuid,
                 provider: provider,
             });
             return res.data;
