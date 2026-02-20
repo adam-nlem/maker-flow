@@ -1,5 +1,5 @@
-import { ChartBarIcon, CheckIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentListIcon, Cog6ToothIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SunIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { HomeIcon as HomeIconSolid, ClipboardDocumentListIcon as ClipboardDocumentListIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
+import { ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SunIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { HomeIcon as HomeIconSolid, GlobeEuropeAfricaIcon as GlobeEuropeAfricaIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
@@ -123,16 +123,24 @@ export default function SideBar() {
               onClick={() => navigate('/')}
             />
             <IconWithTextTile
-              icon={location.pathname === '/tasks' ? ClipboardDocumentListIconSolid : ClipboardDocumentListIcon}
-              label="Tâches"
+              icon={location.pathname === '/tasks' ? GlobeEuropeAfricaIconSolid : GlobeEuropeAfricaIcon}
+              label="Veille"
               isExpanded={isExpanded}
               isBold={true}
               isSelected={location.pathname === '/tasks'}
               onClick={() => navigate('/tasks')}
             />
             <IconWithTextTile
+              icon={location.pathname.startsWith('/insights') ? ClipboardDocumentCheckIconSolid : ClipboardDocumentCheckIcon}
+              label="Script"
+              isExpanded={isExpanded}
+              isBold={true}
+              isSelected={location.pathname.startsWith('/insights')}
+              onClick={() => navigate('/insights')}
+            />
+            <IconWithTextTile
               icon={location.pathname.startsWith('/insights') ? ChartBarIconSolid : ChartBarIcon}
-              label="Insights"
+              label="Statistiques"
               isExpanded={isExpanded}
               isBold={true}
               isSelected={location.pathname.startsWith('/insights')}

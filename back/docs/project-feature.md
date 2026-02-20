@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Project feature allows users to create, manage, and organize their projects. Each project belongs to a user and can have multiple associated modules (UserModules). Projects support categorization through types and lifecycle management (finish/reopen).
+The Project feature allows users to create, manage, and organize their projects. Each project belongs to a user and has built-in features (Tasks, Insights) always available. Projects support categorization through types and lifecycle management (finish/reopen).
 
 ---
 
@@ -23,12 +23,10 @@ The Project feature allows users to create, manage, and organize their projects.
 | `updatedAt` | `DateTimeImmutable` | Last update timestamp (UTC, auto-updated) |
 | `finishedAt` | `DateTimeImmutable` | Completion timestamp (nullable) |
 | `user` | `User` | Owner of the project (ManyToOne) |
-| `userModules` | `Collection<UserModule>` | Associated modules (OneToMany) |
 
 **Constraints:**
 - Unique constraint on `(name, user)` combination
 - Cascade delete on user deletion
-- Orphan removal for userModules
 
 **Lifecycle Callbacks:**
 - `@PreUpdate`: Automatically sets `updatedAt` to current UTC time
@@ -176,13 +174,6 @@ The Project feature allows users to create, manage, and organize their projects.
   - `404 Not Found` if project doesn't exist
   - `304 Not Modified` if project already open
 
-#### Get Project User Modules
-- **Route:** `GET /api/projects/{projectUuid}/user-modules`
-- **Name:** `api_projects_get_user_modules`
-- **Response:** `200 OK` with array of user modules
-- **Serialization Group:** `api_project_get_user_modules`
-- **Error:** `404 Not Found` if project doesn't exist
-
 ---
 
 ## Serialization Groups
@@ -195,20 +186,14 @@ The Project feature allows users to create, manage, and organize their projects.
 | `api_project_get_by_uuid` | Show endpoint response |
 | `api_project_finish` | Finish endpoint response |
 | `api_project_reopen` | Reopen endpoint response |
-| `api_project_get_user_modules` | User modules endpoint response |
 
 ---
 
 ## Relationships
 
 ```
-User (1) ──────────── (N) Project
-                           │
-                           │
-Project (1) ───────── (N) UserModule
+User (1) ------------ (N) Project
 ```
 
 - A **User** can have multiple **Projects**
-- A **Project** can have multiple **UserModules**
 - Deleting a User cascades to delete all their Projects
-- Deleting a Project cascades to delete all associated UserModules

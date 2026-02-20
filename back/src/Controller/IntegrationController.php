@@ -14,7 +14,7 @@ use App\Entity\Enum\OAuthCallbackStatus;
 use App\Entity\Enum\OAuthErrorCode;
 use App\Entity\User;
 use App\Repository\IntegrationRepository;
-use App\Repository\UserModuleRepository;
+use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\IntegrationService;
@@ -38,22 +38,22 @@ final class IntegrationController extends AbstractController
     #[Route('', name: 'api_integrations_list', methods: ['GET'])]
     public function list(
         ListIntegrationsQueryParamDTO $queryParamDto,
-        UserModuleRepository $userModuleRepository,
+        ProjectRepository $projectRepository,
         IntegrationRepository $integrationRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $userModule = $userModuleRepository->getByUuidAndUser($queryParamDto->getUserModuleUuid(), $user);
+        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
-        if ($userModule === null) {
+        if ($project === null) {
             return $this->json(
-                data: ["message" => "You don't have any user module with this uuid"],
+                data: ["message" => "You don't have any project with this uuid"],
                 status: Response::HTTP_NOT_FOUND
             );
         }
 
-        $integrations = $integrationRepository->getByUserModule($userModule);
+        $integrations = $integrationRepository->getByProjectAndUser($project, $user);
 
         return $this->json(
             data: $integrations,
@@ -65,7 +65,7 @@ final class IntegrationController extends AbstractController
     #[Route('', name: 'api_integrations_create', methods: ['POST'])]
     public function create(
         CreateIntegrationRequestDTO $dto,
-        UserModuleRepository $userModuleRepository,
+        ProjectRepository $projectRepository,
         IntegrationRepository $integrationRepository,
         RedisStoreService $redisStoreService,
         InstagramOAuthService $instagramOAuthService,
@@ -74,20 +74,20 @@ final class IntegrationController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $userModule = $userModuleRepository->getByUuidAndUser($dto->getUserModuleUuid(), $user);
+        $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
 
-        if ($userModule === null) {
+        if ($project === null) {
             return $this->json(
-                data: ["message" => "You don't have any user module with this uuid"],
+                data: ["message" => "You don't have any project with this uuid"],
                 status: Response::HTTP_NOT_FOUND
             );
         }
 
-        $existingIntegration = $integrationRepository->getOneByUserModuleAndProviderAndStatus($userModule, $dto->getProvider(), IntegrationStatus::Active);
+        $existingIntegration = $integrationRepository->getOneByProjectAndProviderAndStatus($project, $dto->getProvider(), IntegrationStatus::Active);
 
         if ($existingIntegration !== null) {
             return $this->json(
-                data: ["message" => "This user module already has an integration for this provider"],
+                data: ["message" => "This project already has an integration for this provider"],
                 status: Response::HTTP_CONFLICT
             );
         }
@@ -96,7 +96,7 @@ final class IntegrationController extends AbstractController
 
         $stateModel = new IntegrationStateRedisDTO(
             $user->getUuid(),
-            $userModule->getUuid(),
+            $project->getUuid(),
             $dto->getProvider(),
         );
 
@@ -125,7 +125,7 @@ final class IntegrationController extends AbstractController
         IntegrationProvider $integrationProvider,
         InstagramCallbackQueryParamDTO $queryParamDto,
         UserRepository $userRepository,
-        UserModuleRepository $userModuleRepository,
+        ProjectRepository $projectRepository,
         RedisStoreService $redisStoreService,
         InstagramOAuthService $instagramOAuthService,
         YoutubeOAuthService $youtubeOAuthService,
@@ -162,16 +162,16 @@ final class IntegrationController extends AbstractController
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::UserNotFound);
         }
 
-        $userModule = $userModuleRepository->getByUuidAndUser($stateModel->getUserModuleUuid(), $user);
+        $project = $projectRepository->getByUuidAndUser($stateModel->getProjectUuid(), $user);
 
-        if ($userModule === null) {
+        if ($project === null) {
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::UserNotFound);
         }
 
         try {
             $integration = match ($integrationProvider) {
-                IntegrationProvider::Instagram => $instagramOAuthService->handleCallback($code, $user, $userModule),
-                IntegrationProvider::Youtube => $youtubeOAuthService->handleCallback($code, $user, $userModule),
+                IntegrationProvider::Instagram => $instagramOAuthService->handleCallback($code, $user, $project),
+                IntegrationProvider::Youtube => $youtubeOAuthService->handleCallback($code, $user, $project),
             };
 
             $redisStoreService->delete(

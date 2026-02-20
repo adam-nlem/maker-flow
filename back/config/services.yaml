@@ -7,7 +7,6 @@ parameters:
     app.domain: "%env(string:APP_DOMAIN)%"
     app.frontend_url: "%env(string:FRONTEND_URL)%"
 
-    app.module.icon_path: "%kernel.project_dir%/private/uploads/module/icon"
     app.integration.provider.icon_path: "%kernel.project_dir%/private/uploads/integration/provider/icon"
 
     app.instagram.graph_url: "https://graph.instagram.com"
@@ -50,9 +49,6 @@ services:
     App\Service\Cookie\CookieService:
         arguments:
             $appDomain: "%app.domain%"
-    App\Service\Module\ModuleService:
-        arguments:
-            $moduleIconPath: "%app.module.icon_path%"
     App\Service\RedisStore\RedisStoreService:
         arguments:
             $scheme: "%app.redis_store.scheme%"

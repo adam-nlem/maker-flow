@@ -3,8 +3,6 @@
 namespace App\Entity;
 
 use App\Helper\DateHelper;
-use App\Module\TodoList\Entity\TodoListTag;
-use App\Module\TodoList\Entity\TodoListTask;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -69,12 +67,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private Collection $integrations;
 
     /**
-     * @var Collection<int, UserModule>
-     */
-    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $userModules;
-
-    /**
      * @var Collection<int, Project>
      */
     #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
@@ -94,7 +86,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         $this->tokens = new ArrayCollection();
         $this->integrations = new ArrayCollection();
-        $this->userModules = new ArrayCollection();
         $this->projects = new ArrayCollection();
     }
 
@@ -259,36 +250,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             // set the owning side to null (unless already changed)
             if ($integration->getUser() === $this) {
                 $integration->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, UserModule>
-     */
-    public function getUserModules(): Collection
-    {
-        return $this->userModules;
-    }
-
-    public function addUserModule(UserModule $userModule): static
-    {
-        if (!$this->userModules->contains($userModule)) {
-            $this->userModules->add($userModule);
-            $userModule->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserModule(UserModule $userModule): static
-    {
-        if ($this->userModules->removeElement($userModule)) {
-            // set the owning side to null (unless already changed)
-            if ($userModule->getUser() === $this) {
-                $userModule->setUser(null);
             }
         }
 

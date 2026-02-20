@@ -8,7 +8,7 @@ class IntegrationStateRedisDTO
 {
     public function __construct(
         private readonly string $userUuid,
-        private readonly string $userModuleUuid,
+        private readonly string $projectUuid,
         private readonly IntegrationProvider $provider,
     ) {}
 
@@ -18,7 +18,7 @@ class IntegrationStateRedisDTO
 
         return new self(
             userUuid: $data['userUuid'],
-            userModuleUuid: $data['userModuleUuid'],
+            projectUuid: $data['projectUuid'],
             provider: IntegrationProvider::from($data['provider']),
         );
     }
@@ -27,7 +27,7 @@ class IntegrationStateRedisDTO
     {
         return json_encode([
             'userUuid' => $this->userUuid,
-            'userModuleUuid' => $this->userModuleUuid,
+            'projectUuid' => $this->projectUuid,
             'provider' => $this->provider->value,
         ]);
     }
@@ -37,9 +37,9 @@ class IntegrationStateRedisDTO
         return $this->userUuid;
     }
 
-    public function getUserModuleUuid(): string
+    public function getProjectUuid(): string
     {
-        return $this->userModuleUuid;
+        return $this->projectUuid;
     }
 
     public function getProvider(): IntegrationProvider

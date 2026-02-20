@@ -6,8 +6,6 @@ use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\IntegrationStatus;
 use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -81,11 +79,9 @@ class Integration
     #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?IntegrationStatus $status = null;
 
-    /**
-     * @var Collection<int, UserModule>
-     */
-    #[ORM\ManyToMany(targetEntity: UserModule::class, mappedBy: 'integrations')]
-    private Collection $userModules;
+    #[ORM\ManyToOne(inversedBy: 'integrations')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Project $project = null;
 
     public function __construct()
     {
@@ -96,8 +92,6 @@ class Integration
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
-
-        $this->userModules = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -303,29 +297,14 @@ class Integration
         return $this;
     }
 
-    /**
-     * @return Collection<int, UserModule>
-     */
-    public function getUserModules(): Collection
+    public function getProject(): ?Project
     {
-        return $this->userModules;
+        return $this->project;
     }
 
-    public function addUserModule(UserModule $userModule): static
+    public function setProject(?Project $project): static
     {
-        if (!$this->userModules->contains($userModule)) {
-            $this->userModules->add($userModule);
-            $userModule->addIntegration($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserModule(UserModule $userModule): static
-    {
-        if ($this->userModules->removeElement($userModule)) {
-            $userModule->removeIntegration($this);
-        }
+        $this->project = $project;
 
         return $this;
     }

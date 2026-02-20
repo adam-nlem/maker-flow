@@ -45,24 +45,24 @@ This document describes the backend OAuth integration system used in MakerFlow f
 
 ### Backend Step-by-Step Flow
 
-1. **Frontend requests integration creation** - `POST /api/integrations` with `userModuleUuid` and `provider`
-2. **Validate userModule** - Check userModule exists and belongs to user
-3. **Check existing Active integration** - Return 409 Conflict if userModule already has an **Active** integration for this provider (revoked integrations are ignored, enabling re-auth)
+1. **Frontend requests integration creation** - `POST /api/integrations` with `projectUuid` and `provider`
+2. **Validate project** - Check project exists and belongs to user
+3. **Check existing Active integration** - Return 409 Conflict if project already has an **Active** integration for this provider (revoked integrations are ignored, enabling re-auth)
 4. **Generate state** - Random token `bin2hex(random_bytes(16))`
-5. **Store state in Redis** - Key: `INTEGRATION/STATE/{state}`, Value: JSON with userUuid, userModuleUuid, provider, TTL: 5 min
+5. **Store state in Redis** - Key: `INTEGRATION/STATE/{state}`, Value: JSON with userUuid, projectUuid, provider, TTL: 5 min
 6. **Return OAuth URL** - Provider-specific authorization URL with state
 7. **Provider redirects to callback** - `GET /api/integrations/callback?code=xxx&state=xxx`
-8. **Validate state** - Check Redis for matching state, extract userModuleUuid and provider, delete after use
+8. **Validate state** - Check Redis for matching state, extract projectUuid and provider, delete after use
 9. **Exchange code for tokens** - Provider-specific token exchange
 10. **Fetch user profile** - Provider-specific profile fetch
 11. **Create/update Integration entity** - Store in database
-12. **Link integration to userModule** - Add integration to userModule's integrations collection
+12. **Link integration to project** - Associate integration with the project
 13. **Redirect to frontend callback** - `/integrations/callback?status=success&provider={provider}&integrationUuid=xxx`
 
 ### Business Rules
 
-- **One Active integration per provider per userModule** - A userModule can only have one Active integration for each provider (e.g., one Instagram account per Social Analytics widget). Revoked integrations don't block creating a new one (re-auth flow).
-- **Same integration can be linked to multiple userModules** - The same Instagram account can be used in different projects
+- **One Active integration per provider per project** - A project can only have one Active integration for each provider (e.g., one Instagram account per project). Revoked integrations don't block creating a new one (re-auth flow).
+- **Same integration can be linked to multiple projects** - The same Instagram account can be used in different projects
 
 ---
 
@@ -151,14 +151,14 @@ The `Integration` entity stores connected external accounts and their OAuth toke
 ### Relationships
 
 - **User** - `ManyToOne` - Each integration belongs to one user
-- **UserModules** - `ManyToMany` - Integration can be linked to multiple user modules
+- **Projects** - `ManyToMany` - Integration can be linked to multiple projects
 
-### Usage in SocialAnalytics Module
+### Usage in Insights Feature
 
-The `Integration` entity acts as a profile entity. Related entities now reference `Integration` directly:
+The `Integration` entity acts as a profile entity. Related entities reference `Integration` directly:
 
-- `SocialAnalyticsPost` → `ManyToOne` → `Integration`
-- `SocialAnalyticsInsights` → `ManyToOne` → `Integration`
+- `Post` -> `ManyToOne` -> `Integration`
+- `PostInsight` -> `ManyToOne` -> `Integration`
 
 ---
 
@@ -320,7 +320,7 @@ class IntegrationStateRedisDTO
 {
     public function __construct(
         private readonly string $userUuid,
-        private readonly string $userModuleUuid,
+        private readonly string $projectUuid,
         private readonly IntegrationProvider $provider,
     ) {}
 
@@ -349,7 +349,7 @@ POST /api/integrations
 **Request Body:**
 ```json
 {
-    "userModuleUuid": "uuid-of-user-module",
+    "projectUuid": "uuid-of-project",
     "provider": "instagram"
 }
 ```
@@ -364,7 +364,7 @@ POST /api/integrations
 **Error Response (409 Conflict):**
 ```json
 {
-    "message": "This user module already has an integration for this provider"
+    "message": "This project already has an integration for this provider"
 }
 ```
 
@@ -379,10 +379,10 @@ Redirects to: `/integrations/callback?status=success&provider={provider}&integra
 ### List Integrations
 
 ```
-GET /api/integrations?userModuleUuid=xxx
+GET /api/integrations?projectUuid=xxx
 ```
 
-**Response:** Flat array of integrations (one per provider per userModule, **all statuses** — Active, Revoked, etc.). The frontend uses the `status` field to decide how to render each integration.
+**Response:** Flat array of integrations (one per provider per project, **all statuses** -- Active, Revoked, etc.). The frontend uses the `status` field to decide how to render each integration.
 
 ### Show Integration
 
@@ -449,8 +449,8 @@ $authorizationUrl = match ($dto->getProvider()) {
 
 // In IntegrationController::callback()
 $integration = match ($provider) {
-    IntegrationProvider::Instagram => $this->instagramOAuthService->handleCallback($code, $user, $userModule),
-    IntegrationProvider::TikTok => $this->tiktokOAuthService->handleCallback($code, $user, $userModule),
+    IntegrationProvider::Instagram => $this->instagramOAuthService->handleCallback($code, $user, $project),
+    IntegrationProvider::TikTok => $this->tiktokOAuthService->handleCallback($code, $user, $project),
 };
 ```
 
@@ -460,7 +460,7 @@ The generic `IntegrationStateRedisDTO` is already used for all providers:
 
 ```php
 // DTO/Redis/Integration/IntegrationStateRedisDTO.php
-// Already handles all providers via the provider property
+// Already handles all providers via the provider and projectUuid properties
 ```
 
 ### 2. Environment Variables
@@ -494,9 +494,9 @@ When an OAuth token is revoked (user revokes access in provider settings, token 
 2. **Handler catches + logs** — The message handler catches the exception, logs it, and the worker continues processing other integrations
 3. **Commands skip revoked** — On next cron run, commands use status-filtered repository queries (`getByProviderAndStatus`, `getByProvidersNotSyncedSinceAndStatus`) with `IntegrationStatus::Active`, so revoked integrations are not dispatched
 4. **Frontend shows revoked state** — The list endpoint (`GET /api/integrations`) returns integrations of all statuses. The frontend card shows a "Déconnecté" pill and "Reconnecter" button for revoked integrations
-5. **User clicks "Reconnecter"** — Triggers `POST /api/integrations` which checks for Active-only conflicts via `getOneByUserModuleAndProviderAndStatus(..., Active)`. Since the existing integration is `Revoked`, the check passes and the OAuth popup opens
-6. **User authorizes** — Provider redirects to callback, `handleCallback` finds the existing integration by `accountId`, calls `updateIntegrationToken` which resets the status to `Active` and updates tokens
-7. **Frontend updates** — React Query invalidation refreshes the integration list, card updates to Active state with fresh data
+5. **User clicks "Reconnecter"** -- Triggers `POST /api/integrations` which checks for Active-only conflicts via `getOneByProjectAndProviderAndStatus(..., Active)`. Since the existing integration is `Revoked`, the check passes and the OAuth popup opens
+6. **User authorizes** -- Provider redirects to callback, `handleCallback` finds the existing integration by `accountId`, calls `updateIntegrationToken` which resets the status to `Active` and updates tokens
+7. **Frontend updates** -- React Query invalidation refreshes the integration list, card updates to Active state with fresh data
 
 ### Key Design Decisions
 

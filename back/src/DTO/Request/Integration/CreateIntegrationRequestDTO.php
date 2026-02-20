@@ -11,7 +11,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CreateIntegrationRequestDTO extends AbstractRequestDTO
 {
     #[Assert\NotBlank]
-    private string $userModuleUuid;
+    private string $projectUuid;
 
     #[Assert\NotBlank]
     private IntegrationProvider $provider;
@@ -25,7 +25,7 @@ class CreateIntegrationRequestDTO extends AbstractRequestDTO
 
     public function fromPayload(array $payload)
     {
-        $this->userModuleUuid = $payload["userModuleUuid"];
+        $this->projectUuid = $payload["projectUuid"];
         $this->provider = IntegrationProvider::from($payload["provider"]);
     }
 
@@ -34,9 +34,9 @@ class CreateIntegrationRequestDTO extends AbstractRequestDTO
         return null;
     }
 
-    public function getUserModuleUuid(): string
+    public function getProjectUuid(): string
     {
-        return $this->userModuleUuid;
+        return $this->projectUuid;
     }
 
     public function getProvider(): IntegrationProvider

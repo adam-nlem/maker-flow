@@ -8,7 +8,7 @@ This feature provides a paginated endpoint to list all posts for an integration 
 
 ## Endpoint
 
-**GET** `/api/modules/social-analytics/posts`
+**GET** `/api/posts`
 
 ### Query Parameters
 
@@ -86,24 +86,24 @@ Controller
 ## Files
 
 ```
-src/Module/SocialAnalytics/
+src/
 ├── Controller/
-│   └── SocialAnalyticsPostController.php          # list() endpoint
+│   └── PostController.php          # list() endpoint
 ├── DTO/
 │   ├── QueryParam/
 │   │   └── Post/
-│   │       └── ListSocialAnalyticsPostsQueryParamDTO.php
+│   │       └── ListPostsQueryParamDTO.php
 │   └── Response/
-│       └── SocialAnalyticsPost/
-│           ├── SocialAnalyticsPostInsightWithEvolutionDTO.php
-│           └── SocialAnalyticsPostWithInsightsDTO.php
+│       └── Post/
+│           ├── PostInsightWithEvolutionDTO.php
+│           └── PostWithInsightsDTO.php
 ├── Helper/
 │   └── InsightEvolutionHelper.php                 # Shared evolution calculation logic
 ├── Repository/
-│   ├── SocialAnalyticsPostRepository.php          # getByUserAndIntegrationAndPublishedAfterPaginated()
-│   └── SocialAnalyticsPostInsightRepository.php   # getLatestByPostsAndTimePeriod()
+│   ├── PostRepository.php          # getByUserAndIntegrationAndPublishedAfterPaginated()
+│   └── PostInsightRepository.php   # getLatestByPostsAndTimePeriod()
 └── Service/
-    └── SocialAnalyticsPostService.php             # getPostsWithInsights()
+    └── PostService.php             # getPostsWithInsights()
 ```
 
 ---
@@ -117,4 +117,4 @@ src/Module/SocialAnalytics/
 
 - Posts are filtered by `publishedAt >= now - 365 days` (hardcoded `LastYear` period) and sorted by `publishedAt` DESC (most recent first)
 - Only the latest insight value per type within the time period is returned
-- The `InsightEvolutionHelper` and `InsightHelper` are shared with `SocialAnalyticsIntegrationInsightService` and `SocialAnalyticsPostInsightService` to avoid code duplication
+- The `InsightEvolutionHelper` and `InsightHelper` are shared with `IntegrationInsightService` and `PostInsightService` to avoid code duplication

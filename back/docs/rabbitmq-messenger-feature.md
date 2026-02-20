@@ -74,14 +74,14 @@ Messages are routed via the `#[AsMessage('async')]` attribute on each message cl
 
 ### Creating a Message
 
-Messages are simple PHP classes that hold data. Place them in `src/Module/{ModuleName}/Message/`.
+Messages are simple PHP classes that hold data. Place them in `src/Message/`.
 
 Use the `#[AsMessage('async')]` attribute to automatically route messages to the async transport:
 
 ```php
 <?php
 
-namespace App\Module\SocialAnalytics\Message;
+namespace App\Message;
 
 use Symfony\Component\Messenger\Attribute\AsMessage;
 
@@ -103,15 +103,15 @@ This eliminates the need to manually add routing entries in `messenger.yaml`.
 
 ### Creating a Message Handler
 
-Handlers process messages. Place them in `src/Module/{ModuleName}/Message/Handler/`:
+Handlers process messages. Place them in `src/Message/Handler/`:
 
 ```php
 <?php
 
-namespace App\Module\SocialAnalytics\Message\Handler;
+namespace App\Message\Handler;
 
-use App\Module\SocialAnalytics\Message\FetchIntegrationInsightsMessage;
-use App\Module\SocialAnalytics\Service\SocialAnalyticsIntegrationInsightService;
+use App\Message\FetchIntegrationInsightsMessage;
+use App\Service\IntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -120,7 +120,7 @@ class FetchIntegrationInsightsHandler
 {
     public function __construct(
         private readonly IntegrationRepository $integrationRepository,
-        private readonly SocialAnalyticsIntegrationInsightService $integrationInsightService,
+        private readonly IntegrationInsightService $integrationInsightService,
     ) {}
 
     public function __invoke(FetchIntegrationInsightsMessage $message): void
@@ -274,17 +274,15 @@ back/
 │   └── packages/
 │       └── messenger.yaml              # Messenger configuration
 └── src/
-    └── Module/
-        └── SocialAnalytics/
-            ├── Command/
-            │   ├── FetchIntegrationInsightsCommand.php
-            │   └── FetchPostInsightsCommand.php
-            └── Message/
-                ├── FetchIntegrationInsightsMessage.php
-                ├── FetchPostInsightsMessage.php
-                └── Handler/
-                    ├── FetchIntegrationInsightsHandler.php
-                    └── FetchPostInsightsHandler.php
+    ├── Command/
+    │   ├── FetchIntegrationInsightsCommand.php
+    │   └── FetchPostInsightsCommand.php
+    └── Message/
+        ├── FetchIntegrationInsightsMessage.php
+        ├── FetchPostInsightsMessage.php
+        └── Handler/
+            ├── FetchIntegrationInsightsHandler.php
+            └── FetchPostInsightsHandler.php
 ```
 
 

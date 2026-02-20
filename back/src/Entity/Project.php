@@ -105,10 +105,16 @@ class Project
     private ?User $user = null;
 
     /**
-     * @var Collection<int, UserModule>
+     * @var Collection<int, TodoList>
      */
-    #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $userModules;
+    #[ORM\OneToMany(targetEntity: TodoList::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $todoLists;
+
+    /**
+     * @var Collection<int, Integration>
+     */
+    #[ORM\OneToMany(targetEntity: Integration::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $integrations;
 
     public function __construct()
     {
@@ -119,7 +125,8 @@ class Project
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
-        $this->userModules = new ArrayCollection();
+        $this->todoLists = new ArrayCollection();
+        $this->integrations = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -233,32 +240,18 @@ class Project
     }
 
     /**
-     * @return Collection<int, UserModule>
+     * @return Collection<int, TodoList>
      */
-    public function getUserModules(): Collection
+    public function getTodoLists(): Collection
     {
-        return $this->userModules;
+        return $this->todoLists;
     }
 
-    public function addUserModule(UserModule $userModule): static
+    /**
+     * @return Collection<int, Integration>
+     */
+    public function getIntegrations(): Collection
     {
-        if (!$this->userModules->contains($userModule)) {
-            $this->userModules->add($userModule);
-            $userModule->setProject($this);
-        }
-
-        return $this;
-    }
-
-    public function removeUserModule(UserModule $userModule): static
-    {
-        if ($this->userModules->removeElement($userModule)) {
-            // set the owning side to null (unless already changed)
-            if ($userModule->getProject() === $this) {
-                $userModule->setProject(null);
-            }
-        }
-
-        return $this;
+        return $this->integrations;
     }
 }

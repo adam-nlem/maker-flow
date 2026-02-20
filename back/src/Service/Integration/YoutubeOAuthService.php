@@ -7,12 +7,11 @@ use App\DTO\External\Youtube\YoutubeTokenDTO;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
+use App\Entity\Project;
 use App\Entity\User;
-use App\Entity\UserModule;
 use App\Event\IntegrationCreatedEvent;
 use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
-use App\Repository\UserModuleRepository;
 use App\Service\Integration\Exception\OAuthTokenRevokedException;
 use Google\Client;
 use Google\Service\YouTube;
@@ -24,7 +23,6 @@ class YoutubeOAuthService
     public function __construct(
         private readonly Client $googleClient,
         private readonly IntegrationRepository $integrationRepository,
-        private readonly UserModuleRepository $userModuleRepository,
         private readonly EventDispatcherInterface $eventDispatcher,
         private readonly string $youtubeClientId,
         private readonly string $youtubeProjectId,
@@ -186,7 +184,7 @@ class YoutubeOAuthService
     public function handleCallback(
         string $code,
         User $user,
-        UserModule $userModule,
+        Project $project,
     ): Integration {
         $this->configureGoogleClient();
 
@@ -209,8 +207,8 @@ class YoutubeOAuthService
             $integration = $this->createIntegration($user, $tokenDTO, $channelData);
         }
 
-        $userModule->addIntegration($integration);
-        $this->userModuleRepository->save($userModule, true);
+        $integration->setProject($project);
+        $this->integrationRepository->save($integration, true);
 
         if ($existingIntegration === null) {
             $this->eventDispatcher->dispatch(new IntegrationCreatedEvent($integration), IntegrationCreatedEvent::NAME);

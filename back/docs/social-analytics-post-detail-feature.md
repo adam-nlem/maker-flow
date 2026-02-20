@@ -13,7 +13,7 @@ The system stores insight data points but skips storage when the value is unchan
 
 ## Endpoint
 
-`GET /api/modules/social-analytics/post-insights/detail?postUuid={uuid}`
+`GET /api/post-insights/detail?postUuid={uuid}`
 
 ### Response
 
@@ -55,15 +55,15 @@ The system stores insight data points but skips storage when the value is unchan
 
 ### Serialization Group
 
-`api_modules_social_analytics_post_insights_detail`
+`api_post_insights_detail`
 
 ## Architecture
 
 ### Service
 
-`SocialAnalyticsPostInsightService::getDetail(User, SocialAnalyticsPost)`
+`PostInsightService::getDetail(User, Post)`
 
-The detail logic lives in `SocialAnalyticsPostInsightService` alongside the Instagram fetch logic.
+The detail logic lives in `PostInsightService` alongside the Instagram fetch logic.
 
 **Algorithm** (5 DB queries, rest in-memory):
 1. Get latest insight per type via `getLatestByPostGroupedByType` (DB-level dedup using `MAX(id) GROUP BY type`)
@@ -78,18 +78,18 @@ The detail logic lives in `SocialAnalyticsPostInsightService` alongside the Inst
 8. Build ranking (current post + up to 9 previous posts):
    - Fetch latest insights per type per post via `getLatestByPostIdsGroupedByPostAndType` (1 DB query)
    - Calculate a combined score per post using weighted coefficients: Views (0.30), Reach (0.25), TotalInteractions (0.25), AverageWatchTime (0.10), TotalWatchTime (0.10)
-   - Sort descending by score and return as flat list of `SocialAnalyticsPostRankingItemDTO`
+   - Sort descending by score and return as flat list of `PostRankingItemDTO`
 
 ### Repository Methods
 
-**`SocialAnalyticsPostInsightRepository`:**
-- `getLatestByPostGroupedByType(SocialAnalyticsPost)` — one insight per type (most recent), DB-level dedup
-- `getByPostAndTypes(SocialAnalyticsPost, array)` — all insights for a post filtered by types, ordered by `createdAt ASC`
+**`PostInsightRepository`:**
+- `getLatestByPostGroupedByType(Post)` — one insight per type (most recent), DB-level dedup
+- `getByPostAndTypes(Post, array)` — all insights for a post filtered by types, ordered by `createdAt ASC`
 - `getByPostIdsAndTypes(array, array)` — all insights for multiple posts filtered by types, ordered by `createdAt ASC`
-- `getLatestByPostGroupedByTypeBeforeDate(SocialAnalyticsPost, DateTimeImmutable, array)` — one insight per type (most recent before a date), DB-level dedup, for evolution comparison
+- `getLatestByPostGroupedByTypeBeforeDate(Post, DateTimeImmutable, array)` — one insight per type (most recent before a date), DB-level dedup, for evolution comparison
 - `getLatestByPostIdsGroupedByPostAndType(array)` — one insight per type per post (most recent) for multiple posts, DB-level dedup, for ranking score calculation
 
-**`SocialAnalyticsPostRepository`:**
+**`PostRepository`:**
 - `getByUserAndIntegrationAndPublishedBeforeLimited(User, Integration, DateTimeImmutable, int)` — N posts published before a date
 - `getSingleByIntegrationAndPublishedBeforeDate(Integration, DateTimeImmutable)` — single previous post for evolution
 
@@ -97,12 +97,12 @@ The detail logic lives in `SocialAnalyticsPostInsightService` alongside the Inst
 
 | DTO | Purpose |
 |-----|---------|
-| `ShowSocialAnalyticsPostInsightDetailResponseDTO` | Main response DTO — contains nested `post` (SocialAnalyticsPost), `insightsWithEvolution`, engagement rates, timelines, and ranking |
-| `SocialAnalyticsPostInsightWithEvolutionDTO` | Wraps a `SocialAnalyticsPostInsight` entity with `evolutionPercentage` |
-| `SocialAnalyticsPostInsightTimelineDTO` | Timeline for one insight type |
-| `SocialAnalyticsPostInsightTimelinePointDTO` | Single data point (hours, value, averageValue) |
-| `SocialAnalyticsPostRankingItemDTO` | Ranking entry wrapping a `SocialAnalyticsPost` and a combined `score` |
-| `ShowSocialAnalyticsPostInsightDetailQueryParamDTO` | Query parameter (`postUuid`) |
+| `ShowPostInsightDetailResponseDTO` | Main response DTO — contains nested `post` (Post), `insightsWithEvolution`, engagement rates, timelines, and ranking |
+| `PostInsightWithEvolutionDTO` | Wraps a `PostInsight` entity with `evolutionPercentage` |
+| `PostInsightTimelineDTO` | Timeline for one insight type |
+| `PostInsightTimelinePointDTO` | Single data point (hours, value, averageValue) |
+| `PostRankingItemDTO` | Ranking entry wrapping a `Post` and a combined `score` |
+| `ShowPostInsightDetailQueryParamDTO` | Query parameter (`postUuid`) |
 
 ### Shared Helpers
 
@@ -114,7 +114,7 @@ The detail logic lives in `SocialAnalyticsPostInsightService` alongside the Inst
 
 ## Cleanup Notes
 
-- **Stub controller methods removed**: `SocialAnalyticsPostInsightController` previously had unimplemented stub methods (`list`, `create`, `show`, `update`, `delete`) that exposed reachable API routes returning `null`/`200`. These were removed, keeping only the implemented `detail` endpoint.
-- **`SocialAnalyticsPostController`** stubs (`create`, `show`, `update`, `delete`) were also removed — only `list` and `getThumbnail` remain.
-- **Null safety**: `SocialAnalyticsPostService::getPostsWithInsights` now uses null-safe operator (`?->`) when accessing `$totalFollowers->getValue()`, preventing crashes when no TotalFollowers insight exists for an integration.
+- **Stub controller methods removed**: `PostInsightController` previously had unimplemented stub methods (`list`, `create`, `show`, `update`, `delete`) that exposed reachable API routes returning `null`/`200`. These were removed, keeping only the implemented `detail` endpoint.
+- **`PostController`** stubs (`create`, `show`, `update`, `delete`) were also removed — only `list` and `getThumbnail` remain.
+- **Null safety**: `PostService::getPostsWithInsights` now uses null-safe operator (`?->`) when accessing `$totalFollowers->getValue()`, preventing crashes when no TotalFollowers insight exists for an integration.
 - **All controllers marked `final`** per coding style conventions.

@@ -10,23 +10,21 @@ This document describes the coding conventions, patterns, and best practices use
 
 ```
 back/src/
+├── Command/             # CLI commands
 ├── Controller/          # API Controllers
 ├── DTO/                 # Data Transfer Objects
 │   ├── External/        # External API response DTOs
-│   │   └── [Provider]/  # Provider-specific (Instagram, TikTok, etc.)
+│   │   └── [Provider]/  # Provider-specific (Instagram, YouTube, etc.)
 │   ├── QueryParam/      # Query parameter DTOs
 │   ├── Request/         # Request body DTOs
 │   └── Response/        # Response DTOs
 ├── Entity/              # Doctrine entities
 │   └── Enum/            # PHP enums
+├── Event/               # Domain events
+├── EventSubscriber/     # Event subscribers
 ├── Helper/              # Static helper classes
-├── Module/              # Feature modules (self-contained)
-│   └── [ModuleName]/
-│       ├── Controller/
-│       ├── DTO/
-│       ├── Entity/
-│       ├── Repository/
-│       └── Service/
+├── Message/             # Async messages
+│   └── Handler/         # Message handlers
 ├── Repository/          # Doctrine repositories
 ├── Security/            # Authentication/Authorization
 └── Service/             # Business logic services
@@ -40,16 +38,16 @@ back/src/
 
 | Type | Convention | Example |
 |------|------------|---------|
-| Controller | `{Resource}Controller` | `ProjectController`, `UserController` |
-| Entity | Singular noun | `Project`, `User`, `TodoList` |
-| Repository | `{Entity}Repository` | `ProjectRepository`, `UserRepository` |
-| Service | `{Domain}Service` | `ModuleService`, `CookieService` |
+| Controller | `{Resource}Controller` | `ProjectController`, `UserController`, `PostController` |
+| Entity | Singular noun | `Project`, `User`, `TodoList`, `Post`, `PostInsight` |
+| Repository | `{Entity}Repository` | `ProjectRepository`, `PostRepository` |
+| Service | `{Domain}Service` | `IntegrationInsightService`, `CookieService` |
 | Request DTO | `{Action}{Resource}RequestDTO` | `CreateProjectRequestDTO`, `UpdateProjectRequestDTO` |
 | Response DTO | `{Action}{Resource}ResponseDTO` | `AuthorizeInstagramIntegrationResponseDTO` |
 | QueryParam DTO | `{Action}{Resource}QueryParamDTO` | `ListProjectsQueryParamDTO` |
 | External DTO | `{Provider}{DataType}DTO` | `InstagramTokenDTO`, `InstagramUserProfileDTO` |
 | Enum | Singular noun | `ProjectType`, `Color`, `TodoListStatus` |
-| Helper | `{Domain}Helper` | `DateHelper` |
+| Helper | `{Domain}Helper` | `DateHelper`, `InsightEvolutionHelper` |
 | Exception | `{Name}Exception` | `CustomValidationException`, `IconNotFoundException` |
 
 ### Methods
@@ -67,10 +65,10 @@ back/src/
 
 | Type | Convention | Example |
 |------|------------|---------|
-| Entity instances | camelCase singular | `$project`, `$user`, `$todoList` |
-| Collections | camelCase plural | `$projects`, `$users`, `$todoLists` |
+| Entity instances | camelCase singular | `$project`, `$user`, `$todoList`, `$post` |
+| Collections | camelCase plural | `$projects`, `$users`, `$todoLists`, `$posts` |
 | DTOs | `$dto` or `$queryParamDto` | `$dto`, `$queryParamDto` |
-| UUIDs in routes | `{resource}Uuid` | `$projectUuid`, `$todoListUuid` |
+| UUIDs in routes | `{resource}Uuid` | `$projectUuid`, `$todoListUuid`, `$postUuid` |
 
 ---
 
@@ -159,83 +157,16 @@ if ($project === null) {
 }
 ```
 
----
+### Route Examples
 
-## Module Controllers
-
-Module controllers follow the same conventions as regular controllers but with specific naming patterns for routes.
-
-### Structure
-
-```php
-<?php
-
-namespace App\Module\TodoList\Controller;
-
-use App\Entity\User;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\Routing\Annotation\Route;
-
-#[Route('/api/modules/todo-lists')]
-class TodoListController extends AbstractController
-{
-    #[Route('', name: 'api_modules_todo_lists_list', methods: ['GET'])]
-    public function list()
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-    }
-
-    #[Route('', name: 'api_modules_todo_lists_create', methods: ['POST'])]
-    public function create()
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-    }
-
-    #[Route('/{todoListUuid}', name: 'api_modules_todo_lists_show', methods: ['GET'])]
-    public function show(string $todoListUuid)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-    }
-
-    #[Route('/{todoListUuid}', name: 'api_modules_todo_lists_update', methods: ['PATCH'])]
-    public function update(string $todoListUuid)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-    }
-
-    #[Route('/{todoListUuid}', name: 'api_modules_todo_lists_delete', methods: ['DELETE'])]
-    public function delete(string $todoListUuid)
-    {
-        /** @var User $user */
-        $user = $this->getUser();
-    }
-}
-```
-
-### Module Controller Conventions
-
-1. **Base route** follows pattern: `/api/modules/{module-name}/{resource-plural}`
-   - Example: `/api/modules/todo-lists`, `/api/modules/social-analytics/profiles`
-2. **Route names** follow pattern: `api_modules_{module}_{resource_plural}_{action}`
-   - Example: `api_modules_todo_lists_list`, `api_modules_social_analytics_profiles_create`
-3. **No route name prefix** on class-level `#[Route]` attribute
-4. **Full route names** on each method (not using prefix concatenation)
-5. **UUID parameters** use resource name: `{resourceUuid}` (e.g., `{todoListUuid}`, `{profileUuid}`)
-6. **Resource paths** use plural form with kebab-case (e.g., `todo-lists`, `post-groups`, `metric-logs`)
-
-### Route Name Examples
-
-| Module | Resource | Action | Route Name |
-|--------|----------|--------|------------|
-| TodoList | TodoList | list | `api_modules_todo_lists_list` |
-| TodoList | TodoList | create | `api_modules_todo_lists_create` |
-| TodoList | TodoListTask | list | `api_modules_todo_lists_tasks_list` |
-| SocialAnalytics | Profile | list | `api_modules_social_analytics_profiles_list` |
-| SocialAnalytics | PostGroup | create | `api_modules_social_analytics_post_groups_create` |
+| Resource | Action | Route | Route Name |
+|----------|--------|-------|------------|
+| TodoList | list | `GET /api/todo-lists` | `api_todo_lists_list` |
+| TodoList | create | `POST /api/todo-lists` | `api_todo_lists_create` |
+| Post | list | `GET /api/posts` | `api_posts_list` |
+| PostGroup | create | `POST /api/post-groups` | `api_post_groups_create` |
+| IntegrationInsight | detail | `GET /api/integration-insights/detail` | `api_integration_insights_detail` |
+| PostInsight | detail | `GET /api/post-insights/detail` | `api_post_insights_detail` |
 
 ---
 
@@ -311,11 +242,7 @@ class Resource
    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
    private ?User $user = null;
    ```
-9. **Orphan removal** for OneToMany collections:
-   ```php
-   #[ORM\OneToMany(targetEntity: UserModule::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
-   private Collection $userModules;
-   ```
+9. **Orphan removal** for OneToMany collections
 
 ---
 
@@ -342,7 +269,7 @@ enum ProjectType: string
 1. **Backed enums** with `string` type for API serialization
 2. **PascalCase** for case names
 3. **snake_case** for string values
-4. **Located in** `Entity/Enum/` or `Module/{Name}/Entity/Enum/`
+4. **Located in** `Entity/Enum/`
 
 ---
 
@@ -542,15 +469,15 @@ class EntityRepository extends ServiceEntityRepository
 ```php
 <?php
 
-namespace App\Service\Module;
+namespace App\Service;
 
-class ModuleService
+class IntegrationInsightService
 {
     public function __construct(
-        private readonly string $moduleIconPath,
+        private readonly IntegrationInsightRepository $insightRepository,
     ) {}
 
-    public function getModuleIcon(string $moduleIdentifier): File
+    public function fetchInstagramProfileInsights(Integration $integration): void
     {
         // Business logic...
     }
@@ -592,38 +519,6 @@ class DateHelper
 2. **No state** - pure utility functions
 3. **Constants** for reusable values
 4. **Document methods** with PHPDoc
-
----
-
-## Modules
-
-Modules are self-contained feature packages with their own controllers, entities, DTOs, repositories, and services.
-
-### Structure
-
-```
-Module/
-└── TodoList/
-    ├── Controller/
-    │   ├── TodoListController.php
-    │   └── TodoListTaskController.php
-    ├── DTO/
-    │   ├── QueryParam/
-    │   └── Request/
-    ├── Entity/
-    │   ├── Enum/
-    │   ├── TodoList.php
-    │   └── TodoListTask.php
-    ├── Repository/
-    └── Service/
-```
-
-### Conventions
-
-1. **Route prefix** includes module: `/api/modules/todo-lists`
-2. **Namespace** follows structure: `App\Module\TodoList\Controller`
-3. **Can reference core entities** (User, UserModule, Project)
-4. **Self-contained** - all module-specific code in module folder
 
 ---
 
@@ -693,7 +588,9 @@ api_{resource}_{action}
 | `api_project_update` | Update project response |
 | `api_projects_get_paginated` | List projects response |
 | `api_project_get_by_uuid` | Get single project response |
-| `api_modules_todo_lists_tasks_list` | List todo list tasks |
+| `api_todo_lists_tasks_list` | List todo list tasks |
+| `api_posts_list` | List posts |
+| `api_post_insights_detail` | Post insight detail |
 
 ---
 
@@ -801,7 +698,7 @@ $providers = IntegrationProvider::cases();
 $result = array_map(
     fn(IntegrationProvider $provider) => (new ListIntegrationsGroupedByProviderResponseDTO(
         $provider,
-        $this->integrationRepository->getByUserModuleAndProvider($userModule, $provider)
+        $this->integrationRepository->getByProjectAndProvider($project, $provider)
     ))->getData(),
     $providers
 );

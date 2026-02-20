@@ -5,8 +5,8 @@ namespace App\Repository;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
+use App\Entity\Project;
 use App\Entity\User;
-use App\Entity\UserModule;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -59,8 +59,6 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-
-
     public function getByUuidAndUser(string $uuid, User $user): ?Integration
     {
         return $this->createQueryBuilder('i')
@@ -100,14 +98,26 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getOneByUserModuleAndProviderAndStatus(UserModule $userModule, IntegrationProvider $provider, IntegrationStatus $status): ?Integration
+    public function getByProjectAndUser(Project $project, User $user): array
     {
         return $this->createQueryBuilder('i')
-            ->innerJoin('i.userModules', 'um')
-            ->where('um = :userModule')
+            ->where('i.project = :project')
+            ->andWhere('i.user = :user')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->orderBy('i.createdAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getOneByProjectAndProviderAndStatus(Project $project, IntegrationProvider $provider, IntegrationStatus $status): ?Integration
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.project = :project')
             ->andWhere('i.provider = :provider')
             ->andWhere('i.status = :status')
-            ->setParameter('userModule', $userModule)
+            ->setParameter('project', $project)
             ->setParameter('provider', $provider)
             ->setParameter('status', $status)
             ->orderBy('i.createdAt', 'DESC')
@@ -115,51 +125,6 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
-    }
-
-    public function getByUserModuleAndStatus(UserModule $userModule, IntegrationStatus $status): array
-    {
-        $providers = IntegrationProvider::cases();
-        $integrations = [];
-
-        foreach ($providers as $provider) {
-            $integration = $this->getOneByUserModuleAndProviderAndStatus($userModule, $provider, $status);
-            if ($integration !== null) {
-                $integrations[] = $integration;
-            }
-        }
-
-        return $integrations;
-    }
-
-    public function getOneByUserModuleAndProvider(UserModule $userModule, IntegrationProvider $provider): ?Integration
-    {
-        return $this->createQueryBuilder('i')
-            ->innerJoin('i.userModules', 'um')
-            ->where('um = :userModule')
-            ->andWhere('i.provider = :provider')
-            ->setParameter('userModule', $userModule)
-            ->setParameter('provider', $provider)
-            ->orderBy('i.createdAt', 'DESC')
-            ->setMaxResults(1)
-            ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
-    }
-
-    public function getByUserModule(UserModule $userModule): array
-    {
-        $providers = IntegrationProvider::cases();
-        $integrations = [];
-
-        foreach ($providers as $provider) {
-            $integration = $this->getOneByUserModuleAndProvider($userModule, $provider);
-            if ($integration !== null) {
-                $integrations[] = $integration;
-            }
-        }
-
-        return $integrations;
     }
 
     public function getByProvider(IntegrationProvider $provider): array

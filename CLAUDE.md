@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-MakerFlow is a full-stack web application for social media analytics (Instagram) and task management. It uses a modular architecture mirrored across frontend and backend.
+MakerFlow is a full-stack web application for social media analytics (Instagram, YouTube) and task management. Features (TodoList, Insights) are built-in and always available per project.
 
 ## Tech Stack
 
@@ -37,41 +37,62 @@ dce front npm run typecheck    # TypeScript type checking
 
 ## Architecture
 
-### Module System
+### Feature Organization
 
-Features are organized as self-contained modules on both frontend and backend. Current modules: **SocialAnalytics** (Instagram analytics) and **TodoList**.
+Features are organized in a flat structure across both frontend and backend. Current features: **Insights** (Instagram/YouTube analytics) and **Tasks** (todo list management).
 
-**Backend module structure** (`back/src/Module/<ModuleName>/`):
-- `Controller/` — API endpoints
-- `Entity/` — Doctrine entities
-- `Repository/` — Data access
-- `Service/` — Business logic
-- `DTO/` — Module-specific DTOs
-- `Message/` + `Handler/` — Async RabbitMQ messages
-- `Command/` — CLI commands
-- `EventSubscriber/` — Reacts to integration lifecycle events
+**Backend structure** (`back/src/`):
+- `Controller/` -- API endpoints (e.g., `PostController`, `TodoListController`, `IntegrationInsightController`)
+- `Entity/` -- Doctrine entities (e.g., `Post`, `PostInsight`, `TodoList`)
+- `Repository/` -- Data access
+- `Service/` -- Business logic
+- `DTO/` -- Data transfer objects (Request, Response, QueryParam, External)
+- `Message/` + `Handler/` -- Async RabbitMQ messages
+- `Command/` -- CLI commands
+- `Event/` + `EventSubscriber/` -- Domain events and subscribers
+- `Helper/` -- Static utility classes
 
-**Frontend module structure** (`front/app/modules/<moduleName>/`):
-- `components/` — Module UI components
-- `hooks/api/` — React Query hooks (query keys + fetch hooks)
-- `stores/` — Zustand stores
-- `models/` — TypeScript interfaces/DTOs
-- `helpers/` — Module utility functions
+**Frontend structure** (`front/app/`):
+- `components/` -- UI components organized by feature (`insights/`, `tasks/`, `projects/`, `sidebar/`, `ui/`)
+- `hooks/api/` -- React Query hooks organized by resource (`posts/`, `integrations/`, `projects/`, `todoLists/`)
+- `stores/` -- Zustand stores organized by domain (`project/`, `insights/`, `sidebar/`)
+- `models/` -- TypeScript classes and enums
+- `routes/` -- Route page components
+- `services/` -- External services (HTTP client)
 
 ### Backend Patterns
 
 - **DTOs layered by purpose**: `DTO/Request/`, `DTO/Response/`, `DTO/QueryParam/`, `DTO/External/` (third-party API shapes)
 - **Serialization Groups** on entities for flexible API responses (e.g., `#[Groups(['api_user_me'])]`)
 - **UUIDs** as entity identifiers via Symfony UID
-- **Event-driven**: `IntegrationCreatedEvent` dispatched when OAuth completes; modules subscribe to react
-- **Async processing**: Long tasks (Instagram insight fetching) dispatched via RabbitMQ with `#[AsMessage]` / `#[AsMessageHandler]`
+- **Event-driven**: `IntegrationCreatedEvent` dispatched when OAuth completes; subscribers react
+- **Async processing**: Long tasks (insight fetching) dispatched via RabbitMQ with `#[AsMessage]` / `#[AsMessageHandler]`
+- **Scoping by project**: Features are scoped to projects via `projectUuid`
 
 ### Frontend Patterns
 
-- **React Query hooks**: Each resource has a query keys file and custom hooks (e.g., `useShowSocialAnalyticsIntegrationDetail`)
-- **Zustand stores**: Client state for UI concerns (focused project, sidebar, modals)
+- **React Query hooks**: Each resource has a query keys file and custom hooks (e.g., `useShowIntegrationDetail`)
+- **Zustand stores**: Client state for UI concerns (focused project, sidebar, modals, filters)
 - **Server-side rendering**: Enabled via React Router + Express server
 - **Axios HTTP client**: Centralized in `front/app/services/httpClient/`
+
+### API Routes
+
+Key API routes (no `/modules/` prefix):
+- `/api/projects` -- Project CRUD
+- `/api/todo-lists` -- Todo list management
+- `/api/posts` -- Post listing
+- `/api/post-groups` -- Post groups
+- `/api/integration-insights` -- Integration insight aggregation
+- `/api/post-insights` -- Post insight detail
+- `/api/integrations` -- OAuth integrations
+
+### Frontend Routes
+
+- `/` -- Home/Dashboard
+- `/tasks` -- Tasks page
+- `/insights` -- Insights page
+- `/insights/posts/:postUuid` -- Post detail page
 
 ### Shared Conventions
 
@@ -83,9 +104,9 @@ Features are organized as self-contained modules on both frontend and backend. C
 
 Always consult before making changes:
 
-- **Frontend docs**: `front/docs/` — coding style, UI style guidelines, feature docs
-- **Backend docs**: `back/docs/` — coding style, feature docs, messaging patterns
-- **UI guidelines**: `front/docs/ui-style-guidelines.md` — design system, colors, typography, component catalog (must read before any frontend UI work)
+- **Frontend docs**: `front/docs/` -- coding style, UI style guidelines, feature docs
+- **Backend docs**: `back/docs/` -- coding style, feature docs, messaging patterns
+- **UI guidelines**: `front/docs/ui-style-guidelines.md` -- design system, colors, typography, component catalog (must read before any frontend UI work)
 - **Coding styles**: `front/docs/coding-style.md` and `back/docs/coding-style.md`
 
 After completing a task, update or create relevant documentation in `front/docs/` or `back/docs/` and update their `README.md` index if needed.

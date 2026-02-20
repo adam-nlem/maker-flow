@@ -7,12 +7,11 @@ use App\DTO\External\Instagram\InstagramUserProfileDTO;
 use App\Entity\Enum\IntegrationProvider;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
+use App\Entity\Project;
 use App\Entity\User;
-use App\Entity\UserModule;
 use App\Event\IntegrationCreatedEvent;
 use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
-use App\Repository\UserModuleRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\Service\Integration\Exception\OAuthTokenRevokedException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
@@ -24,7 +23,6 @@ class InstagramOAuthService
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly IntegrationRepository $integrationRepository,
-        private readonly UserModuleRepository $userModuleRepository,
         private readonly EventDispatcherInterface $eventDispatcher,
 
 
@@ -169,7 +167,7 @@ class InstagramOAuthService
         return $this->updateIntegrationToken($integration, $newToken);
     }
 
-    public function handleCallback(string $code, User $user, UserModule $userModule): Integration
+    public function handleCallback(string $code, User $user, Project $project): Integration
     {
         $shortLivedToken = $this->exchangeCodeForToken($code);
         $longLivedToken = $this->exchangeForLongLivedToken($shortLivedToken->getAccessToken());
@@ -187,14 +185,13 @@ class InstagramOAuthService
             $integration = $this->createIntegration($user, $longLivedToken, $instagramUserProfile);
         }
 
-        $userModule->addIntegration($integration);
-        $this->userModuleRepository->save($userModule, true);
-
+        $integration->setProject($project);
+        $this->integrationRepository->save($integration, true);
 
         if ($existingIntegration === null) {
             $this->eventDispatcher->dispatch(new IntegrationCreatedEvent($integration), IntegrationCreatedEvent::NAME);
         }
-        
+
         return $integration;
     }
 }

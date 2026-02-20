@@ -2,7 +2,7 @@
 
 ## Overview
 
-This feature provides a decoupled event system for integration lifecycle events. Modules can subscribe to these events without coupling the core integration code to module-specific logic.
+This feature provides a decoupled event system for integration lifecycle events. Features can subscribe to these events without coupling the core integration code to feature-specific logic.
 
 ---
 
@@ -12,34 +12,34 @@ This feature provides a decoupled event system for integration lifecycle events.
 IntegrationController (callback)
     └── Dispatches IntegrationCreatedEvent
         └── EventSubscribers listen and react
-            └── Module-specific logic (e.g., dispatch messages)
+            └── Feature-specific logic (e.g., dispatch messages)
 ```
 
 ### Flow Diagram
 
 ```
-┌─────────────────────────────────────┐
-│     IntegrationController           │
-│     (OAuth callback success)        │
-└─────────────────┬───────────────────┘
-                  │ dispatch()
-                  ▼
-┌─────────────────────────────────────┐
-│     IntegrationCreatedEvent         │
-│     (contains Integration entity)   │
-└─────────────────┬───────────────────┘
-                  │ subscribed
-                  ▼
-┌─────────────────────────────────────┐
-│  IntegrationCreatedSubscriber       │
-│  (in SocialAnalytics module)        │
-└─────────────────┬───────────────────┘
-                  │ dispatch messages
-                  ▼
-┌─────────────────────────────────────┐
-│  FetchIntegrationInsightsMessage    │
-│  FetchPostInsightsMessage           │
-└─────────────────────────────────────┘
++-------------------------------------+
+|     IntegrationController           |
+|     (OAuth callback success)        |
++-----------------+-------------------+
+                  | dispatch()
+                  v
++-------------------------------------+
+|     IntegrationCreatedEvent         |
+|     (contains Integration entity)   |
++-----------------+-------------------+
+                  | subscribed
+                  v
++-------------------------------------+
+|  IntegrationCreatedSubscriber       |
+|  (insights feature)                 |
++-----------------+-------------------+
+                  | dispatch messages
+                  v
++-------------------------------------+
+|  FetchIntegrationInsightsMessage    |
+|  FetchPostInsightsMessage           |
++-------------------------------------+
 ```
 
 ---
@@ -54,9 +54,9 @@ IntegrationController (callback)
 
 ### Event Subscribers
 
-| Subscriber | Module | Description |
-|------------|--------|-------------|
-| `IntegrationCreatedSubscriber` | SocialAnalytics | Dispatches insight fetch messages for Instagram integrations |
+| Subscriber | Feature | Description |
+|------------|---------|-------------|
+| `IntegrationCreatedSubscriber` | Insights | Dispatches insight fetch messages for Instagram integrations |
 
 ---
 
@@ -66,10 +66,8 @@ IntegrationController (callback)
 src/
 ├── Event/
 │   └── IntegrationCreatedEvent.php
-└── Module/
-    └── SocialAnalytics/
-        └── EventSubscriber/
-            └── IntegrationCreatedSubscriber.php
+└── EventSubscriber/
+    └── IntegrationCreatedSubscriber.php
 ```
 
 ---
@@ -121,17 +119,17 @@ public function callback(
 }
 ```
 
-### Creating an Event Subscriber (Module-Specific)
+### Creating an Event Subscriber
 
 ```php
 <?php
 
-namespace App\Module\SocialAnalytics\EventSubscriber;
+namespace App\EventSubscriber;
 
 use App\Entity\Enum\IntegrationProvider;
 use App\Event\IntegrationCreatedEvent;
-use App\Module\SocialAnalytics\Message\FetchIntegrationInsightsMessage;
-use App\Module\SocialAnalytics\Message\FetchPostInsightsMessage;
+use App\Message\FetchIntegrationInsightsMessage;
+use App\Message\FetchPostInsightsMessage;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
@@ -169,7 +167,7 @@ class IntegrationCreatedSubscriber implements EventSubscriberInterface
 1. **Event classes** located in `src/Event/`
 2. **Event naming** follows pattern: `{Entity}{Action}Event` (e.g., `IntegrationCreatedEvent`)
 3. **Event constant** `NAME` follows pattern: `{entity}.{action}` (e.g., `integration.created`)
-4. **Module subscribers** located in `src/Module/{ModuleName}/EventSubscriber/`
+4. **Subscribers** located in `src/EventSubscriber/`
 5. **Subscriber naming** follows pattern: `{EventName}Subscriber` (e.g., `IntegrationCreatedSubscriber`)
 6. **Filter by provider** in subscriber if logic is provider-specific
 
@@ -177,7 +175,7 @@ class IntegrationCreatedSubscriber implements EventSubscriberInterface
 
 ## Benefits
 
-- **Decoupling**: Core code doesn't know about module-specific logic
-- **Extensibility**: Multiple modules can subscribe to the same event
+- **Decoupling**: Core code doesn't know about feature-specific logic
+- **Extensibility**: Multiple features can subscribe to the same event
 - **Testability**: Events and subscribers can be tested independently
 - **Single Responsibility**: Each subscriber handles one concern

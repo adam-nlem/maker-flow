@@ -8,7 +8,7 @@ This feature provides a detail endpoint that returns aggregated Instagram integr
 
 ## Endpoint
 
-**GET** `/api/modules/social-analytics/integration-insights/detail`
+**GET** `/api/integration-insights/detail`
 
 ### Query Parameters
 
@@ -62,12 +62,12 @@ This feature provides a detail endpoint that returns aggregated Instagram integr
 
 ```
 Controller
-    └── SocialAnalyticsIntegrationInsightService
-        ├── SocialAnalyticsIntegrationInsightRepository (insights by time period)
+    └── IntegrationInsightService
+        ├── IntegrationInsightRepository (insights by time period)
         │   └── InsightEvolutionHelper (evolution calculation)
         ├── InsightHelper (extracting insight values)
         ├── TimelineGapFillerHelper (fills missing daily data points)
-        └── SocialAnalyticsPostRepository (post count, streak)
+        └── PostRepository (post count, streak)
 ```
 
 ---
@@ -75,25 +75,25 @@ Controller
 ## Files
 
 ```
-src/Module/SocialAnalytics/
+src/
 ├── Controller/
-│   └── SocialAnalyticsIntegrationInsightController.php
+│   └── IntegrationInsightController.php
 ├── DTO/
 │   └── Response/
-│       └── SocialAnalyticsIntegrationInsight/
-│           ├── ShowSocialAnalyticsIntegrationDetailResponseDTO.php
-│           ├── SocialAnalyticsIntegrationInsightTimelineDTO.php
-│           ├── SocialAnalyticsIntegrationInsightTimelinePointDTO.php
-│           └── SocialAnalyticsIntegrationInsightWithEvolutionDTO.php
+│       └── IntegrationInsight/
+│           ├── ShowIntegrationDetailResponseDTO.php
+│           ├── IntegrationInsightTimelineDTO.php
+│           ├── IntegrationInsightTimelinePointDTO.php
+│           └── IntegrationInsightWithEvolutionDTO.php
 ├── Helper/
 │   ├── InsightEvolutionHelper.php
 │   ├── InsightHelper.php
 │   └── TimelineGapFillerHelper.php
 ├── Repository/
-│   ├── SocialAnalyticsIntegrationInsightRepository.php
-│   └── SocialAnalyticsPostRepository.php
+│   ├── IntegrationInsightRepository.php
+│   └── PostRepository.php
 └── Service/
-    └── SocialAnalyticsIntegrationInsightService.php
+    └── IntegrationInsightService.php
 ```
 
 ---
@@ -103,5 +103,5 @@ src/Module/SocialAnalytics/
 - Timelines are returned for these insight types: TotalFollowers, Comments, Shares, Saves, Views, Reach, Likes
 - The controller hardcodes the time period to `LastYear`, so the backend always returns a **full year** of `timelines` data
 - **Insight tile values are computed on the frontend**: the dynamic insight tiles display the sum of daily values within the selected time period, computed via `computeTotalValue(getFilteredInsightsForType(...))` in `insightChartDataHelper.ts`. This means tile values update reactively when the user changes the time period filter, without an additional API call.
-- The `InsightEvolutionHelper` and `InsightHelper` are shared with `SocialAnalyticsPostService` and `SocialAnalyticsPostInsightService` to avoid code duplication
-- The detail logic lives in `SocialAnalyticsIntegrationInsightService` alongside the Instagram fetch logic (one service per domain)
+- The `InsightEvolutionHelper` and `InsightHelper` are shared with `PostService` and `PostInsightService` to avoid code duplication
+- The detail logic lives in `IntegrationInsightService` alongside the fetch logic (one service per domain)

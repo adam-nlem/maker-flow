@@ -11,7 +11,7 @@ class ListIntegrationsQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
     #[Assert\Uuid]
-    private string $userModuleUuid;
+    private string $projectUuid;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -22,11 +22,11 @@ class ListIntegrationsQueryParamDTO extends AbstractQueryParamDTO
 
     protected function fromQueryParams(array $queryParams): void
     {
-        $this->userModuleUuid = $queryParams["userModuleUuid"];
+        $this->projectUuid = $queryParams["projectUuid"];
     }
 
-    public function getUserModuleUuid(): string
+    public function getProjectUuid(): string
     {
-        return $this->userModuleUuid;
+        return $this->projectUuid;
     }
 }
