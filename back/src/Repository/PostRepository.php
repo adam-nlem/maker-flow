@@ -64,7 +64,7 @@ class PostRepository extends ServiceEntityRepository
         $sql = "
             WITH unique_days AS (
                 SELECT DISTINCT DATE(published_at) AS post_date
-                FROM social_analytics_post
+                FROM post
                 WHERE integration_id = :integration_id
             ),
             streak_check AS (

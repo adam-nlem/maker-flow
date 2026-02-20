@@ -40,6 +40,9 @@ class PostGroup
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Project $project = null;
 
+    #[ORM\OneToOne(targetEntity: Script::class, mappedBy: 'postGroup')]
+    private ?Script $script = null;
+
     /**
      * @var Collection<int, Post>
      */
@@ -167,6 +170,18 @@ class PostGroup
                 $post->setPostGroup(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getScript(): ?Script
+    {
+        return $this->script;
+    }
+
+    public function setScript(?Script $script): static
+    {
+        $this->script = $script;
 
         return $this;
     }

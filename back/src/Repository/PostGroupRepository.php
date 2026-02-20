@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\PostGroup;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 class PostGroupRepository extends ServiceEntityRepository
@@ -31,5 +33,15 @@ class PostGroupRepository extends ServiceEntityRepository
         }
     }
 
-    // Add custom queries here if needed
+    public function getByUuidAndUser(string $uuid, User $user): ?PostGroup
+    {
+        return $this->createQueryBuilder('pg')
+            ->where('pg.uuid = :uuid')
+            ->andWhere('pg.user = :user')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

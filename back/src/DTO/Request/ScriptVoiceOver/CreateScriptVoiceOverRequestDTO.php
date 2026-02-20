@@ -1,0 +1,61 @@
+<?php
+
+namespace App\DTO\Request\ScriptVoiceOver;
+
+use App\DTO\Request\AbstractRequestDTO;
+use App\Entity\Enum\VoiceOverType;
+use App\Entity\ScriptVoiceOver;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
+
+class CreateScriptVoiceOverRequestDTO extends AbstractRequestDTO
+{
+    private string $scriptUuid;
+    private string $content;
+    private VoiceOverType $voiceOverType;
+    private ?int $position;
+
+    public function __construct(
+        protected RequestStack $requestStack,
+        protected ValidatorInterface $validator,
+    ) {
+        parent::__construct($requestStack, $validator);
+    }
+
+    protected function fromPayload(array $payload): void
+    {
+        $this->scriptUuid = $payload["scriptUuid"];
+        $this->content = $payload["content"];
+        $this->voiceOverType = VoiceOverType::tryFrom($payload["voiceOverType"] ?? "") ?? VoiceOverType::Neutral;
+        $this->position = $payload["position"] ?? null;
+    }
+
+    protected function buildObject(): ScriptVoiceOver
+    {
+        $voiceOver = new ScriptVoiceOver();
+
+        return $voiceOver
+            ->setContent($this->getContent())
+            ->setVoiceOverType($this->getVoiceOverType());
+    }
+
+    public function getScriptUuid(): string
+    {
+        return $this->scriptUuid;
+    }
+
+    public function getContent(): string
+    {
+        return $this->content;
+    }
+
+    public function getVoiceOverType(): VoiceOverType
+    {
+        return $this->voiceOverType;
+    }
+
+    public function getPosition(): ?int
+    {
+        return $this->position;
+    }
+}

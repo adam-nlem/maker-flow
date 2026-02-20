@@ -116,6 +116,18 @@ class Project
     #[ORM\OneToMany(targetEntity: Integration::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
     private Collection $integrations;
 
+    /**
+     * @var Collection<int, Script>
+     */
+    #[ORM\OneToMany(targetEntity: Script::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scripts;
+
+    /**
+     * @var Collection<int, ScriptTag>
+     */
+    #[ORM\OneToMany(targetEntity: ScriptTag::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptTags;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -127,6 +139,8 @@ class Project
         }
         $this->todoLists = new ArrayCollection();
         $this->integrations = new ArrayCollection();
+        $this->scripts = new ArrayCollection();
+        $this->scriptTags = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -253,5 +267,21 @@ class Project
     public function getIntegrations(): Collection
     {
         return $this->integrations;
+    }
+
+    /**
+     * @return Collection<int, Script>
+     */
+    public function getScripts(): Collection
+    {
+        return $this->scripts;
+    }
+
+    /**
+     * @return Collection<int, ScriptTag>
+     */
+    public function getScriptTags(): Collection
+    {
+        return $this->scriptTags;
     }
 }

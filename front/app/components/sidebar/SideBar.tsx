@@ -1,4 +1,4 @@
-import { ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SunIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SparklesIcon, SunIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { HomeIcon as HomeIconSolid, GlobeEuropeAfricaIcon as GlobeEuropeAfricaIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
@@ -180,25 +180,19 @@ export default function SideBar() {
 
           <div className="border-t border-light-gray rounded w-full"></div>
 
-          {/* USER SECTION */}
-          {user && (
-            isExpanded ? (
-              <div className="flex flex-row justify-between hover:bg-light-gray cursor-pointer rounded-lg m-3 p-2">
-                <div className="flex flex-col">
-                  <h1 className="text-heading-sm whitespace-nowrap">{user.fullName}</h1>
-                  <p className="text-body-xs text-gray whitespace-nowrap">{user.email}</p>
-                </div>
-                <div className="flex flex-col justify-center leading-none">
-                  <ChevronUpIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} />
-                  <ChevronDownIcon className="size-3.5 text-gray -mt-0.5" strokeWidth={2} />
-                </div>
+          <div className="p-3">
+            <Button
+              type="button"
+              style="primary"
+            // isLoading={isPending}
+            // disabled={isPending}
+            >
+              <div className="flex flex-row justify-center items-center gap-3">
+                <SparklesIcon className="size-4 text-clear" strokeWidth={2} />
+                {isExpanded ? <p className="text-sm">Passer Premium ?</p> : null}
               </div>
-            ) : (
-              <div className="my-4.75 p-2 rounded-lg cursor-pointer hover:bg-light-gray">
-                <UserCircleIcon className="size-6 text-gray" strokeWidth={1.5} />
-              </div>
-            )
-          )}
+            </Button>
+          </div>
         </div>
       </div>
 
