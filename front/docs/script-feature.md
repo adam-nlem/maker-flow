@@ -86,6 +86,7 @@ front/app/
     ├── ScriptTagsRow.tsx
     └── parts/
         ├── ScriptPartsList.tsx       ← DnD orchestrator
+        ├── ScriptPartHeader.tsx     ← reusable colored header (icon + label, drag handle)
         ├── ScriptChapterCard.tsx
         ├── ScriptVoiceOverCard.tsx
         ├── ScriptDialogueCard.tsx
@@ -123,11 +124,11 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 - Each field maintains local state (e.g. `useState(chapter.title)`)
 - On `onBlur`, the handler compares the trimmed local value against the prop value
 - If changed, the update mutation fires with only the changed field
-- For enum selects (chapterType, voiceOverType, shotType), auto-save fires on `onChange` since selection is atomic
+- For enum types (chapterType, voiceOverType, shotType), a `SelectDropdown` renders a clickable `Pill` trigger that opens a dropdown of `Pill` options — auto-saves on select
 - Input/TextArea use the `simple` prop for borderless inline styling
-- Drag handle + delete button are hover-revealed (`opacity-0 group-hover:opacity-100`)
+- Delete button is hover-revealed (`opacity-0 group-hover:opacity-100`)
 
-**Structured part cards** (chapter, voice-over, dialogue, shot) keep a bordered card wrapper for visual distinction. **Text parts** are borderless to blend into the page.
+**Structured part cards** (chapter, voice-over, dialogue, shot) use `ScriptPartHeader` as a colored header bar (icon + label) that doubles as the drag handle. Each part type has its own color: chapter (blue), voice-over (yellow), shot (primary), dialogue (purple). **Text parts** are borderless to blend into the page.
 
 ### Text Part (Notebook-Style)
 `ScriptTextCard` is a borderless, always-editable text block that blends into the page:

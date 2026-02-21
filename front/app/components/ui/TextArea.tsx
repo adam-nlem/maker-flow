@@ -15,7 +15,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     const internalRef = useRef<HTMLTextAreaElement>(null);
     
     // Use the auto-resize hook
-    useAutoResizeTextarea(internalRef, (props.value as string) || '', 60);
+    useAutoResizeTextarea(internalRef, (props.value as string) || '', 0);
     
     // Sync the internal ref with the forwarded ref
     useImperativeHandle(ref, () => internalRef.current as HTMLTextAreaElement);

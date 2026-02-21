@@ -1,4 +1,4 @@
-text-primary bg-primary/10 border-primary/30import { useState } from "react";
+import { useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import type { DialogueSubject } from "~/models/DialogueSubject";
 import { Input } from "~/components/ui/Input";

@@ -1,11 +1,13 @@
 import { useState } from "react";
-import { Bars3Icon, TrashIcon } from "@heroicons/react/24/outline";
+import { FilmIcon, TrashIcon } from "@heroicons/react/24/outline";
 import type { ScriptShot } from "~/models/ScriptShot";
 import { ShotType, shotTypeToLabel, shotTypeToBgClass, shotTypeToTextClass } from "~/models/enums/ShotType";
 import { Pill } from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
+import SelectDropdown from "~/components/ui/SelectDropdown";
 import { useUpdateScriptShot } from "~/hooks/api/scriptShots/useUpdateScriptShot";
 import { useDeleteScriptShot } from "~/hooks/api/scriptShots/useDeleteScriptShot";
+import ScriptPartHeader from "./ScriptPartHeader";
 
 interface Props {
     shot: ScriptShot;
@@ -36,43 +38,45 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Pr
     const pillColor = `${shotTypeToBgClass[shotType]} ${shotTypeToTextClass[shotType]}`;
 
     return (
-        <div className="group border border-light-gray rounded-xl p-4 bg-clear flex flex-row items-start gap-3">
-            <div
-                {...dragHandleProps}
-                className="shrink-0 mt-0.5 text-gray opacity-0 group-hover:opacity-100 transition-opacity cursor-grab"
-            >
-                <Bars3Icon className="size-4" strokeWidth={2} />
-            </div>
-            <div className="flex-1 min-w-0 flex flex-col gap-2">
-                <div className="flex flex-row items-center gap-2">
-                    <Pill text="Plan" color={pillColor} />
-                    <select
-                        value={shotType}
-                        onChange={(e) => handleShotTypeChange(e.target.value as ShotType)}
-                        className="text-xs px-2 py-0.5 rounded-lg border-0 bg-transparent focus:outline-none focus:ring-0 cursor-pointer"
-                    >
-                        {Object.values(ShotType).map((type) => (
-                            <option key={type} value={type}>{shotTypeToLabel[type]}</option>
-                        ))}
-                    </select>
-                </div>
-                <TextArea
-                    simple
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    onBlur={handleContentBlur}
-                    placeholder="Description du plan..."
-                    textStyle="text-body-sm"
-                    fullWidth
+        <div className="group border border-light-gray rounded-xl p-4 bg-clear flex-1 flex flex-col gap-2">
+            <ScriptPartHeader icon={FilmIcon} label="Plan" colorClassName="bg-primary/10 border border-primary/30" dragHandleProps={dragHandleProps} />
+            <div className="flex flex-row items-center gap-2">
+                <SelectDropdown
+                    items={Object.values(ShotType)}
+                    selectedItemId={shotType}
+                    getItemId={(type) => type}
+                    onSelect={(type) => handleShotTypeChange(type)}
+                    renderTrigger={({ onClick }) => (
+                        <button onClick={onClick} className="cursor-pointer">
+                            <Pill text={shotTypeToLabel[shotType]} color={pillColor} />
+                        </button>
+                    )}
+                    renderItem={({ item, isSelected, onSelect }) => (
+                        <button onClick={onSelect} className="cursor-pointer">
+                            <Pill
+                                text={shotTypeToLabel[item]}
+                                color={`${shotTypeToBgClass[item]} ${shotTypeToTextClass[item]}${isSelected ? " ring-1 ring-current" : ""}`}
+                            />
+                        </button>
+                    )}
                 />
+                <button
+                    onClick={() => deleteScriptShot({ shotUuid: shot.uuid, scriptUuid })}
+                    disabled={isDeleting}
+                    className="shrink-0 mt-0.5 text-gray hover:text-danger cursor-pointer opacity-0 group-hover:opacity-100 transition"
+                >
+                    <TrashIcon className="size-4" strokeWidth={2} />
+                </button>
             </div>
-            <button
-                onClick={() => deleteScriptShot({ shotUuid: shot.uuid, scriptUuid })}
-                disabled={isDeleting}
-                className="shrink-0 mt-0.5 text-gray hover:text-danger cursor-pointer opacity-0 group-hover:opacity-100 transition"
-            >
-                <TrashIcon className="size-4" strokeWidth={2} />
-            </button>
+            <TextArea
+                simple
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                onBlur={handleContentBlur}
+                placeholder="Description du plan..."
+                textStyle="text-body-sm"
+                fullWidth
+            />
         </div>
     );
 }

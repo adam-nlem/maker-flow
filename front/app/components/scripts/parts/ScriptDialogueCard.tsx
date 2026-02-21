@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { Bars3Icon, TrashIcon } from "@heroicons/react/24/outline";
+import { ChatBubbleLeftRightIcon, TrashIcon } from "@heroicons/react/24/outline";
 import type { ScriptDialogue } from "~/models/ScriptDialogue";
-import { Pill } from "~/components/ui/Pill";
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { useUpdateScriptDialogue } from "~/hooks/api/scriptDialogues/useUpdateScriptDialogue";
 import { useDeleteScriptDialogue } from "~/hooks/api/scriptDialogues/useDeleteScriptDialogue";
+import ScriptPartHeader from "./ScriptPartHeader";
 import DialogueSubjectRow from "./DialogueSubjectRow";
 import AddDialogueSubjectRow from "./AddDialogueSubjectRow";
 
@@ -37,41 +37,35 @@ export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandlePro
     return (
         <div className="group border border-light-gray rounded-xl bg-clear">
             {/* Card header */}
-            <div className="flex flex-row items-start gap-3 p-4">
-                <div
-                    {...dragHandleProps}
-                    className="shrink-0 mt-0.5 text-gray opacity-0 group-hover:opacity-100 transition-opacity cursor-grab"
-                >
-                    <Bars3Icon className="size-4" strokeWidth={2} />
+            <div className="flex flex-col gap-2 p-4">
+                <ScriptPartHeader icon={ChatBubbleLeftRightIcon} label="Dialogue" colorClassName="bg-purple/10 border border-purple/30" dragHandleProps={dragHandleProps} />
+                <div className="flex flex-row items-center gap-2">
+                    <button
+                        onClick={() => deleteScriptDialogue({ dialogueUuid: dialogue.uuid, scriptUuid })}
+                        disabled={isDeleting}
+                        className="shrink-0 mt-0.5 text-gray hover:text-danger cursor-pointer opacity-0 group-hover:opacity-100 transition"
+                    >
+                        <TrashIcon className="size-4" strokeWidth={2} />
+                    </button>
                 </div>
-                <div className="flex-1 min-w-0 flex flex-col gap-2">
-                    <Pill text="Dialogue" color="bg-purple/20 text-purple" />
-                    <Input
-                        simple
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        onBlur={handleTitleBlur}
-                        placeholder="Titre du dialogue"
-                        textStyle="text-heading-sm"
-                        fullWidth
-                    />
-                    <TextArea
-                        simple
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        onBlur={handleDescriptionBlur}
-                        placeholder="Description (optionnel)"
-                        textStyle="text-body-sm"
-                        fullWidth
-                    />
-                </div>
-                <button
-                    onClick={() => deleteScriptDialogue({ dialogueUuid: dialogue.uuid, scriptUuid })}
-                    disabled={isDeleting}
-                    className="shrink-0 mt-0.5 text-gray hover:text-danger cursor-pointer opacity-0 group-hover:opacity-100 transition"
-                >
-                    <TrashIcon className="size-4" strokeWidth={2} />
-                </button>
+                <Input
+                    simple
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    onBlur={handleTitleBlur}
+                    placeholder="Titre du dialogue"
+                    textStyle="text-heading-sm"
+                    fullWidth
+                />
+                <TextArea
+                    simple
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    onBlur={handleDescriptionBlur}
+                    placeholder="Description (optionnel)"
+                    textStyle="text-body-sm"
+                    fullWidth
+                />
             </div>
 
             {/* Subjects section */}

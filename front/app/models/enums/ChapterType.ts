@@ -9,8 +9,8 @@ export const chapterTypeToLabel: Record<ChapterType, string> = {
 }
 
 export const chapterTypeToBgClass: Record<ChapterType, string> = {
-    [ChapterType.OnScreen]: "bg-blue/30",
-    [ChapterType.OffScreen]: "bg-purple/30",
+    [ChapterType.OnScreen]: "bg-blue/10",
+    [ChapterType.OffScreen]: "bg-purple/10",
 }
 
 export const chapterTypeToTextClass: Record<ChapterType, string> = {
