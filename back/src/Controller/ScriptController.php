@@ -17,6 +17,7 @@ use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptRepository;
 use App\Repository\ScriptShotRepository;
 use App\Repository\ScriptTagRepository;
+use App\Repository\ScriptTextRepository;
 use App\Repository\ScriptVoiceOverRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -213,6 +214,7 @@ final class ScriptController extends AbstractController
         ScriptVoiceOverRepository $voiceOverRepository,
         ScriptDialogueRepository $dialogueRepository,
         ScriptShotRepository $shotRepository,
+        ScriptTextRepository $textRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -227,8 +229,9 @@ final class ScriptController extends AbstractController
         $voiceOvers = $voiceOverRepository->getByScriptAndUserOrderedByPosition($script, $user);
         $dialogues = $dialogueRepository->getByScriptAndUserOrderedByPosition($script, $user);
         $shots = $shotRepository->getByScriptAndUserOrderedByPosition($script, $user);
+        $texts = $textRepository->getByScriptAndUserOrderedByPosition($script, $user);
 
-        $allParts = array_merge($chapters, $voiceOvers, $dialogues, $shots);
+        $allParts = array_merge($chapters, $voiceOvers, $dialogues, $shots, $texts);
 
         usort($allParts, fn($a, $b) => $a->getPosition() <=> $b->getPosition());
 
@@ -248,6 +251,7 @@ final class ScriptController extends AbstractController
         ScriptVoiceOverRepository $voiceOverRepository,
         ScriptDialogueRepository $dialogueRepository,
         ScriptShotRepository $shotRepository,
+        ScriptTextRepository $textRepository,
         EntityManagerInterface $entityManager,
     ): JsonResponse {
         /** @var User $user */
@@ -268,6 +272,7 @@ final class ScriptController extends AbstractController
                 ScriptPartType::VoiceOver => $voiceOverRepository->getByUuidAndUser($partUuid, $user),
                 ScriptPartType::Dialogue => $dialogueRepository->getByUuidAndUser($partUuid, $user),
                 ScriptPartType::Shot => $shotRepository->getByUuidAndUser($partUuid, $user),
+                ScriptPartType::Text => $textRepository->getByUuidAndUser($partUuid, $user),
                 default => null,
             };
 
@@ -279,6 +284,7 @@ final class ScriptController extends AbstractController
                     ScriptPartType::VoiceOver => $voiceOverRepository->save($entity),
                     ScriptPartType::Dialogue => $dialogueRepository->save($entity),
                     ScriptPartType::Shot => $shotRepository->save($entity),
+                    ScriptPartType::Text => $textRepository->save($entity),
                     default => null,
                 };
             }

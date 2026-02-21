@@ -1639,6 +1639,118 @@
       "id": "eecbe009-bdaf-40d9-b35b-5efc5eb51482"
     },
     {
+      "name": "Script Texts",
+      "item": [
+        {
+          "name": "List Texts",
+          "id": "a1b2c3d4-e5f6-7890-abcd-111111111111",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/texts?scriptUuid={{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "texts"
+              ],
+              "query": [
+                {
+                  "key": "scriptUuid",
+                  "value": "{{scriptUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Text",
+          "id": "a1b2c3d4-e5f6-7890-abcd-222222222222",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"content\": \"Contenu du texte libre\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/texts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "texts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Text",
+          "id": "a1b2c3d4-e5f6-7890-abcd-333333333333",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Nouveau contenu\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/texts/{{textUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "texts",
+                "{{textUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Text",
+          "id": "a1b2c3d4-e5f6-7890-abcd-444444444444",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/texts/{{textUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "texts",
+                "{{textUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "f5e4d3c2-b1a0-9876-fedc-555555555555"
+    },
+    {
       "name": "Dialogue Subjects",
       "item": [
         {
@@ -1869,6 +1981,11 @@
     {
       "id": "e84ec166-89a4-446f-b3ec-b17fa98833bd",
       "key": "dialogueSubjectUuid",
+      "value": ""
+    },
+    {
+      "id": "b2a3c4d5-e6f7-8901-abcd-666666666666",
+      "key": "textUuid",
       "value": ""
     }
   ]

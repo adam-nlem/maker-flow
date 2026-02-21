@@ -8,4 +8,5 @@ enum ScriptPartType: string
     case VoiceOver = 'voice_over';
     case Dialogue = 'dialogue';
     case Shot = 'shot';
+    case Text = 'text';
 }

@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { PlusIcon, DocumentTextIcon, MicrophoneIcon, ChatBubbleLeftRightIcon, FilmIcon } from "@heroicons/react/24/outline";
+import { PlusIcon, DocumentTextIcon, MicrophoneIcon, ChatBubbleLeftRightIcon, FilmIcon, Bars3BottomLeftIcon } from "@heroicons/react/24/outline";
 import { useCreateScriptChapter } from "~/hooks/api/scriptChapters/useCreateScriptChapter";
 import { useCreateScriptVoiceOver } from "~/hooks/api/scriptVoiceOvers/useCreateScriptVoiceOver";
 import { useCreateScriptDialogue } from "~/hooks/api/scriptDialogues/useCreateScriptDialogue";
 import { useCreateScriptShot } from "~/hooks/api/scriptShots/useCreateScriptShot";
+import { useCreateScriptText } from "~/hooks/api/scriptTexts/useCreateScriptText";
 import { ChapterType } from "~/models/enums/ChapterType";
 import { VoiceOverType } from "~/models/enums/VoiceOverType";
 import { ShotType } from "~/models/enums/ShotType";
@@ -13,6 +14,7 @@ interface Props {
 }
 
 const PART_OPTIONS = [
+    { key: "text", label: "Texte", icon: Bars3BottomLeftIcon },
     { key: "chapter", label: "Chapitre", icon: DocumentTextIcon },
     { key: "voice_over", label: "Voix off", icon: MicrophoneIcon },
     { key: "dialogue", label: "Dialogue", icon: ChatBubbleLeftRightIcon },
@@ -28,10 +30,14 @@ export default function AddScriptPartMenu({ scriptUuid }: Props) {
     const { createScriptVoiceOver } = useCreateScriptVoiceOver();
     const { createScriptDialogue } = useCreateScriptDialogue();
     const { createScriptShot } = useCreateScriptShot();
+    const { createScriptText } = useCreateScriptText();
 
     const handleAdd = async (key: PartKey) => {
         setIsOpen(false);
         switch (key) {
+            case "text":
+                await createScriptText({ scriptUuid, content: "" });
+                break;
             case "chapter":
                 await createScriptChapter({ scriptUuid, title: "Nouveau chapitre", chapterType: ChapterType.OnScreen });
                 break;

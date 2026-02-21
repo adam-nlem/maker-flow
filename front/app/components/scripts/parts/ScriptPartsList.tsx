@@ -5,10 +5,12 @@ import type { ScriptChapter } from "~/models/ScriptChapter";
 import type { ScriptVoiceOver } from "~/models/ScriptVoiceOver";
 import type { ScriptDialogue } from "~/models/ScriptDialogue";
 import type { ScriptShot } from "~/models/ScriptShot";
+import type { ScriptText } from "~/models/ScriptText";
 import ScriptChapterCard from "./ScriptChapterCard";
 import ScriptVoiceOverCard from "./ScriptVoiceOverCard";
 import ScriptDialogueCard from "./ScriptDialogueCard";
 import ScriptShotCard from "./ScriptShotCard";
+import ScriptTextCard from "./ScriptTextCard";
 import AddScriptPartMenu from "./AddScriptPartMenu";
 import { useReorderScriptParts } from "~/hooks/api/scripts/useReorderScriptParts";
 
@@ -56,6 +58,8 @@ function renderPartCard(part: ScriptPart, scriptUuid: string, dragHandleProps?: 
             return <ScriptDialogueCard dialogue={part as ScriptDialogue} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
         case "shot":
             return <ScriptShotCard shot={part as ScriptShot} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+        case "text":
+            return <ScriptTextCard text={part as ScriptText} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
     }
 }
 
@@ -111,10 +115,7 @@ export default function ScriptPartsList({ parts, scriptUuid }: Props) {
                     </DroppableZone>
 
                     {localParts.length === 0 && (
-                        <div className="flex flex-col items-center justify-center py-16 text-gray">
-                            <p className="text-body-sm">Aucun élément pour l&apos;instant.</p>
-                            <p className="text-body-xs">Ajoutez un chapitre, une voix off, un dialogue ou un plan.</p>
-                        </div>
+                        <ScriptTextCard scriptUuid={scriptUuid} />
                     )}
 
                     <DragOverlay>

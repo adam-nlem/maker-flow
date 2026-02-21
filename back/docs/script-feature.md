@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Script feature allows users to create structured writing plans for social media content. A Script belongs to a Project and can optionally be linked to a PostGroup (1:1). Scripts contain reorderable **parts** — 4 separate entity types (Chapter, VoiceOver, Dialogue, Shot) each in their own table, sharing a global `position` for cross-type ordering. Scripts also have **tags** that are project-scoped, linked via ManyToMany.
+The Script feature allows users to create structured writing plans for social media content. A Script belongs to a Project and can optionally be linked to a PostGroup (1:1). Scripts contain reorderable **parts** — 5 separate entity types (Chapter, VoiceOver, Dialogue, Shot, Text) each in their own table, sharing a global `position` for cross-type ordering. Scripts also have **tags** that are project-scoped, linked via ManyToMany.
 
 ---
 
@@ -29,6 +29,7 @@ The Script feature allows users to create structured writing plans for social me
 | `scriptVoiceOvers` | `Collection<ScriptVoiceOver>` | Voice-overs (OneToMany, cascade remove, orphanRemoval) |
 | `scriptDialogues` | `Collection<ScriptDialogue>` | Dialogues (OneToMany, cascade remove, orphanRemoval) |
 | `scriptShots` | `Collection<ScriptShot>` | Shots (OneToMany, cascade remove, orphanRemoval) |
+| `scriptTexts` | `Collection<ScriptText>` | Texts (OneToMany, cascade remove, orphanRemoval) |
 
 ### `ScriptTag` (`App\Entity\ScriptTag`)
 
@@ -124,6 +125,25 @@ Project-scoped tags. Scripts reference tags via ManyToMany.
 
 **Virtual getter:** `getType(): string` returns `'shot'`
 
+### `ScriptText` (`App\Entity\ScriptText`)
+
+**Location:** `back/src/Entity/ScriptText.php`
+
+Free-form text block for notebook-style editing. No subtype — just content.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `int` | Auto-generated primary key |
+| `uuid` | `string (GUID)` | Unique identifier exposed via API |
+| `content` | `string (TEXT)` | Text content |
+| `position` | `int` | Global order across all part types |
+| `createdAt` | `DateTimeImmutable` | Creation timestamp (UTC) |
+| `updatedAt` | `DateTimeImmutable` | Last update timestamp (UTC, auto-updated) |
+| `script` | `Script` | Parent script (ManyToOne, cascade delete) |
+| `user` | `User` | Owner (ManyToOne, cascade delete) |
+
+**Virtual getter:** `getType(): string` returns `'text'`
+
 ### `DialogueSubject` (`App\Entity\DialogueSubject`)
 
 **Location:** `back/src/Entity/DialogueSubject.php`
@@ -154,6 +174,7 @@ Used in reorder DTOs to identify part types. Not stored as a DB column.
 | `voice_over` | Voice-over part |
 | `dialogue` | Dialogue part |
 | `shot` | Shot part |
+| `text` | Text part |
 
 ### `ChapterType` (`App\Entity\Enum\ChapterType`)
 
@@ -207,7 +228,7 @@ Used in reorder DTOs to identify part types. Not stored as a DB column.
 | `getByTitleAndProjectAndUser` | `string $title, Project $project, User $user` | `?ScriptTag` | Finds tag by exact title (uniqueness check) |
 | `getByUserAndWithUuidIn` | `User $user, array $uuids` | `array` | Batch fetch tags by UUIDs |
 
-### Part Repositories (ScriptChapter, ScriptVoiceOver, ScriptDialogue, ScriptShot)
+### Part Repositories (ScriptChapter, ScriptVoiceOver, ScriptDialogue, ScriptShot, ScriptText)
 
 All follow the same pattern:
 
@@ -265,7 +286,7 @@ All follow the same pattern:
 | update | PATCH | `/{tagUuid}` | `api_scripts_tags_update` | Update tag |
 | delete | DELETE | `/{tagUuid}` | `api_scripts_tags_delete` | Delete tag |
 
-### Part Controllers (ScriptChapter, ScriptVoiceOver, ScriptDialogue, ScriptShot)
+### Part Controllers (ScriptChapter, ScriptVoiceOver, ScriptDialogue, ScriptShot, ScriptText)
 
 All follow the same CRUD pattern:
 
@@ -281,8 +302,9 @@ All follow the same CRUD pattern:
 - Voice-overs: `/api/scripts/voice-overs`
 - Dialogues: `/api/scripts/dialogues`
 - Shots: `/api/scripts/shots`
+- Texts: `/api/scripts/texts`
 
-**Auto-position on create:** If no `position` is provided, computes `max()` across all 4 part repos and assigns `max + 1`.
+**Auto-position on create:** If no `position` is provided, computes `max()` across all 5 part repos and assigns `max + 1`.
 
 ### `DialogueSubjectController` — Route: `/api/scripts/dialogue-subjects`
 
@@ -310,6 +332,7 @@ All follow the same CRUD pattern:
 | `ListScriptVoiceOversQueryParamDTO` | `scriptUuid` | NotBlank |
 | `ListScriptDialoguesQueryParamDTO` | `scriptUuid` | NotBlank |
 | `ListScriptShotsQueryParamDTO` | `scriptUuid` | NotBlank |
+| `ListScriptTextsQueryParamDTO` | `scriptUuid` | NotBlank |
 | `ListDialogueSubjectsQueryParamDTO` | `scriptDialogueUuid` | NotBlank |
 
 ### Request DTOs
@@ -329,6 +352,8 @@ All follow the same CRUD pattern:
 | `UpdateScriptDialogueRequestDTO` | `title?`, `description?` |
 | `CreateScriptShotRequestDTO` | `scriptUuid`, `content`, `shotType` (default: ARoll), `position?` |
 | `UpdateScriptShotRequestDTO` | `content?`, `shotType?` |
+| `CreateScriptTextRequestDTO` | `scriptUuid`, `content`, `position?` |
+| `UpdateScriptTextRequestDTO` | `content?` |
 | `CreateDialogueSubjectRequestDTO` | `scriptDialogueUuid`, `speaker`, `content`, `position?` |
 | `UpdateDialogueSubjectRequestDTO` | `speaker?`, `content?` |
 | `ReorderDialogueSubjectsRequestDTO` | `scriptDialogueUuid`, `orderedUuids` |
@@ -359,6 +384,9 @@ All follow the same CRUD pattern:
 | `api_scripts_shots_list` | Shot list endpoint |
 | `api_scripts_shots_create` | Shot create endpoint |
 | `api_scripts_shots_update` | Shot update endpoint |
+| `api_scripts_texts_list` | Text list endpoint |
+| `api_scripts_texts_create` | Text create endpoint |
+| `api_scripts_texts_update` | Text update endpoint |
 | `api_scripts_dialogue_subjects_list` | Dialogue subject list endpoint |
 | `api_scripts_dialogue_subjects_create` | Dialogue subject create endpoint |
 | `api_scripts_dialogue_subjects_update` | Dialogue subject update endpoint |
@@ -378,6 +406,7 @@ Script (1) ────── (N) ScriptChapter
 Script (1) ────── (N) ScriptVoiceOver
 Script (1) ────── (N) ScriptDialogue
 Script (1) ────── (N) ScriptShot
+Script (1) ────── (N) ScriptText
 ScriptDialogue (1) ── (N) DialogueSubject
 ```
 
@@ -385,8 +414,8 @@ ScriptDialogue (1) ── (N) DialogueSubject
 
 ## Global Position Ordering
 
-Script parts (Chapter, VoiceOver, Dialogue, Shot) share a global `position` field for cross-type ordering within a script:
+Script parts (Chapter, VoiceOver, Dialogue, Shot, Text) share a global `position` field for cross-type ordering within a script:
 
-- **Auto-assignment on create:** If no `position` is provided, the controller computes `max()` across all 4 part repos and assigns `max + 1`.
-- **Unified list:** `GET /api/scripts/{uuid}/parts` fetches from all 4 repos, merges, sorts by `position`, and serializes with each entity's virtual `getType()` getter.
+- **Auto-assignment on create:** If no `position` is provided, the controller computes `max()` across all 5 part repos and assigns `max + 1`.
+- **Unified list:** `GET /api/scripts/{uuid}/parts` fetches from all 5 repos, merges, sorts by `position`, and serializes with each entity's virtual `getType()` getter.
 - **Reorder:** `PATCH /api/scripts/{uuid}/reorder-parts` accepts `orderedParts: [{uuid, type}]`, dispatches to the correct repo via `ScriptPartType` enum, and sets `position = array index`.

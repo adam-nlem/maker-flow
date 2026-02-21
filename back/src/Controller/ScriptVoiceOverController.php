@@ -12,6 +12,7 @@ use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptRepository;
 use App\Repository\ScriptShotRepository;
+use App\Repository\ScriptTextRepository;
 use App\Repository\ScriptVoiceOverRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -54,6 +55,7 @@ final class ScriptVoiceOverController extends AbstractController
         ScriptVoiceOverRepository $voiceOverRepository,
         ScriptDialogueRepository $dialogueRepository,
         ScriptShotRepository $shotRepository,
+        ScriptTextRepository $textRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -83,6 +85,7 @@ final class ScriptVoiceOverController extends AbstractController
                 $voiceOverRepository->getMaxPositionByScript($script),
                 $dialogueRepository->getMaxPositionByScript($script),
                 $shotRepository->getMaxPositionByScript($script),
+                $textRepository->getMaxPositionByScript($script),
             );
             $voiceOver->setPosition($maxPosition + 1);
         }

@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Script feature provides a split-view editor for managing scripts per project. Users create scripts, edit their metadata (title, hook, publication date, tags), and build structured content with four part types: chapters, voice-overs, dialogues, and shots. Parts are reorderable via drag-and-drop.
+The Script feature provides a split-view editor for managing scripts per project. Users create scripts, edit their metadata (title, hook, publication date, tags), and build structured content with five part types: chapters, voice-overs, dialogues, shots, and texts. Parts are reorderable via drag-and-drop. Text parts provide a notebook-style editing experience with auto-save on blur.
 
 **Route:** `/scripts`
 
@@ -40,6 +40,7 @@ front/app/
 │   ├── ScriptVoiceOver.ts       ← type = 'voice_over' as const
 │   ├── ScriptDialogue.ts        ← type = 'dialogue' as const
 │   ├── ScriptShot.ts            ← type = 'shot' as const
+│   ├── ScriptText.ts            ← type = 'text' as const
 │   ├── DialogueSubject.ts
 │   └── enums/
 │       ├── ScriptPartType.ts
@@ -67,6 +68,7 @@ front/app/
 │   ├── scriptVoiceOvers/  (same CRUD pattern)
 │   ├── scriptDialogues/   (same CRUD pattern)
 │   ├── scriptShots/       (same CRUD pattern)
+│   ├── scriptTexts/       (same CRUD pattern)
 │   └── dialogueSubjects/
 │       ├── useCreateDialogueSubject.ts  ← uses scriptDialogueUuid
 │       ├── useUpdateDialogueSubject.ts
@@ -88,6 +90,7 @@ front/app/
         ├── ScriptVoiceOverCard.tsx
         ├── ScriptDialogueCard.tsx
         ├── ScriptShotCard.tsx
+        ├── ScriptTextCard.tsx         ← borderless, auto-save on blur
         ├── DialogueSubjectRow.tsx    ← read/edit subject line
         ├── AddDialogueSubjectRow.tsx ← inline subject creation
         └── AddScriptPartMenu.tsx     ← "+ Add part" dropdown
@@ -107,16 +110,24 @@ class ScriptChapter { public readonly type = 'chapter' as const; ... }
 class ScriptVoiceOver { public readonly type = 'voice_over' as const; ... }
 class ScriptDialogue { public readonly type = 'dialogue' as const; ... }
 class ScriptShot { public readonly type = 'shot' as const; ... }
+class ScriptText { public readonly type = 'text' as const; ... }
 
-export type ScriptPart = ScriptChapter | ScriptVoiceOver | ScriptDialogue | ScriptShot;
+export type ScriptPart = ScriptChapter | ScriptVoiceOver | ScriptDialogue | ScriptShot | ScriptText;
 ```
 `useListScriptParts` maps the heterogeneous API response via `scriptPartFromJSON(json)` which switches on `json.type`.
 
 ### Inline Editing Pattern
 Each part card maintains local `isEditing: boolean` state. In edit mode, form fields replace the read view. On "Enregistrer" the mutation fires, on "Annuler" local state is reset from the prop.
 
-### Auto-save on Blur (ScriptMetaHeader)
-Title and hook fields call `updateScript` only when the value has actually changed from the original `script.title` / `script.hook`.
+### Auto-save on Blur (ScriptMetaHeader, ScriptTextCard)
+Title and hook fields call `updateScript` only when the value has actually changed from the original `script.title` / `script.hook`. `ScriptTextCard` follows the same pattern — auto-saves on blur when content has changed.
+
+### Text Part (Notebook-Style)
+`ScriptTextCard` is a borderless, always-editable text block that blends into the page:
+- **Always editable:** No view/edit toggle, uses a `simple` TextArea
+- **Auto-save on blur:** Calls `updateScriptText` when content changes
+- **No card border:** Only shows drag handle + delete button on hover (`opacity-0 group-hover:opacity-100`)
+- **Virtual mode:** When a script has no parts, a virtual `ScriptTextCard` (no `text` prop) is rendered. On first blur with non-empty content, it creates a real entity via `createScriptText`
 
 ### Drag-and-Drop
 Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay`). Parts are reordered optimistically in local state, then `useReorderScriptParts` fires with the new ordered array of `{uuid, type}`. If `parts` prop changes while no drag is active, local state is synced.
@@ -159,7 +170,7 @@ scriptTagQueryKeys.all        // ['script-tags']
 scriptTagQueryKeys.list(uuid) // ['script-tags', 'list', projectUuid]
 ```
 
-All part mutations (chapters, voice-overs, dialogues, shots, dialogue subjects) invalidate `scriptQueryKeys.parts(scriptUuid)`.
+All part mutations (chapters, voice-overs, dialogues, shots, texts, dialogue subjects) invalidate `scriptQueryKeys.parts(scriptUuid)`.
 
 ---
 

@@ -40,8 +40,6 @@ final class ScriptTagController extends AbstractController
             $tags = $tagRepository->getByUserAndProjectLimited($user, $project, 20);
         }
 
-        dd($tags);
-
         return $this->json(
             data: $tags,
             status: Response::HTTP_OK,

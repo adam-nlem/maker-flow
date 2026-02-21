@@ -3,4 +3,5 @@ export enum ScriptPartType {
     VoiceOver = 'voice_over',
     Dialogue = 'dialogue',
     Shot = 'shot',
+    Text = 'text',
 }

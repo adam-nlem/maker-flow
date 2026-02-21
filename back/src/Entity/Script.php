@@ -128,6 +128,12 @@ class Script
     #[ORM\OneToMany(targetEntity: ScriptShot::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
     private Collection $scriptShots;
 
+    /**
+     * @var Collection<int, ScriptText>
+     */
+    #[ORM\OneToMany(targetEntity: ScriptText::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptTexts;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -143,6 +149,7 @@ class Script
         $this->scriptVoiceOvers = new ArrayCollection();
         $this->scriptDialogues = new ArrayCollection();
         $this->scriptShots = new ArrayCollection();
+        $this->scriptTexts = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -398,6 +405,35 @@ class Script
         if ($this->scriptShots->removeElement($scriptShot)) {
             if ($scriptShot->getScript() === $this) {
                 $scriptShot->setScript(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ScriptText>
+     */
+    public function getScriptTexts(): Collection
+    {
+        return $this->scriptTexts;
+    }
+
+    public function addScriptText(ScriptText $scriptText): static
+    {
+        if (!$this->scriptTexts->contains($scriptText)) {
+            $this->scriptTexts->add($scriptText);
+            $scriptText->setScript($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScriptText(ScriptText $scriptText): static
+    {
+        if ($this->scriptTexts->removeElement($scriptText)) {
+            if ($scriptText->getScript() === $this) {
+                $scriptText->setScript(null);
             }
         }
 

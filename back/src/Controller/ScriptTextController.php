@@ -2,11 +2,11 @@
 
 namespace App\Controller;
 
-use App\DTO\QueryParam\ScriptShot\ListScriptShotsQueryParamDTO;
+use App\DTO\QueryParam\ScriptText\ListScriptTextsQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
-use App\DTO\Request\ScriptShot\CreateScriptShotRequestDTO;
-use App\DTO\Request\ScriptShot\UpdateScriptShotRequestDTO;
-use App\Entity\ScriptShot;
+use App\DTO\Request\ScriptText\CreateScriptTextRequestDTO;
+use App\DTO\Request\ScriptText\UpdateScriptTextRequestDTO;
+use App\Entity\ScriptText;
 use App\Entity\User;
 use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
@@ -20,14 +20,14 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/scripts/shots', requirements: ['shotUuid' => Requirement::UUID])]
-final class ScriptShotController extends AbstractController
+#[Route('/api/scripts/texts', requirements: ['textUuid' => Requirement::UUID])]
+final class ScriptTextController extends AbstractController
 {
-    #[Route('', name: 'api_scripts_shots_list', methods: ['GET'])]
+    #[Route('', name: 'api_scripts_texts_list', methods: ['GET'])]
     public function list(
-        ListScriptShotsQueryParamDTO $queryParamDto,
+        ListScriptTextsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
-        ScriptShotRepository $shotRepository,
+        ScriptTextRepository $textRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -38,18 +38,18 @@ final class ScriptShotController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $shots = $shotRepository->getByScriptAndUserOrderedByPosition($script, $user);
+        $texts = $textRepository->getByScriptAndUserOrderedByPosition($script, $user);
 
         return $this->json(
-            data: $shots,
+            data: $texts,
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_scripts_shots_list']]
+            context: ['groups' => ['api_scripts_texts_list']]
         );
     }
 
-    #[Route('', name: 'api_scripts_shots_create', methods: ['POST'])]
+    #[Route('', name: 'api_scripts_texts_create', methods: ['POST'])]
     public function create(
-        CreateScriptShotRequestDTO $dto,
+        CreateScriptTextRequestDTO $dto,
         ScriptRepository $scriptRepository,
         ScriptChapterRepository $chapterRepository,
         ScriptVoiceOverRepository $voiceOverRepository,
@@ -67,18 +67,18 @@ final class ScriptShotController extends AbstractController
         }
 
         try {
-            /** @var ScriptShot $shot */
-            $shot = $dto->build();
+            /** @var ScriptText $text */
+            $text = $dto->build();
         } catch (CustomValidationException $e) {
             return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
         }
 
-        $shot
+        $text
             ->setUser($user)
             ->setScript($script);
 
         if ($dto->getPosition() !== null) {
-            $shot->setPosition($dto->getPosition());
+            $text->setPosition($dto->getPosition());
         } else {
             $maxPosition = max(
                 $chapterRepository->getMaxPositionByScript($script),
@@ -87,64 +87,60 @@ final class ScriptShotController extends AbstractController
                 $shotRepository->getMaxPositionByScript($script),
                 $textRepository->getMaxPositionByScript($script),
             );
-            $shot->setPosition($maxPosition + 1);
+            $text->setPosition($maxPosition + 1);
         }
 
-        $shotRepository->save($shot, true);
+        $textRepository->save($text, true);
 
         return $this->json(
-            data: $shot,
+            data: $text,
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_scripts_shots_create']]
+            context: ['groups' => ['api_scripts_texts_create']]
         );
     }
 
-    #[Route('/{shotUuid}', name: 'api_scripts_shots_update', methods: ['PATCH'])]
+    #[Route('/{textUuid}', name: 'api_scripts_texts_update', methods: ['PATCH'])]
     public function update(
-        string $shotUuid,
-        UpdateScriptShotRequestDTO $dto,
-        ScriptShotRepository $shotRepository,
+        string $textUuid,
+        UpdateScriptTextRequestDTO $dto,
+        ScriptTextRepository $textRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $shot = $shotRepository->getByUuidAndUser($shotUuid, $user);
+        $text = $textRepository->getByUuidAndUser($textUuid, $user);
 
-        if ($shot === null) {
-            return $this->json(data: ["message" => "You don't have any shot with this uuid"], status: Response::HTTP_NOT_FOUND);
+        if ($text === null) {
+            return $this->json(data: ["message" => "You don't have any text with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        if ($dto->getContent() !== null && $dto->getContent() !== $shot->getContent()) {
-            $shot->setContent($dto->getContent());
+        if ($dto->getContent() !== null && $dto->getContent() !== $text->getContent()) {
+            $text->setContent($dto->getContent());
         }
 
-        if ($dto->getShotType() !== null && $dto->getShotType() !== $shot->getShotType()) {
-            $shot->setShotType($dto->getShotType());
-        }
-
-        $shotRepository->save($shot, true);
+        $textRepository->save($text, true);
 
         return $this->json(
-            data: $shot,
+            data: $text,
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_scripts_shots_update']]
+            context: ['groups' => ['api_scripts_texts_update']]
         );
     }
 
-    #[Route('/{shotUuid}', name: 'api_scripts_shots_delete', methods: ['DELETE'])]
-    public function delete(string $shotUuid, ScriptShotRepository $shotRepository): JsonResponse
+    #[Route('/{textUuid}', name: 'api_scripts_texts_delete', methods: ['DELETE'])]
+    public function delete(string $textUuid, ScriptTextRepository $textRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $shot = $shotRepository->getByUuidAndUser($shotUuid, $user);
+        $text = $textRepository->getByUuidAndUser($textUuid, $user);
 
-        if ($shot === null) {
-            return $this->json(data: ["message" => "You don't have any shot with this uuid"], status: Response::HTTP_NOT_FOUND);
+        if ($text === null) {
+            return $this->json(data: ["message" => "You don't have any text with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $shotRepository->remove($shot, true);
+        $textRepository->remove($text, true);
 
-        return $this->json(data: ["message" => "Shot deleted successfully"], status: Response::HTTP_OK);
+        return $this->json(data: ["message" => "Text deleted successfully"], status: Response::HTTP_OK);
     }
 }
