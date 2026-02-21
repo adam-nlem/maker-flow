@@ -92,6 +92,16 @@ class Script
     ])]
     private ?PostGroup $postGroup = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups([
+        'api_scripts_list',
+        'api_scripts_create',
+        'api_scripts_update',
+        'api_scripts_show',
+    ])]
+    private ?HookTemplate $hookTemplate = null;
+
     /**
      * @var Collection<int, ScriptTag>
      */
@@ -267,6 +277,18 @@ class Script
     public function setPostGroup(?PostGroup $postGroup): static
     {
         $this->postGroup = $postGroup;
+
+        return $this;
+    }
+
+    public function getHookTemplate(): ?HookTemplate
+    {
+        return $this->hookTemplate;
+    }
+
+    public function setHookTemplate(?HookTemplate $hookTemplate): static
+    {
+        $this->hookTemplate = $hookTemplate;
 
         return $this;
     }

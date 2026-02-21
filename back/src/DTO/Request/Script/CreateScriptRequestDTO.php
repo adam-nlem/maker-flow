@@ -14,6 +14,7 @@ class CreateScriptRequestDTO extends AbstractRequestDTO
     private ?string $hook;
     private ?string $publishedAt;
     private ?string $postGroupUuid;
+    private ?string $hookTemplateUuid;
     private ?array $tagUuids;
 
     public function __construct(
@@ -30,6 +31,7 @@ class CreateScriptRequestDTO extends AbstractRequestDTO
         $this->hook = $payload["hook"] ?? null;
         $this->publishedAt = $payload["publishedAt"] ?? null;
         $this->postGroupUuid = $payload["postGroupUuid"] ?? null;
+        $this->hookTemplateUuid = $payload["hookTemplateUuid"] ?? null;
         $this->tagUuids = $payload["tagUuids"] ?? null;
     }
 
@@ -72,6 +74,11 @@ class CreateScriptRequestDTO extends AbstractRequestDTO
     public function getPostGroupUuid(): ?string
     {
         return $this->postGroupUuid;
+    }
+
+    public function getHookTemplateUuid(): ?string
+    {
+        return $this->hookTemplateUuid;
     }
 
     public function getTagUuids(): ?array

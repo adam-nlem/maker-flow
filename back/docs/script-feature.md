@@ -24,6 +24,7 @@ The Script feature allows users to create structured writing plans for social me
 | `user` | `User` | Owner (ManyToOne, cascade delete) |
 | `project` | `Project` | Parent project (ManyToOne inversedBy `scripts`, cascade delete) |
 | `postGroup` | `PostGroup` | Optional linked post group (OneToOne, SET NULL on delete) |
+| `hookTemplate` | `HookTemplate` | Optional source hook template (ManyToOne, SET NULL on delete) |
 | `tags` | `Collection<ScriptTag>` | Project-scoped tags (ManyToMany owning side) |
 | `scriptChapters` | `Collection<ScriptChapter>` | Chapters (OneToMany, cascade remove, orphanRemoval) |
 | `scriptVoiceOvers` | `Collection<ScriptVoiceOver>` | Voice-overs (OneToMany, cascade remove, orphanRemoval) |
@@ -339,8 +340,8 @@ All follow the same CRUD pattern:
 
 | DTO | Properties |
 |-----|------------|
-| `CreateScriptRequestDTO` | `projectUuid`, `title`, `hook?`, `publishedAt?`, `postGroupUuid?`, `tagUuids?` |
-| `UpdateScriptRequestDTO` | `title?`, `hook?`, `publishedAt?`, `postGroupUuid?` (nullable = unlink), `tagUuids?` |
+| `CreateScriptRequestDTO` | `projectUuid`, `title`, `hook?`, `publishedAt?`, `postGroupUuid?`, `hookTemplateUuid?`, `tagUuids?` |
+| `UpdateScriptRequestDTO` | `title?`, `hook?`, `publishedAt?`, `postGroupUuid?` (nullable = unlink), `hookTemplateUuid?` (nullable = unlink), `tagUuids?` |
 | `ReorderScriptPartsRequestDTO` | `orderedParts: [{uuid, type}]` |
 | `CreateScriptTagRequestDTO` | `projectUuid`, `title`, `color` (default: Green) |
 | `UpdateScriptTagRequestDTO` | `title`, `color` |
@@ -401,6 +402,7 @@ User (1) ──────── (N) ScriptTag
 Project (1) ───── (N) Script
 Project (1) ───── (N) ScriptTag
 PostGroup (1) ─── (0..1) Script        [OneToOne, nullable, SET NULL]
+HookTemplate (1) ── (N) Script        [ManyToOne, nullable, SET NULL]
 Script (N) ────── (N) ScriptTag        [ManyToMany, owning side on Script]
 Script (1) ────── (N) ScriptChapter
 Script (1) ────── (N) ScriptVoiceOver

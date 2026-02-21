@@ -25,10 +25,14 @@ interface DraggablePartProps {
 }
 
 function DraggablePart({ part, scriptUuid }: DraggablePartProps) {
-    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: part.uuid });
+    const { attributes, listeners, setNodeRef: setDragRef, isDragging } = useDraggable({ id: part.uuid });
+    const { setNodeRef: setDropRef } = useDroppable({ id: part.uuid });
 
     return (
-        <div ref={setNodeRef} className={isDragging ? "opacity-40" : ""}>
+        <div
+            ref={(node) => { setDragRef(node); setDropRef(node); }}
+            className={isDragging ? "opacity-40" : ""}
+        >
             {renderPartCard(part, scriptUuid, { ...attributes, ...listeners })}
         </div>
     );

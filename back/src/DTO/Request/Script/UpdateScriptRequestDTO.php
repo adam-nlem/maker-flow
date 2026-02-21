@@ -12,8 +12,10 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     private ?string $hook;
     private ?string $publishedAt;
     private ?string $postGroupUuid;
+    private ?string $hookTemplateUuid;
     private ?array $tagUuids;
     private bool $hasPostGroupUuid = false;
+    private bool $hasHookTemplateUuid = false;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -29,6 +31,8 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
         $this->publishedAt = $payload["publishedAt"] ?? null;
         $this->postGroupUuid = $payload["postGroupUuid"] ?? null;
         $this->hasPostGroupUuid = array_key_exists("postGroupUuid", $payload);
+        $this->hookTemplateUuid = $payload["hookTemplateUuid"] ?? null;
+        $this->hasHookTemplateUuid = array_key_exists("hookTemplateUuid", $payload);
         $this->tagUuids = $payload["tagUuids"] ?? null;
     }
 
@@ -39,6 +43,7 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
             'hook' => $this->getHook(),
             'publishedAt' => $this->getPublishedAt(),
             'postGroupUuid' => $this->getPostGroupUuid(),
+            'hookTemplateUuid' => $this->getHookTemplateUuid(),
             'tagUuids' => $this->getTagUuids(),
         ];
     }
@@ -66,6 +71,16 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     public function hasPostGroupUuid(): bool
     {
         return $this->hasPostGroupUuid;
+    }
+
+    public function getHookTemplateUuid(): ?string
+    {
+        return $this->hookTemplateUuid;
+    }
+
+    public function hasHookTemplateUuid(): bool
+    {
+        return $this->hasHookTemplateUuid;
     }
 
     public function getTagUuids(): ?array

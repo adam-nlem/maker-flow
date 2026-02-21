@@ -10,6 +10,7 @@ use App\DTO\Request\Script\UpdateScriptRequestDTO;
 use App\Entity\Enum\ScriptPartType;
 use App\Entity\Script;
 use App\Entity\User;
+use App\Repository\HookTemplateRepository;
 use App\Repository\PostGroupRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\ScriptChapterRepository;
@@ -59,6 +60,7 @@ final class ScriptController extends AbstractController
         ProjectRepository $projectRepository,
         ScriptRepository $scriptRepository,
         PostGroupRepository $postGroupRepository,
+        HookTemplateRepository $hookTemplateRepository,
         ScriptTagRepository $scriptTagRepository,
     ): JsonResponse {
         /** @var User $user */
@@ -85,6 +87,13 @@ final class ScriptController extends AbstractController
             $postGroup = $postGroupRepository->getByUuidAndUser($dto->getPostGroupUuid(), $user);
             if ($postGroup !== null) {
                 $script->setPostGroup($postGroup);
+            }
+        }
+
+        if ($dto->getHookTemplateUuid() !== null) {
+            $hookTemplate = $hookTemplateRepository->getByUuid($dto->getHookTemplateUuid());
+            if ($hookTemplate !== null) {
+                $script->setHookTemplate($hookTemplate);
             }
         }
 
@@ -131,6 +140,7 @@ final class ScriptController extends AbstractController
         UpdateScriptRequestDTO $dto,
         ScriptRepository $scriptRepository,
         PostGroupRepository $postGroupRepository,
+        HookTemplateRepository $hookTemplateRepository,
         ScriptTagRepository $scriptTagRepository,
     ): JsonResponse {
         /** @var User $user */
@@ -161,6 +171,17 @@ final class ScriptController extends AbstractController
                 $postGroup = $postGroupRepository->getByUuidAndUser($dto->getPostGroupUuid(), $user);
                 if ($postGroup !== null) {
                     $script->setPostGroup($postGroup);
+                }
+            }
+        }
+
+        if ($dto->hasHookTemplateUuid()) {
+            if ($dto->getHookTemplateUuid() === null) {
+                $script->setHookTemplate(null);
+            } else {
+                $hookTemplate = $hookTemplateRepository->getByUuid($dto->getHookTemplateUuid());
+                if ($hookTemplate !== null) {
+                    $script->setHookTemplate($hookTemplate);
                 }
             }
         }
