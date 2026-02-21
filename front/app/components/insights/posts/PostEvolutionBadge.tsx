@@ -11,7 +11,7 @@ export default function PostEvolutionBadge({ evolutionPercentage }: PostEvolutio
 
     return (
         <div
-            className={`${isPositive ? "text-green-500 bg-green-100" : "text-red-500 bg-red-100"} w-fit h-fit p-0.5 rounded flex flex-row items-center gap-1`}
+            className={`border ${isPositive ? "text-primary bg-primary/10 border-primary/30" : "text-red bg-red/10 border-red/30"} w-fit h-fit p-0.5 rounded flex flex-row items-center gap-1`}
             title="Évolution par rapport au contenu précédent à la même durée après publication"
         >
             {isPositive

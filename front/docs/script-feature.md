@@ -91,7 +91,7 @@ front/app/
         ├── ScriptDialogueCard.tsx
         ├── ScriptShotCard.tsx
         ├── ScriptTextCard.tsx         ← borderless, auto-save on blur
-        ├── DialogueSubjectRow.tsx    ← read/edit subject line
+        ├── DialogueSubjectRow.tsx    ← inline-editable subject line
         ├── AddDialogueSubjectRow.tsx ← inline subject creation
         └── AddScriptPartMenu.tsx     ← "+ Add part" dropdown
 ```
@@ -116,11 +116,18 @@ export type ScriptPart = ScriptChapter | ScriptVoiceOver | ScriptDialogue | Scri
 ```
 `useListScriptParts` maps the heterogeneous API response via `scriptPartFromJSON(json)` which switches on `json.type`.
 
-### Inline Editing Pattern
-Each part card maintains local `isEditing: boolean` state. In edit mode, form fields replace the read view. On "Enregistrer" the mutation fires, on "Annuler" local state is reset from the prop.
+### Inline Editing Pattern (Auto-save on Blur)
+All part cards and `DialogueSubjectRow` use the same inline editing pattern — fields are always editable with auto-save on blur. There is no view/edit toggle, no Save/Cancel buttons.
 
-### Auto-save on Blur (ScriptMetaHeader, ScriptTextCard)
-Title and hook fields call `updateScript` only when the value has actually changed from the original `script.title` / `script.hook`. `ScriptTextCard` follows the same pattern — auto-saves on blur when content has changed.
+**How it works:**
+- Each field maintains local state (e.g. `useState(chapter.title)`)
+- On `onBlur`, the handler compares the trimmed local value against the prop value
+- If changed, the update mutation fires with only the changed field
+- For enum selects (chapterType, voiceOverType, shotType), auto-save fires on `onChange` since selection is atomic
+- Input/TextArea use the `simple` prop for borderless inline styling
+- Drag handle + delete button are hover-revealed (`opacity-0 group-hover:opacity-100`)
+
+**Structured part cards** (chapter, voice-over, dialogue, shot) keep a bordered card wrapper for visual distinction. **Text parts** are borderless to blend into the page.
 
 ### Text Part (Notebook-Style)
 `ScriptTextCard` is a borderless, always-editable text block that blends into the page:
@@ -140,7 +147,7 @@ Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay
 - **Note:** `useListScriptTags` returns `{ scriptTags }` (not `{ tags }`)
 
 ### Dialogue Subjects
-`ScriptDialogueCard` always renders the subjects list below the header (no toggle). `DialogueSubjectRow` handles read/inline-edit/delete for each subject. `AddDialogueSubjectRow` provides inline creation. The create hook uses `scriptDialogueUuid` (not `dialogueUuid`).
+`ScriptDialogueCard` always renders the subjects list below the header. `DialogueSubjectRow` is always inline-editable (speaker + content fields auto-save on blur). `AddDialogueSubjectRow` provides inline creation. The create hook uses `scriptDialogueUuid` (not `dialogueUuid`).
 
 ---
 
