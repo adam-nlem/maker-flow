@@ -1,5 +1,5 @@
-import { ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SparklesIcon, SunIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { HomeIcon as HomeIconSolid, GlobeEuropeAfricaIcon as GlobeEuropeAfricaIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid } from "@heroicons/react/24/solid";
+import { ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SparklesIcon, SunIcon } from "@heroicons/react/24/outline";
+import { HomeIcon as HomeIconSolid, GlobeEuropeAfricaIcon as GlobeEuropeAfricaIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
@@ -113,12 +113,11 @@ export default function SideBar() {
           }
 
           {/* NAVIGATION SECTION */}
-          <div className={`mt-10 flex flex-col ${isExpanded ? '' : 'items-center'}`}>
+          <div className={`mt-10 flex flex-col gap-1 ${isExpanded ? '' : 'items-center'}`}>
             <IconWithTextTile
               icon={location.pathname === '/' ? HomeIconSolid : HomeIcon}
               label="Accueil"
               isExpanded={isExpanded}
-              isBold={true}
               isSelected={location.pathname === '/'}
               onClick={() => navigate('/')}
             />
@@ -126,23 +125,20 @@ export default function SideBar() {
               icon={location.pathname === '/tasks' ? GlobeEuropeAfricaIconSolid : GlobeEuropeAfricaIcon}
               label="Veille"
               isExpanded={isExpanded}
-              isBold={true}
               isSelected={location.pathname === '/tasks'}
               onClick={() => navigate('/tasks')}
             />
             <IconWithTextTile
-              icon={location.pathname.startsWith('/insights') ? ClipboardDocumentCheckIconSolid : ClipboardDocumentCheckIcon}
+              icon={location.pathname.startsWith('/scripts') ? ClipboardDocumentCheckIconSolid : ClipboardDocumentCheckIcon}
               label="Script"
               isExpanded={isExpanded}
-              isBold={true}
-              isSelected={location.pathname.startsWith('/insights')}
-              onClick={() => navigate('/insights')}
+              isSelected={location.pathname.startsWith('/scripts')}
+              onClick={() => navigate('/scripts')}
             />
             <IconWithTextTile
               icon={location.pathname.startsWith('/insights') ? ChartBarIconSolid : ChartBarIcon}
               label="Statistiques"
               isExpanded={isExpanded}
-              isBold={true}
               isSelected={location.pathname.startsWith('/insights')}
               onClick={() => navigate('/insights')}
             />

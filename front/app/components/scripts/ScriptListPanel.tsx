@@ -1,0 +1,57 @@
+import { PlusIcon } from "@heroicons/react/24/outline";
+import type { Script } from "~/models/Script";
+import ScriptListItem from "./ScriptListItem";
+import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
+import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
+
+interface Props {
+    scripts: Script[];
+    projectUuid: string;
+}
+
+export default function ScriptListPanel({ scripts, projectUuid }: Props) {
+    const { createScript, isPending } = useCreateScript();
+    const focusedScriptUuid = useFocusScriptStore((state) => state.focusedScriptUuid);
+    const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
+
+    const handleNewScript = async () => {
+        const newScript = await createScript({ projectUuid, title: "Nouveau script" });
+        setFocusedScriptUuid(newScript.uuid);
+    };
+
+    return (
+        <div className="w-72 shrink-0 border-r border-light-gray h-full flex flex-col">
+            {/* Header */}
+            <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
+                <h2 className="text-heading-md">Scripts</h2>
+                <button
+                    onClick={handleNewScript}
+                    disabled={isPending}
+                    className="flex flex-row items-center gap-1 text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
+                    title="Nouveau script"
+                >
+                    <PlusIcon className="size-4" strokeWidth={2} />
+                </button>
+            </div>
+
+            {/* List */}
+            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1 scrollbar-none">
+                {scripts.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-12 text-gray">
+                        <p className="text-body-sm text-center">Aucun script.</p>
+                        <p className="text-body-xs text-center mt-1">Cliquez sur + pour en créer un.</p>
+                    </div>
+                ) : (
+                    scripts.map((script) => (
+                        <ScriptListItem
+                            key={script.uuid}
+                            script={script}
+                            isSelected={script.uuid === focusedScriptUuid}
+                            onClick={() => setFocusedScriptUuid(script.uuid)}
+                        />
+                    ))
+                )}
+            </div>
+        </div>
+    );
+}

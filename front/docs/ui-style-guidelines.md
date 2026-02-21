@@ -99,7 +99,7 @@ In dark mode (`:root.dark`), the following tokens are overridden:
 | `--color-gray` | `#6b7280` | `#9ca3af` |
 | `--color-gray-400` | `#9ca3af` | `#6b7280` |
 | `--color-gray-900` | `#111827` | `#F0F0F0` |
-| `--color-surface-hover` | `#F9FAFB` | `#23233a` |
+| `--color-surface-hover` | `rgba(67, 206, 169, 0.05)` | `rgba(67, 206, 169, 0.05)` |
 
 See [dark-mode-feature.md](dark-mode-feature.md) for full details.
 

@@ -16,8 +16,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/todo-lists/tags')]
+#[Route('/api/todo-lists/tags', requirements: ['tagUuid' => Requirement::UUID])]
 class TodoListTagController extends AbstractController
 {
     #[Route('', name: 'api_todo_lists_tags_list', methods: ['GET'])]
@@ -85,8 +86,8 @@ class TodoListTagController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'show', methods: ['GET'])]
-    public function show(string $uuid) {}
+    #[Route('/{tagUuid}', name: 'api_todo_lists_tags_show', methods: ['GET'])]
+    public function show(string $tagUuid) {}
 
     #[Route('/{tagUuid}', name: 'api_todo_lists_tags_update', methods: ['PATCH'])]
     public function update(

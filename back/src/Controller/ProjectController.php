@@ -16,8 +16,9 @@ use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\Stateless
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/projects')]
+#[Route('/api/projects', requirements: ['projectUuid' => Requirement::UUID])]
 final class ProjectController extends AbstractController
 {
     #[Route('', name: 'api_projects_create', methods: ['POST'])]

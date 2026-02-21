@@ -16,8 +16,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/scripts/dialogue-subjects')]
+#[Route('/api/scripts/dialogue-subjects', requirements: ['dialogueSubjectUuid' => Requirement::UUID])]
 final class DialogueSubjectController extends AbstractController
 {
     #[Route('', name: 'api_scripts_dialogue_subjects_list', methods: ['GET'])]
@@ -86,16 +87,16 @@ final class DialogueSubjectController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_dialogue_subjects_update', methods: ['PATCH'])]
+    #[Route('/{dialogueSubjectUuid}', name: 'api_scripts_dialogue_subjects_update', methods: ['PATCH'])]
     public function update(
-        string $uuid,
+        string $dialogueSubjectUuid,
         UpdateDialogueSubjectRequestDTO $dto,
         DialogueSubjectRepository $subjectRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $subject = $subjectRepository->getByUuidAndUser($uuid, $user);
+        $subject = $subjectRepository->getByUuidAndUser($dialogueSubjectUuid, $user);
 
         if ($subject === null) {
             return $this->json(data: ["message" => "You don't have any dialogue subject with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -118,13 +119,13 @@ final class DialogueSubjectController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_dialogue_subjects_delete', methods: ['DELETE'])]
-    public function delete(string $uuid, DialogueSubjectRepository $subjectRepository): JsonResponse
+    #[Route('/{dialogueSubjectUuid}', name: 'api_scripts_dialogue_subjects_delete', methods: ['DELETE'])]
+    public function delete(string $dialogueSubjectUuid, DialogueSubjectRepository $subjectRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $subject = $subjectRepository->getByUuidAndUser($uuid, $user);
+        $subject = $subjectRepository->getByUuidAndUser($dialogueSubjectUuid, $user);
 
         if ($subject === null) {
             return $this->json(data: ["message" => "You don't have any dialogue subject with this uuid"], status: Response::HTTP_NOT_FOUND);

@@ -21,7 +21,7 @@ export default function IconWithTextTile({
 }: IconWithTextTileProps) {
     return (
         <div
-            className={`flex flex-row items-center gap-3 cursor-pointer rounded-lg p-2 ${isSelected ? 'bg-light-gray' : 'hover:bg-light-gray'}`}
+            className={`flex flex-row items-center gap-3 cursor-pointer rounded-lg p-2 ${isSelected ? 'bg-primary/10 border border-primary/30' : 'hover:bg-surface-hover border border-transparent'}`}
             onClick={onClick}
         >
             <Icon

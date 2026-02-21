@@ -14,8 +14,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/scripts/tags')]
+#[Route('/api/scripts/tags', requirements: ['tagUuid' => Requirement::UUID])]
 final class ScriptTagController extends AbstractController
 {
     #[Route('', name: 'api_scripts_tags_list', methods: ['GET'])]
@@ -38,6 +39,8 @@ final class ScriptTagController extends AbstractController
         } else {
             $tags = $tagRepository->getByUserAndProjectLimited($user, $project, 20);
         }
+
+        dd($tags);
 
         return $this->json(
             data: $tags,

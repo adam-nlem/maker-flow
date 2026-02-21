@@ -1,0 +1,15 @@
+{
+  "workspace": {
+    "id": "3e9cca16-9f67-408c-8c1f-d3f9cdd5147c"
+  },
+  "entities": {
+    "environments": [],
+    "flows": [],
+    "globals": [],
+    "mocks": [],
+    "specs": [],
+    "collections": [
+      "../back/docs/makerflow-api.postman_collection.json"
+    ]
+  }
+}

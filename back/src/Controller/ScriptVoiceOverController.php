@@ -17,8 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/scripts/voice-overs')]
+#[Route('/api/scripts/voice-overs', requirements: ['voiceOverUuid' => Requirement::UUID])]
 final class ScriptVoiceOverController extends AbstractController
 {
     #[Route('', name: 'api_scripts_voice_overs_list', methods: ['GET'])]
@@ -95,16 +96,16 @@ final class ScriptVoiceOverController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_voice_overs_update', methods: ['PATCH'])]
+    #[Route('/{voiceOverUuid}', name: 'api_scripts_voice_overs_update', methods: ['PATCH'])]
     public function update(
-        string $uuid,
+        string $voiceOverUuid,
         UpdateScriptVoiceOverRequestDTO $dto,
         ScriptVoiceOverRepository $voiceOverRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $voiceOver = $voiceOverRepository->getByUuidAndUser($uuid, $user);
+        $voiceOver = $voiceOverRepository->getByUuidAndUser($voiceOverUuid, $user);
 
         if ($voiceOver === null) {
             return $this->json(data: ["message" => "You don't have any voice-over with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -127,13 +128,13 @@ final class ScriptVoiceOverController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_voice_overs_delete', methods: ['DELETE'])]
-    public function delete(string $uuid, ScriptVoiceOverRepository $voiceOverRepository): JsonResponse
+    #[Route('/{voiceOverUuid}', name: 'api_scripts_voice_overs_delete', methods: ['DELETE'])]
+    public function delete(string $voiceOverUuid, ScriptVoiceOverRepository $voiceOverRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $voiceOver = $voiceOverRepository->getByUuidAndUser($uuid, $user);
+        $voiceOver = $voiceOverRepository->getByUuidAndUser($voiceOverUuid, $user);
 
         if ($voiceOver === null) {
             return $this->json(data: ["message" => "You don't have any voice-over with this uuid"], status: Response::HTTP_NOT_FOUND);

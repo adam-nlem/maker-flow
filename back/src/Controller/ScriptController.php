@@ -23,8 +23,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/scripts')]
+#[Route('/api/scripts', requirements: ['scriptUuid' => Requirement::UUID])]
 final class ScriptController extends AbstractController
 {
     #[Route('', name: 'api_scripts_list', methods: ['GET'])]
@@ -102,15 +103,15 @@ final class ScriptController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_show', methods: ['GET'])]
+    #[Route('/{scriptUuid}', name: 'api_scripts_show', methods: ['GET'])]
     public function show(
-        string $uuid,
+        string $scriptUuid,
         ScriptRepository $scriptRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($uuid, $user);
+        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -123,9 +124,9 @@ final class ScriptController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_update', methods: ['PATCH'])]
+    #[Route('/{scriptUuid}', name: 'api_scripts_update', methods: ['PATCH'])]
     public function update(
-        string $uuid,
+        string $scriptUuid,
         UpdateScriptRequestDTO $dto,
         ScriptRepository $scriptRepository,
         PostGroupRepository $postGroupRepository,
@@ -134,7 +135,7 @@ final class ScriptController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($uuid, $user);
+        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -185,15 +186,15 @@ final class ScriptController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_delete', methods: ['DELETE'])]
+    #[Route('/{scriptUuid}', name: 'api_scripts_delete', methods: ['DELETE'])]
     public function delete(
-        string $uuid,
+        string $scriptUuid,
         ScriptRepository $scriptRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($uuid, $user);
+        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -204,9 +205,9 @@ final class ScriptController extends AbstractController
         return $this->json(data: ["message" => "Script deleted successfully"], status: Response::HTTP_OK);
     }
 
-    #[Route('/{uuid}/parts', name: 'api_scripts_parts_list', methods: ['GET'])]
+    #[Route('/{scriptUuid}/parts', name: 'api_scripts_parts_list', methods: ['GET'])]
     public function listParts(
-        string $uuid,
+        string $scriptUuid,
         ScriptRepository $scriptRepository,
         ScriptChapterRepository $chapterRepository,
         ScriptVoiceOverRepository $voiceOverRepository,
@@ -216,7 +217,7 @@ final class ScriptController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($uuid, $user);
+        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -238,9 +239,9 @@ final class ScriptController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}/reorder-parts', name: 'api_scripts_parts_reorder', methods: ['PATCH'])]
+    #[Route('/{scriptUuid}/reorder-parts', name: 'api_scripts_parts_reorder', methods: ['PATCH'])]
     public function reorderParts(
-        string $uuid,
+        string $scriptUuid,
         ReorderScriptPartsRequestDTO $dto,
         ScriptRepository $scriptRepository,
         ScriptChapterRepository $chapterRepository,
@@ -252,7 +253,7 @@ final class ScriptController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($uuid, $user);
+        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);

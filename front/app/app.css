@@ -42,7 +42,7 @@ body {
   --color-purple: #5346B6;
 
   --color-pastel-green: #BCD5AA;
-  --color-surface-hover: #F9FAFB;
+  --color-surface-hover: rgba(67, 206, 169, 0.10);
 
   /* Custom text sizes with appropriate fonts */
   --font-size-xs: 0.75rem;
@@ -67,7 +67,7 @@ body {
   --color-gray: #9ca3af;
   --color-gray-400: #6b7280;
   --color-gray-900: #F0F0F0;
-  --color-surface-hover: #23233a;
+  --color-surface-hover: rgba(67, 206, 169, 0.05);
   --shimmer-highlight: rgba(255, 255, 255, 0.1);
 }
 

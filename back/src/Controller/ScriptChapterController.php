@@ -17,8 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/scripts/chapters')]
+#[Route('/api/scripts/chapters', requirements: ['chapterUuid' => Requirement::UUID])]
 final class ScriptChapterController extends AbstractController
 {
     #[Route('', name: 'api_scripts_chapters_list', methods: ['GET'])]
@@ -95,16 +96,16 @@ final class ScriptChapterController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_chapters_update', methods: ['PATCH'])]
+    #[Route('/{chapterUuid}', name: 'api_scripts_chapters_update', methods: ['PATCH'])]
     public function update(
-        string $uuid,
+        string $chapterUuid,
         UpdateScriptChapterRequestDTO $dto,
         ScriptChapterRepository $chapterRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $chapter = $chapterRepository->getByUuidAndUser($uuid, $user);
+        $chapter = $chapterRepository->getByUuidAndUser($chapterUuid, $user);
 
         if ($chapter === null) {
             return $this->json(data: ["message" => "You don't have any chapter with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -131,13 +132,13 @@ final class ScriptChapterController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_chapters_delete', methods: ['DELETE'])]
-    public function delete(string $uuid, ScriptChapterRepository $chapterRepository): JsonResponse
+    #[Route('/{chapterUuid}', name: 'api_scripts_chapters_delete', methods: ['DELETE'])]
+    public function delete(string $chapterUuid, ScriptChapterRepository $chapterRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $chapter = $chapterRepository->getByUuidAndUser($uuid, $user);
+        $chapter = $chapterRepository->getByUuidAndUser($chapterUuid, $user);
 
         if ($chapter === null) {
             return $this->json(data: ["message" => "You don't have any chapter with this uuid"], status: Response::HTTP_NOT_FOUND);

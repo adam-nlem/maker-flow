@@ -17,8 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/scripts/dialogues')]
+#[Route('/api/scripts/dialogues', requirements: ['dialogueUuid' => Requirement::UUID])]
 final class ScriptDialogueController extends AbstractController
 {
     #[Route('', name: 'api_scripts_dialogues_list', methods: ['GET'])]
@@ -95,16 +96,16 @@ final class ScriptDialogueController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_dialogues_update', methods: ['PATCH'])]
+    #[Route('/{dialogueUuid}', name: 'api_scripts_dialogues_update', methods: ['PATCH'])]
     public function update(
-        string $uuid,
+        string $dialogueUuid,
         UpdateScriptDialogueRequestDTO $dto,
         ScriptDialogueRepository $dialogueRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $dialogue = $dialogueRepository->getByUuidAndUser($uuid, $user);
+        $dialogue = $dialogueRepository->getByUuidAndUser($dialogueUuid, $user);
 
         if ($dialogue === null) {
             return $this->json(data: ["message" => "You don't have any dialogue with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -127,13 +128,13 @@ final class ScriptDialogueController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_dialogues_delete', methods: ['DELETE'])]
-    public function delete(string $uuid, ScriptDialogueRepository $dialogueRepository): JsonResponse
+    #[Route('/{dialogueUuid}', name: 'api_scripts_dialogues_delete', methods: ['DELETE'])]
+    public function delete(string $dialogueUuid, ScriptDialogueRepository $dialogueRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $dialogue = $dialogueRepository->getByUuidAndUser($uuid, $user);
+        $dialogue = $dialogueRepository->getByUuidAndUser($dialogueUuid, $user);
 
         if ($dialogue === null) {
             return $this->json(data: ["message" => "You don't have any dialogue with this uuid"], status: Response::HTTP_NOT_FOUND);

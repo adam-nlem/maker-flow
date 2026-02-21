@@ -17,8 +17,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 
-#[Route('/api/scripts/shots')]
+#[Route('/api/scripts/shots', requirements: ['shotUuid' => Requirement::UUID])]
 final class ScriptShotController extends AbstractController
 {
     #[Route('', name: 'api_scripts_shots_list', methods: ['GET'])]
@@ -95,16 +96,16 @@ final class ScriptShotController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_shots_update', methods: ['PATCH'])]
+    #[Route('/{shotUuid}', name: 'api_scripts_shots_update', methods: ['PATCH'])]
     public function update(
-        string $uuid,
+        string $shotUuid,
         UpdateScriptShotRequestDTO $dto,
         ScriptShotRepository $shotRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $shot = $shotRepository->getByUuidAndUser($uuid, $user);
+        $shot = $shotRepository->getByUuidAndUser($shotUuid, $user);
 
         if ($shot === null) {
             return $this->json(data: ["message" => "You don't have any shot with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -127,13 +128,13 @@ final class ScriptShotController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_scripts_shots_delete', methods: ['DELETE'])]
-    public function delete(string $uuid, ScriptShotRepository $shotRepository): JsonResponse
+    #[Route('/{shotUuid}', name: 'api_scripts_shots_delete', methods: ['DELETE'])]
+    public function delete(string $shotUuid, ScriptShotRepository $shotRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $shot = $shotRepository->getByUuidAndUser($uuid, $user);
+        $shot = $shotRepository->getByUuidAndUser($shotUuid, $user);
 
         if ($shot === null) {
             return $this->json(data: ["message" => "You don't have any shot with this uuid"], status: Response::HTTP_NOT_FOUND);

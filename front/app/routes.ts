@@ -12,5 +12,6 @@ export default [
     route("tasks", "routes/tasks.tsx"),
     route("insights", "routes/insights.tsx"),
     route("insights/posts/:postUuid", "routes/insights.post-detail.tsx"),
+    route("scripts", "routes/scripts.tsx"),
   ]),
 ] satisfies RouteConfig;

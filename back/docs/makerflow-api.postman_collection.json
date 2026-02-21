@@ -1,0 +1,1875 @@
+{
+  "info": {
+    "_postman_id": "makerflow-api-collection",
+    "name": "MakerFlow API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Login",
+          "id": "1dc6541f-83aa-4a95-ae8e-babe772e7112",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/login",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "login"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "0a1abc6c-8aac-47a8-bb12-e46c270cc3dd"
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register",
+          "id": "fcd08cd7-704f-400d-ae27-c48ec2b4bc46",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/users/register",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Me",
+          "id": "ab2957a7-cb78-4c46-9274-f4266ccb2a8d",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "users",
+                "me"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "514e7cfc-5a68-40fc-882a-938f0f5435c5"
+    },
+    {
+      "name": "Projects",
+      "item": [
+        {
+          "name": "List Projects",
+          "id": "c29fe9cd-e39d-4f4c-a166-6a961d73468f",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Project",
+          "id": "6c84f4f4-4fa1-47b5-b6b0-c8575c64ccf1",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Mon Projet\",\n  \"description\": \"Description du projet\",\n  \"types\": [\"content_creation\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/projects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Project",
+          "id": "0270a311-9722-4658-83db-1a561560c9b9",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Project",
+          "id": "a5eee022-ce89-4dc5-b6df-85c12ff98804",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Nouveau nom\",\n  \"description\": \"Nouvelle description\",\n  \"types\": [\"content_creation\", \"blog\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Project",
+          "id": "38fc0e76-f737-4115-89ad-49697039f5fd",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Finish Project",
+          "id": "aa0bd851-1e04-47ac-bfb1-2b6725147a8d",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectUuid}}/finish",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectUuid}}",
+                "finish"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reopen Project",
+          "id": "2843246d-b684-4dae-846c-e230c3aee56d",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/{{projectUuid}}/reopen",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "{{projectUuid}}",
+                "reopen"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "e04a9644-57a3-4ac1-b522-4cae76d6f15a"
+    },
+    {
+      "name": "Integrations",
+      "item": [
+        {
+          "name": "List Integrations",
+          "id": "5e4ccdf9-6bcb-4673-8250-0054545d33eb",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/integrations?projectUuid={{projectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "integrations"
+              ],
+              "query": [
+                {
+                  "key": "projectUuid",
+                  "value": "{{projectUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Integration (initiate OAuth)",
+          "id": "b0fb2fa5-8e8c-45b9-a8a6-1f3fd8ad0e77",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectUuid\": \"{{projectUuid}}\",\n  \"provider\": \"instagram\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/integrations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "integrations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Integration",
+          "id": "d3cc4c81-8a11-486b-ba28-152ead22d6db",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/integrations/{{integrationUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "integrations",
+                "{{integrationUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Integration",
+          "id": "9cadbef7-6926-439d-a53a-572d1b5e8c55",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/integrations/{{integrationUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "integrations",
+                "{{integrationUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Provider Icon",
+          "id": "d4568006-d93d-4175-a11d-a95ae9843f57",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/integrations/providers/instagram/icon",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "integrations",
+                "providers",
+                "instagram",
+                "icon"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "c14fe3de-b35f-4628-9875-af172bcc7727"
+    },
+    {
+      "name": "Integration Insights",
+      "item": [
+        {
+          "name": "List Insights",
+          "id": "47fbad53-2476-40a1-ba99-f7090ff4fa67",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/integration-insights?integrationUuid={{integrationUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "integration-insights"
+              ],
+              "query": [
+                {
+                  "key": "integrationUuid",
+                  "value": "{{integrationUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Insight Detail",
+          "id": "a946312f-6ac2-4908-bcdb-89b97001c4c3",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/integration-insights/detail?integrationUuid={{integrationUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "integration-insights",
+                "detail"
+              ],
+              "query": [
+                {
+                  "key": "integrationUuid",
+                  "value": "{{integrationUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "93410f3c-0201-4a22-ba3a-186c3db6b8ba"
+    },
+    {
+      "name": "Posts",
+      "item": [
+        {
+          "name": "List Posts",
+          "id": "06931ac5-4d5d-4c9a-8b4d-5908a70f7dae",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts?integrationUuid={{integrationUuid}}&page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "posts"
+              ],
+              "query": [
+                {
+                  "key": "integrationUuid",
+                  "value": "{{integrationUuid}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Post Thumbnail",
+          "id": "2d7eddb9-4cf0-4a74-b842-81e8e1ff89be",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/{{postUuid}}/thumbnail",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "posts",
+                "{{postUuid}}",
+                "thumbnail"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "c9ad25c5-7004-4ed8-944c-1d5c787098a1"
+    },
+    {
+      "name": "Post Insights",
+      "item": [
+        {
+          "name": "Get Post Insight Detail",
+          "id": "dfd51340-c450-4e60-a6b9-22447a36d0a4",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/post-insights/detail?postUuid={{postUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "post-insights",
+                "detail"
+              ],
+              "query": [
+                {
+                  "key": "postUuid",
+                  "value": "{{postUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "4810b0d0-7ba5-4142-8d2b-85c95289d5c0"
+    },
+    {
+      "name": "Todo Lists",
+      "item": [
+        {
+          "name": "List Todo Lists",
+          "id": "7a76ac56-b8c8-4891-a454-18187ff3795c",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists?projectUuid={{projectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists"
+              ],
+              "query": [
+                {
+                  "key": "projectUuid",
+                  "value": "{{projectUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Todo List",
+          "id": "80788172-c87d-4a13-b87c-fe761cb1c4e8",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectUuid\": \"{{projectUuid}}\",\n  \"title\": \"Ma liste de tâches\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Todo List",
+          "id": "ddaf5c09-b9db-4e81-ae7f-3cd16fe70cf8",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nouveau titre\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/{{todoListUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "{{todoListUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Todo List",
+          "id": "4acd754e-2f69-46db-8064-866c07efe6d5",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/{{todoListUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "{{todoListUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "36e5709e-7fc1-4105-bb7c-169aba7e2d78"
+    },
+    {
+      "name": "Todo List Tasks",
+      "item": [
+        {
+          "name": "List Tasks",
+          "id": "e1b90932-f848-4d62-aad1-eaa8bba7130c",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/tasks?todoListUuid={{todoListUuid}}&page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "tasks"
+              ],
+              "query": [
+                {
+                  "key": "todoListUuid",
+                  "value": "{{todoListUuid}}"
+                },
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "status",
+                  "value": "pending",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Task",
+          "id": "26049f0f-421e-4e0d-9ce2-4c0d529efb19",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"todoListUuid\": \"{{todoListUuid}}\",\n  \"title\": \"Ma tâche\",\n  \"content\": \"Description de la tâche\",\n  \"status\": \"pending\",\n  \"priority\": \"medium\",\n  \"dueDate\": null,\n  \"tagUuids\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/tasks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "tasks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Task",
+          "id": "c81ea1b5-b494-4b5b-8ad6-296177682f17",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nouveau titre\",\n  \"content\": \"Nouveau contenu\",\n  \"status\": \"in_progress\",\n  \"priority\": \"high\",\n  \"dueDate\": \"2025-12-31\",\n  \"tagUuids\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/tasks/{{taskUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "tasks",
+                "{{taskUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Task",
+          "id": "73fb824f-2f94-4a75-9335-01a51398e21c",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/tasks/{{taskUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "tasks",
+                "{{taskUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "316cde71-622d-4748-a0a5-7a0ed9c25fa6"
+    },
+    {
+      "name": "Todo List Tags",
+      "item": [
+        {
+          "name": "List Tags",
+          "id": "03bf7fef-3ee1-4d8c-b008-c471d1ee6331",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/tags?todoListUuid={{todoListUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "tags"
+              ],
+              "query": [
+                {
+                  "key": "todoListUuid",
+                  "value": "{{todoListUuid}}"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Tag",
+          "id": "f41dbaca-e79f-4b74-a5ac-107a4ae83e4d",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"todoListUuid\": \"{{todoListUuid}}\",\n  \"title\": \"Mon tag\",\n  \"color\": \"blue\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "tags"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tag",
+          "id": "e1c4b937-6adc-4abb-b25a-ddd7e6a85768",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nouveau titre\",\n  \"color\": \"red\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/tags/{{tagUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "tags",
+                "{{tagUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Tag",
+          "id": "3ddad0da-8e79-4973-92bb-6d65247c2215",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/todo-lists/tags/{{tagUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "todo-lists",
+                "tags",
+                "{{tagUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "aed03b3c-8be9-4930-9109-0458d486347d"
+    },
+    {
+      "name": "Scripts",
+      "item": [
+        {
+          "name": "List Scripts",
+          "id": "bef3f372-e44b-41d4-8c6f-ed64770281d8",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts?projectUuid={{projectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts"
+              ],
+              "query": [
+                {
+                  "key": "projectUuid",
+                  "value": "{{projectUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Script",
+          "id": "111e351c-8fe9-4eb1-91a4-28ad3dfc7f32",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectUuid\": \"{{projectUuid}}\",\n  \"title\": \"Mon script\",\n  \"hook\": \"L'accroche du script\",\n  \"publishedAt\": null,\n  \"postGroupUuid\": null,\n  \"tagUuids\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Script",
+          "id": "d9a20b12-d13a-4393-aae5-462d66ee5a2e",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/{{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "{{scriptUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Script",
+          "id": "25383fe9-81a0-4f8e-918f-39989d17f50e",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nouveau titre\",\n  \"hook\": \"Nouvelle accroche\",\n  \"publishedAt\": \"2025-12-31\",\n  \"postGroupUuid\": null,\n  \"tagUuids\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/{{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "{{scriptUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Script",
+          "id": "a1664ca2-c9b7-4ed0-af2a-8c2d41eed622",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/{{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "{{scriptUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Script Parts",
+          "id": "c4ed6ed0-c0a0-4e02-b38d-116cdfbadf7f",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/{{scriptUuid}}/parts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "{{scriptUuid}}",
+                "parts"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reorder Script Parts",
+          "id": "5107ba66-9126-4808-ba4c-1972ae2f1529",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderedParts\": [\n    { \"uuid\": \"uuid-of-part-1\", \"type\": \"chapter\" },\n    { \"uuid\": \"uuid-of-part-2\", \"type\": \"voice_over\" },\n    { \"uuid\": \"uuid-of-part-3\", \"type\": \"dialogue\" }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/{{scriptUuid}}/reorder-parts",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "{{scriptUuid}}",
+                "reorder-parts"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "24c361e0-607d-48ad-bd85-6987c18870c0"
+    },
+    {
+      "name": "Script Tags",
+      "item": [
+        {
+          "name": "List Script Tags",
+          "id": "e6976455-2b73-42a0-bbfc-af9736c2f230",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/tags?projectUuid={{projectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "tags"
+              ],
+              "query": [
+                {
+                  "key": "projectUuid",
+                  "value": "{{projectUuid}}"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Script Tag",
+          "id": "eef80979-726c-4748-bebc-8acb1c53ed8c",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectUuid\": \"{{projectUuid}}\",\n  \"title\": \"Mon tag\",\n  \"color\": \"purple\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/tags",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "tags"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Script Tag",
+          "id": "d1823212-2d8a-459b-81a4-d9991afd333c",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nouveau titre\",\n  \"color\": \"green\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/tags/{{scriptTagUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "tags",
+                "{{scriptTagUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Script Tag",
+          "id": "0d40a63e-d469-49b8-ba05-3980fad7a080",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/tags/{{scriptTagUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "tags",
+                "{{scriptTagUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "eed39d64-139d-4fa5-acc6-be67ca14b60a"
+    },
+    {
+      "name": "Script Chapters",
+      "item": [
+        {
+          "name": "List Chapters",
+          "id": "75016e63-e044-45b2-8c54-7af1b4f0bc39",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/chapters?scriptUuid={{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "chapters"
+              ],
+              "query": [
+                {
+                  "key": "scriptUuid",
+                  "value": "{{scriptUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Chapter",
+          "id": "ffba92db-cf15-4746-925a-6c1e279f4204",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"title\": \"Chapitre 1\",\n  \"description\": \"Description du chapitre\",\n  \"chapterType\": \"on_screen\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/chapters",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "chapters"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Chapter",
+          "id": "41a50280-7e8a-4c1a-b72c-a6d06ded86ad",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nouveau titre\",\n  \"description\": \"Nouvelle description\",\n  \"chapterType\": \"off_screen\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/chapters/{{chapterUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "chapters",
+                "{{chapterUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Chapter",
+          "id": "1f5f62f1-d9c7-4cf0-9a1c-b00c42aec1b5",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/chapters/{{chapterUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "chapters",
+                "{{chapterUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "45c162a2-493e-4dab-8c6e-7f3217fa81b0"
+    },
+    {
+      "name": "Script Voice-overs",
+      "item": [
+        {
+          "name": "List Voice-overs",
+          "id": "b962f816-cce7-4bd8-a397-b2420998f06a",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/voice-overs?scriptUuid={{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "voice-overs"
+              ],
+              "query": [
+                {
+                  "key": "scriptUuid",
+                  "value": "{{scriptUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Voice-over",
+          "id": "41606b3a-9449-44b1-a36f-12d2e31698a5",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"content\": \"Texte de la voix off...\",\n  \"voiceOverType\": \"calm\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/voice-overs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "voice-overs"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Voice-over",
+          "id": "6f185bbb-d3d3-46b3-bafe-47eb1ef37258",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Nouveau contenu\",\n  \"voiceOverType\": \"dynamic\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/voice-overs/{{voiceOverUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "voice-overs",
+                "{{voiceOverUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Voice-over",
+          "id": "3d56a3cf-297b-4607-9704-42d365d26794",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/voice-overs/{{voiceOverUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "voice-overs",
+                "{{voiceOverUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "b4ff5f8c-aaee-472f-965a-5d1650599389"
+    },
+    {
+      "name": "Script Dialogues",
+      "item": [
+        {
+          "name": "List Dialogues",
+          "id": "97121f7b-2127-4a04-ad43-e21025764105",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/dialogues?scriptUuid={{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "dialogues"
+              ],
+              "query": [
+                {
+                  "key": "scriptUuid",
+                  "value": "{{scriptUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Dialogue",
+          "id": "5e6473d7-5e85-4078-8b2c-bd1fda3c8272",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"title\": \"Dialogue 1\",\n  \"description\": \"Description du dialogue\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/dialogues",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "dialogues"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Dialogue",
+          "id": "86a66e11-91c3-41b2-8f9d-61f24bad3266",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nouveau titre\",\n  \"description\": \"Nouvelle description\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/dialogues/{{dialogueUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "dialogues",
+                "{{dialogueUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Dialogue",
+          "id": "0ad1a66f-6def-429f-af57-83ff45519189",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/dialogues/{{dialogueUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "dialogues",
+                "{{dialogueUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "8cd351e2-5b12-48bd-887d-7c2dab85db4d"
+    },
+    {
+      "name": "Script Shots",
+      "item": [
+        {
+          "name": "List Shots",
+          "id": "ee944be2-09bb-4852-bed6-fe92b66cc673",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/shots?scriptUuid={{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "shots"
+              ],
+              "query": [
+                {
+                  "key": "scriptUuid",
+                  "value": "{{scriptUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Shot",
+          "id": "f1709c9b-838d-408b-b262-8200ba432d45",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"content\": \"Description du plan\",\n  \"shotType\": \"a_roll\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/shots",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "shots"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Shot",
+          "id": "599b4a65-9ab6-40f9-b048-29a555f09586",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Nouveau contenu\",\n  \"shotType\": \"b_roll\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/shots/{{shotUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "shots",
+                "{{shotUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Shot",
+          "id": "b2345581-a60a-4a84-8344-bc795623dad7",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/shots/{{shotUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "shots",
+                "{{shotUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "eecbe009-bdaf-40d9-b35b-5efc5eb51482"
+    },
+    {
+      "name": "Dialogue Subjects",
+      "item": [
+        {
+          "name": "List Dialogue Subjects",
+          "id": "6aa42ef2-1609-489f-bf21-3062624f1637",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/dialogue-subjects?scriptDialogueUuid={{dialogueUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "dialogue-subjects"
+              ],
+              "query": [
+                {
+                  "key": "scriptDialogueUuid",
+                  "value": "{{dialogueUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Dialogue Subject",
+          "id": "c7b87ec4-2333-4e45-8b35-39a9f440797e",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptDialogueUuid\": \"{{dialogueUuid}}\",\n  \"speaker\": \"Intervenant A\",\n  \"content\": \"Ce qu'il dit...\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/dialogue-subjects",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "dialogue-subjects"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Dialogue Subject",
+          "id": "888753f1-167c-4889-8ca0-8893fea95699",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"speaker\": \"Intervenant B\",\n  \"content\": \"Nouveau contenu\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/dialogue-subjects/{{dialogueSubjectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "dialogue-subjects",
+                "{{dialogueSubjectUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Dialogue Subject",
+          "id": "add1f1d0-9295-4401-855f-b2f692ed3180",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/dialogue-subjects/{{dialogueSubjectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "dialogue-subjects",
+                "{{dialogueSubjectUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reorder Dialogue Subjects",
+          "id": "8239b09c-faf8-4c73-9758-738236b9033a",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptDialogueUuid\": \"{{dialogueUuid}}\",\n  \"orderedUuids\": [\n    \"uuid-subject-1\",\n    \"uuid-subject-2\",\n    \"uuid-subject-3\"\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/dialogue-subjects/reorder",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "dialogue-subjects",
+                "reorder"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "c8251f6e-ac8a-4a7d-a09b-2ec2d82f1c65"
+    }
+  ],
+  "auth": {
+    "type": "noauth"
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "pm.request.headers.add({ key: 'X-Timezone', value: pm.collectionVariables.get('timezone') || 'Europe/Paris' });"
+        ],
+        "type": "text/javascript"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "id": "2700f6bd-5fd1-40bf-b04b-b394f05fa0ad",
+      "key": "baseUrl",
+      "value": "http://localhost"
+    },
+    {
+      "id": "5fe94cea-8679-4e08-bedc-971f15e10818",
+      "key": "timezone",
+      "value": "Europe/Paris"
+    },
+    {
+      "id": "eb7edb0d-d229-430b-995a-b8d98bcc24f2",
+      "key": "projectUuid",
+      "value": ""
+    },
+    {
+      "id": "8edcf2a9-ce80-4ea6-b2a8-6bfab166c6a1",
+      "key": "integrationUuid",
+      "value": ""
+    },
+    {
+      "id": "c90371a0-0c7d-4daf-bbba-762fdb433cc0",
+      "key": "todoListUuid",
+      "value": ""
+    },
+    {
+      "id": "803c565c-8254-4dd7-b036-5064b8919243",
+      "key": "taskUuid",
+      "value": ""
+    },
+    {
+      "id": "f33fdb1c-59d5-4421-9663-7763d5ef5331",
+      "key": "tagUuid",
+      "value": ""
+    },
+    {
+      "id": "f75b4d67-9365-498c-9b74-e9c7eb1be167",
+      "key": "postUuid",
+      "value": ""
+    },
+    {
+      "id": "fbfb9145-4a17-43ec-99fc-78dd97b770f3",
+      "key": "scriptUuid",
+      "value": ""
+    },
+    {
+      "id": "2a7f2c32-fcff-4e33-90de-c6593a9db4ad",
+      "key": "scriptTagUuid",
+      "value": ""
+    },
+    {
+      "id": "822a7487-7e51-4837-b83c-346de299f364",
+      "key": "chapterUuid",
+      "value": ""
+    },
+    {
+      "id": "c4f92e0d-b063-4a3e-bbc8-f5982c01e401",
+      "key": "voiceOverUuid",
+      "value": ""
+    },
+    {
+      "id": "2df687ee-3bcf-460e-8fb1-2b5d3929ea04",
+      "key": "dialogueUuid",
+      "value": ""
+    },
+    {
+      "id": "9f3e01be-26bd-4386-9ed6-8e509dda2647",
+      "key": "shotUuid",
+      "value": ""
+    },
+    {
+      "id": "e84ec166-89a4-446f-b3ec-b17fa98833bd",
+      "key": "dialogueSubjectUuid",
+      "value": ""
+    }
+  ]
+}
