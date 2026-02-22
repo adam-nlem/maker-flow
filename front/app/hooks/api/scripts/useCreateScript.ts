@@ -9,6 +9,8 @@ interface CreateScriptData {
     hook?: string;
     publishedAt?: string;
     tagUuids?: string[];
+    platforms?: string[];
+    status?: string;
 }
 
 export function useCreateScript() {

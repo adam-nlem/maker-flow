@@ -269,7 +269,7 @@ export class AuthResponseDTO {
 export class OAuthCallbackReponseDTO {
     constructor(
         public readonly status: OAuthCallbackStatus,
-        public readonly platform: IntegrationPlatform,
+        public readonly platform: Platform,
         public readonly errorCode?: OAuthErrorCode,
         public readonly integrationUuid?: string,
     ) {}
@@ -277,7 +277,7 @@ export class OAuthCallbackReponseDTO {
     static fromSearchParams(params: URLSearchParams): OAuthCallbackReponseDTO {
         return new OAuthCallbackReponseDTO(
             params.get("status") as OAuthCallbackStatus,
-            params.get("platform") as IntegrationPlatform,
+            params.get("platform") as Platform,
             (params.get("errorCode") as OAuthErrorCode) ?? undefined,
             params.get("integrationUuid") ?? undefined,
         );
@@ -290,17 +290,17 @@ export class OAuthCallbackReponseDTO {
 When the API returns items grouped by an enum (e.g., tasks by status, integrations by platform), create a dedicated DTO class:
 
 ```tsx
-import type { IntegrationPlatform } from "../enums/IntegrationPlatform";
+import type { Platform } from "../enums/Platform";
 import { Integration, type IntegrationJSON } from "../Integration";
 
 export interface IntegrationsGroupedByPlatformDTOJSON {
-    platform: IntegrationPlatform;
+    platform: Platform;
     integrations: IntegrationJSON[];
 }
 
 export class IntegrationsGroupedByPlatformDTO {
     constructor(
-        public readonly platform: IntegrationPlatform,
+        public readonly platform: Platform,
         public integrations: Integration[],
     ) { }
 
@@ -458,7 +458,7 @@ OAuth hooks are special because success/error comes from popup `postMessage`, no
 // hooks/api/integrations/useAuthorizeInstagram.ts
 interface UseCreateIntegrationProps {
     projectUuid: string;
-    platform: IntegrationPlatform;
+    platform: Platform;
 }
 
 export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegrationProps) {

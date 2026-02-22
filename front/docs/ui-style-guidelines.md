@@ -451,6 +451,33 @@ SVG circular progress indicator.
 
 ---
 
+### PlatformIconToggle
+
+**Location:** `front/app/components/ui/PlatformIconToggle.tsx`
+
+Toggleable platform icon button. Fetches the platform SVG icon internally via `useShowPlatformIcon` and renders it with visual states for selected/unselected.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `platform` | `Platform` | The platform to display |
+| `isSelected` | `boolean` | Selection state |
+| `onToggle` | `() => void` | Toggle handler |
+
+**States:**
+- **Unselected:** `grayscale opacity-40`, `hover:opacity-60`
+- **Selected:** full color, `opacity-100`
+
+**Example:**
+```tsx
+<PlatformIconToggle
+    platform={Platform.Instagram}
+    isSelected={true}
+    onToggle={() => handleToggle(Platform.Instagram)}
+/>
+```
+
+---
+
 ### Shimmer
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/Shimmer.tsx`

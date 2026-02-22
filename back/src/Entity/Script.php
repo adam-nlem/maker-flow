@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\ScriptStatus;
 use App\Helper\DateHelper;
 use App\Repository\ScriptRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -73,6 +74,24 @@ class Script
         'api_scripts_show',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column(type: Types::JSON, nullable: true)]
+    #[Groups([
+        'api_scripts_list',
+        'api_scripts_create',
+        'api_scripts_update',
+        'api_scripts_show',
+    ])]
+    private ?array $platforms = null;
+
+    #[ORM\Column(enumType: ScriptStatus::class, nullable: true)]
+    #[Groups([
+        'api_scripts_list',
+        'api_scripts_create',
+        'api_scripts_update',
+        'api_scripts_show',
+    ])]
+    private ?ScriptStatus $status = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
@@ -241,6 +260,30 @@ class Script
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getPlatforms(): ?array
+    {
+        return $this->platforms;
+    }
+
+    public function setPlatforms(?array $platforms): static
+    {
+        $this->platforms = $platforms;
+
+        return $this;
+    }
+
+    public function getStatus(): ?ScriptStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(?ScriptStatus $status): static
+    {
+        $this->status = $status;
 
         return $this;
     }

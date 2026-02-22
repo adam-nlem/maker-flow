@@ -126,7 +126,7 @@ public function callback(
 
 namespace App\EventSubscriber;
 
-use App\Entity\Enum\IntegrationPlatform;
+use App\Entity\Enum\Platform;
 use App\Event\IntegrationCreatedEvent;
 use App\Message\FetchIntegrationInsightsMessage;
 use App\Message\FetchPostInsightsMessage;
@@ -150,7 +150,7 @@ class IntegrationCreatedSubscriber implements EventSubscriberInterface
     {
         $integration = $event->getIntegration();
 
-        if ($integration->getPlatform() !== IntegrationPlatform::Instagram) {
+        if ($integration->getPlatform() !== Platform::Instagram) {
             return;
         }
 

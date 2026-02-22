@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\Enum\IntegrationPlatform;
+use App\Entity\Enum\Platform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Helper\DateHelper;
 use App\Message\FetchIntegrationInsightsMessage;
@@ -21,8 +21,8 @@ use Symfony\Component\Messenger\MessageBusInterface;
 class FetchIntegrationInsightsCommand extends Command
 {
     private const SUPPORTED_PLATFORMS = [
-        IntegrationPlatform::Instagram,
-        IntegrationPlatform::Youtube,
+        Platform::Instagram,
+        Platform::Youtube,
     ];
 
     //TODO: Change this back to 24 horus

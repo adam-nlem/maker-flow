@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { OAuthCallbackStatus } from "~/models/enums/OAuthCallbackStatus";
 import { OAuthErrorCode } from "~/models/enums/OAuthErrorCode";
-import { IntegrationPlatform } from "~/models/enums/IntegrationPlatform";
+import { Platform } from "~/models/enums/Platform";
 import { WindowMessageType } from "~/models/enums/WindowMessageType";
 import { OAuthCallbackReponseDTO } from "~/models/dtos/OAuthCallbackReponseDTO";
 
@@ -11,7 +11,7 @@ interface OAuthCallbackMessage {
 }
 
 interface UseOAuthMessageListenerProps {
-    platform: IntegrationPlatform;
+    platform: Platform;
 }
 
 export function useOAuthMessageListener({ platform }: UseOAuthMessageListenerProps) {

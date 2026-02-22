@@ -2,14 +2,14 @@
 
 namespace App\DTO\Redis\Integration;
 
-use App\Entity\Enum\IntegrationPlatform;
+use App\Entity\Enum\Platform;
 
 class IntegrationStateRedisDTO
 {
     public function __construct(
         private readonly string $userUuid,
         private readonly string $projectUuid,
-        private readonly IntegrationPlatform $platform,
+        private readonly Platform $platform,
     ) {}
 
     public static function fromJson(string $json): self
@@ -19,7 +19,7 @@ class IntegrationStateRedisDTO
         return new self(
             userUuid: $data['userUuid'],
             projectUuid: $data['projectUuid'],
-            platform: IntegrationPlatform::from($data['platform']),
+            platform: Platform::from($data['platform']),
         );
     }
 
@@ -42,7 +42,7 @@ class IntegrationStateRedisDTO
         return $this->projectUuid;
     }
 
-    public function getPlatform(): IntegrationPlatform
+    public function getPlatform(): Platform
     {
         return $this->platform;
     }

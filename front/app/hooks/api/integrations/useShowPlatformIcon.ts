@@ -3,13 +3,13 @@ import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { integrationQueryKeys } from "./integrationQueryKeys";
 
-export function useShowIntegrationPlatformIcon(platform?: string) {
+export function useShowPlatformIcon(platform?: string) {
     const [iconUrl, setIconUrl] = useState<string | null>(null);
 
     const query = useQuery({
         queryKey: integrationQueryKeys.platformIcon(platform ?? ''),
         queryFn: async () => {
-            const res = await httpClient.get(`/integrations/platforms/${platform}/icon`, {
+            const res = await httpClient.get(`/platforms/${platform}/icon`, {
                 responseType: 'blob'
             });
             return res.data as Blob;

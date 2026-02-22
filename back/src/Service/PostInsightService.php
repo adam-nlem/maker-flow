@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Enum\IntegrationPlatform;
+use App\Entity\Enum\Platform;
 use App\Entity\Integration;
 use App\Entity\User;
 use App\Helper\DateHelper;
@@ -70,7 +70,7 @@ class PostInsightService
 
     public function fetchInstagramPostInsights(Integration $integration): void
     {
-        if ($integration->getPlatform() !== IntegrationPlatform::Instagram) {
+        if ($integration->getPlatform() !== Platform::Instagram) {
             throw new \InvalidArgumentException('Integration must be an Instagram integration');
         }
 
@@ -104,7 +104,7 @@ class PostInsightService
 
     public function fetchYoutubePostInsights(Integration $integration): void
     {
-        if ($integration->getPlatform() !== IntegrationPlatform::Youtube) {
+        if ($integration->getPlatform() !== Platform::Youtube) {
             throw new \InvalidArgumentException('Integration must be a YouTube integration');
         }
 

@@ -1,12 +1,12 @@
-import { useShowIntegrationPlatformIcon } from "~/hooks/api/integrations/useShowIntegrationPlatformIcon";
-import type { IntegrationPlatform } from "~/models/enums/IntegrationPlatform";
+import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
+import type { Platform } from "~/models/enums/Platform";
 import Shimmer from "~/components/ui/Shimmer";
 import { Button } from "~/components/ui/Button";
 import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
 
 interface CreateIntegrationCardProps {
   projectUuid: string;
-  platform: IntegrationPlatform;
+  platform: Platform;
 }
 
 export default function CreateIntegrationCard({ projectUuid, platform }: CreateIntegrationCardProps) {
@@ -15,7 +15,7 @@ export default function CreateIntegrationCard({ projectUuid, platform }: CreateI
     platform: platform,
   });
 
-  const { iconUrl } = useShowIntegrationPlatformIcon(platform);
+  const { iconUrl } = useShowPlatformIcon(platform);
 
   return (
     <div className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 justify-between w-full">

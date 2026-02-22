@@ -56,7 +56,7 @@ front/app/
 │   ├── api/integrations/
 │   │   ├── useAuthorizeInstagram.ts    # Contains useCreateIntegration hook
 │   │   ├── useListIntegrations.ts      # Hook to list integrations (flat list)
-│   │   ├── useShowIntegrationPlatformIcon.ts  # Hook to fetch platform icons
+│   │   ├── useShowPlatformIcon.ts         # Hook to fetch platform icons
 │   │   └── integrationQueryKeys.ts     # Query keys for integrations
 │   ├── useOAuthPopup.ts                # Utility hook for popup management
 │   └── useOAuthMessageListener.ts      # Utility hook for message listening
@@ -65,7 +65,7 @@ front/app/
 │   │   ├── OAuthCallbackReponseDTO.ts  # DTO for callback response
 │   │   └── IntegrationsGroupedByPlatformDTO.ts  # @deprecated - kept for future use
 │   └── enums/
-│       ├── IntegrationPlatform.ts      # Platform enum (Instagram, Youtube, etc.)
+│       ├── Platform.ts               # Platform enum (Instagram, Youtube, Tiktok)
 │       ├── IntegrationStatus.ts        # Integration status enum (Active, Revoked, Error)
 │       ├── OAuthCallbackStatus.ts      # Status enum (success, error)
 │       ├── OAuthErrorCode.ts           # Error codes with translations
@@ -150,7 +150,7 @@ Generic API hook that orchestrates the OAuth flow for any platform.
 
 interface UseCreateIntegrationProps {
     projectUuid: string;
-    platform: IntegrationPlatform;
+    platform: Platform;
 }
 
 export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegrationProps) {
@@ -202,7 +202,7 @@ export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegra
 | Property | Type | Description |
 |----------|------|-------------|
 | `projectUuid` | `string` | UUID of the project to link the integration to |
-| `platform` | `IntegrationPlatform` | The integration platform (Instagram, etc.) |
+| `platform` | `Platform` | The integration platform (Instagram, etc.) |
 
 **Returns:**
 | Property | Type | Description |
@@ -224,7 +224,7 @@ Utility hook that manages the OAuth popup window lifecycle.
 // Location: hooks/useOAuthPopup.ts
 
 interface UseOAuthPopupProps {
-    platform: IntegrationPlatform;
+    platform: Platform;
     onSuccess?: () => void;
 }
 
@@ -275,7 +275,7 @@ export function useOAuthPopup({ platform, onSuccess }: UseOAuthPopupProps) {
 **Props:**
 | Property | Type | Description |
 |----------|------|-------------|
-| `platform` | `IntegrationPlatform` | The integration platform |
+| `platform` | `Platform` | The integration platform |
 | `onSuccess` | `() => void` | Optional callback called when integration is created |
 
 **Features:**
@@ -399,15 +399,15 @@ export default function IntegrationsCallback() {
 
 ## Enums
 
-### IntegrationPlatform
+### Platform
 
 ```typescript
-// Location: models/enums/IntegrationPlatform.ts
+// Location: models/enums/Platform.ts
 
-export enum IntegrationPlatform {
-    Instagram = "instagram",
-    Youtube = "youtube",
-    Tiktok = "tiktok",
+export enum Platform {
+    Instagram = 'instagram',
+    Youtube = 'youtube',
+    Tiktok = 'tiktok',
 }
 ```
 
@@ -482,7 +482,7 @@ export enum WindowMessageType {
 export class OAuthCallbackReponseDTO {
     constructor(
         public readonly status: OAuthCallbackStatus,
-        public readonly platform: IntegrationPlatform,
+        public readonly platform: Platform,
         public readonly errorCode?: OAuthErrorCode,
         public readonly integrationUuid?: string,
     ) {}
@@ -490,7 +490,7 @@ export class OAuthCallbackReponseDTO {
     static fromSearchParams(params: URLSearchParams): OAuthCallbackReponseDTO {
         return new OAuthCallbackReponseDTO(
             params.get("status") as OAuthCallbackStatus,
-            params.get("platform") as IntegrationPlatform,
+            params.get("platform") as Platform,
             (params.get("errorCode") as OAuthErrorCode) ?? undefined,
             params.get("integrationUuid") ?? undefined,
         );
@@ -509,7 +509,7 @@ export default function DashboardContent({ projectUuid }: { projectUuid: string 
     const { integrations, isLoading } = useListIntegrations({ projectUuid });
     const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
         projectUuid,
-        platform: IntegrationPlatform.Instagram,
+        platform: Platform.Instagram,
     });
 
     const handleConnectInstagram = () => {
@@ -553,7 +553,7 @@ When an OAuth token is revoked (user revokes access in platform settings, token 
 ### How It Works
 
 1. **List endpoint returns all statuses** -- `GET /api/integrations` returns Active and Revoked integrations
-2. **Dashboard routes by status** -- `DashboardContent` iterates over `integrationPlatformTypeOptions` and checks the status:
+2. **Dashboard routes by status** -- `DashboardContent` iterates over `platformOptions` and checks the status:
    - **Active** integration -> `IntegrationCard` (shows profile + insight data)
    - **Revoked** or **missing** integration -> `CreateIntegrationCard` (shimmer placeholders + "Se connecter" button)
 3. **User clicks "Se connecter"** -- Triggers the same `useCreateIntegration` hook / OAuth popup flow as initial setup
@@ -569,13 +569,15 @@ No separate re-auth UI or endpoint is needed. The existing `CreateIntegrationCar
 
 ## Adding a New Integration
 
-### 1. Add Platform Enum
+### 1. Add Platform Enum Case
 
 ```typescript
-// models/enums/IntegrationPlatform.ts
-export enum IntegrationPlatform {
-    Instagram = "instagram",
-    TikTok = "tiktok",  // Add new platform
+// models/enums/Platform.ts
+export enum Platform {
+    Instagram = 'instagram',
+    Youtube = 'youtube',
+    Tiktok = 'tiktok',
+    NewPlatform = 'new_platform',  // Add new platform
 }
 ```
 
@@ -587,7 +589,7 @@ The `useCreateIntegration` hook is generic and works with any platform. Simply p
 // In your component
 const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
     projectUuid,
-    platform: IntegrationPlatform.TikTok,
+    platform: Platform.TikTok,
 });
 ```
 
@@ -595,7 +597,7 @@ No new hook is needed - the generic `useCreateIntegration` handles all platforms
 
 ### 3. Checklist
 
-- [ ] Add platform to `IntegrationPlatform` enum (frontend)
+- [ ] Add platform case to `Platform` enum (frontend)
 - [ ] Ensure backend has matching platform case in controller
 - [ ] Test full flow end-to-end
 - [ ] Test error scenarios (popup blocked, user denies, etc.)
@@ -671,29 +673,29 @@ if (payload.platform !== platform) {
 
 ---
 
-## Integration Platform Icons
+## Platform Icons
 
 ### Overview
 
-Integration platform icons (e.g., Instagram logo) are served from the backend as SVG files.
+Platform icons (e.g., Instagram logo) are served from the backend as SVG files via a dedicated `PlatformController`.
 
 ### API Endpoint
 
-`GET /api/integrations/platforms/{platform}/icon`
+`GET /api/platforms/{platform}/icon`
 
 Returns the SVG icon file for the specified platform.
 
-### useShowIntegrationPlatformIcon
+### useShowPlatformIcon
 
-**Location:** `hooks/api/integrations/useShowIntegrationPlatformIcon.ts`
+**Location:** `hooks/api/integrations/useShowPlatformIcon.ts`
 
-Fetches the icon for a specific integration platform.
+Fetches the icon for a specific platform.
 
 **Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `platform` | `string?` | The integration platform identifier |
+| `platform` | `string?` | The platform identifier |
 
 **Returns:**
 
@@ -707,6 +709,7 @@ Fetches the icon for a specific integration platform.
 - Returns a blob URL created from the SVG response
 - Uses `staleTime: Infinity` to cache icons permanently
 - Query is disabled if `platform` is undefined
+- Used by both `IntegrationTile` (insights) and `ScriptPlatformsRow` (scripts)
 
 ### Query Keys
 

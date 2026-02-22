@@ -657,14 +657,14 @@ When returning a list of items grouped by an enum (e.g., tasks by status, integr
 namespace App\DTO\Response\Integration;
 
 use App\DTO\Response\ResponseDTOInterface;
-use App\Entity\Enum\IntegrationPlatform;
+use App\Entity\Enum\Platform;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 class ListIntegrationsGroupedByPlatformResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
         #[Groups(['api_integrations_list'])]
-        private IntegrationPlatform $platform,
+        private Platform $platform,
         /** @var Integration[] $integrations */
         #[Groups(['api_integrations_list'])]
         private array $integrations,
@@ -678,7 +678,7 @@ class ListIntegrationsGroupedByPlatformResponseDTO implements ResponseDTOInterfa
         ];
     }
 
-    public function getPlatform(): IntegrationPlatform
+    public function getPlatform(): Platform
     {
         return $this->platform;
     }
@@ -693,10 +693,10 @@ class ListIntegrationsGroupedByPlatformResponseDTO implements ResponseDTOInterfa
 ### Controller Usage
 
 ```php
-$platforms = IntegrationPlatform::cases();
+$platforms = Platform::cases();
 
 $result = array_map(
-    fn(IntegrationPlatform $platform) => (new ListIntegrationsGroupedByPlatformResponseDTO(
+    fn(Platform $platform) => (new ListIntegrationsGroupedByPlatformResponseDTO(
         $platform,
         $this->integrationRepository->getByProjectAndPlatform($project, $platform)
     ))->getData(),

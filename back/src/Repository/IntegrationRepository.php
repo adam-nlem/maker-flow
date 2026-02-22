@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Enum\IntegrationPlatform;
+use App\Entity\Enum\Platform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
 use App\Entity\Project;
@@ -84,7 +84,7 @@ class IntegrationRepository extends ServiceEntityRepository
         return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserAndPlatformAndAccountId(User $user, IntegrationPlatform $platform, string $accountId): ?Integration
+    public function getByUserAndPlatformAndAccountId(User $user, Platform $platform, string $accountId): ?Integration
     {
         return $this->createQueryBuilder('i')
             ->where('i.user = :user')
@@ -111,7 +111,7 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getOneByProjectAndPlatformAndStatus(Project $project, IntegrationPlatform $platform, IntegrationStatus $status): ?Integration
+    public function getOneByProjectAndPlatformAndStatus(Project $project, Platform $platform, IntegrationStatus $status): ?Integration
     {
         return $this->createQueryBuilder('i')
             ->where('i.project = :project')
@@ -127,7 +127,7 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByPlatform(IntegrationPlatform $platform): array
+    public function getByPlatform(Platform $platform): array
     {
         return $this->createQueryBuilder('i')
             ->where('i.platform = :platform')
@@ -137,7 +137,7 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByPlatformAndStatus(IntegrationPlatform $platform, IntegrationStatus $status): array
+    public function getByPlatformAndStatus(Platform $platform, IntegrationStatus $status): array
     {
         return $this->createQueryBuilder('i')
             ->where('i.platform = :platform')
@@ -150,7 +150,7 @@ class IntegrationRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param IntegrationPlatform[] $platforms
+     * @param Platform[] $platforms
      * @return Integration[]
      */
     public function getByPlatformsNotSyncedSince(array $platforms, \DateTimeImmutable $since): array
@@ -167,7 +167,7 @@ class IntegrationRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param IntegrationPlatform[] $platforms
+     * @param Platform[] $platforms
      * @return Integration[]
      */
     public function getByPlatformsNotSyncedSinceAndStatus(array $platforms, \DateTimeImmutable $since, IntegrationStatus $status): array

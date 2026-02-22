@@ -179,11 +179,11 @@ X-axis uses `formatDurationToFrench()` (via a local helper converting hours to s
 
 `IntegrationPageView` displays conditional info banners depending on the integration platform:
 
-- **Instagram** (amber): Explains that Instagram does not provide historical data, so analytics are built incrementally over time. Only shown when `integration.platform === IntegrationPlatform.Instagram`.
+- **Instagram** (amber): Explains that Instagram does not provide historical data, so analytics are built incrementally over time. Only shown when `integration.platform === Platform.Instagram`.
 - **YouTube** (blue): Shown when `detail.isYoutubeReportPending === true`. Explains that YouTube reporting jobs take 24-48 hours to generate after initial connection. Displays a spinning `ArrowPathIcon` animation to indicate the process is ongoing. The banner disappears once all reporting jobs have processed at least one report.
 
 ## Cleanup Notes
 
 - **Design system colors**: Evolution badges and insight tiles use `text-green` / `bg-pastel-green` (positive) and `text-danger` / `bg-danger/10` (negative) from the design system instead of hardcoded Tailwind color classes.
-- **Dashboard integration routing**: `DashboardContent` iterates `integrationPlatformTypeOptions` and renders `IntegrationCard` for Active integrations or `CreateIntegrationCard` for Revoked/missing integrations. This means revoked integrations show the same shimmer + "Se connecter" card as platforms with no integration at all, reusing the existing OAuth flow for re-authentication.
+- **Dashboard integration routing**: `DashboardContent` iterates `platformOptions` and renders `IntegrationCard` for Active integrations or `CreateIntegrationCard` for Revoked/missing integrations. This means revoked integrations show the same shimmer + "Se connecter" card as platforms with no integration at all, reusing the existing OAuth flow for re-authentication.
 - **Post detail safe rendering**: The timeline chart renders conditionally when the selected timeline exists. Engagement progress bars use `?? 0` fallback for nullable values. The empty placeholder div was removed and the chart section takes full width.

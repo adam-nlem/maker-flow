@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Script feature provides a split-view editor for managing scripts per project. Users create scripts, edit their metadata (title, hook, publication date, tags), and build structured content with five part types: chapters, voice-overs, dialogues, shots, and texts. Parts are reorderable via drag-and-drop. Text parts provide a notebook-style editing experience with auto-save on blur.
+The Script feature provides a split-view editor for managing scripts per project. Users create scripts, edit their metadata (title, hook, publication date, tags, platforms, status), and build structured content with five part types: chapters, voice-overs, dialogues, shots, and texts. Parts are reorderable via drag-and-drop. Text parts provide a notebook-style editing experience with auto-save on blur.
 
 **Route:** `/scripts`
 
@@ -19,9 +19,10 @@ ScriptPageView (flex-row h-screen)
   │     └── "+ New script" button (inline creation)
   └── ScriptEditorPanel (flex-1, right panel)
         ├── ScriptMetaHeader
-        │     ├── title input (auto-save on blur)
+        │     ├── [title input] + [ScriptPlatformsRow] (same row, icons right-aligned)
         │     ├── ScriptTagsRow (tag pills + popover)
-        │     └── date picker (native input[type=date])
+        │     ├── status SelectDropdown (Pill trigger)
+        │     └── date picker (CalendarDaysIcon button)
         ├── ScriptHookCard (hook textarea + template toggle)
         └── ScriptPartsList (flex-1 overflow-y-auto)
               ├── DnD-reorderable part cards
@@ -44,6 +45,7 @@ front/app/
 │   ├── DialogueSubject.ts
 │   └── enums/
 │       ├── ScriptPartType.ts    ← with french translation + icon maps
+│       ├── ScriptStatus.ts      ← with label/bg/text class maps (pending, in_progress, completed)
 │       ├── ChapterType.ts       ← with label/bg/text class maps
 │       ├── VoiceOverType.ts     ← with label/bg/text class maps
 │       └── ShotType.ts          ← with label/bg/text class maps
@@ -86,6 +88,7 @@ front/app/
     ├── ScriptEditorPanel.tsx
     ├── ScriptMetaHeader.tsx
     ├── ScriptTagsRow.tsx
+    ├── ScriptPlatformsRow.tsx
     └── parts/
         ├── ScriptHookCard.tsx        ← hook card with template toggle + placeholder editing
         ├── HookContentRenderer.tsx   ← rich text with clickable placeholder pills
@@ -150,6 +153,21 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 
 ### Drag-and-Drop
 Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay`). Parts are reordered optimistically in local state, then `useReorderScriptParts` fires with the new ordered array of `{uuid, type}`. If `parts` prop changes while no drag is active, local state is synced.
+
+### Platform Management
+- `ScriptPlatformsRow` renders all platform icons as `PlatformIconToggle` buttons (reusable UI component), positioned to the right of the title
+- **Optimistic updates:** Local state (`localPlatforms`) updates immediately on click. A `useRef` counter tracks in-flight mutations — prop sync from cache invalidation is suppressed while mutations are pending, preventing flicker during rapid clicks. On error, local state rolls back to the previous value.
+- **Unselected:** `grayscale opacity-40` — icon appears gray/faded, `hover:opacity-60` on hover
+- **Selected:** full color, `opacity-100`
+- On click: toggles the platform (add/remove), calls `useUpdateScript` with the full `platforms` array
+- Icons are 20px (`size-5`) with `transition-all` for smooth visual feedback
+
+### Status Management
+- Status uses `SelectDropdown` + `Pill` pattern (same as `ScriptShotCard` for `ShotType`)
+- Local state tracks the selected `ScriptStatus` for immediate UI feedback
+- On select: calls `useUpdateScript` with the new `status` value
+- Uses `scriptStatusToLabel`, `scriptStatusToBgClass`, `scriptStatusToTextClass` for Pill rendering
+- Colors: Pending (green), InProgress (yellow), Completed (purple)
 
 ### Tag Management
 - `ScriptTagsRow` lists assigned tags as colored pills with `×` to remove

@@ -14,8 +14,12 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     private ?string $postGroupUuid;
     private ?string $hookTemplateUuid;
     private ?array $tagUuids;
+    private ?array $platforms;
+    private ?string $status;
     private bool $hasPostGroupUuid = false;
     private bool $hasHookTemplateUuid = false;
+    private bool $hasPlatforms = false;
+    private bool $hasStatus = false;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -34,6 +38,10 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
         $this->hookTemplateUuid = $payload["hookTemplateUuid"] ?? null;
         $this->hasHookTemplateUuid = array_key_exists("hookTemplateUuid", $payload);
         $this->tagUuids = $payload["tagUuids"] ?? null;
+        $this->platforms = $payload["platforms"] ?? null;
+        $this->hasPlatforms = array_key_exists("platforms", $payload);
+        $this->status = $payload["status"] ?? null;
+        $this->hasStatus = array_key_exists("status", $payload);
     }
 
     protected function buildObject(): array
@@ -86,5 +94,25 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     public function getTagUuids(): ?array
     {
         return $this->tagUuids;
+    }
+
+    public function getPlatforms(): ?array
+    {
+        return $this->platforms;
+    }
+
+    public function hasPlatforms(): bool
+    {
+        return $this->hasPlatforms;
+    }
+
+    public function getStatus(): ?string
+    {
+        return $this->status;
+    }
+
+    public function hasStatus(): bool
+    {
+        return $this->hasStatus;
     }
 }

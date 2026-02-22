@@ -4,7 +4,7 @@ namespace App\Service\Integration;
 
 use App\DTO\External\Youtube\YoutubeChannelDTO;
 use App\DTO\External\Youtube\YoutubeTokenDTO;
-use App\Entity\Enum\IntegrationPlatform;
+use App\Entity\Enum\Platform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
 use App\Entity\Project;
@@ -108,7 +108,7 @@ class YoutubeOAuthService
         $integration = new Integration();
         $integration
             ->setUser($user)
-            ->setPlatform(IntegrationPlatform::Youtube)
+            ->setPlatform(Platform::Youtube)
             ->setAccessToken($tokenDTO->getAccessToken())
             ->setRefreshToken($tokenDTO->getRefreshToken())
             ->setAccountId($channelData->getChannelId())
@@ -197,7 +197,7 @@ class YoutubeOAuthService
 
         $existingIntegration = $this->integrationRepository->getByUserAndPlatformAndAccountId(
             $user,
-            IntegrationPlatform::Youtube,
+            Platform::Youtube,
             $channelData->getChannelId()
         );
 

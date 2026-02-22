@@ -1,9 +1,9 @@
-import { IntegrationPlatform } from "./enums/IntegrationPlatform";
+import { Platform } from "./enums/Platform";
 import { IntegrationStatus } from "./enums/IntegrationStatus";
 
 export interface IntegrationJSON {
     uuid: string;
-    platform: IntegrationPlatform;
+    platform: Platform;
     accountId: string;
     userName: string;
     name: string | null;
@@ -18,7 +18,7 @@ export interface IntegrationJSON {
 export class Integration {
     constructor(
         public readonly uuid: string,
-        public readonly platform: IntegrationPlatform,
+        public readonly platform: Platform,
         public readonly accountId: string,
         public readonly userName: string,
         public readonly name: string | null,

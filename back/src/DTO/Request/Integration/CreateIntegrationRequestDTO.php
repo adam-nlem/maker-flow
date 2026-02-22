@@ -3,7 +3,7 @@
 namespace App\DTO\Request\Integration;
 
 use App\DTO\Request\AbstractRequestDTO;
-use App\Entity\Enum\IntegrationPlatform;
+use App\Entity\Enum\Platform;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -14,7 +14,7 @@ class CreateIntegrationRequestDTO extends AbstractRequestDTO
     private string $projectUuid;
 
     #[Assert\NotBlank]
-    private IntegrationPlatform $platform;
+    private Platform $platform;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -26,7 +26,7 @@ class CreateIntegrationRequestDTO extends AbstractRequestDTO
     public function fromPayload(array $payload)
     {
         $this->projectUuid = $payload["projectUuid"];
-        $this->platform = IntegrationPlatform::from($payload["platform"]);
+        $this->platform = Platform::from($payload["platform"]);
     }
 
     protected function buildObject(): mixed
@@ -39,7 +39,7 @@ class CreateIntegrationRequestDTO extends AbstractRequestDTO
         return $this->projectUuid;
     }
 
-    public function getPlatform(): IntegrationPlatform
+    public function getPlatform(): Platform
     {
         return $this->platform;
     }

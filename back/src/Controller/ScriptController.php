@@ -8,6 +8,7 @@ use App\DTO\Request\Script\CreateScriptRequestDTO;
 use App\DTO\Request\Script\ReorderScriptPartsRequestDTO;
 use App\DTO\Request\Script\UpdateScriptRequestDTO;
 use App\Entity\Enum\ScriptPartType;
+use App\Entity\Enum\ScriptStatus;
 use App\Entity\Script;
 use App\Entity\User;
 use App\Repository\HookTemplateRepository;
@@ -104,6 +105,14 @@ final class ScriptController extends AbstractController
             }
         }
 
+        if ($dto->getPlatforms() !== null) {
+            $script->setPlatforms($dto->getPlatforms());
+        }
+
+        if ($dto->getStatus() !== null) {
+            $script->setStatus(ScriptStatus::from($dto->getStatus()));
+        }
+
         $scriptRepository->save($script, true);
 
         return $this->json(
@@ -197,6 +206,14 @@ final class ScriptController extends AbstractController
                     $script->addTag($tag);
                 }
             }
+        }
+
+        if ($dto->hasPlatforms()) {
+            $script->setPlatforms($dto->getPlatforms());
+        }
+
+        if ($dto->hasStatus()) {
+            $script->setStatus($dto->getStatus() !== null ? ScriptStatus::from($dto->getStatus()) : null);
         }
 
         $scriptRepository->save($script, true);

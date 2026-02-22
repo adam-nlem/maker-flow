@@ -93,15 +93,16 @@ enum OAuthErrorCode: string
 }
 ```
 
-### IntegrationPlatform
+### Platform
 
 ```php
-// App\Entity\Enum\IntegrationPlatform
-enum IntegrationPlatform: string
+// App\Entity\Enum\Platform
+enum Platform: string
 {
     case Github = 'github';
     case Youtube = 'youtube';
     case Instagram = 'instagram';
+    case Tiktok = 'tiktok';
 }
 ```
 
@@ -132,7 +133,7 @@ The `Integration` entity stores connected external accounts and their OAuth toke
 | Property | Type | Nullable | Description |
 |----------|------|----------|-------------|
 | `uuid` | `GUID` | No | Unique identifier |
-| `platform` | `IntegrationPlatform` | No | Platform enum (Instagram, etc.) |
+| `platform` | `Platform` | No | Platform enum (Instagram, etc.) |
 | `accessToken` | `string` | No | OAuth access token |
 | `refreshToken` | `string` | Yes | OAuth refresh token (if available) |
 | `scope` | `array` | Yes | Granted OAuth scopes |
@@ -321,7 +322,7 @@ class IntegrationStateRedisDTO
     public function __construct(
         private readonly string $userUuid,
         private readonly string $projectUuid,
-        private readonly IntegrationPlatform $platform,
+        private readonly Platform $platform,
     ) {}
 
     public static function fromJson(string $json): self { }
@@ -405,11 +406,14 @@ DELETE /api/integrations/{integrationUuid}
 #### Create Platform Enum Case
 
 ```php
-// Entity/Enum/IntegrationPlatform.php
-enum IntegrationPlatform: string
+// Entity/Enum/Platform.php
+enum Platform: string
 {
+    case Github = 'github';
+    case Youtube = 'youtube';
     case Instagram = 'instagram';
-    case TikTok = 'tiktok';  // Add new platform
+    case Tiktok = 'tiktok';
+    case NewPlatform = 'new_platform';  // Add new platform
 }
 ```
 
@@ -443,14 +447,14 @@ The generic `POST /api/integrations` route handles all platforms. Add the new pl
 ```php
 // In IntegrationController::create()
 $authorizationUrl = match ($dto->getPlatform()) {
-    IntegrationPlatform::Instagram => $this->instagramOAuthService->getAuthorizationUrl($state),
-    IntegrationPlatform::TikTok => $this->tiktokOAuthService->getAuthorizationUrl($state),
+    Platform::Instagram => $this->instagramOAuthService->getAuthorizationUrl($state),
+    Platform::TikTok => $this->tiktokOAuthService->getAuthorizationUrl($state),
 };
 
 // In IntegrationController::callback()
 $integration = match ($platform) {
-    IntegrationPlatform::Instagram => $this->instagramOAuthService->handleCallback($code, $user, $project),
-    IntegrationPlatform::TikTok => $this->tiktokOAuthService->handleCallback($code, $user, $project),
+    Platform::Instagram => $this->instagramOAuthService->handleCallback($code, $user, $project),
+    Platform::TikTok => $this->tiktokOAuthService->handleCallback($code, $user, $project),
 };
 ```
 
@@ -474,7 +478,7 @@ TIKTOK_REDIRECT_URI=https://api.yourapp.com/api/integrations/callback
 
 ### 3. Checklist
 
-- [ ] Add platform to `IntegrationPlatform` enum
+- [ ] Add platform case to `Platform` enum
 - [ ] Create External DTOs for API responses
 - [ ] Create OAuth service with `handleCallback`, `getAuthorizationUrl`, and token methods
 - [ ] Add platform case to `IntegrationController::create()` match statement
@@ -517,7 +521,7 @@ try {
 } catch (\Exception $e) {
     return $this->redirectToFrontendCallback(
         OAuthCallbackStatus::Error,
-        IntegrationPlatform::Instagram,
+        Platform::Instagram,
         OAuthErrorCode::TokenExchangeFailed
     );
 }
@@ -530,7 +534,7 @@ On error or success, the backend redirects to the frontend callback route with q
 ```php
 private function redirectToFrontendCallback(
     OAuthCallbackStatus $status,
-    IntegrationPlatform $platform,
+    Platform $platform,
     ?OAuthErrorCode $errorCode = null,
     ?string $integrationUuid = null
 ): Response {

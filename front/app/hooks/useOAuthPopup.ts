@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { OAuthErrorCode } from "~/models/enums/OAuthErrorCode";
-import { IntegrationPlatform } from "~/models/enums/IntegrationPlatform";
+import { Platform } from "~/models/enums/Platform";
 import { useOAuthMessageListener } from "~/hooks/useOAuthMessageListener";
 
 const POPUP_WIDTH = 600;
@@ -8,7 +8,7 @@ const POPUP_HEIGHT = 700;
 const POPUP_CHECK_INTERVAL_MS = 500;
 
 interface UseOAuthPopupProps {
-    platform: IntegrationPlatform;
+    platform: Platform;
     onSuccess?: () => void;
 }
 

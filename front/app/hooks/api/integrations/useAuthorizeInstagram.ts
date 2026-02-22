@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { useOAuthPopup } from "~/hooks/useOAuthPopup";
 import { OAuthErrorCode } from "~/models/enums/OAuthErrorCode";
-import { IntegrationPlatform } from "~/models/enums/IntegrationPlatform";
+import { Platform } from "~/models/enums/Platform";
 import { integrationQueryKeys } from "./integrationQueryKeys";
 
 interface CreateIntegrationResponse {
@@ -12,7 +12,7 @@ interface CreateIntegrationResponse {
 
 interface UseCreateIntegrationProps {
     projectUuid: string;
-    platform: IntegrationPlatform;
+    platform: Platform;
 }
 
 export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegrationProps) {

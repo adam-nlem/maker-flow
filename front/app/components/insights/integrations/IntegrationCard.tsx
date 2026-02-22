@@ -1,5 +1,5 @@
 import type { Integration } from "~/models/Integration"
-import { useShowIntegrationPlatformIcon } from "~/hooks/api/integrations/useShowIntegrationPlatformIcon"
+import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon"
 import { IntegrationInsightType, integrationInsightTypeToFrenchTranslation } from "~/models/enums/IntegrationInsightType"
 import { useListIntegrationInsights } from "~/hooks/api/integrationInsights/useListIntegrationInsights"
 
@@ -14,7 +14,7 @@ export default function IntegrationCard({
     insightType,
     onClick,
 }: IntegrationCardProps) {
-    const { iconUrl } = useShowIntegrationPlatformIcon(integration.platform)
+    const { iconUrl } = useShowPlatformIcon(integration.platform)
     const { integrationInsights, isLoading, error } = useListIntegrationInsights({ integrationUuid: integration.uuid })
 
     return (

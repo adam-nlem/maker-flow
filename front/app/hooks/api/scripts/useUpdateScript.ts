@@ -9,6 +9,8 @@ interface UpdateScriptData {
     postGroupUuid?: string | null;
     hookTemplateUuid?: string | null;
     tagUuids?: string[];
+    platforms?: string[] | null;
+    status?: string | null;
 }
 
 interface UpdateScriptParams {

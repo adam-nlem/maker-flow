@@ -88,8 +88,8 @@ Console Command
 The `fetch-integration-insights` command only fetches insights for integrations whose `lastSyncedAt` is older than 24 hours. This prevents excessive API calls and respects rate limits.
 
 Supported platforms are defined in the command's `SUPPORTED_PLATFORMS` constant:
-- `IntegrationPlatform::Instagram`
-- `IntegrationPlatform::Youtube`
+- `Platform::Instagram`
+- `Platform::Youtube`
 
 ---
 

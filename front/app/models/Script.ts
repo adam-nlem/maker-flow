@@ -1,5 +1,7 @@
 import { HookTemplate, type HookTemplateJSON } from "./HookTemplate";
 import { ScriptTag, type ScriptTagJSON } from "./ScriptTag";
+import { Platform } from "./enums/Platform";
+import { ScriptStatus } from "./enums/ScriptStatus";
 
 export interface ScriptJSON {
     uuid: string;
@@ -8,6 +10,8 @@ export interface ScriptJSON {
     hookTemplate?: HookTemplateJSON;
     publishedAt?: string;
     tags?: ScriptTagJSON[];
+    platforms?: string[];
+    status?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -20,6 +24,8 @@ export class Script {
         public hookTemplate: HookTemplate | undefined,
         public publishedAt: Date | undefined,
         public tags: ScriptTag[],
+        public platforms: Platform[],
+        public status: ScriptStatus | undefined,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
     ) { }
@@ -32,6 +38,8 @@ export class Script {
             json.hookTemplate ? HookTemplate.fromJSON(json.hookTemplate) : undefined,
             json.publishedAt ? new Date(json.publishedAt) : undefined,
             (json.tags ?? []).map(ScriptTag.fromJSON),
+            (json.platforms ?? []).filter(p => Object.values(Platform).includes(p as Platform)) as Platform[],
+            json.status ? json.status as ScriptStatus : undefined,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
         )
@@ -45,6 +53,8 @@ export class Script {
             hookTemplate: this.hookTemplate?.toJSON(),
             publishedAt: this.publishedAt?.toISOString(),
             tags: this.tags.map(t => t.toJSON()),
+            platforms: this.platforms,
+            status: this.status,
             createdAt: this.createdAt.toISOString(),
             updatedAt: this.updatedAt?.toISOString(),
         }

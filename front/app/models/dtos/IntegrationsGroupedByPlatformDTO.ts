@@ -1,4 +1,4 @@
-import type { IntegrationPlatform } from "../enums/IntegrationPlatform";
+import type { Platform } from "../enums/Platform";
 import { Integration, type IntegrationJSON } from "../Integration";
 
 /**
@@ -6,7 +6,7 @@ import { Integration, type IntegrationJSON } from "../Integration";
  * (one per platform per project). Kept for potential future use if grouped responses are needed.
  */
 export interface IntegrationsGroupedByPlatformDTOJSON {
-    platform: IntegrationPlatform;
+    platform: Platform;
     integrations: IntegrationJSON[];
 }
 
@@ -16,7 +16,7 @@ export interface IntegrationsGroupedByPlatformDTOJSON {
  */
 export class IntegrationsGroupedByPlatformDTO {
     constructor(
-        public readonly platform: IntegrationPlatform,
+        public readonly platform: Platform,
         public integrations: Integration[],
     ) { }
 
