@@ -43,7 +43,7 @@ front/app/
 │   ├── ScriptText.ts            ← type = 'text' as const
 │   ├── DialogueSubject.ts
 │   └── enums/
-│       ├── ScriptPartType.ts
+│       ├── ScriptPartType.ts    ← with french translation + icon maps
 │       ├── ChapterType.ts       ← with label/bg/text class maps
 │       ├── VoiceOverType.ts     ← with label/bg/text class maps
 │       └── ShotType.ts          ← with label/bg/text class maps
@@ -73,6 +73,8 @@ front/app/
 │       ├── useCreateDialogueSubject.ts  ← uses scriptDialogueUuid
 │       ├── useUpdateDialogueSubject.ts
 │       └── useDeleteDialogueSubject.ts
+├── helpers/
+│   └── hookPlaceholderParser.ts  ← shared parser for [placeholder] tokens
 ├── stores/scripts/
 │   └── focusScriptStore.ts      ← persisted, key "app:scripts:focused"
 ├── routes/
@@ -85,7 +87,8 @@ front/app/
     ├── ScriptMetaHeader.tsx
     ├── ScriptTagsRow.tsx
     └── parts/
-        ├── ScriptHookCard.tsx        ← hook card with template toggle (not reorderable)
+        ├── ScriptHookCard.tsx        ← hook card with template toggle + placeholder editing
+        ├── HookContentRenderer.tsx   ← rich text with clickable placeholder pills
         ├── ScriptPartsList.tsx       ← DnD orchestrator
         ├── ScriptPartHeader.tsx     ← reusable colored header (icon + label, drag handle)
         ├── ScriptChapterCard.tsx
@@ -132,7 +135,11 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 **Structured part cards** (chapter, voice-over, dialogue, shot) use `ScriptPartHeader` as a colored header bar (icon + label) that doubles as the drag handle. Each part type has its own color: chapter (blue), voice-over (yellow), shot (primary), dialogue (purple), hook (primary). **Text parts** are borderless to blend into the page.
 
 ### Hook Card
-`ScriptHookCard` is a standalone card rendered above the parts list. It uses the same visual pattern as structured part cards (`border border-light-gray rounded-xl p-4 bg-clear`) with a `ScriptPartHeader` (BookOpenIcon, primary color). It is not reorderable and has no delete button. A `BookOpenIcon` toggle button (group-hover visible, always visible in `text-primary` when a template is linked) opens/closes the hook template panel.
+`ScriptHookCard` is a standalone card rendered above the parts list inside `ScriptPartsList`. It uses the same visual pattern as structured part cards (`border border-light-gray rounded-xl p-4 bg-clear`) with a `ScriptPartHeader` (CheckBadgeIcon, primary color). It is not reorderable and has no delete button. A `Button` opens/closes the hook template panel.
+
+**Placeholder editing:** When the hook text contains `[placeholder]` tokens, `HookContentRenderer` displays them as clickable `Pill` components inline with the text. Clicking a pill opens a popover input to replace the placeholder value. Once all placeholders are filled, the card switches to a plain `TextArea` for free-form editing. The component uses `key={script.hookTemplate?.uuid}` on mount to reset local state when a new template is applied.
+
+**Shared parser:** `hookPlaceholderParser.ts` exports `parseHookPlaceholders(content)` (returns `HookPart[]` with `type: 'text' | 'placeholder'`) and `hasPlaceholders(content)`. Used by both `HookContentRenderer` (interactive editing) and `HookTemplateCard` (display preview).
 
 ### Text Part (Notebook-Style)
 `ScriptTextCard` is a borderless, always-editable text block that blends into the page:

@@ -94,7 +94,7 @@ Filtering is client-side — no extra API calls needed.
 
 ### `HookTemplateCard` (`~/components/scripts/hookTemplates/HookTemplateCard.tsx`)
 
-Clickable card in the panel list. Shows template title and content preview with `[placeholder]` tokens highlighted in primary color.
+Clickable card in the panel list. Shows template title and content preview. Uses `parseHookPlaceholders()` from `~/helpers/hookPlaceholderParser` to render `[placeholder]` tokens as `Pill` components with French translations from `HookTemplatePlaceholder` enum.
 
 ### `ApplyHookTemplateModal` (`~/components/scripts/hookTemplates/ApplyHookTemplateModal.tsx`)
 
@@ -117,10 +117,7 @@ The right panel renders conditionally based on `useHookTemplatePanelStore.isOpen
 
 ## Toggle Button
 
-**`ScriptMetaHeader.tsx`** has a `BookOpenIcon` button next to the hook TextArea:
-- Default: `text-gray` with `hover:text-dark`
-- When script has a linked template: `text-primary` (visual indicator)
-- Clicking toggles `useHookTemplatePanelStore`
+**`ScriptHookCard.tsx`** has a `Button` (secondary style) with `InboxStackIcon` to open the template library panel. Clicking toggles `useHookTemplatePanelStore`.
 
 ---
 
@@ -138,11 +135,39 @@ The right panel renders conditionally based on `useHookTemplatePanelStore.isOpen
 
 ---
 
+## Enums
+
+### `HookTemplateCategory` (`~/models/enums/HookTemplateCategory.ts`)
+
+Category filter for the template panel. Values: `All`, `Public`, `Private`, `Recent`.
+- `hookTemplateCategoryToFrenchTranslation`: French labels (Tous, Publics, Privés, Récents)
+
+### `HookTemplatePlaceholder` (`~/models/enums/HookTemplatePlaceholder.ts`)
+
+Represents `[placeholder]` tokens in template content. Values: `Topic`, `Audience`, `Benefit`, `Statistic`, `Problem`, `Product`, `Result`, `Emotion`.
+- `hookTemplatePlaceholderToFrenchTranslation`: French labels (Sujet, Audience, Bénéfice, Statistique, Problème, Produit, Résultat, Émotion)
+
+---
+
+## Placeholder System
+
+Templates use `[placeholder]` tokens (e.g., `[Sujet]`, `[Audience]`) that users can fill in after applying a template.
+
+**Shared parser** (`~/helpers/hookPlaceholderParser.ts`):
+- `parseHookPlaceholders(content)`: Splits text into `HookPart[]` with `type: 'text' | 'placeholder'`
+- `hasPlaceholders(content)`: Returns `true` if any `[...]` tokens remain
+
+**Display in HookTemplateCard**: Placeholder tokens rendered as `Pill` with French translations.
+
+**Interactive editing in ScriptHookCard**: When hook text has placeholders, `HookContentRenderer` displays them as clickable `Pill` components. Clicking a pill opens a popover input to replace it with a value. Once all placeholders are filled, the hook switches to a plain `TextArea`.
+
+---
+
 ## Relationships
 
 ```
 Script (N) ──── (0..1) HookTemplate    [hookTemplate field, nullable]
 HookTemplatePanel ──── uses ──── useListHookTemplates
 ScriptPageView ──── contains ──── HookTemplatePanel + ApplyHookTemplateModal
-ScriptMetaHeader ──── toggles ──── useHookTemplatePanelStore
+ScriptHookCard ──── toggles ──── useHookTemplatePanelStore
 ```
