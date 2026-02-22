@@ -9,13 +9,13 @@ import { useUpdateScriptShot } from "~/hooks/api/scriptShots/useUpdateScriptShot
 import { useDeleteScriptShot } from "~/hooks/api/scriptShots/useDeleteScriptShot";
 import ScriptPartHeader from "./ScriptPartHeader";
 
-interface Props {
+interface ScriptShotCardProps {
     shot: ScriptShot;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
 }
 
-export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Props) {
+export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: ScriptShotCardProps) {
     const [content, setContent] = useState(shot.content);
     const [shotType, setShotType] = useState<ShotType>(shot.shotType);
 
@@ -74,7 +74,7 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Pr
                 onChange={(e) => setContent(e.target.value)}
                 onBlur={handleContentBlur}
                 placeholder="Description du plan..."
-                textStyle="text-body-sm"
+                textStyle="text-sm"
                 fullWidth
             />
         </div>

@@ -7,6 +7,7 @@ interface UpdateScriptData {
     hook?: string | null;
     publishedAt?: Date | null;
     postGroupUuid?: string | null;
+    hookTemplateUuid?: string | null;
     tagUuids?: string[];
 }
 

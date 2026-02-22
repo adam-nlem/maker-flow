@@ -10,13 +10,13 @@ import { useUpdateScriptChapter } from "~/hooks/api/scriptChapters/useUpdateScri
 import { useDeleteScriptChapter } from "~/hooks/api/scriptChapters/useDeleteScriptChapter";
 import ScriptPartHeader from "./ScriptPartHeader";
 
-interface Props {
+interface ScriptChapterCardProps {
     chapter: ScriptChapter;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
 }
 
-export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps }: Props) {
+export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps }: ScriptChapterCardProps) {
     const [title, setTitle] = useState(chapter.title);
     const [description, setDescription] = useState(chapter.description ?? "");
     const [chapterType, setChapterType] = useState<ChapterType>(chapter.chapterType);
@@ -94,7 +94,7 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                 onChange={(e) => setDescription(e.target.value)}
                 onBlur={handleDescriptionBlur}
                 placeholder="Description (optionnel)"
-                textStyle="text-body-sm"
+                textStyle="text-sm"
                 fullWidth
             />
         </div>

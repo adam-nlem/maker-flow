@@ -9,13 +9,13 @@ import { useUpdateScriptVoiceOver } from "~/hooks/api/scriptVoiceOvers/useUpdate
 import { useDeleteScriptVoiceOver } from "~/hooks/api/scriptVoiceOvers/useDeleteScriptVoiceOver";
 import ScriptPartHeader from "./ScriptPartHeader";
 
-interface Props {
+interface ScriptVoiceOverCardProps {
     voiceOver: ScriptVoiceOver;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
 }
 
-export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleProps }: Props) {
+export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleProps }: ScriptVoiceOverCardProps) {
     const [content, setContent] = useState(voiceOver.content);
     const [voiceOverType, setVoiceOverType] = useState<VoiceOverType>(voiceOver.voiceOverType);
 
@@ -74,7 +74,7 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
                 onChange={(e) => setContent(e.target.value)}
                 onBlur={handleContentBlur}
                 placeholder="Contenu de la voix off..."
-                textStyle="text-body-sm"
+                textStyle="text-sm"
                 fullWidth
             />
         </div>

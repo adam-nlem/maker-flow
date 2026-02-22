@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { PlusIcon, DocumentTextIcon, MicrophoneIcon, ChatBubbleLeftRightIcon, FilmIcon, Bars3BottomLeftIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import { ScriptPartType, scriptPartTypeToFrenchTranslation, scriptPartTypeToIcon } from "~/models/enums/ScriptPartType";
 import { useCreateScriptChapter } from "~/hooks/api/scriptChapters/useCreateScriptChapter";
 import { useCreateScriptVoiceOver } from "~/hooks/api/scriptVoiceOvers/useCreateScriptVoiceOver";
 import { useCreateScriptDialogue } from "~/hooks/api/scriptDialogues/useCreateScriptDialogue";
@@ -9,21 +10,11 @@ import { ChapterType } from "~/models/enums/ChapterType";
 import { VoiceOverType } from "~/models/enums/VoiceOverType";
 import { ShotType } from "~/models/enums/ShotType";
 
-interface Props {
+interface AddScriptPartMenuProps {
     scriptUuid: string;
 }
 
-const PART_OPTIONS = [
-    { key: "text", label: "Texte", icon: Bars3BottomLeftIcon },
-    { key: "chapter", label: "Chapitre", icon: DocumentTextIcon },
-    { key: "voice_over", label: "Voix off", icon: MicrophoneIcon },
-    { key: "dialogue", label: "Dialogue", icon: ChatBubbleLeftRightIcon },
-    { key: "shot", label: "Plan", icon: FilmIcon },
-] as const;
-
-type PartKey = typeof PART_OPTIONS[number]["key"];
-
-export default function AddScriptPartMenu({ scriptUuid }: Props) {
+export default function AddScriptPartMenu({ scriptUuid }: AddScriptPartMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const { createScriptChapter } = useCreateScriptChapter();
@@ -32,22 +23,22 @@ export default function AddScriptPartMenu({ scriptUuid }: Props) {
     const { createScriptShot } = useCreateScriptShot();
     const { createScriptText } = useCreateScriptText();
 
-    const handleAdd = async (key: PartKey) => {
+    const handleAdd = async (type: ScriptPartType) => {
         setIsOpen(false);
-        switch (key) {
-            case "text":
+        switch (type) {
+            case ScriptPartType.Text:
                 await createScriptText({ scriptUuid, content: "" });
                 break;
-            case "chapter":
+            case ScriptPartType.Chapter:
                 await createScriptChapter({ scriptUuid, title: "Nouveau chapitre", chapterType: ChapterType.OnScreen });
                 break;
-            case "voice_over":
+            case ScriptPartType.VoiceOver:
                 await createScriptVoiceOver({ scriptUuid, content: "", voiceOverType: VoiceOverType.Neutral });
                 break;
-            case "dialogue":
+            case ScriptPartType.Dialogue:
                 await createScriptDialogue({ scriptUuid, title: "Nouveau dialogue" });
                 break;
-            case "shot":
+            case ScriptPartType.Shot:
                 await createScriptShot({ scriptUuid, content: "", shotType: ShotType.ARoll });
                 break;
         }
@@ -59,16 +50,19 @@ export default function AddScriptPartMenu({ scriptUuid }: Props) {
                 <>
                     <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
                     <div className="absolute bottom-full left-0 mb-2 z-30 border border-light-gray rounded-xl bg-clear shadow-lg p-1.5 flex flex-col gap-0.5 min-w-48">
-                        {PART_OPTIONS.map(({ key, label, icon: Icon }) => (
-                            <button
-                                key={key}
-                                onClick={() => handleAdd(key)}
-                                className="flex flex-row items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-hover transition-colors text-left cursor-pointer w-full"
-                            >
-                                <Icon className="size-4 text-gray shrink-0" strokeWidth={2} />
-                                <span className="text-heading-sm">{label}</span>
-                            </button>
-                        ))}
+                        {Object.values(ScriptPartType).map((type) => {
+                            const Icon = scriptPartTypeToIcon[type];
+                            return (
+                                <button
+                                    key={type}
+                                    onClick={() => handleAdd(type)}
+                                    className="flex flex-row items-center gap-3 px-3 py-2 rounded-lg hover:bg-surface-hover transition-colors text-left cursor-pointer w-full"
+                                >
+                                    <Icon className="size-4 text-gray shrink-0" strokeWidth={2} />
+                                    <span className="text-heading-sm">{scriptPartTypeToFrenchTranslation[type]}</span>
+                                </button>
+                            );
+                        })}
                     </div>
                 </>
             )}

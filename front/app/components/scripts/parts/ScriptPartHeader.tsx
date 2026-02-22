@@ -2,14 +2,14 @@ import type { ComponentType, SVGProps } from "react";
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
-interface Props {
+interface ScriptPartHeaderProps {
     icon: HeroIcon;
     label: string;
     colorClassName: string;
     dragHandleProps?: Record<string, unknown>;
 }
 
-export default function ScriptPartHeader({ icon: Icon, label, colorClassName, dragHandleProps }: Props) {
+export default function ScriptPartHeader({ icon: Icon, label, colorClassName, dragHandleProps }: ScriptPartHeaderProps) {
     return (
         <div
             {...dragHandleProps}

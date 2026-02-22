@@ -3,13 +3,13 @@ import type { Script } from "~/models/Script";
 import { colorToBgClass } from "~/models/enums/Color";
 import { useDeleteScript } from "~/hooks/api/scripts/useDeleteScript";
 
-interface Props {
+interface ScriptListItemProps {
     script: Script;
     isSelected: boolean;
     onClick: () => void;
 }
 
-export default function ScriptListItem({ script, isSelected, onClick }: Props) {
+export default function ScriptListItem({ script, isSelected, onClick }: ScriptListItemProps) {
     const { deleteScript, isPending: isDeleting } = useDeleteScript();
 
     const handleDelete = (e: React.MouseEvent) => {

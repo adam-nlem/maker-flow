@@ -6,13 +6,13 @@ import { useCreateScriptText } from "~/hooks/api/scriptTexts/useCreateScriptText
 import { useUpdateScriptText } from "~/hooks/api/scriptTexts/useUpdateScriptText";
 import { useDeleteScriptText } from "~/hooks/api/scriptTexts/useDeleteScriptText";
 
-interface Props {
+interface ScriptTextCardProps {
     text?: ScriptText;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
 }
 
-export default function ScriptTextCard({ text, scriptUuid, dragHandleProps }: Props) {
+export default function ScriptTextCard({ text, scriptUuid, dragHandleProps }: ScriptTextCardProps) {
     const [content, setContent] = useState(text?.content ?? "");
 
     const { createScriptText } = useCreateScriptText();

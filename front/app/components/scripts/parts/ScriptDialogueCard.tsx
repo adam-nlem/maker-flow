@@ -9,13 +9,13 @@ import ScriptPartHeader from "./ScriptPartHeader";
 import DialogueSubjectRow from "./DialogueSubjectRow";
 import AddDialogueSubjectRow from "./AddDialogueSubjectRow";
 
-interface Props {
+interface ScriptDialogueCardProps {
     dialogue: ScriptDialogue;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
 }
 
-export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandleProps }: Props) {
+export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandleProps }: ScriptDialogueCardProps) {
     const [title, setTitle] = useState(dialogue.title);
     const [description, setDescription] = useState(dialogue.description ?? "");
 
@@ -63,7 +63,7 @@ export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandlePro
                     onChange={(e) => setDescription(e.target.value)}
                     onBlur={handleDescriptionBlur}
                     placeholder="Description (optionnel)"
-                    textStyle="text-body-sm"
+                    textStyle="text-sm"
                     fullWidth
                 />
             </div>

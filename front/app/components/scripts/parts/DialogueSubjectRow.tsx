@@ -6,12 +6,12 @@ import { TextArea } from "~/components/ui/TextArea";
 import { useUpdateDialogueSubject } from "~/hooks/api/dialogueSubjects/useUpdateDialogueSubject";
 import { useDeleteDialogueSubject } from "~/hooks/api/dialogueSubjects/useDeleteDialogueSubject";
 
-interface Props {
+interface DialogueSubjectRowProps {
     subject: DialogueSubject;
     scriptUuid: string;
 }
 
-export default function DialogueSubjectRow({ subject, scriptUuid }: Props) {
+export default function DialogueSubjectRow({ subject, scriptUuid }: DialogueSubjectRowProps) {
     const [speaker, setSpeaker] = useState(subject.speaker);
     const [content, setContent] = useState(subject.content);
 
@@ -48,7 +48,7 @@ export default function DialogueSubjectRow({ subject, scriptUuid }: Props) {
                     onChange={(e) => setContent(e.target.value)}
                     onBlur={handleContentBlur}
                     placeholder="Contenu..."
-                    textStyle="text-body-sm"
+                    textStyle="text-sm"
                     fullWidth
                 />
             </div>

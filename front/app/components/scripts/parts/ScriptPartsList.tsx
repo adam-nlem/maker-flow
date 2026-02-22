@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DndContext, DragOverlay, PointerSensor, type DragEndEvent, type DragStartEvent, useSensor, useSensors, useDroppable, useDraggable } from "@dnd-kit/core";
+import type { Script } from "~/models/Script";
 import type { ScriptPart } from "~/models/ScriptPart";
 import type { ScriptChapter } from "~/models/ScriptChapter";
 import type { ScriptVoiceOver } from "~/models/ScriptVoiceOver";
@@ -11,12 +12,13 @@ import ScriptVoiceOverCard from "./ScriptVoiceOverCard";
 import ScriptDialogueCard from "./ScriptDialogueCard";
 import ScriptShotCard from "./ScriptShotCard";
 import ScriptTextCard from "./ScriptTextCard";
+import ScriptHookCard from "./ScriptHookCard";
 import AddScriptPartMenu from "./AddScriptPartMenu";
 import { useReorderScriptParts } from "~/hooks/api/scripts/useReorderScriptParts";
 
-interface Props {
+interface ScriptPartsListProps {
     parts: ScriptPart[];
-    scriptUuid: string;
+    script: Script;
 }
 
 interface DraggablePartProps {
@@ -38,12 +40,7 @@ function DraggablePart({ part, scriptUuid }: DraggablePartProps) {
     );
 }
 
-interface DroppableZoneProps {
-    id: string;
-    children: React.ReactNode;
-}
-
-function DroppableZone({ id, children }: DroppableZoneProps) {
+function DroppableZone({ id, children }: { id: string; children: React.ReactNode }) {
     const { setNodeRef, isOver } = useDroppable({ id });
     return (
         <div ref={setNodeRef} className={`flex flex-col gap-3 min-h-8 rounded-lg transition-colors ${isOver ? "bg-primary/5" : ""}`}>
@@ -67,10 +64,10 @@ function renderPartCard(part: ScriptPart, scriptUuid: string, dragHandleProps?: 
     }
 }
 
-export default function ScriptPartsList({ parts, scriptUuid }: Props) {
+export default function ScriptPartsList({ parts, script }: ScriptPartsListProps) {
+    const scriptUuid = script.uuid;
     const [localParts, setLocalParts] = useState<ScriptPart[]>(parts);
     const [activePart, setActivePart] = useState<ScriptPart | null>(null);
-
     const { reorderScriptParts } = useReorderScriptParts();
 
     // Keep local state in sync when parts prop changes (e.g. after server invalidation)
@@ -111,6 +108,8 @@ export default function ScriptPartsList({ parts, scriptUuid }: Props) {
     return (
         <div className="flex flex-col h-full overflow-hidden">
             <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-none">
+                <ScriptHookCard key={script.hookTemplate?.uuid} script={script} />
+
                 <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                     <DroppableZone id="parts-list">
                         {localParts.map((part) => (

@@ -1,17 +1,23 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useListScripts } from "~/hooks/api/scripts/useListScripts";
+import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
+import type { HookTemplate } from "~/models/HookTemplate";
 import ScriptListPanel from "./ScriptListPanel";
 import ScriptEditorPanel from "./ScriptEditorPanel";
+import HookTemplatePanel from "./hookTemplates/HookTemplatePanel";
+import ApplyHookTemplateModal from "./hookTemplates/ApplyHookTemplateModal";
 
-interface Props {
+interface ScriptPageViewProps {
     projectUuid: string;
 }
 
-export default function ScriptPageView({ projectUuid }: Props) {
+export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
     const { scripts } = useListScripts({ projectUuid });
     const focusedScriptUuid = useFocusScriptStore((s) => s.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid);
+    const { updateScript } = useUpdateScript();
+    const [pendingTemplate, setPendingTemplate] = useState<HookTemplate | null>(null);
 
     // Auto-select first script if none is selected or the stored UUID is no longer in the list
     useEffect(() => {
@@ -21,6 +27,25 @@ export default function ScriptPageView({ projectUuid }: Props) {
     }, [scripts, focusedScriptUuid, setFocusedScriptUuid]);
 
     const focusedScript = scripts.find((s) => s.uuid === focusedScriptUuid) ?? null;
+
+    const handleApplyTemplate = (template: HookTemplate) => {
+        if (!focusedScript) return;
+
+        if (focusedScript.hook && focusedScript.hook.trim().length > 0) {
+            setPendingTemplate(template);
+        } else {
+            applyTemplate(template);
+        }
+    };
+
+    const applyTemplate = (template: HookTemplate) => {
+        if (!focusedScript) return;
+        updateScript({
+            scriptUuid: focusedScript.uuid,
+            data: { hook: template.content, hookTemplateUuid: template.uuid },
+        });
+        setPendingTemplate(null);
+    };
 
     return (
         <div className="flex flex-row h-screen overflow-hidden">
@@ -35,6 +60,21 @@ export default function ScriptPageView({ projectUuid }: Props) {
                     </div>
                 )}
             </div>
+
+            {focusedScript && (
+                <HookTemplatePanel
+                    scripts={scripts}
+                    focusedScript={focusedScript}
+                    onApplyTemplate={handleApplyTemplate}
+                />
+            )}
+
+            <ApplyHookTemplateModal
+                isOpen={pendingTemplate !== null}
+                template={pendingTemplate}
+                onConfirm={() => pendingTemplate && applyTemplate(pendingTemplate)}
+                onCancel={() => setPendingTemplate(null)}
+            />
         </div>
     );
 }

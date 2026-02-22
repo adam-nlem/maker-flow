@@ -2,19 +2,17 @@ import { useState } from "react";
 import { CalendarDaysIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import { Input } from "~/components/ui/Input";
-import { TextArea } from "~/components/ui/TextArea";
 import { DatePicker } from "~/components/ui/DatePicker";
 import ScriptTagsRow from "./ScriptTagsRow";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 
-interface Props {
+interface ScriptMetaHeaderProps {
     script: Script;
     projectUuid: string;
 }
 
-export default function ScriptMetaHeader({ script, projectUuid }: Props) {
+export default function ScriptMetaHeader({ script, projectUuid }: ScriptMetaHeaderProps) {
     const [title, setTitle] = useState(script.title);
-    const [hook, setHook] = useState(script.hook ?? "");
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
 
     const { updateScript } = useUpdateScript();
@@ -22,13 +20,6 @@ export default function ScriptMetaHeader({ script, projectUuid }: Props) {
     const handleTitleBlur = () => {
         if (title.trim() !== script.title) {
             updateScript({ scriptUuid: script.uuid, data: { title: title.trim() || script.title } });
-        }
-    };
-
-    const handleHookBlur = () => {
-        const newHook = hook.trim() || null;
-        if (newHook !== (script.hook ?? null)) {
-            updateScript({ scriptUuid: script.uuid, data: { hook: newHook } });
         }
     };
 
@@ -51,18 +42,6 @@ export default function ScriptMetaHeader({ script, projectUuid }: Props) {
                 onBlur={handleTitleBlur}
                 placeholder="Titre du script"
                 textStyle="text-heading-xl"
-                fullWidth
-            />
-
-            {/* Hook */}
-            <TextArea
-                simple
-                value={hook}
-                onChange={(e) => setHook(e.target.value)}
-                onBlur={handleHookBlur}
-                placeholder="Hook..."
-                textStyle="text-body-sm"
-                className="text-gray"
                 fullWidth
             />
 

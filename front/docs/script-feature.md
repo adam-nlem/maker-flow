@@ -20,9 +20,9 @@ ScriptPageView (flex-row h-screen)
   └── ScriptEditorPanel (flex-1, right panel)
         ├── ScriptMetaHeader
         │     ├── title input (auto-save on blur)
-        │     ├── hook textarea (auto-save on blur)
         │     ├── ScriptTagsRow (tag pills + popover)
         │     └── date picker (native input[type=date])
+        ├── ScriptHookCard (hook textarea + template toggle)
         └── ScriptPartsList (flex-1 overflow-y-auto)
               ├── DnD-reorderable part cards
               └── AddScriptPartMenu (sticky bottom)
@@ -85,6 +85,7 @@ front/app/
     ├── ScriptMetaHeader.tsx
     ├── ScriptTagsRow.tsx
     └── parts/
+        ├── ScriptHookCard.tsx        ← hook card with template toggle (not reorderable)
         ├── ScriptPartsList.tsx       ← DnD orchestrator
         ├── ScriptPartHeader.tsx     ← reusable colored header (icon + label, drag handle)
         ├── ScriptChapterCard.tsx
@@ -128,7 +129,10 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 - Input/TextArea use the `simple` prop for borderless inline styling
 - Delete button is hover-revealed (`opacity-0 group-hover:opacity-100`)
 
-**Structured part cards** (chapter, voice-over, dialogue, shot) use `ScriptPartHeader` as a colored header bar (icon + label) that doubles as the drag handle. Each part type has its own color: chapter (blue), voice-over (yellow), shot (primary), dialogue (purple). **Text parts** are borderless to blend into the page.
+**Structured part cards** (chapter, voice-over, dialogue, shot) use `ScriptPartHeader` as a colored header bar (icon + label) that doubles as the drag handle. Each part type has its own color: chapter (blue), voice-over (yellow), shot (primary), dialogue (purple), hook (primary). **Text parts** are borderless to blend into the page.
+
+### Hook Card
+`ScriptHookCard` is a standalone card rendered above the parts list. It uses the same visual pattern as structured part cards (`border border-light-gray rounded-xl p-4 bg-clear`) with a `ScriptPartHeader` (BookOpenIcon, primary color). It is not reorderable and has no delete button. A `BookOpenIcon` toggle button (group-hover visible, always visible in `text-primary` when a template is linked) opens/closes the hook template panel.
 
 ### Text Part (Notebook-Style)
 `ScriptTextCard` is a borderless, always-editable text block that blends into the page:
