@@ -92,9 +92,15 @@ Right-side panel (w-72, border-l) displaying the template library.
 
 Filtering is client-side — no extra API calls needed.
 
+**Header actions:** `PlusIcon` button opens `CreateHookTemplateModal`, `XMarkIcon` closes the panel.
+
 ### `HookTemplateCard` (`~/components/scripts/hookTemplates/HookTemplateCard.tsx`)
 
 Clickable card in the panel list. Shows template title and content preview. Uses `parseHookPlaceholders()` from `~/helpers/hookPlaceholderParser` to render `[placeholder]` tokens as `Pill` components with French translations from `HookTemplatePlaceholder` enum.
+
+### `CreateHookTemplateModal` (`~/components/scripts/hookTemplates/CreateHookTemplateModal.tsx`)
+
+Creation modal opened via the `+` button in the panel header. Form fields: title (Input), content (TextArea with ref), visibility (ToggleChip: Privé/Public), and a placeholder palette. Clicking a placeholder Pill inserts the `[key]` token at the current cursor position in the content textarea. On submit, calls `useCreateHookTemplate` and closes — React Query invalidation refreshes the panel list automatically.
 
 ### `ApplyHookTemplateModal` (`~/components/scripts/hookTemplates/ApplyHookTemplateModal.tsx`)
 
@@ -153,9 +159,12 @@ Represents `[placeholder]` tokens in template content. Values: `Topic`, `Audienc
 
 Templates use `[placeholder]` tokens (e.g., `[Sujet]`, `[Audience]`) that users can fill in after applying a template.
 
-**Shared parser** (`~/helpers/hookPlaceholderParser.ts`):
+**Shared helper** (`~/helpers/hookPlaceholderParser.ts`):
 - `parseHookPlaceholders(content)`: Splits text into `HookPart[]` with `type: 'text' | 'placeholder'`
 - `hasPlaceholders(content)`: Returns `true` if any `[...]` tokens remain
+- `formatPlaceholderToken(placeholder)`: Returns `[key]` — single source of truth for the token format
+- `insertPlaceholder(content, placeholder, cursorStart, cursorEnd)`: Inserts `[key]` at cursor position, returns `{ content, cursorPosition }`
+- `replacePlaceholder(content, placeholder, value)`: Replaces all `[key]` occurrences with `value`
 
 **Display in HookTemplateCard**: Placeholder tokens rendered as `Pill` with French translations.
 

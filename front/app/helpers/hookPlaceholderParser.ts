@@ -24,3 +24,21 @@ export function parseHookPlaceholders(content: string): HookPart[] {
 export function hasPlaceholders(content: string): boolean {
     return /\[[^\]]+\]/.test(content);
 }
+
+export function formatPlaceholderToken(placeholder: string): string {
+    return `[${placeholder}]`;
+}
+
+export function insertPlaceholder(content: string, placeholder: string, cursorStart: number, cursorEnd: number): { content: string; cursorPosition: number } {
+    const token = formatPlaceholderToken(placeholder);
+    const needsSpace = cursorStart > 0 && !/\s/.test(content[cursorStart - 1]);
+    const insertion = (needsSpace ? " " : "") + token;
+    return {
+        content: content.slice(0, cursorStart) + insertion + content.slice(cursorEnd),
+        cursorPosition: cursorStart + insertion.length,
+    };
+}
+
+export function replacePlaceholder(content: string, placeholder: string, value: string): string {
+    return content.replaceAll(formatPlaceholderToken(placeholder), value);
+}

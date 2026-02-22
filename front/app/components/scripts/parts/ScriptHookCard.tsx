@@ -5,7 +5,7 @@ import { Button } from "~/components/ui/Button";
 import { TextArea } from "~/components/ui/TextArea";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useHookTemplatePanelStore } from "~/stores/scripts/hookTemplatePanelStore";
-import { hasPlaceholders } from "~/helpers/hookPlaceholderParser";
+import { hasPlaceholders, replacePlaceholder } from "~/helpers/hookPlaceholderParser";
 import ScriptPartHeader from "./ScriptPartHeader";
 import HookContentRenderer from "./HookContentRenderer";
 
@@ -28,7 +28,7 @@ export default function ScriptHookCard({ script }: ScriptHookCardProps) {
     };
 
     const handleReplacePlaceholder = (placeholder: string, value: string) => {
-        const updated = hook.replaceAll(`[${placeholder}]`, value);
+        const updated = replacePlaceholder(hook, placeholder, value);
         setHook(updated);
         updateScript({ scriptUuid: script.uuid, data: { hook: updated } });
     };

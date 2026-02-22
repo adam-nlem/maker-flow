@@ -4,12 +4,12 @@ import ScriptListItem from "./ScriptListItem";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 
-interface Props {
+interface ScriptListPanelProps {
     scripts: Script[];
     projectUuid: string;
 }
 
-export default function ScriptListPanel({ scripts, projectUuid }: Props) {
+export default function ScriptListPanel({ scripts, projectUuid }: ScriptListPanelProps) {
     const { createScript, isPending } = useCreateScript();
     const focusedScriptUuid = useFocusScriptStore((state) => state.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { XMarkIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon, MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Input } from "~/components/ui/Input";
 import { ToggleChip } from "~/components/ui/ToggleChip";
 import type { HookTemplate } from "~/models/HookTemplate";
@@ -8,6 +8,7 @@ import { HookTemplateCategory, hookTemplateCategoryToFrenchTranslation } from "~
 import { useListHookTemplates } from "~/hooks/api/hookTemplates/useListHookTemplates";
 import { useHookTemplatePanelStore } from "~/stores/scripts/hookTemplatePanelStore";
 import HookTemplateCard from "./HookTemplateCard";
+import CreateHookTemplateModal from "./CreateHookTemplateModal";
 
 interface HookTemplatePanelProps {
     scripts: Script[];
@@ -19,6 +20,7 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
     const [activeCategory, setActiveCategory] = useState<HookTemplateCategory>(HookTemplateCategory.All);
     const [searchInput, setSearchInput] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const isOpen = useHookTemplatePanelStore((s) => s.isOpen);
     const setIsOpen = useHookTemplatePanelStore((s) => s.setIsOpen);
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -61,12 +63,20 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
                 {/* Header */}
                 <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
                     <h2 className="text-heading-md">Hooks</h2>
-                    <button
-                        onClick={() => setIsOpen(false)}
-                        className="text-gray hover:text-dark transition-colors cursor-pointer"
-                    >
-                        <XMarkIcon className="size-4" strokeWidth={2} />
-                    </button>
+                    <div className="flex flex-row items-center gap-2">
+                        <button
+                            onClick={() => setShowCreateModal(true)}
+                            className="text-gray hover:text-dark transition-colors cursor-pointer"
+                        >
+                            <PlusIcon className="size-4" strokeWidth={2} />
+                        </button>
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            className="text-gray hover:text-dark transition-colors cursor-pointer"
+                        >
+                            <XMarkIcon className="size-4" strokeWidth={2} />
+                        </button>
+                    </div>
                 </div>
 
                 {/* Search */}
@@ -112,6 +122,8 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
                     )}
                 </div>
             </div>
+
+            <CreateHookTemplateModal showModal={showCreateModal} onClose={() => setShowCreateModal(false)} />
         </div>
     );
 }
