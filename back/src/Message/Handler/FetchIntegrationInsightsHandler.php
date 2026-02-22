@@ -2,7 +2,7 @@
 
 namespace App\Message\Handler;
 
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Message\FetchIntegrationInsightsMessage;
 use App\Service\IntegrationInsightService;
@@ -29,9 +29,9 @@ class FetchIntegrationInsightsHandler
         }
 
         try {
-            match ($integration->getProvider()) {
-                IntegrationProvider::Instagram => $this->integrationInsightService->fetchInstagramProfileInsights($integration),
-                IntegrationProvider::Youtube => $this->integrationInsightService->fetchYoutubeProfileInsights($integration),
+            match ($integration->getPlatform()) {
+                IntegrationPlatform::Instagram => $this->integrationInsightService->fetchInstagramProfileInsights($integration),
+                IntegrationPlatform::Youtube => $this->integrationInsightService->fetchYoutubeProfileInsights($integration),
             };
 
         } catch (\Exception $e) {

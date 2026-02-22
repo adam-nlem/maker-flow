@@ -2,7 +2,7 @@
 
 namespace App\Repository;
 
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
 use App\Entity\Project;
@@ -84,14 +84,14 @@ class IntegrationRepository extends ServiceEntityRepository
         return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserAndProviderAndAccountId(User $user, IntegrationProvider $provider, string $accountId): ?Integration
+    public function getByUserAndPlatformAndAccountId(User $user, IntegrationPlatform $platform, string $accountId): ?Integration
     {
         return $this->createQueryBuilder('i')
             ->where('i.user = :user')
-            ->andWhere('i.provider = :provider')
+            ->andWhere('i.platform = :platform')
             ->andWhere('i.accountId = :accountId')
             ->setParameter('user', $user)
-            ->setParameter('provider', $provider)
+            ->setParameter('platform', $platform)
             ->setParameter('accountId', $accountId)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
@@ -111,14 +111,14 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getOneByProjectAndProviderAndStatus(Project $project, IntegrationProvider $provider, IntegrationStatus $status): ?Integration
+    public function getOneByProjectAndPlatformAndStatus(Project $project, IntegrationPlatform $platform, IntegrationStatus $status): ?Integration
     {
         return $this->createQueryBuilder('i')
             ->where('i.project = :project')
-            ->andWhere('i.provider = :provider')
+            ->andWhere('i.platform = :platform')
             ->andWhere('i.status = :status')
             ->setParameter('project', $project)
-            ->setParameter('provider', $provider)
+            ->setParameter('platform', $platform)
             ->setParameter('status', $status)
             ->orderBy('i.createdAt', 'DESC')
             ->setMaxResults(1)
@@ -127,22 +127,22 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByProvider(IntegrationProvider $provider): array
+    public function getByPlatform(IntegrationPlatform $platform): array
     {
         return $this->createQueryBuilder('i')
-            ->where('i.provider = :provider')
-            ->setParameter('provider', $provider)
+            ->where('i.platform = :platform')
+            ->setParameter('platform', $platform)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByProviderAndStatus(IntegrationProvider $provider, IntegrationStatus $status): array
+    public function getByPlatformAndStatus(IntegrationPlatform $platform, IntegrationStatus $status): array
     {
         return $this->createQueryBuilder('i')
-            ->where('i.provider = :provider')
+            ->where('i.platform = :platform')
             ->andWhere('i.status = :status')
-            ->setParameter('provider', $provider)
+            ->setParameter('platform', $platform)
             ->setParameter('status', $status)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
@@ -150,15 +150,15 @@ class IntegrationRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param IntegrationProvider[] $providers
+     * @param IntegrationPlatform[] $platforms
      * @return Integration[]
      */
-    public function getByProvidersNotSyncedSince(array $providers, \DateTimeImmutable $since): array
+    public function getByPlatformsNotSyncedSince(array $platforms, \DateTimeImmutable $since): array
     {
         return $this->createQueryBuilder('i')
-            ->where('i.provider IN (:providers)')
+            ->where('i.platform IN (:platforms)')
             ->andWhere('i.lastSyncedAt < :since')
-            ->setParameter('providers', $providers)
+            ->setParameter('platforms', $platforms)
             ->setParameter('since', $since)
             ->orderBy('i.lastSyncedAt', 'ASC')
             ->getQuery()
@@ -167,16 +167,16 @@ class IntegrationRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param IntegrationProvider[] $providers
+     * @param IntegrationPlatform[] $platforms
      * @return Integration[]
      */
-    public function getByProvidersNotSyncedSinceAndStatus(array $providers, \DateTimeImmutable $since, IntegrationStatus $status): array
+    public function getByPlatformsNotSyncedSinceAndStatus(array $platforms, \DateTimeImmutable $since, IntegrationStatus $status): array
     {
         return $this->createQueryBuilder('i')
-            ->where('i.provider IN (:providers)')
+            ->where('i.platform IN (:platforms)')
             ->andWhere('i.lastSyncedAt < :since')
             ->andWhere('i.status = :status')
-            ->setParameter('providers', $providers)
+            ->setParameter('platforms', $platforms)
             ->setParameter('since', $since)
             ->setParameter('status', $status)
             ->orderBy('i.lastSyncedAt', 'ASC')

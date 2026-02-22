@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Helper\DateHelper;
 use App\Message\FetchIntegrationInsightsMessage;
@@ -20,9 +20,9 @@ use Symfony\Component\Messenger\MessageBusInterface;
 )]
 class FetchIntegrationInsightsCommand extends Command
 {
-    private const SUPPORTED_PROVIDERS = [
-        IntegrationProvider::Instagram,
-        IntegrationProvider::Youtube,
+    private const SUPPORTED_PLATFORMS = [
+        IntegrationPlatform::Instagram,
+        IntegrationPlatform::Youtube,
     ];
 
     //TODO: Change this back to 24 horus
@@ -44,8 +44,8 @@ class FetchIntegrationInsightsCommand extends Command
         $since = DateHelper::createUtcDateTimeImmutable()
             ->modify('-' . self::SYNC_THRESHOLD_HOURS . ' hours');
 
-        $integrations = $this->integrationRepository->getByProvidersNotSyncedSinceAndStatus(
-            self::SUPPORTED_PROVIDERS,
+        $integrations = $this->integrationRepository->getByPlatformsNotSyncedSinceAndStatus(
+            self::SUPPORTED_PLATFORMS,
             $since,
             IntegrationStatus::Active
         );
@@ -56,7 +56,7 @@ class FetchIntegrationInsightsCommand extends Command
             $io->text(sprintf(
                 '  - Dispatching: %s (%s)',
                 $integration->getUserName(),
-                $integration->getProvider()->value
+                $integration->getPlatform()->value
             ));
             $this->bus->dispatch(new FetchIntegrationInsightsMessage($integration->getId()));
         }

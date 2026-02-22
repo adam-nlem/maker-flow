@@ -108,8 +108,8 @@ class PostService
 
     public function downloadAndStoreThumbnail(Post $post, string $thumbnailUrl): ?string
     {
-        $provider = strtolower($post->getIntegration()->getProvider()->value);
-        $thumbnailDirectory = $this->getThumbnailDirectory($provider);
+        $platform = strtolower($post->getIntegration()->getPlatform()->value);
+        $thumbnailDirectory = $this->getThumbnailDirectory($platform);
 
         if (!$this->filesystem->exists($thumbnailDirectory)) {
             $this->filesystem->mkdir($thumbnailDirectory);
@@ -130,11 +130,11 @@ class PostService
         return $filePath;
     }
 
-    private function getThumbnailDirectory(string $provider): string
+    private function getThumbnailDirectory(string $platform): string
     {
         $projectDir = $this->parameterBag->get('kernel.project_dir');
 
-        return sprintf('%s%s', $projectDir, sprintf(self::THUMBNAIL_BASE_PATH, $provider));
+        return sprintf('%s%s', $projectDir, sprintf(self::THUMBNAIL_BASE_PATH, $platform));
     }
 
     private function getExtensionFromUrl(string $url): string
@@ -148,8 +148,8 @@ class PostService
     //TODO: Add a placeholder
     public function getPostThumbnail(Post $post): ?\Symfony\Component\HttpFoundation\File\File
     {
-        $provider = strtolower($post->getIntegration()->getProvider()->value);
-        $thumbnailDirectory = $this->getThumbnailDirectory($provider);
+        $platform = strtolower($post->getIntegration()->getPlatform()->value);
+        $thumbnailDirectory = $this->getThumbnailDirectory($platform);
 
         $possibleExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 

@@ -2,7 +2,7 @@
 
 namespace App\Entity\Enum;
 
-enum IntegrationProvider: string
+enum IntegrationPlatform: string
 {
     case Github = 'github';
     case Youtube = 'youtube';

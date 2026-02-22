@@ -7,7 +7,7 @@ parameters:
     app.domain: "%env(string:APP_DOMAIN)%"
     app.frontend_url: "%env(string:FRONTEND_URL)%"
 
-    app.integration.provider.icon_path: "%kernel.project_dir%/private/uploads/integration/provider/icon"
+    app.integration.platform.icon_path: "%kernel.project_dir%/private/uploads/integration/platform/icon"
 
     app.instagram.graph_url: "https://graph.instagram.com"
     app.instagram.authorization_url: "https://www.instagram.com/oauth/authorize"
@@ -83,6 +83,6 @@ services:
             $frontendUrl: "%app.frontend_url%"
     App\Service\Integration\IntegrationService:
         arguments:
-            $integrationProviderIconPath: "%app.integration.provider.icon_path%"
+            $integrationPlatformIconPath: "%app.integration.platform.icon_path%"
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

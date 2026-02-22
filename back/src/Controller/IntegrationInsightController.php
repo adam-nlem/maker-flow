@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Enum\IntegrationProvider;
 use App\Entity\User;
 use App\DTO\QueryParam\IntegrationInsight\ListIntegrationInsightsQueryParamDTO;
 use App\DTO\QueryParam\IntegrationInsight\ShowIntegrationDetailQueryParamDTO;

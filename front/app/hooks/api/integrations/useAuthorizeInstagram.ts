@@ -3,7 +3,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { useOAuthPopup } from "~/hooks/useOAuthPopup";
 import { OAuthErrorCode } from "~/models/enums/OAuthErrorCode";
-import { IntegrationProvider } from "~/models/enums/IntegrationProvider";
+import { IntegrationPlatform } from "~/models/enums/IntegrationPlatform";
 import { integrationQueryKeys } from "./integrationQueryKeys";
 
 interface CreateIntegrationResponse {
@@ -12,10 +12,10 @@ interface CreateIntegrationResponse {
 
 interface UseCreateIntegrationProps {
     projectUuid: string;
-    provider: IntegrationProvider;
+    platform: IntegrationPlatform;
 }
 
-export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegrationProps) {
+export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegrationProps) {
     const queryClient = useQueryClient();
 
     const {
@@ -25,7 +25,7 @@ export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegra
         oauthError,
         reset: resetOAuth,
     } = useOAuthPopup({
-        provider,
+        platform,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
         },
@@ -35,7 +35,7 @@ export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegra
         mutationFn: async () => {
             const res = await httpClient.post<CreateIntegrationResponse>('/integrations', {
                 projectUuid,
-                provider: provider,
+                platform: platform,
             });
             return res.data;
         },

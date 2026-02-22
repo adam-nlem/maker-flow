@@ -45,23 +45,23 @@ This document describes the backend OAuth integration system used in MakerFlow f
 
 ### Backend Step-by-Step Flow
 
-1. **Frontend requests integration creation** - `POST /api/integrations` with `projectUuid` and `provider`
+1. **Frontend requests integration creation** - `POST /api/integrations` with `projectUuid` and `platform`
 2. **Validate project** - Check project exists and belongs to user
-3. **Check existing Active integration** - Return 409 Conflict if project already has an **Active** integration for this provider (revoked integrations are ignored, enabling re-auth)
+3. **Check existing Active integration** - Return 409 Conflict if project already has an **Active** integration for this platform (revoked integrations are ignored, enabling re-auth)
 4. **Generate state** - Random token `bin2hex(random_bytes(16))`
-5. **Store state in Redis** - Key: `INTEGRATION/STATE/{state}`, Value: JSON with userUuid, projectUuid, provider, TTL: 5 min
-6. **Return OAuth URL** - Provider-specific authorization URL with state
-7. **Provider redirects to callback** - `GET /api/integrations/callback?code=xxx&state=xxx`
-8. **Validate state** - Check Redis for matching state, extract projectUuid and provider, delete after use
-9. **Exchange code for tokens** - Provider-specific token exchange
-10. **Fetch user profile** - Provider-specific profile fetch
+5. **Store state in Redis** - Key: `INTEGRATION/STATE/{state}`, Value: JSON with userUuid, projectUuid, platform, TTL: 5 min
+6. **Return OAuth URL** - Platform-specific authorization URL with state
+7. **Platform redirects to callback** - `GET /api/integrations/callback?code=xxx&state=xxx`
+8. **Validate state** - Check Redis for matching state, extract projectUuid and platform, delete after use
+9. **Exchange code for tokens** - Platform-specific token exchange
+10. **Fetch user profile** - Platform-specific profile fetch
 11. **Create/update Integration entity** - Store in database
 12. **Link integration to project** - Associate integration with the project
-13. **Redirect to frontend callback** - `/integrations/callback?status=success&provider={provider}&integrationUuid=xxx`
+13. **Redirect to frontend callback** - `/integrations/callback?status=success&platform={platform}&integrationUuid=xxx`
 
 ### Business Rules
 
-- **One Active integration per provider per project** - A project can only have one Active integration for each provider (e.g., one Instagram account per project). Revoked integrations don't block creating a new one (re-auth flow).
+- **One Active integration per platform per project** - A project can only have one Active integration for each platform (e.g., one Instagram account per project). Revoked integrations don't block creating a new one (re-auth flow).
 - **Same integration can be linked to multiple projects** - The same Instagram account can be used in different projects
 
 ---
@@ -89,15 +89,15 @@ enum OAuthErrorCode: string
     case MissingCode = 'missing_code';
     case TokenExchangeFailed = 'token_exchange_failed';
     case UserNotFound = 'user_not_found';
-    case ProviderError = 'provider_error';
+    case PlatformError = 'platform_error';
 }
 ```
 
-### IntegrationProvider
+### IntegrationPlatform
 
 ```php
-// App\Entity\Enum\IntegrationProvider
-enum IntegrationProvider: string
+// App\Entity\Enum\IntegrationPlatform
+enum IntegrationPlatform: string
 {
     case Github = 'github';
     case Youtube = 'youtube';
@@ -132,7 +132,7 @@ The `Integration` entity stores connected external accounts and their OAuth toke
 | Property | Type | Nullable | Description |
 |----------|------|----------|-------------|
 | `uuid` | `GUID` | No | Unique identifier |
-| `provider` | `IntegrationProvider` | No | Provider enum (Instagram, etc.) |
+| `platform` | `IntegrationPlatform` | No | Platform enum (Instagram, etc.) |
 | `accessToken` | `string` | No | OAuth access token |
 | `refreshToken` | `string` | Yes | OAuth refresh token (if available) |
 | `scope` | `array` | Yes | Granted OAuth scopes |
@@ -164,7 +164,7 @@ The `Integration` entity acts as a profile entity. Related entities reference `I
 
 ## External DTOs
 
-External DTOs are used to type responses from third-party APIs. They are located in `DTO/External/{Provider}/`.
+External DTOs are used to type responses from third-party APIs. They are located in `DTO/External/{Platform}/`.
 
 ### InstagramTokenDTO
 
@@ -321,7 +321,7 @@ class IntegrationStateRedisDTO
     public function __construct(
         private readonly string $userUuid,
         private readonly string $projectUuid,
-        private readonly IntegrationProvider $provider,
+        private readonly IntegrationPlatform $platform,
     ) {}
 
     public static function fromJson(string $json): self { }
@@ -350,7 +350,7 @@ POST /api/integrations
 ```json
 {
     "projectUuid": "uuid-of-project",
-    "provider": "instagram"
+    "platform": "instagram"
 }
 ```
 
@@ -364,7 +364,7 @@ POST /api/integrations
 **Error Response (409 Conflict):**
 ```json
 {
-    "message": "This project already has an integration for this provider"
+    "message": "This project already has an integration for this platform"
 }
 ```
 
@@ -374,7 +374,7 @@ POST /api/integrations
 GET /api/integrations/callback?code=xxx&state=xxx
 ```
 
-Redirects to: `/integrations/callback?status=success&provider={provider}&integrationUuid=xxx`
+Redirects to: `/integrations/callback?status=success&platform={platform}&integrationUuid=xxx`
 
 ### List Integrations
 
@@ -382,7 +382,7 @@ Redirects to: `/integrations/callback?status=success&provider={provider}&integra
 GET /api/integrations?projectUuid=xxx
 ```
 
-**Response:** Flat array of integrations (one per provider per project, **all statuses** -- Active, Revoked, etc.). The frontend uses the `status` field to decide how to render each integration.
+**Response:** Flat array of integrations (one per platform per project, **all statuses** -- Active, Revoked, etc.). The frontend uses the `status` field to decide how to render each integration.
 
 ### Show Integration
 
@@ -402,14 +402,14 @@ DELETE /api/integrations/{integrationUuid}
 
 ### 1. Backend
 
-#### Create Provider Enum Case
+#### Create Platform Enum Case
 
 ```php
-// Entity/Enum/IntegrationProvider.php
-enum IntegrationProvider: string
+// Entity/Enum/IntegrationPlatform.php
+enum IntegrationPlatform: string
 {
     case Instagram = 'instagram';
-    case TikTok = 'tiktok';  // Add new provider
+    case TikTok = 'tiktok';  // Add new platform
 }
 ```
 
@@ -436,31 +436,31 @@ class TikTokOAuthService
 }
 ```
 
-#### Add Provider Case to Controller
+#### Add Platform Case to Controller
 
-The generic `POST /api/integrations` route handles all providers. Add the new provider to the `match` statement:
+The generic `POST /api/integrations` route handles all platforms. Add the new platform to the `match` statement:
 
 ```php
 // In IntegrationController::create()
-$authorizationUrl = match ($dto->getProvider()) {
-    IntegrationProvider::Instagram => $this->instagramOAuthService->getAuthorizationUrl($state),
-    IntegrationProvider::TikTok => $this->tiktokOAuthService->getAuthorizationUrl($state),
+$authorizationUrl = match ($dto->getPlatform()) {
+    IntegrationPlatform::Instagram => $this->instagramOAuthService->getAuthorizationUrl($state),
+    IntegrationPlatform::TikTok => $this->tiktokOAuthService->getAuthorizationUrl($state),
 };
 
 // In IntegrationController::callback()
-$integration = match ($provider) {
-    IntegrationProvider::Instagram => $this->instagramOAuthService->handleCallback($code, $user, $project),
-    IntegrationProvider::TikTok => $this->tiktokOAuthService->handleCallback($code, $user, $project),
+$integration = match ($platform) {
+    IntegrationPlatform::Instagram => $this->instagramOAuthService->handleCallback($code, $user, $project),
+    IntegrationPlatform::TikTok => $this->tiktokOAuthService->handleCallback($code, $user, $project),
 };
 ```
 
 #### Create Redis State Model (if not exists)
 
-The generic `IntegrationStateRedisDTO` is already used for all providers:
+The generic `IntegrationStateRedisDTO` is already used for all platforms:
 
 ```php
 // DTO/Redis/Integration/IntegrationStateRedisDTO.php
-// Already handles all providers via the provider and projectUuid properties
+// Already handles all platforms via the platform and projectUuid properties
 ```
 
 ### 2. Environment Variables
@@ -474,11 +474,11 @@ TIKTOK_REDIRECT_URI=https://api.yourapp.com/api/integrations/callback
 
 ### 3. Checklist
 
-- [ ] Add provider to `IntegrationProvider` enum
+- [ ] Add platform to `IntegrationPlatform` enum
 - [ ] Create External DTOs for API responses
 - [ ] Create OAuth service with `handleCallback`, `getAuthorizationUrl`, and token methods
-- [ ] Add provider case to `IntegrationController::create()` match statement
-- [ ] Add provider case to `IntegrationController::callback()` match statement
+- [ ] Add platform case to `IntegrationController::create()` match statement
+- [ ] Add platform case to `IntegrationController::callback()` match statement
 - [ ] Add environment variables
 - [ ] Test full flow end-to-end
 
@@ -486,15 +486,15 @@ TIKTOK_REDIRECT_URI=https://api.yourapp.com/api/integrations/callback
 
 ## Re-Authentication Flow
 
-When an OAuth token is revoked (user revokes access in provider settings, token expires beyond renewal, etc.), the system handles re-authentication through the existing OAuth flow:
+When an OAuth token is revoked (user revokes access in platform settings, token expires beyond renewal, etc.), the system handles re-authentication through the existing OAuth flow:
 
 ### How It Works
 
 1. **Token refresh fails** — The OAuth service (`InstagramOAuthService` or `YoutubeOAuthService`) catches the error during `refreshTokenIfNeeded()`, sets the integration status to `Revoked`, persists, and throws `OAuthTokenRevokedException`
 2. **Handler catches + logs** — The message handler catches the exception, logs it, and the worker continues processing other integrations
-3. **Commands skip revoked** — On next cron run, commands use status-filtered repository queries (`getByProviderAndStatus`, `getByProvidersNotSyncedSinceAndStatus`) with `IntegrationStatus::Active`, so revoked integrations are not dispatched
+3. **Commands skip revoked** — On next cron run, commands use status-filtered repository queries (`getByPlatformAndStatus`, `getByPlatformsNotSyncedSinceAndStatus`) with `IntegrationStatus::Active`, so revoked integrations are not dispatched
 4. **Frontend shows revoked state** — The list endpoint (`GET /api/integrations`) returns integrations of all statuses. The frontend card shows a "Déconnecté" pill and "Reconnecter" button for revoked integrations
-5. **User clicks "Reconnecter"** -- Triggers `POST /api/integrations` which checks for Active-only conflicts via `getOneByProjectAndProviderAndStatus(..., Active)`. Since the existing integration is `Revoked`, the check passes and the OAuth popup opens
+5. **User clicks "Reconnecter"** -- Triggers `POST /api/integrations` which checks for Active-only conflicts via `getOneByProjectAndPlatformAndStatus(..., Active)`. Since the existing integration is `Revoked`, the check passes and the OAuth popup opens
 6. **User authorizes** -- Provider redirects to callback, `handleCallback` finds the existing integration by `accountId`, calls `updateIntegrationToken` which resets the status to `Active` and updates tokens
 7. **Frontend updates** -- React Query invalidation refreshes the integration list, card updates to Active state with fresh data
 
@@ -517,7 +517,7 @@ try {
 } catch (\Exception $e) {
     return $this->redirectToFrontendCallback(
         OAuthCallbackStatus::Error,
-        IntegrationProvider::Instagram,
+        IntegrationPlatform::Instagram,
         OAuthErrorCode::TokenExchangeFailed
     );
 }
@@ -530,11 +530,11 @@ On error or success, the backend redirects to the frontend callback route with q
 ```php
 private function redirectToFrontendCallback(
     OAuthCallbackStatus $status,
-    IntegrationProvider $provider,
+    IntegrationPlatform $platform,
     ?OAuthErrorCode $errorCode = null,
     ?string $integrationUuid = null
 ): Response {
-    $dto = new OAuthCallbackResponseDTO($status, $provider, $errorCode, $integrationUuid);
+    $dto = new OAuthCallbackResponseDTO($status, $platform, $errorCode, $integrationUuid);
     return $this->redirect(
         $this->frontendUrl . '/integrations/callback?' . http_build_query($dto->getData())
     );
@@ -548,7 +548,7 @@ private function redirectToFrontendCallback(
 ### Manual Testing Checklist
 
 1. **Happy path** - Full authorization flow succeeds
-2. **User denies** - Provider error handled
+2. **User denies** - Platform error handled
 3. **State expired** - Invalid state error after 5 minutes
 4. **Existing integration** - Token updated, not duplicated
 5. **Token refresh** - Refresh endpoint works

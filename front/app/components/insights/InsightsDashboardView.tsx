@@ -2,7 +2,7 @@ import { Button } from "~/components/ui/Button";
 import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
 import { oAuthErrorCodeToFrenchTranslation } from "~/models/enums/OAuthErrorCode";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
-import { IntegrationProvider, integrationProviderTypeOptions } from "~/models/enums/IntegrationProvider";
+import { IntegrationPlatform, integrationPlatformTypeOptions } from "~/models/enums/IntegrationPlatform";
 import InsightsDashboardContent from "./InsightsDashboardContent";
 import Shimmer from "~/components/ui/Shimmer";
 import CreateIntegrationCard from "./integrations/CreateIntegrationCard";
@@ -12,7 +12,7 @@ export default function InsightsDashboardView({ projectUuid }: { projectUuid: st
     const { integrations, isLoading } = useListIntegrations({ projectUuid });
     const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
         projectUuid,
-        provider: IntegrationProvider.Instagram,
+        platform: IntegrationPlatform.Instagram,
     });
 
     const handleConnectInstagram = () => {
@@ -43,11 +43,11 @@ export default function InsightsDashboardView({ projectUuid }: { projectUuid: st
             </div>
 
             <div className="flex flex-row justify-between gap-3">
-                {integrationProviderTypeOptions.map((integrationProviderType) => (
+                {integrationPlatformTypeOptions.map((integrationPlatformType) => (
                     <CreateIntegrationCard
-                        key={integrationProviderType}
+                        key={integrationPlatformType}
                         projectUuid={projectUuid}
-                        provider={integrationProviderType}
+                        platform={integrationPlatformType}
                     />
                 ))}
             </div>

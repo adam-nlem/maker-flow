@@ -8,14 +8,14 @@ use Symfony\Component\HttpFoundation\File\File;
 class IntegrationService
 {
     public function __construct(
-        private readonly string $integrationProviderIconPath,
+        private readonly string $integrationPlatformIconPath,
     ) {}
 
-    public function getIntegrationProviderIcon(string $provider): File
+    public function getIntegrationPlatformIcon(string $platform): File
     {
-        $filePath = sprintf('%s/%s.svg', $this->integrationProviderIconPath, $provider);
+        $filePath = sprintf('%s/%s.svg', $this->integrationPlatformIconPath, $platform);
         if (!file_exists($filePath)) {
-            $filePath = sprintf('%s/placeholder.svg', $this->integrationProviderIconPath);
+            $filePath = sprintf('%s/placeholder.svg', $this->integrationPlatformIconPath);
         }
         return new File($filePath, false);
     }

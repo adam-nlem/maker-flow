@@ -15,14 +15,14 @@ This document describes the frontend OAuth integration system used in MakerFlow 
 |                    Component (e.g., Dashboard)                    |
 |                                                                   |
 |  const { createIntegration, isPending, integrationUuid, ... }    |
-|      = useCreateIntegration({ projectUuid, provider });           |
+|      = useCreateIntegration({ projectUuid, platform });           |
 +----------------------------+-------------------------------------+
                              |
                              v
 +------------------------------------------------------------------+
 |                    useCreateIntegration                            |
 |                                                                   |
-|  - Calls POST /api/integrations with projectUuid & provider      |
+|  - Calls POST /api/integrations with projectUuid & platform      |
 |  - Uses useOAuthPopup for popup management                       |
 |  - Combines mutation state with OAuth state                      |
 |  - Invalidates integrations query on success                     |
@@ -56,16 +56,16 @@ front/app/
 │   ├── api/integrations/
 │   │   ├── useAuthorizeInstagram.ts    # Contains useCreateIntegration hook
 │   │   ├── useListIntegrations.ts      # Hook to list integrations (flat list)
-│   │   ├── useShowIntegrationProviderIcon.ts  # Hook to fetch provider icons
+│   │   ├── useShowIntegrationPlatformIcon.ts  # Hook to fetch platform icons
 │   │   └── integrationQueryKeys.ts     # Query keys for integrations
 │   ├── useOAuthPopup.ts                # Utility hook for popup management
 │   └── useOAuthMessageListener.ts      # Utility hook for message listening
 ├── models/
 │   ├── dtos/
 │   │   ├── OAuthCallbackReponseDTO.ts  # DTO for callback response
-│   │   └── IntegrationsGroupedByProviderDTO.ts  # @deprecated - kept for future use
+│   │   └── IntegrationsGroupedByPlatformDTO.ts  # @deprecated - kept for future use
 │   └── enums/
-│       ├── IntegrationProvider.ts      # Provider enum (Instagram, Youtube, etc.)
+│       ├── IntegrationPlatform.ts      # Platform enum (Instagram, Youtube, etc.)
 │       ├── IntegrationStatus.ts        # Integration status enum (Active, Revoked, Error)
 │       ├── OAuthCallbackStatus.ts      # Status enum (success, error)
 │       ├── OAuthErrorCode.ts           # Error codes with translations
@@ -123,8 +123,8 @@ front/app/
 ### Step-by-Step Flow
 
 1. **User clicks "Connect Instagram"** - Component calls `createIntegration()`
-2. **API request** - `useCreateIntegration` calls `POST /api/integrations` with `projectUuid` and `provider`
-3. **Backend validates** - Checks project exists and no existing integration for this provider
+2. **API request** - `useCreateIntegration` calls `POST /api/integrations` with `projectUuid` and `platform`
+3. **Backend validates** - Checks project exists and no existing integration for this platform
 4. **Backend returns auth URL** - Instagram OAuth URL with state parameter
 5. **Open popup** - `useOAuthPopup.openPopup(url)` opens centered popup window
 6. **User authorizes** - User logs into Instagram and grants permissions
@@ -143,17 +143,17 @@ front/app/
 
 ### useCreateIntegration
 
-Generic API hook that orchestrates the OAuth flow for any provider.
+Generic API hook that orchestrates the OAuth flow for any platform.
 
 ```typescript
 // Location: hooks/api/integrations/useAuthorizeInstagram.ts
 
 interface UseCreateIntegrationProps {
     projectUuid: string;
-    provider: IntegrationProvider;
+    platform: IntegrationPlatform;
 }
 
-export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegrationProps) {
+export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegrationProps) {
     const queryClient = useQueryClient();
 
     const {
@@ -163,7 +163,7 @@ export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegra
         oauthError,
         reset: resetOAuth,
     } = useOAuthPopup({
-        provider,
+        platform,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
         },
@@ -173,7 +173,7 @@ export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegra
         mutationFn: async () => {
             const res = await httpClient.post<CreateIntegrationResponse>('/integrations', {
                 projectUuid,
-                provider: provider,
+                platform: platform,
             });
             return res.data;
         },
@@ -202,7 +202,7 @@ export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegra
 | Property | Type | Description |
 |----------|------|-------------|
 | `projectUuid` | `string` | UUID of the project to link the integration to |
-| `provider` | `IntegrationProvider` | The integration provider (Instagram, etc.) |
+| `platform` | `IntegrationPlatform` | The integration platform (Instagram, etc.) |
 
 **Returns:**
 | Property | Type | Description |
@@ -224,14 +224,14 @@ Utility hook that manages the OAuth popup window lifecycle.
 // Location: hooks/useOAuthPopup.ts
 
 interface UseOAuthPopupProps {
-    provider: IntegrationProvider;
+    platform: IntegrationPlatform;
     onSuccess?: () => void;
 }
 
 /**
  * Utility hook to manage OAuth popup window and listen for callback messages
  */
-export function useOAuthPopup({ provider, onSuccess }: UseOAuthPopupProps) {
+export function useOAuthPopup({ platform, onSuccess }: UseOAuthPopupProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [popupError, setPopupError] = useState<OAuthErrorCode | null>(null);
     const popupRef = useRef<Window | null>(null);
@@ -240,7 +240,7 @@ export function useOAuthPopup({ provider, onSuccess }: UseOAuthPopupProps) {
         integrationUuid,
         oauthError: messageError,
         reset: resetMessageListener,
-    } = useOAuthMessageListener({ provider });
+    } = useOAuthMessageListener({ platform });
 
     // Close popup when message received
     useEffect(() => {
@@ -260,7 +260,7 @@ export function useOAuthPopup({ provider, onSuccess }: UseOAuthPopupProps) {
     const openPopup = useCallback((url: string) => {
         // ... opens centered popup window
         // ... sets up interval to detect manual close
-    }, [isOpen, provider, resetMessageListener]);
+    }, [isOpen, platform, resetMessageListener]);
 
     return {
         openPopup,
@@ -275,7 +275,7 @@ export function useOAuthPopup({ provider, onSuccess }: UseOAuthPopupProps) {
 **Props:**
 | Property | Type | Description |
 |----------|------|-------------|
-| `provider` | `IntegrationProvider` | The integration provider |
+| `platform` | `IntegrationPlatform` | The integration platform |
 | `onSuccess` | `() => void` | Optional callback called when integration is created |
 
 **Features:**
@@ -299,7 +299,7 @@ interface OAuthCallbackMessage {
     payload: OAuthCallbackReponseDTO;
 }
 
-export function useOAuthMessageListener({ provider }: UseOAuthMessageListenerProps) {
+export function useOAuthMessageListener({ platform }: UseOAuthMessageListenerProps) {
     const [integrationUuid, setIntegrationUuid] = useState<string | null>(null);
     const [oauthError, setOauthError] = useState<OAuthErrorCode | null>(null);
 
@@ -314,9 +314,9 @@ export function useOAuthMessageListener({ provider }: UseOAuthMessageListenerPro
             return;
         }
 
-        // 3. Validate provider
+        // 3. Validate platform
         const { payload } = event.data;
-        if (payload.provider !== provider) {
+        if (payload.platform !== platform) {
             return;
         }
 
@@ -328,7 +328,7 @@ export function useOAuthMessageListener({ provider }: UseOAuthMessageListenerPro
             setOauthError(payload.errorCode);
             setIntegrationUuid(null);
         }
-    }, [provider]);
+    }, [platform]);
 
     useEffect(() => {
         window.addEventListener("message", handleMessage);
@@ -342,7 +342,7 @@ export function useOAuthMessageListener({ provider }: UseOAuthMessageListenerPro
 **Security:**
 - Validates `event.origin` matches current origin
 - Validates message type using enum
-- Filters by provider to support multiple integrations
+- Filters by platform to support multiple integrations
 
 ---
 
@@ -391,7 +391,7 @@ export default function IntegrationsCallback() {
 | Parameter | Type | Description |
 |-----------|------|-------------|
 | `status` | `success \| error` | OAuth result status |
-| `provider` | `instagram` | Integration provider |
+| `platform` | `instagram` | Integration platform |
 | `errorCode` | `string?` | Error code if status is error |
 | `integrationUuid` | `string?` | Integration UUID if status is success |
 
@@ -399,12 +399,12 @@ export default function IntegrationsCallback() {
 
 ## Enums
 
-### IntegrationProvider
+### IntegrationPlatform
 
 ```typescript
-// Location: models/enums/IntegrationProvider.ts
+// Location: models/enums/IntegrationPlatform.ts
 
-export enum IntegrationProvider {
+export enum IntegrationPlatform {
     Instagram = "instagram",
     Youtube = "youtube",
     Tiktok = "tiktok",
@@ -446,7 +446,7 @@ export enum OAuthErrorCode {
     MissingCode = "missing_code",
     TokenExchangeFailed = "token_exchange_failed",
     UserNotFound = "user_not_found",
-    ProviderError = "provider_error",
+    PlatformError = "platform_error",
     PopupBlocked = "popup_blocked",
 }
 
@@ -455,7 +455,7 @@ export const oAuthErrorCodeToFrenchTranslation: Record<OAuthErrorCode, string> =
     [OAuthErrorCode.MissingCode]: "Code d'autorisation manquant.",
     [OAuthErrorCode.TokenExchangeFailed]: "Echec de la connexion. Veuillez reessayer.",
     [OAuthErrorCode.UserNotFound]: "Utilisateur non trouve.",
-    [OAuthErrorCode.ProviderError]: "Erreur du fournisseur. Veuillez reessayer.",
+    [OAuthErrorCode.PlatformError]: "Erreur du fournisseur. Veuillez reessayer.",
     [OAuthErrorCode.PopupBlocked]: "Le popup a ete bloque. Veuillez autoriser les popups.",
 };
 ```
@@ -482,7 +482,7 @@ export enum WindowMessageType {
 export class OAuthCallbackReponseDTO {
     constructor(
         public readonly status: OAuthCallbackStatus,
-        public readonly provider: IntegrationProvider,
+        public readonly platform: IntegrationPlatform,
         public readonly errorCode?: OAuthErrorCode,
         public readonly integrationUuid?: string,
     ) {}
@@ -490,7 +490,7 @@ export class OAuthCallbackReponseDTO {
     static fromSearchParams(params: URLSearchParams): OAuthCallbackReponseDTO {
         return new OAuthCallbackReponseDTO(
             params.get("status") as OAuthCallbackStatus,
-            params.get("provider") as IntegrationProvider,
+            params.get("platform") as IntegrationPlatform,
             (params.get("errorCode") as OAuthErrorCode) ?? undefined,
             params.get("integrationUuid") ?? undefined,
         );
@@ -509,7 +509,7 @@ export default function DashboardContent({ projectUuid }: { projectUuid: string 
     const { integrations, isLoading } = useListIntegrations({ projectUuid });
     const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
         projectUuid,
-        provider: IntegrationProvider.Instagram,
+        platform: IntegrationPlatform.Instagram,
     });
 
     const handleConnectInstagram = () => {
@@ -548,12 +548,12 @@ export default function DashboardContent({ projectUuid }: { projectUuid: string 
 
 ## Re-Authentication Flow (Revoked Integrations)
 
-When an OAuth token is revoked (user revokes access in provider settings, token expires beyond renewal), the backend sets the integration status to `Revoked`. The frontend handles this gracefully:
+When an OAuth token is revoked (user revokes access in platform settings, token expires beyond renewal), the backend sets the integration status to `Revoked`. The frontend handles this gracefully:
 
 ### How It Works
 
 1. **List endpoint returns all statuses** -- `GET /api/integrations` returns Active and Revoked integrations
-2. **Dashboard routes by status** -- `DashboardContent` iterates over `integrationProviderTypeOptions` and checks the status:
+2. **Dashboard routes by status** -- `DashboardContent` iterates over `integrationPlatformTypeOptions` and checks the status:
    - **Active** integration -> `IntegrationCard` (shows profile + insight data)
    - **Revoked** or **missing** integration -> `CreateIntegrationCard` (shimmer placeholders + "Se connecter" button)
 3. **User clicks "Se connecter"** -- Triggers the same `useCreateIntegration` hook / OAuth popup flow as initial setup
@@ -569,34 +569,34 @@ No separate re-auth UI or endpoint is needed. The existing `CreateIntegrationCar
 
 ## Adding a New Integration
 
-### 1. Add Provider Enum
+### 1. Add Platform Enum
 
 ```typescript
-// models/enums/IntegrationProvider.ts
-export enum IntegrationProvider {
+// models/enums/IntegrationPlatform.ts
+export enum IntegrationPlatform {
     Instagram = "instagram",
-    TikTok = "tiktok",  // Add new provider
+    TikTok = "tiktok",  // Add new platform
 }
 ```
 
 ### 2. Use the Generic Hook
 
-The `useCreateIntegration` hook is generic and works with any provider. Simply pass the new provider:
+The `useCreateIntegration` hook is generic and works with any platform. Simply pass the new platform:
 
 ```tsx
 // In your component
 const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
     projectUuid,
-    provider: IntegrationProvider.TikTok,
+    platform: IntegrationPlatform.TikTok,
 });
 ```
 
-No new hook is needed - the generic `useCreateIntegration` handles all providers.
+No new hook is needed - the generic `useCreateIntegration` handles all platforms.
 
 ### 3. Checklist
 
-- [ ] Add provider to `IntegrationProvider` enum (frontend)
-- [ ] Ensure backend has matching provider case in controller
+- [ ] Add platform to `IntegrationPlatform` enum (frontend)
+- [ ] Ensure backend has matching platform case in controller
 - [ ] Test full flow end-to-end
 - [ ] Test error scenarios (popup blocked, user denies, etc.)
 
@@ -624,12 +624,12 @@ if (event.data?.type !== WindowMessageType.OAuthCallback) {
 }
 ```
 
-### Provider Filtering
+### Platform Filtering
 
-Each listener only processes messages for its specific provider:
+Each listener only processes messages for its specific platform:
 
 ```typescript
-if (payload.provider !== provider) {
+if (payload.platform !== platform) {
     return;
 }
 ```
@@ -646,7 +646,7 @@ if (payload.provider !== provider) {
 | Popup | Blocked by browser | `OAuthErrorCode.PopupBlocked` |
 | Backend | Invalid state | `OAuthErrorCode.InvalidState` |
 | Backend | Token exchange failed | `OAuthErrorCode.TokenExchangeFailed` |
-| Provider | User denied | `OAuthErrorCode.ProviderError` |
+| Platform | User denied | `OAuthErrorCode.PlatformError` |
 
 ### Error Display
 
@@ -664,36 +664,36 @@ if (payload.provider !== provider) {
 
 1. **Happy path** - Full authorization flow succeeds
 2. **Popup blocked** - Error displayed, user can retry
-3. **User denies** - Provider error handled
+3. **User denies** - Platform error handled
 4. **User closes popup** - State resets correctly
 5. **Direct navigation** - Callback route redirects to home
-6. **Multiple providers** - Messages filtered correctly
+6. **Multiple platforms** - Messages filtered correctly
 
 ---
 
-## Integration Provider Icons
+## Integration Platform Icons
 
 ### Overview
 
-Integration provider icons (e.g., Instagram logo) are served from the backend as SVG files.
+Integration platform icons (e.g., Instagram logo) are served from the backend as SVG files.
 
 ### API Endpoint
 
-`GET /api/integrations/providers/{provider}/icon`
+`GET /api/integrations/platforms/{platform}/icon`
 
-Returns the SVG icon file for the specified provider.
+Returns the SVG icon file for the specified platform.
 
-### useShowIntegrationProviderIcon
+### useShowIntegrationPlatformIcon
 
-**Location:** `hooks/api/integrations/useShowIntegrationProviderIcon.ts`
+**Location:** `hooks/api/integrations/useShowIntegrationPlatformIcon.ts`
 
-Fetches the icon for a specific integration provider.
+Fetches the icon for a specific integration platform.
 
 **Parameters:**
 
 | Parameter | Type | Description |
 |-----------|------|-------------|
-| `provider` | `string?` | The integration provider identifier |
+| `platform` | `string?` | The integration platform identifier |
 
 **Returns:**
 
@@ -706,7 +706,7 @@ Fetches the icon for a specific integration provider.
 **Notes:**
 - Returns a blob URL created from the SVG response
 - Uses `staleTime: Infinity` to cache icons permanently
-- Query is disabled if `provider` is undefined
+- Query is disabled if `platform` is undefined
 
 ### Query Keys
 
@@ -714,6 +714,6 @@ Fetches the icon for a specific integration provider.
 const integrationQueryKeys = {
     all: ['integrations'] as const,
     list: (projectUuid: string) => [...integrationQueryKeys.all, 'list', projectUuid] as const,
-    providerIcon: (provider: string) => [...integrationQueryKeys.all, 'providerIcon', provider] as const,
+    platformIcon: (platform: string) => [...integrationQueryKeys.all, 'platformIcon', platform] as const,
 };
 ```

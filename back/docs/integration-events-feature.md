@@ -126,7 +126,7 @@ public function callback(
 
 namespace App\EventSubscriber;
 
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Event\IntegrationCreatedEvent;
 use App\Message\FetchIntegrationInsightsMessage;
 use App\Message\FetchPostInsightsMessage;
@@ -150,7 +150,7 @@ class IntegrationCreatedSubscriber implements EventSubscriberInterface
     {
         $integration = $event->getIntegration();
 
-        if ($integration->getProvider() !== IntegrationProvider::Instagram) {
+        if ($integration->getPlatform() !== IntegrationPlatform::Instagram) {
             return;
         }
 
@@ -169,7 +169,7 @@ class IntegrationCreatedSubscriber implements EventSubscriberInterface
 3. **Event constant** `NAME` follows pattern: `{entity}.{action}` (e.g., `integration.created`)
 4. **Subscribers** located in `src/EventSubscriber/`
 5. **Subscriber naming** follows pattern: `{EventName}Subscriber` (e.g., `IntegrationCreatedSubscriber`)
-6. **Filter by provider** in subscriber if logic is provider-specific
+6. **Filter by platform** in subscriber if logic is platform-specific
 
 ---
 

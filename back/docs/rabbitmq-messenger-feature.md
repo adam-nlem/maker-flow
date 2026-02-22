@@ -154,7 +154,7 @@ class FetchIntegrationInsightsCommand extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $integrations = $this->integrationRepository->getByProvider(IntegrationProvider::Instagram);
+        $integrations = $this->integrationRepository->getByPlatform(IntegrationPlatform::Instagram);
 
         foreach ($integrations as $integration) {
             $this->bus->dispatch(new FetchIntegrationInsightsMessage($integration->getId()));

@@ -5,7 +5,7 @@ import { ArrowTrendingUpIcon, DocumentTextIcon, UserIcon } from "@heroicons/reac
 import { useInsightsFilterStore } from "~/stores/insightsFilterStore";
 import { useShowIntegrationDetail } from "~/hooks/api/integrationInsights/useShowIntegrationDetail";
 import { ArrowPathIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { IntegrationProvider } from "~/models/enums/IntegrationProvider";
+import { IntegrationPlatform } from "~/models/enums/IntegrationPlatform";
 import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
 import AreaChart from "~/components/ui/AreaChart";
 import { timePeriodToDays } from "~/models/enums/TimePeriod";
@@ -32,7 +32,7 @@ export default function IntegrationPageView({ integration }: IntegrationPageView
   }
   return (
     <div className="flex flex-col gap-3 mt-5 flex-1 min-h-0">
-      {integration.provider === IntegrationProvider.Instagram && (
+      {integration.platform === IntegrationPlatform.Instagram && (
         <div className="flex flex-row items-center bg-amber-300/10 p-3 gap-3 rounded-lg border border-amber-300">
           <ExclamationTriangleIcon className="size-5 text-amber-500" strokeWidth={2} />
           <p className="text-xs text-amber-500">

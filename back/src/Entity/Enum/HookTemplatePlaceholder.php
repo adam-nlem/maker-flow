@@ -12,4 +12,8 @@ enum HookTemplatePlaceholder: string
     case Product = 'product';
     case Result = 'result';
     case Emotion = 'emotion';
+    case Number = 'number';
+    case Goal = 'goal';
+    case Date = 'date';
+
 }

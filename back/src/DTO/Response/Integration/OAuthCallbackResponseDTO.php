@@ -3,7 +3,7 @@
 namespace App\DTO\Response\Integration;
 
 use App\DTO\Response\ResponseDTOInterface;
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Entity\Enum\OAuthCallbackStatus;
 use App\Entity\Enum\OAuthErrorCode;
 
@@ -11,7 +11,7 @@ class OAuthCallbackResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
         private OAuthCallbackStatus $status,
-        private IntegrationProvider $provider,
+        private IntegrationPlatform $platform,
         private ?OAuthErrorCode $errorCode,
         private ?string $integrationUuid,
     ) {}
@@ -20,7 +20,7 @@ class OAuthCallbackResponseDTO implements ResponseDTOInterface
     {
         return [
             'status' => $this->getStatus()->value,
-            'provider' => $this->getProvider()->value,
+            'platform' => $this->getPlatform()->value,
             'error_code' => $this->getErrorCode()?->value,
             'integration_uuid' => $this->getIntegrationUuid(),
         ];
@@ -31,9 +31,9 @@ class OAuthCallbackResponseDTO implements ResponseDTOInterface
         return $this->status;
     }
 
-    public function getProvider(): IntegrationProvider
+    public function getPlatform(): IntegrationPlatform
     {
-        return $this->provider;
+        return $this->platform;
     }
 
     public function getErrorCode(): ?OAuthErrorCode

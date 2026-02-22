@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import { OAuthCallbackStatus } from "~/models/enums/OAuthCallbackStatus";
 import { OAuthErrorCode } from "~/models/enums/OAuthErrorCode";
-import { IntegrationProvider } from "~/models/enums/IntegrationProvider";
+import { IntegrationPlatform } from "~/models/enums/IntegrationPlatform";
 import { WindowMessageType } from "~/models/enums/WindowMessageType";
 import { OAuthCallbackReponseDTO } from "~/models/dtos/OAuthCallbackReponseDTO";
 
@@ -11,10 +11,10 @@ interface OAuthCallbackMessage {
 }
 
 interface UseOAuthMessageListenerProps {
-    provider: IntegrationProvider;
+    platform: IntegrationPlatform;
 }
 
-export function useOAuthMessageListener({ provider }: UseOAuthMessageListenerProps) {
+export function useOAuthMessageListener({ platform }: UseOAuthMessageListenerProps) {
     const [integrationUuid, setIntegrationUuid] = useState<string | null>(null);
     const [oauthError, setOauthError] = useState<OAuthErrorCode | null>(null);
 
@@ -31,7 +31,7 @@ export function useOAuthMessageListener({ provider }: UseOAuthMessageListenerPro
 
         const { payload } = event.data;
 
-        if (payload.provider !== provider) {
+        if (payload.platform !== platform) {
             return;
         }
 
@@ -42,7 +42,7 @@ export function useOAuthMessageListener({ provider }: UseOAuthMessageListenerPro
             setOauthError(payload.errorCode ?? OAuthErrorCode.Unknown);
             setIntegrationUuid(null);
         }
-    }, [provider]);
+    }, [platform]);
 
     useEffect(() => {
         window.addEventListener("message", handleMessage);

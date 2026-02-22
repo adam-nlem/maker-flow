@@ -1,5 +1,5 @@
-import { useShowIntegrationProviderIcon } from "~/hooks/api/integrations/useShowIntegrationProviderIcon";
-import { integrationProviderToFrenchTranslation } from "~/models/enums/IntegrationProvider";
+import { useShowIntegrationPlatformIcon } from "~/hooks/api/integrations/useShowIntegrationPlatformIcon";
+import { integrationPlatformToFrenchTranslation } from "~/models/enums/IntegrationPlatform";
 import type { Integration } from "~/models/Integration";
 
 interface IntegrationTileProps {
@@ -10,7 +10,7 @@ interface IntegrationTileProps {
 
 export default function IntegrationTile({ integration, isSelected = false, onClick }: IntegrationTileProps) {
 
-    const { iconUrl } = useShowIntegrationProviderIcon(integration.provider)
+    const { iconUrl } = useShowIntegrationPlatformIcon(integration.platform)
 
     return (
         <div className={`flex flex-row justify-between gap-2 items-center ${isSelected ? 'bg-light-gray' : 'hover:bg-light-gray'} cursor-pointer rounded-md p-2 w-fit`}
@@ -18,12 +18,12 @@ export default function IntegrationTile({ integration, isSelected = false, onCli
             {iconUrl && (
                 <img
                     src={iconUrl}
-                    alt={integration.provider}
+                    alt={integration.platform}
                     className="size-5 rounded-md object-cover"
                 />
             )}
 
-            <h1 className={`text-heading-sm whitespace-nowrap ${isSelected ? 'text-dark' : 'text-gray'}`}>{integrationProviderToFrenchTranslation[integration.provider]}</h1>
+            <h1 className={`text-heading-sm whitespace-nowrap ${isSelected ? 'text-dark' : 'text-gray'}`}>{integrationPlatformToFrenchTranslation[integration.platform]}</h1>
         </div>
     )
 

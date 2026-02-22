@@ -269,7 +269,7 @@ export class AuthResponseDTO {
 export class OAuthCallbackReponseDTO {
     constructor(
         public readonly status: OAuthCallbackStatus,
-        public readonly provider: IntegrationProvider,
+        public readonly platform: IntegrationPlatform,
         public readonly errorCode?: OAuthErrorCode,
         public readonly integrationUuid?: string,
     ) {}
@@ -277,7 +277,7 @@ export class OAuthCallbackReponseDTO {
     static fromSearchParams(params: URLSearchParams): OAuthCallbackReponseDTO {
         return new OAuthCallbackReponseDTO(
             params.get("status") as OAuthCallbackStatus,
-            params.get("provider") as IntegrationProvider,
+            params.get("platform") as IntegrationPlatform,
             (params.get("errorCode") as OAuthErrorCode) ?? undefined,
             params.get("integrationUuid") ?? undefined,
         );
@@ -287,26 +287,26 @@ export class OAuthCallbackReponseDTO {
 
 ### Grouped DTO Pattern
 
-When the API returns items grouped by an enum (e.g., tasks by status, integrations by provider), create a dedicated DTO class:
+When the API returns items grouped by an enum (e.g., tasks by status, integrations by platform), create a dedicated DTO class:
 
 ```tsx
-import type { IntegrationProvider } from "../enums/IntegrationProvider";
+import type { IntegrationPlatform } from "../enums/IntegrationPlatform";
 import { Integration, type IntegrationJSON } from "../Integration";
 
-export interface IntegrationsGroupedByProviderDTOJSON {
-    provider: IntegrationProvider;
+export interface IntegrationsGroupedByPlatformDTOJSON {
+    platform: IntegrationPlatform;
     integrations: IntegrationJSON[];
 }
 
-export class IntegrationsGroupedByProviderDTO {
+export class IntegrationsGroupedByPlatformDTO {
     constructor(
-        public readonly provider: IntegrationProvider,
+        public readonly platform: IntegrationPlatform,
         public integrations: Integration[],
     ) { }
 
-    static fromJSON(json: IntegrationsGroupedByProviderDTOJSON): IntegrationsGroupedByProviderDTO {
-        return new IntegrationsGroupedByProviderDTO(
-            json.provider,
+    static fromJSON(json: IntegrationsGroupedByPlatformDTOJSON): IntegrationsGroupedByPlatformDTO {
+        return new IntegrationsGroupedByPlatformDTO(
+            json.platform,
             json.integrations.map(integration => Integration.fromJSON(integration)),
         );
     }
@@ -316,10 +316,10 @@ export class IntegrationsGroupedByProviderDTO {
 **Usage in hooks:**
 
 ```tsx
-const res = await httpClient.get<IntegrationsGroupedByProviderDTOJSON[]>(`/integrations`, {
+const res = await httpClient.get<IntegrationsGroupedByPlatformDTOJSON[]>(`/integrations`, {
     params: { projectUuid }
 });
-return res.data.map((json) => IntegrationsGroupedByProviderDTO.fromJSON(json));
+return res.data.map((json) => IntegrationsGroupedByPlatformDTO.fromJSON(json));
 ```
 
 ### Conventions
@@ -458,10 +458,10 @@ OAuth hooks are special because success/error comes from popup `postMessage`, no
 // hooks/api/integrations/useAuthorizeInstagram.ts
 interface UseCreateIntegrationProps {
     projectUuid: string;
-    provider: IntegrationProvider;
+    platform: IntegrationPlatform;
 }
 
-export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegrationProps) {
+export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegrationProps) {
     const queryClient = useQueryClient();
 
     const {
@@ -471,7 +471,7 @@ export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegra
         oauthError,
         reset: resetOAuth,
     } = useOAuthPopup({
-        provider,
+        platform,
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
         },
@@ -481,7 +481,7 @@ export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegra
         mutationFn: async () => {
             const res = await httpClient.post<CreateIntegrationResponse>('/integrations', {
                 projectUuid,
-                provider: provider,
+                platform: platform,
             });
             return res.data;
         },
@@ -508,7 +508,7 @@ export function useCreateIntegration({ projectUuid, provider }: UseCreateIntegra
 
 ### OAuth Hook Conventions
 
-1. **Generic hook** - `useCreateIntegration` works with any provider via props
+1. **Generic hook** - `useCreateIntegration` works with any platform via props
 2. **Return state values** (`integrationUuid`, `oauthError`) instead of callbacks
 3. **Combine pending states** - `isPending` includes both mutation and popup open state
 4. **Combine errors** - `oauthError` includes both popup errors and mutation errors

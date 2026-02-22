@@ -14,7 +14,7 @@ back/src/
 ├── Controller/          # API Controllers
 ├── DTO/                 # Data Transfer Objects
 │   ├── External/        # External API response DTOs
-│   │   └── [Provider]/  # Provider-specific (Instagram, YouTube, etc.)
+│   │   └── [Platform]/  # Platform-specific (Instagram, YouTube, etc.)
 │   ├── QueryParam/      # Query parameter DTOs
 │   ├── Request/         # Request body DTOs
 │   └── Response/        # Response DTOs
@@ -45,7 +45,7 @@ back/src/
 | Request DTO | `{Action}{Resource}RequestDTO` | `CreateProjectRequestDTO`, `UpdateProjectRequestDTO` |
 | Response DTO | `{Action}{Resource}ResponseDTO` | `AuthorizeInstagramIntegrationResponseDTO` |
 | QueryParam DTO | `{Action}{Resource}QueryParamDTO` | `ListProjectsQueryParamDTO` |
-| External DTO | `{Provider}{DataType}DTO` | `InstagramTokenDTO`, `InstagramUserProfileDTO` |
+| External DTO | `{Platform}{DataType}DTO` | `InstagramTokenDTO`, `InstagramUserProfileDTO` |
 | Enum | Singular noun | `ProjectType`, `Color`, `TodoListStatus` |
 | Helper | `{Domain}Helper` | `DateHelper`, `InsightEvolutionHelper` |
 | Exception | `{Name}Exception` | `CustomValidationException`, `IconNotFoundException` |
@@ -390,7 +390,7 @@ class InstagramTokenDTO
 
 ### External DTO Conventions
 
-1. **Located in** `DTO/External/{Provider}/`
+1. **Located in** `DTO/External/{Platform}/`
 2. **Immutable** - use `readonly` properties
 3. **Factory method** `fromArray()` for creating from API response
 4. **Default values** for optional fields in `fromArray()`
@@ -618,7 +618,7 @@ Redis keys follow the pattern: `{DOMAIN}/{SUBDOMAIN}/{TYPE}/{identifier}`
 
 | Purpose | Key Pattern | Example |
 |---------|-------------|---------|
-| OAuth state | `INTEGRATION/{PROVIDER}/STATE/{state}` | `INTEGRATION/INSTAGRAM/STATE/abc123` |
+| OAuth state | `INTEGRATION/{PLATFORM}/STATE/{state}` | `INTEGRATION/INSTAGRAM/STATE/abc123` |
 
 ### Key Generator Methods
 
@@ -647,7 +647,7 @@ public static function getIntegrationTikTokStateKey(string $state): string
 
 ## Grouped Response Pattern
 
-When returning a list of items grouped by an enum (e.g., tasks by status, integrations by provider), use a dedicated Response DTO with `getData()` method.
+When returning a list of items grouped by an enum (e.g., tasks by status, integrations by platform), use a dedicated Response DTO with `getData()` method.
 
 ### Response DTO Structure
 
@@ -657,14 +657,14 @@ When returning a list of items grouped by an enum (e.g., tasks by status, integr
 namespace App\DTO\Response\Integration;
 
 use App\DTO\Response\ResponseDTOInterface;
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-class ListIntegrationsGroupedByProviderResponseDTO implements ResponseDTOInterface
+class ListIntegrationsGroupedByPlatformResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
         #[Groups(['api_integrations_list'])]
-        private IntegrationProvider $provider,
+        private IntegrationPlatform $platform,
         /** @var Integration[] $integrations */
         #[Groups(['api_integrations_list'])]
         private array $integrations,
@@ -673,14 +673,14 @@ class ListIntegrationsGroupedByProviderResponseDTO implements ResponseDTOInterfa
     public function getData(): array
     {
         return [
-            'provider' => $this->getProvider()->value,
+            'platform' => $this->getPlatform()->value,
             'integrations' => $this->getIntegrations(),
         ];
     }
 
-    public function getProvider(): IntegrationProvider
+    public function getPlatform(): IntegrationPlatform
     {
-        return $this->provider;
+        return $this->platform;
     }
 
     public function getIntegrations(): array
@@ -693,14 +693,14 @@ class ListIntegrationsGroupedByProviderResponseDTO implements ResponseDTOInterfa
 ### Controller Usage
 
 ```php
-$providers = IntegrationProvider::cases();
+$platforms = IntegrationPlatform::cases();
 
 $result = array_map(
-    fn(IntegrationProvider $provider) => (new ListIntegrationsGroupedByProviderResponseDTO(
-        $provider,
-        $this->integrationRepository->getByProjectAndProvider($project, $provider)
+    fn(IntegrationPlatform $platform) => (new ListIntegrationsGroupedByPlatformResponseDTO(
+        $platform,
+        $this->integrationRepository->getByProjectAndPlatform($project, $platform)
     ))->getData(),
-    $providers
+    $platforms
 );
 
 return $this->json(

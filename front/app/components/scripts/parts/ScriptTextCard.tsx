@@ -50,7 +50,7 @@ export default function ScriptTextCard({ text, scriptUuid, dragHandleProps }: Sc
                     onChange={(e) => setContent(e.target.value)}
                     onBlur={handleBlur}
                     placeholder="Ecrivez ici..."
-                    textStyle="text-body-sm"
+                    textStyle="text-sm"
                     fullWidth
                 />
             </div>
@@ -59,7 +59,7 @@ export default function ScriptTextCard({ text, scriptUuid, dragHandleProps }: Sc
                 <button
                     onClick={() => deleteScriptText({ textUuid: text.uuid, scriptUuid })}
                     disabled={isDeleting}
-                    className="shrink-0 mt-1 text-gray hover:text-danger transition-colors cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity"
+                    className="shrink-0 mt-1 text-gray hover:text-danger transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
                 >
                     <TrashIcon className="size-4" strokeWidth={2} />
                 </button>

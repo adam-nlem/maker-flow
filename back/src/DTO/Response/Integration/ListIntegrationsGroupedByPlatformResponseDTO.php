@@ -3,17 +3,17 @@
 namespace App\DTO\Response\Integration;
 
 use App\DTO\Response\ResponseDTOInterface;
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-class ListIntegrationsGroupedByProviderResponseDTO implements ResponseDTOInterface
+class ListIntegrationsGroupedByPlatformResponseDTO implements ResponseDTOInterface
 {
 
     public function __construct(
         #[Groups([
             'api_integrations_list'
         ])]
-        private IntegrationProvider $provider,
+        private IntegrationPlatform $platform,
         /** @var Integration[] $integrations */
         #[Groups([
             'api_integrations_list'
@@ -24,14 +24,14 @@ class ListIntegrationsGroupedByProviderResponseDTO implements ResponseDTOInterfa
     public function getData(): array
     {
         return [
-            'provider' => $this->getProvider()->value,
+            'platform' => $this->getPlatform()->value,
             'integrations' => $this->getIntegrations(),
         ];
     }
 
-    public function getProvider(): IntegrationProvider
+    public function getPlatform(): IntegrationPlatform
     {
-        return $this->provider;
+        return $this->platform;
     }
 
     public function getIntegrations(): array

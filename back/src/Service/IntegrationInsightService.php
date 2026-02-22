@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Entity\Integration;
 use App\Entity\User;
 use App\Helper\DateHelper;
@@ -62,7 +62,7 @@ class IntegrationInsightService
 
     public function fetchInstagramProfileInsights(Integration $integration): void
     {
-        if ($integration->getProvider() !== IntegrationProvider::Instagram) {
+        if ($integration->getPlatform() !== IntegrationPlatform::Instagram) {
             throw new \InvalidArgumentException('Integration must be an Instagram integration');
         }
 
@@ -107,7 +107,7 @@ class IntegrationInsightService
 
     public function fetchYoutubeProfileInsights(Integration $integration): void
     {
-        if ($integration->getProvider() !== IntegrationProvider::Youtube) {
+        if ($integration->getPlatform() !== IntegrationPlatform::Youtube) {
             throw new \InvalidArgumentException('Integration must be a YouTube integration');
         }
 
@@ -330,7 +330,7 @@ class IntegrationInsightService
 
     private function isYoutubeReportPending(Integration $integration): ?bool
     {
-        if ($integration->getProvider() !== IntegrationProvider::Youtube) {
+        if ($integration->getPlatform() !== IntegrationPlatform::Youtube) {
             return null;
         }
 

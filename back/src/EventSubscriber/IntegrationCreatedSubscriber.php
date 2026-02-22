@@ -2,7 +2,6 @@
 
 namespace App\EventSubscriber;
 
-use App\Entity\Enum\IntegrationProvider;
 use App\Event\IntegrationCreatedEvent;
 use App\Message\FetchIntegrationInsightsMessage;
 use App\Message\FetchPostInsightsMessage;

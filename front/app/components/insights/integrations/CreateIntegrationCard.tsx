@@ -1,21 +1,21 @@
-import { useShowIntegrationProviderIcon } from "~/hooks/api/integrations/useShowIntegrationProviderIcon";
-import type { IntegrationProvider } from "~/models/enums/IntegrationProvider";
+import { useShowIntegrationPlatformIcon } from "~/hooks/api/integrations/useShowIntegrationPlatformIcon";
+import type { IntegrationPlatform } from "~/models/enums/IntegrationPlatform";
 import Shimmer from "~/components/ui/Shimmer";
 import { Button } from "~/components/ui/Button";
 import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
 
 interface CreateIntegrationCardProps {
   projectUuid: string;
-  provider: IntegrationProvider;
+  platform: IntegrationPlatform;
 }
 
-export default function CreateIntegrationCard({ projectUuid, provider }: CreateIntegrationCardProps) {
+export default function CreateIntegrationCard({ projectUuid, platform }: CreateIntegrationCardProps) {
   const { createIntegration, isPending, integrationUuid, oauthError, reset } = useCreateIntegration({
     projectUuid,
-    provider: provider,
+    platform: platform,
   });
 
-  const { iconUrl } = useShowIntegrationProviderIcon(provider);
+  const { iconUrl } = useShowIntegrationPlatformIcon(platform);
 
   return (
     <div className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 justify-between w-full">
@@ -32,7 +32,7 @@ export default function CreateIntegrationCard({ projectUuid, provider }: CreateI
         {iconUrl && (
           <img
             src={iconUrl}
-            alt={provider}
+            alt={platform}
             className="size-7"
           />
         )}

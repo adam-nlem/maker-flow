@@ -87,9 +87,9 @@ Console Command
 
 The `fetch-integration-insights` command only fetches insights for integrations whose `lastSyncedAt` is older than 24 hours. This prevents excessive API calls and respects rate limits.
 
-Supported providers are defined in the command's `SUPPORTED_PROVIDERS` constant:
-- `IntegrationProvider::Instagram`
-- `IntegrationProvider::Youtube`
+Supported platforms are defined in the command's `SUPPORTED_PLATFORMS` constant:
+- `IntegrationPlatform::Instagram`
+- `IntegrationPlatform::Youtube`
 
 ---
 
@@ -443,13 +443,13 @@ The `refreshTokenIfNeeded` method in `YoutubeOAuthService`:
 
 ## Error Handling
 
-- **Invalid provider**: Throws `InvalidArgumentException` if integration provider doesn't match the method
+- **Invalid platform**: Throws `InvalidArgumentException` if integration platform doesn't match the method
 - **Missing integration**: Handler silently returns if integration not found by ID
 - **Revoked integration**: Handler silently returns if integration status is not `Active` (defense in depth)
 - **API errors**: HTTP errors from Instagram/YouTube APIs propagate as exceptions
 - **Revoked OAuth token (YouTube `invalid_grant`)**: When YouTube returns `invalid_grant` (user revoked access, refresh token expired, etc.), the integration status is set to `Revoked` and an `OAuthTokenRevokedException` is thrown. The exception is caught by message handlers, logged, and the worker continues processing other integrations.
 - **Revoked OAuth token (Instagram 4xx)**: When Instagram returns a 4xx error during token refresh (user revoked access, token expired beyond renewal, etc.), the `ClientExceptionInterface` is caught, the integration status is set to `Revoked`, and an `OAuthTokenRevokedException` is thrown. Same handling as YouTube.
-- **Commands skip revoked integrations**: Both `FetchPostInsightsCommand` and `FetchIntegrationInsightsCommand` use status-filtered repository queries (`getByProviderAndStatus`, `getByProvidersNotSyncedSinceAndStatus`) with `IntegrationStatus::Active`, preventing wasted API calls and repeated errors for revoked integrations.
+- **Commands skip revoked integrations**: Both `FetchPostInsightsCommand` and `FetchIntegrationInsightsCommand` use status-filtered repository queries (`getByPlatformAndStatus`, `getByPlatformsNotSyncedSinceAndStatus`) with `IntegrationStatus::Active`, preventing wasted API calls and repeated errors for revoked integrations.
 - **No reports available**: During the initial 24-48h after job creation, the system gracefully handles the absence of reports — posts are created with metadata only, insights are enriched on subsequent fetches.
 - **Failed messages**: Stored in `failed` transport for manual retry (see RabbitMQ documentation)
 

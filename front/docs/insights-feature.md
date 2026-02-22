@@ -94,7 +94,7 @@ InsightsPageView                 h-screen overflow-hidden, flex flex-col
 | `PostDetailPageView` | `components/insights/posts/PostDetailPageView.tsx` | Post detail page with insight tiles and timeline charts |
 | `PostInsightSummaryCard` | `components/insights/posts/PostInsightSummaryCard.tsx` | Visibility summary grid card (Views, Reach, AvgWatchTime, TotalWatchTime) with evolution badges; formats watch time values with `formatDurationToFrench` |
 | `DashboardContent` | `components/insights/DashboardContent.tsx` | Dashboard card grid: routes Active integrations to `IntegrationCard`, Revoked/missing to `CreateIntegrationCard` |
-| `IntegrationCard` | `components/insights/integrations/IntegrationCard.tsx` | Active integration card: profile picture, name, provider icon, insight value for selected type |
+| `IntegrationCard` | `components/insights/integrations/IntegrationCard.tsx` | Active integration card: profile picture, name, platform icon, insight value for selected type |
 | `CreateIntegrationCard` | `components/insights/integrations/CreateIntegrationCard.tsx` | Placeholder card with shimmer + "Se connecter" button. Used for both new connections and re-auth of revoked integrations |
 | `FilterTile` | `components/insights/FilterTile.tsx` | Filter chip used in dropdowns |
 | `LineChart` | `~/components/ui/LineChart.tsx` | Recharts line chart with current vs average lines |
@@ -175,15 +175,15 @@ X-axis uses `formatDurationToFrench()` (via a local helper converting hours to s
 
 `useShowPostThumbnail` fetches post thumbnails as blobs and creates object URLs for display. The hook stores the raw `Blob` in React Query's cache (not the object URL), then creates the object URL via `useMemo` and revokes it on cleanup via `useEffect`. This prevents memory leaks from unreleased object URLs accumulating over time.
 
-## Provider-Specific Banners
+## Platform-Specific Banners
 
-`IntegrationPageView` displays conditional info banners depending on the integration provider:
+`IntegrationPageView` displays conditional info banners depending on the integration platform:
 
-- **Instagram** (amber): Explains that Instagram does not provide historical data, so analytics are built incrementally over time. Only shown when `integration.provider === IntegrationProvider.Instagram`.
+- **Instagram** (amber): Explains that Instagram does not provide historical data, so analytics are built incrementally over time. Only shown when `integration.platform === IntegrationPlatform.Instagram`.
 - **YouTube** (blue): Shown when `detail.isYoutubeReportPending === true`. Explains that YouTube reporting jobs take 24-48 hours to generate after initial connection. Displays a spinning `ArrowPathIcon` animation to indicate the process is ongoing. The banner disappears once all reporting jobs have processed at least one report.
 
 ## Cleanup Notes
 
 - **Design system colors**: Evolution badges and insight tiles use `text-green` / `bg-pastel-green` (positive) and `text-danger` / `bg-danger/10` (negative) from the design system instead of hardcoded Tailwind color classes.
-- **Dashboard integration routing**: `DashboardContent` iterates `integrationProviderTypeOptions` and renders `IntegrationCard` for Active integrations or `CreateIntegrationCard` for Revoked/missing integrations. This means revoked integrations show the same shimmer + "Se connecter" card as providers with no integration at all, reusing the existing OAuth flow for re-authentication.
+- **Dashboard integration routing**: `DashboardContent` iterates `integrationPlatformTypeOptions` and renders `IntegrationCard` for Active integrations or `CreateIntegrationCard` for Revoked/missing integrations. This means revoked integrations show the same shimmer + "Se connecter" card as platforms with no integration at all, reusing the existing OAuth flow for re-authentication.
 - **Post detail safe rendering**: The timeline chart renders conditionally when the selected timeline exists. Engagement progress bars use `?? 0` fallback for nullable values. The empty placeholder div was removed and the chart section takes full width.

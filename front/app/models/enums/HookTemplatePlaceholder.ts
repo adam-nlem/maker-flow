@@ -7,6 +7,10 @@ export enum HookTemplatePlaceholder {
     Product = 'product',
     Result = 'result',
     Emotion = 'emotion',
+    Number = 'number',
+    Goal = 'goal',
+    Date = 'date',
+
 }
 
 export const hookTemplatePlaceholderToFrenchTranslation: Record<HookTemplatePlaceholder, string> = {
@@ -18,4 +22,7 @@ export const hookTemplatePlaceholderToFrenchTranslation: Record<HookTemplatePlac
     [HookTemplatePlaceholder.Product]: "Produit",
     [HookTemplatePlaceholder.Result]: "Résultat",
     [HookTemplatePlaceholder.Emotion]: "Émotion",
+    [HookTemplatePlaceholder.Number]: "Nombre",
+    [HookTemplatePlaceholder.Goal]: "Objectif",
+    [HookTemplatePlaceholder.Date]: "date",
 }

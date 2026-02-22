@@ -2,7 +2,7 @@
 
 namespace App\Command;
 
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Message\FetchPostInsightsMessage;
 use App\Service\PostInsightService;
@@ -33,14 +33,14 @@ class FetchPostInsightsCommand extends Command
 
         $io->title('Fetching post insights');
 
-        $instagramIntegrations = $this->integrationRepository->getByProviderAndStatus(IntegrationProvider::Instagram, IntegrationStatus::Active);
+        $instagramIntegrations = $this->integrationRepository->getByPlatformAndStatus(IntegrationPlatform::Instagram, IntegrationStatus::Active);
         $io->info(sprintf('Found %d active Instagram integrations', count($instagramIntegrations)));
 
         foreach ($instagramIntegrations as $integration) {
             $this->bus->dispatch(new FetchPostInsightsMessage($integration->getId()));
         }
 
-        $youtubeIntegrations = $this->integrationRepository->getByProviderAndStatus(IntegrationProvider::Youtube, IntegrationStatus::Active);
+        $youtubeIntegrations = $this->integrationRepository->getByPlatformAndStatus(IntegrationPlatform::Youtube, IntegrationStatus::Active);
         $io->info(sprintf('Found %d active YouTube integrations', count($youtubeIntegrations)));
 
         foreach ($youtubeIntegrations as $integration) {

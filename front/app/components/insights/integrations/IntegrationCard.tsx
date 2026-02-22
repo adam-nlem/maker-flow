@@ -1,5 +1,5 @@
 import type { Integration } from "~/models/Integration"
-import { useShowIntegrationProviderIcon } from "~/hooks/api/integrations/useShowIntegrationProviderIcon"
+import { useShowIntegrationPlatformIcon } from "~/hooks/api/integrations/useShowIntegrationPlatformIcon"
 import { IntegrationInsightType, integrationInsightTypeToFrenchTranslation } from "~/models/enums/IntegrationInsightType"
 import { useListIntegrationInsights } from "~/hooks/api/integrationInsights/useListIntegrationInsights"
 
@@ -14,7 +14,7 @@ export default function IntegrationCard({
     insightType,
     onClick,
 }: IntegrationCardProps) {
-    const { iconUrl } = useShowIntegrationProviderIcon(integration.provider)
+    const { iconUrl } = useShowIntegrationPlatformIcon(integration.platform)
     const { integrationInsights, isLoading, error } = useListIntegrationInsights({ integrationUuid: integration.uuid })
 
     return (
@@ -40,7 +40,7 @@ export default function IntegrationCard({
                 {iconUrl && (
                     <img
                         src={iconUrl}
-                        alt={integration.provider}
+                        alt={integration.platform}
                         className="ml-20 size-7 rounded-md object-cover"
                     />
                 )}

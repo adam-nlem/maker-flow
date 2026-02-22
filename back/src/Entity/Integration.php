@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
@@ -23,9 +23,9 @@ class Integration
     #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?string $uuid = null;
 
-    #[ORM\Column(enumType: IntegrationProvider::class)]
+    #[ORM\Column(enumType: IntegrationPlatform::class)]
     #[Groups(['api_integrations_list', 'api_integrations_show'])]
-    private ?IntegrationProvider $provider = null;
+    private ?IntegrationPlatform $platform = null;
 
     #[ORM\Column(type: Types::TEXT)]
     private ?string $accessToken = null;
@@ -117,14 +117,14 @@ class Integration
         return $this;
     }
 
-    public function getProvider(): ?IntegrationProvider
+    public function getPlatform(): ?IntegrationPlatform
     {
-        return $this->provider;
+        return $this->platform;
     }
 
-    public function setProvider(IntegrationProvider $provider): static
+    public function setPlatform(IntegrationPlatform $platform): static
     {
-        $this->provider = $provider;
+        $this->platform = $platform;
 
         return $this;
     }

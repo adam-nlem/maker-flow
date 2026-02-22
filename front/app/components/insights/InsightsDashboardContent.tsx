@@ -6,7 +6,7 @@ import { useInsightsFilterStore } from "~/stores/insightsFilterStore"
 import { integrationInsightTypeOptions, IntegrationInsightType, integrationInsightTypeToFrenchTranslation } from "~/models/enums/IntegrationInsightType"
 import FilterTile from "./FilterTile"
 import IntegrationCard from "./integrations/IntegrationCard"
-import { integrationProviderTypeOptions } from "~/models/enums/IntegrationProvider"
+import { integrationPlatformTypeOptions } from "~/models/enums/IntegrationPlatform"
 import CreateIntegrationCard from "./integrations/CreateIntegrationCard"
 
 interface InsightsDashboardContentProps {
@@ -47,14 +47,14 @@ export default function InsightsDashboardContent({
             </div>
 
             <div className="flex flex-row justify-between gap-3">
-                {integrationProviderTypeOptions.map((providerType) => {
-                    const integration = integrations.find((i) => i.provider === providerType)
+                {integrationPlatformTypeOptions.map((platformType) => {
+                    const integration = integrations.find((i) => i.platform === platformType)
 
                     if (!integration || integration.status !== IntegrationStatus.Active) {
                         return <CreateIntegrationCard
-                            key={providerType}
+                            key={platformType}
                             projectUuid={projectUuid}
-                            provider={providerType}
+                            platform={platformType}
                         />
                     }
 

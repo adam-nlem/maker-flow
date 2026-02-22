@@ -8,7 +8,7 @@ use App\DTO\Redis\Integration\IntegrationStateRedisDTO;
 use App\DTO\Request\Integration\CreateIntegrationRequestDTO;
 use App\DTO\Response\Integration\CreateIntegrationResponseDTO;
 use App\DTO\Response\Integration\OAuthCallbackResponseDTO;
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Enum\OAuthCallbackStatus;
 use App\Entity\Enum\OAuthErrorCode;
@@ -84,11 +84,11 @@ final class IntegrationController extends AbstractController
             );
         }
 
-        $existingIntegration = $integrationRepository->getOneByProjectAndProviderAndStatus($project, $dto->getProvider(), IntegrationStatus::Active);
+        $existingIntegration = $integrationRepository->getOneByProjectAndPlatformAndStatus($project, $dto->getPlatform(), IntegrationStatus::Active);
 
         if ($existingIntegration !== null) {
             return $this->json(
-                data: ["message" => "This project already has an integration for this provider"],
+                data: ["message" => "This project already has an integration for this platform"],
                 status: Response::HTTP_CONFLICT
             );
         }
@@ -98,7 +98,7 @@ final class IntegrationController extends AbstractController
         $stateModel = new IntegrationStateRedisDTO(
             $user->getUuid(),
             $project->getUuid(),
-            $dto->getProvider(),
+            $dto->getPlatform(),
         );
 
         $redisStoreService->set(
@@ -107,9 +107,9 @@ final class IntegrationController extends AbstractController
             time() + 60 * 5
         );
 
-        $authorizationUrl = match ($dto->getProvider()) {
-            IntegrationProvider::Instagram => $instagramOAuthService->getAuthorizationUrl($state),
-            IntegrationProvider::Youtube => $youtubeOAuthService->getAuthorizationUrl($state),
+        $authorizationUrl = match ($dto->getPlatform()) {
+            IntegrationPlatform::Instagram => $instagramOAuthService->getAuthorizationUrl($state),
+            IntegrationPlatform::Youtube => $youtubeOAuthService->getAuthorizationUrl($state),
         };
 
         $responseDto = (new CreateIntegrationResponseDTO($authorizationUrl))->getData();
@@ -121,9 +121,9 @@ final class IntegrationController extends AbstractController
         );
     }
 
-    #[Route('/{integrationProvider}/callback', name: 'api_integrations_callback', methods: ['GET'])]
+    #[Route('/{integrationPlatform}/callback', name: 'api_integrations_callback', methods: ['GET'])]
     public function callback(
-        IntegrationProvider $integrationProvider,
+        IntegrationPlatform $integrationPlatform,
         InstagramCallbackQueryParamDTO $queryParamDto,
         UserRepository $userRepository,
         ProjectRepository $projectRepository,
@@ -140,58 +140,58 @@ final class IntegrationController extends AbstractController
         );
 
         if ($stateDataJson === null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::InvalidState);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationPlatform, OAuthErrorCode::InvalidState);
         }
 
         $stateModel = IntegrationStateRedisDTO::fromJson($stateDataJson);
 
-        if ($stateModel->getProvider() !== $integrationProvider) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::InvalidState);
+        if ($stateModel->getPlatform() !== $integrationPlatform) {
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationPlatform, OAuthErrorCode::InvalidState);
         }
 
         if ($error !== null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::ProviderError);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationPlatform, OAuthErrorCode::PlatformError);
         }
 
         if ($code === null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::MissingCode);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationPlatform, OAuthErrorCode::MissingCode);
         }
 
         $user = $userRepository->getByUuid($stateModel->getUserUuid());
 
         if ($user === null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::UserNotFound);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationPlatform, OAuthErrorCode::UserNotFound);
         }
 
         $project = $projectRepository->getByUuidAndUser($stateModel->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::UserNotFound);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationPlatform, OAuthErrorCode::UserNotFound);
         }
 
         try {
-            $integration = match ($integrationProvider) {
-                IntegrationProvider::Instagram => $instagramOAuthService->handleCallback($code, $user, $project),
-                IntegrationProvider::Youtube => $youtubeOAuthService->handleCallback($code, $user, $project),
+            $integration = match ($integrationPlatform) {
+                IntegrationPlatform::Instagram => $instagramOAuthService->handleCallback($code, $user, $project),
+                IntegrationPlatform::Youtube => $youtubeOAuthService->handleCallback($code, $user, $project),
             };
 
             $redisStoreService->delete(
                 RedisStoreService::getIntegrationStateKey($state)
             );
 
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, $integrationProvider, null, $integration->getUuid());
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Success, $integrationPlatform, null, $integration->getUuid());
         } catch (\Exception $e) {
-            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationProvider, OAuthErrorCode::TokenExchangeFailed);
+            return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $integrationPlatform, OAuthErrorCode::TokenExchangeFailed);
         }
     }
 
     private function redirectToFrontendCallback(
         OAuthCallbackStatus $status,
-        IntegrationProvider $provider,
+        IntegrationPlatform $platform,
         ?OAuthErrorCode $errorCode = null,
         ?string $integrationUuid = null
     ): Response {
-        $dto = new OAuthCallbackResponseDTO($status, $provider, $errorCode, $integrationUuid);
+        $dto = new OAuthCallbackResponseDTO($status, $platform, $errorCode, $integrationUuid);
         return $this->redirect(
             $this->frontendUrl . '/integrations/callback?' . http_build_query($dto->getData())
         );
@@ -242,10 +242,10 @@ final class IntegrationController extends AbstractController
         );
     }
 
-    #[Route('/providers/{provider}/icon', name: 'api_integrations_provider_icon', methods: ['GET'])]
-    public function getProviderIcon(string $provider, IntegrationService $integrationService): Response
+    #[Route('/platforms/{platform}/icon', name: 'api_integrations_platform_icon', methods: ['GET'])]
+    public function getPlatformIcon(string $platform, IntegrationService $integrationService): Response
     {
-        $iconFile = $integrationService->getIntegrationProviderIcon($provider);
+        $iconFile = $integrationService->getIntegrationPlatformIcon($platform);
 
         return new BinaryFileResponse(
             $iconFile,

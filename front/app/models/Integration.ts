@@ -1,9 +1,9 @@
-import { IntegrationProvider } from "./enums/IntegrationProvider";
+import { IntegrationPlatform } from "./enums/IntegrationPlatform";
 import { IntegrationStatus } from "./enums/IntegrationStatus";
 
 export interface IntegrationJSON {
     uuid: string;
-    provider: IntegrationProvider;
+    platform: IntegrationPlatform;
     accountId: string;
     userName: string;
     name: string | null;
@@ -18,7 +18,7 @@ export interface IntegrationJSON {
 export class Integration {
     constructor(
         public readonly uuid: string,
-        public readonly provider: IntegrationProvider,
+        public readonly platform: IntegrationPlatform,
         public readonly accountId: string,
         public readonly userName: string,
         public readonly name: string | null,
@@ -33,7 +33,7 @@ export class Integration {
     static fromJSON(json: IntegrationJSON): Integration {
         return new Integration(
             json.uuid,
-            json.provider,
+            json.platform,
             json.accountId,
             json.userName,
             json.name,

@@ -4,7 +4,7 @@ namespace App\Service\Integration;
 
 use App\DTO\External\Instagram\InstagramTokenDTO;
 use App\DTO\External\Instagram\InstagramUserProfileDTO;
-use App\Entity\Enum\IntegrationProvider;
+use App\Entity\Enum\IntegrationPlatform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
 use App\Entity\Project;
@@ -108,7 +108,7 @@ class InstagramOAuthService
         $integration = new Integration();
         $integration
             ->setUser($user)
-            ->setProvider(IntegrationProvider::Instagram)
+            ->setPlatform(IntegrationPlatform::Instagram)
             ->setAccessToken($tokenDTO->getAccessToken())
             ->setAccountId($instagramUserProfile->getUserId())
             ->setUserName($instagramUserProfile->getUsername())
@@ -173,9 +173,9 @@ class InstagramOAuthService
         $longLivedToken = $this->exchangeForLongLivedToken($shortLivedToken->getAccessToken());
         $instagramUserProfile = $this->getUserProfile($longLivedToken->getAccessToken());
 
-        $existingIntegration = $this->integrationRepository->getByUserAndProviderAndAccountId(
+        $existingIntegration = $this->integrationRepository->getByUserAndPlatformAndAccountId(
             $user,
-            IntegrationProvider::Instagram,
+            IntegrationPlatform::Instagram,
             $instagramUserProfile->getUserId()
         );
 
