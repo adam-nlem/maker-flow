@@ -35,8 +35,6 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
         }
     };
 
-    const pillColor = `${voiceOverTypeToBgClass[voiceOverType]} ${voiceOverTypeToTextClass[voiceOverType]}`;
-
     return (
         <div className="group border border-light-gray rounded-xl p-4 bg-clear flex-1 flex flex-col gap-2">
             <ScriptPartHeader icon={MicrophoneIcon} label="Voix off" colorClassName="bg-yellow/10 border border-yellow/30" dragHandleProps={dragHandleProps} />
@@ -47,18 +45,23 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
                     getItemId={(type) => type}
                     onSelect={(type) => handleVoiceOverTypeChange(type)}
                     renderTrigger={({ onClick }) => (
-                        <button onClick={onClick} className="cursor-pointer">
-                            <Pill label={voiceOverTypeToLabel[voiceOverType]} bgColorClassName={pillColor} />
-                        </button>
+                        <Pill
+                            onClick={onClick}
+                            label={voiceOverTypeToLabel[voiceOverType]}
+                            isSelected
+                            bgColorClassName={voiceOverTypeToBgClass[voiceOverType]}
+                            textColorClassName={voiceOverTypeToTextClass[voiceOverType]}
+                        />
                     )}
-                    renderItem={({ item, isSelected, onSelect }) => (
-                        <button onClick={onSelect} className="cursor-pointer">
-                            <Pill
-                                label={voiceOverTypeToLabel[item]}
-                                bgColorClassName={`${voiceOverTypeToBgClass[item]} ${voiceOverTypeToTextClass[item]}${isSelected ? " ring-1 ring-current" : ""}`}
-                            />
-                        </button>
-                    )}
+                    renderItem={({ item, isSelected, onSelect }) => {
+                        return !isSelected ? <Pill
+                            label={voiceOverTypeToLabel[item]}
+                            isSelected
+                            onClick={onSelect}
+                            bgColorClassName={voiceOverTypeToBgClass[item]}
+                            textColorClassName={voiceOverTypeToTextClass[item]}
+                        /> : null
+                    }}
                 />
                 <button
                     onClick={() => deleteScriptVoiceOver({ voiceOverUuid: voiceOver.uuid, scriptUuid })}

@@ -28,7 +28,7 @@ export default function HookTemplateCard({ template, isSelected = false, onClick
             <span className="text-body-xs text-gray line-clamp-2 flex flex-wrap items-center gap-1">
                 {parts.map((part, index) =>
                     part.type === 'placeholder' ? (
-                        <Pill key={index} label={part.label} bgColorClassName="bg-purple/10 text-primary border border-primary-30" />
+                        <Pill key={index} label={part.label} isSelected bgColorClassName="bg-purple/10 border border-primary-30" textColorClassName="text-primary" />
                     ) : (
                         <span key={index}>{part.value}</span>
                     )

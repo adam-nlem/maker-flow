@@ -1,6 +1,8 @@
 import ModalOverlay from "~/components/ui/ModalOverlay";
 import { Button } from "~/components/ui/Button";
 import type { HookTemplate } from "~/models/HookTemplate";
+import { parseHookPlaceholders } from "~/helpers/hookPlaceholderParser";
+import Pill from "~/components/ui/Pill";
 
 interface ApplyHookTemplateModalProps {
     isOpen: boolean;
@@ -11,6 +13,7 @@ interface ApplyHookTemplateModalProps {
 
 export default function ApplyHookTemplateModal({ isOpen, template, onConfirm, onCancel }: ApplyHookTemplateModalProps) {
     if (!template) return null;
+    const parts = parseHookPlaceholders(template.content);
 
     return (
         <ModalOverlay isOpen={isOpen} onClose={onCancel} className="items-center justify-center">
@@ -22,21 +25,29 @@ export default function ApplyHookTemplateModal({ isOpen, template, onConfirm, on
 
                 <div className="flex flex-col gap-1">
                     <span className="text-heading-sm">{template.title}</span>
-                    <p className="text-body-sm text-gray">{template.content}</p>
+                    <span className="text-body-xs text-gray line-clamp-2 flex flex-wrap items-center gap-1">
+                        {parts.map((part, index) =>
+                            part.type === 'placeholder' ? (
+                                <Pill key={index} label={part.label} isSelected bgColorClassName="bg-purple/10 border border-primary-30" textColorClassName="text-primary" />
+                            ) : (
+                                <span key={index}>{part.value}</span>
+                            )
+                        )}
+                    </span>
                 </div>
 
                 <p className="text-body-xs text-gray">
                     Le hook actuel sera remplacé par le contenu de ce template.
                 </p>
 
-                <div className="flex flex-row gap-3 justify-end">
-                    <Button style="secondary" width="w-fit" onClick={onCancel}>
-                        Annuler
-                    </Button>
-                    <Button style="primary" width="w-fit" onClick={onConfirm}>
-                        Appliquer
-                    </Button>
-                </div>
+                <Button style="primary" onClick={onConfirm}>
+                    Appliquer
+                </Button>
+
+                <Button style="secondary" onClick={onCancel}>
+                    Annuler
+                </Button>
+
             </div>
         </ModalOverlay>
     );

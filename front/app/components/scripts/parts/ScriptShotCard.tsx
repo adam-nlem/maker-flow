@@ -35,8 +35,6 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
         }
     };
 
-    const pillColor = `${shotTypeToBgClass[shotType]} ${shotTypeToTextClass[shotType]}`;
-
     return (
         <div className="group border border-light-gray rounded-xl p-4 bg-clear flex-1 flex flex-col gap-2">
             <ScriptPartHeader icon={FilmIcon} label="Plan" colorClassName="bg-primary/10 border border-primary/30" dragHandleProps={dragHandleProps} />
@@ -47,18 +45,23 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
                     getItemId={(type) => type}
                     onSelect={(type) => handleShotTypeChange(type)}
                     renderTrigger={({ onClick }) => (
-                        <button onClick={onClick} className="cursor-pointer">
-                            <Pill label={shotTypeToLabel[shotType]} bgColorClassName={pillColor} />
-                        </button>
+                        <Pill
+                            onClick={onClick}
+                            label={shotTypeToLabel[shotType]}
+                            isSelected
+                            bgColorClassName={shotTypeToBgClass[shotType]}
+                            textColorClassName={shotTypeToTextClass[shotType]}
+                        />
                     )}
-                    renderItem={({ item, isSelected, onSelect }) => (
-                        <button onClick={onSelect} className="cursor-pointer">
-                            <Pill
-                                label={shotTypeToLabel[item]}
-                                bgColorClassName={`${shotTypeToBgClass[item]} ${shotTypeToTextClass[item]}${isSelected ? " ring-1 ring-current" : ""}`}
-                            />
-                        </button>
-                    )}
+                    renderItem={({ item, isSelected, onSelect }) => {
+                        return !isSelected ? <Pill
+                            label={shotTypeToLabel[item]}
+                            isSelected
+                            onClick={onSelect}
+                            bgColorClassName={shotTypeToBgClass[item]}
+                            textColorClassName={shotTypeToTextClass[item]}
+                        /> : null
+                    }}
                 />
                 <button
                     onClick={() => deleteScriptShot({ shotUuid: shot.uuid, scriptUuid })}

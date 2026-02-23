@@ -24,5 +24,5 @@ export const hookTemplatePlaceholderToFrenchTranslation: Record<HookTemplatePlac
     [HookTemplatePlaceholder.Emotion]: "Émotion",
     [HookTemplatePlaceholder.Number]: "Nombre",
     [HookTemplatePlaceholder.Goal]: "Objectif",
-    [HookTemplatePlaceholder.Date]: "date",
+    [HookTemplatePlaceholder.Date]: "Date",
 }

@@ -52,9 +52,13 @@ export default function HookContentRenderer({ content, onReplacePlaceholder }: H
             {parts.map((part, index) =>
                 part.type === 'placeholder' ? (
                     <div key={index} className="relative inline-flex">
-                        <button onClick={() => handlePillClick(part.value)} className="cursor-pointer">
-                            <Pill label={part.label} bgColorClassName="bg-primary/10 text-primary border border-primary/30" />
-                        </button>
+                        <Pill
+                            label={part.label}
+                            isSelected
+                            onClick={() => handlePillClick(part.value)}
+                            bgColorClassName="bg-primary/10 border border-primary/30"
+                            textColorClassName="text-primary"
+                        />
 
                         {activePlaceholder === part.value && (
                             <>

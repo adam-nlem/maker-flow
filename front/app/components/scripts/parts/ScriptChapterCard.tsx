@@ -43,8 +43,6 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
         }
     };
 
-    const pillColor = `${chapterTypeToBgClass[chapterType]} ${chapterTypeToTextClass[chapterType]}`;
-
     return (
         <div className="group border border-light-gray rounded-xl p-4 bg-clear flex-1 flex flex-col gap-2">
 
@@ -57,18 +55,23 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                     getItemId={(type) => type}
                     onSelect={(type) => handleChapterTypeChange(type)}
                     renderTrigger={({ onClick }) => (
-                        <button onClick={onClick} className="cursor-pointer">
-                            <Pill label={chapterTypeToLabel[chapterType]} bgColorClassName={pillColor} />
-                        </button>
+                        <Pill
+                            onClick={onClick}
+                            label={chapterTypeToLabel[chapterType]}
+                            isSelected
+                            bgColorClassName={chapterTypeToBgClass[chapterType]}
+                            textColorClassName={chapterTypeToTextClass[chapterType]}
+                        />
                     )}
-                    renderItem={({ item, isSelected, onSelect }) => (
-                        <button onClick={onSelect} className="cursor-pointer">
-                            <Pill
-                                label={chapterTypeToLabel[item]}
-                                bgColorClassName={`${pillColor} ${isSelected ? " ring-1 ring-current" : ""}`}
-                            />
-                        </button>
-                    )}
+                    renderItem={({ item, isSelected, onSelect }) => {
+                        return !isSelected ? <Pill
+                            label={chapterTypeToLabel[item]}
+                            isSelected
+                            onClick={onSelect}
+                            bgColorClassName={chapterTypeToBgClass[item]}
+                            textColorClassName={chapterTypeToTextClass[item]}
+                        /> : null
+                    }}
                 />
 
                 <button

@@ -469,23 +469,31 @@ Unified pill component supporting multiple modes: toggle pill with HeroIcon, tog
 | `bgColorClassName` | `string` | - | Background color class applied when `isSelected` is true |
 | `textColorClassName` | `string` | - | Text color class applied when `isSelected` is true |
 
-**Modes:**
-- **Toggle mode** (default): bordered pill with `border-dashed` when unselected, solid with `bgColorClassName`/`textColorClassName` when selected. Used for platform toggles and tag pills.
-- **Icon/Image**: pass `icon` for a prefix HeroIcon SVG, `imageUrl` for a raster image, `suffixIcon` for a trailing action icon. All are optional.
-- **Suffix icon**: when `suffixIcon` is provided, renders a clickable icon after the label. Click events use `stopPropagation` so `onSuffixClick` fires independently from `onClick`.
+**Styling:**
+- `bgColorClassName` and `textColorClassName` are only applied when `isSelected` is true. Always pass `isSelected` when using colored pills.
+- When `isSelected` is false/undefined, the pill renders with a dashed border and gray text.
+- `suffixIcon` renders a clickable icon after the label with `stopPropagation` built-in.
+
+**Usage in SelectDropdown:**
+- `renderTrigger`: pass `onClick` directly on the Pill (no wrapping `<button>`)
+- `renderItem`: hide the selected item with `!isSelected ? <Pill ... /> : null`
+- Always pass separate `bgColorClassName` and `textColorClassName` (don't combine them)
 
 **Examples:**
 ```tsx
+// Colored pill in SelectDropdown trigger
+<Pill onClick={onClick} label="A-Roll" isSelected bgColorClassName={shotTypeToBgClass[shotType]} textColorClassName={shotTypeToTextClass[shotType]} />
+
+// Colored pill in SelectDropdown item
+{!isSelected ? <Pill label={shotTypeToLabel[item]} isSelected onClick={onSelect} bgColorClassName={shotTypeToBgClass[item]} textColorClassName={shotTypeToTextClass[item]} /> : null}
+
 // Tag pill with remove button
 <Pill label="Intro" isSelected bgColorClassName="bg-blue/30" textColorClassName="text-blue" suffixIcon={XMarkIcon} onSuffixClick={handleRemove} />
 
 // Toggle pill with image (platform selection)
 <Pill imageUrl={iconUrl} label="Instagram" isSelected={true} onClick={toggle} />
 
-// Toggle pill with icon
-<Pill icon={BookOpenIcon} label="Chapters" isSelected={false} onClick={toggle} />
-
-// Simple unselected pill
+// Simple unselected pill (dashed border)
 <Pill icon={TagIcon} label="Tag" onClick={openDropdown} />
 ```
 
