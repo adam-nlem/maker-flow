@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, CubeTransparentIcon, PlusIcon, SwatchIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
-import { ScriptStatus, scriptStatusToLabel, scriptStatusToBgClass, scriptStatusToTextClass } from "~/models/enums/ScriptStatus";
+import { ScriptStatus, scriptStatusToLabel, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
-import { Pill } from "~/components/ui/Pill";
+import Pill from "~/components/ui/Pill";
 import { DatePicker } from "~/components/ui/DatePicker";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import ScriptTagsRow from "./ScriptTagsRow";
@@ -38,18 +38,8 @@ export default function ScriptMetaHeader({ script, projectUuid }: ScriptMetaHead
         updateScript({ scriptUuid: script.uuid, data: { status: newStatus } });
     };
 
-    const publishedAtLabel = script.publishedAt
-        ? script.publishedAt.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })
-        : "Pas de date";
-
-    const statusPillColor = status
-        ? `${scriptStatusToBgClass[status]} ${scriptStatusToTextClass[status]}`
-        : "bg-light-gray text-gray";
-
     return (
         <div className="px-6 py-5 border-b border-light-gray flex flex-col gap-4">
-            {/* Title + platform icons */}
-
             <Input
                 simple
                 value={title}
@@ -61,52 +51,64 @@ export default function ScriptMetaHeader({ script, projectUuid }: ScriptMetaHead
             />
             <ScriptPlatformsRow script={script} />
 
+            <ScriptTagsRow script={script} projectUuid={projectUuid} />
 
-            {/* Bottom row: tags + status + publication date */}
-            <div className="flex flex-row items-center gap-4 flex-wrap">
-                <ScriptTagsRow script={script} projectUuid={projectUuid} />
 
-                <SelectDropdown
-                    items={Object.values(ScriptStatus)}
-                    selectedItemId={status}
-                    getItemId={(s) => s}
-                    onSelect={handleStatusChange}
-                    renderTrigger={({ onClick }) => (
-                        <button onClick={onClick} className="cursor-pointer">
-                            <Pill text={status ? scriptStatusToLabel[status] : "Statut"} color={statusPillColor} />
-                        </button>
-                    )}
-                    renderItem={({ item, isSelected, onSelect }) => (
-                        <button onClick={onSelect} className="cursor-pointer">
-                            <Pill
-                                text={scriptStatusToLabel[item]}
-                                color={`${scriptStatusToBgClass[item]} ${scriptStatusToTextClass[item]}${isSelected ? " ring-1 ring-current" : ""}`}
+
+
+            <SelectDropdown
+                items={Object.values(ScriptStatus)}
+                selectedItemId={status}
+                getItemId={(s) => s}
+                onSelect={handleStatusChange}
+                renderTrigger={({ onClick }) => (
+                    <Pill
+                        onClick={onClick}
+                        icon={status ? scriptStatusToIcon[status] : SwatchIcon}
+                        label={status ? scriptStatusToLabel[status] : "Statut"}
+                        isSelected={!!status}
+                        bgColorClassName={status ? scriptStatusToBgClass[status] : ""}
+                        textColorClassName={status ? scriptStatusToTextClass[status] : ""} />)
+                }
+                renderItem={({ item, isSelected, onSelect }) => {
+                    return !isSelected ? <Pill
+                        label={scriptStatusToLabel[item]}
+                        icon={scriptStatusToIcon[item]}
+                        isSelected
+                        onClick={onSelect}
+                        bgColorClassName={scriptStatusToBgClass[item]}
+                        textColorClassName={scriptStatusToTextClass[item]}
+                    /> : null
+                }}
+            />
+
+            <div className="relative shrink-0">
+                <Pill
+                    onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                    icon={CalendarDaysIcon}
+                    label={script.publishedAt
+                        ? script.publishedAt.toLocaleDateString("fr-FR",
+                            {
+                                day: "numeric",
+                                month: "short",
+                                year: "numeric"
+                            }
+                        )
+                        : "Pas de date"}
+                    isSelected={!!script.publishedAt} />
+
+                {isDatePickerOpen && (
+                    <>
+                        <div className="fixed inset-0 z-20" onClick={() => setIsDatePickerOpen(false)} />
+                        <div className="absolute top-full left-0 mt-2 z-30">
+                            <DatePicker
+                                selectedDate={script.publishedAt ?? undefined}
+                                onDateSelected={handleDateSelected}
                             />
-                        </button>
-                    )}
-                />
+                        </div>
+                    </>
+                )}
 
-                <div className="relative ml-auto shrink-0">
-                    <button
-                        onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
-                        className="flex flex-row items-center gap-2 text-gray hover:text-dark transition-colors cursor-pointer"
-                    >
-                        <CalendarDaysIcon className="size-4 shrink-0" strokeWidth={2} />
-                        <span className="text-body-sm">{publishedAtLabel}</span>
-                    </button>
-
-                    {isDatePickerOpen && (
-                        <>
-                            <div className="fixed inset-0 z-20" onClick={() => setIsDatePickerOpen(false)} />
-                            <div className="absolute top-full right-0 mt-2 z-30">
-                                <DatePicker
-                                    selectedDate={script.publishedAt ?? undefined}
-                                    onDateSelected={handleDateSelected}
-                                />
-                            </div>
-                        </>
-                    )}
-                </div>
             </div>
         </div>
     );

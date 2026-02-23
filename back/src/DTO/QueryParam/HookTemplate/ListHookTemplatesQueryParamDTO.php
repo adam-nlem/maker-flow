@@ -4,11 +4,20 @@ namespace App\DTO\QueryParam\HookTemplate;
 
 use App\DTO\QueryParam\AbstractQueryParamDTO;
 use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class ListHookTemplatesQueryParamDTO extends AbstractQueryParamDTO
 {
     private ?string $searchTerm;
+
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private int $page;
+
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private int $limit;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -20,10 +29,22 @@ class ListHookTemplatesQueryParamDTO extends AbstractQueryParamDTO
     protected function fromQueryParams(array $queryParams): void
     {
         $this->searchTerm = $queryParams["searchTerm"] ?? null;
+        $this->page = $queryParams["page"];
+        $this->limit = $queryParams["limit"];
     }
 
     public function getSearchTerm(): ?string
     {
         return $this->searchTerm;
+    }
+
+    public function getPage(): int
+    {
+        return $this->page;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
     }
 }

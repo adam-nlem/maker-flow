@@ -106,7 +106,7 @@ export default function ScriptPartsList({ parts, script }: ScriptPartsListProps)
     };
 
     return (
-        <div className="flex flex-col h-full overflow-hidden">
+        <div className="flex flex-col h-full overflow-hidden bg-dot-pattern">
             <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-none">
                 <ScriptHookCard key={script.hookTemplate?.uuid} script={script} />
 

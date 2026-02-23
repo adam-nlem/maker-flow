@@ -451,29 +451,42 @@ SVG circular progress indicator.
 
 ---
 
-### PlatformIconToggle
+### Pill
 
-**Location:** `front/app/components/ui/PlatformIconToggle.tsx`
+**Location:** `front/app/components/ui/Pill.tsx`
 
-Toggleable platform icon button. Fetches the platform SVG icon internally via `useShowPlatformIcon` and renders it with visual states for selected/unselected.
+Unified pill component supporting multiple modes: toggle pill with HeroIcon, toggle pill with image, colored pill with suffix action.
 
-| Prop | Type | Description |
-|------|------|-------------|
-| `platform` | `Platform` | The platform to display |
-| `isSelected` | `boolean` | Selection state |
-| `onToggle` | `() => void` | Toggle handler |
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `icon` | `HeroIcon` | - | Optional prefix icon (HeroIcon SVG) |
+| `suffixIcon` | `HeroIcon` | - | Optional suffix icon (e.g. XMarkIcon for removal) |
+| `imageUrl` | `string` | - | Optional image URL (for platform icons, etc.) |
+| `label` | `string` | **required** | Text label |
+| `isSelected` | `boolean` | - | Toggle state (controls border style in toggle mode) |
+| `onClick` | `() => void` | - | Click handler for the whole pill |
+| `onSuffixClick` | `() => void` | - | Click handler for the suffix icon (stopPropagation built-in) |
+| `bgColorClassName` | `string` | - | Background color class applied when `isSelected` is true |
+| `textColorClassName` | `string` | - | Text color class applied when `isSelected` is true |
 
-**States:**
-- **Unselected:** `grayscale opacity-40`, `hover:opacity-60`
-- **Selected:** full color, `opacity-100`
+**Modes:**
+- **Toggle mode** (default): bordered pill with `border-dashed` when unselected, solid with `bgColorClassName`/`textColorClassName` when selected. Used for platform toggles and tag pills.
+- **Icon/Image**: pass `icon` for a prefix HeroIcon SVG, `imageUrl` for a raster image, `suffixIcon` for a trailing action icon. All are optional.
+- **Suffix icon**: when `suffixIcon` is provided, renders a clickable icon after the label. Click events use `stopPropagation` so `onSuffixClick` fires independently from `onClick`.
 
-**Example:**
+**Examples:**
 ```tsx
-<PlatformIconToggle
-    platform={Platform.Instagram}
-    isSelected={true}
-    onToggle={() => handleToggle(Platform.Instagram)}
-/>
+// Tag pill with remove button
+<Pill label="Intro" isSelected bgColorClassName="bg-blue/30" textColorClassName="text-blue" suffixIcon={XMarkIcon} onSuffixClick={handleRemove} />
+
+// Toggle pill with image (platform selection)
+<Pill imageUrl={iconUrl} label="Instagram" isSelected={true} onClick={toggle} />
+
+// Toggle pill with icon
+<Pill icon={BookOpenIcon} label="Chapters" isSelected={false} onClick={toggle} />
+
+// Simple unselected pill
+<Pill icon={TagIcon} label="Tag" onClick={openDropdown} />
 ```
 
 ---

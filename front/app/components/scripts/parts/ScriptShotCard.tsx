@@ -2,7 +2,7 @@ import { useState } from "react";
 import { FilmIcon, TrashIcon } from "@heroicons/react/24/outline";
 import type { ScriptShot } from "~/models/ScriptShot";
 import { ShotType, shotTypeToLabel, shotTypeToBgClass, shotTypeToTextClass } from "~/models/enums/ShotType";
-import { Pill } from "~/components/ui/Pill";
+import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import { useUpdateScriptShot } from "~/hooks/api/scriptShots/useUpdateScriptShot";
@@ -48,14 +48,14 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
                     onSelect={(type) => handleShotTypeChange(type)}
                     renderTrigger={({ onClick }) => (
                         <button onClick={onClick} className="cursor-pointer">
-                            <Pill text={shotTypeToLabel[shotType]} color={pillColor} />
+                            <Pill label={shotTypeToLabel[shotType]} bgColorClassName={pillColor} />
                         </button>
                     )}
                     renderItem={({ item, isSelected, onSelect }) => (
                         <button onClick={onSelect} className="cursor-pointer">
                             <Pill
-                                text={shotTypeToLabel[item]}
-                                color={`${shotTypeToBgClass[item]} ${shotTypeToTextClass[item]}${isSelected ? " ring-1 ring-current" : ""}`}
+                                label={shotTypeToLabel[item]}
+                                bgColorClassName={`${shotTypeToBgClass[item]} ${shotTypeToTextClass[item]}${isSelected ? " ring-1 ring-current" : ""}`}
                             />
                         </button>
                     )}

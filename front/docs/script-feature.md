@@ -52,7 +52,7 @@ front/app/
 ├── hooks/api/
 │   ├── scripts/
 │   │   ├── scriptQueryKeys.ts   ← all, list(projectUuid), parts(scriptUuid)
-│   │   ├── useListScripts.ts
+│   │   ├── useListPaginatedScripts.ts  ← infinite scroll (page/limit/hasMore)
 │   │   ├── useCreateScript.ts   ← returns Script (for immediate focus)
 │   │   ├── useUpdateScript.ts
 │   │   ├── useDeleteScript.ts   ← takes raw UUID string
@@ -108,6 +108,9 @@ front/app/
 
 ## Key Patterns
 
+### Infinite Scroll Pagination
+`ScriptListPanel` uses infinite scroll to load scripts page by page. `useListPaginatedScripts` manages page/additionalScripts/hasMore/isLoadingMore state (same pattern as `useListPaginatedPosts`). A sentinel `<div>` at the bottom of the list triggers an `IntersectionObserver` (rootMargin `200px`) to call `listMore()` when the user scrolls near the end. The API sends `page` and `limit` query params; `hasMore` is determined by `count === limit`.
+
 ### Script Creation (no modal)
 Clicking "+ New script" in `ScriptListPanel` calls `useCreateScript` directly with a default title `"Nouveau script"`. Since `useCreateScript.mutationFn` returns the full `Script` object, the new UUID is immediately available to set as focused, opening the editor instantly.
 
@@ -155,7 +158,7 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay`). Parts are reordered optimistically in local state, then `useReorderScriptParts` fires with the new ordered array of `{uuid, type}`. If `parts` prop changes while no drag is active, local state is synced.
 
 ### Platform Management
-- `ScriptPlatformsRow` renders all platform icons as `PlatformIconToggle` buttons (reusable UI component), positioned to the right of the title
+- `ScriptPlatformsRow` renders all platform icons as `Pill` components (via a local `PlatformPill` wrapper that resolves the icon URL), positioned to the right of the title
 - **Optimistic updates:** Local state (`localPlatforms`) updates immediately on click. A `useRef` counter tracks in-flight mutations — prop sync from cache invalidation is suppressed while mutations are pending, preventing flicker during rapid clicks. On error, local state rolls back to the previous value.
 - **Unselected:** `grayscale opacity-40` — icon appears gray/faded, `hover:opacity-60` on hover
 - **Selected:** full color, `opacity-100`

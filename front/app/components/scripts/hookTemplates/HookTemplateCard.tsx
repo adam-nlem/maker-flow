@@ -1,7 +1,7 @@
 import { TrashIcon } from "@heroicons/react/24/outline";
 import type { HookTemplate } from "~/models/HookTemplate";
 import { parseHookPlaceholders } from "~/helpers/hookPlaceholderParser";
-import { Pill } from "~/components/ui/Pill";
+import Pill from "~/components/ui/Pill";
 import { useDeleteHookTemplate } from "~/hooks/api/hookTemplates/useDeleteHookTemplate";
 
 interface HookTemplateCardProps {
@@ -28,7 +28,7 @@ export default function HookTemplateCard({ template, isSelected = false, onClick
             <span className="text-body-xs text-gray line-clamp-2 flex flex-wrap items-center gap-1">
                 {parts.map((part, index) =>
                     part.type === 'placeholder' ? (
-                        <Pill key={index} text={part.label} color="bg-purple/10 text-primary border border-primary-30" textStyle="text-heading-xs" />
+                        <Pill key={index} label={part.label} bgColorClassName="bg-purple/10 text-primary border border-primary-30" />
                     ) : (
                         <span key={index}>{part.value}</span>
                     )

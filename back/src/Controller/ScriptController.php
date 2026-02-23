@@ -46,7 +46,7 @@ final class ScriptController extends AbstractController
             return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $scripts = $scriptRepository->getByProjectAndUser($project, $user);
+        $scripts = $scriptRepository->getByProjectAndUserPaginated($project, $user, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(
             data: $scripts,

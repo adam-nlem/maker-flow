@@ -75,6 +75,22 @@ class HookTemplateRepository extends ServiceEntityRepository
     /**
      * @return HookTemplate[]
      */
+    public function getPublicOrByUserPaginated(User $user, int $page, int $limit): array
+    {
+        return $this->createQueryBuilder('ht')
+            ->where('ht.isPublic = true OR ht.user = :user')
+            ->setParameter('user', $user)
+            ->orderBy('ht.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return HookTemplate[]
+     */
     public function searchByTitlePublicOrByUser(string $searchTerm, User $user): array
     {
         return $this->createQueryBuilder('ht')
@@ -83,6 +99,24 @@ class HookTemplateRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->setParameter('searchTerm', '%' . $searchTerm . '%')
             ->orderBy('ht.createdAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return HookTemplate[]
+     */
+    public function searchByTitlePublicOrByUserPaginated(string $searchTerm, User $user, int $page, int $limit): array
+    {
+        return $this->createQueryBuilder('ht')
+            ->where('ht.isPublic = true OR ht.user = :user')
+            ->andWhere('LOWER(ht.title) LIKE LOWER(:searchTerm)')
+            ->setParameter('user', $user)
+            ->setParameter('searchTerm', '%' . $searchTerm . '%')
+            ->orderBy('ht.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);

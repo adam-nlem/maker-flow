@@ -2,7 +2,7 @@ import { useState } from "react";
 import { BookOpenIcon, TrashIcon } from "@heroicons/react/24/outline";
 import type { ScriptChapter } from "~/models/ScriptChapter";
 import { ChapterType, chapterTypeToLabel, chapterTypeToBgClass, chapterTypeToTextClass } from "~/models/enums/ChapterType";
-import { Pill } from "~/components/ui/Pill";
+import Pill from "~/components/ui/Pill";
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import SelectDropdown from "~/components/ui/SelectDropdown";
@@ -58,14 +58,14 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                     onSelect={(type) => handleChapterTypeChange(type)}
                     renderTrigger={({ onClick }) => (
                         <button onClick={onClick} className="cursor-pointer">
-                            <Pill text={chapterTypeToLabel[chapterType]} color={pillColor} />
+                            <Pill label={chapterTypeToLabel[chapterType]} bgColorClassName={pillColor} />
                         </button>
                     )}
                     renderItem={({ item, isSelected, onSelect }) => (
                         <button onClick={onSelect} className="cursor-pointer">
                             <Pill
-                                text={chapterTypeToLabel[item]}
-                                color={`${pillColor} ${isSelected ? " ring-1 ring-current" : ""}`}
+                                label={chapterTypeToLabel[item]}
+                                bgColorClassName={`${pillColor} ${isSelected ? " ring-1 ring-current" : ""}`}
                             />
                         </button>
                     )}

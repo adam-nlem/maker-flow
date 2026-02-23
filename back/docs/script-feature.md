@@ -213,7 +213,8 @@ Used in reorder DTOs to identify part types. Not stored as a DB column.
 | `save` | `Script $entity, bool $flush` | `void` | Persists a script |
 | `remove` | `Script $entity, bool $flush` | `void` | Removes a script |
 | `getByUuidAndUser` | `string $uuid, User $user` | `?Script` | Finds script by UUID for a specific user |
-| `getByProjectAndUser` | `Project $project, User $user` | `array` | Returns scripts for a project ordered by creation date DESC |
+| `getByProjectAndUser` | `Project $project, User $user` | `array` | Returns all scripts for a project ordered by creation date DESC |
+| `getByProjectAndUserPaginated` | `Project $project, User $user, int $page, int $limit` | `array` | Paginated scripts ordered by creation date DESC |
 
 ### `ScriptTagRepository`
 
@@ -327,7 +328,7 @@ All follow the same CRUD pattern:
 
 | DTO | Properties | Validation |
 |-----|------------|------------|
-| `ListScriptsQueryParamDTO` | `projectUuid` | NotBlank |
+| `ListScriptsQueryParamDTO` | `projectUuid`, `page`, `limit` | NotBlank, Positive |
 | `ListScriptTagsQueryParamDTO` | `projectUuid`, `searchTerm?` | NotBlank on projectUuid |
 | `ListScriptChaptersQueryParamDTO` | `scriptUuid` | NotBlank |
 | `ListScriptVoiceOversQueryParamDTO` | `scriptUuid` | NotBlank |

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import ScriptListItem from "./ScriptListItem";
@@ -7,17 +8,41 @@ import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 interface ScriptListPanelProps {
     scripts: Script[];
     projectUuid: string;
+    hasMore: boolean;
+    isLoadingMore: boolean;
+    listMore: () => void;
 }
 
-export default function ScriptListPanel({ scripts, projectUuid }: ScriptListPanelProps) {
+export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadingMore, listMore }: ScriptListPanelProps) {
     const { createScript, isPending } = useCreateScript();
     const focusedScriptUuid = useFocusScriptStore((state) => state.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
+    const sentinelRef = useRef<HTMLDivElement>(null);
 
     const handleNewScript = async () => {
         const newScript = await createScript({ projectUuid, title: "Nouveau script" });
         setFocusedScriptUuid(newScript.uuid);
     };
+
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+                    listMore();
+                }
+            },
+            { rootMargin: "0px 0px 200px 0px" },
+        );
+
+        observer.observe(sentinel);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [hasMore, isLoadingMore, listMore]);
 
     return (
         <div className="w-72 shrink-0 border-r border-light-gray h-full flex flex-col">
@@ -42,14 +67,17 @@ export default function ScriptListPanel({ scripts, projectUuid }: ScriptListPane
                         <p className="text-body-xs text-center mt-1">Cliquez sur + pour en créer un.</p>
                     </div>
                 ) : (
-                    scripts.map((script) => (
-                        <ScriptListItem
-                            key={script.uuid}
-                            script={script}
-                            isSelected={script.uuid === focusedScriptUuid}
-                            onClick={() => setFocusedScriptUuid(script.uuid)}
-                        />
-                    ))
+                    <>
+                        {scripts.map((script) => (
+                            <ScriptListItem
+                                key={script.uuid}
+                                script={script}
+                                isSelected={script.uuid === focusedScriptUuid}
+                                onClick={() => setFocusedScriptUuid(script.uuid)}
+                            />
+                        ))}
+                        <div ref={sentinelRef} className="h-1" />
+                    </>
                 )}
             </div>
         </div>

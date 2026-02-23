@@ -27,10 +27,13 @@ final class HookTemplateController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
+        $page = $queryParamDto->getPage();
+        $limit = $queryParamDto->getLimit();
+
         if ($queryParamDto->getSearchTerm() !== null) {
-            $hookTemplates = $hookTemplateRepository->searchByTitlePublicOrByUser($queryParamDto->getSearchTerm(), $user);
+            $hookTemplates = $hookTemplateRepository->searchByTitlePublicOrByUserPaginated($queryParamDto->getSearchTerm(), $user, $page, $limit);
         } else {
-            $hookTemplates = $hookTemplateRepository->getPublicOrByUser($user);
+            $hookTemplates = $hookTemplateRepository->getPublicOrByUserPaginated($user, $page, $limit);
         }
 
         return $this->json(

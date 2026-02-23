@@ -1,8 +1,24 @@
 import { useEffect, useRef, useState } from "react";
 import type { Script } from "~/models/Script";
-import { Platform, platformOptions } from "~/models/enums/Platform";
-import PlatformIconToggle from "~/components/scripts/PlatformIconToggle";
+import { Platform, platformOptions, platformToFrenchTranslation } from "~/models/enums/Platform";
+import Pill from "~/components/ui/Pill";
+import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
+
+function PlatformPill({ platform, isSelected, onToggle }: { platform: Platform; isSelected: boolean; onToggle: () => void }) {
+    const { iconUrl } = useShowPlatformIcon(platform);
+
+    if (!iconUrl) return null;
+
+    return (
+        <Pill
+            imageUrl={iconUrl}
+            label={platformToFrenchTranslation[platform]}
+            isSelected={isSelected}
+            onClick={onToggle}
+        />
+    );
+}
 
 interface Props {
     script: Script;
@@ -43,7 +59,7 @@ export default function ScriptPlatformsRow({ script }: Props) {
     return (
         <div className="flex flex-row items-center gap-2">
             {platformOptions.map((platform) => (
-                <PlatformIconToggle
+                <PlatformPill
                     key={platform}
                     platform={platform}
                     isSelected={assignedPlatforms.has(platform)}

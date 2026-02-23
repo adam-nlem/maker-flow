@@ -5,7 +5,7 @@ import { ToggleChip } from "~/components/ui/ToggleChip";
 import type { HookTemplate } from "~/models/HookTemplate";
 import type { Script } from "~/models/Script";
 import { HookTemplateCategory, hookTemplateCategoryToFrenchTranslation } from "~/models/enums/HookTemplateCategory";
-import { useListHookTemplates } from "~/hooks/api/hookTemplates/useListHookTemplates";
+import { useListPaginatedHookTemplates } from "~/hooks/api/hookTemplates/useListPaginatedHookTemplates";
 import { useHookTemplatePanelStore } from "~/stores/scripts/hookTemplatePanelStore";
 import HookTemplateCard from "./HookTemplateCard";
 import CreateHookTemplateModal from "./CreateHookTemplateModal";
@@ -35,7 +35,28 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
         };
     }, [searchInput]);
 
-    const { hookTemplates } = useListHookTemplates({ searchTerm: debouncedSearchTerm || undefined });
+    const { hookTemplates, hasMore, isLoadingMore, listMore } = useListPaginatedHookTemplates({ searchTerm: debouncedSearchTerm || undefined });
+    const sentinelRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        if (!sentinel) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+                    listMore();
+                }
+            },
+            { rootMargin: "0px 0px 200px 0px" },
+        );
+
+        observer.observe(sentinel);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [hasMore, isLoadingMore, listMore]);
 
     const recentTemplateUuids = new Set(
         scripts
@@ -111,14 +132,17 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
                             <p className="text-body-sm text-center">Aucun template.</p>
                         </div>
                     ) : (
-                        filteredTemplates.map((template) => (
-                            <HookTemplateCard
-                                key={template.uuid}
-                                template={template}
-                                isSelected={focusedScript.hookTemplate?.uuid === template.uuid}
-                                onClick={() => onApplyTemplate(template)}
-                            />
-                        ))
+                        <>
+                            {filteredTemplates.map((template) => (
+                                <HookTemplateCard
+                                    key={template.uuid}
+                                    template={template}
+                                    isSelected={focusedScript.hookTemplate?.uuid === template.uuid}
+                                    onClick={() => onApplyTemplate(template)}
+                                />
+                            ))}
+                            <div ref={sentinelRef} className="h-1" />
+                        </>
                     )}
                 </div>
             </div>

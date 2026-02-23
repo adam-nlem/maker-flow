@@ -1,3 +1,6 @@
+import { ArrowPathIcon, CheckBadgeIcon, CheckIcon, ClockIcon } from "@heroicons/react/24/outline";
+import type { ComponentType, SVGProps } from "react";
+
 export enum ScriptStatus {
     Pending = 'pending',
     InProgress = 'in_progress',
@@ -21,3 +24,9 @@ export const scriptStatusToTextClass: Record<ScriptStatus, string> = {
     [ScriptStatus.InProgress]: "text-yellow",
     [ScriptStatus.Completed]: "text-purple",
 }
+
+export const scriptStatusToIcon: Record<ScriptStatus, ComponentType<SVGProps<SVGSVGElement>>> = {
+    [ScriptStatus.Pending]: ClockIcon,
+    [ScriptStatus.InProgress]: ArrowPathIcon,
+    [ScriptStatus.Completed]: CheckIcon,
+};

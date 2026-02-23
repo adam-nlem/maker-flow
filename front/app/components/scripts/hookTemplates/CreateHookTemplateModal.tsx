@@ -3,7 +3,7 @@ import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { Button } from "~/components/ui/Button";
-import { Pill } from "~/components/ui/Pill";
+import Pill from "~/components/ui/Pill";
 import { ToggleChip } from "~/components/ui/ToggleChip";
 import ModalOverlay from "~/components/ui/ModalOverlay";
 import { useCreateHookTemplate } from "~/hooks/api/hookTemplates/useCreateHookTemplate";
@@ -99,9 +99,8 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                                             className={isUsed ? "opacity-40 pointer-events-none" : "cursor-pointer"}
                                         >
                                             <Pill
-                                                text={hookTemplatePlaceholderToFrenchTranslation[placeholder]}
-                                                color="bg-purple/10 text-primary border border-primary/30 hover:bg-purple/20"
-                                                textStyle="text-heading-xs"
+                                                label={hookTemplatePlaceholderToFrenchTranslation[placeholder]}
+                                                bgColorClassName="bg-purple/10 text-primary border border-primary/30 hover:bg-purple/20"
                                             />
                                         </button>
                                     );

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { MicrophoneIcon, TrashIcon } from "@heroicons/react/24/outline";
 import type { ScriptVoiceOver } from "~/models/ScriptVoiceOver";
 import { VoiceOverType, voiceOverTypeToLabel, voiceOverTypeToBgClass, voiceOverTypeToTextClass } from "~/models/enums/VoiceOverType";
-import { Pill } from "~/components/ui/Pill";
+import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import { useUpdateScriptVoiceOver } from "~/hooks/api/scriptVoiceOvers/useUpdateScriptVoiceOver";
@@ -48,14 +48,14 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
                     onSelect={(type) => handleVoiceOverTypeChange(type)}
                     renderTrigger={({ onClick }) => (
                         <button onClick={onClick} className="cursor-pointer">
-                            <Pill text={voiceOverTypeToLabel[voiceOverType]} color={pillColor} />
+                            <Pill label={voiceOverTypeToLabel[voiceOverType]} bgColorClassName={pillColor} />
                         </button>
                     )}
                     renderItem={({ item, isSelected, onSelect }) => (
                         <button onClick={onSelect} className="cursor-pointer">
                             <Pill
-                                text={voiceOverTypeToLabel[item]}
-                                color={`${voiceOverTypeToBgClass[item]} ${voiceOverTypeToTextClass[item]}${isSelected ? " ring-1 ring-current" : ""}`}
+                                label={voiceOverTypeToLabel[item]}
+                                bgColorClassName={`${voiceOverTypeToBgClass[item]} ${voiceOverTypeToTextClass[item]}${isSelected ? " ring-1 ring-current" : ""}`}
                             />
                         </button>
                     )}

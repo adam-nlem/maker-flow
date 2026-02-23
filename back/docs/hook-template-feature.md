@@ -65,7 +65,9 @@ Templates use `[placeholder_value]` syntax in their `content` field (e.g., `"Did
 | `getByUuidAndUser` | `string $uuid, User $user` | `?HookTemplate` | Find by UUID and ownership (for update/delete) |
 | `getByUuid` | `string $uuid` | `?HookTemplate` | Find by UUID (for linking public templates to scripts) |
 | `getPublicOrByUser` | `User $user` | `HookTemplate[]` | All public templates + user's own, ordered by createdAt DESC |
+| `getPublicOrByUserPaginated` | `User $user, int $page, int $limit` | `HookTemplate[]` | Paginated version of above |
 | `searchByTitlePublicOrByUser` | `string $searchTerm, User $user` | `HookTemplate[]` | Same with LIKE search on title |
+| `searchByTitlePublicOrByUserPaginated` | `string $searchTerm, User $user, int $page, int $limit` | `HookTemplate[]` | Paginated version of above |
 
 Query builder alias: `'ht'`.
 
@@ -79,7 +81,7 @@ Query builder alias: `'ht'`.
 
 | Action | Method | Route | Name | Description |
 |--------|--------|-------|------|-------------|
-| `list` | GET | `` | `api_hook_templates_list` | List public + user's own, optional searchTerm QP |
+| `list` | GET | `` | `api_hook_templates_list` | List public + user's own, paginated (page/limit QP), optional searchTerm QP |
 | `placeholders` | GET | `/placeholders` | `api_hook_templates_placeholders` | Returns all HookTemplatePlaceholder enum values |
 | `create` | POST | `` | `api_hook_templates_create` | Create a new template |
 | `update` | PATCH | `/{hookTemplateUuid}` | `api_hook_templates_update` | Update own template only |
@@ -97,7 +99,7 @@ Query builder alias: `'ht'`.
 
 | DTO | Properties | Validation |
 |-----|------------|------------|
-| `ListHookTemplatesQueryParamDTO` | `searchTerm?` | None (all optional) |
+| `ListHookTemplatesQueryParamDTO` | `searchTerm?`, `page`, `limit` | NotBlank + Positive on page/limit |
 
 ### Request DTOs
 

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useListScripts } from "~/hooks/api/scripts/useListScripts";
+import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import type { HookTemplate } from "~/models/HookTemplate";
@@ -13,7 +13,7 @@ interface ScriptPageViewProps {
 }
 
 export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
-    const { scripts } = useListScripts({ projectUuid });
+    const { scripts, hasMore, isLoadingMore, listMore } = useListPaginatedScripts({ projectUuid });
     const focusedScriptUuid = useFocusScriptStore((s) => s.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid);
     const { updateScript } = useUpdateScript();
@@ -49,7 +49,13 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
 
     return (
         <div className="flex flex-row h-screen overflow-hidden">
-            <ScriptListPanel scripts={scripts} projectUuid={projectUuid} />
+            <ScriptListPanel
+                scripts={scripts}
+                projectUuid={projectUuid}
+                hasMore={hasMore}
+                isLoadingMore={isLoadingMore}
+                listMore={listMore}
+            />
 
             <div className="flex-1 overflow-hidden">
                 {focusedScript ? (

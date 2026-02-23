@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { parseHookPlaceholders } from "~/helpers/hookPlaceholderParser";
-import { Pill } from "~/components/ui/Pill";
+import Pill from "~/components/ui/Pill";
 import { Input } from "~/components/ui/Input";
 
 interface HookContentRendererProps {
@@ -53,7 +53,7 @@ export default function HookContentRenderer({ content, onReplacePlaceholder }: H
                 part.type === 'placeholder' ? (
                     <div key={index} className="relative inline-flex">
                         <button onClick={() => handlePillClick(part.value)} className="cursor-pointer">
-                            <Pill text={part.label} color="bg-primary/10 text-primary border border-primary/30" textStyle="text-heading-xs" />
+                            <Pill label={part.label} bgColorClassName="bg-primary/10 text-primary border border-primary/30" />
                         </button>
 
                         {activePlaceholder === part.value && (

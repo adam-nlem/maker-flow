@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { TagIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import type { ScriptTag } from "~/models/ScriptTag";
 import { colorToBgClass, colorToTextClass, Color } from "~/models/enums/Color";
@@ -7,6 +7,7 @@ import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
 import { useCreateScriptTag } from "~/hooks/api/scriptTags/useCreateScriptTag";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { Input } from "~/components/ui/Input";
+import Pill from "../ui/Pill";
 
 interface Props {
     script: Script;
@@ -49,28 +50,22 @@ export default function ScriptTagsRow({ script, projectUuid }: Props) {
     return (
         <div className="flex flex-row flex-wrap items-center gap-2">
             {script.tags.map((tag) => (
-                <div
+                <Pill
                     key={tag.uuid}
-                    className={`flex flex-row items-center gap-1 px-2 py-0.5 rounded-md ${colorToBgClass[tag.color]}`}
-                >
-                    <span className={`text-heading-xs ${colorToTextClass[tag.color]}`}>{tag.title}</span>
-                    <button
-                        onClick={() => handleRemoveTag(tag.uuid)}
-                        className={`${colorToTextClass[tag.color]} hover:opacity-70 transition-opacity cursor-pointer`}
-                    >
-                        <XMarkIcon className="size-3" strokeWidth={2.5} />
-                    </button>
-                </div>
+                    label={tag.title}
+                    isSelected
+                    bgColorClassName={colorToBgClass[tag.color]}
+                    textColorClassName={colorToTextClass[tag.color]}
+                    suffixIcon={XMarkIcon}
+                    onSuffixClick={() => handleRemoveTag(tag.uuid)}
+                />
             ))}
 
             <div className="relative">
-                <button
+                <Pill
                     onClick={() => setIsOpen(!isOpen)}
-                    className="flex flex-row items-center gap-1 px-2 py-0.5 rounded-md border border-dashed border-light-gray text-gray hover:border-gray hover:text-dark transition-colors cursor-pointer"
-                >
-                    <PlusIcon className="size-3" strokeWidth={2.5} />
-                    <span className="text-heading-xs">Tag</span>
-                </button>
+                    icon={TagIcon}
+                    label={"Tag"} />
 
                 {isOpen && (
                     <>
