@@ -15,14 +15,13 @@ The Script feature provides a split-view editor for managing scripts per project
 ```
 ScriptPageView (flex-row h-screen)
   ├── ScriptListPanel (w-72, left panel)
-  │     ├── ScriptListItem[] (per script)
+  │     ├── ScriptListItem[] (per script, uses ScriptSimpleMetaCol)
   │     └── "+ New script" button (inline creation)
   └── ScriptEditorPanel (flex-1, right panel)
-        ├── ScriptMetaHeader
-        │     ├── [title input] + [ScriptPlatformsRow] (same row, icons right-aligned)
-        │     ├── ScriptTagsRow (tag pills + popover)
-        │     ├── status SelectDropdown (Pill trigger)
-        │     └── date picker (CalendarDaysIcon button)
+        ├── ScriptMetaHeader (collapsible via ChevronUp/Down toggle)
+        │     ├── [title input] + [toggle button] (always visible)
+        │     ├── Expanded: ScriptPlatformsRow, ScriptTagsRow, status, date picker
+        │     └── Collapsed: ScriptSimpleMetaCol (compact read-only summary)
         ├── ScriptHookCard (hook textarea + template toggle)
         └── ScriptPartsList (flex-1 overflow-y-auto)
               ├── DnD-reorderable part cards
@@ -78,13 +77,15 @@ front/app/
 ├── helpers/
 │   └── hookPlaceholderParser.ts  ← shared parser for [placeholder] tokens
 ├── stores/scripts/
-│   └── focusScriptStore.ts      ← persisted, key "app:scripts:focused"
+│   ├── focusScriptStore.ts          ← persisted, key "app:scripts:focused"
+│   └── scriptMetaHeaderStore.ts     ← persisted, key "app:scripts:meta-header" (expanded/collapsed)
 ├── routes/
 │   └── scripts.tsx              ← thin route, delegates to ScriptPageView
 └── components/scripts/
     ├── ScriptPageView.tsx
     ├── ScriptListPanel.tsx
     ├── ScriptListItem.tsx
+    ├── ScriptSimpleMetaCol.tsx      ← compact read-only meta (platforms, tag dots, date)
     ├── ScriptEditorPanel.tsx
     ├── ScriptMetaHeader.tsx
     ├── ScriptTagsRow.tsx

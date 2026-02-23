@@ -36,7 +36,7 @@ export default function ScriptHookCard({ script }: ScriptHookCardProps) {
     return (
         <div className="group border border-light-gray rounded-xl p-4 bg-clear flex flex-col gap-2 mb-3">
 
-            <ScriptPartHeader icon={CheckBadgeIcon} label="Hook" colorClassName="bg-primary/10 border border-primary/30" />
+            <ScriptPartHeader icon={CheckBadgeIcon} label="Hook" colorClassName="bg-red/10 border border-red/30" />
             {hasPlaceholders(hook) ? (
                 <HookContentRenderer content={hook} onReplacePlaceholder={handleReplacePlaceholder} />
             ) : (
