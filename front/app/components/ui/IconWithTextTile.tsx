@@ -8,7 +8,8 @@ interface IconWithTextTileProps {
     isExpanded?: boolean;
     isBold?: boolean;
     isSelected?: boolean;
-    activeClassName?: string;
+    activeBgClassName?: string;
+    activeBorderClassName?: string;
     className?: string;
     onClick?: () => void;
 }
@@ -19,13 +20,14 @@ export default function IconWithTextTile({
     isExpanded = true,
     isBold = false,
     isSelected = false,
-    activeClassName = "bg-primary/10 border border-primary/30",
+    activeBgClassName = "bg-primary/10",
+    activeBorderClassName = "border border-primary/30",
     className = "",
     onClick,
 }: IconWithTextTileProps) {
     return (
         <div
-            className={`flex flex-row items-center gap-3 cursor-pointer rounded-lg p-2 ${isSelected ? activeClassName : 'hover:bg-surface-hover border border-transparent'} ${className}`}
+            className={`flex flex-row items-center gap-3 cursor-pointer rounded-lg p-2 ${isSelected ? `${activeBgClassName} ${activeBorderClassName}` : 'hover:bg-surface-hover border border-transparent'} ${className}`}
             onClick={onClick}
         >
             <Icon

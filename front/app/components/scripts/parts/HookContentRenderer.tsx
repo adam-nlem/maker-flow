@@ -56,7 +56,7 @@ export default function HookContentRenderer({ content, onReplacePlaceholder }: H
                             label={part.label}
                             isSelected
                             onClick={() => handlePillClick(part.value)}
-                            bgColorClassName="bg-primary/10 border border-primary/30"
+                            bgColorClassName="bg-primary/10" borderColorClassName="border-primary/30"
                             textColorClassName="text-primary"
                         />
 

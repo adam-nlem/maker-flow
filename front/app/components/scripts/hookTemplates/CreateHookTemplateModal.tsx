@@ -101,7 +101,7 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                                             <Pill
                                                 label={hookTemplatePlaceholderToFrenchTranslation[placeholder]}
                                                 isSelected
-                                                bgColorClassName="bg-purple/10 border border-primary/30 hover:bg-purple/20"
+                                                bgColorClassName="bg-purple/10 hover:bg-purple/20" borderColorClassName="border-primary/30"
                                                 textColorClassName="text-primary"
                                             />
                                         </button>

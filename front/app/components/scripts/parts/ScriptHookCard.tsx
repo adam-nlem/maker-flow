@@ -8,6 +8,7 @@ import { useHookTemplatePanelStore } from "~/stores/scripts/hookTemplatePanelSto
 import { hasPlaceholders, replacePlaceholder } from "~/helpers/hookPlaceholderParser";
 import ScriptPartHeader from "./ScriptPartHeader";
 import HookContentRenderer from "./HookContentRenderer";
+import { useScriptEditorStore } from "~/stores/scripts/scriptEditorStore";
 
 interface ScriptHookCardProps {
     script: Script;
@@ -16,9 +17,9 @@ interface ScriptHookCardProps {
 export default function ScriptHookCard({ script }: ScriptHookCardProps) {
     const [hook, setHook] = useState(script.hook ?? "");
     const { updateScript } = useUpdateScript();
+    const isExpanded = useScriptEditorStore((s) => s.isExpanded);
 
     const toggleHookTemplatePanel = useHookTemplatePanelStore((s) => s.toggle);
-    const hasLinkedTemplate = script.hookTemplate !== undefined;
 
     const handleHookBlur = () => {
         const newHook = hook.trim() || null;
@@ -34,9 +35,10 @@ export default function ScriptHookCard({ script }: ScriptHookCardProps) {
     };
 
     return (
-        <div className="group border border-light-gray rounded-xl p-4 bg-clear flex flex-col gap-2 mb-3">
+        <div className="group border border-red/30 rounded-xl p-4 bg-clear flex flex-col gap-2 mb-3">
+            {isExpanded &&
+                <ScriptPartHeader icon={CheckBadgeIcon} label="Hook" colorClassName="bg-red/10" borderClassName="border border-red/30" />}
 
-            <ScriptPartHeader icon={CheckBadgeIcon} label="Hook" colorClassName="bg-red/10 border border-red/30" />
             {hasPlaceholders(hook) ? (
                 <HookContentRenderer content={hook} onReplacePlaceholder={handleReplacePlaceholder} />
             ) : (
@@ -50,18 +52,18 @@ export default function ScriptHookCard({ script }: ScriptHookCardProps) {
                     fullWidth
                 />
             )}
-
-            <Button
-                style={"secondary"}
-                onClick={toggleHookTemplatePanel}
-                width="w-fit"
-                height="h-7"
-            >
-                <div className="flex flex-row justify-center items-center gap-2 shrink-0">
-                    <InboxStackIcon className="size-4" strokeWidth={2} />
-                    <p className="text-sm">Blibliothèque de hooks</p>
-                </div>
-            </Button>
+            {isExpanded &&
+                <Button
+                    style={"secondary"}
+                    onClick={toggleHookTemplatePanel}
+                    width="w-fit"
+                    height="h-7"
+                >
+                    <div className="flex flex-row justify-center items-center gap-2 shrink-0">
+                        <InboxStackIcon className="size-4" strokeWidth={2} />
+                        <p className="text-sm">Blibliothèque de hooks</p>
+                    </div>
+                </Button>}
         </div>
     );
 }

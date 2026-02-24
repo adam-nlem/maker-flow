@@ -11,12 +11,13 @@ interface PillProps {
     onClick?: () => void;
     onSuffixClick?: () => void;
     bgColorClassName?: string;
+    borderColorClassName?: string;
     textColorClassName?: string;
 }
 
-export default function Pill({ icon: Icon, suffixIcon: SuffixIcon, imageUrl, label, isSelected, onClick, onSuffixClick, bgColorClassName = "border-light-gray", textColorClassName = "text-dark" }: PillProps) {
+export default function Pill({ icon: Icon, suffixIcon: SuffixIcon, imageUrl, label, isSelected, onClick, onSuffixClick, bgColorClassName = "", borderColorClassName = "", textColorClassName = "text-dark" }: PillProps) {
     return (
-        <div onClick={onClick} className={`max-w-fit flex flex-row items-center gap-1 px-2 py-0.5 rounded-md border ${isSelected ? `${bgColorClassName} ${textColorClassName}` : "border-dashed border-light-gray text-gray hover:border-gray hover:text-dark"}  transition-colors cursor-pointer`}>
+        <div onClick={onClick} className={`max-w-fit flex flex-row items-center gap-1 px-2 py-0.5 rounded-md border ${isSelected ? `${bgColorClassName} ${borderColorClassName} ${textColorClassName}` : "border-dashed border-light-gray text-gray hover:border-gray hover:text-dark"}  transition-colors cursor-pointer`}>
             {Icon && (
                 <Icon
                     className={`size-3 shrink-0 ${isSelected ? textColorClassName : 'text-gray'}`}

@@ -106,7 +106,8 @@ export default function ScriptMetaHeader({ script, projectUuid }: ScriptMetaHead
                                     }
                                 )
                                 : "Pas de date"}
-                            isSelected={!!script.publishedAt} />
+                            isSelected={!!script.publishedAt}
+                            borderColorClassName="border-light-gray" />
 
                         {isDatePickerOpen && (
                             <>

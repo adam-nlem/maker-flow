@@ -43,7 +43,7 @@ front/app/
 │   ├── ScriptText.ts            ← type = 'text' as const
 │   ├── DialogueSubject.ts
 │   └── enums/
-│       ├── ScriptPartType.ts    ← with french translation + icon + bg/text class maps
+│       ├── ScriptPartType.ts    ← with french translation + icon + bg/border/text class maps
 │       ├── ScriptStatus.ts      ← with label/bg/text class maps (pending, in_progress, completed)
 │       ├── ChapterType.ts       ← with label/bg/text class maps
 │       ├── VoiceOverType.ts     ← with label/bg/text class maps

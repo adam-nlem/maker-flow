@@ -331,15 +331,7 @@ Icon + label badge with optional actions.
 
 ### Pill
 
-**Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/Pill.tsx`
-
-Small colored label/tag.
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `text` | `ReactNode` | Pill content |
-| `color` | `string` | Background color class |
-| `className` | `string` | Additional classes |
+See detailed Pill documentation below in the **Script Feature Components** section.
 
 ---
 
@@ -466,18 +458,20 @@ Unified pill component supporting multiple modes: toggle pill with HeroIcon, tog
 | `isSelected` | `boolean` | - | Toggle state (controls border style in toggle mode) |
 | `onClick` | `() => void` | - | Click handler for the whole pill |
 | `onSuffixClick` | `() => void` | - | Click handler for the suffix icon (stopPropagation built-in) |
-| `bgColorClassName` | `string` | - | Background color class applied when `isSelected` is true |
-| `textColorClassName` | `string` | - | Text color class applied when `isSelected` is true |
+| `bgColorClassName` | `string` | `""` | Background color class applied when `isSelected` is true |
+| `borderColorClassName` | `string` | `""` | Border color class applied when `isSelected` is true |
+| `textColorClassName` | `string` | `"text-dark"` | Text color class applied when `isSelected` is true |
 
 **Styling:**
-- `bgColorClassName` and `textColorClassName` are only applied when `isSelected` is true. Always pass `isSelected` when using colored pills.
+- `bgColorClassName`, `borderColorClassName`, and `textColorClassName` are only applied when `isSelected` is true. Always pass `isSelected` when using colored pills.
+- Keep bg, border, and text classes separate — never mix them in a single prop.
 - When `isSelected` is false/undefined, the pill renders with a dashed border and gray text.
 - `suffixIcon` renders a clickable icon after the label with `stopPropagation` built-in.
 
 **Usage in SelectDropdown:**
 - `renderTrigger`: pass `onClick` directly on the Pill (no wrapping `<button>`)
 - `renderItem`: hide the selected item with `!isSelected ? <Pill ... /> : null`
-- Always pass separate `bgColorClassName` and `textColorClassName` (don't combine them)
+- Always pass separate `bgColorClassName`, `borderColorClassName`, and `textColorClassName`
 
 **Examples:**
 ```tsx
@@ -490,8 +484,11 @@ Unified pill component supporting multiple modes: toggle pill with HeroIcon, tog
 // Tag pill with remove button
 <Pill label="Intro" isSelected bgColorClassName="bg-blue/30" textColorClassName="text-blue" suffixIcon={XMarkIcon} onSuffixClick={handleRemove} />
 
-// Toggle pill with image (platform selection)
-<Pill imageUrl={iconUrl} label="Instagram" isSelected={true} onClick={toggle} />
+// Pill with explicit border color
+<Pill label="Placeholder" isSelected bgColorClassName="bg-primary/10" borderColorClassName="border-primary/30" textColorClassName="text-primary" />
+
+// Toggle pill with image (platform selection) — uses borderColorClassName for selected border
+<Pill imageUrl={iconUrl} label="Instagram" isSelected={true} onClick={toggle} borderColorClassName="border-light-gray" />
 
 // Simple unselected pill (dashed border)
 <Pill icon={TagIcon} label="Tag" onClick={openDropdown} />

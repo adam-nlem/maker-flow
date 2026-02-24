@@ -16,6 +16,16 @@ import ScriptHookCard from "./ScriptHookCard";
 import AddScriptPartMenu from "./AddScriptPartMenu";
 import { useReorderScriptParts } from "~/hooks/api/scripts/useReorderScriptParts";
 
+class InteractiveAwarePointerSensor extends PointerSensor {
+    static activators = [{
+        eventName: 'onPointerDown' as const,
+        handler: ({ nativeEvent }: { nativeEvent: PointerEvent }) => {
+            const target = nativeEvent.target as Element;
+            return !target.closest('input, textarea, select, button, a, [contenteditable]');
+        },
+    }];
+}
+
 interface ScriptPartsListProps {
     parts: ScriptPart[];
     script: Script;
@@ -76,7 +86,7 @@ export default function ScriptPartsList({ parts, script }: ScriptPartsListProps)
     }
 
     const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+        useSensor(InteractiveAwarePointerSensor, { activationConstraint: { distance: 8 } })
     );
 
     const handleDragStart = (event: DragStartEvent) => {

@@ -16,6 +16,7 @@ function PlatformPill({ platform, isSelected, onToggle }: { platform: Platform; 
             label={platformToFrenchTranslation[platform]}
             isSelected={isSelected}
             onClick={onToggle}
+            borderColorClassName="border-light-gray"
         />
     );
 }
