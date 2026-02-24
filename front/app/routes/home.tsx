@@ -5,8 +5,6 @@ import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProjec
 import TodoListDashboardView from "~/components/tasks/TodoListDashboardView";
 import InsightsDashboardView from "~/components/insights/InsightsDashboardView";
 import { ScriptCalendar } from "~/components/scripts/calendar";
-import type { Project } from "~/models/Project";
-import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -23,14 +21,13 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
   const { focusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
 
-
   return (
     <div className="w-full">
       <SideBar />
       <div className="w-full pl-16 flex flex-row flex-wrap">
         {focusedProject && (
           <>
-            <Test project={focusedProject} />
+            <ScriptCalendar projectUuid={focusedProject.uuid} />
 
             <TodoListDashboardView projectUuid={focusedProject.uuid} />
             <InsightsDashboardView projectUuid={focusedProject.uuid} />
@@ -39,12 +36,4 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
       </div>
     </div>
   );
-}
-
-function Test({ project }: {
-  project: Project | null
-}) {
-  if (project === null) return
-  const { scripts, hasMore, isLoadingMore, listMore } = useListPaginatedScripts({ projectUuid: project.uuid });
-  return <ScriptCalendar scripts={scripts} projectUuid={project.uuid} />
 }

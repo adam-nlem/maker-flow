@@ -1,44 +1,56 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { DndContext, DragOverlay, PointerSensor, type DragEndEvent, type DragStartEvent, useSensor, useSensors } from "@dnd-kit/core";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 import type { Script } from "~/models/Script";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
+import { useListCalendarScripts } from "~/hooks/api/scripts/useListCalendarScripts";
 import { DAYS_FR, MONTHS_FR, getDaysInMonth, getFirstDayOfMonth, isSameDay, toDateKey } from "~/utils/dateHelpers";
 import ScriptCalendarDayCell from "./ScriptCalendarDayCell";
 import ScriptCalendarCard from "./ScriptCalendarCard";
 import ScriptDetailModal from "./ScriptDetailModal";
 
 interface ScriptCalendarProps {
-    scripts: Script[];
     projectUuid: string;
 }
 
-export default function ScriptCalendar({ scripts, projectUuid }: ScriptCalendarProps) {
+export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
     const today = new Date();
     const [currentMonth, setCurrentMonth] = useState(today.getMonth());
     const [currentYear, setCurrentYear] = useState(today.getFullYear());
     const [draggedScript, setDraggedScript] = useState<Script | null>(null);
     const [selectedScript, setSelectedScript] = useState<Script | null>(null);
-    const [localScripts, setLocalScripts] = useState<Script[]>(scripts);
-    const pendingMutations = useRef(0);
+
+    const { scriptsByDay: fetchedScriptsByDay } = useListCalendarScripts({
+        projectUuid,
+        year: currentYear,
+        month: currentMonth + 1,
+    });
 
     const { updateScript } = useUpdateScript();
     const { createScript } = useCreateScript();
-
-    useEffect(() => {
-        if (pendingMutations.current === 0) {
-            setLocalScripts(scripts);
-        }
-    }, [scripts]);
 
     const sensors = useSensors(
         useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
     );
 
+    const scriptsByDay = useMemo(() => {
+        const map = new Map<string, Script[]>();
+        for (const group of fetchedScriptsByDay) {
+            map.set(group.date, group.scripts);
+        }
+        return map;
+    }, [fetchedScriptsByDay]);
+
     const handleDragStart = (event: DragStartEvent) => {
-        const script = localScripts.find((s) => s.uuid === event.active.id);
-        setDraggedScript(script ?? null);
+        for (const group of fetchedScriptsByDay) {
+            const script = group.scripts.find((s) => s.uuid === event.active.id);
+            if (script) {
+                setDraggedScript(script);
+                return;
+            }
+        }
+        setDraggedScript(null);
     };
 
     const handleDragEnd = async (event: DragEndEvent) => {
@@ -51,22 +63,8 @@ export default function ScriptCalendar({ scripts, projectUuid }: ScriptCalendarP
         if (isNaN(day)) return;
 
         const newDate = new Date(currentYear, currentMonth, day);
-        const previousScripts = localScripts;
 
-        setLocalScripts(prev => prev.map(s =>
-            s.uuid === (active.id as string)
-                ? Object.assign(Object.create(Object.getPrototypeOf(s)), s, { publishedAt: newDate })
-                : s
-        ));
-
-        pendingMutations.current++;
-        try {
-            await updateScript({ scriptUuid: active.id as string, data: { publishedAt: newDate } });
-        } catch {
-            setLocalScripts(previousScripts);
-        } finally {
-            pendingMutations.current--;
-        }
+        await updateScript({ scriptUuid: active.id as string, data: { publishedAt: newDate } });
     };
 
     const handleCreateScript = (date: Date) => {
@@ -95,20 +93,6 @@ export default function ScriptCalendar({ scripts, projectUuid }: ScriptCalendarP
         setCurrentMonth(today.getMonth());
         setCurrentYear(today.getFullYear());
     };
-
-    // Group scripts by date key for the current month
-    const scriptsByDay = useMemo(() => {
-        const map = new Map<string, Script[]>();
-        for (const script of localScripts) {
-            if (!script.publishedAt) continue;
-            if (script.publishedAt.getMonth() !== currentMonth || script.publishedAt.getFullYear() !== currentYear) continue;
-            const key = toDateKey(script.publishedAt);
-            const existing = map.get(key) ?? [];
-            existing.push(script);
-            map.set(key, existing);
-        }
-        return map;
-    }, [localScripts, currentMonth, currentYear]);
 
     const daysInMonth = getDaysInMonth(currentYear, currentMonth);
     const firstDayOfMonth = getFirstDayOfMonth(currentYear, currentMonth);

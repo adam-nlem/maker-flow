@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\DTO\QueryParam\Script\ListCalendarScriptsQueryParamDTO;
 use App\DTO\QueryParam\Script\ListScriptsQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
+use App\DTO\Response\Script\ListScriptsGroupedByDayResponseDTO;
 use App\DTO\Request\Script\CreateScriptRequestDTO;
 use App\DTO\Request\Script\ReorderScriptPartsRequestDTO;
 use App\DTO\Request\Script\UpdateScriptRequestDTO;
@@ -52,6 +54,42 @@ final class ScriptController extends AbstractController
             data: $scripts,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_scripts_list']]
+        );
+    }
+
+    #[Route('/calendar', name: 'api_scripts_calendar', methods: ['GET'])]
+    public function calendar(
+        ListCalendarScriptsQueryParamDTO $queryParamDto,
+        ScriptRepository $scriptRepository,
+        ProjectRepository $projectRepository,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+
+        if ($project === null) {
+            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        $scripts = $scriptRepository->getByProjectAndUserAndMonth($project, $user, $queryParamDto->getYear(), $queryParamDto->getMonth());
+
+        $grouped = [];
+        foreach ($scripts as $script) {
+            $dateKey = $script->getPublishedAt()->format('Y-m-d');
+            $grouped[$dateKey][] = $script;
+        }
+
+        $result = array_map(
+            fn(string $date, array $dayScripts) => (new ListScriptsGroupedByDayResponseDTO($date, $dayScripts))->getData(),
+            array_keys($grouped),
+            array_values($grouped),
+        );
+
+        return $this->json(
+            data: $result,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_scripts_calendar']]
         );
     }
 

@@ -35,6 +35,8 @@ front/app/
 ├── models/
 │   ├── Script.ts
 │   ├── ScriptTag.ts
+│   ├── dtos/
+│   │   └── ListScriptsGroupedByDayDTO.ts  ← calendar API response DTO
 │   ├── ScriptPart.ts            ← union type + scriptPartFromJSON factory
 │   ├── ScriptChapter.ts         ← type = 'chapter' as const
 │   ├── ScriptVoiceOver.ts       ← type = 'voice_over' as const
@@ -50,8 +52,9 @@ front/app/
 │       └── ShotType.ts          ← with label/bg/text class maps
 ├── hooks/api/
 │   ├── scripts/
-│   │   ├── scriptQueryKeys.ts   ← all, list(projectUuid), parts(scriptUuid)
+│   │   ├── scriptQueryKeys.ts   ← all, list(projectUuid), calendar(projectUuid, year, month), parts(scriptUuid)
 │   │   ├── useListPaginatedScripts.ts  ← infinite scroll (page/limit/hasMore)
+│   │   ├── useListCalendarScripts.ts   ← monthly scripts grouped by day
 │   │   ├── useCreateScript.ts   ← returns Script (for immediate focus)
 │   │   ├── useUpdateScript.ts
 │   │   ├── useDeleteScript.ts   ← takes raw UUID string
@@ -216,9 +219,10 @@ Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay
 ## Query Keys
 
 ```ts
-scriptQueryKeys.all           // ['scripts']
-scriptQueryKeys.list(uuid)    // ['scripts', 'list', projectUuid]
-scriptQueryKeys.parts(uuid)   // ['scripts', 'parts', scriptUuid]
+scriptQueryKeys.all                        // ['scripts']
+scriptQueryKeys.list(uuid)                 // ['scripts', 'list', projectUuid]
+scriptQueryKeys.calendar(uuid, year, month) // ['scripts', 'calendar', projectUuid, year, month]
+scriptQueryKeys.parts(uuid)                // ['scripts', 'parts', scriptUuid]
 
 scriptTagQueryKeys.all        // ['script-tags']
 scriptTagQueryKeys.list(uuid) // ['script-tags', 'list', projectUuid]
@@ -267,18 +271,33 @@ front/app/components/scripts/calendar/
 **ScriptCalendar:**
 | Prop | Type | Description |
 |------|------|-------------|
-| `scripts` | `Script[]` | All scripts — filtered by month client-side |
-| `projectUuid` | `string` | Project UUID for script creation and editor panel |
+| `projectUuid` | `string` | Project UUID for data fetching, script creation, and editor panel |
+
+### API Endpoint
+
+**`GET /api/scripts/calendar`** — Returns scripts for a given month, grouped by day.
+
+| Param | Type | Description |
+|-------|------|-------------|
+| `projectUuid` | `string` | Required |
+| `year` | `int` | Required, positive |
+| `month` | `int` | Required, 1-12 |
+
+**Response:** `ListScriptsGroupedByDayResponseDTO[]` — array of `{ date: "YYYY-MM-DD", scripts: Script[] }`. Only days with scripts are included. Backend groups scripts by `publishedAt` date and returns them ordered by `publishedAt ASC`.
+
+**Frontend DTO:** `ListScriptsGroupedByDayDTO` (in `front/app/models/dtos/`) mirrors the backend response with `fromJSON` factory.
+
+**Frontend hook:** `useListCalendarScripts({ projectUuid, year, month })` — returns `{ scriptsByDay: ListScriptsGroupedByDayDTO[] }`. The calendar converts this to a `Map<string, Script[]>` keyed by date.
 
 ### Key Details
 
+- **Self-contained data fetching:** The calendar fetches its own data via `useListCalendarScripts` — no scripts prop needed. When the user navigates months, React Query caches each month separately via `scriptQueryKeys.calendar(projectUuid, year, month)`.
 - **Self-contained behavior:** The calendar handles all actions internally — no callback props needed. Uses `useUpdateScript` for DnD date changes, `useCreateScript` for the "+" button, and local `selectedScript` state for the detail modal.
 - **Shared date helpers:** `DAYS_FR`, `MONTHS_FR`, `getDaysInMonth`, `getFirstDayOfMonth`, `isSameDay`, `isPastDay`, `toDateKey` are shared between `ScriptCalendar` and `DatePicker` via `~/utils/dateHelpers`.
 - **Monday-first grid:** Same weekday logic as `DatePicker`
-- **Client-side grouping:** Scripts grouped by `publishedAt` into a `Map<string, Script[]>` keyed by `YYYY-MM-DD`
-- **Month navigation:** Local `useState` (not persisted), `<` / `>` arrows + "Aujourd'hui" reset button
+- **Server-side grouping:** Scripts are grouped by day on the backend. The frontend receives pre-grouped `ListScriptsGroupedByDayDTO[]` and converts to `Map<string, Script[]>`.
+- **Month navigation:** Local `useState` (not persisted), `<` / `>` arrows + "Aujourd'hui" reset button. Month is 0-indexed in JS, converted to 1-indexed for the API.
 - **Drag-and-drop:** Uses `@dnd-kit/core` — cards are `useDraggable`, day cells are `useDroppable`. Same pattern as `TodoListTasksBoard` (Kanban status change). `PointerSensor` with 8px activation constraint to avoid interfering with clicks. `DragOverlay` shows a rotated shadow preview.
-- **Optimistic DnD updates:** Local state (`localScripts`) updates immediately on drop. A `useRef` counter tracks in-flight mutations — prop sync from cache invalidation is suppressed while mutations are pending, preventing flicker during rapid drags. On error, local state rolls back to the previous value. Same pattern as `ScriptPlatformsRow`.
 - **Day cells:** `min-h-25`, overflow scroll with `scrollbar-none` for many scripts
 - **"+" button:** Hover-revealed (`opacity-0 group-hover:opacity-100`), creates a "Nouveau script" with the day's date pre-filled
 - **Detail modal:** `ScriptDetailModal` wraps `ScriptEditorPanel` inside `ModalOverlay`. Clicking a script card opens the full editor (title, platforms, tags, status, date, hook, parts). Uses `key={script.uuid}` to reset on script change.

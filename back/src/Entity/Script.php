@@ -24,6 +24,7 @@ class Script
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -33,6 +34,7 @@ class Script
     #[ORM\Column(length: 255)]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -42,6 +44,7 @@ class Script
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -51,6 +54,7 @@ class Script
     #[ORM\Column(nullable: true)]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -60,6 +64,7 @@ class Script
     #[ORM\Column]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -69,6 +74,7 @@ class Script
     #[ORM\Column(nullable: true)]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -78,6 +84,7 @@ class Script
     #[ORM\Column(type: Types::JSON, nullable: true)]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -87,6 +94,7 @@ class Script
     #[ORM\Column(enumType: ScriptStatus::class, nullable: true)]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -105,6 +113,7 @@ class Script
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -115,6 +124,7 @@ class Script
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -127,6 +137,7 @@ class Script
     #[ORM\ManyToMany(targetEntity: ScriptTag::class, inversedBy: 'scripts')]
     #[Groups([
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',

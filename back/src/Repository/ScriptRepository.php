@@ -79,4 +79,27 @@ class ScriptRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    /**
+     * @return Script[]
+     */
+    public function getByProjectAndUserAndMonth(Project $project, User $user, int $year, int $month): array
+    {
+        $startOfMonth = new \DateTimeImmutable("$year-$month-01");
+        $startOfNextMonth = $startOfMonth->modify('first day of next month');
+
+        return $this->createQueryBuilder('s')
+            ->where('s.project = :project')
+            ->andWhere('s.user = :user')
+            ->andWhere('s.publishedAt >= :startOfMonth')
+            ->andWhere('s.publishedAt < :startOfNextMonth')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->setParameter('startOfMonth', $startOfMonth)
+            ->setParameter('startOfNextMonth', $startOfNextMonth)
+            ->orderBy('s.publishedAt', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }
