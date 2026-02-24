@@ -1,13 +1,13 @@
 import { useState } from "react";
-import { FilmIcon, TrashIcon } from "@heroicons/react/24/outline";
 import type { ScriptShot } from "~/models/ScriptShot";
 import { ShotType, shotTypeToLabel, shotTypeToBgClass, shotTypeToTextClass } from "~/models/enums/ShotType";
+import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import { useUpdateScriptShot } from "~/hooks/api/scriptShots/useUpdateScriptShot";
 import { useDeleteScriptShot } from "~/hooks/api/scriptShots/useDeleteScriptShot";
-import ScriptPartHeader from "./ScriptPartHeader";
+import ScriptPartCard from "./ScriptPartCard";
 
 interface ScriptShotCardProps {
     shot: ScriptShot;
@@ -36,41 +36,36 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
     };
 
     return (
-        <div className="group border border-light-gray rounded-xl p-4 bg-clear flex-1 flex flex-col gap-2">
-            <ScriptPartHeader icon={FilmIcon} label="Plan" colorClassName="bg-primary/10 border border-primary/30" dragHandleProps={dragHandleProps} />
-            <div className="flex flex-row items-center gap-2">
-                <SelectDropdown
-                    items={Object.values(ShotType)}
-                    selectedItemId={shotType}
-                    getItemId={(type) => type}
-                    onSelect={(type) => handleShotTypeChange(type)}
-                    renderTrigger={({ onClick }) => (
-                        <Pill
-                            onClick={onClick}
-                            label={shotTypeToLabel[shotType]}
-                            isSelected
-                            bgColorClassName={shotTypeToBgClass[shotType]}
-                            textColorClassName={shotTypeToTextClass[shotType]}
-                        />
-                    )}
-                    renderItem={({ item, isSelected, onSelect }) => {
-                        return !isSelected ? <Pill
-                            label={shotTypeToLabel[item]}
-                            isSelected
-                            onClick={onSelect}
-                            bgColorClassName={shotTypeToBgClass[item]}
-                            textColorClassName={shotTypeToTextClass[item]}
-                        /> : null
-                    }}
-                />
-                <button
-                    onClick={() => deleteScriptShot({ shotUuid: shot.uuid, scriptUuid })}
-                    disabled={isDeleting}
-                    className="shrink-0 mt-0.5 text-gray hover:text-danger cursor-pointer opacity-0 group-hover:opacity-100 transition"
-                >
-                    <TrashIcon className="size-4" strokeWidth={2} />
-                </button>
-            </div>
+        <ScriptPartCard
+            partType={ScriptPartType.Shot}
+            dragHandleProps={dragHandleProps}
+            onDelete={() => deleteScriptShot({ shotUuid: shot.uuid, scriptUuid })}
+            isDeleting={isDeleting}
+        >
+            <SelectDropdown
+                items={Object.values(ShotType)}
+                selectedItemId={shotType}
+                getItemId={(type) => type}
+                onSelect={(type) => handleShotTypeChange(type)}
+                renderTrigger={({ onClick }) => (
+                    <Pill
+                        onClick={onClick}
+                        label={shotTypeToLabel[shotType]}
+                        isSelected
+                        bgColorClassName={shotTypeToBgClass[shotType]}
+                        textColorClassName={shotTypeToTextClass[shotType]}
+                    />
+                )}
+                renderItem={({ item, isSelected, onSelect }) => {
+                    return !isSelected ? <Pill
+                        label={shotTypeToLabel[item]}
+                        isSelected
+                        onClick={onSelect}
+                        bgColorClassName={shotTypeToBgClass[item]}
+                        textColorClassName={shotTypeToTextClass[item]}
+                    /> : null
+                }}
+            />
             <TextArea
                 simple
                 value={content}
@@ -80,6 +75,6 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
                 textStyle="text-sm"
                 fullWidth
             />
-        </div>
+        </ScriptPartCard>
     );
 }

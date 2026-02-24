@@ -117,7 +117,7 @@ export default function ScriptPartsList({ parts, script }: ScriptPartsListProps)
                         ))}
                     </DroppableZone>
 
-                    {localParts.length === 0 && (
+                    {(localParts.length === 0 || localParts[localParts.length - 1].type !== "text") && (
                         <ScriptTextCard scriptUuid={scriptUuid} />
                     )}
 

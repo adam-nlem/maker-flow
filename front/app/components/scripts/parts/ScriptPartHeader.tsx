@@ -6,14 +6,12 @@ interface ScriptPartHeaderProps {
     icon: HeroIcon;
     label: string;
     colorClassName: string;
-    dragHandleProps?: Record<string, unknown>;
 }
 
-export default function ScriptPartHeader({ icon: Icon, label, colorClassName, dragHandleProps }: ScriptPartHeaderProps) {
+export default function ScriptPartHeader({ icon: Icon, label, colorClassName }: ScriptPartHeaderProps) {
     return (
         <div
-            {...dragHandleProps}
-            className={`flex flex-row justify-center items-center gap-3 cursor-grab rounded-lg p-1 ${colorClassName}`}
+            className={`flex flex-row justify-center items-center gap-3 rounded-lg p-1 ${colorClassName}`}
         >
             <Icon className="size-5 shrink-0 text-dark" strokeWidth={1} />
             <span className="text-body-sm whitespace-nowrap text-dark">{label}</span>

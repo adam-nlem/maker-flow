@@ -10,7 +10,7 @@ import ScriptTagsRow from "./ScriptTagsRow";
 import ScriptPlatformsRow from "./ScriptPlatformsRow";
 import ScriptSimpleMetaColumn from "./ScriptSimpleMetaCol";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
-import { useScriptMetaHeaderStore } from "~/stores/scripts/scriptMetaHeaderStore";
+import { useScriptEditorStore } from "~/stores/scripts/scriptEditorStore";
 
 interface ScriptMetaHeaderProps {
     script: Script;
@@ -23,7 +23,7 @@ export default function ScriptMetaHeader({ script, projectUuid }: ScriptMetaHead
     const [status, setStatus] = useState<ScriptStatus | undefined>(script.status);
 
     const { updateScript } = useUpdateScript();
-    const { isExpanded, toggle } = useScriptMetaHeaderStore();
+    const { isExpanded, toggle } = useScriptEditorStore();
 
     const handleTitleBlur = () => {
         if (title.trim() !== script.title) {

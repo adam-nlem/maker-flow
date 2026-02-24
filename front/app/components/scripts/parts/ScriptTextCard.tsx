@@ -1,10 +1,11 @@
 import { useState } from "react";
-import { Bars3Icon, TrashIcon } from "@heroicons/react/24/outline";
 import type { ScriptText } from "~/models/ScriptText";
+import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import { TextArea } from "~/components/ui/TextArea";
 import { useCreateScriptText } from "~/hooks/api/scriptTexts/useCreateScriptText";
 import { useUpdateScriptText } from "~/hooks/api/scriptTexts/useUpdateScriptText";
 import { useDeleteScriptText } from "~/hooks/api/scriptTexts/useDeleteScriptText";
+import ScriptPartCard from "./ScriptPartCard";
 
 interface ScriptTextCardProps {
     text?: ScriptText;
@@ -33,37 +34,22 @@ export default function ScriptTextCard({ text, scriptUuid, dragHandleProps }: Sc
     };
 
     return (
-        <div className="group flex flex-row items-start gap-3">
-            {text && (
-                <div
-                    {...dragHandleProps}
-                    className="shrink-0 mt-1 text-gray opacity-0 group-hover:opacity-100 transition-opacity cursor-grab"
-                >
-                    <Bars3Icon className="size-4" strokeWidth={2} />
-                </div>
-            )}
-
-            <div className="flex-1 min-w-0">
-                <TextArea
-                    simple
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    onBlur={handleBlur}
-                    placeholder="Ecrivez ici..."
-                    textStyle="text-sm"
-                    fullWidth
-                />
-            </div>
-
-            {text && (
-                <button
-                    onClick={() => deleteScriptText({ textUuid: text.uuid, scriptUuid })}
-                    disabled={isDeleting}
-                    className="shrink-0 mt-1 text-gray hover:text-danger transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
-                >
-                    <TrashIcon className="size-4" strokeWidth={2} />
-                </button>
-            )}
-        </div>
+        <ScriptPartCard
+            partType={ScriptPartType.Text}
+            dragHandleProps={dragHandleProps}
+            bordered={false}
+            onDelete={text ? () => deleteScriptText({ textUuid: text.uuid, scriptUuid }) : undefined}
+            isDeleting={isDeleting}
+        >
+            <TextArea
+                simple
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                onBlur={handleBlur}
+                placeholder="Ecrivez ici..."
+                textStyle="text-sm"
+                fullWidth
+            />
+        </ScriptPartCard>
     );
 }

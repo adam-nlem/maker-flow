@@ -1,16 +1,16 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-type ScriptMetaHeaderState = {
+type ScriptEditorState = {
     isExpanded: boolean
 }
 
-type ScriptMetaHeaderAction = {
+type ScriptEditorAction = {
     toggle: () => void
     setIsExpanded: (expanded: boolean) => void
 }
 
-export const useScriptMetaHeaderStore = create<ScriptMetaHeaderState & ScriptMetaHeaderAction>()(
+export const useScriptEditorStore = create<ScriptEditorState & ScriptEditorAction>()(
     persist(
         (set) => ({
             isExpanded: true,
@@ -18,7 +18,7 @@ export const useScriptMetaHeaderStore = create<ScriptMetaHeaderState & ScriptMet
             setIsExpanded: (expanded) => set({ isExpanded: expanded }),
         }),
         {
-            name: "app:scripts:meta-header",
+            name: "app:scripts:editor",
         }
     )
 )
