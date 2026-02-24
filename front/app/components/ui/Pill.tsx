@@ -6,7 +6,7 @@ interface PillProps {
     icon?: HeroIcon;
     suffixIcon?: HeroIcon;
     imageUrl?: string;
-    label: string;
+    label?: string;
     isSelected?: boolean;
     onClick?: () => void;
     onSuffixClick?: () => void;
@@ -30,7 +30,7 @@ export default function Pill({ icon: Icon, suffixIcon: SuffixIcon, imageUrl, lab
                     className={`size-5 rounded-md object-cover ${isSelected ? "opacity-100" : "grayscale opacity-40 hover:opacity-60"}`}
                 />
             )}
-            <span className="text-heading-xs whitespace-nowrap">{label}</span>
+            {label && <span className="text-heading-xs whitespace-nowrap">{label}</span>}
             {SuffixIcon && (
                 <button
                     onClick={(e) => { e.stopPropagation(); onSuffixClick?.(); }}

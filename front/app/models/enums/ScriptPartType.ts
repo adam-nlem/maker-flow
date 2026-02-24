@@ -24,3 +24,19 @@ export const scriptPartTypeToIcon: Record<ScriptPartType, ComponentType<SVGProps
     [ScriptPartType.Dialogue]: ChatBubbleLeftRightIcon,
     [ScriptPartType.Shot]: FilmIcon,
 }
+
+export const scriptPartTypeToBgClass: Record<ScriptPartType, string> = {
+    [ScriptPartType.Text]: "bg-gray/10 border border-gray/30",
+    [ScriptPartType.Chapter]: "bg-blue/10 border border-blue/30",
+    [ScriptPartType.VoiceOver]: "bg-yellow/10 border border-yellow/30",
+    [ScriptPartType.Dialogue]: "bg-purple/10 border border-purple/30",
+    [ScriptPartType.Shot]: "bg-primary/10 border border-primary/30",
+}
+
+export const scriptPartTypeToTextClass: Record<ScriptPartType, string> = {
+    [ScriptPartType.Text]: "text-gray",
+    [ScriptPartType.Chapter]: "text-blue",
+    [ScriptPartType.VoiceOver]: "text-yellow",
+    [ScriptPartType.Dialogue]: "text-purple",
+    [ScriptPartType.Shot]: "text-primary",
+}

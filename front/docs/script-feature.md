@@ -43,7 +43,7 @@ front/app/
 │   ├── ScriptText.ts            ← type = 'text' as const
 │   ├── DialogueSubject.ts
 │   └── enums/
-│       ├── ScriptPartType.ts    ← with french translation + icon maps
+│       ├── ScriptPartType.ts    ← with french translation + icon + bg/text class maps
 │       ├── ScriptStatus.ts      ← with label/bg/text class maps (pending, in_progress, completed)
 │       ├── ChapterType.ts       ← with label/bg/text class maps
 │       ├── VoiceOverType.ts     ← with label/bg/text class maps
@@ -78,7 +78,7 @@ front/app/
 │   └── hookPlaceholderParser.ts  ← shared parser for [placeholder] tokens
 ├── stores/scripts/
 │   ├── focusScriptStore.ts          ← persisted, key "app:scripts:focused"
-│   └── scriptMetaHeaderStore.ts     ← persisted, key "app:scripts:meta-header" (expanded/collapsed)
+│   └── scriptEditorStore.ts          ← persisted, key "app:scripts:editor" (meta header + parts expanded)
 ├── routes/
 │   └── scripts.tsx              ← thin route, delegates to ScriptPageView
 └── components/scripts/
@@ -90,10 +90,17 @@ front/app/
     ├── ScriptMetaHeader.tsx
     ├── ScriptTagsRow.tsx
     ├── ScriptPlatformsRow.tsx
+    ├── calendar/
+    │   ├── index.ts                 ← barrel export
+    │   ├── ScriptCalendar.tsx       ← monthly calendar with nav + grid + behavior
+    │   ├── ScriptCalendarDayCell.tsx ← individual day cell (droppable)
+    │   ├── ScriptCalendarCard.tsx   ← compact script card (draggable)
+    │   └── ScriptDetailModal.tsx    ← full editor modal (wraps ScriptEditorPanel)
     └── parts/
         ├── ScriptHookCard.tsx        ← hook card with template toggle + placeholder editing
         ├── HookContentRenderer.tsx   ← rich text with clickable placeholder pills
         ├── ScriptPartsList.tsx       ← DnD orchestrator
+        ├── ScriptPartCard.tsx       ← reusable card wrapper (header, delete, animation)
         ├── ScriptPartHeader.tsx     ← reusable colored header (icon + label, drag handle)
         ├── ScriptChapterCard.tsx
         ├── ScriptVoiceOverCard.tsx
@@ -139,7 +146,13 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 - Input/TextArea use the `simple` prop for borderless inline styling
 - Delete button is hover-revealed (`opacity-0 group-hover:opacity-100`)
 
-**Structured part cards** (chapter, voice-over, dialogue, shot) use `ScriptPartHeader` as a colored header bar (icon + label) that doubles as the drag handle. Each part type has its own color: chapter (blue), voice-over (yellow), shot (primary), dialogue (purple), hook (primary). **Text parts** are borderless to blend into the page.
+**Structured part cards** (chapter, voice-over, dialogue, shot, text) all use `ScriptPartCard` as their wrapper component. `ScriptPartCard` handles:
+- Rendering `ScriptPartHeader` with icon, label, and color resolved from centralized maps in `ScriptPartType.ts`
+- Standardized delete action ("Supprimer" text, hover-revealed)
+- Optional card border (`bordered` prop, default true)
+- Store-driven header expand/collapse: reads `arePartsExpanded` from `useScriptEditorStore` — when false, the header + delete action are hidden with a smooth CSS grid animation (`grid-rows-[0fr]`/`[1fr]` + opacity transition); children (content) remain always visible
+
+Each part type has its own color: chapter (blue), voice-over (yellow), shot (primary), dialogue (purple), text (gray). Hook uses hardcoded values (red) since it's not a `ScriptPartType` member.
 
 ### Hook Card
 `ScriptHookCard` is a standalone card rendered above the parts list inside `ScriptPartsList`. It uses the same visual pattern as structured part cards (`border border-light-gray rounded-xl p-4 bg-clear`) with a `ScriptPartHeader` (CheckBadgeIcon, primary color). It is not reorderable and has no delete button. A `Button` opens/closes the hook template panel.
@@ -153,7 +166,7 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 - **Always editable:** No view/edit toggle, uses a `simple` TextArea
 - **Auto-save on blur:** Calls `updateScriptText` when content changes
 - **No card border:** Only shows drag handle + delete button on hover (`opacity-0 group-hover:opacity-100`)
-- **Virtual mode:** When a script has no parts, a virtual `ScriptTextCard` (no `text` prop) is rendered. On first blur with non-empty content, it creates a real entity via `createScriptText`
+- **Virtual mode:** A virtual `ScriptTextCard` (no `text` prop) is rendered at the bottom of the parts list whenever the list is empty OR the last part is not a text. This lets the user start writing at any time. On first blur with non-empty content, it creates a real entity via `createScriptText`
 
 ### Drag-and-Drop
 Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay`). Parts are reordered optimistically in local state, then `useReorderScriptParts` fires with the new ordered array of `{uuid, type}`. If `parts` prop changes while no drag is active, local state is synced.
@@ -212,6 +225,63 @@ scriptTagQueryKeys.list(uuid) // ['script-tags', 'list', projectUuid]
 ```
 
 All part mutations (chapters, voice-overs, dialogues, shots, texts, dialogue subjects) invalidate `scriptQueryKeys.parts(scriptUuid)`.
+
+---
+
+## Calendar
+
+### Overview
+
+`ScriptCalendar` is a standalone reusable monthly calendar component that displays planned scripts by their `publishedAt` date. It is designed to be embedded in any page (homescreen, dedicated calendar page).
+
+### Component Tree
+
+```
+ScriptCalendar (month nav + 7-col grid)
+  ├── Header: < Month Year > + "Aujourd'hui" button
+  ├── Day headers: Lun, Mar, Mer, Jeu, Ven, Sam, Dim
+  └── ScriptCalendarDayCell[] (per day in month)
+        ├── Day number (today = primary circle)
+        ├── "+" button (hover-revealed, creates script on that date)
+        └── ScriptCalendarCard[] (per script on that day)
+              ├── Title (text-heading-xs, truncated)
+              └── Platform icons + tag color dots
+```
+
+### File Structure
+
+```
+front/app/utils/
+└── dateHelpers.ts               ← shared calendar helpers (DAYS_FR, MONTHS_FR, getDaysInMonth, etc.)
+
+front/app/components/scripts/calendar/
+├── index.ts                     ← barrel export
+├── ScriptCalendar.tsx           ← main component (month nav + grid + behavior)
+├── ScriptCalendarDayCell.tsx    ← individual day cell (droppable)
+├── ScriptCalendarCard.tsx       ← compact script card (draggable)
+└── ScriptDetailModal.tsx        ← full editor modal (wraps ScriptEditorPanel)
+```
+
+### Props
+
+**ScriptCalendar:**
+| Prop | Type | Description |
+|------|------|-------------|
+| `scripts` | `Script[]` | All scripts — filtered by month client-side |
+| `projectUuid` | `string` | Project UUID for script creation and editor panel |
+
+### Key Details
+
+- **Self-contained behavior:** The calendar handles all actions internally — no callback props needed. Uses `useUpdateScript` for DnD date changes, `useCreateScript` for the "+" button, and local `selectedScript` state for the detail modal.
+- **Shared date helpers:** `DAYS_FR`, `MONTHS_FR`, `getDaysInMonth`, `getFirstDayOfMonth`, `isSameDay`, `isPastDay`, `toDateKey` are shared between `ScriptCalendar` and `DatePicker` via `~/utils/dateHelpers`.
+- **Monday-first grid:** Same weekday logic as `DatePicker`
+- **Client-side grouping:** Scripts grouped by `publishedAt` into a `Map<string, Script[]>` keyed by `YYYY-MM-DD`
+- **Month navigation:** Local `useState` (not persisted), `<` / `>` arrows + "Aujourd'hui" reset button
+- **Drag-and-drop:** Uses `@dnd-kit/core` — cards are `useDraggable`, day cells are `useDroppable`. Same pattern as `TodoListTasksBoard` (Kanban status change). `PointerSensor` with 8px activation constraint to avoid interfering with clicks. `DragOverlay` shows a rotated shadow preview.
+- **Optimistic DnD updates:** Local state (`localScripts`) updates immediately on drop. A `useRef` counter tracks in-flight mutations — prop sync from cache invalidation is suppressed while mutations are pending, preventing flicker during rapid drags. On error, local state rolls back to the previous value. Same pattern as `ScriptPlatformsRow`.
+- **Day cells:** `min-h-25`, overflow scroll with `scrollbar-none` for many scripts
+- **"+" button:** Hover-revealed (`opacity-0 group-hover:opacity-100`), creates a "Nouveau script" with the day's date pre-filled
+- **Detail modal:** `ScriptDetailModal` wraps `ScriptEditorPanel` inside `ModalOverlay`. Clicking a script card opens the full editor (title, platforms, tags, status, date, hook, parts). Uses `key={script.uuid}` to reset on script change.
 
 ---
 
