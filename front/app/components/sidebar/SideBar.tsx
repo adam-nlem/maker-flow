@@ -1,5 +1,5 @@
-import { ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SparklesIcon, SunIcon } from "@heroicons/react/24/outline";
-import { HomeIcon as HomeIconSolid, GlobeEuropeAfricaIcon as GlobeEuropeAfricaIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid } from "@heroicons/react/24/solid";
+import { CalendarDaysIcon, ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SparklesIcon, SunIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon as CalendarDaysIconSolid, HomeIcon as HomeIconSolid, GlobeEuropeAfricaIcon as GlobeEuropeAfricaIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
@@ -134,6 +134,13 @@ export default function SideBar() {
               isExpanded={isExpanded}
               isSelected={location.pathname.startsWith('/scripts')}
               onClick={() => navigate('/scripts')}
+            />
+            <IconWithTextTile
+              icon={location.pathname === '/calendar' ? CalendarDaysIconSolid : CalendarDaysIcon}
+              label="Calendrier"
+              isExpanded={isExpanded}
+              isSelected={location.pathname === '/calendar'}
+              onClick={() => navigate('/calendar')}
             />
             <IconWithTextTile
               icon={location.pathname.startsWith('/insights') ? ChartBarIconSolid : ChartBarIcon}

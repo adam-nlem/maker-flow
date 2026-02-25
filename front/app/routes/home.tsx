@@ -4,7 +4,6 @@ import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedP
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import TodoListDashboardView from "~/components/tasks/TodoListDashboardView";
 import InsightsDashboardView from "~/components/insights/InsightsDashboardView";
-import { ScriptCalendar } from "~/components/scripts/calendar";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -27,8 +26,6 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
       <div className="w-full pl-16 flex flex-row flex-wrap">
         {focusedProject && (
           <>
-            <ScriptCalendar projectUuid={focusedProject.uuid} />
-
             <TodoListDashboardView projectUuid={focusedProject.uuid} />
             <InsightsDashboardView projectUuid={focusedProject.uuid} />
           </>

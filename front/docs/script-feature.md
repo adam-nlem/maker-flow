@@ -236,7 +236,9 @@ All part mutations (chapters, voice-overs, dialogues, shots, texts, dialogue sub
 
 ### Overview
 
-`ScriptCalendar` is a standalone reusable monthly calendar component that displays planned scripts by their `publishedAt` date. It is designed to be embedded in any page (homescreen, dedicated calendar page).
+`ScriptCalendar` is a standalone monthly calendar component that displays planned scripts by their `publishedAt` date. It has its own dedicated page at `/calendar`.
+
+**Route:** `/calendar` (`front/app/routes/calendar.tsx`)
 
 ### Component Tree
 
@@ -306,7 +308,9 @@ front/app/components/scripts/calendar/
 
 ## Sidebar Integration
 
-The Scripts nav item in `SideBar.tsx` uses:
-- `PencilSquareIcon` (outline) / `PencilSquareIconSolid` (solid) from `@heroicons/react`
-- Route: `/scripts`
-- Active when: `location.pathname.startsWith('/scripts')`
+Nav items in `SideBar.tsx`:
+
+| Route | Icon (outline / solid) | Label |
+|-------|------------------------|-------|
+| `/scripts` | `ClipboardDocumentCheckIcon` / `ClipboardDocumentCheckIconSolid` | Script |
+| `/calendar` | `CalendarDaysIcon` / `CalendarDaysIconSolid` | Calendrier |
