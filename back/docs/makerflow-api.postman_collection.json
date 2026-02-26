@@ -1920,7 +1920,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"projectUuid\": \"{{projectUuid}}\",\n  \"platform\": \"youtube\",\n  \"contentType\": \"long_form\",\n  \"niche\": \"Tech\",\n  \"targetAudience\": \"Developers 25-40\",\n  \"tones\": [\"casual_friendly\", \"educational_authoritative\"],\n  \"signaturePhrases\": [\"Let's dive in\"],\n  \"neverList\": [\"clickbait\"],\n  \"styleSample\": \"\"\n}"
+              "raw": "{\n  \"projectUuid\": \"{{projectUuid}}\",\n  \"platforms\": [\"youtube\", \"instagram\"],\n  \"contentType\": \"long_form\",\n  \"niche\": \"Tech\",\n  \"targetAudience\": \"Developers 25-40\",\n  \"tones\": [\"casual_friendly\", \"educational_authoritative\"],\n  \"signaturePhrases\": [\"Let's dive in\"],\n  \"neverList\": [\"clickbait\"],\n  \"styleSample\": \"\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/creator-profiles",
