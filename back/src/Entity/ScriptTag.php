@@ -30,6 +30,7 @@ class ScriptTag
         'api_scripts_tags_update',
 
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -43,6 +44,7 @@ class ScriptTag
         'api_scripts_tags_update',
 
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -56,6 +58,7 @@ class ScriptTag
         'api_scripts_tags_update',
 
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -69,6 +72,7 @@ class ScriptTag
         'api_scripts_tags_update',
 
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
@@ -82,6 +86,7 @@ class ScriptTag
         'api_scripts_tags_update',
 
         'api_scripts_list',
+        'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',

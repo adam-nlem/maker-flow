@@ -81,7 +81,8 @@ front/app/
 │   └── hookPlaceholderParser.ts  ← shared parser for [placeholder] tokens
 ├── stores/scripts/
 │   ├── focusScriptStore.ts          ← persisted, key "app:scripts:focused"
-│   └── scriptEditorStore.ts          ← persisted, key "app:scripts:editor" (meta header + parts expanded)
+│   ├── scriptEditorStore.ts          ← persisted, key "app:scripts:editor" (meta header + parts expanded)
+│   └── calendarStore.ts             ← persisted, key "app:scripts:calendar" (month/year nav + filters)
 ├── routes/
 │   └── scripts.tsx              ← thin route, delegates to ScriptPageView
 └── components/scripts/
@@ -95,7 +96,8 @@ front/app/
     ├── ScriptPlatformsRow.tsx
     ├── calendar/
     │   ├── index.ts                 ← barrel export
-    │   ├── ScriptCalendar.tsx       ← monthly calendar with nav + grid + behavior
+    │   ├── ScriptCalendar.tsx       ← monthly calendar with nav + grid + filter panel + behavior
+    │   ├── CalendarFilterPanel.tsx  ← left panel with platform/status/tag toggle pills
     │   ├── ScriptCalendarDayCell.tsx ← individual day cell (droppable)
     │   ├── ScriptCalendarCard.tsx   ← compact script card (draggable)
     │   └── ScriptDetailModal.tsx    ← full editor modal (wraps ScriptEditorPanel)
@@ -219,10 +221,10 @@ Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay
 ## Query Keys
 
 ```ts
-scriptQueryKeys.all                        // ['scripts']
-scriptQueryKeys.list(uuid)                 // ['scripts', 'list', projectUuid]
-scriptQueryKeys.calendar(uuid, year, month) // ['scripts', 'calendar', projectUuid, year, month]
-scriptQueryKeys.parts(uuid)                // ['scripts', 'parts', scriptUuid]
+scriptQueryKeys.all                                          // ['scripts']
+scriptQueryKeys.list(uuid)                                   // ['scripts', 'list', projectUuid]
+scriptQueryKeys.calendar(uuid, year, month)                  // ['scripts', 'calendar', projectUuid, year, month]
+scriptQueryKeys.parts(uuid)                                  // ['scripts', 'parts', scriptUuid]
 
 scriptTagQueryKeys.all        // ['script-tags']
 scriptTagQueryKeys.list(uuid) // ['script-tags', 'list', projectUuid]
@@ -243,15 +245,20 @@ All part mutations (chapters, voice-overs, dialogues, shots, texts, dialogue sub
 ### Component Tree
 
 ```
-ScriptCalendar (month nav + 7-col grid)
-  ├── Header: < Month Year > + "Aujourd'hui" button
-  ├── Day headers: Lun, Mar, Mer, Jeu, Ven, Sam, Dim
-  └── ScriptCalendarDayCell[] (per day in month)
-        ├── Day number (today = primary circle)
-        ├── "+" button (hover-revealed, creates script on that date)
-        └── ScriptCalendarCard[] (per script on that day)
-              ├── Title (text-heading-xs, truncated)
-              └── Platform icons + tag color dots
+CalendarPage (route)
+  ├── CalendarFilterPanel (reads from calendarStore)
+  │     ├── Plateformes: PlatformPill[] (toggle platform filter)
+  │     ├── Statuts: Pill[] (toggle status filter)
+  │     └── Tags: Pill[] (toggle tag filter, from useListScriptTags)
+  └── ScriptCalendar (reads from calendarStore)
+        ├── Header: < Month Year > + "Aujourd'hui" button
+        ├── Day headers: Lun, Mar, Mer, Jeu, Ven, Sam, Dim
+        └── ScriptCalendarDayCell[] (per day in month)
+              ├── Day number (today = primary circle)
+              ├── "+" button (hover-revealed, creates script on that date)
+              └── ScriptCalendarCard[] (per script on that day)
+                    ├── Title (text-heading-xs, truncated)
+                    └── Platform icons + tag color dots
 ```
 
 ### File Structure
@@ -262,7 +269,8 @@ front/app/utils/
 
 front/app/components/scripts/calendar/
 ├── index.ts                     ← barrel export
-├── ScriptCalendar.tsx           ← main component (month nav + grid + behavior)
+├── ScriptCalendar.tsx           ← main component (filter state + month nav + grid + behavior)
+├── CalendarFilterPanel.tsx      ← left panel with platform/status/tag toggle pills
 ├── ScriptCalendarDayCell.tsx    ← individual day cell (droppable)
 ├── ScriptCalendarCard.tsx       ← compact script card (draggable)
 └── ScriptDetailModal.tsx        ← full editor modal (wraps ScriptEditorPanel)
@@ -294,6 +302,9 @@ front/app/components/scripts/calendar/
 ### Key Details
 
 - **Self-contained data fetching:** The calendar fetches its own data via `useListCalendarScripts` — no scripts prop needed. When the user navigates months, React Query caches each month separately via `scriptQueryKeys.calendar(projectUuid, year, month)`.
+- **Zustand store (`calendarStore`):** Filter state (`selectedPlatforms`, `selectedStatuses`, `selectedTagUuids`) and month navigation (`currentMonth`, `currentYear`) are persisted in `useCalendarStore` (key `"app:scripts:calendar"`). Both `CalendarFilterPanel` and `ScriptCalendar` read from the store directly — no prop drilling.
+- **Client-side filtering:** All scripts for a month are fetched once from the API (no filter params sent). Filtering by platforms, statuses, and tags is applied client-side in a `useMemo` inside `ScriptCalendar`. Default state: nothing selected = show all scripts (including those with no platforms/status/tags). When the user selects specific filters, only matching scripts are shown. Selecting all options for a dimension returns to "show all" behavior. Empty day groups are removed after filtering.
+- **Filter panel:** `CalendarFilterPanel` renders three sections (Plateformes, Statuts, Tags) with toggleable `Pill` components. None selected by default (= show all). Platform pills use the `PlatformPill` pattern with `useShowPlatformIcon`. Status pills use `scriptStatusToIcon`/`scriptStatusToLabel`. Tag pills use `colorToBgClass`/`colorToTextClass`. Tags are fetched via `useListScriptTags`.
 - **Self-contained behavior:** The calendar handles all actions internally — no callback props needed. Uses `useUpdateScript` for DnD date changes, `useCreateScript` for the "+" button, and local `selectedScript` state for the detail modal.
 - **Shared date helpers:** `DAYS_FR`, `MONTHS_FR`, `getDaysInMonth`, `getFirstDayOfMonth`, `isSameDay`, `isPastDay`, `toDateKey` are shared between `ScriptCalendar` and `DatePicker` via `~/utils/dateHelpers`.
 - **Monday-first grid:** Same weekday logic as `DatePicker`
