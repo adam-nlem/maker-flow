@@ -2,7 +2,7 @@
 
 namespace App\Entity;
 
-use App\Entity\Enum\VoiceOverType;
+use App\Entity\Enum\Tone;
 use App\Helper\DateHelper;
 use App\Repository\ScriptVoiceOverRepository;
 use Doctrine\DBAL\Types\Types;
@@ -37,14 +37,14 @@ class ScriptVoiceOver
     ])]
     private ?string $content = null;
 
-    #[ORM\Column(enumType: VoiceOverType::class)]
+    #[ORM\Column(enumType: Tone::class)]
     #[Groups([
         'api_scripts_voice_overs_list',
         'api_scripts_voice_overs_create',
         'api_scripts_voice_overs_update',
         'api_scripts_parts_list',
     ])]
-    private ?VoiceOverType $voiceOverType = null;
+    private ?Tone $tone = null;
 
     #[ORM\Column]
     #[Groups([
@@ -138,14 +138,14 @@ class ScriptVoiceOver
         return $this;
     }
 
-    public function getVoiceOverType(): ?VoiceOverType
+    public function getTone(): ?Tone
     {
-        return $this->voiceOverType;
+        return $this->tone;
     }
 
-    public function setVoiceOverType(VoiceOverType $voiceOverType): static
+    public function setTone(Tone $tone): static
     {
-        $this->voiceOverType = $voiceOverType;
+        $this->tone = $tone;
 
         return $this;
     }

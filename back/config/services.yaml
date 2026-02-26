@@ -17,6 +17,8 @@ parameters:
     app.instagram.app_secret: "%env(string:INSTAGRAM_APP_SECRET)%"
     app.instagram.redirect_uri: "%env(string:INSTAGRAM_REDIRECT_URI)%"
 
+    app.gemini.api_key: "%env(string:GEMINI_API_KEY)%"
+
     app.redis_store.scheme: "%env(string:REDIS_STORE_SCHEME)%"
     app.redis_store.host: "%env(string:REDIS_STORE_HOST)%"
     app.redis_store.port: "%env(string:REDIS_STORE_PORT)%"
@@ -84,5 +86,8 @@ services:
     App\Service\PlatformService:
         arguments:
             $platformIconPath: "%app.platform.icon_path%"
+    App\Service\GeminiClientService:
+        arguments:
+            $geminiApiKey: "%app.gemini.api_key%"
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

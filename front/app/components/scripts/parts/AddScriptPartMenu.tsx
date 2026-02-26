@@ -7,7 +7,7 @@ import { useCreateScriptDialogue } from "~/hooks/api/scriptDialogues/useCreateSc
 import { useCreateScriptShot } from "~/hooks/api/scriptShots/useCreateScriptShot";
 import { useCreateScriptText } from "~/hooks/api/scriptTexts/useCreateScriptText";
 import { ChapterType } from "~/models/enums/ChapterType";
-import { VoiceOverType } from "~/models/enums/VoiceOverType";
+import { Tone } from "~/models/enums/Tone";
 import { ShotType } from "~/models/enums/ShotType";
 
 interface AddScriptPartMenuProps {
@@ -33,7 +33,7 @@ export default function AddScriptPartMenu({ scriptUuid }: AddScriptPartMenuProps
                 await createScriptChapter({ scriptUuid, title: "Nouveau chapitre", chapterType: ChapterType.OnScreen });
                 break;
             case ScriptPartType.VoiceOver:
-                await createScriptVoiceOver({ scriptUuid, content: "", voiceOverType: VoiceOverType.Neutral });
+                await createScriptVoiceOver({ scriptUuid, content: "", tone: Tone.Neutral });
                 break;
             case ScriptPartType.Dialogue:
                 await createScriptDialogue({ scriptUuid, title: "Nouveau dialogue" });

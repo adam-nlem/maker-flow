@@ -118,8 +118,8 @@ final class ScriptVoiceOverController extends AbstractController
             $voiceOver->setContent($dto->getContent());
         }
 
-        if ($dto->getVoiceOverType() !== null && $dto->getVoiceOverType() !== $voiceOver->getVoiceOverType()) {
-            $voiceOver->setVoiceOverType($dto->getVoiceOverType());
+        if ($dto->getTone() !== null && $dto->getTone() !== $voiceOver->getTone()) {
+            $voiceOver->setTone($dto->getTone());
         }
 
         $voiceOverRepository->save($voiceOver, true);

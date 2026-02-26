@@ -1891,6 +1891,101 @@
         }
       ],
       "id": "c8251f6e-ac8a-4a7d-a09b-2ec2d82f1c65"
+    },
+    {
+      "name": "Creator Profiles",
+      "item": [
+        {
+          "name": "Show Creator Profile",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/creator-profiles?projectUuid={{projectUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "creator-profiles"],
+              "query": [
+                { "key": "projectUuid", "value": "{{projectUuid}}" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create or Update Creator Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectUuid\": \"{{projectUuid}}\",\n  \"platform\": \"youtube\",\n  \"contentType\": \"long_form\",\n  \"niche\": \"Tech\",\n  \"targetAudience\": \"Developers 25-40\",\n  \"tones\": [\"casual_friendly\", \"educational_authoritative\"],\n  \"signaturePhrases\": [\"Let's dive in\"],\n  \"neverList\": [\"clickbait\"],\n  \"styleSample\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/creator-profiles",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "creator-profiles"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-creatorprof01"
+    },
+    {
+      "name": "Script Generations",
+      "item": [
+        {
+          "name": "Create Script Generation",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"topic\": \"How to learn programming\",\n  \"goal\": \"educate\",\n  \"keyPoints\": \"Start with Python, practice daily\",\n  \"openingStyle\": \"bold_hook\",\n  \"callToAction\": \"Subscribe for more\",\n  \"extraContext\": \"\",\n  \"activeSkills\": [\"strong_hook\", \"retention_boosters\"],\n  \"skillInputs\": {},\n  \"replaceExisting\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/script-generations",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "script-generations"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Script Generation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/script-generations/{{generationUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "script-generations", "{{generationUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Latest Script Generation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/script-generations?scriptUuid={{scriptUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "script-generations"],
+              "query": [
+                { "key": "scriptUuid", "value": "{{scriptUuid}}" }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "a1b2c3d4-e5f6-7890-abcd-scriptgen001"
     }
   ],
   "auth": {
@@ -1986,6 +2081,11 @@
     {
       "id": "b2a3c4d5-e6f7-8901-abcd-666666666666",
       "key": "textUuid",
+      "value": ""
+    },
+    {
+      "id": "b2a3c4d5-e6f7-8901-abcd-777777777777",
+      "key": "generationUuid",
       "value": ""
     }
   ]

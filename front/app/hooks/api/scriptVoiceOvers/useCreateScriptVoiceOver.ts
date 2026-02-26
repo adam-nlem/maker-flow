@@ -1,12 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { scriptQueryKeys } from "../scripts/scriptQueryKeys";
-import type { VoiceOverType } from "~/models/enums/VoiceOverType";
+import type { Tone } from "~/models/enums/Tone";
 
 interface CreateScriptVoiceOverData {
     scriptUuid: string;
     content: string;
-    voiceOverType?: VoiceOverType;
+    tone?: Tone;
 }
 
 export function useCreateScriptVoiceOver() {

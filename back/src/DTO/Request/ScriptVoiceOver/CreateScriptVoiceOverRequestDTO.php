@@ -3,7 +3,7 @@
 namespace App\DTO\Request\ScriptVoiceOver;
 
 use App\DTO\Request\AbstractRequestDTO;
-use App\Entity\Enum\VoiceOverType;
+use App\Entity\Enum\Tone;
 use App\Entity\ScriptVoiceOver;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -12,7 +12,7 @@ class CreateScriptVoiceOverRequestDTO extends AbstractRequestDTO
 {
     private string $scriptUuid;
     private string $content;
-    private VoiceOverType $voiceOverType;
+    private Tone $tone;
     private ?int $position;
 
     public function __construct(
@@ -26,7 +26,7 @@ class CreateScriptVoiceOverRequestDTO extends AbstractRequestDTO
     {
         $this->scriptUuid = $payload["scriptUuid"];
         $this->content = $payload["content"];
-        $this->voiceOverType = VoiceOverType::tryFrom($payload["voiceOverType"] ?? "") ?? VoiceOverType::Neutral;
+        $this->tone = Tone::tryFrom($payload["tone"] ?? "") ?? Tone::Neutral;
         $this->position = $payload["position"] ?? null;
     }
 
@@ -36,7 +36,7 @@ class CreateScriptVoiceOverRequestDTO extends AbstractRequestDTO
 
         return $voiceOver
             ->setContent($this->getContent())
-            ->setVoiceOverType($this->getVoiceOverType());
+            ->setTone($this->getTone());
     }
 
     public function getScriptUuid(): string
@@ -49,9 +49,9 @@ class CreateScriptVoiceOverRequestDTO extends AbstractRequestDTO
         return $this->content;
     }
 
-    public function getVoiceOverType(): VoiceOverType
+    public function getTone(): Tone
     {
-        return $this->voiceOverType;
+        return $this->tone;
     }
 
     public function getPosition(): ?int

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptVoiceOver } from "~/models/ScriptVoiceOver";
-import { VoiceOverType, voiceOverTypeToLabel, voiceOverTypeToBgClass, voiceOverTypeToTextClass } from "~/models/enums/VoiceOverType";
+import { Tone, toneToLabel, toneToBgClass, toneToTextClass } from "~/models/enums/Tone";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -17,7 +17,7 @@ interface ScriptVoiceOverCardProps {
 
 export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleProps }: ScriptVoiceOverCardProps) {
     const [content, setContent] = useState(voiceOver.content);
-    const [voiceOverType, setVoiceOverType] = useState<VoiceOverType>(voiceOver.voiceOverType);
+    const [tone, setTone] = useState<Tone>(voiceOver.tone);
 
     const { updateScriptVoiceOver } = useUpdateScriptVoiceOver();
     const { deleteScriptVoiceOver, isPending: isDeleting } = useDeleteScriptVoiceOver();
@@ -28,10 +28,10 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
         }
     };
 
-    const handleVoiceOverTypeChange = async (newType: VoiceOverType) => {
-        setVoiceOverType(newType);
-        if (newType !== voiceOver.voiceOverType) {
-            await updateScriptVoiceOver({ voiceOverUuid: voiceOver.uuid, scriptUuid, data: { voiceOverType: newType } });
+    const handleToneChange = async (newTone: Tone) => {
+        setTone(newTone);
+        if (newTone !== voiceOver.tone) {
+            await updateScriptVoiceOver({ voiceOverUuid: voiceOver.uuid, scriptUuid, data: { tone: newTone } });
         }
     };
 
@@ -43,26 +43,26 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
             isDeleting={isDeleting}
         >
             <SelectDropdown
-                items={Object.values(VoiceOverType)}
-                selectedItemId={voiceOverType}
+                items={Object.values(Tone)}
+                selectedItemId={tone}
                 getItemId={(type) => type}
-                onSelect={(type) => handleVoiceOverTypeChange(type)}
+                onSelect={(type) => handleToneChange(type)}
                 renderTrigger={({ onClick }) => (
                     <Pill
                         onClick={onClick}
-                        label={voiceOverTypeToLabel[voiceOverType]}
+                        label={toneToLabel[tone]}
                         isSelected
-                        bgColorClassName={voiceOverTypeToBgClass[voiceOverType]}
-                        textColorClassName={voiceOverTypeToTextClass[voiceOverType]}
+                        bgColorClassName={toneToBgClass[tone]}
+                        textColorClassName={toneToTextClass[tone]}
                     />
                 )}
                 renderItem={({ item, isSelected, onSelect }) => {
                     return !isSelected ? <Pill
-                        label={voiceOverTypeToLabel[item]}
+                        label={toneToLabel[item]}
                         isSelected
                         onClick={onSelect}
-                        bgColorClassName={voiceOverTypeToBgClass[item]}
-                        textColorClassName={voiceOverTypeToTextClass[item]}
+                        bgColorClassName={toneToBgClass[item]}
+                        textColorClassName={toneToTextClass[item]}
                     /> : null
                 }}
             />

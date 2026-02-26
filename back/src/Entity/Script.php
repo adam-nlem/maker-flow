@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\ContentType;
 use App\Entity\Enum\ScriptStatus;
 use App\Helper\DateHelper;
 use App\Repository\ScriptRepository;
@@ -91,6 +92,16 @@ class Script
     ])]
     private ?array $platforms = null;
 
+    #[ORM\Column(enumType: ContentType::class, nullable: true)]
+    #[Groups([
+        'api_scripts_list',
+        'api_scripts_calendar',
+        'api_scripts_create',
+        'api_scripts_update',
+        'api_scripts_show',
+    ])]
+    private ?ContentType $contentType = null;
+
     #[ORM\Column(enumType: ScriptStatus::class, nullable: true)]
     #[Groups([
         'api_scripts_list',
@@ -174,6 +185,12 @@ class Script
     #[ORM\OneToMany(targetEntity: ScriptText::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
     private Collection $scriptTexts;
 
+    /**
+     * @var Collection<int, ScriptGeneration>
+     */
+    #[ORM\OneToMany(targetEntity: ScriptGeneration::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptGenerations;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -190,6 +207,7 @@ class Script
         $this->scriptDialogues = new ArrayCollection();
         $this->scriptShots = new ArrayCollection();
         $this->scriptTexts = new ArrayCollection();
+        $this->scriptGenerations = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -283,6 +301,18 @@ class Script
     public function setPlatforms(?array $platforms): static
     {
         $this->platforms = $platforms;
+
+        return $this;
+    }
+
+    public function getContentType(): ?ContentType
+    {
+        return $this->contentType;
+    }
+
+    public function setContentType(?ContentType $contentType): static
+    {
+        $this->contentType = $contentType;
 
         return $this;
     }
@@ -514,5 +544,13 @@ class Script
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, ScriptGeneration>
+     */
+    public function getScriptGenerations(): Collection
+    {
+        return $this->scriptGenerations;
     }
 }

@@ -1,9 +1,9 @@
-import { VoiceOverType } from "./enums/VoiceOverType";
+import { Tone } from "./enums/Tone";
 
 export interface ScriptVoiceOverJSON {
     uuid: string;
     content: string;
-    voiceOverType: VoiceOverType;
+    tone: Tone;
     position: number;
     type: 'voice_over';
     createdAt: string;
@@ -16,7 +16,7 @@ export class ScriptVoiceOver {
     constructor(
         public readonly uuid: string,
         public content: string,
-        public voiceOverType: VoiceOverType,
+        public tone: Tone,
         public position: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
@@ -26,7 +26,7 @@ export class ScriptVoiceOver {
         return new ScriptVoiceOver(
             json.uuid,
             json.content,
-            json.voiceOverType,
+            json.tone,
             json.position,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
@@ -37,7 +37,7 @@ export class ScriptVoiceOver {
         return {
             uuid: this.uuid,
             content: this.content,
-            voiceOverType: this.voiceOverType,
+            tone: this.tone,
             position: this.position,
             type: this.type,
             createdAt: this.createdAt.toISOString(),

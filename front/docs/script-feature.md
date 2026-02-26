@@ -48,7 +48,7 @@ front/app/
 │       ├── ScriptPartType.ts    ← with french translation + icon + bg/border/text class maps
 │       ├── ScriptStatus.ts      ← with label/bg/text class maps (pending, in_progress, completed)
 │       ├── ChapterType.ts       ← with label/bg/text class maps
-│       ├── VoiceOverType.ts     ← with label/bg/text class maps
+│       ├── Tone.ts              ← with label/bg/text class maps (renamed from VoiceOverType)
 │       └── ShotType.ts          ← with label/bg/text class maps
 ├── hooks/api/
 │   ├── scripts/
@@ -147,7 +147,7 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 - Each field maintains local state (e.g. `useState(chapter.title)`)
 - On `onBlur`, the handler compares the trimmed local value against the prop value
 - If changed, the update mutation fires with only the changed field
-- For enum types (chapterType, voiceOverType, shotType), a `SelectDropdown` renders a clickable `Pill` trigger that opens a dropdown of `Pill` options — auto-saves on select
+- For enum types (chapterType, tone, shotType), a `SelectDropdown` renders a clickable `Pill` trigger that opens a dropdown of `Pill` options — auto-saves on select
 - Input/TextArea use the `simple` prop for borderless inline styling
 - Delete button is hover-revealed (`opacity-0 group-hover:opacity-100`)
 

@@ -128,6 +128,12 @@ class Project
     #[ORM\OneToMany(targetEntity: ScriptTag::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
     private Collection $scriptTags;
 
+    /**
+     * @var Collection<int, CreatorProfile>
+     */
+    #[ORM\OneToMany(targetEntity: CreatorProfile::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $creatorProfiles;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -141,6 +147,7 @@ class Project
         $this->integrations = new ArrayCollection();
         $this->scripts = new ArrayCollection();
         $this->scriptTags = new ArrayCollection();
+        $this->creatorProfiles = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -283,5 +290,13 @@ class Project
     public function getScriptTags(): Collection
     {
         return $this->scriptTags;
+    }
+
+    /**
+     * @return Collection<int, CreatorProfile>
+     */
+    public function getCreatorProfiles(): Collection
+    {
+        return $this->creatorProfiles;
     }
 }

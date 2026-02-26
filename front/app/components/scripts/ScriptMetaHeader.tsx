@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, SwatchIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, SwatchIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import { ScriptStatus, scriptStatusToLabel, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
@@ -15,9 +15,10 @@ import { useScriptEditorStore } from "~/stores/scripts/scriptEditorStore";
 interface ScriptMetaHeaderProps {
     script: Script;
     projectUuid: string;
+    onOpenGenerateModal: () => void;
 }
 
-export default function ScriptMetaHeader({ script, projectUuid }: ScriptMetaHeaderProps) {
+export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal }: ScriptMetaHeaderProps) {
     const [title, setTitle] = useState(script.title);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [status, setStatus] = useState<ScriptStatus | undefined>(script.status);
@@ -53,6 +54,9 @@ export default function ScriptMetaHeader({ script, projectUuid }: ScriptMetaHead
                     textStyle="text-heading-xl"
                     fullWidth
                 />
+                <button onClick={onOpenGenerateModal} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Générer avec l'IA">
+                    <SparklesIcon className="size-5" strokeWidth={2} />
+                </button>
                 <button onClick={toggle} className="shrink-0 text-gray hover:text-dark transition-colors cursor-pointer">
                     {isExpanded
                         ? <ChevronUpIcon className="size-5" strokeWidth={2} />

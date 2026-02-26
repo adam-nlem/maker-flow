@@ -80,7 +80,7 @@ Project-scoped tags. Scripts reference tags via ManyToMany.
 | `id` | `int` | Auto-generated primary key |
 | `uuid` | `string (GUID)` | Unique identifier exposed via API |
 | `content` | `string (TEXT)` | Voice-over content |
-| `voiceOverType` | `VoiceOverType` | Calm, Dynamic, Dramatic, or Neutral |
+| `tone` | `Tone` | Voice-over tone (calm, dynamic, dramatic, neutral, casual_friendly, etc.) |
 | `position` | `int` | Global order across all part types |
 | `createdAt` | `DateTimeImmutable` | Creation timestamp (UTC) |
 | `updatedAt` | `DateTimeImmutable` | Last update timestamp (UTC, auto-updated) |
@@ -184,7 +184,9 @@ Used in reorder DTOs to identify part types. Not stored as a DB column.
 | `on_screen` | On-screen chapter |
 | `off_screen` | Off-screen chapter |
 
-### `VoiceOverType` (`App\Entity\Enum\VoiceOverType`)
+### `Tone` (`App\Entity\Enum\Tone`)
+
+Renamed from `VoiceOverType`. Also used by `CreatorProfile` (see [script-generation-feature.md](script-generation-feature.md)).
 
 | Value | Description |
 |-------|-------------|
@@ -192,6 +194,11 @@ Used in reorder DTOs to identify part types. Not stored as a DB column.
 | `dynamic` | Dynamic delivery |
 | `dramatic` | Dramatic delivery |
 | `neutral` | Neutral delivery |
+| `casual_friendly` | Casual & friendly |
+| `educational_authoritative` | Educational & authoritative |
+| `hype_energetic` | Hype & energetic |
+| `funny_sarcastic` | Funny & sarcastic |
+| `storytelling_emotional` | Storytelling & emotional |
 
 ### `ShotType` (`App\Entity\Enum\ShotType`)
 
@@ -348,8 +355,8 @@ All follow the same CRUD pattern:
 | `UpdateScriptTagRequestDTO` | `title`, `color` |
 | `CreateScriptChapterRequestDTO` | `scriptUuid`, `title`, `description?`, `chapterType` (default: OnScreen), `position?` |
 | `UpdateScriptChapterRequestDTO` | `title?`, `description?`, `chapterType?` |
-| `CreateScriptVoiceOverRequestDTO` | `scriptUuid`, `content`, `voiceOverType` (default: Neutral), `position?` |
-| `UpdateScriptVoiceOverRequestDTO` | `content?`, `voiceOverType?` |
+| `CreateScriptVoiceOverRequestDTO` | `scriptUuid`, `content`, `tone` (default: Neutral), `position?` |
+| `UpdateScriptVoiceOverRequestDTO` | `content?`, `tone?` |
 | `CreateScriptDialogueRequestDTO` | `scriptUuid`, `title`, `description?`, `position?` |
 | `UpdateScriptDialogueRequestDTO` | `title?`, `description?` |
 | `CreateScriptShotRequestDTO` | `scriptUuid`, `content`, `shotType` (default: ARoll), `position?` |
