@@ -1,17 +1,18 @@
 import { CallToActionType } from "./enums/CallToActionType";
+import { ScriptPartType } from "./enums/ScriptPartType";
 
 export interface ScriptCallToActionJSON {
     uuid: string;
     content: string;
     callToActionType: CallToActionType;
     position: number;
-    type: 'call_to_action';
+    type: ScriptPartType.CallToAction;
     createdAt: string;
     updatedAt?: string;
 }
 
 export class ScriptCallToAction {
-    public readonly type = 'call_to_action' as const;
+    public readonly type = ScriptPartType.CallToAction;
 
     constructor(
         public readonly uuid: string,

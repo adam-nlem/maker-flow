@@ -9,6 +9,7 @@ class ScriptOutputPartDTO
         private readonly ?string $title,
         private readonly ?string $description,
         private readonly ?string $content,
+        private readonly ?string $tone,
         private readonly ?string $callToActionType,
         private readonly ?string $retentionCueType,
     ) {}
@@ -20,6 +21,7 @@ class ScriptOutputPartDTO
             title: $data['title'] ?? null,
             description: $data['description'] ?? null,
             content: $data['content'] ?? null,
+            tone: $data['tone'] ?? null,
             callToActionType: $data['callToActionType'] ?? null,
             retentionCueType: $data['retentionCueType'] ?? null,
         );
@@ -43,6 +45,11 @@ class ScriptOutputPartDTO
     public function getContent(): ?string
     {
         return $this->content;
+    }
+
+    public function getTone(): ?string
+    {
+        return $this->tone;
     }
 
     public function getCallToActionType(): ?string

@@ -6,6 +6,7 @@ use App\DTO\ScriptOutputDTO;
 use App\Entity\Enum\CallToActionType;
 use App\Entity\Enum\ChapterType;
 use App\Entity\Enum\RetentionCueType;
+use App\Entity\Enum\ScriptPartType;
 use App\Entity\Enum\ShotType;
 use App\Entity\Enum\Tone;
 use App\Entity\Script;
@@ -52,12 +53,12 @@ class ScriptOutputParserService
             $content = trim($part->getContent() ?? '');
 
             match ($part->getType()) {
-                'chapter' => $this->createChapter($part->getTitle(), $part->getDescription(), $script, $user, $position++),
-                'voice_over' => $content !== '' ? $this->createVoiceOver($content, $script, $user, $position++) : null,
-                'shot' => $content !== '' ? $this->createShot($content, $script, $user, $position++) : null,
-                'call_to_action' => $content !== '' ? $this->createCallToAction($content, $part->getCallToActionType(), $script, $user, $position++) : null,
-                'retention_cue' => $content !== '' ? $this->createRetentionCue($content, $part->getRetentionCueType(), $script, $user, $position++) : null,
-                'text' => $content !== '' ? $this->createText($content, $script, $user, $position++) : null,
+                ScriptPartType::Chapter->value => $this->createChapter($part->getTitle(), $part->getDescription(), $script, $user, $position++),
+                ScriptPartType::VoiceOver->value => $content !== '' ? $this->createVoiceOver($content, $part->getTone(), $script, $user, $position++) : null,
+                ScriptPartType::Shot->value => $content !== '' ? $this->createShot($content, $script, $user, $position++) : null,
+                ScriptPartType::CallToAction->value => $content !== '' ? $this->createCallToAction($content, $part->getCallToActionType(), $script, $user, $position++) : null,
+                ScriptPartType::RetentionCue->value => $content !== '' ? $this->createRetentionCue($content, $part->getRetentionCueType(), $script, $user, $position++) : null,
+                ScriptPartType::Text->value => $content !== '' ? $this->createText($content, $script, $user, $position++) : null,
                 default => null,
             };
         }
@@ -107,14 +108,14 @@ class ScriptOutputParserService
         $this->chapterRepository->save($chapter);
     }
 
-    private function createVoiceOver(string $content, Script $script, User $user, int $position): void
+    private function createVoiceOver(string $content, ?string $tone, Script $script, User $user, int $position): void
     {
         $voiceOver = new ScriptVoiceOver();
         $voiceOver
             ->setScript($script)
             ->setUser($user)
             ->setContent($content)
-            ->setTone(Tone::Neutral)
+            ->setTone(Tone::tryFrom($tone ?? '') ?? Tone::Neutral)
             ->setPosition($position);
         $this->voiceOverRepository->save($voiceOver);
     }

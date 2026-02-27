@@ -1,4 +1,5 @@
 import { ChapterType } from "./enums/ChapterType";
+import { ScriptPartType } from "./enums/ScriptPartType";
 
 export interface ScriptChapterJSON {
     uuid: string;
@@ -6,13 +7,13 @@ export interface ScriptChapterJSON {
     description?: string;
     chapterType: ChapterType;
     position: number;
-    type: 'chapter';
+    type: ScriptPartType.Chapter;
     createdAt: string;
     updatedAt?: string;
 }
 
 export class ScriptChapter {
-    public readonly type = 'chapter' as const;
+    public readonly type = ScriptPartType.Chapter;
 
     constructor(
         public readonly uuid: string,

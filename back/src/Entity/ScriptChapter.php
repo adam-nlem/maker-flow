@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Enum\ChapterType;
+use App\Entity\Enum\ScriptPartType;
 use App\Helper\DateHelper;
 use App\Repository\ScriptChapterRepository;
 use Doctrine\DBAL\Types\Types;
@@ -115,7 +116,7 @@ class ScriptChapter
     ])]
     public function getType(): string
     {
-        return 'chapter';
+        return ScriptPartType::Chapter->value;
     }
 
     public function getId(): ?int

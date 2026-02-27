@@ -1,3 +1,4 @@
+import { ScriptPartType } from "./enums/ScriptPartType";
 import { ScriptChapter, type ScriptChapterJSON } from "./ScriptChapter";
 import { ScriptVoiceOver, type ScriptVoiceOverJSON } from "./ScriptVoiceOver";
 import { ScriptDialogue, type ScriptDialogueJSON } from "./ScriptDialogue";
@@ -19,19 +20,19 @@ export type ScriptPartJSON =
 
 export function scriptPartFromJSON(json: ScriptPartJSON): ScriptPart {
     switch (json.type) {
-        case 'chapter':
+        case ScriptPartType.Chapter:
             return ScriptChapter.fromJSON(json);
-        case 'voice_over':
+        case ScriptPartType.VoiceOver:
             return ScriptVoiceOver.fromJSON(json);
-        case 'dialogue':
+        case ScriptPartType.Dialogue:
             return ScriptDialogue.fromJSON(json);
-        case 'shot':
+        case ScriptPartType.Shot:
             return ScriptShot.fromJSON(json);
-        case 'text':
+        case ScriptPartType.Text:
             return ScriptText.fromJSON(json);
-        case 'call_to_action':
+        case ScriptPartType.CallToAction:
             return ScriptCallToAction.fromJSON(json);
-        case 'retention_cue':
+        case ScriptPartType.RetentionCue:
             return ScriptRetentionCue.fromJSON(json);
     }
 }

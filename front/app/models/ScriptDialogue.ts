@@ -1,4 +1,5 @@
 import { DialogueSubject, type DialogueSubjectJSON } from "./DialogueSubject";
+import { ScriptPartType } from "./enums/ScriptPartType";
 
 export interface ScriptDialogueJSON {
     uuid: string;
@@ -6,13 +7,13 @@ export interface ScriptDialogueJSON {
     description?: string;
     dialogueSubjects?: DialogueSubjectJSON[];
     position: number;
-    type: 'dialogue';
+    type: ScriptPartType.Dialogue;
     createdAt: string;
     updatedAt?: string;
 }
 
 export class ScriptDialogue {
-    public readonly type = 'dialogue' as const;
+    public readonly type = ScriptPartType.Dialogue;
 
     constructor(
         public readonly uuid: string,

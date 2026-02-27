@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\ScriptPartType;
 use App\Helper\DateHelper;
 use App\Repository\ScriptDialogueRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -121,7 +122,7 @@ class ScriptDialogue
     ])]
     public function getType(): string
     {
-        return 'dialogue';
+        return ScriptPartType::Dialogue->value;
     }
 
     public function getId(): ?int

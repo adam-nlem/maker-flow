@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Entity\Enum\CallToActionType;
+use App\Entity\Enum\ScriptPartType;
 use App\Helper\DateHelper;
 use App\Repository\ScriptCallToActionRepository;
 use Doctrine\DBAL\Types\Types;
@@ -106,7 +107,7 @@ class ScriptCallToAction
     ])]
     public function getType(): string
     {
-        return 'call_to_action';
+        return ScriptPartType::CallToAction->value;
     }
 
     public function getId(): ?int
