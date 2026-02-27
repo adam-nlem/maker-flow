@@ -265,10 +265,16 @@ Parses the AI response into typed script parts using markers:
 
 | Marker | Part Type Created |
 |--------|-------------------|
+| `[TITLE]...[/TITLE]` | Metadata only — stored on `Script.title` |
+| `[HOOK]...[/HOOK]` | Metadata only — stored on `Script.hook` |
 | `[CHAPTER]Title[/CHAPTER]` | `ScriptChapter` (title extracted) |
 | `[VOICE_OVER]...[/VOICE_OVER]` | `ScriptVoiceOver` (Tone::Neutral) |
 | `[B-ROLL: description]` | `ScriptShot` (ShotType::BRoll) |
 | Unmarked text | `ScriptText` |
+
+Returns a `ScriptOutputMetadataDTO` containing extracted `?title` and `?hook`.
+
+**Marker stripping:** All parsed content (title, hook, voice over) is passed through `stripMarkers()` which removes any nested marker tags. This is a defensive measure since the AI may nest markers despite prompt instructions forbidding it.
 
 Parts are created with incrementing positions starting from `max(existing positions) + 1`.
 

@@ -38,7 +38,7 @@ class ScriptGenerationRepository extends ServiceEntityRepository
     public function getById(int $id): ?ScriptGeneration
     {
         return $this->createQueryBuilder('sg')
-            ->where('sd.id = :id')
+            ->where('sg.id = :id')
             ->setParameter('id', $id)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)

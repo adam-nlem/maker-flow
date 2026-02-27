@@ -75,7 +75,15 @@ class GenerateScriptHandler
                 ? 0
                 : $this->outputParserService->getMaxPositionForScript($script) + 1;
 
-            $this->outputParserService->parseAndCreateParts($output, $script, $user, $startPosition);
+            $metadata = $this->outputParserService->parseAndCreateParts($output, $script, $user, $startPosition);
+
+            if ($metadata->getTitle() !== null) {
+                $script->setTitle($metadata->getTitle());
+            }
+
+            if ($metadata->getHook() !== null) {
+                $script->setHook($metadata->getHook());
+            }
 
             // Mark as completed
             $generation->setStatus(ScriptGenerationStatus::Completed)

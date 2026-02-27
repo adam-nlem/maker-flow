@@ -15,6 +15,7 @@ use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptShotRepository;
 use App\Repository\ScriptTextRepository;
+use App\DTO\ScriptOutputMetadataDTO;
 use App\Repository\ScriptVoiceOverRepository;
 
 class ScriptOutputParserService
@@ -28,10 +29,12 @@ class ScriptOutputParserService
     ) {
     }
 
-    public function parseAndCreateParts(string $output, Script $script, User $user, int $startPosition): void
+    public function parseAndCreateParts(string $output, Script $script, User $user, int $startPosition): ScriptOutputMetadataDTO
     {
         $position = $startPosition;
         $remaining = $output;
+        $title = null;
+        $hook = null;
 
         while ($remaining !== '') {
             $remaining = trim($remaining);
@@ -39,16 +42,36 @@ class ScriptOutputParserService
                 break;
             }
 
+            // Try to match [TITLE]...[/TITLE]
+            if (preg_match('/^\[TITLE\](.*?)\[\/TITLE\]/s', $remaining, $match)) {
+                $content = trim($match[1]);
+                if ($content !== '') {
+                    $title = $content;
+                }
+                $remaining = substr($remaining, strlen($match[0]));
+                continue;
+            }
+
+            // Try to match [HOOK]...[/HOOK]
+            if (preg_match('/^\[HOOK\](.*?)\[\/HOOK\]/s', $remaining, $match)) {
+                $content = trim($match[1]);
+                if ($content !== '') {
+                    $hook = $content;
+                }
+                $remaining = substr($remaining, strlen($match[0]));
+                continue;
+            }
+
             // Try to match [CHAPTER]Title[/CHAPTER]
-            if (preg_match('/^\[CHAPTER\](.*?)\[\/CHAPTER\](.*?)(?=\[CHAPTER\]|\[VOICE_OVER\]|\[B-ROLL:|$)/s', $remaining, $match)) {
-                $title = trim($match[1]);
+            if (preg_match('/^\[CHAPTER\](.*?)\[\/CHAPTER\](.*?)(?=\[TITLE\]|\[HOOK\]|\[CHAPTER\]|\[VOICE_OVER\]|\[B-ROLL:|$)/s', $remaining, $match)) {
+                $chapterTitle = trim($match[1]);
                 $description = trim($match[2]);
 
                 $chapter = new ScriptChapter();
                 $chapter
                     ->setScript($script)
                     ->setUser($user)
-                    ->setTitle($title)
+                    ->setTitle($chapterTitle)
                     ->setDescription($description !== '' ? $description : null)
                     ->setChapterType(ChapterType::OnScreen)
                     ->setPosition($position++);
@@ -97,7 +120,7 @@ class ScriptOutputParserService
             }
 
             // Capture text until the next marker or end
-            if (preg_match('/^(.*?)(?=\[CHAPTER\]|\[VOICE_OVER\]|\[B-ROLL:)/s', $remaining, $match) && $match[1] !== '') {
+            if (preg_match('/^(.*?)(?=\[TITLE\]|\[HOOK\]|\[CHAPTER\]|\[VOICE_OVER\]|\[B-ROLL:)/s', $remaining, $match) && $match[1] !== '') {
                 $content = trim($match[1]);
 
                 if ($content !== '') {
@@ -127,6 +150,8 @@ class ScriptOutputParserService
             }
             break;
         }
+
+        return new ScriptOutputMetadataDTO($title, $hook);
     }
 
     public function getMaxPositionForScript(Script $script): int

@@ -23,8 +23,8 @@ class PromptAssemblerService
 
         $blocks[] = $this->buildScriptBriefBlock($generation);
         $blocks[] = $this->buildSkillModulesBlock($generation);
-        $blocks[] = $this->buildFormattingInstructions();
-        $blocks[] = "Écris maintenant le script en français. N'ajoute pas de titre ni de préambule — commence directement par la première ligne du script.";
+        $blocks[] = $this->buildFormattingInstructions($generation);
+        $blocks[] = "Écris maintenant le script en français. N'ajoute pas de préambule — commence directement par le titre puis le script.";
 
         return implode("\n\n", array_filter($blocks));
     }
@@ -132,17 +132,44 @@ class PromptAssemblerService
             };
         }
 
+        // Negative instructions for disabled skills
+        $negativeInstructions = [];
+
+        if (!in_array(SkillModule::StrongHook->value, $activeSkills, true)) {
+            $negativeInstructions[] = "une accroche spécialement travaillée (strong hook)";
+        }
+        if (!in_array(SkillModule::RetentionBoosters->value, $activeSkills, true)) {
+            $negativeInstructions[] = "des marqueurs [RETENTION CUE]";
+        }
+        if (!in_array(SkillModule::BRollCues->value, $activeSkills, true)) {
+            $negativeInstructions[] = "des indications [B-ROLL: ...]";
+        }
+
+        if (count($negativeInstructions) > 0) {
+            $list = implode(', ', $negativeInstructions);
+            $blocks[] = "IMPORTANT : N'ajoute PAS les éléments suivants car ces modules sont désactivés : {$list}.";
+        }
+
         return implode("\n\n", array_filter($blocks));
     }
 
-    private function buildFormattingInstructions(): string
+    private function buildFormattingInstructions(ScriptGeneration $generation): string
     {
-        return <<<EOT
-Formate ta sortie en utilisant ces marqueurs :
-- Entoure chaque section principale avec [CHAPTER]Titre[/CHAPTER] suivi du contenu de la section
-- Entoure le contenu parlé/narré avec [VOICE_OVER]...[/VOICE_OVER]
-- Marque les suggestions de B-roll avec [B-ROLL: description]
-- Tout autre contenu sera traité comme des blocs de texte brut
-EOT;
+        $activeSkills = $generation->getActiveSkills();
+        $lines = [];
+        $lines[] = 'Formate ta sortie en utilisant ces marqueurs :';
+        $lines[] = '- Commence par le titre du script entouré de [TITLE]...[/TITLE]';
+        $lines[] = '- Puis l\'accroche du script entourée de [HOOK]...[/HOOK]';
+        $lines[] = '- Entoure chaque section principale avec [CHAPTER]Titre[/CHAPTER] suivi du contenu de la section';
+        $lines[] = '- Entoure le contenu parlé/narré avec [VOICE_OVER]...[/VOICE_OVER] uniquement si il n\'es pas dans un autre marqueur';
+
+        if (in_array(SkillModule::BRollCues->value, $activeSkills, true)) {
+            $lines[] = '- Marque les suggestions de B-roll avec [B-ROLL: description] uniquement si il n\'es pas dans un autre marqueur';
+        }
+
+        $lines[] = '- Tout autre contenu sera traité comme des blocs de texte brut';
+        $lines[] = '- IMPORTANT : ne jamais imbriquer un marqueur dans un autre. Chaque marqueur doit être au niveau racine.';
+
+        return implode("\n", $lines);
     }
 }
