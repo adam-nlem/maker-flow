@@ -5,6 +5,7 @@ namespace App\Service;
 use App\Entity\CreatorProfile;
 use App\Entity\Enum\SkillModule;
 use App\Entity\Enum\Tone;
+use App\Entity\Enum\VideoDuration;
 use App\Entity\ScriptGeneration;
 
 class PromptAssemblerService
@@ -96,6 +97,17 @@ class PromptAssemblerService
         }
 
         $lines[] = "Style d'ouverture préféré : {$generation->getOpeningStyle()->value}";
+
+        $durationLabel = match ($generation->getDuration()) {
+            VideoDuration::ThirtySeconds => '30 secondes',
+            VideoDuration::OneMinute => '1 minute',
+            VideoDuration::OneMinuteThirty => '1 minute 30',
+            VideoDuration::TwoMinutes => '2 minutes',
+            VideoDuration::FiveToTenMinutes => '5 à 10 minutes',
+            VideoDuration::TenToTwentyMinutes => '10 à 20 minutes',
+            VideoDuration::TwentyPlusMinutes => 'plus de 20 minutes',
+        };
+        $lines[] = "Durée cible de la vidéo : {$durationLabel}. Adapte la longueur et le niveau de détail du script en conséquence.";
 
         if ($generation->getCallToAction() !== null && $generation->getCallToAction() !== '') {
             $lines[] = "Appel à l'action : {$generation->getCallToAction()}";

@@ -1945,7 +1945,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"topic\": \"How to learn programming\",\n  \"goal\": \"educate\",\n  \"keyPoints\": \"Start with Python, practice daily\",\n  \"openingStyle\": \"bold_hook\",\n  \"callToAction\": \"Subscribe for more\",\n  \"extraContext\": \"\",\n  \"activeSkills\": [\"strong_hook\", \"retention_boosters\"],\n  \"skillInputs\": {},\n  \"replaceExisting\": false\n}"
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"topic\": \"How to learn programming\",\n  \"goal\": \"educate\",\n  \"keyPoints\": \"Start with Python, practice daily\",\n  \"openingStyle\": \"bold_hook\",\n  \"duration\": \"2_minutes\",\n  \"callToAction\": \"Subscribe for more\",\n  \"extraContext\": \"\",\n  \"activeSkills\": [\"strong_hook\", \"retention_boosters\"],\n  \"skillInputs\": {},\n  \"replaceExisting\": false\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/script-generations",

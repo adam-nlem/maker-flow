@@ -1,6 +1,7 @@
 import { ScriptGenerationStatus } from "./enums/ScriptGenerationStatus";
 import { ScriptGoal } from "./enums/ScriptGoal";
 import { OpeningStyle } from "./enums/OpeningStyle";
+import { VideoDuration } from "./enums/VideoDuration";
 
 export interface ScriptGenerationJSON {
     uuid: string;
@@ -9,6 +10,7 @@ export interface ScriptGenerationJSON {
     goal: string;
     keyPoints?: string;
     openingStyle: string;
+    duration: string;
     callToAction?: string;
     extraContext?: string;
     activeSkills: string[];
@@ -27,6 +29,7 @@ export class ScriptGeneration {
         public readonly goal: ScriptGoal,
         public readonly keyPoints: string | undefined,
         public readonly openingStyle: OpeningStyle,
+        public readonly duration: VideoDuration,
         public readonly callToAction: string | undefined,
         public readonly extraContext: string | undefined,
         public readonly activeSkills: string[],
@@ -45,6 +48,7 @@ export class ScriptGeneration {
             json.goal as ScriptGoal,
             json.keyPoints,
             json.openingStyle as OpeningStyle,
+            json.duration as VideoDuration,
             json.callToAction,
             json.extraContext,
             json.activeSkills,

@@ -19,7 +19,7 @@ ScriptEditorPanel
   ├── GenerationStatusBanner (shown when generation is active)
   ├── GenerateScriptModal (portal via ModalOverlay)
   │     ├── Creator Profile banner (if no profile exists) → opens CreatorProfileModal
-  │     ├── ScriptBriefForm (topic, goal, key points, opening style, CTA, extra context)
+  │     ├── ScriptBriefForm (topic, goal, key points, opening style, duration, CTA, extra context)
   │     ├── SkillModuleToggles (6 toggleable modules with conditional inputs)
   │     └── Replace existing toggle (shown only if script has parts)
   ├── CreatorProfileModal (portal via ModalOverlay)
@@ -39,6 +39,7 @@ front/app/
 │       ├── Tone.ts                    ← 9 values (toFrenchTranslation, bg, text maps) — renamed from VoiceOverType
 │       ├── ScriptGoal.ts              ← 6 values (toFrenchTranslation map)
 │       ├── OpeningStyle.ts            ← 6 values (toFrenchTranslation map)
+│       ├── VideoDuration.ts           ← 7 values (toFrenchTranslation map)
 │       ├── ScriptGenerationStatus.ts  ← pending, processing, completed, failed (toFrenchTranslation, bg, text maps)
 │       ├── ScriptFormat.ts            ← full_script, outline, hybrid (toFrenchTranslation map)
 │       └── SkillModule.ts             ← 6 modules (toFrenchTranslation, description, hasExtraInput, extraInputType maps)
@@ -71,7 +72,7 @@ front/app/
 ### Generation Flow
 
 1. User clicks sparkle icon in `ScriptMetaHeader` → opens `GenerateScriptModal`
-2. User fills brief (topic required, goal required, opening style required)
+2. User fills brief (topic required, goal required, opening style required, duration required)
 3. User optionally toggles skill modules and configures extra inputs
 4. User optionally checks "Replace existing content" (shown only if script has parts)
 5. User clicks "Générer le script" → `useCreateScriptGeneration` fires
@@ -143,6 +144,7 @@ class ScriptGeneration {
     goal: ScriptGoal
     keyPoints: string | undefined
     openingStyle: OpeningStyle
+    duration: VideoDuration
     callToAction: string | undefined
     extraContext: string | undefined
     activeSkills: string[]

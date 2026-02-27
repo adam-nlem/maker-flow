@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Entity\Enum\OpeningStyle;
 use App\Entity\Enum\ScriptGenerationStatus;
 use App\Entity\Enum\ScriptGoal;
+use App\Entity\Enum\VideoDuration;
 use App\Helper\DateHelper;
 use App\Repository\ScriptGenerationRepository;
 use Doctrine\DBAL\Types\Types;
@@ -62,6 +63,13 @@ class ScriptGeneration
         'api_script_generations_create',
     ])]
     private ?OpeningStyle $openingStyle = null;
+
+    #[ORM\Column(enumType: VideoDuration::class)]
+    #[Groups([
+        'api_script_generations_show',
+        'api_script_generations_create',
+    ])]
+    private ?VideoDuration $duration = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
@@ -212,6 +220,18 @@ class ScriptGeneration
     public function setOpeningStyle(OpeningStyle $openingStyle): static
     {
         $this->openingStyle = $openingStyle;
+
+        return $this;
+    }
+
+    public function getDuration(): ?VideoDuration
+    {
+        return $this->duration;
+    }
+
+    public function setDuration(VideoDuration $duration): static
+    {
+        $this->duration = $duration;
 
         return $this;
     }

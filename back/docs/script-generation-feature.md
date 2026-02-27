@@ -48,6 +48,7 @@ Tracks each async generation job and stores the input data (brief + skills) for 
 | `goal` | `ScriptGoal` enum | Brief: goal of the script |
 | `keyPoints` | `text`, nullable | Brief: key points to cover |
 | `openingStyle` | `OpeningStyle` enum | Brief: style of the opening |
+| `duration` | `VideoDuration` enum | Brief: target video duration |
 | `callToAction` | `text`, nullable | Brief: desired call to action |
 | `extraContext` | `text`, nullable | Brief: additional context for the AI |
 | `activeSkills` | `JSON` | Array of active skill module keys |
@@ -110,6 +111,18 @@ Renamed from `VoiceOverType`. Used in both `ScriptVoiceOver` (as `tone` field) a
 | `relatable_question` | Relatable question |
 | `jump_into_content` | Jump straight into content |
 | `surprise_me` | Let the AI decide |
+
+### `VideoDuration` (`App\Entity\Enum\VideoDuration`)
+
+| Value | Description |
+|-------|-------------|
+| `30_seconds` | 30 seconds |
+| `1_minute` | 1 minute |
+| `1_minute_30` | 1 minute 30 seconds |
+| `2_minutes` | 2 minutes |
+| `5_to_10_minutes` | 5 to 10 minutes |
+| `10_to_20_minutes` | 10 to 20 minutes |
+| `20_plus_minutes` | 20+ minutes |
 
 ### `SkillModule` (`App\Entity\Enum\SkillModule`)
 
@@ -235,6 +248,7 @@ Used in `skillInputs['format']` to control script output format.
 | `goal` | `ScriptGoal` | Yes |
 | `keyPoints` | `string` | No |
 | `openingStyle` | `OpeningStyle` | Yes |
+| `duration` | `VideoDuration` | Yes |
 | `callToAction` | `string` | No |
 | `extraContext` | `string` | No |
 | `activeSkills` | `string[]` | Yes |
@@ -253,7 +267,7 @@ Builds the full prompt by concatenating structured blocks:
 
 1. `[CREATOR_PROFILE]` — platform, content type, niche, audience, tones
 2. `[STYLE_SAMPLE]` — creator's style sample (if provided)
-3. `[SCRIPT_BRIEF]` — topic, goal, key points, opening style, CTA, extra context
+3. `[SCRIPT_BRIEF]` — topic, goal, key points, opening style, duration, CTA, extra context
 4. Skill module injections (strong hook, retention boosters, storytelling, SEO, format, B-Roll)
 5. Formatting instructions (markers for structured output)
 6. Final instruction

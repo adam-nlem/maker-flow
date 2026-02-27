@@ -9,6 +9,7 @@ import { useLatestScriptGeneration } from "~/hooks/api/scriptGenerations/useLate
 import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore";
 import type { ScriptGoal } from "~/models/enums/ScriptGoal";
 import type { OpeningStyle } from "~/models/enums/OpeningStyle";
+import type { VideoDuration } from "~/models/enums/VideoDuration";
 import type { SkillModule } from "~/models/enums/SkillModule";
 
 interface GenerateScriptModalProps {
@@ -37,6 +38,7 @@ export default function GenerateScriptModal({
     const [goal, setGoal] = useState<ScriptGoal | undefined>(undefined);
     const [keyPoints, setKeyPoints] = useState("");
     const [openingStyle, setOpeningStyle] = useState<OpeningStyle | undefined>(undefined);
+    const [duration, setDuration] = useState<VideoDuration | undefined>(undefined);
     const [callToAction, setCallToAction] = useState("");
     const [extraContext, setExtraContext] = useState("");
     const [activeSkills, setActiveSkills] = useState<SkillModule[]>([]);
@@ -50,6 +52,7 @@ export default function GenerateScriptModal({
             setGoal(latestGeneration.goal);
             setKeyPoints(latestGeneration.keyPoints ?? "");
             setOpeningStyle(latestGeneration.openingStyle);
+            setDuration(latestGeneration.duration);
             setCallToAction(latestGeneration.callToAction ?? "");
             setExtraContext(latestGeneration.extraContext ?? "");
             setActiveSkills(latestGeneration.activeSkills as SkillModule[]);
@@ -61,7 +64,7 @@ export default function GenerateScriptModal({
     const { createScriptGeneration, isPending } = useCreateScriptGeneration();
     const setActiveGenerationUuid = useScriptGenerationStore((s) => s.setActiveGenerationUuid);
 
-    const canSubmit = topic.trim() !== "" && goal !== undefined && openingStyle !== undefined;
+    const canSubmit = topic.trim() !== "" && goal !== undefined && openingStyle !== undefined && duration !== undefined;
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -73,6 +76,7 @@ export default function GenerateScriptModal({
             goal,
             keyPoints: keyPoints.trim() || undefined,
             openingStyle,
+            duration,
             callToAction: callToAction.trim() || undefined,
             extraContext: extraContext.trim() || undefined,
             activeSkills,
@@ -119,6 +123,8 @@ export default function GenerateScriptModal({
                             onKeyPointsChange={setKeyPoints}
                             openingStyle={openingStyle}
                             onOpeningStyleChange={setOpeningStyle}
+                            duration={duration}
+                            onDurationChange={setDuration}
                             callToAction={callToAction}
                             onCallToActionChange={setCallToAction}
                             extraContext={extraContext}

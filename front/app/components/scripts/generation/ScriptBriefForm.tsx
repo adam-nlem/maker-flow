@@ -2,6 +2,7 @@ import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { ScriptGoal, scriptGoalToFrenchTranslation } from "~/models/enums/ScriptGoal";
 import { OpeningStyle, openingStyleToFrenchTranslation } from "~/models/enums/OpeningStyle";
+import { type VideoDuration, videoDurationToFrenchTranslation, videoDurationOptions } from "~/models/enums/VideoDuration";
 import Pill from "~/components/ui/Pill";
 
 interface ScriptBriefFormProps {
@@ -13,6 +14,8 @@ interface ScriptBriefFormProps {
     onKeyPointsChange: (value: string) => void;
     openingStyle: OpeningStyle | undefined;
     onOpeningStyleChange: (value: OpeningStyle) => void;
+    duration: VideoDuration | undefined;
+    onDurationChange: (value: VideoDuration) => void;
     callToAction: string;
     onCallToActionChange: (value: string) => void;
     extraContext: string;
@@ -28,6 +31,8 @@ export default function ScriptBriefForm({
     onKeyPointsChange,
     openingStyle,
     onOpeningStyleChange,
+    duration,
+    onDurationChange,
     callToAction,
     onCallToActionChange,
     extraContext,
@@ -79,6 +84,22 @@ export default function ScriptBriefForm({
                             borderColorClassName="border border-light-gray"
                             isSelected={openingStyle === s}
                             onClick={() => onOpeningStyleChange(s)}
+                        />
+                    ))}
+                </div>
+            </div>
+
+            <div>
+                <h3 className="text-heading-sm">Durée de la vidéo</h3>
+                <div className="flex flex-wrap gap-2 mt-2">
+                    {videoDurationOptions.map((d) => (
+                        <Pill
+                            key={d}
+                            label={videoDurationToFrenchTranslation[d]}
+                            bgColorClassName="bg-primary/30"
+                            borderColorClassName="border border-light-gray"
+                            isSelected={duration === d}
+                            onClick={() => onDurationChange(d)}
                         />
                     ))}
                 </div>

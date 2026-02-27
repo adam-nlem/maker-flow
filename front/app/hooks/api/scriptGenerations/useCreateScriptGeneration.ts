@@ -3,6 +3,7 @@ import { httpClient } from "~/services/httpClient/httpClient";
 import { ScriptGeneration, type ScriptGenerationJSON } from "~/models/ScriptGeneration";
 import type { ScriptGoal } from "~/models/enums/ScriptGoal";
 import type { OpeningStyle } from "~/models/enums/OpeningStyle";
+import type { VideoDuration } from "~/models/enums/VideoDuration";
 
 interface CreateScriptGenerationData {
     scriptUuid: string;
@@ -10,6 +11,7 @@ interface CreateScriptGenerationData {
     goal: ScriptGoal;
     keyPoints?: string;
     openingStyle: OpeningStyle;
+    duration: VideoDuration;
     callToAction?: string;
     extraContext?: string;
     activeSkills: string[];

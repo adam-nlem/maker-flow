@@ -6,6 +6,7 @@ use App\DTO\Request\AbstractRequestDTO;
 use App\Entity\Enum\OpeningStyle;
 use App\Entity\Enum\ScriptGenerationStatus;
 use App\Entity\Enum\ScriptGoal;
+use App\Entity\Enum\VideoDuration;
 use App\Entity\ScriptGeneration;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -17,6 +18,7 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
     private ScriptGoal $goal;
     private ?string $keyPoints;
     private OpeningStyle $openingStyle;
+    private VideoDuration $duration;
     private ?string $callToAction;
     private ?string $extraContext;
     private array $activeSkills;
@@ -37,6 +39,7 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
         $this->goal = ScriptGoal::from($payload["goal"]);
         $this->keyPoints = $payload["keyPoints"] ?? null;
         $this->openingStyle = OpeningStyle::from($payload["openingStyle"]);
+        $this->duration = VideoDuration::from($payload["duration"]);
         $this->callToAction = $payload["callToAction"] ?? null;
         $this->extraContext = $payload["extraContext"] ?? null;
         $this->activeSkills = $payload["activeSkills"] ?? [];
@@ -54,6 +57,7 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
             ->setGoal($this->goal)
             ->setKeyPoints($this->keyPoints)
             ->setOpeningStyle($this->openingStyle)
+            ->setDuration($this->duration)
             ->setCallToAction($this->callToAction)
             ->setExtraContext($this->extraContext)
             ->setActiveSkills($this->activeSkills)
@@ -84,6 +88,11 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
     public function getOpeningStyle(): OpeningStyle
     {
         return $this->openingStyle;
+    }
+
+    public function getDuration(): VideoDuration
+    {
+        return $this->duration;
     }
 
     public function getCallToAction(): ?string
