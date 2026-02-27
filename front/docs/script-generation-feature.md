@@ -4,7 +4,7 @@
 
 The Script Generation feature adds AI-powered script writing to the existing script editor. Users fill a brief (topic, goal, opening style, etc.), optionally configure skill modules, and trigger async generation. The system polls for completion and displays generated parts in the script editor.
 
-**Integration point:** `ScriptEditorPanel` — sparkle icon in `ScriptMetaHeader` opens the generation modal.
+**Integration point:** `ScriptEditorPanel` — sparkle icon in `ScriptMetaHeader` toggles the `GenerateScriptPanel` right panel.
 
 ---
 
@@ -13,16 +13,20 @@ The Script Generation feature adds AI-powered script writing to the existing scr
 ### Component Tree
 
 ```
-ScriptEditorPanel
-  ├── ScriptMetaHeader
-  │     └── SparklesIcon button → opens GenerateScriptModal
-  ├── GenerationStatusBanner (shown when generation is active)
-  ├── GenerateScriptModal (portal via ModalOverlay)
-  │     ├── Creator Profile banner → navigates to /settings (creator profile section)
+ScriptPageView
+  ├── ScriptListPanel (w-72)
+  ├── ScriptEditorPanel (flex-1)
+  │     ├── ScriptMetaHeader
+  │     │     └── SparklesIcon button → toggles GenerateScriptPanel via shared store
+  │     ├── GenerationStatusBanner (shown when generation is active)
+  │     └── ScriptPartsList
+  ├── GenerateScriptPanel (w-96, collapsible right panel)
+  │     ├── Creator Profile banner → navigates to /settings
   │     ├── ScriptBriefForm (topic, goal, key points, opening style, duration, CTA, extra context)
-  │     ├── SkillModuleToggles (6 toggleable modules with conditional inputs)
-  │     └── Replace existing toggle (shown only if script has parts)
-  └── [existing] ScriptPartsList
+  │     ├── SkillModuleToggles (7 toggleable modules with conditional inputs)
+  │     ├── Replace existing toggle (shown only if script has parts)
+  │     └── Sticky footer with submit button
+  └── HookTemplatePanel (w-72, collapsible right panel)
 
 Settings Page (/settings)
   ├── Left nav (SettingsSection enum: General, CreatorProfile, Project)
@@ -47,6 +51,8 @@ front/app/
 │       ├── VideoDuration.ts           ← 7 values (toFrenchTranslation map)
 │       ├── ScriptGenerationStatus.ts  ← pending, processing, completed, failed (toFrenchTranslation, bg, text maps)
 │       ├── ScriptFormat.ts            ← full_script, outline, hybrid (toFrenchTranslation map)
+│       ├── CallToActionType.ts        ← 6 values (toFrenchTranslation map)
+│       ├── RetentionCueType.ts        ← 4 values (toFrenchTranslation map)
 │       ├── SettingsSection.ts         ← general, creator_profile, project (toFrenchTranslation map)
 │       └── SkillModule.ts             ← 7 modules (toFrenchTranslation, description, hasExtraInput, extraInputType maps)
 ├── hooks/api/
@@ -59,10 +65,11 @@ front/app/
 │       ├── useCreateScriptGeneration.ts  ← POST, returns ScriptGeneration
 │       └── useShowScriptGeneration.ts    ← GET with polling (refetchInterval: 2s)
 ├── stores/scripts/
-│   └── scriptGenerationStore.ts       ← activeGenerationUuid state
+│   ├── scriptGenerationStore.ts       ← activeGenerationUuid state
+│   └── scriptRightPanelStore.ts       ← shared panel state (generate | hookTemplates)
 ├── components/scripts/
 │   ├── generation/
-│   │   ├── GenerateScriptModal.tsx     ← main modal with brief + skills + replace toggle
+│   │   ├── GenerateScriptPanel.tsx     ← collapsible right panel with brief + skills + replace toggle
 │   │   ├── ScriptBriefForm.tsx         ← per-generation brief fields
 │   │   ├── SkillModuleToggles.tsx      ← skill module toggles with conditional inputs
 │   │   └── GenerationStatusBanner.tsx  ← inline status banner with auto-dismiss
@@ -82,16 +89,32 @@ front/app/
 
 ### Generation Flow
 
-1. User clicks sparkle icon in `ScriptMetaHeader` → opens `GenerateScriptModal`
+1. User clicks sparkle icon in `ScriptMetaHeader` → toggles `GenerateScriptPanel` via shared `scriptRightPanelStore`
 2. User fills brief (topic required, goal required, opening style required, duration required)
-3. User optionally toggles skill modules and configures extra inputs
+3. User optionally toggles skill modules and configures extra inputs (CTA type, retention cue type, etc.)
 4. User optionally checks "Replace existing content" (shown only if script has parts)
 5. User clicks "Générer le script" → `useCreateScriptGeneration` fires
 6. On success, `activeGenerationUuid` is stored in `scriptGenerationStore`
-7. Modal closes, `GenerationStatusBanner` appears in the editor
+7. Panel closes, `GenerationStatusBanner` appears in the editor
 8. `useShowScriptGeneration` polls every 2 seconds while status is `pending` or `processing`
 9. On `completed` → invalidates `scriptQueryKeys.parts(scriptUuid)` → parts list re-fetches → banner auto-dismisses after 3 seconds
 10. On `failed` → banner shows error message with dismiss button
+
+### Shared Right Panel Store
+
+Both `GenerateScriptPanel` and `HookTemplatePanel` share `useScriptRightPanelStore`. Only one panel can be open at a time — opening one automatically closes the other.
+
+```ts
+// scriptRightPanelStore.ts — uses ScriptRightPanel enum (~/models/enums/ScriptRightPanel)
+{
+    activePanel: ScriptRightPanel | null   // ScriptRightPanel.Generate | ScriptRightPanel.HookTemplates
+    openPanel: (panel: ScriptRightPanel) => void
+    closePanel: () => void
+    togglePanel: (panel: ScriptRightPanel) => void  // toggle: if same panel → close, else → open
+}
+```
+
+Persistence key: `"app:scripts:right-panel"`
 
 ### Polling Strategy
 
@@ -103,7 +126,7 @@ front/app/
 ### Creator Profile
 
 - Creator Profile form lives in the **Settings page** (`/settings`, creator profile section)
-- `GenerateScriptModal` shows a banner that navigates to `/settings` for profile configuration
+- `GenerateScriptPanel` shows a banner that navigates to `/settings` for profile configuration
 - `CreatorProfileForm` uses upsert pattern — same form for create and update
 - Dynamic array inputs for `signaturePhrases` and `neverList` (add with Enter or +, remove with ×)
 - Multi-select `ToggleChip` for `platforms` and `tones`
@@ -115,12 +138,12 @@ front/app/
 | Module | Extra Input | Input Type |
 |--------|-------------|------------|
 | Strong Hook | No | — |
-| Retention Boosters | No | — |
+| Retention Boosters | Yes | ToggleChip select (RetentionCueType enum: question/teaser/pattern_break/cliffhanger) |
 | Storytelling Mode | Yes | TextArea (personal story) |
 | SEO Optimization | Yes | Input (target keyword) |
 | Script Format | Yes | ToggleChip select (ScriptFormat enum: full_script/outline/hybrid) |
 | B-Roll Cues | No | — |
-| Call to Action | No | — |
+| Call to Action | Yes | ToggleChip select (CallToActionType enum: subscribe/like/comment/share/link/custom) |
 
 Each module renders as a card with a radio-style toggle indicator. Active modules show a primary border/background. Conditional extra inputs appear below the module when active.
 
@@ -178,7 +201,7 @@ scriptGenerationQueryKeys.all                  // ['scriptGenerations']
 scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', generationUuid]
 ```
 
-### Store
+### Stores
 
 ```ts
 // scriptGenerationStore.ts
@@ -187,21 +210,28 @@ scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', 
     setActiveGenerationUuid: (uuid: string | null) => void
     clearActiveGeneration: () => void
 }
+
+// scriptRightPanelStore.ts (shared with hook templates) — uses ScriptRightPanel enum
+{
+    activePanel: ScriptRightPanel | null   // ScriptRightPanel.Generate | ScriptRightPanel.HookTemplates
+    openPanel: (panel: ScriptRightPanel) => void
+    closePanel: () => void
+    togglePanel: (panel: ScriptRightPanel) => void
+}
 ```
 
 ---
 
 ## Component Props
 
-### GenerateScriptModal
+### GenerateScriptPanel
 
 | Prop | Type | Description |
 |------|------|-------------|
-| `isOpen` | `boolean` | Controls modal visibility |
-| `onClose` | `() => void` | Close handler |
 | `scriptUuid` | `string` | Target script for generation |
 | `projectUuid` | `string` | Project UUID for creator profile |
-| `hasExistingParts` | `boolean` | Shows replace toggle when true |
+
+Reads `activePanel` from `useScriptRightPanelStore` internally. Resolves `hasExistingParts` via `useListScriptParts` (React Query cache reuse).
 
 ### GenerationStatusBanner
 

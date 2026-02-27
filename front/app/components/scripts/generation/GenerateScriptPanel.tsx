@@ -1,36 +1,34 @@
 import { useEffect, useRef, useState } from "react";
-import { SparklesIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { SparklesIcon, UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router";
-import ModalOverlay from "~/components/ui/ModalOverlay";
 import { Button } from "~/components/ui/Button";
 import ScriptBriefForm from "./ScriptBriefForm";
 import SkillModuleToggles from "./SkillModuleToggles";
 import { useCreateScriptGeneration } from "~/hooks/api/scriptGenerations/useCreateScriptGeneration";
 import { useLatestScriptGeneration } from "~/hooks/api/scriptGenerations/useLatestScriptGeneration";
+import { useListScriptParts } from "~/hooks/api/scripts/useListScriptParts";
 import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore";
+import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
+import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
 import type { ScriptGoal } from "~/models/enums/ScriptGoal";
 import type { OpeningStyle } from "~/models/enums/OpeningStyle";
 import type { VideoDuration } from "~/models/enums/VideoDuration";
 import type { SkillModule } from "~/models/enums/SkillModule";
 
-interface GenerateScriptModalProps {
-    isOpen: boolean;
-    onClose: () => void;
+interface GenerateScriptPanelProps {
     scriptUuid: string;
     projectUuid: string;
-    hasExistingParts: boolean;
 }
 
-export default function GenerateScriptModal({
-    isOpen,
-    onClose,
-    scriptUuid,
-    projectUuid,
-    hasExistingParts,
-}: GenerateScriptModalProps) {
+export default function GenerateScriptPanel({ scriptUuid, projectUuid }: GenerateScriptPanelProps) {
     const navigate = useNavigate();
     const { latestGeneration } = useLatestScriptGeneration({ scriptUuid });
+    const { parts } = useListScriptParts({ scriptUuid });
+    const hasExistingParts = parts.length > 0;
     const hasPreFilled = useRef(false);
+
+    const isOpen = useScriptRightPanelStore((s) => s.activePanel === ScriptRightPanel.Generate);
+    const closePanel = useScriptRightPanelStore((s) => s.closePanel);
 
     const [topic, setTopic] = useState("");
     const [goal, setGoal] = useState<ScriptGoal | undefined>(undefined);
@@ -83,23 +81,30 @@ export default function GenerateScriptModal({
         });
 
         setActiveGenerationUuid(generation.uuid);
-        onClose();
+        closePanel();
     };
 
     return (
-        <ModalOverlay isOpen={isOpen} onClose={onClose}>
-            <div
-                className="border rounded-xl border-light-gray w-150 h-fit max-h-[90vh] flex flex-col shadow-lg bg-clear overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-            >
-                <div className="px-8 py-5 border-b border-light-gray flex flex-row items-center gap-3">
-                    <SparklesIcon className="size-5 text-primary" strokeWidth={2} />
-                    <h1 className="text-heading-lg">Générer avec l'IA</h1>
+        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "w-96" : "w-0"}`}>
+            <div className="w-96 min-w-96 shrink-0 border-l border-light-gray h-full flex flex-col">
+                {/* Header */}
+                <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
+                    <div className="flex flex-row items-center gap-2">
+                        <SparklesIcon className="size-5 text-primary" strokeWidth={2} />
+                        <h2 className="text-heading-md">Générer avec l'IA</h2>
+                    </div>
+                    <button
+                        onClick={closePanel}
+                        className="text-gray hover:text-dark transition-colors cursor-pointer"
+                    >
+                        <XMarkIcon className="size-4" strokeWidth={2} />
+                    </button>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-8 py-5 scrollbar-none">
+                {/* Scrollable content */}
+                <div className="flex-1 overflow-y-auto p-4 scrollbar-none">
                     <div
-                        onClick={() => { onClose(); navigate('/settings'); }}
+                        onClick={() => { closePanel(); navigate('/settings'); }}
                         className="flex flex-row items-center gap-3 px-4 py-3 mb-5 rounded-xl border border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
                     >
                         <UserCircleIcon className="size-5 text-primary shrink-0" strokeWidth={2} />
@@ -109,7 +114,7 @@ export default function GenerateScriptModal({
                         </div>
                     </div>
 
-                    <form id="generate-form" className="flex flex-col gap-6" onSubmit={handleSubmit}>
+                    <form id="generate-panel-form" className="flex flex-col gap-5" onSubmit={handleSubmit}>
                         <ScriptBriefForm
                             topic={topic}
                             onTopicChange={setTopic}
@@ -161,14 +166,15 @@ export default function GenerateScriptModal({
                     </form>
                 </div>
 
-                <div className="px-8 py-4 border-t border-light-gray">
+                {/* Sticky footer */}
+                <div className="px-4 py-3 border-t border-light-gray">
                     <Button
                         type="submit"
                         style="primary"
                         isLoading={isPending}
                         disabled={isPending || !canSubmit}
                         onClick={() => {
-                            const form = document.getElementById('generate-form') as HTMLFormElement;
+                            const form = document.getElementById('generate-panel-form') as HTMLFormElement;
                             form?.requestSubmit();
                         }}
                     >
@@ -179,6 +185,6 @@ export default function GenerateScriptModal({
                     </Button>
                 </div>
             </div>
-        </ModalOverlay>
+        </div>
     );
 }

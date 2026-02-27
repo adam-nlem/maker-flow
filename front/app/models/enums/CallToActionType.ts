@@ -7,6 +7,8 @@ export enum CallToActionType {
     Custom = 'custom',
 }
 
+export const callToActionTypeOptions = Object.values(CallToActionType);
+
 export const callToActionTypeToFrenchTranslation: Record<CallToActionType, string> = {
     [CallToActionType.Subscribe]: "S'abonner",
     [CallToActionType.Like]: "Liker",

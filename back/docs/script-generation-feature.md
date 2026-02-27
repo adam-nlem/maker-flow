@@ -52,7 +52,7 @@ Tracks each async generation job and stores the input data (brief + skills) for 
 | `callToAction` | `text`, nullable | Brief: desired call to action |
 | `extraContext` | `text`, nullable | Brief: additional context for the AI |
 | `activeSkills` | `JSON` | Array of active skill module keys |
-| `skillInputs` | `JSON` | Extra inputs per skill (story, keyword, format) |
+| `skillInputs` | `JSON` | Extra inputs per skill (story, keyword, format, CTA type, retention cue type) |
 | `replaceExisting` | `boolean` | Whether to delete existing parts before inserting |
 | `assembledPrompt` | `text`, nullable | Full prompt sent to AI (for debugging, not serialized) |
 | `errorMessage` | `text`, nullable | Error details if failed |
@@ -110,7 +110,6 @@ Renamed from `VoiceOverType`. Used in both `ScriptVoiceOver` (as `tone` field) a
 | `personal_story` | Personal story |
 | `relatable_question` | Relatable question |
 | `jump_into_content` | Jump straight into content |
-| `surprise_me` | Let the AI decide |
 
 ### `VideoDuration` (`App\Entity\Enum\VideoDuration`)
 
@@ -269,7 +268,7 @@ Builds the full prompt by concatenating structured blocks:
 1. Creator profile block — platform, content type, niche, audience, tones, signature phrases, never list
 2. Style sample block — creator's style sample (if provided)
 3. Script brief block — topic, goal, key points, opening style, duration, CTA, extra context
-4. Skill modules block — active skill instructions (strong hook, retention boosters, storytelling, SEO, format, B-Roll, call to action) + negative instructions for disabled skills
+4. Skill modules block — active skill instructions (strong hook, retention boosters, storytelling, SEO, format, B-Roll, call to action) + negative instructions for disabled skills. When a specific CTA type or retention cue type is selected via `skillInputs`, the instruction targets that specific type; otherwise, generic instructions are used
 5. JSON formatting instructions — structured JSON schema with conditionally included part types based on active skills
 6. Final instruction ("commence directement par le JSON")
 

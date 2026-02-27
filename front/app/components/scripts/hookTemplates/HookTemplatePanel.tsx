@@ -6,7 +6,8 @@ import type { HookTemplate } from "~/models/HookTemplate";
 import type { Script } from "~/models/Script";
 import { HookTemplateCategory, hookTemplateCategoryToFrenchTranslation } from "~/models/enums/HookTemplateCategory";
 import { useListPaginatedHookTemplates } from "~/hooks/api/hookTemplates/useListPaginatedHookTemplates";
-import { useHookTemplatePanelStore } from "~/stores/scripts/hookTemplatePanelStore";
+import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
+import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
 import HookTemplateCard from "./HookTemplateCard";
 import CreateHookTemplateModal from "./CreateHookTemplateModal";
 
@@ -21,8 +22,8 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
     const [searchInput, setSearchInput] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
     const [showCreateModal, setShowCreateModal] = useState(false);
-    const isOpen = useHookTemplatePanelStore((s) => s.isOpen);
-    const setIsOpen = useHookTemplatePanelStore((s) => s.setIsOpen);
+    const isOpen = useScriptRightPanelStore((s) => s.activePanel === ScriptRightPanel.HookTemplates);
+    const closePanel = useScriptRightPanelStore((s) => s.closePanel);
     const debounceTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     useEffect(() => {
@@ -92,7 +93,7 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
                             <PlusIcon className="size-4" strokeWidth={2} />
                         </button>
                         <button
-                            onClick={() => setIsOpen(false)}
+                            onClick={closePanel}
                             className="text-gray hover:text-dark transition-colors cursor-pointer"
                         >
                             <XMarkIcon className="size-4" strokeWidth={2} />

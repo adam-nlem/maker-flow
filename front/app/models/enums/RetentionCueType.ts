@@ -5,6 +5,8 @@ export enum RetentionCueType {
     Cliffhanger = 'cliffhanger',
 }
 
+export const retentionCueTypeOptions = Object.values(RetentionCueType);
+
 export const retentionCueTypeToFrenchTranslation: Record<RetentionCueType, string> = {
     [RetentionCueType.Question]: "Question",
     [RetentionCueType.Teaser]: "Teaser",

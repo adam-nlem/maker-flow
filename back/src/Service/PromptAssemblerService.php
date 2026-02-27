@@ -3,6 +3,8 @@
 namespace App\Service;
 
 use App\Entity\CreatorProfile;
+use App\Entity\Enum\CallToActionType;
+use App\Entity\Enum\RetentionCueType;
 use App\Entity\Enum\SkillModule;
 use App\Entity\Enum\Tone;
 use App\Entity\Enum\VideoDuration;
@@ -129,7 +131,7 @@ class PromptAssemblerService
         foreach ($activeSkills as $skill) {
             match ($skill) {
                 SkillModule::StrongHook->value => $blocks[] = "Commence par une accroche exceptionnellement forte. Les 3 premières secondes doivent créer de la curiosité, de la tension ou une affirmation audacieuse qui rend l'arrêt coûteux.",
-                SkillModule::RetentionBoosters->value => $blocks[] = "Toutes les 60 à 90 secondes, place un moment de ré-engagement : une rupture de pattern, un teaser, une question ou un cliffhanger. Utilise le type \"retention_cue\" dans le JSON avec le retentionCueType approprié (question, teaser, pattern_break, cliffhanger).",
+                SkillModule::RetentionBoosters->value => $blocks[] = $this->buildRetentionBoostersInstruction($skillInputs),
                 SkillModule::StorytellingMode->value => $blocks[] = isset($skillInputs['story'])
                     ? "Ancre le script dans cette histoire : {$skillInputs['story']}. Tisse le contenu éducatif à travers elle plutôt que de le présenter sous forme de liste."
                     : null,
@@ -140,7 +142,7 @@ class PromptAssemblerService
                     ? "Livre le script sous forme de {$skillInputs['format']}. Plan = points de discussion par section. Script complet = chaque mot tel qu'il serait prononcé. Hybride = titres de sections avec points de discussion détaillés."
                     : null,
                 SkillModule::BRollCues->value => $blocks[] = "Ajoute des éléments de type \"shot\" dans le JSON tout au long du script là où des images pertinentes (B-roll) renforceraient le propos.",
-                SkillModule::CallToAction->value => $blocks[] = "Intègre un ou plusieurs appels à l'action dans le script. Utilise le type \"call_to_action\" dans le JSON avec le callToActionType approprié (subscribe, like, comment, share, link, custom).",
+                SkillModule::CallToAction->value => $blocks[] = $this->buildCallToActionInstruction($skillInputs),
                 default => null,
             };
         }
@@ -167,6 +169,44 @@ class PromptAssemblerService
         }
 
         return implode("\n\n", array_filter($blocks));
+    }
+
+    private function buildCallToActionInstruction(array $skillInputs): string
+    {
+        $selectedType = CallToActionType::tryFrom($skillInputs[SkillModule::CallToAction->value] ?? '');
+
+        if ($selectedType !== null) {
+            $label = match ($selectedType) {
+                CallToActionType::Subscribe => 's\'abonner',
+                CallToActionType::Like => 'liker',
+                CallToActionType::Comment => 'commenter',
+                CallToActionType::Share => 'partager',
+                CallToActionType::Link => 'cliquer sur un lien',
+                CallToActionType::Custom => 'personnalisé',
+            };
+
+            return "Intègre un appel à l'action de type \"{$label}\" dans le script. Utilise le type \"call_to_action\" dans le JSON avec callToActionType \"{$selectedType->value}\".";
+        }
+
+        return "Intègre un ou plusieurs appels à l'action dans le script. Utilise le type \"call_to_action\" dans le JSON avec le callToActionType approprié (subscribe, like, comment, share, link, custom).";
+    }
+
+    private function buildRetentionBoostersInstruction(array $skillInputs): string
+    {
+        $selectedType = RetentionCueType::tryFrom($skillInputs[SkillModule::RetentionBoosters->value] ?? '');
+
+        if ($selectedType !== null) {
+            $label = match ($selectedType) {
+                RetentionCueType::Question => 'question',
+                RetentionCueType::Teaser => 'teaser',
+                RetentionCueType::PatternBreak => 'rupture de pattern',
+                RetentionCueType::Cliffhanger => 'cliffhanger',
+            };
+
+            return "Toutes les 60 à 90 secondes, place un moment de ré-engagement de type \"{$label}\". Utilise le type \"retention_cue\" dans le JSON avec retentionCueType \"{$selectedType->value}\".";
+        }
+
+        return "Toutes les 60 à 90 secondes, place un moment de ré-engagement : une rupture de pattern, un teaser, une question ou un cliffhanger. Utilise le type \"retention_cue\" dans le JSON avec le retentionCueType approprié (question, teaser, pattern_break, cliffhanger).";
     }
 
     private function buildFormattingInstructions(ScriptGeneration $generation): string

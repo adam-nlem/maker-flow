@@ -55,17 +55,18 @@ Added `hookTemplateUuid?: string | null` to `UpdateScriptData` to support linkin
 
 ## Zustand Store
 
-### `useHookTemplatePanelStore` (`~/stores/scripts/hookTemplatePanelStore.ts`)
+### `useScriptRightPanelStore` (`~/stores/scripts/scriptRightPanelStore.ts`)
 
-Persisted store controlling the right panel visibility.
+Shared persisted store controlling both right panels (hook templates and script generation). Only one panel can be open at a time.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `isOpen` | `boolean` | Panel visibility state |
-| `toggle` | `() => void` | Toggle panel open/close |
-| `setIsOpen` | `(open: boolean) => void` | Set panel visibility directly |
+| `activePanel` | `ScriptRightPanel \| null` | Currently open panel (`ScriptRightPanel` enum) |
+| `openPanel` | `(panel) => void` | Open a specific panel |
+| `closePanel` | `() => void` | Close the active panel |
+| `togglePanel` | `(panel) => void` | Toggle: if same → close, else → open |
 
-Persistence key: `"app:scripts:hook-template-panel"`
+Persistence key: `"app:scripts:right-panel"`
 
 ---
 
@@ -117,26 +118,28 @@ Confirmation dialog using `ModalOverlay`. Shown when the user clicks a template 
 3. If the script has no hook text → apply directly (skip dialog)
 4. On confirm: `updateScript({ hook: template.content, hookTemplateUuid: template.uuid })`
 
-The right panel renders conditionally based on `useHookTemplatePanelStore.isOpen`.
+The right panel renders conditionally based on `useScriptRightPanelStore.activePanel === 'hookTemplates'`.
 
 ---
 
 ## Toggle Button
 
-**`ScriptHookCard.tsx`** has a `Button` (secondary style) with `InboxStackIcon` to open the template library panel. Clicking toggles `useHookTemplatePanelStore`.
+**`ScriptHookCard.tsx`** has a `Button` (secondary style) with `InboxStackIcon` to open the template library panel. Clicking calls `togglePanel('hookTemplates')` on `useScriptRightPanelStore`.
 
 ---
 
 ## Layout
 
 ```
-┌──────────────┬─────────────────────────────┬──────────────┐
-│ ScriptList   │    ScriptEditorPanel        │ HookTemplate │
-│ Panel (w-72) │    (flex-1)                 │ Panel (w-72) │
-│              │                             │  (optional)  │
-│ border-r     │ ScriptMetaHeader            │  border-l    │
-│              │ ScriptPartsList             │              │
-└──────────────┴─────────────────────────────┴──────────────┘
+┌──────────────┬─────────────────────────────┬──────────────┬──────────────┐
+│ ScriptList   │    ScriptEditorPanel        │ Generate     │ HookTemplate │
+│ Panel (w-72) │    (flex-1)                 │ Panel (w-96) │ Panel (w-72) │
+│              │                             │  (optional)  │  (optional)  │
+│ border-r     │ ScriptMetaHeader            │  border-l    │  border-l    │
+│              │ ScriptPartsList             │              │              │
+└──────────────┴─────────────────────────────┴──────────────┴──────────────┘
+
+Only one right panel (Generate or HookTemplate) can be open at a time via shared store.
 ```
 
 ---
@@ -178,5 +181,5 @@ Templates use `[placeholder]` tokens (e.g., `[Sujet]`, `[Audience]`) that users 
 Script (N) ──── (0..1) HookTemplate    [hookTemplate field, nullable]
 HookTemplatePanel ──── uses ──── useListHookTemplates
 ScriptPageView ──── contains ──── HookTemplatePanel + ApplyHookTemplateModal
-ScriptHookCard ──── toggles ──── useHookTemplatePanelStore
+ScriptHookCard ──── toggles ──── useScriptRightPanelStore ('hookTemplates')
 ```

@@ -4,7 +4,8 @@ import type { Script } from "~/models/Script";
 import { Button } from "~/components/ui/Button";
 import { TextArea } from "~/components/ui/TextArea";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
-import { useHookTemplatePanelStore } from "~/stores/scripts/hookTemplatePanelStore";
+import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
+import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
 import { hasPlaceholders, replacePlaceholder } from "~/helpers/hookPlaceholderParser";
 import ScriptPartHeader from "./ScriptPartHeader";
 import HookContentRenderer from "./HookContentRenderer";
@@ -19,7 +20,7 @@ export default function ScriptHookCard({ script }: ScriptHookCardProps) {
     const { updateScript } = useUpdateScript();
     const isExpanded = useScriptEditorStore((s) => s.isExpanded);
 
-    const toggleHookTemplatePanel = useHookTemplatePanelStore((s) => s.toggle);
+    const togglePanel = useScriptRightPanelStore((s) => s.togglePanel);
 
     const handleHookBlur = () => {
         const newHook = hook.trim() || null;
@@ -55,7 +56,7 @@ export default function ScriptHookCard({ script }: ScriptHookCardProps) {
             {isExpanded &&
                 <Button
                     style={"secondary"}
-                    onClick={toggleHookTemplatePanel}
+                    onClick={() => togglePanel(ScriptRightPanel.HookTemplates)}
                     width="w-fit"
                     height="h-7"
                 >

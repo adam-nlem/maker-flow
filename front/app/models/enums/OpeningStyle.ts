@@ -4,7 +4,6 @@ export enum OpeningStyle {
     PersonalStory = 'personal_story',
     RelatableQuestion = 'relatable_question',
     JumpIntoContent = 'jump_into_content',
-    SurpriseMe = 'surprise_me',
 }
 
 export const openingStyleToFrenchTranslation: Record<OpeningStyle, string> = {
@@ -13,5 +12,4 @@ export const openingStyleToFrenchTranslation: Record<OpeningStyle, string> = {
     [OpeningStyle.PersonalStory]: "Histoire personnelle",
     [OpeningStyle.RelatableQuestion]: "Question relatable",
     [OpeningStyle.JumpIntoContent]: "Direct dans le contenu",
-    [OpeningStyle.SurpriseMe]: "Surprise-moi",
 }

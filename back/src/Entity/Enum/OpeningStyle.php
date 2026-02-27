@@ -9,5 +9,4 @@ enum OpeningStyle: string
     case PersonalStory = 'personal_story';
     case RelatableQuestion = 'relatable_question';
     case JumpIntoContent = 'jump_into_content';
-    case SurpriseMe = 'surprise_me';
 }

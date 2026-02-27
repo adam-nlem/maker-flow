@@ -1,6 +1,8 @@
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { ToggleChip } from "~/components/ui/ToggleChip";
+import { callToActionTypeOptions, callToActionTypeToFrenchTranslation } from "~/models/enums/CallToActionType";
+import { retentionCueTypeOptions, retentionCueTypeToFrenchTranslation } from "~/models/enums/RetentionCueType";
 import { ScriptFormat, scriptFormatToFrenchTranslation } from "~/models/enums/ScriptFormat";
 import {
     SkillModule,
@@ -91,6 +93,30 @@ export default function SkillModuleToggles({
                                                     label={scriptFormatToFrenchTranslation[format]}
                                                     isSelected={skillInputs[skill] === format}
                                                     onToggle={() => updateSkillInput(skill, format)}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                    {extraType === 'select' && skill === SkillModule.CallToAction && (
+                                        <div className="flex flex-wrap gap-2">
+                                            {callToActionTypeOptions.map((ctaType) => (
+                                                <ToggleChip
+                                                    key={ctaType}
+                                                    label={callToActionTypeToFrenchTranslation[ctaType]}
+                                                    isSelected={skillInputs[skill] === ctaType}
+                                                    onToggle={() => updateSkillInput(skill, ctaType)}
+                                                />
+                                            ))}
+                                        </div>
+                                    )}
+                                    {extraType === 'select' && skill === SkillModule.RetentionBoosters && (
+                                        <div className="flex flex-wrap gap-2">
+                                            {retentionCueTypeOptions.map((cueType) => (
+                                                <ToggleChip
+                                                    key={cueType}
+                                                    label={retentionCueTypeToFrenchTranslation[cueType]}
+                                                    isSelected={skillInputs[skill] === cueType}
+                                                    onToggle={() => updateSkillInput(skill, cueType)}
                                                 />
                                             ))}
                                         </div>

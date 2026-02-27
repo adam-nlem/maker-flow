@@ -30,12 +30,12 @@ export const skillModuleToDescription: Record<SkillModule, string> = {
 
 export const skillModuleHasExtraInput: Record<SkillModule, boolean> = {
     [SkillModule.StrongHook]: false,
-    [SkillModule.RetentionBoosters]: false,
+    [SkillModule.RetentionBoosters]: true,
     [SkillModule.StorytellingMode]: true,
     [SkillModule.SeoOptimization]: true,
     [SkillModule.ScriptFormat]: true,
     [SkillModule.BRollCues]: false,
-    [SkillModule.CallToAction]: false,
+    [SkillModule.CallToAction]: true,
 }
 
 export type SkillModuleExtraInputType = 'text' | 'select';
@@ -44,4 +44,6 @@ export const skillModuleExtraInputType: Partial<Record<SkillModule, SkillModuleE
     [SkillModule.StorytellingMode]: 'text',
     [SkillModule.SeoOptimization]: 'text',
     [SkillModule.ScriptFormat]: 'select',
+    [SkillModule.CallToAction]: 'select',
+    [SkillModule.RetentionBoosters]: 'select',
 }

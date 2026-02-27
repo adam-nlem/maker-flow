@@ -5,6 +5,7 @@ import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import type { HookTemplate } from "~/models/HookTemplate";
 import ScriptListPanel from "./ScriptListPanel";
 import ScriptEditorPanel from "./ScriptEditorPanel";
+import GenerateScriptPanel from "./generation/GenerateScriptPanel";
 import HookTemplatePanel from "./hookTemplates/HookTemplatePanel";
 import ApplyHookTemplateModal from "./hookTemplates/ApplyHookTemplateModal";
 
@@ -66,6 +67,14 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
                     </div>
                 )}
             </div>
+
+            {focusedScript && (
+                <GenerateScriptPanel
+                    key={`generate-${focusedScript.uuid}`}
+                    scriptUuid={focusedScript.uuid}
+                    projectUuid={projectUuid}
+                />
+            )}
 
             {focusedScript && (
                 <HookTemplatePanel
