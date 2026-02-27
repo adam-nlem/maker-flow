@@ -3,7 +3,7 @@ export enum ChapterType {
     OffScreen = 'off_screen',
 }
 
-export const chapterTypeToLabel: Record<ChapterType, string> = {
+export const chapterTypeToFrenchTranslation: Record<ChapterType, string> = {
     [ChapterType.OnScreen]: "On-screen",
     [ChapterType.OffScreen]: "Off-screen",
 }

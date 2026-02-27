@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, SwatchIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
-import { ScriptStatus, scriptStatusToLabel, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
+import { ScriptStatus, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
 import Pill from "~/components/ui/Pill";
 import { DatePicker } from "~/components/ui/DatePicker";
@@ -80,14 +80,14 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                             <Pill
                                 onClick={onClick}
                                 icon={status ? scriptStatusToIcon[status] : SwatchIcon}
-                                label={status ? scriptStatusToLabel[status] : "Statut"}
+                                label={status ? scriptStatusToFrenchTranslation[status] : "Statut"}
                                 isSelected={!!status}
                                 bgColorClassName={status ? scriptStatusToBgClass[status] : ""}
                                 textColorClassName={status ? scriptStatusToTextClass[status] : ""} />)
                         }
                         renderItem={({ item, isSelected, onSelect }) => {
                             return !isSelected ? <Pill
-                                label={scriptStatusToLabel[item]}
+                                label={scriptStatusToFrenchTranslation[item]}
                                 icon={scriptStatusToIcon[item]}
                                 isSelected
                                 onClick={onSelect}

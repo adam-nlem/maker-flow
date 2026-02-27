@@ -26,8 +26,7 @@ class ScriptOutputParserService
         private readonly ScriptDialogueRepository $dialogueRepository,
         private readonly ScriptShotRepository $shotRepository,
         private readonly ScriptTextRepository $textRepository,
-    ) {
-    }
+    ) {}
 
     public function parseAndCreateParts(string $output, Script $script, User $user, int $startPosition): ScriptOutputMetadataDTO
     {
@@ -73,7 +72,7 @@ class ScriptOutputParserService
                     ->setUser($user)
                     ->setTitle($chapterTitle)
                     ->setDescription($description !== '' ? $description : null)
-                    ->setChapterType(ChapterType::OnScreen)
+                    ->setChapterType(ChapterType::OffScreen)
                     ->setPosition($position++);
                 $this->chapterRepository->save($chapter);
 

@@ -3,7 +3,7 @@ export enum ShotType {
     BRoll = 'b_roll',
 }
 
-export const shotTypeToLabel: Record<ShotType, string> = {
+export const shotTypeToFrenchTranslation: Record<ShotType, string> = {
     [ShotType.ARoll]: "A-Roll",
     [ShotType.BRoll]: "B-Roll",
 }

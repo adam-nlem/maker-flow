@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptVoiceOver } from "~/models/ScriptVoiceOver";
-import { Tone, toneToLabel, toneToBgClass, toneToTextClass } from "~/models/enums/Tone";
+import { Tone, toneToFrenchTranslation, toneToBgClass, toneToTextClass } from "~/models/enums/Tone";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -50,7 +50,7 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
                 renderTrigger={({ onClick }) => (
                     <Pill
                         onClick={onClick}
-                        label={toneToLabel[tone]}
+                        label={toneToFrenchTranslation[tone]}
                         isSelected
                         bgColorClassName={toneToBgClass[tone]}
                         textColorClassName={toneToTextClass[tone]}
@@ -58,7 +58,7 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
                 )}
                 renderItem={({ item, isSelected, onSelect }) => {
                     return !isSelected ? <Pill
-                        label={toneToLabel[item]}
+                        label={toneToFrenchTranslation[item]}
                         isSelected
                         onClick={onSelect}
                         bgColorClassName={toneToBgClass[item]}

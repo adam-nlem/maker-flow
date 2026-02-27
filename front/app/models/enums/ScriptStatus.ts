@@ -9,7 +9,7 @@ export enum ScriptStatus {
 
 export const scriptStatusOptions = Object.values(ScriptStatus);
 
-export const scriptStatusToLabel: Record<ScriptStatus, string> = {
+export const scriptStatusToFrenchTranslation: Record<ScriptStatus, string> = {
     [ScriptStatus.Pending]: "En attente",
     [ScriptStatus.InProgress]: "En cours",
     [ScriptStatus.Completed]: "Terminé",

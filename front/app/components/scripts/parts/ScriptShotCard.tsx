@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptShot } from "~/models/ScriptShot";
-import { ShotType, shotTypeToLabel, shotTypeToBgClass, shotTypeToTextClass } from "~/models/enums/ShotType";
+import { ShotType, shotTypeToFrenchTranslation, shotTypeToBgClass, shotTypeToTextClass } from "~/models/enums/ShotType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -50,7 +50,7 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
                 renderTrigger={({ onClick }) => (
                     <Pill
                         onClick={onClick}
-                        label={shotTypeToLabel[shotType]}
+                        label={shotTypeToFrenchTranslation[shotType]}
                         isSelected
                         bgColorClassName={shotTypeToBgClass[shotType]}
                         textColorClassName={shotTypeToTextClass[shotType]}
@@ -58,7 +58,7 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
                 )}
                 renderItem={({ item, isSelected, onSelect }) => {
                     return !isSelected ? <Pill
-                        label={shotTypeToLabel[item]}
+                        label={shotTypeToFrenchTranslation[item]}
                         isSelected
                         onClick={onSelect}
                         bgColorClassName={shotTypeToBgClass[item]}

@@ -122,6 +122,16 @@ Renamed from `VoiceOverType`. Used in both `ScriptVoiceOver` (as `tone` field) a
 | `script_format` | Script format (requires format input) |
 | `b_roll_cues` | B-Roll visual cues |
 
+### `ScriptFormat` (`App\Entity\Enum\ScriptFormat`)
+
+Used in `skillInputs['format']` to control script output format.
+
+| Value | Description |
+|-------|-------------|
+| `full_script` | Full script — every word as it would be spoken |
+| `outline` | Detailed outline — talking points per section |
+| `hybrid` | Hybrid — section headings with detailed talking points |
+
 ### `ScriptGenerationStatus` (`App\Entity\Enum\ScriptGenerationStatus`)
 
 | Value | Description |

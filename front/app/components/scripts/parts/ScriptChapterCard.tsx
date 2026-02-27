@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptChapter } from "~/models/ScriptChapter";
-import { ChapterType, chapterTypeToLabel, chapterTypeToBgClass, chapterTypeToTextClass } from "~/models/enums/ChapterType";
+import { ChapterType, chapterTypeToFrenchTranslation, chapterTypeToBgClass, chapterTypeToTextClass } from "~/models/enums/ChapterType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { Input } from "~/components/ui/Input";
@@ -58,7 +58,7 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                 renderTrigger={({ onClick }) => (
                     <Pill
                         onClick={onClick}
-                        label={chapterTypeToLabel[chapterType]}
+                        label={chapterTypeToFrenchTranslation[chapterType]}
                         isSelected
                         bgColorClassName={chapterTypeToBgClass[chapterType]}
                         textColorClassName={chapterTypeToTextClass[chapterType]}
@@ -66,7 +66,7 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                 )}
                 renderItem={({ item, isSelected, onSelect }) => {
                     return !isSelected ? <Pill
-                        label={chapterTypeToLabel[item]}
+                        label={chapterTypeToFrenchTranslation[item]}
                         isSelected
                         onClick={onSelect}
                         bgColorClassName={chapterTypeToBgClass[item]}

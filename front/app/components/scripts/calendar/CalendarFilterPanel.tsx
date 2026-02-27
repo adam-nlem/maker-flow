@@ -1,5 +1,5 @@
 import { Platform, platformOptions, platformToFrenchTranslation } from "~/models/enums/Platform";
-import { ScriptStatus, scriptStatusToLabel, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
+import { ScriptStatus, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
 import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
@@ -59,7 +59,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
                         <Pill
                             key={status}
                             icon={scriptStatusToIcon[status]}
-                            label={scriptStatusToLabel[status]}
+                            label={scriptStatusToFrenchTranslation[status]}
                             isSelected={selectedStatusSet.has(status)}
                             onClick={() => toggleStatus(status)}
                             bgColorClassName={scriptStatusToBgClass[status]}
