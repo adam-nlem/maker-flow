@@ -18,13 +18,18 @@ ScriptEditorPanel
   │     └── SparklesIcon button → opens GenerateScriptModal
   ├── GenerationStatusBanner (shown when generation is active)
   ├── GenerateScriptModal (portal via ModalOverlay)
-  │     ├── Creator Profile banner (if no profile exists) → opens CreatorProfileModal
+  │     ├── Creator Profile banner → navigates to /settings (creator profile section)
   │     ├── ScriptBriefForm (topic, goal, key points, opening style, duration, CTA, extra context)
   │     ├── SkillModuleToggles (6 toggleable modules with conditional inputs)
   │     └── Replace existing toggle (shown only if script has parts)
-  ├── CreatorProfileModal (portal via ModalOverlay)
-  │     └── CreatorProfileForm (platform, content type, niche, audience, tones, phrases, never list, style sample)
   └── [existing] ScriptPartsList
+
+Settings Page (/settings)
+  ├── Left nav (SettingsSection enum: General, CreatorProfile, Project)
+  └── Right content
+        ├── GeneralSettings (placeholder)
+        ├── CreatorProfileSettings → CreatorProfileForm
+        └── ProjectSettings (placeholder)
 ```
 
 ### File Structure
@@ -42,7 +47,8 @@ front/app/
 │       ├── VideoDuration.ts           ← 7 values (toFrenchTranslation map)
 │       ├── ScriptGenerationStatus.ts  ← pending, processing, completed, failed (toFrenchTranslation, bg, text maps)
 │       ├── ScriptFormat.ts            ← full_script, outline, hybrid (toFrenchTranslation map)
-│       └── SkillModule.ts             ← 6 modules (toFrenchTranslation, description, hasExtraInput, extraInputType maps)
+│       ├── SettingsSection.ts         ← general, creator_profile, project (toFrenchTranslation map)
+│       └── SkillModule.ts             ← 7 modules (toFrenchTranslation, description, hasExtraInput, extraInputType maps)
 ├── hooks/api/
 │   ├── creatorProfiles/
 │   │   ├── creatorProfileQueryKeys.ts
@@ -54,15 +60,20 @@ front/app/
 │       └── useShowScriptGeneration.ts    ← GET with polling (refetchInterval: 2s)
 ├── stores/scripts/
 │   └── scriptGenerationStore.ts       ← activeGenerationUuid state
-└── components/scripts/
-    ├── generation/
-    │   ├── GenerateScriptModal.tsx     ← main modal with brief + skills + replace toggle
-    │   ├── ScriptBriefForm.tsx         ← per-generation brief fields
-    │   ├── SkillModuleToggles.tsx      ← skill module toggles with conditional inputs
-    │   └── GenerationStatusBanner.tsx  ← inline status banner with auto-dismiss
-    └── creatorProfile/
-        ├── CreatorProfileForm.tsx      ← full creator profile form
-        └── CreatorProfileModal.tsx     ← modal wrapper
+├── components/scripts/
+│   ├── generation/
+│   │   ├── GenerateScriptModal.tsx     ← main modal with brief + skills + replace toggle
+│   │   ├── ScriptBriefForm.tsx         ← per-generation brief fields
+│   │   ├── SkillModuleToggles.tsx      ← skill module toggles with conditional inputs
+│   │   └── GenerationStatusBanner.tsx  ← inline status banner with auto-dismiss
+│   └── creatorProfile/
+│       └── CreatorProfileForm.tsx      ← full creator profile form (used in Settings page)
+├── components/settings/
+│   ├── GeneralSettings.tsx             ← placeholder
+│   ├── CreatorProfileSettings.tsx      ← wraps CreatorProfileForm
+│   └── ProjectSettings.tsx             ← placeholder
+└── routes/
+    └── settings.tsx                    ← settings page with sidebar + content layout
 ```
 
 ---
@@ -91,15 +102,15 @@ front/app/
 
 ### Creator Profile
 
-- Loaded via `useShowCreatorProfile` in `ScriptEditorPanel` (returns `null` on 404)
-- If no profile exists, `GenerateScriptModal` shows a banner linking to `CreatorProfileModal`
+- Creator Profile form lives in the **Settings page** (`/settings`, creator profile section)
+- `GenerateScriptModal` shows a banner that navigates to `/settings` for profile configuration
 - `CreatorProfileForm` uses upsert pattern — same form for create and update
 - Dynamic array inputs for `signaturePhrases` and `neverList` (add with Enter or +, remove with ×)
 - Multi-select `ToggleChip` for `platforms` and `tones`
 
 ### Skill Modules
 
-6 toggleable modules in `SkillModuleToggles`:
+7 toggleable modules in `SkillModuleToggles`:
 
 | Module | Extra Input | Input Type |
 |--------|-------------|------------|
@@ -109,6 +120,7 @@ front/app/
 | SEO Optimization | Yes | Input (target keyword) |
 | Script Format | Yes | ToggleChip select (ScriptFormat enum: full_script/outline/hybrid) |
 | B-Roll Cues | No | — |
+| Call to Action | No | — |
 
 Each module renders as a card with a radio-style toggle indicator. Active modules show a primary border/background. Conditional extra inputs appear below the module when active.
 
@@ -190,8 +202,6 @@ scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', 
 | `scriptUuid` | `string` | Target script for generation |
 | `projectUuid` | `string` | Project UUID for creator profile |
 | `hasExistingParts` | `boolean` | Shows replace toggle when true |
-| `hasCreatorProfile` | `boolean` | Hides profile banner when true |
-| `onOpenCreatorProfile` | `() => void` | Opens creator profile modal |
 
 ### GenerationStatusBanner
 
@@ -200,12 +210,3 @@ scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', 
 | `scriptUuid` | `string` | Script UUID for polling invalidation |
 
 Reads `activeGenerationUuid` from `scriptGenerationStore` internally.
-
-### CreatorProfileModal
-
-| Prop | Type | Description |
-|------|------|-------------|
-| `isOpen` | `boolean` | Controls modal visibility |
-| `onClose` | `() => void` | Close handler |
-| `projectUuid` | `string` | Project UUID for the profile |
-| `creatorProfile` | `CreatorProfile \| null` | Existing profile data (null for create) |

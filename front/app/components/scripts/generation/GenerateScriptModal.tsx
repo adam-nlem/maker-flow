@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { SparklesIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router";
 import ModalOverlay from "~/components/ui/ModalOverlay";
 import { Button } from "~/components/ui/Button";
 import ScriptBriefForm from "./ScriptBriefForm";
@@ -18,8 +19,6 @@ interface GenerateScriptModalProps {
     scriptUuid: string;
     projectUuid: string;
     hasExistingParts: boolean;
-    onOpenCreatorProfile: () => void;
-    hasCreatorProfile: boolean;
 }
 
 export default function GenerateScriptModal({
@@ -28,9 +27,8 @@ export default function GenerateScriptModal({
     scriptUuid,
     projectUuid,
     hasExistingParts,
-    onOpenCreatorProfile,
-    hasCreatorProfile,
 }: GenerateScriptModalProps) {
+    const navigate = useNavigate();
     const { latestGeneration } = useLatestScriptGeneration({ scriptUuid });
     const hasPreFilled = useRef(false);
 
@@ -100,18 +98,16 @@ export default function GenerateScriptModal({
                 </div>
 
                 <div className="flex-1 overflow-y-auto px-8 py-5 scrollbar-none">
-                    {/* {!hasCreatorProfile && ( */}
-                        <div
-                            onClick={onOpenCreatorProfile}
-                            className="flex flex-row items-center gap-3 px-4 py-3 mb-5 rounded-xl border border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
-                        >
-                            <UserCircleIcon className="size-5 text-primary shrink-0" strokeWidth={2} />
-                            <div className="flex flex-col">
-                                <span className="text-heading-xs">Configurez votre profil créateur</span>
-                                <span className="text-body-xs">Améliorez les résultats en ajoutant votre style et vos préférences</span>
-                            </div>
+                    <div
+                        onClick={() => { onClose(); navigate('/settings'); }}
+                        className="flex flex-row items-center gap-3 px-4 py-3 mb-5 rounded-xl border border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
+                    >
+                        <UserCircleIcon className="size-5 text-primary shrink-0" strokeWidth={2} />
+                        <div className="flex flex-col">
+                            <span className="text-heading-xs">Configurez votre profil créateur</span>
+                            <span className="text-body-xs">Améliorez les résultats en ajoutant votre style et vos préférences</span>
                         </div>
-                    {/* )} */}
+                    </div>
 
                     <form id="generate-form" className="flex flex-col gap-6" onSubmit={handleSubmit}>
                         <ScriptBriefForm
