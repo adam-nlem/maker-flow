@@ -6,9 +6,13 @@ import { useCreateScriptVoiceOver } from "~/hooks/api/scriptVoiceOvers/useCreate
 import { useCreateScriptDialogue } from "~/hooks/api/scriptDialogues/useCreateScriptDialogue";
 import { useCreateScriptShot } from "~/hooks/api/scriptShots/useCreateScriptShot";
 import { useCreateScriptText } from "~/hooks/api/scriptTexts/useCreateScriptText";
+import { useCreateScriptCallToAction } from "~/hooks/api/scriptCallToActions/useCreateScriptCallToAction";
+import { useCreateScriptRetentionCue } from "~/hooks/api/scriptRetentionCues/useCreateScriptRetentionCue";
 import { ChapterType } from "~/models/enums/ChapterType";
 import { Tone } from "~/models/enums/Tone";
 import { ShotType } from "~/models/enums/ShotType";
+import { CallToActionType } from "~/models/enums/CallToActionType";
+import { RetentionCueType } from "~/models/enums/RetentionCueType";
 
 interface AddScriptPartMenuProps {
     scriptUuid: string;
@@ -22,6 +26,8 @@ export default function AddScriptPartMenu({ scriptUuid }: AddScriptPartMenuProps
     const { createScriptDialogue } = useCreateScriptDialogue();
     const { createScriptShot } = useCreateScriptShot();
     const { createScriptText } = useCreateScriptText();
+    const { createScriptCallToAction } = useCreateScriptCallToAction();
+    const { createScriptRetentionCue } = useCreateScriptRetentionCue();
 
     const handleAdd = async (type: ScriptPartType) => {
         setIsOpen(false);
@@ -40,6 +46,12 @@ export default function AddScriptPartMenu({ scriptUuid }: AddScriptPartMenuProps
                 break;
             case ScriptPartType.Shot:
                 await createScriptShot({ scriptUuid, content: "", shotType: ShotType.ARoll });
+                break;
+            case ScriptPartType.CallToAction:
+                await createScriptCallToAction({ scriptUuid, content: "", callToActionType: CallToActionType.Custom });
+                break;
+            case ScriptPartType.RetentionCue:
+                await createScriptRetentionCue({ scriptUuid, content: "", retentionCueType: RetentionCueType.Question });
                 break;
         }
     };

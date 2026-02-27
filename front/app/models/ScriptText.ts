@@ -1,14 +1,16 @@
+import { ScriptPartType } from "./enums/ScriptPartType";
+
 export interface ScriptTextJSON {
     uuid: string;
     content: string;
     position: number;
-    type: 'text';
+    type: ScriptPartType.Text;
     createdAt: string;
     updatedAt?: string;
 }
 
 export class ScriptText {
-    public readonly type = 'text' as const;
+    public readonly type = ScriptPartType.Text;
 
     constructor(
         public readonly uuid: string,

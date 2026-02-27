@@ -1,0 +1,80 @@
+import { useState } from "react";
+import type { ScriptRetentionCue } from "~/models/ScriptRetentionCue";
+import { RetentionCueType, retentionCueTypeToFrenchTranslation, retentionCueTypeToBgClass, retentionCueTypeToTextClass } from "~/models/enums/RetentionCueType";
+import { ScriptPartType } from "~/models/enums/ScriptPartType";
+import Pill from "~/components/ui/Pill";
+import { TextArea } from "~/components/ui/TextArea";
+import SelectDropdown from "~/components/ui/SelectDropdown";
+import { useUpdateScriptRetentionCue } from "~/hooks/api/scriptRetentionCues/useUpdateScriptRetentionCue";
+import { useDeleteScriptRetentionCue } from "~/hooks/api/scriptRetentionCues/useDeleteScriptRetentionCue";
+import ScriptPartCard from "./ScriptPartCard";
+
+interface ScriptRetentionCueCardProps {
+    retentionCue: ScriptRetentionCue;
+    scriptUuid: string;
+    dragHandleProps?: Record<string, unknown>;
+}
+
+export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragHandleProps }: ScriptRetentionCueCardProps) {
+    const [content, setContent] = useState(retentionCue.content);
+    const [retentionCueType, setRetentionCueType] = useState<RetentionCueType>(retentionCue.retentionCueType);
+
+    const { updateScriptRetentionCue } = useUpdateScriptRetentionCue();
+    const { deleteScriptRetentionCue, isPending: isDeleting } = useDeleteScriptRetentionCue();
+
+    const handleContentBlur = async () => {
+        if (content.trim() !== retentionCue.content) {
+            await updateScriptRetentionCue({ retentionCueUuid: retentionCue.uuid, scriptUuid, data: { content: content.trim() } });
+        }
+    };
+
+    const handleRetentionCueTypeChange = async (newType: RetentionCueType) => {
+        setRetentionCueType(newType);
+        if (newType !== retentionCue.retentionCueType) {
+            await updateScriptRetentionCue({ retentionCueUuid: retentionCue.uuid, scriptUuid, data: { retentionCueType: newType } });
+        }
+    };
+
+    return (
+        <ScriptPartCard
+            partType={ScriptPartType.RetentionCue}
+            dragHandleProps={dragHandleProps}
+            onDelete={() => deleteScriptRetentionCue({ retentionCueUuid: retentionCue.uuid, scriptUuid })}
+            isDeleting={isDeleting}
+        >
+            <SelectDropdown
+                items={Object.values(RetentionCueType)}
+                selectedItemId={retentionCueType}
+                getItemId={(type) => type}
+                onSelect={(type) => handleRetentionCueTypeChange(type)}
+                renderTrigger={({ onClick }) => (
+                    <Pill
+                        onClick={onClick}
+                        label={retentionCueTypeToFrenchTranslation[retentionCueType]}
+                        isSelected
+                        bgColorClassName={retentionCueTypeToBgClass[retentionCueType]}
+                        textColorClassName={retentionCueTypeToTextClass[retentionCueType]}
+                    />
+                )}
+                renderItem={({ item, isSelected, onSelect }) => {
+                    return !isSelected ? <Pill
+                        label={retentionCueTypeToFrenchTranslation[item]}
+                        isSelected
+                        onClick={onSelect}
+                        bgColorClassName={retentionCueTypeToBgClass[item]}
+                        textColorClassName={retentionCueTypeToTextClass[item]}
+                    /> : null
+                }}
+            />
+            <TextArea
+                simple
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                onBlur={handleContentBlur}
+                placeholder="Contenu du signal de rétention..."
+                textStyle="text-sm"
+                fullWidth
+            />
+        </ScriptPartCard>
+    );
+}

@@ -9,4 +9,6 @@ enum ScriptPartType: string
     case Dialogue = 'dialogue';
     case Shot = 'shot';
     case Text = 'text';
+    case CallToAction = 'call_to_action';
+    case RetentionCue = 'retention_cue';
 }

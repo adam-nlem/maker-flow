@@ -7,11 +7,15 @@ import type { ScriptVoiceOver } from "~/models/ScriptVoiceOver";
 import type { ScriptDialogue } from "~/models/ScriptDialogue";
 import type { ScriptShot } from "~/models/ScriptShot";
 import type { ScriptText } from "~/models/ScriptText";
+import type { ScriptCallToAction } from "~/models/ScriptCallToAction";
+import type { ScriptRetentionCue } from "~/models/ScriptRetentionCue";
 import ScriptChapterCard from "./ScriptChapterCard";
 import ScriptVoiceOverCard from "./ScriptVoiceOverCard";
 import ScriptDialogueCard from "./ScriptDialogueCard";
 import ScriptShotCard from "./ScriptShotCard";
 import ScriptTextCard from "./ScriptTextCard";
+import ScriptCallToActionCard from "./ScriptCallToActionCard";
+import ScriptRetentionCueCard from "./ScriptRetentionCueCard";
 import ScriptHookCard from "./ScriptHookCard";
 import AddScriptPartMenu from "./AddScriptPartMenu";
 import { useReorderScriptParts } from "~/hooks/api/scripts/useReorderScriptParts";
@@ -71,6 +75,10 @@ function renderPartCard(part: ScriptPart, scriptUuid: string, dragHandleProps?: 
             return <ScriptShotCard shot={part as ScriptShot} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
         case "text":
             return <ScriptTextCard text={part as ScriptText} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+        case "call_to_action":
+            return <ScriptCallToActionCard callToAction={part as ScriptCallToAction} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+        case "retention_cue":
+            return <ScriptRetentionCueCard retentionCue={part as ScriptRetentionCue} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
     }
 }
 

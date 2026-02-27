@@ -1751,6 +1751,230 @@
       "id": "f5e4d3c2-b1a0-9876-fedc-555555555555"
     },
     {
+      "name": "Script Call-to-Actions",
+      "item": [
+        {
+          "name": "List Call-to-Actions",
+          "id": "cta-list-0001-0000-0000-000000000001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/call-to-actions?scriptUuid={{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "call-to-actions"
+              ],
+              "query": [
+                {
+                  "key": "scriptUuid",
+                  "value": "{{scriptUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Call-to-Action",
+          "id": "cta-create-0001-0000-0000-000000000002",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"content\": \"Abonnez-vous pour plus de contenu\",\n  \"callToActionType\": \"subscribe\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/call-to-actions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "call-to-actions"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Call-to-Action",
+          "id": "cta-update-0001-0000-0000-000000000003",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Nouveau contenu CTA\",\n  \"callToActionType\": \"like\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/call-to-actions/{{callToActionUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "call-to-actions",
+                "{{callToActionUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Call-to-Action",
+          "id": "cta-delete-0001-0000-0000-000000000004",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/call-to-actions/{{callToActionUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "call-to-actions",
+                "{{callToActionUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "cta-folder-0001-0000-0000-000000000000"
+    },
+    {
+      "name": "Script Retention Cues",
+      "item": [
+        {
+          "name": "List Retention Cues",
+          "id": "rc-list-0001-0000-0000-000000000001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/retention-cues?scriptUuid={{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "retention-cues"
+              ],
+              "query": [
+                {
+                  "key": "scriptUuid",
+                  "value": "{{scriptUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Retention Cue",
+          "id": "rc-create-0001-0000-0000-000000000002",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"content\": \"Et devinez ce qui se passe ensuite...\",\n  \"retentionCueType\": \"teaser\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/retention-cues",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "retention-cues"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Retention Cue",
+          "id": "rc-update-0001-0000-0000-000000000003",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Nouveau contenu de rétention\",\n  \"retentionCueType\": \"question\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/retention-cues/{{retentionCueUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "retention-cues",
+                "{{retentionCueUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Retention Cue",
+          "id": "rc-delete-0001-0000-0000-000000000004",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/retention-cues/{{retentionCueUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "retention-cues",
+                "{{retentionCueUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "rc-folder-0001-0000-0000-000000000000"
+    },
+    {
       "name": "Dialogue Subjects",
       "item": [
         {

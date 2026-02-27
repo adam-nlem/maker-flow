@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Script feature allows users to create structured writing plans for social media content. A Script belongs to a Project and can optionally be linked to a PostGroup (1:1). Scripts contain reorderable **parts** — 5 separate entity types (Chapter, VoiceOver, Dialogue, Shot, Text) each in their own table, sharing a global `position` for cross-type ordering. Scripts also have **tags** that are project-scoped, linked via ManyToMany.
+The Script feature allows users to create structured writing plans for social media content. A Script belongs to a Project and can optionally be linked to a PostGroup (1:1). Scripts contain reorderable **parts** — 7 separate entity types (Chapter, VoiceOver, Dialogue, Shot, Text, CallToAction, RetentionCue) each in their own table, sharing a global `position` for cross-type ordering. Scripts also have **tags** that are project-scoped, linked via ManyToMany.
 
 ---
 
@@ -31,6 +31,8 @@ The Script feature allows users to create structured writing plans for social me
 | `scriptDialogues` | `Collection<ScriptDialogue>` | Dialogues (OneToMany, cascade remove, orphanRemoval) |
 | `scriptShots` | `Collection<ScriptShot>` | Shots (OneToMany, cascade remove, orphanRemoval) |
 | `scriptTexts` | `Collection<ScriptText>` | Texts (OneToMany, cascade remove, orphanRemoval) |
+| `scriptCallToActions` | `Collection<ScriptCallToAction>` | Call-to-actions (OneToMany, cascade remove, orphanRemoval) |
+| `scriptRetentionCues` | `Collection<ScriptRetentionCue>` | Retention cues (OneToMany, cascade remove, orphanRemoval) |
 
 ### `ScriptTag` (`App\Entity\ScriptTag`)
 
@@ -145,6 +147,42 @@ Free-form text block for notebook-style editing. No subtype — just content.
 
 **Virtual getter:** `getType(): string` returns `'text'`
 
+### `ScriptCallToAction` (`App\Entity\ScriptCallToAction`)
+
+**Location:** `back/src/Entity/ScriptCallToAction.php`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `int` | Auto-generated primary key |
+| `uuid` | `string (GUID)` | Unique identifier exposed via API |
+| `content` | `string (TEXT)` | Call-to-action content |
+| `callToActionType` | `CallToActionType` | Type of CTA (subscribe, like, comment, share, link, custom) |
+| `position` | `int` | Global order across all part types |
+| `createdAt` | `DateTimeImmutable` | Creation timestamp (UTC) |
+| `updatedAt` | `DateTimeImmutable` | Last update timestamp (UTC, auto-updated) |
+| `script` | `Script` | Parent script (ManyToOne, cascade delete) |
+| `user` | `User` | Owner (ManyToOne, cascade delete) |
+
+**Virtual getter:** `getType(): string` returns `'call_to_action'`
+
+### `ScriptRetentionCue` (`App\Entity\ScriptRetentionCue`)
+
+**Location:** `back/src/Entity/ScriptRetentionCue.php`
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `int` | Auto-generated primary key |
+| `uuid` | `string (GUID)` | Unique identifier exposed via API |
+| `content` | `string (TEXT)` | Retention cue content |
+| `retentionCueType` | `RetentionCueType` | Type of cue (question, teaser, pattern_break, cliffhanger) |
+| `position` | `int` | Global order across all part types |
+| `createdAt` | `DateTimeImmutable` | Creation timestamp (UTC) |
+| `updatedAt` | `DateTimeImmutable` | Last update timestamp (UTC, auto-updated) |
+| `script` | `Script` | Parent script (ManyToOne, cascade delete) |
+| `user` | `User` | Owner (ManyToOne, cascade delete) |
+
+**Virtual getter:** `getType(): string` returns `'retention_cue'`
+
 ### `DialogueSubject` (`App\Entity\DialogueSubject`)
 
 **Location:** `back/src/Entity/DialogueSubject.php`
@@ -176,6 +214,28 @@ Used in reorder DTOs to identify part types. Not stored as a DB column.
 | `dialogue` | Dialogue part |
 | `shot` | Shot part |
 | `text` | Text part |
+| `call_to_action` | Call-to-action part |
+| `retention_cue` | Retention cue part |
+
+### `CallToActionType` (`App\Entity\Enum\CallToActionType`)
+
+| Value | Description |
+|-------|-------------|
+| `subscribe` | Subscribe CTA |
+| `like` | Like CTA |
+| `comment` | Comment CTA |
+| `share` | Share CTA |
+| `link` | Link CTA |
+| `custom` | Custom CTA |
+
+### `RetentionCueType` (`App\Entity\Enum\RetentionCueType`)
+
+| Value | Description |
+|-------|-------------|
+| `question` | Question to the audience |
+| `teaser` | Teaser for upcoming content |
+| `pattern_break` | Pattern break to reset attention |
+| `cliffhanger` | Cliffhanger moment |
 
 ### `ChapterType` (`App\Entity\Enum\ChapterType`)
 
@@ -237,7 +297,7 @@ Renamed from `VoiceOverType`. Also used by `CreatorProfile` (see [script-generat
 | `getByTitleAndProjectAndUser` | `string $title, Project $project, User $user` | `?ScriptTag` | Finds tag by exact title (uniqueness check) |
 | `getByUserAndWithUuidIn` | `User $user, array $uuids` | `array` | Batch fetch tags by UUIDs |
 
-### Part Repositories (ScriptChapter, ScriptVoiceOver, ScriptDialogue, ScriptShot, ScriptText)
+### Part Repositories (ScriptChapter, ScriptVoiceOver, ScriptDialogue, ScriptShot, ScriptText, ScriptCallToAction, ScriptRetentionCue)
 
 All follow the same pattern:
 
@@ -277,10 +337,10 @@ All follow the same pattern:
 | update | PATCH | `/{uuid}` | `api_scripts_update` | Update script (supports PostGroup unlink via explicit null) |
 | delete | DELETE | `/{uuid}` | `api_scripts_delete` | Delete script |
 | listParts | GET | `/{uuid}/parts` | `api_scripts_parts_list` | Unified list of all parts sorted by position |
-| reorderParts | PATCH | `/{uuid}/reorder-parts` | `api_scripts_parts_reorder` | Reorder parts across all 4 types |
+| reorderParts | PATCH | `/{uuid}/reorder-parts` | `api_scripts_parts_reorder` | Reorder parts across all 7 types |
 
 **Special behaviors:**
-- `listParts`: Fetches from all 4 part repos, merges into one array, sorts by `position`. Each entity has a virtual `getType()` getter serialized in the response.
+- `listParts`: Fetches from all 7 part repos, merges into one array, sorts by `position`. Each entity has a virtual `getType()` getter serialized in the response.
 - `reorderParts`: Takes `orderedParts: [{uuid, type}]`, groups by `ScriptPartType` enum, batch-fetches from each repo, sets `position = index`.
 - `update`: Supports explicit `null` for `postGroupUuid` to unlink a PostGroup (tracked via `hasPostGroupUuid()` in DTO).
 
@@ -295,7 +355,7 @@ All follow the same pattern:
 | update | PATCH | `/{tagUuid}` | `api_scripts_tags_update` | Update tag |
 | delete | DELETE | `/{tagUuid}` | `api_scripts_tags_delete` | Delete tag |
 
-### Part Controllers (ScriptChapter, ScriptVoiceOver, ScriptDialogue, ScriptShot, ScriptText)
+### Part Controllers (ScriptChapter, ScriptVoiceOver, ScriptDialogue, ScriptShot, ScriptText, ScriptCallToAction, ScriptRetentionCue)
 
 All follow the same CRUD pattern:
 
@@ -312,8 +372,10 @@ All follow the same CRUD pattern:
 - Dialogues: `/api/scripts/dialogues`
 - Shots: `/api/scripts/shots`
 - Texts: `/api/scripts/texts`
+- Call-to-actions: `/api/scripts/call-to-actions`
+- Retention cues: `/api/scripts/retention-cues`
 
-**Auto-position on create:** If no `position` is provided, computes `max()` across all 5 part repos and assigns `max + 1`.
+**Auto-position on create:** If no `position` is provided, computes `max()` across all 7 part repos and assigns `max + 1`.
 
 ### `DialogueSubjectController` — Route: `/api/scripts/dialogue-subjects`
 
@@ -342,6 +404,8 @@ All follow the same CRUD pattern:
 | `ListScriptDialoguesQueryParamDTO` | `scriptUuid` | NotBlank |
 | `ListScriptShotsQueryParamDTO` | `scriptUuid` | NotBlank |
 | `ListScriptTextsQueryParamDTO` | `scriptUuid` | NotBlank |
+| `ListScriptCallToActionsQueryParamDTO` | `scriptUuid` | NotBlank |
+| `ListScriptRetentionCuesQueryParamDTO` | `scriptUuid` | NotBlank |
 | `ListDialogueSubjectsQueryParamDTO` | `scriptDialogueUuid` | NotBlank |
 
 ### Request DTOs
@@ -363,6 +427,10 @@ All follow the same CRUD pattern:
 | `UpdateScriptShotRequestDTO` | `content?`, `shotType?` |
 | `CreateScriptTextRequestDTO` | `scriptUuid`, `content`, `position?` |
 | `UpdateScriptTextRequestDTO` | `content?` |
+| `CreateScriptCallToActionRequestDTO` | `scriptUuid`, `content`, `callToActionType` (default: Custom), `position?` |
+| `UpdateScriptCallToActionRequestDTO` | `content?`, `callToActionType?` |
+| `CreateScriptRetentionCueRequestDTO` | `scriptUuid`, `content`, `retentionCueType` (default: Question), `position?` |
+| `UpdateScriptRetentionCueRequestDTO` | `content?`, `retentionCueType?` |
 | `CreateDialogueSubjectRequestDTO` | `scriptDialogueUuid`, `speaker`, `content`, `position?` |
 | `UpdateDialogueSubjectRequestDTO` | `speaker?`, `content?` |
 | `ReorderDialogueSubjectsRequestDTO` | `scriptDialogueUuid`, `orderedUuids` |
@@ -396,6 +464,12 @@ All follow the same CRUD pattern:
 | `api_scripts_texts_list` | Text list endpoint |
 | `api_scripts_texts_create` | Text create endpoint |
 | `api_scripts_texts_update` | Text update endpoint |
+| `api_scripts_call_to_actions_list` | Call-to-action list endpoint |
+| `api_scripts_call_to_actions_create` | Call-to-action create endpoint |
+| `api_scripts_call_to_actions_update` | Call-to-action update endpoint |
+| `api_scripts_retention_cues_list` | Retention cue list endpoint |
+| `api_scripts_retention_cues_create` | Retention cue create endpoint |
+| `api_scripts_retention_cues_update` | Retention cue update endpoint |
 | `api_scripts_dialogue_subjects_list` | Dialogue subject list endpoint |
 | `api_scripts_dialogue_subjects_create` | Dialogue subject create endpoint |
 | `api_scripts_dialogue_subjects_update` | Dialogue subject update endpoint |
@@ -417,6 +491,8 @@ Script (1) ────── (N) ScriptVoiceOver
 Script (1) ────── (N) ScriptDialogue
 Script (1) ────── (N) ScriptShot
 Script (1) ────── (N) ScriptText
+Script (1) ────── (N) ScriptCallToAction
+Script (1) ────── (N) ScriptRetentionCue
 ScriptDialogue (1) ── (N) DialogueSubject
 ```
 
@@ -424,8 +500,8 @@ ScriptDialogue (1) ── (N) DialogueSubject
 
 ## Global Position Ordering
 
-Script parts (Chapter, VoiceOver, Dialogue, Shot, Text) share a global `position` field for cross-type ordering within a script:
+Script parts (Chapter, VoiceOver, Dialogue, Shot, Text, CallToAction, RetentionCue) share a global `position` field for cross-type ordering within a script:
 
-- **Auto-assignment on create:** If no `position` is provided, the controller computes `max()` across all 5 part repos and assigns `max + 1`.
-- **Unified list:** `GET /api/scripts/{uuid}/parts` fetches from all 5 repos, merges, sorts by `position`, and serializes with each entity's virtual `getType()` getter.
+- **Auto-assignment on create:** If no `position` is provided, the controller computes `max()` across all 7 part repos and assigns `max + 1`.
+- **Unified list:** `GET /api/scripts/{uuid}/parts` fetches from all 7 repos, merges, sorts by `position`, and serializes with each entity's virtual `getType()` getter.
 - **Reorder:** `PATCH /api/scripts/{uuid}/reorder-parts` accepts `orderedParts: [{uuid, type}]`, dispatches to the correct repo via `ScriptPartType` enum, and sets `position = array index`.

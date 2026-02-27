@@ -2,17 +2,17 @@
 
 namespace App\Entity;
 
-use App\Entity\Enum\ScriptPartType;
+use App\Entity\Enum\CallToActionType;
 use App\Helper\DateHelper;
-use App\Repository\ScriptTextRepository;
+use App\Repository\ScriptCallToActionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ORM\Entity(repositoryClass: ScriptTextRepository::class)]
+#[ORM\Entity(repositoryClass: ScriptCallToActionRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class ScriptText
+class ScriptCallToAction
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -21,50 +21,59 @@ class ScriptText
 
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_call_to_actions_list',
+        'api_scripts_call_to_actions_create',
+        'api_scripts_call_to_actions_update',
         'api_scripts_parts_list',
     ])]
     private ?string $uuid = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_call_to_actions_list',
+        'api_scripts_call_to_actions_create',
+        'api_scripts_call_to_actions_update',
         'api_scripts_parts_list',
     ])]
     private ?string $content = null;
 
+    #[ORM\Column(enumType: CallToActionType::class)]
+    #[Groups([
+        'api_scripts_call_to_actions_list',
+        'api_scripts_call_to_actions_create',
+        'api_scripts_call_to_actions_update',
+        'api_scripts_parts_list',
+    ])]
+    private ?CallToActionType $callToActionType = null;
+
     #[ORM\Column]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_call_to_actions_list',
+        'api_scripts_call_to_actions_create',
+        'api_scripts_call_to_actions_update',
         'api_scripts_parts_list',
     ])]
     private ?int $position = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_call_to_actions_list',
+        'api_scripts_call_to_actions_create',
+        'api_scripts_call_to_actions_update',
         'api_scripts_parts_list',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_call_to_actions_list',
+        'api_scripts_call_to_actions_create',
+        'api_scripts_call_to_actions_update',
         'api_scripts_parts_list',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'scriptTexts')]
+    #[ORM\ManyToOne(inversedBy: 'scriptCallToActions')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Script $script = null;
 
@@ -90,14 +99,14 @@ class ScriptText
     }
 
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_call_to_actions_list',
+        'api_scripts_call_to_actions_create',
+        'api_scripts_call_to_actions_update',
         'api_scripts_parts_list',
     ])]
     public function getType(): string
     {
-        return ScriptPartType::Text->value;
+        return 'call_to_action';
     }
 
     public function getId(): ?int
@@ -125,6 +134,18 @@ class ScriptText
     public function setContent(string $content): static
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getCallToActionType(): ?CallToActionType
+    {
+        return $this->callToActionType;
+    }
+
+    public function setCallToActionType(CallToActionType $callToActionType): static
+    {
+        $this->callToActionType = $callToActionType;
 
         return $this;
     }

@@ -12,6 +12,8 @@ use App\Repository\ScriptGenerationRepository;
 use App\Repository\ScriptShotRepository;
 use App\Repository\ScriptTextRepository;
 use App\Repository\ScriptVoiceOverRepository;
+use App\Repository\ScriptCallToActionRepository;
+use App\Repository\ScriptRetentionCueRepository;
 use App\Service\GeminiClientService;
 use App\Service\PromptAssemblerService;
 use App\Service\ScriptOutputParserService;
@@ -33,6 +35,8 @@ class GenerateScriptHandler
         private readonly ScriptDialogueRepository $dialogueRepository,
         private readonly ScriptShotRepository $shotRepository,
         private readonly ScriptTextRepository $textRepository,
+        private readonly ScriptCallToActionRepository $callToActionRepository,
+        private readonly ScriptRetentionCueRepository $retentionCueRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $log,
     ) {}
@@ -114,6 +118,12 @@ class GenerateScriptHandler
         }
         foreach ($script->getScriptTexts() as $text) {
             $this->textRepository->remove($text);
+        }
+        foreach ($script->getScriptCallToActions() as $callToAction) {
+            $this->callToActionRepository->remove($callToAction);
+        }
+        foreach ($script->getScriptRetentionCues() as $retentionCue) {
+            $this->retentionCueRepository->remove($retentionCue);
         }
         $this->entityManager->flush();
     }

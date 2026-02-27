@@ -186,6 +186,18 @@ class Script
     private Collection $scriptTexts;
 
     /**
+     * @var Collection<int, ScriptCallToAction>
+     */
+    #[ORM\OneToMany(targetEntity: ScriptCallToAction::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptCallToActions;
+
+    /**
+     * @var Collection<int, ScriptRetentionCue>
+     */
+    #[ORM\OneToMany(targetEntity: ScriptRetentionCue::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptRetentionCues;
+
+    /**
      * @var Collection<int, ScriptGeneration>
      */
     #[ORM\OneToMany(targetEntity: ScriptGeneration::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
@@ -207,6 +219,8 @@ class Script
         $this->scriptDialogues = new ArrayCollection();
         $this->scriptShots = new ArrayCollection();
         $this->scriptTexts = new ArrayCollection();
+        $this->scriptCallToActions = new ArrayCollection();
+        $this->scriptRetentionCues = new ArrayCollection();
         $this->scriptGenerations = new ArrayCollection();
     }
 
@@ -540,6 +554,64 @@ class Script
         if ($this->scriptTexts->removeElement($scriptText)) {
             if ($scriptText->getScript() === $this) {
                 $scriptText->setScript(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ScriptCallToAction>
+     */
+    public function getScriptCallToActions(): Collection
+    {
+        return $this->scriptCallToActions;
+    }
+
+    public function addScriptCallToAction(ScriptCallToAction $scriptCallToAction): static
+    {
+        if (!$this->scriptCallToActions->contains($scriptCallToAction)) {
+            $this->scriptCallToActions->add($scriptCallToAction);
+            $scriptCallToAction->setScript($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScriptCallToAction(ScriptCallToAction $scriptCallToAction): static
+    {
+        if ($this->scriptCallToActions->removeElement($scriptCallToAction)) {
+            if ($scriptCallToAction->getScript() === $this) {
+                $scriptCallToAction->setScript(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ScriptRetentionCue>
+     */
+    public function getScriptRetentionCues(): Collection
+    {
+        return $this->scriptRetentionCues;
+    }
+
+    public function addScriptRetentionCue(ScriptRetentionCue $scriptRetentionCue): static
+    {
+        if (!$this->scriptRetentionCues->contains($scriptRetentionCue)) {
+            $this->scriptRetentionCues->add($scriptRetentionCue);
+            $scriptRetentionCue->setScript($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScriptRetentionCue(ScriptRetentionCue $scriptRetentionCue): static
+    {
+        if ($this->scriptRetentionCues->removeElement($scriptRetentionCue)) {
+            if ($scriptRetentionCue->getScript() === $this) {
+                $scriptRetentionCue->setScript(null);
             }
         }
 

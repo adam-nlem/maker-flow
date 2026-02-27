@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\ScriptPartType;
 use App\Entity\Enum\Tone;
 use App\Helper\DateHelper;
 use App\Repository\ScriptVoiceOverRepository;
@@ -106,7 +107,7 @@ class ScriptVoiceOver
     ])]
     public function getType(): string
     {
-        return 'voice_over';
+        return ScriptPartType::VoiceOver->value;
     }
 
     public function getId(): ?int

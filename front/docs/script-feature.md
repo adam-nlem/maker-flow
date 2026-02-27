@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Script feature provides a split-view editor for managing scripts per project. Users create scripts, edit their metadata (title, hook, publication date, tags, platforms, status), and build structured content with five part types: chapters, voice-overs, dialogues, shots, and texts. Parts are reorderable via drag-and-drop. Text parts provide a notebook-style editing experience with auto-save on blur.
+The Script feature provides a split-view editor for managing scripts per project. Users create scripts, edit their metadata (title, hook, publication date, tags, platforms, status), and build structured content with seven part types: chapters, voice-overs, dialogues, shots, texts, call-to-actions, and retention cues. Parts are reorderable via drag-and-drop. Text parts provide a notebook-style editing experience with auto-save on blur.
 
 **Route:** `/scripts`
 
@@ -43,13 +43,17 @@ front/app/
 │   ├── ScriptDialogue.ts        ← type = 'dialogue' as const
 │   ├── ScriptShot.ts            ← type = 'shot' as const
 │   ├── ScriptText.ts            ← type = 'text' as const
+│   ├── ScriptCallToAction.ts    ← type = 'call_to_action' as const
+│   ├── ScriptRetentionCue.ts    ← type = 'retention_cue' as const
 │   ├── DialogueSubject.ts
 │   └── enums/
 │       ├── ScriptPartType.ts    ← with french translation + icon + bg/border/text class maps
 │       ├── ScriptStatus.ts      ← with label/bg/text class maps (pending, in_progress, completed)
 │       ├── ChapterType.ts       ← with label/bg/text class maps
 │       ├── Tone.ts              ← with label/bg/text class maps (renamed from VoiceOverType)
-│       └── ShotType.ts          ← with label/bg/text class maps
+│       ├── ShotType.ts          ← with label/bg/text class maps
+│       ├── CallToActionType.ts  ← with label/bg/text class maps
+│       └── RetentionCueType.ts  ← with label/bg/text class maps
 ├── hooks/api/
 │   ├── scripts/
 │   │   ├── scriptQueryKeys.ts   ← all, list(projectUuid), calendar(projectUuid, year, month), parts(scriptUuid)
@@ -73,6 +77,8 @@ front/app/
 │   ├── scriptDialogues/   (same CRUD pattern)
 │   ├── scriptShots/       (same CRUD pattern)
 │   ├── scriptTexts/       (same CRUD pattern)
+│   ├── scriptCallToActions/  (same CRUD pattern)
+│   ├── scriptRetentionCues/  (same CRUD pattern)
 │   └── dialogueSubjects/
 │       ├── useCreateDialogueSubject.ts  ← uses scriptDialogueUuid
 │       ├── useUpdateDialogueSubject.ts
@@ -112,6 +118,8 @@ front/app/
         ├── ScriptDialogueCard.tsx
         ├── ScriptShotCard.tsx
         ├── ScriptTextCard.tsx         ← borderless, auto-save on blur
+        ├── ScriptCallToActionCard.tsx ← CTA card with type selector + content
+        ├── ScriptRetentionCueCard.tsx ← retention cue card with type selector + content
         ├── DialogueSubjectRow.tsx    ← inline-editable subject line
         ├── AddDialogueSubjectRow.tsx ← inline subject creation
         └── AddScriptPartMenu.tsx     ← "+ Add part" dropdown
@@ -135,8 +143,10 @@ class ScriptVoiceOver { public readonly type = 'voice_over' as const; ... }
 class ScriptDialogue { public readonly type = 'dialogue' as const; ... }
 class ScriptShot { public readonly type = 'shot' as const; ... }
 class ScriptText { public readonly type = 'text' as const; ... }
+class ScriptCallToAction { public readonly type = 'call_to_action' as const; ... }
+class ScriptRetentionCue { public readonly type = 'retention_cue' as const; ... }
 
-export type ScriptPart = ScriptChapter | ScriptVoiceOver | ScriptDialogue | ScriptShot | ScriptText;
+export type ScriptPart = ScriptChapter | ScriptVoiceOver | ScriptDialogue | ScriptShot | ScriptText | ScriptCallToAction | ScriptRetentionCue;
 ```
 `useListScriptParts` maps the heterogeneous API response via `scriptPartFromJSON(json)` which switches on `json.type`.
 
@@ -157,7 +167,7 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 - Optional card border (`bordered` prop, default true)
 - Store-driven header expand/collapse: reads `arePartsExpanded` from `useScriptEditorStore` — when false, the header + delete action are hidden with a smooth CSS grid animation (`grid-rows-[0fr]`/`[1fr]` + opacity transition); children (content) remain always visible
 
-Each part type has its own color: chapter (blue), voice-over (yellow), shot (primary), dialogue (purple), text (gray). Hook uses hardcoded values (red) since it's not a `ScriptPartType` member.
+Each part type has its own color: chapter (blue), voice-over (yellow), shot (primary), dialogue (purple), text (gray), call-to-action (orange), retention cue (pink). Hook uses hardcoded values (red) since it's not a `ScriptPartType` member.
 
 ### Hook Card
 `ScriptHookCard` is a standalone card rendered above the parts list inside `ScriptPartsList`. It uses the same visual pattern as structured part cards (`border border-light-gray rounded-xl p-4 bg-clear`) with a `ScriptPartHeader` (CheckBadgeIcon, primary color). It is not reorderable and has no delete button. A `Button` opens/closes the hook template panel.
@@ -230,7 +240,7 @@ scriptTagQueryKeys.all        // ['script-tags']
 scriptTagQueryKeys.list(uuid) // ['script-tags', 'list', projectUuid]
 ```
 
-All part mutations (chapters, voice-overs, dialogues, shots, texts, dialogue subjects) invalidate `scriptQueryKeys.parts(scriptUuid)`.
+All part mutations (chapters, voice-overs, dialogues, shots, texts, call-to-actions, retention cues, dialogue subjects) invalidate `scriptQueryKeys.parts(scriptUuid)`.
 
 ---
 

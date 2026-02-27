@@ -23,6 +23,8 @@ use App\Repository\ScriptShotRepository;
 use App\Repository\ScriptTagRepository;
 use App\Repository\ScriptTextRepository;
 use App\Repository\ScriptVoiceOverRepository;
+use App\Repository\ScriptCallToActionRepository;
+use App\Repository\ScriptRetentionCueRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -291,6 +293,8 @@ final class ScriptController extends AbstractController
         ScriptDialogueRepository $dialogueRepository,
         ScriptShotRepository $shotRepository,
         ScriptTextRepository $textRepository,
+        ScriptCallToActionRepository $callToActionRepository,
+        ScriptRetentionCueRepository $retentionCueRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -306,8 +310,10 @@ final class ScriptController extends AbstractController
         $dialogues = $dialogueRepository->getByScriptAndUserOrderedByPosition($script, $user);
         $shots = $shotRepository->getByScriptAndUserOrderedByPosition($script, $user);
         $texts = $textRepository->getByScriptAndUserOrderedByPosition($script, $user);
+        $callToActions = $callToActionRepository->getByScriptAndUserOrderedByPosition($script, $user);
+        $retentionCues = $retentionCueRepository->getByScriptAndUserOrderedByPosition($script, $user);
 
-        $allParts = array_merge($chapters, $voiceOvers, $dialogues, $shots, $texts);
+        $allParts = array_merge($chapters, $voiceOvers, $dialogues, $shots, $texts, $callToActions, $retentionCues);
 
         usort($allParts, fn($a, $b) => $a->getPosition() <=> $b->getPosition());
 
@@ -328,6 +334,8 @@ final class ScriptController extends AbstractController
         ScriptDialogueRepository $dialogueRepository,
         ScriptShotRepository $shotRepository,
         ScriptTextRepository $textRepository,
+        ScriptCallToActionRepository $callToActionRepository,
+        ScriptRetentionCueRepository $retentionCueRepository,
         EntityManagerInterface $entityManager,
     ): JsonResponse {
         /** @var User $user */
@@ -349,6 +357,8 @@ final class ScriptController extends AbstractController
                 ScriptPartType::Dialogue => $dialogueRepository->getByUuidAndUser($partUuid, $user),
                 ScriptPartType::Shot => $shotRepository->getByUuidAndUser($partUuid, $user),
                 ScriptPartType::Text => $textRepository->getByUuidAndUser($partUuid, $user),
+                ScriptPartType::CallToAction => $callToActionRepository->getByUuidAndUser($partUuid, $user),
+                ScriptPartType::RetentionCue => $retentionCueRepository->getByUuidAndUser($partUuid, $user),
                 default => null,
             };
 
@@ -361,6 +371,8 @@ final class ScriptController extends AbstractController
                     ScriptPartType::Dialogue => $dialogueRepository->save($entity),
                     ScriptPartType::Shot => $shotRepository->save($entity),
                     ScriptPartType::Text => $textRepository->save($entity),
+                    ScriptPartType::CallToAction => $callToActionRepository->save($entity),
+                    ScriptPartType::RetentionCue => $retentionCueRepository->save($entity),
                     default => null,
                 };
             }

@@ -25,7 +25,7 @@ class PromptAssemblerService
         $blocks[] = $this->buildScriptBriefBlock($generation);
         $blocks[] = $this->buildSkillModulesBlock($generation);
         $blocks[] = $this->buildFormattingInstructions($generation);
-        $blocks[] = "Écris maintenant le script en français. N'ajoute pas de préambule — commence directement par le titre puis le script.";
+        $blocks[] = "Écris maintenant le script en français. N'ajoute pas de préambule — commence directement par le JSON.";
 
         return implode("\n\n", array_filter($blocks));
     }
@@ -129,7 +129,7 @@ class PromptAssemblerService
         foreach ($activeSkills as $skill) {
             match ($skill) {
                 SkillModule::StrongHook->value => $blocks[] = "Commence par une accroche exceptionnellement forte. Les 3 premières secondes doivent créer de la curiosité, de la tension ou une affirmation audacieuse qui rend l'arrêt coûteux.",
-                SkillModule::RetentionBoosters->value => $blocks[] = "Toutes les 60 à 90 secondes, place un moment de ré-engagement : une rupture de pattern, un teaser ou une question. Marque-les [RETENTION CUE] dans le script.",
+                SkillModule::RetentionBoosters->value => $blocks[] = "Toutes les 60 à 90 secondes, place un moment de ré-engagement : une rupture de pattern, un teaser, une question ou un cliffhanger. Utilise le type \"retention_cue\" dans le JSON avec le retentionCueType approprié (question, teaser, pattern_break, cliffhanger).",
                 SkillModule::StorytellingMode->value => $blocks[] = isset($skillInputs['story'])
                     ? "Ancre le script dans cette histoire : {$skillInputs['story']}. Tisse le contenu éducatif à travers elle plutôt que de le présenter sous forme de liste."
                     : null,
@@ -139,7 +139,8 @@ class PromptAssemblerService
                 SkillModule::ScriptFormat->value => $blocks[] = isset($skillInputs['format'])
                     ? "Livre le script sous forme de {$skillInputs['format']}. Plan = points de discussion par section. Script complet = chaque mot tel qu'il serait prononcé. Hybride = titres de sections avec points de discussion détaillés."
                     : null,
-                SkillModule::BRollCues->value => $blocks[] = "Ajoute des indications [B-ROLL: description] tout au long du script là où des images pertinentes renforceraient le propos.",
+                SkillModule::BRollCues->value => $blocks[] = "Ajoute des éléments de type \"shot\" dans le JSON tout au long du script là où des images pertinentes (B-roll) renforceraient le propos.",
+                SkillModule::CallToAction->value => $blocks[] = "Intègre un ou plusieurs appels à l'action dans le script. Utilise le type \"call_to_action\" dans le JSON avec le callToActionType approprié (subscribe, like, comment, share, link, custom).",
                 default => null,
             };
         }
@@ -151,10 +152,13 @@ class PromptAssemblerService
             $negativeInstructions[] = "une accroche spécialement travaillée (strong hook)";
         }
         if (!in_array(SkillModule::RetentionBoosters->value, $activeSkills, true)) {
-            $negativeInstructions[] = "des marqueurs [RETENTION CUE]";
+            $negativeInstructions[] = "des éléments de type \"retention_cue\"";
         }
         if (!in_array(SkillModule::BRollCues->value, $activeSkills, true)) {
-            $negativeInstructions[] = "des indications [B-ROLL: ...]";
+            $negativeInstructions[] = "des éléments de type \"shot\"";
+        }
+        if (!in_array(SkillModule::CallToAction->value, $activeSkills, true)) {
+            $negativeInstructions[] = "des éléments de type \"call_to_action\"";
         }
 
         if (count($negativeInstructions) > 0) {
@@ -169,18 +173,30 @@ class PromptAssemblerService
     {
         $activeSkills = $generation->getActiveSkills();
         $lines = [];
-        $lines[] = 'Formate ta sortie en utilisant ces marqueurs :';
-        $lines[] = '- Commence par le titre du script entouré de [TITLE]...[/TITLE]';
-        $lines[] = '- Puis l\'accroche du script entourée de [HOOK]...[/HOOK]';
-        $lines[] = '- Entoure chaque section principale avec [CHAPTER]Titre[/CHAPTER] suivi du contenu de la section';
-        $lines[] = '- Entoure le contenu parlé/narré avec [VOICE_OVER]...[/VOICE_OVER] uniquement si il n\'es pas dans un autre marqueur';
+        $lines[] = 'Formate ta sortie UNIQUEMENT en JSON valide, sans blocs de code markdown ni texte autour. Utilise cette structure exacte :';
+        $lines[] = '{';
+        $lines[] = '  "title": "Titre du script",';
+        $lines[] = '  "hook": "Accroche du script",';
+        $lines[] = '  "parts": [';
+        $lines[] = '    { "type": "chapter", "title": "Titre du chapitre", "description": "Description optionnelle ou null" },';
+        $lines[] = '    { "type": "voice_over", "content": "Contenu narré/parlé", "tone": "calm|dynamic|dramatic|neutral|casual_friendly|educational_authoritative|hype_energetic|funny_sarcastic|storytelling_emotional" },';
 
         if (in_array(SkillModule::BRollCues->value, $activeSkills, true)) {
-            $lines[] = '- Marque les suggestions de B-roll avec [B-ROLL: description] uniquement si il n\'es pas dans un autre marqueur';
+            $lines[] = '    { "type": "shot", "content": "Description du plan B-roll" },';
         }
 
-        $lines[] = '- Tout autre contenu sera traité comme des blocs de texte brut';
-        $lines[] = '- IMPORTANT : ne jamais imbriquer un marqueur dans un autre. Chaque marqueur doit être au niveau racine.';
+        if (in_array(SkillModule::CallToAction->value, $activeSkills, true)) {
+            $lines[] = '    { "type": "call_to_action", "content": "Contenu du CTA", "callToActionType": "subscribe|like|comment|share|link|custom" },';
+        }
+
+        if (in_array(SkillModule::RetentionBoosters->value, $activeSkills, true)) {
+            $lines[] = '    { "type": "retention_cue", "content": "Moment de ré-engagement", "retentionCueType": "question|teaser|pattern_break|cliffhanger" },';
+        }
+
+        $lines[] = '    { "type": "text", "content": "Tout autre contenu" }';
+        $lines[] = '  ]';
+        $lines[] = '}';
+        $lines[] = 'L\'ordre des éléments dans le tableau "parts" définit l\'ordre du script. Chaque élément est indépendant, pas d\'imbrication.';
 
         return implode("\n", $lines);
     }

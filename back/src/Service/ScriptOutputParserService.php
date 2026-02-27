@@ -2,20 +2,26 @@
 
 namespace App\Service;
 
+use App\DTO\ScriptOutputDTO;
+use App\Entity\Enum\CallToActionType;
 use App\Entity\Enum\ChapterType;
+use App\Entity\Enum\RetentionCueType;
 use App\Entity\Enum\ShotType;
 use App\Entity\Enum\Tone;
 use App\Entity\Script;
+use App\Entity\ScriptCallToAction;
 use App\Entity\ScriptChapter;
+use App\Entity\ScriptRetentionCue;
 use App\Entity\ScriptShot;
 use App\Entity\ScriptText;
 use App\Entity\ScriptVoiceOver;
 use App\Entity\User;
+use App\Repository\ScriptCallToActionRepository;
 use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
+use App\Repository\ScriptRetentionCueRepository;
 use App\Repository\ScriptShotRepository;
 use App\Repository\ScriptTextRepository;
-use App\DTO\ScriptOutputMetadataDTO;
 use App\Repository\ScriptVoiceOverRepository;
 
 class ScriptOutputParserService
@@ -26,131 +32,37 @@ class ScriptOutputParserService
         private readonly ScriptDialogueRepository $dialogueRepository,
         private readonly ScriptShotRepository $shotRepository,
         private readonly ScriptTextRepository $textRepository,
+        private readonly ScriptCallToActionRepository $callToActionRepository,
+        private readonly ScriptRetentionCueRepository $retentionCueRepository,
     ) {}
 
-    public function parseAndCreateParts(string $output, Script $script, User $user, int $startPosition): ScriptOutputMetadataDTO
+    public function parseAndCreateParts(string $output, Script $script, User $user, int $startPosition): ScriptOutputDTO
     {
-        $position = $startPosition;
-        $remaining = $output;
-        $title = null;
-        $hook = null;
+        $cleanOutput = $this->stripMarkdownCodeFences($output);
+        $decoded = json_decode($cleanOutput, true);
 
-        while ($remaining !== '') {
-            $remaining = trim($remaining);
-            if ($remaining === '') {
-                break;
-            }
-
-            // Try to match [TITLE]...[/TITLE]
-            if (preg_match('/^\[TITLE\](.*?)\[\/TITLE\]/s', $remaining, $match)) {
-                $content = trim($match[1]);
-                if ($content !== '') {
-                    $title = $content;
-                }
-                $remaining = substr($remaining, strlen($match[0]));
-                continue;
-            }
-
-            // Try to match [HOOK]...[/HOOK]
-            if (preg_match('/^\[HOOK\](.*?)\[\/HOOK\]/s', $remaining, $match)) {
-                $content = trim($match[1]);
-                if ($content !== '') {
-                    $hook = $content;
-                }
-                $remaining = substr($remaining, strlen($match[0]));
-                continue;
-            }
-
-            // Try to match [CHAPTER]Title[/CHAPTER]
-            if (preg_match('/^\[CHAPTER\](.*?)\[\/CHAPTER\](.*?)(?=\[TITLE\]|\[HOOK\]|\[CHAPTER\]|\[VOICE_OVER\]|\[B-ROLL:|$)/s', $remaining, $match)) {
-                $chapterTitle = trim($match[1]);
-                $description = trim($match[2]);
-
-                $chapter = new ScriptChapter();
-                $chapter
-                    ->setScript($script)
-                    ->setUser($user)
-                    ->setTitle($chapterTitle)
-                    ->setDescription($description !== '' ? $description : null)
-                    ->setChapterType(ChapterType::OffScreen)
-                    ->setPosition($position++);
-                $this->chapterRepository->save($chapter);
-
-                $remaining = substr($remaining, strlen($match[0]));
-                continue;
-            }
-
-            // Try to match [VOICE_OVER]...[/VOICE_OVER]
-            if (preg_match('/^\[VOICE_OVER\](.*?)\[\/VOICE_OVER\]/s', $remaining, $match)) {
-                $content = trim($match[1]);
-
-                if ($content !== '') {
-                    $voiceOver = new ScriptVoiceOver();
-                    $voiceOver
-                        ->setScript($script)
-                        ->setUser($user)
-                        ->setContent($content)
-                        ->setTone(Tone::Neutral)
-                        ->setPosition($position++);
-                    $this->voiceOverRepository->save($voiceOver);
-                }
-
-                $remaining = substr($remaining, strlen($match[0]));
-                continue;
-            }
-
-            // Try to match [B-ROLL: description]
-            if (preg_match('/^\[B-ROLL:\s*(.*?)\]/s', $remaining, $match)) {
-                $description = trim($match[1]);
-
-                if ($description !== '') {
-                    $shot = new ScriptShot();
-                    $shot
-                        ->setScript($script)
-                        ->setUser($user)
-                        ->setContent($description)
-                        ->setShotType(ShotType::BRoll)
-                        ->setPosition($position++);
-                    $this->shotRepository->save($shot);
-                }
-
-                $remaining = substr($remaining, strlen($match[0]));
-                continue;
-            }
-
-            // Capture text until the next marker or end
-            if (preg_match('/^(.*?)(?=\[TITLE\]|\[HOOK\]|\[CHAPTER\]|\[VOICE_OVER\]|\[B-ROLL:)/s', $remaining, $match) && $match[1] !== '') {
-                $content = trim($match[1]);
-
-                if ($content !== '') {
-                    $text = new ScriptText();
-                    $text
-                        ->setScript($script)
-                        ->setUser($user)
-                        ->setContent($content)
-                        ->setPosition($position++);
-                    $this->textRepository->save($text);
-                }
-
-                $remaining = substr($remaining, strlen($match[1]));
-                continue;
-            }
-
-            // No marker found — rest is plain text
-            $content = trim($remaining);
-            if ($content !== '') {
-                $text = new ScriptText();
-                $text
-                    ->setScript($script)
-                    ->setUser($user)
-                    ->setContent($content)
-                    ->setPosition($position++);
-                $this->textRepository->save($text);
-            }
-            break;
+        if ($decoded === null) {
+            throw new \RuntimeException('Failed to decode AI output as JSON: ' . json_last_error_msg());
         }
 
-        return new ScriptOutputMetadataDTO($title, $hook);
+        $dto = ScriptOutputDTO::fromArray($decoded);
+        $position = $startPosition;
+
+        foreach ($dto->getParts() as $part) {
+            $content = trim($part->getContent() ?? '');
+
+            match ($part->getType()) {
+                'chapter' => $this->createChapter($part->getTitle(), $part->getDescription(), $script, $user, $position++),
+                'voice_over' => $content !== '' ? $this->createVoiceOver($content, $script, $user, $position++) : null,
+                'shot' => $content !== '' ? $this->createShot($content, $script, $user, $position++) : null,
+                'call_to_action' => $content !== '' ? $this->createCallToAction($content, $part->getCallToActionType(), $script, $user, $position++) : null,
+                'retention_cue' => $content !== '' ? $this->createRetentionCue($content, $part->getRetentionCueType(), $script, $user, $position++) : null,
+                'text' => $content !== '' ? $this->createText($content, $script, $user, $position++) : null,
+                default => null,
+            };
+        }
+
+        return $dto;
     }
 
     public function getMaxPositionForScript(Script $script): int
@@ -161,6 +73,96 @@ class ScriptOutputParserService
             $this->dialogueRepository->getMaxPositionByScript($script),
             $this->shotRepository->getMaxPositionByScript($script),
             $this->textRepository->getMaxPositionByScript($script),
+            $this->callToActionRepository->getMaxPositionByScript($script),
+            $this->retentionCueRepository->getMaxPositionByScript($script),
         );
+    }
+
+    private function stripMarkdownCodeFences(string $output): string
+    {
+        $output = trim($output);
+
+        if (preg_match('/^```(?:json)?\s*\n?(.*?)\n?\s*```$/s', $output, $match)) {
+            return trim($match[1]);
+        }
+
+        return $output;
+    }
+
+    private function createChapter(?string $title, ?string $description, Script $script, User $user, int $position): void
+    {
+        $chapterTitle = trim($title ?? '');
+        if ($chapterTitle === '') {
+            return;
+        }
+
+        $chapter = new ScriptChapter();
+        $chapter
+            ->setScript($script)
+            ->setUser($user)
+            ->setTitle($chapterTitle)
+            ->setDescription($description !== null && trim($description) !== '' ? trim($description) : null)
+            ->setChapterType(ChapterType::OffScreen)
+            ->setPosition($position);
+        $this->chapterRepository->save($chapter);
+    }
+
+    private function createVoiceOver(string $content, Script $script, User $user, int $position): void
+    {
+        $voiceOver = new ScriptVoiceOver();
+        $voiceOver
+            ->setScript($script)
+            ->setUser($user)
+            ->setContent($content)
+            ->setTone(Tone::Neutral)
+            ->setPosition($position);
+        $this->voiceOverRepository->save($voiceOver);
+    }
+
+    private function createShot(string $content, Script $script, User $user, int $position): void
+    {
+        $shot = new ScriptShot();
+        $shot
+            ->setScript($script)
+            ->setUser($user)
+            ->setContent($content)
+            ->setShotType(ShotType::BRoll)
+            ->setPosition($position);
+        $this->shotRepository->save($shot);
+    }
+
+    private function createCallToAction(string $content, ?string $callToActionType, Script $script, User $user, int $position): void
+    {
+        $callToAction = new ScriptCallToAction();
+        $callToAction
+            ->setScript($script)
+            ->setUser($user)
+            ->setContent($content)
+            ->setCallToActionType(CallToActionType::tryFrom($callToActionType ?? '') ?? CallToActionType::Custom)
+            ->setPosition($position);
+        $this->callToActionRepository->save($callToAction);
+    }
+
+    private function createRetentionCue(string $content, ?string $retentionCueType, Script $script, User $user, int $position): void
+    {
+        $retentionCue = new ScriptRetentionCue();
+        $retentionCue
+            ->setScript($script)
+            ->setUser($user)
+            ->setContent($content)
+            ->setRetentionCueType(RetentionCueType::tryFrom($retentionCueType ?? '') ?? RetentionCueType::Question)
+            ->setPosition($position);
+        $this->retentionCueRepository->save($retentionCue);
+    }
+
+    private function createText(string $content, Script $script, User $user, int $position): void
+    {
+        $text = new ScriptText();
+        $text
+            ->setScript($script)
+            ->setUser($user)
+            ->setContent($content)
+            ->setPosition($position);
+        $this->textRepository->save($text);
     }
 }

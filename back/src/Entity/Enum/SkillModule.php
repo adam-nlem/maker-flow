@@ -10,4 +10,5 @@ enum SkillModule: string
     case SeoOptimization = 'seo_optimization';
     case ScriptFormat = 'script_format';
     case BRollCues = 'b_roll_cues';
+    case CallToAction = 'call_to_action';
 }

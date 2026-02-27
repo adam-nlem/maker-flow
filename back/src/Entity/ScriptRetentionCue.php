@@ -2,17 +2,18 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\RetentionCueType;
 use App\Entity\Enum\ScriptPartType;
 use App\Helper\DateHelper;
-use App\Repository\ScriptTextRepository;
+use App\Repository\ScriptRetentionCueRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ORM\Entity(repositoryClass: ScriptTextRepository::class)]
+#[ORM\Entity(repositoryClass: ScriptRetentionCueRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class ScriptText
+class ScriptRetentionCue
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -21,50 +22,59 @@ class ScriptText
 
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_retention_cues_list',
+        'api_scripts_retention_cues_create',
+        'api_scripts_retention_cues_update',
         'api_scripts_parts_list',
     ])]
     private ?string $uuid = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_retention_cues_list',
+        'api_scripts_retention_cues_create',
+        'api_scripts_retention_cues_update',
         'api_scripts_parts_list',
     ])]
     private ?string $content = null;
 
+    #[ORM\Column(enumType: RetentionCueType::class)]
+    #[Groups([
+        'api_scripts_retention_cues_list',
+        'api_scripts_retention_cues_create',
+        'api_scripts_retention_cues_update',
+        'api_scripts_parts_list',
+    ])]
+    private ?RetentionCueType $retentionCueType = null;
+
     #[ORM\Column]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_retention_cues_list',
+        'api_scripts_retention_cues_create',
+        'api_scripts_retention_cues_update',
         'api_scripts_parts_list',
     ])]
     private ?int $position = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_retention_cues_list',
+        'api_scripts_retention_cues_create',
+        'api_scripts_retention_cues_update',
         'api_scripts_parts_list',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_retention_cues_list',
+        'api_scripts_retention_cues_create',
+        'api_scripts_retention_cues_update',
         'api_scripts_parts_list',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'scriptTexts')]
+    #[ORM\ManyToOne(inversedBy: 'scriptRetentionCues')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Script $script = null;
 
@@ -90,14 +100,14 @@ class ScriptText
     }
 
     #[Groups([
-        'api_scripts_texts_list',
-        'api_scripts_texts_create',
-        'api_scripts_texts_update',
+        'api_scripts_retention_cues_list',
+        'api_scripts_retention_cues_create',
+        'api_scripts_retention_cues_update',
         'api_scripts_parts_list',
     ])]
     public function getType(): string
     {
-        return ScriptPartType::Text->value;
+        return ScriptPartType::RetentionCue->value;
     }
 
     public function getId(): ?int
@@ -125,6 +135,18 @@ class ScriptText
     public function setContent(string $content): static
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    public function getRetentionCueType(): ?RetentionCueType
+    {
+        return $this->retentionCueType;
+    }
+
+    public function setRetentionCueType(RetentionCueType $retentionCueType): static
+    {
+        $this->retentionCueType = $retentionCueType;
 
         return $this;
     }

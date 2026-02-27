@@ -134,6 +134,7 @@ Renamed from `VoiceOverType`. Used in both `ScriptVoiceOver` (as `tone` field) a
 | `seo_optimization` | SEO optimization (requires keyword input) |
 | `script_format` | Script format (requires format input) |
 | `b_roll_cues` | B-Roll visual cues |
+| `call_to_action` | Call-to-action integration |
 
 ### `ScriptFormat` (`App\Entity\Enum\ScriptFormat`)
 
@@ -265,12 +266,12 @@ Used in `skillInputs['format']` to control script output format.
 
 Builds the full prompt by concatenating structured blocks:
 
-1. `[CREATOR_PROFILE]` — platform, content type, niche, audience, tones
-2. `[STYLE_SAMPLE]` — creator's style sample (if provided)
-3. `[SCRIPT_BRIEF]` — topic, goal, key points, opening style, duration, CTA, extra context
-4. Skill module injections (strong hook, retention boosters, storytelling, SEO, format, B-Roll)
-5. Formatting instructions (markers for structured output)
-6. Final instruction
+1. Creator profile block — platform, content type, niche, audience, tones, signature phrases, never list
+2. Style sample block — creator's style sample (if provided)
+3. Script brief block — topic, goal, key points, opening style, duration, CTA, extra context
+4. Skill modules block — active skill instructions (strong hook, retention boosters, storytelling, SEO, format, B-Roll, call to action) + negative instructions for disabled skills
+5. JSON formatting instructions — structured JSON schema with conditionally included part types based on active skills
+6. Final instruction ("commence directement par le JSON")
 
 ### `GeminiClientService`
 
@@ -285,22 +286,41 @@ Calls the Google Gemini API (`https://generativelanguage.googleapis.com/v1beta/m
 
 **Location:** `back/src/Service/ScriptOutputParserService.php`
 
-Parses the AI response into typed script parts using markers:
+Parses the AI JSON response into typed script parts. The AI outputs a structured JSON object:
 
-| Marker | Part Type Created |
-|--------|-------------------|
-| `[TITLE]...[/TITLE]` | Metadata only — stored on `Script.title` |
-| `[HOOK]...[/HOOK]` | Metadata only — stored on `Script.hook` |
-| `[CHAPTER]Title[/CHAPTER]` | `ScriptChapter` (title extracted) |
-| `[VOICE_OVER]...[/VOICE_OVER]` | `ScriptVoiceOver` (Tone::Neutral) |
-| `[B-ROLL: description]` | `ScriptShot` (ShotType::BRoll) |
-| Unmarked text | `ScriptText` |
+```json
+{
+  "title": "Script title",
+  "hook": "Script hook",
+  "parts": [
+    { "type": "chapter", "title": "...", "description": "..." },
+    { "type": "voice_over", "content": "..." },
+    { "type": "shot", "content": "..." },
+    { "type": "call_to_action", "content": "...", "callToActionType": "subscribe|like|comment|share|link|custom" },
+    { "type": "retention_cue", "content": "...", "retentionCueType": "question|teaser|pattern_break|cliffhanger" },
+    { "type": "text", "content": "..." }
+  ]
+}
+```
 
-Returns a `ScriptOutputMetadataDTO` containing extracted `?title` and `?hook`.
+| Part Type | Entity Created | Key Fields |
+|-----------|---------------|------------|
+| `chapter` | `ScriptChapter` | title, description, ChapterType::OffScreen |
+| `voice_over` | `ScriptVoiceOver` | content, Tone::Neutral |
+| `shot` | `ScriptShot` | content, ShotType::BRoll |
+| `call_to_action` | `ScriptCallToAction` | content, CallToActionType from callToActionType field |
+| `retention_cue` | `ScriptRetentionCue` | content, RetentionCueType from retentionCueType field |
+| `text` | `ScriptText` | content |
 
-**Marker stripping:** All parsed content (title, hook, voice over) is passed through `stripMarkers()` which removes any nested marker tags. This is a defensive measure since the AI may nest markers despite prompt instructions forbidding it.
+Returns a `ScriptOutputDTO` containing extracted `?title`, `?hook`, and `ScriptOutputPartDTO[]`.
 
-Parts are created with incrementing positions starting from `max(existing positions) + 1`.
+**DTOs:**
+- `ScriptOutputDTO` (`back/src/DTO/ScriptOutputDTO.php`): Top-level parsed output with `title`, `hook`, and `parts` array. Static `fromArray()` factory.
+- `ScriptOutputPartDTO` (`back/src/DTO/ScriptOutputPartDTO.php`): Individual parsed part with `type`, `title`, `description`, `content`, `callToActionType`, `retentionCueType`. Static `fromArray()` factory.
+
+**Markdown code fence stripping:** The parser strips ```` ```json ``` ```` wrappers if the AI includes them.
+
+Parts are created with incrementing positions starting from `max(existing positions across all 7 repos) + 1`.
 
 ---
 
@@ -323,8 +343,8 @@ Flow:
 2. Load `CreatorProfile` for the script's project + user (optional)
 3. Call `PromptAssemblerService::assemble()` → store in `assembledPrompt` → flush
 4. Call `GeminiClientService::generateScript()` → get AI response
-5. **On success only:** if `replaceExisting` is true → delete all existing parts on the script
-6. Parse response via `ScriptOutputParserService::parseAndCreateParts()` → creates typed parts
+5. **On success only:** if `replaceExisting` is true → delete all existing parts on the script (all 7 part types)
+6. Parse response via `ScriptOutputParserService::parseAndCreateParts()` → creates typed parts (including CallToAction and RetentionCue)
 7. Set status to `completed`, set `completedAt` → flush
 8. **On error:** set status to `failed`, store `errorMessage` → flush (existing parts preserved)
 

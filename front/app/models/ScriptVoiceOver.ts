@@ -1,3 +1,4 @@
+import { ScriptPartType } from "./enums/ScriptPartType";
 import { Tone } from "./enums/Tone";
 
 export interface ScriptVoiceOverJSON {
@@ -5,13 +6,13 @@ export interface ScriptVoiceOverJSON {
     content: string;
     tone: Tone;
     position: number;
-    type: 'voice_over';
+    type: ScriptPartType.VoiceOver;
     createdAt: string;
     updatedAt?: string;
 }
 
 export class ScriptVoiceOver {
-    public readonly type = 'voice_over' as const;
+    public readonly type = ScriptPartType.VoiceOver;
 
     constructor(
         public readonly uuid: string,

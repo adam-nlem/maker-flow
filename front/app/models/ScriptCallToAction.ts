@@ -1,44 +1,43 @@
-import { ScriptPartType } from "./enums/ScriptPartType";
-import { ShotType } from "./enums/ShotType";
+import { CallToActionType } from "./enums/CallToActionType";
 
-export interface ScriptShotJSON {
+export interface ScriptCallToActionJSON {
     uuid: string;
     content: string;
-    shotType: ShotType;
+    callToActionType: CallToActionType;
     position: number;
-    type: ScriptPartType.Shot;
+    type: 'call_to_action';
     createdAt: string;
     updatedAt?: string;
 }
 
-export class ScriptShot {
-    public readonly type = ScriptPartType.Shot;
+export class ScriptCallToAction {
+    public readonly type = 'call_to_action' as const;
 
     constructor(
         public readonly uuid: string,
         public content: string,
-        public shotType: ShotType,
+        public callToActionType: CallToActionType,
         public position: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
     ) { }
 
-    static fromJSON(json: ScriptShotJSON): ScriptShot {
-        return new ScriptShot(
+    static fromJSON(json: ScriptCallToActionJSON): ScriptCallToAction {
+        return new ScriptCallToAction(
             json.uuid,
             json.content,
-            json.shotType,
+            json.callToActionType,
             json.position,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
         )
     }
 
-    toJSON(): ScriptShotJSON {
+    toJSON(): ScriptCallToActionJSON {
         return {
             uuid: this.uuid,
             content: this.content,
-            shotType: this.shotType,
+            callToActionType: this.callToActionType,
             position: this.position,
             type: this.type,
             createdAt: this.createdAt.toISOString(),

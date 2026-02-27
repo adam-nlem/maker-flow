@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\ScriptPartType;
 use App\Entity\Enum\ShotType;
 use App\Helper\DateHelper;
 use App\Repository\ScriptShotRepository;
@@ -106,7 +107,7 @@ class ScriptShot
     ])]
     public function getType(): string
     {
-        return 'shot';
+        return ScriptPartType::Shot->value;
     }
 
     public function getId(): ?int
