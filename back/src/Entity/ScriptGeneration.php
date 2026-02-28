@@ -99,13 +99,6 @@ class ScriptGeneration
     ])]
     private array $skillInputs = [];
 
-    #[ORM\Column]
-    #[Groups([
-        'api_script_generations_show',
-        'api_script_generations_create',
-    ])]
-    private bool $replaceExisting = false;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $assembledPrompt = null;
 
@@ -280,18 +273,6 @@ class ScriptGeneration
     public function setSkillInputs(array $skillInputs): static
     {
         $this->skillInputs = $skillInputs;
-
-        return $this;
-    }
-
-    public function isReplaceExisting(): bool
-    {
-        return $this->replaceExisting;
-    }
-
-    public function setReplaceExisting(bool $replaceExisting): static
-    {
-        $this->replaceExisting = $replaceExisting;
 
         return $this;
     }

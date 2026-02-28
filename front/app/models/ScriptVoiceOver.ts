@@ -7,6 +7,7 @@ export interface ScriptVoiceOverJSON {
     tone: Tone;
     position: number;
     type: ScriptPartType.VoiceOver;
+    generationUuid?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -21,6 +22,7 @@ export class ScriptVoiceOver {
         public position: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
+        public readonly generationUuid?: string,
     ) { }
 
     static fromJSON(json: ScriptVoiceOverJSON): ScriptVoiceOver {
@@ -31,6 +33,7 @@ export class ScriptVoiceOver {
             json.position,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
+            json.generationUuid,
         )
     }
 

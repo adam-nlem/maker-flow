@@ -7,6 +7,7 @@ interface CreateScriptShotData {
     scriptUuid: string;
     content: string;
     shotType?: ShotType;
+    generationUuid?: string;
 }
 
 export function useCreateScriptShot() {

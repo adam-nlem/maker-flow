@@ -33,6 +33,7 @@ class InteractiveAwarePointerSensor extends PointerSensor {
 interface ScriptPartsListProps {
     parts: ScriptPart[];
     script: Script;
+    generationUuid?: string;
 }
 
 interface DraggablePartProps {
@@ -82,7 +83,7 @@ function renderPartCard(part: ScriptPart, scriptUuid: string, dragHandleProps?: 
     }
 }
 
-export default function ScriptPartsList({ parts, script }: ScriptPartsListProps) {
+export default function ScriptPartsList({ parts, script, generationUuid }: ScriptPartsListProps) {
     const scriptUuid = script.uuid;
     const [localParts, setLocalParts] = useState<ScriptPart[]>(parts);
     const [activePart, setActivePart] = useState<ScriptPart | null>(null);
@@ -150,7 +151,7 @@ export default function ScriptPartsList({ parts, script }: ScriptPartsListProps)
             </div>
 
             <div className="px-6 py-4 border-t border-light-gray">
-                <AddScriptPartMenu scriptUuid={scriptUuid} />
+                <AddScriptPartMenu scriptUuid={scriptUuid} generationUuid={generationUuid} />
             </div>
         </div>
     );

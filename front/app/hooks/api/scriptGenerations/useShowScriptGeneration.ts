@@ -30,11 +30,11 @@ export function useShowScriptGeneration({ generationUuid, scriptUuid }: UseShowS
         },
     });
 
-    // Invalidate script data and parts when generation completes
+    // Invalidate generation-scoped parts and generation list when generation completes
     const generation = query.data;
     if (generation?.status === ScriptGenerationStatus.Completed) {
-        queryClient.invalidateQueries({ queryKey: scriptQueryKeys.parts(scriptUuid) });
-        queryClient.invalidateQueries({ queryKey: scriptQueryKeys.all });
+        queryClient.invalidateQueries({ queryKey: scriptQueryKeys.parts(scriptUuid, generationUuid ?? undefined) });
+        queryClient.invalidateQueries({ queryKey: scriptGenerationQueryKeys.list(scriptUuid) });
     }
 
     return {

@@ -13,6 +13,7 @@ class CreateScriptDialogueRequestDTO extends AbstractRequestDTO
     private string $title;
     private ?string $description;
     private ?int $position;
+    private ?string $generationUuid = null;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -27,6 +28,7 @@ class CreateScriptDialogueRequestDTO extends AbstractRequestDTO
         $this->title = $payload["title"];
         $this->description = $payload["description"] ?? null;
         $this->position = $payload["position"] ?? null;
+        $this->generationUuid = $payload["generationUuid"] ?? null;
     }
 
     protected function buildObject(): ScriptDialogue
@@ -60,5 +62,10 @@ class CreateScriptDialogueRequestDTO extends AbstractRequestDTO
     public function getPosition(): ?int
     {
         return $this->position;
+    }
+
+    public function getGenerationUuid(): ?string
+    {
+        return $this->generationUuid;
     }
 }

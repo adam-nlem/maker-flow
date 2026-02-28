@@ -14,6 +14,7 @@ class CreateScriptShotRequestDTO extends AbstractRequestDTO
     private string $content;
     private ShotType $shotType;
     private ?int $position;
+    private ?string $generationUuid = null;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -28,6 +29,7 @@ class CreateScriptShotRequestDTO extends AbstractRequestDTO
         $this->content = $payload["content"];
         $this->shotType = ShotType::tryFrom($payload["shotType"] ?? "") ?? ShotType::ARoll;
         $this->position = $payload["position"] ?? null;
+        $this->generationUuid = $payload["generationUuid"] ?? null;
     }
 
     protected function buildObject(): ScriptShot
@@ -57,5 +59,10 @@ class CreateScriptShotRequestDTO extends AbstractRequestDTO
     public function getPosition(): ?int
     {
         return $this->position;
+    }
+
+    public function getGenerationUuid(): ?string
+    {
+        return $this->generationUuid;
     }
 }

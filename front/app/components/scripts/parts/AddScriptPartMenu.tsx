@@ -16,9 +16,10 @@ import { RetentionCueType } from "~/models/enums/RetentionCueType";
 
 interface AddScriptPartMenuProps {
     scriptUuid: string;
+    generationUuid?: string;
 }
 
-export default function AddScriptPartMenu({ scriptUuid }: AddScriptPartMenuProps) {
+export default function AddScriptPartMenu({ scriptUuid, generationUuid }: AddScriptPartMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const { createScriptChapter } = useCreateScriptChapter();
@@ -33,25 +34,25 @@ export default function AddScriptPartMenu({ scriptUuid }: AddScriptPartMenuProps
         setIsOpen(false);
         switch (type) {
             case ScriptPartType.Text:
-                await createScriptText({ scriptUuid, content: "" });
+                await createScriptText({ scriptUuid, content: "", generationUuid });
                 break;
             case ScriptPartType.Chapter:
-                await createScriptChapter({ scriptUuid, title: "Nouveau chapitre", chapterType: ChapterType.OnScreen });
+                await createScriptChapter({ scriptUuid, title: "Nouveau chapitre", chapterType: ChapterType.OnScreen, generationUuid });
                 break;
             case ScriptPartType.VoiceOver:
-                await createScriptVoiceOver({ scriptUuid, content: "", tone: Tone.Neutral });
+                await createScriptVoiceOver({ scriptUuid, content: "", tone: Tone.Neutral, generationUuid });
                 break;
             case ScriptPartType.Dialogue:
-                await createScriptDialogue({ scriptUuid, title: "Nouveau dialogue" });
+                await createScriptDialogue({ scriptUuid, title: "Nouveau dialogue", generationUuid });
                 break;
             case ScriptPartType.Shot:
-                await createScriptShot({ scriptUuid, content: "", shotType: ShotType.ARoll });
+                await createScriptShot({ scriptUuid, content: "", shotType: ShotType.ARoll, generationUuid });
                 break;
             case ScriptPartType.CallToAction:
-                await createScriptCallToAction({ scriptUuid, content: "", callToActionType: CallToActionType.Custom });
+                await createScriptCallToAction({ scriptUuid, content: "", callToActionType: CallToActionType.Custom, generationUuid });
                 break;
             case ScriptPartType.RetentionCue:
-                await createScriptRetentionCue({ scriptUuid, content: "", retentionCueType: RetentionCueType.Question });
+                await createScriptRetentionCue({ scriptUuid, content: "", retentionCueType: RetentionCueType.Question, generationUuid });
                 break;
         }
     };

@@ -7,6 +7,7 @@ interface CreateScriptVoiceOverData {
     scriptUuid: string;
     content: string;
     tone?: Tone;
+    generationUuid?: string;
 }
 
 export function useCreateScriptVoiceOver() {

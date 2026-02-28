@@ -14,6 +14,7 @@ class CreateScriptVoiceOverRequestDTO extends AbstractRequestDTO
     private string $content;
     private Tone $tone;
     private ?int $position;
+    private ?string $generationUuid = null;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -28,6 +29,7 @@ class CreateScriptVoiceOverRequestDTO extends AbstractRequestDTO
         $this->content = $payload["content"];
         $this->tone = Tone::tryFrom($payload["tone"] ?? "") ?? Tone::Neutral;
         $this->position = $payload["position"] ?? null;
+        $this->generationUuid = $payload["generationUuid"] ?? null;
     }
 
     protected function buildObject(): ScriptVoiceOver
@@ -57,5 +59,10 @@ class CreateScriptVoiceOverRequestDTO extends AbstractRequestDTO
     public function getPosition(): ?int
     {
         return $this->position;
+    }
+
+    public function getGenerationUuid(): ?string
+    {
+        return $this->generationUuid;
     }
 }

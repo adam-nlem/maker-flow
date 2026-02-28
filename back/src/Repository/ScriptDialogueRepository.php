@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Script;
 use App\Entity\ScriptDialogue;
+use App\Entity\ScriptGeneration;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
@@ -49,27 +50,42 @@ class ScriptDialogueRepository extends ServiceEntityRepository
     /**
      * @return ScriptDialogue[]
      */
-    public function getByScriptAndUserOrderedByPosition(Script $script, User $user): array
+    public function getByScriptUserAndGenerationOrderedByPosition(Script $script, User $user, ?ScriptGeneration $generation): array
     {
-        return $this->createQueryBuilder('d')
+        $qb = $this->createQueryBuilder('d')
             ->where('d.script = :script')
             ->andWhere('d.user = :user')
             ->setParameter('script', $script)
             ->setParameter('user', $user)
-            ->orderBy('d.position', 'ASC')
-            ->getQuery()
+            ->orderBy('d.position', 'ASC');
+
+        if ($generation !== null) {
+            $qb->andWhere('d.scriptGeneration = :generation')
+               ->setParameter('generation', $generation);
+        } else {
+            $qb->andWhere('d.scriptGeneration IS NULL');
+        }
+
+        return $qb->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getMaxPositionByScript(Script $script): int
+    public function getMaxPositionByScriptAndGeneration(Script $script, ?ScriptGeneration $generation): int
     {
-        $result = $this->createQueryBuilder('d')
+        $qb = $this->createQueryBuilder('d')
             ->select('MAX(d.position)')
             ->where('d.script = :script')
-            ->setParameter('script', $script)
-            ->getQuery()
-            ->getSingleScalarResult();
+            ->setParameter('script', $script);
+
+        if ($generation !== null) {
+            $qb->andWhere('d.scriptGeneration = :generation')
+               ->setParameter('generation', $generation);
+        } else {
+            $qb->andWhere('d.scriptGeneration IS NULL');
+        }
+
+        $result = $qb->getQuery()->getSingleScalarResult();
 
         return (int) ($result ?? -1);
     }

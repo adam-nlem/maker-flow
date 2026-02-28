@@ -7,6 +7,7 @@ export interface ScriptRetentionCueJSON {
     retentionCueType: RetentionCueType;
     position: number;
     type: ScriptPartType.RetentionCue;
+    generationUuid?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -21,6 +22,7 @@ export class ScriptRetentionCue {
         public position: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
+        public readonly generationUuid?: string,
     ) { }
 
     static fromJSON(json: ScriptRetentionCueJSON): ScriptRetentionCue {
@@ -31,6 +33,7 @@ export class ScriptRetentionCue {
             json.position,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
+            json.generationUuid,
         )
     }
 

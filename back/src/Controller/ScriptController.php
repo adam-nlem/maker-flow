@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\Script\ListCalendarScriptsQueryParamDTO;
+use App\DTO\QueryParam\Script\ListScriptPartsQueryParamDTO;
 use App\DTO\QueryParam\Script\ListScriptsQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Response\Script\ListScriptsGroupedByDayResponseDTO;
@@ -24,6 +25,7 @@ use App\Repository\ScriptTagRepository;
 use App\Repository\ScriptTextRepository;
 use App\Repository\ScriptVoiceOverRepository;
 use App\Repository\ScriptCallToActionRepository;
+use App\Repository\ScriptGenerationRepository;
 use App\Repository\ScriptRetentionCueRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -287,7 +289,9 @@ final class ScriptController extends AbstractController
     #[Route('/{scriptUuid}/parts', name: 'api_scripts_parts_list', methods: ['GET'])]
     public function listParts(
         string $scriptUuid,
+        ListScriptPartsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
+        ScriptGenerationRepository $generationRepository,
         ScriptChapterRepository $chapterRepository,
         ScriptVoiceOverRepository $voiceOverRepository,
         ScriptDialogueRepository $dialogueRepository,
@@ -305,13 +309,24 @@ final class ScriptController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $chapters = $chapterRepository->getByScriptAndUserOrderedByPosition($script, $user);
-        $voiceOvers = $voiceOverRepository->getByScriptAndUserOrderedByPosition($script, $user);
-        $dialogues = $dialogueRepository->getByScriptAndUserOrderedByPosition($script, $user);
-        $shots = $shotRepository->getByScriptAndUserOrderedByPosition($script, $user);
-        $texts = $textRepository->getByScriptAndUserOrderedByPosition($script, $user);
-        $callToActions = $callToActionRepository->getByScriptAndUserOrderedByPosition($script, $user);
-        $retentionCues = $retentionCueRepository->getByScriptAndUserOrderedByPosition($script, $user);
+        $generationUuid = $queryParamDto->getGenerationUuid();
+        $generation = null;
+
+        if ($generationUuid !== null) {
+            $generation = $generationRepository->getByUuidAndUser($generationUuid, $user);
+
+            if ($generation === null) {
+                return $this->json(data: ["message" => "You don't have any generation with this uuid"], status: Response::HTTP_NOT_FOUND);
+            }
+        }
+
+        $chapters = $chapterRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
+        $voiceOvers = $voiceOverRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
+        $dialogues = $dialogueRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
+        $shots = $shotRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
+        $texts = $textRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
+        $callToActions = $callToActionRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
+        $retentionCues = $retentionCueRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
 
         $allParts = array_merge($chapters, $voiceOvers, $dialogues, $shots, $texts, $callToActions, $retentionCues);
 

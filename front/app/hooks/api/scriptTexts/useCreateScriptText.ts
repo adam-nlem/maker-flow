@@ -6,6 +6,7 @@ interface CreateScriptTextData {
     scriptUuid: string;
     content: string;
     position?: number;
+    generationUuid?: string;
 }
 
 export function useCreateScriptText() {

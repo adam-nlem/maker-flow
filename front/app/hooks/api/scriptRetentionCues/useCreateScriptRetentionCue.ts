@@ -7,6 +7,7 @@ interface CreateScriptRetentionCueData {
     scriptUuid: string;
     content: string;
     retentionCueType?: RetentionCueType;
+    generationUuid?: string;
 }
 
 export function useCreateScriptRetentionCue() {

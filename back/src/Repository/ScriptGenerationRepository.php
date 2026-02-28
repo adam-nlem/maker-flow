@@ -56,7 +56,10 @@ class ScriptGenerationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getLatestByScriptAndUser(Script $script, User $user): ?ScriptGeneration
+    /**
+     * @return ScriptGeneration[]
+     */
+    public function getByScriptAndUser(Script $script, User $user): array
     {
         return $this->createQueryBuilder('sg')
             ->where('sg.script = :script')
@@ -64,9 +67,8 @@ class ScriptGenerationRepository extends ServiceEntityRepository
             ->setParameter('script', $script)
             ->setParameter('user', $user)
             ->orderBy('sg.createdAt', 'DESC')
-            ->setMaxResults(1)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 }

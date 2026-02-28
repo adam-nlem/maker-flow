@@ -2,7 +2,9 @@
 
 ## Overview
 
-The Script Generation feature allows users to generate script content using AI (Google Gemini). The system collects structured context via a **Creator Profile** (per project, persistent) and a **Script Brief** (per generation), assembles a prompt, and generates script content asynchronously via RabbitMQ. Generated content fills an existing script's parts.
+The Script Generation feature allows users to generate script content using AI (Google Gemini). The system collects structured context via a **Creator Profile** (per project, persistent) and a **Script Brief** (per generation), assembles a prompt, and generates script content asynchronously via RabbitMQ.
+
+**Generation compartments:** Each generation creates an isolated set of parts with independent positions (starting from 0). Parts are linked to their generation via a `scriptGeneration` ManyToOne on each part entity. Manually created parts (no generation) form their own compartment. The API supports filtering parts by generation.
 
 ---
 
@@ -53,7 +55,6 @@ Tracks each async generation job and stores the input data (brief + skills) for 
 | `extraContext` | `text`, nullable | Brief: additional context for the AI |
 | `activeSkills` | `JSON` | Array of active skill module keys |
 | `skillInputs` | `JSON` | Extra inputs per skill (story, keyword, format, CTA type, retention cue type) |
-| `replaceExisting` | `boolean` | Whether to delete existing parts before inserting |
 | `assembledPrompt` | `text`, nullable | Full prompt sent to AI (for debugging, not serialized) |
 | `errorMessage` | `text`, nullable | Error details if failed |
 | `script` | `Script` | Target script (ManyToOne, cascade delete) |
@@ -176,7 +177,7 @@ Used in `skillInputs['format']` to control script output format.
 |--------|------------|--------|-------------|
 | `save` | `ScriptGeneration $entity, bool $flush` | `void` | Persists a generation |
 | `getByUuidAndUser` | `string $uuid, User $user` | `?ScriptGeneration` | Finds generation by UUID |
-| `getLatestByScriptAndUser` | `Script $script, User $user` | `?ScriptGeneration` | Latest generation for a script |
+| `getByScriptAndUser` | `Script $script, User $user` | `ScriptGeneration[]` | All generations for a script, ordered by createdAt DESC |
 
 ---
 
@@ -199,7 +200,7 @@ Used in `skillInputs['format']` to control script output format.
 |--------|--------|-------|-----|-------------|
 | create | POST | `` | `GenerateScriptRequestDTO` (build pattern) | Dispatch generation job. Returns ScriptGeneration with status `pending` |
 | show | GET | `/{generationUuid}` | — | Get generation status (used for polling) |
-| latest | GET | `` | `LatestScriptGenerationQueryParamDTO` | Get latest generation for a script |
+| list | GET | `` | `LatestScriptGenerationQueryParamDTO` | Get all generations for a script (ordered by createdAt DESC) |
 
 ---
 
@@ -253,7 +254,6 @@ Used in `skillInputs['format']` to control script output format.
 | `extraContext` | `string` | No |
 | `activeSkills` | `string[]` | Yes |
 | `skillInputs` | `array` | Yes |
-| `replaceExisting` | `bool` | Yes |
 
 ---
 
@@ -319,7 +319,7 @@ Returns a `ScriptOutputDTO` containing extracted `?title`, `?hook`, and `ScriptO
 
 **Markdown code fence stripping:** The parser strips ```` ```json ``` ```` wrappers if the AI includes them.
 
-Parts are created with incrementing positions starting from `max(existing positions across all 7 repos) + 1`.
+Parts are created with incrementing positions starting from 0 within their generation compartment. Each generated part is linked to its `ScriptGeneration` entity.
 
 ---
 
@@ -342,10 +342,9 @@ Flow:
 2. Load `CreatorProfile` for the script's project + user (optional)
 3. Call `PromptAssemblerService::assemble()` → store in `assembledPrompt` → flush
 4. Call `GeminiClientService::generateScript()` → get AI response
-5. **On success only:** if `replaceExisting` is true → delete all existing parts on the script (all 7 part types)
-6. Parse response via `ScriptOutputParserService::parseAndCreateParts()` → creates typed parts (including CallToAction and RetentionCue)
-7. Set status to `completed`, set `completedAt` → flush
-8. **On error:** set status to `failed`, store `errorMessage` → flush (existing parts preserved)
+5. Parse response via `ScriptOutputParserService::parseAndCreateParts()` → creates typed parts linked to the generation (positions start at 0)
+6. Set status to `completed`, set `completedAt` → flush
+7. **On error:** set status to `failed`, store `errorMessage` → flush
 
 ---
 
@@ -385,4 +384,22 @@ Project (1) ───── (N) CreatorProfile
 Project + User ── (0..1) CreatorProfile    [Unique constraint]
 User (1) ──────── (N) ScriptGeneration
 Script (1) ────── (N) ScriptGeneration
+ScriptGeneration (1) ── (N) ScriptParts (all 7 types: Text, Chapter, VoiceOver, Dialogue, Shot, CallToAction, RetentionCue)
 ```
+
+### Part ↔ Generation Compartments
+
+Each of the 7 script part entities has an optional `scriptGeneration` ManyToOne:
+
+```php
+#[ORM\ManyToOne(targetEntity: ScriptGeneration::class)]
+#[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+private ?ScriptGeneration $scriptGeneration = null;
+```
+
+- `scriptGeneration = null` → manual part (created by user)
+- `scriptGeneration = entity` → AI-generated part (created by generation)
+- Positions are scoped per script + generation combination (each compartment starts at 0)
+- Part repositories expose `getByScriptUserAndGenerationOrderedByPosition()` and `getMaxPositionByScriptAndGeneration()`
+- `ScriptController::listParts()` accepts optional `generationUuid` query param to filter by compartment
+- Part creation controllers accept optional `generationUuid` in their DTOs to assign new parts to a specific compartment

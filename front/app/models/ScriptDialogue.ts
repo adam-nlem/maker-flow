@@ -8,6 +8,7 @@ export interface ScriptDialogueJSON {
     dialogueSubjects?: DialogueSubjectJSON[];
     position: number;
     type: ScriptPartType.Dialogue;
+    generationUuid?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -23,6 +24,7 @@ export class ScriptDialogue {
         public position: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
+        public readonly generationUuid?: string,
     ) { }
 
     static fromJSON(json: ScriptDialogueJSON): ScriptDialogue {
@@ -34,6 +36,7 @@ export class ScriptDialogue {
             json.position,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
+            json.generationUuid,
         )
     }
 

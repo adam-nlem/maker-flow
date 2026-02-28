@@ -8,6 +8,7 @@ export interface ScriptChapterJSON {
     chapterType: ChapterType;
     position: number;
     type: ScriptPartType.Chapter;
+    generationUuid?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -23,6 +24,7 @@ export class ScriptChapter {
         public position: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
+        public readonly generationUuid?: string,
     ) { }
 
     static fromJSON(json: ScriptChapterJSON): ScriptChapter {
@@ -34,6 +36,7 @@ export class ScriptChapter {
             json.position,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
+            json.generationUuid,
         )
     }
 

@@ -1,11 +1,16 @@
+import { useEffect, useRef } from "react";
 import type { Script } from "~/models/Script";
 import ScriptMetaHeader from "./ScriptMetaHeader";
 import ScriptPartsList from "./parts/ScriptPartsList";
 import { useListScriptParts } from "~/hooks/api/scripts/useListScriptParts";
 import Shimmer from "~/components/ui/Shimmer";
 import GenerationStatusBanner from "./generation/GenerationStatusBanner";
+import GenerationHistoryBar from "./generation/GenerationHistoryBar";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
+import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore";
+import { useListScriptGenerations } from "~/hooks/api/scriptGenerations/useListScriptGenerations";
+import { ScriptGenerationStatus } from "~/models/enums/ScriptGenerationStatus";
 
 interface ScriptEditorPanelProps {
     script: Script;
@@ -13,7 +18,21 @@ interface ScriptEditorPanelProps {
 }
 
 export default function ScriptEditorPanel({ script, projectUuid }: ScriptEditorPanelProps) {
-    const { parts, isLoading } = useListScriptParts({ scriptUuid: script.uuid });
+    const focusedGenerationUuid = useScriptGenerationStore((s) => s.focusedGenerationUuid);
+    const setFocusedGenerationUuid = useScriptGenerationStore((s) => s.setFocusedGenerationUuid);
+    const { generations } = useListScriptGenerations({ scriptUuid: script.uuid });
+    const hasInitialized = useRef(false);
+
+    useEffect(() => {
+        if (hasInitialized.current || generations.length === 0) return;
+        hasInitialized.current = true;
+        const latestCompleted = generations.find((g) => g.status === ScriptGenerationStatus.Completed);
+        if (latestCompleted) {
+            setFocusedGenerationUuid(latestCompleted.uuid);
+        }
+    }, [generations, setFocusedGenerationUuid]);
+
+    const { parts, isLoading } = useListScriptParts({ scriptUuid: script.uuid, generationUuid: focusedGenerationUuid });
     const togglePanel = useScriptRightPanelStore((s) => s.togglePanel);
 
     return (
@@ -22,6 +41,12 @@ export default function ScriptEditorPanel({ script, projectUuid }: ScriptEditorP
                 script={script}
                 projectUuid={projectUuid}
                 onOpenGenerateModal={() => togglePanel(ScriptRightPanel.Generate)}
+            />
+
+            <GenerationHistoryBar
+                scriptUuid={script.uuid}
+                selectedGenerationUuid={focusedGenerationUuid}
+                onSelectGeneration={setFocusedGenerationUuid}
             />
 
             <GenerationStatusBanner scriptUuid={script.uuid} />
@@ -34,7 +59,7 @@ export default function ScriptEditorPanel({ script, projectUuid }: ScriptEditorP
                 </div>
             ) : (
                 <div className="flex-1 overflow-y-auto">
-                    <ScriptPartsList parts={parts} script={script} />
+                    <ScriptPartsList parts={parts} script={script} generationUuid={focusedGenerationUuid} />
                 </div>
             )}
         </div>

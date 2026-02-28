@@ -1,3 +1,6 @@
+import { ArrowPathIcon, CheckCircleIcon, CheckIcon, ClockIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import type { ComponentType, SVGProps } from "react";
+
 export enum ScriptGenerationStatus {
     Pending = 'pending',
     Processing = 'processing',
@@ -13,15 +16,29 @@ export const scriptGenerationStatusToFrenchTranslation: Record<ScriptGenerationS
 }
 
 export const scriptGenerationStatusToBgClass: Record<ScriptGenerationStatus, string> = {
-    [ScriptGenerationStatus.Pending]: "bg-yellow/30",
-    [ScriptGenerationStatus.Processing]: "bg-blue/30",
-    [ScriptGenerationStatus.Completed]: "bg-green/30",
-    [ScriptGenerationStatus.Failed]: "bg-red/30",
+    [ScriptGenerationStatus.Pending]: "bg-yellow/10",
+    [ScriptGenerationStatus.Processing]: "bg-blue/10",
+    [ScriptGenerationStatus.Completed]: "bg-primary/10",
+    [ScriptGenerationStatus.Failed]: "bg-red/10",
 }
 
+export const scriptGenerationStatusToBorderClass: Record<ScriptGenerationStatus, string> = {
+    [ScriptGenerationStatus.Pending]: "border border-yellow/30",
+    [ScriptGenerationStatus.Processing]: "border border-blue/30",
+    [ScriptGenerationStatus.Completed]: "border border-primary/30",
+    [ScriptGenerationStatus.Failed]: "border border-red/30",
+}
 export const scriptGenerationStatusToTextClass: Record<ScriptGenerationStatus, string> = {
     [ScriptGenerationStatus.Pending]: "text-yellow",
     [ScriptGenerationStatus.Processing]: "text-blue",
-    [ScriptGenerationStatus.Completed]: "text-green",
+    [ScriptGenerationStatus.Completed]: "text-primary",
     [ScriptGenerationStatus.Failed]: "text-red",
 }
+
+
+export const scriptGenerationStatusToIcon: Record<ScriptGenerationStatus, ComponentType<SVGProps<SVGSVGElement>>> = {
+    [ScriptGenerationStatus.Pending]: ClockIcon,
+    [ScriptGenerationStatus.Processing]: ArrowPathIcon,
+    [ScriptGenerationStatus.Completed]: CheckCircleIcon,
+    [ScriptGenerationStatus.Failed]: XCircleIcon,
+};

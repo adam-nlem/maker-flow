@@ -7,6 +7,7 @@ export interface ScriptShotJSON {
     shotType: ShotType;
     position: number;
     type: ScriptPartType.Shot;
+    generationUuid?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -21,6 +22,7 @@ export class ScriptShot {
         public position: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
+        public readonly generationUuid?: string,
     ) { }
 
     static fromJSON(json: ScriptShotJSON): ScriptShot {
@@ -31,6 +33,7 @@ export class ScriptShot {
             json.position,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
+            json.generationUuid,
         )
     }
 

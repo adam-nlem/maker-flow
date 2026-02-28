@@ -12,6 +12,7 @@ class CreateScriptTextRequestDTO extends AbstractRequestDTO
     private string $scriptUuid;
     private string $content;
     private ?int $position;
+    private ?string $generationUuid = null;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -25,6 +26,7 @@ class CreateScriptTextRequestDTO extends AbstractRequestDTO
         $this->scriptUuid = $payload["scriptUuid"];
         $this->content = $payload["content"];
         $this->position = $payload["position"] ?? null;
+        $this->generationUuid = $payload["generationUuid"] ?? null;
     }
 
     protected function buildObject(): ScriptText
@@ -47,5 +49,10 @@ class CreateScriptTextRequestDTO extends AbstractRequestDTO
     public function getPosition(): ?int
     {
         return $this->position;
+    }
+
+    public function getGenerationUuid(): ?string
+    {
+        return $this->generationUuid;
     }
 }

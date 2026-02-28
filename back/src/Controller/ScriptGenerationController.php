@@ -79,8 +79,8 @@ final class ScriptGenerationController extends AbstractController
         );
     }
 
-    #[Route('', name: 'api_script_generations_latest', methods: ['GET'])]
-    public function latest(
+    #[Route('', name: 'api_script_generations_list', methods: ['GET'])]
+    public function list(
         LatestScriptGenerationQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
         ScriptGenerationRepository $generationRepository,
@@ -94,14 +94,10 @@ final class ScriptGenerationController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $generation = $generationRepository->getLatestByScriptAndUser($script, $user);
-
-        if ($generation === null) {
-            return $this->json(data: null, status: Response::HTTP_NOT_FOUND);
-        }
+        $generations = $generationRepository->getByScriptAndUser($script, $user);
 
         return $this->json(
-            data: $generation,
+            data: $generations,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_script_generations_show']]
         );

@@ -8,6 +8,7 @@ interface CreateScriptChapterData {
     title: string;
     description?: string;
     chapterType?: ChapterType;
+    generationUuid?: string;
 }
 
 export function useCreateScriptChapter() {

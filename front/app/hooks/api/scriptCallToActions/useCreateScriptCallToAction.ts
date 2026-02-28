@@ -7,6 +7,7 @@ interface CreateScriptCallToActionData {
     scriptUuid: string;
     content: string;
     callToActionType?: CallToActionType;
+    generationUuid?: string;
 }
 
 export function useCreateScriptCallToAction() {

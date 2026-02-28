@@ -6,18 +6,10 @@ use App\Entity\Enum\ScriptGenerationStatus;
 use App\Helper\DateHelper;
 use App\Message\GenerateScriptMessage;
 use App\Repository\CreatorProfileRepository;
-use App\Repository\ScriptChapterRepository;
-use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptGenerationRepository;
-use App\Repository\ScriptShotRepository;
-use App\Repository\ScriptTextRepository;
-use App\Repository\ScriptVoiceOverRepository;
-use App\Repository\ScriptCallToActionRepository;
-use App\Repository\ScriptRetentionCueRepository;
 use App\Service\GeminiClientService;
 use App\Service\PromptAssemblerService;
 use App\Service\ScriptOutputParserService;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
@@ -30,14 +22,6 @@ class GenerateScriptHandler
         private readonly PromptAssemblerService $promptAssemblerService,
         private readonly GeminiClientService $geminiClientService,
         private readonly ScriptOutputParserService $outputParserService,
-        private readonly ScriptChapterRepository $chapterRepository,
-        private readonly ScriptVoiceOverRepository $voiceOverRepository,
-        private readonly ScriptDialogueRepository $dialogueRepository,
-        private readonly ScriptShotRepository $shotRepository,
-        private readonly ScriptTextRepository $textRepository,
-        private readonly ScriptCallToActionRepository $callToActionRepository,
-        private readonly ScriptRetentionCueRepository $retentionCueRepository,
-        private readonly EntityManagerInterface $entityManager,
         private readonly LoggerInterface $log,
     ) {}
 
@@ -69,17 +53,8 @@ class GenerateScriptHandler
             // Call Gemini API
             $output = $this->geminiClientService->generateScript($prompt);
 
-            // Only delete existing parts AFTER successful API call
-            if ($generation->isReplaceExisting()) {
-                $this->deleteExistingParts($script);
-            }
-
-            // Parse output and create parts
-            $startPosition = $generation->isReplaceExisting()
-                ? 0
-                : $this->outputParserService->getMaxPositionForScript($script) + 1;
-
-            $metadata = $this->outputParserService->parseAndCreateParts($output, $script, $user, $startPosition);
+            // Parse output and create parts (scoped to this generation)
+            $metadata = $this->outputParserService->parseAndCreateParts($output, $script, $user, $generation);
 
             if ($metadata->getTitle() !== null) {
                 $script->setTitle($metadata->getTitle());
@@ -100,31 +75,5 @@ class GenerateScriptHandler
         }
 
         $this->generationRepository->save($generation, true);
-    }
-
-    private function deleteExistingParts($script): void
-    {
-        foreach ($script->getScriptChapters() as $chapter) {
-            $this->chapterRepository->remove($chapter);
-        }
-        foreach ($script->getScriptVoiceOvers() as $voiceOver) {
-            $this->voiceOverRepository->remove($voiceOver);
-        }
-        foreach ($script->getScriptDialogues() as $dialogue) {
-            $this->dialogueRepository->remove($dialogue);
-        }
-        foreach ($script->getScriptShots() as $shot) {
-            $this->shotRepository->remove($shot);
-        }
-        foreach ($script->getScriptTexts() as $text) {
-            $this->textRepository->remove($text);
-        }
-        foreach ($script->getScriptCallToActions() as $callToAction) {
-            $this->callToActionRepository->remove($callToAction);
-        }
-        foreach ($script->getScriptRetentionCues() as $retentionCue) {
-            $this->retentionCueRepository->remove($retentionCue);
-        }
-        $this->entityManager->flush();
     }
 }

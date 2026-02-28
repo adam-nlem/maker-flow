@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Repository\ScriptCallToActionRepository;
 use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
+use App\Repository\ScriptGenerationRepository;
 use App\Repository\ScriptRepository;
 use App\Repository\ScriptRetentionCueRepository;
 use App\Repository\ScriptShotRepository;
@@ -53,6 +54,7 @@ final class ScriptCallToActionController extends AbstractController
     public function create(
         CreateScriptCallToActionRequestDTO $dto,
         ScriptRepository $scriptRepository,
+        ScriptGenerationRepository $generationRepository,
         ScriptChapterRepository $chapterRepository,
         ScriptVoiceOverRepository $voiceOverRepository,
         ScriptDialogueRepository $dialogueRepository,
@@ -81,17 +83,26 @@ final class ScriptCallToActionController extends AbstractController
             ->setUser($user)
             ->setScript($script);
 
+        $generation = null;
+        if ($dto->getGenerationUuid() !== null) {
+            $generation = $generationRepository->getByUuidAndUser($dto->getGenerationUuid(), $user);
+            if ($generation === null) {
+                return $this->json(data: ["message" => "You don't have any generation with this uuid"], status: Response::HTTP_NOT_FOUND);
+            }
+            $callToAction->setScriptGeneration($generation);
+        }
+
         if ($dto->getPosition() !== null) {
             $callToAction->setPosition($dto->getPosition());
         } else {
             $maxPosition = max(
-                $chapterRepository->getMaxPositionByScript($script),
-                $voiceOverRepository->getMaxPositionByScript($script),
-                $dialogueRepository->getMaxPositionByScript($script),
-                $shotRepository->getMaxPositionByScript($script),
-                $textRepository->getMaxPositionByScript($script),
-                $callToActionRepository->getMaxPositionByScript($script),
-                $retentionCueRepository->getMaxPositionByScript($script),
+                $chapterRepository->getMaxPositionByScriptAndGeneration($script, $generation),
+                $voiceOverRepository->getMaxPositionByScriptAndGeneration($script, $generation),
+                $dialogueRepository->getMaxPositionByScriptAndGeneration($script, $generation),
+                $shotRepository->getMaxPositionByScriptAndGeneration($script, $generation),
+                $textRepository->getMaxPositionByScriptAndGeneration($script, $generation),
+                $callToActionRepository->getMaxPositionByScriptAndGeneration($script, $generation),
+                $retentionCueRepository->getMaxPositionByScriptAndGeneration($script, $generation),
             );
             $callToAction->setPosition($maxPosition + 1);
         }

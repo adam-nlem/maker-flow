@@ -7,6 +7,7 @@ export interface ScriptCallToActionJSON {
     callToActionType: CallToActionType;
     position: number;
     type: ScriptPartType.CallToAction;
+    generationUuid?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -21,6 +22,7 @@ export class ScriptCallToAction {
         public position: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
+        public readonly generationUuid?: string,
     ) { }
 
     static fromJSON(json: ScriptCallToActionJSON): ScriptCallToAction {
@@ -31,6 +33,7 @@ export class ScriptCallToAction {
             json.position,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
+            json.generationUuid,
         )
     }
 

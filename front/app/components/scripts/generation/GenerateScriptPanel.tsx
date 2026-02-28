@@ -6,8 +6,7 @@ import { SidePanel } from "~/components/ui/SidePanel";
 import ScriptBriefForm from "./ScriptBriefForm";
 import SkillModuleToggles from "./SkillModuleToggles";
 import { useCreateScriptGeneration } from "~/hooks/api/scriptGenerations/useCreateScriptGeneration";
-import { useLatestScriptGeneration } from "~/hooks/api/scriptGenerations/useLatestScriptGeneration";
-import { useListScriptParts } from "~/hooks/api/scripts/useListScriptParts";
+import { useShowScriptGeneration } from "~/hooks/api/scriptGenerations/useShowScriptGeneration";
 import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
@@ -23,10 +22,9 @@ interface GenerateScriptPanelProps {
 
 export default function GenerateScriptPanel({ scriptUuid, projectUuid }: GenerateScriptPanelProps) {
     const navigate = useNavigate();
-    const { latestGeneration } = useLatestScriptGeneration({ scriptUuid });
-    const { parts } = useListScriptParts({ scriptUuid });
-    const hasExistingParts = parts.length > 0;
-    const hasPreFilled = useRef(false);
+    const focusedGenerationUuid = useScriptGenerationStore((s) => s.focusedGenerationUuid);
+    const { generation: focusedGeneration } = useShowScriptGeneration({ generationUuid: focusedGenerationUuid ?? null, scriptUuid });
+    const hasPreFilled = useRef<string | undefined>(undefined);
 
     const isOpen = useScriptRightPanelStore((s) => s.activePanel === ScriptRightPanel.Generate);
     const closePanel = useScriptRightPanelStore((s) => s.closePanel);
@@ -40,23 +38,20 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
     const [extraContext, setExtraContext] = useState("");
     const [activeSkills, setActiveSkills] = useState<SkillModule[]>([]);
     const [skillInputs, setSkillInputs] = useState<Record<string, string>>({});
-    const [replaceExisting, setReplaceExisting] = useState(false);
-
     useEffect(() => {
-        if (latestGeneration && !hasPreFilled.current) {
-            hasPreFilled.current = true;
-            setTopic(latestGeneration.topic);
-            setGoal(latestGeneration.goal);
-            setKeyPoints(latestGeneration.keyPoints ?? "");
-            setOpeningStyle(latestGeneration.openingStyle);
-            setDuration(latestGeneration.duration);
-            setCallToAction(latestGeneration.callToAction ?? "");
-            setExtraContext(latestGeneration.extraContext ?? "");
-            setActiveSkills(latestGeneration.activeSkills as SkillModule[]);
-            setSkillInputs(latestGeneration.skillInputs);
-            setReplaceExisting(latestGeneration.replaceExisting);
+        if (focusedGeneration && hasPreFilled.current !== focusedGeneration.uuid) {
+            hasPreFilled.current = focusedGeneration.uuid;
+            setTopic(focusedGeneration.topic);
+            setGoal(focusedGeneration.goal);
+            setKeyPoints(focusedGeneration.keyPoints ?? "");
+            setOpeningStyle(focusedGeneration.openingStyle);
+            setDuration(focusedGeneration.duration);
+            setCallToAction(focusedGeneration.callToAction ?? "");
+            setExtraContext(focusedGeneration.extraContext ?? "");
+            setActiveSkills(focusedGeneration.activeSkills as SkillModule[]);
+            setSkillInputs(focusedGeneration.skillInputs);
         }
-    }, [latestGeneration]);
+    }, [focusedGeneration]);
 
     const { createScriptGeneration, isPending } = useCreateScriptGeneration();
     const setActiveGenerationUuid = useScriptGenerationStore((s) => s.setActiveGenerationUuid);
@@ -78,7 +73,6 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
             extraContext: extraContext.trim() || undefined,
             activeSkills,
             skillInputs,
-            replaceExisting,
         });
 
         setActiveGenerationUuid(generation.uuid);
@@ -149,28 +143,6 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
                         onCallToActionChange={setCallToAction}
                     />
 
-                    {hasExistingParts && (
-                        <>
-                            <div className="border-t border-light-gray" />
-
-                            <div
-                                onClick={() => setReplaceExisting(!replaceExisting)}
-                                className="flex flex-row items-center gap-3 cursor-pointer"
-                            >
-                                <div className={`size-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${replaceExisting ? 'border-primary bg-primary' : 'border-light-gray'}`}>
-                                    {replaceExisting && (
-                                        <svg className="size-3 text-clear" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    )}
-                                </div>
-                                <div className="flex flex-col">
-                                    <span className="text-heading-xs">Remplacer le contenu existant</span>
-                                    <span className="text-body-xs">Le contenu actuel du script sera remplacé par le contenu généré</span>
-                                </div>
-                            </div>
-                        </>
-                    )}
                 </form>
             </div>
         </SidePanel>

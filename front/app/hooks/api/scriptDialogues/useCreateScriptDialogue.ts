@@ -6,6 +6,7 @@ interface CreateScriptDialogueData {
     scriptUuid: string;
     title: string;
     description?: string;
+    generationUuid?: string;
 }
 
 export function useCreateScriptDialogue() {

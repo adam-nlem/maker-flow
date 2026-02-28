@@ -15,7 +15,6 @@ export interface ScriptGenerationJSON {
     extraContext?: string;
     activeSkills: string[];
     skillInputs: Record<string, string>;
-    replaceExisting: boolean;
     errorMessage?: string;
     createdAt: string;
     completedAt?: string;
@@ -34,7 +33,6 @@ export class ScriptGeneration {
         public readonly extraContext: string | undefined,
         public readonly activeSkills: string[],
         public readonly skillInputs: Record<string, string>,
-        public readonly replaceExisting: boolean,
         public readonly errorMessage: string | undefined,
         public readonly createdAt: Date,
         public readonly completedAt?: Date,
@@ -53,7 +51,6 @@ export class ScriptGeneration {
             json.extraContext,
             json.activeSkills,
             json.skillInputs,
-            json.replaceExisting,
             json.errorMessage,
             new Date(json.createdAt),
             json.completedAt ? new Date(json.completedAt) : undefined,

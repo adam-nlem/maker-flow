@@ -23,7 +23,6 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
     private ?string $extraContext;
     private array $activeSkills;
     private array $skillInputs;
-    private bool $replaceExisting;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -44,7 +43,6 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
         $this->extraContext = $payload["extraContext"] ?? null;
         $this->activeSkills = $payload["activeSkills"] ?? [];
         $this->skillInputs = $payload["skillInputs"] ?? [];
-        $this->replaceExisting = $payload["replaceExisting"] ?? false;
     }
 
     protected function buildObject(): ScriptGeneration
@@ -61,8 +59,7 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
             ->setCallToAction($this->callToAction)
             ->setExtraContext($this->extraContext)
             ->setActiveSkills($this->activeSkills)
-            ->setSkillInputs($this->skillInputs)
-            ->setReplaceExisting($this->replaceExisting);
+            ->setSkillInputs($this->skillInputs);
     }
 
     public function getScriptUuid(): string
@@ -113,10 +110,5 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
     public function getSkillInputs(): array
     {
         return $this->skillInputs;
-    }
-
-    public function isReplaceExisting(): bool
-    {
-        return $this->replaceExisting;
     }
 }

@@ -5,6 +5,7 @@ export interface ScriptTextJSON {
     content: string;
     position: number;
     type: ScriptPartType.Text;
+    generationUuid?: string;
     createdAt: string;
     updatedAt?: string;
 }
@@ -18,6 +19,7 @@ export class ScriptText {
         public position: number,
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
+        public readonly generationUuid?: string,
     ) { }
 
     static fromJSON(json: ScriptTextJSON): ScriptText {
@@ -27,6 +29,7 @@ export class ScriptText {
             json.position,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
+            json.generationUuid,
         )
     }
 

@@ -14,6 +14,7 @@ class CreateScriptRetentionCueRequestDTO extends AbstractRequestDTO
     private string $content;
     private RetentionCueType $retentionCueType;
     private ?int $position;
+    private ?string $generationUuid = null;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -28,6 +29,7 @@ class CreateScriptRetentionCueRequestDTO extends AbstractRequestDTO
         $this->content = $payload["content"];
         $this->retentionCueType = RetentionCueType::tryFrom($payload["retentionCueType"] ?? "") ?? RetentionCueType::Question;
         $this->position = $payload["position"] ?? null;
+        $this->generationUuid = $payload["generationUuid"] ?? null;
     }
 
     protected function buildObject(): ScriptRetentionCue
@@ -57,5 +59,10 @@ class CreateScriptRetentionCueRequestDTO extends AbstractRequestDTO
     public function getPosition(): ?int
     {
         return $this->position;
+    }
+
+    public function getGenerationUuid(): ?string
+    {
+        return $this->generationUuid;
     }
 }

@@ -308,6 +308,7 @@ All follow the same pattern:
 | `getByUuidAndUser` | `string $uuid, User $user` | `?Entity` | Find by UUID and user |
 | `getByScriptAndUserOrderedByPosition` | `Script $script, User $user` | `array` | All parts for script ordered by position |
 | `getMaxPositionByScript` | `Script $script` | `int` | Max position value (-1 if no results) |
+| `getMaxPositionByScriptAndGeneration` | `Script $script, ?ScriptGeneration $generation` | `int` | Max position scoped by script and optional generation (-1 if no results) |
 
 ### `DialogueSubjectRepository`
 
@@ -375,7 +376,9 @@ All follow the same CRUD pattern:
 - Call-to-actions: `/api/scripts/call-to-actions`
 - Retention cues: `/api/scripts/retention-cues`
 
-**Auto-position on create:** If no `position` is provided, computes `max()` across all 7 part repos and assigns `max + 1`.
+**Auto-position on create:** If no `position` is provided, computes `max()` across all 7 part repos (scoped by generation if `generationUuid` is provided) and assigns `max + 1`.
+
+**Generation scoping on create:** All part creation endpoints accept an optional `generationUuid` parameter. When provided, the part is assigned to the specified `ScriptGeneration` via `setScriptGeneration()`, and max position calculation uses `getMaxPositionByScriptAndGeneration` to scope positions within that generation compartment.
 
 ### `DialogueSubjectController` — Route: `/api/scripts/dialogue-subjects`
 
@@ -417,19 +420,19 @@ All follow the same CRUD pattern:
 | `ReorderScriptPartsRequestDTO` | `orderedParts: [{uuid, type}]` |
 | `CreateScriptTagRequestDTO` | `projectUuid`, `title`, `color` (default: Green) |
 | `UpdateScriptTagRequestDTO` | `title`, `color` |
-| `CreateScriptChapterRequestDTO` | `scriptUuid`, `title`, `description?`, `chapterType` (default: OnScreen), `position?` |
+| `CreateScriptChapterRequestDTO` | `scriptUuid`, `title`, `description?`, `chapterType` (default: OnScreen), `position?`, `generationUuid?` |
 | `UpdateScriptChapterRequestDTO` | `title?`, `description?`, `chapterType?` |
-| `CreateScriptVoiceOverRequestDTO` | `scriptUuid`, `content`, `tone` (default: Neutral), `position?` |
+| `CreateScriptVoiceOverRequestDTO` | `scriptUuid`, `content`, `tone` (default: Neutral), `position?`, `generationUuid?` |
 | `UpdateScriptVoiceOverRequestDTO` | `content?`, `tone?` |
-| `CreateScriptDialogueRequestDTO` | `scriptUuid`, `title`, `description?`, `position?` |
+| `CreateScriptDialogueRequestDTO` | `scriptUuid`, `title`, `description?`, `position?`, `generationUuid?` |
 | `UpdateScriptDialogueRequestDTO` | `title?`, `description?` |
-| `CreateScriptShotRequestDTO` | `scriptUuid`, `content`, `shotType` (default: ARoll), `position?` |
+| `CreateScriptShotRequestDTO` | `scriptUuid`, `content`, `shotType` (default: ARoll), `position?`, `generationUuid?` |
 | `UpdateScriptShotRequestDTO` | `content?`, `shotType?` |
-| `CreateScriptTextRequestDTO` | `scriptUuid`, `content`, `position?` |
+| `CreateScriptTextRequestDTO` | `scriptUuid`, `content`, `position?`, `generationUuid?` |
 | `UpdateScriptTextRequestDTO` | `content?` |
-| `CreateScriptCallToActionRequestDTO` | `scriptUuid`, `content`, `callToActionType` (default: Custom), `position?` |
+| `CreateScriptCallToActionRequestDTO` | `scriptUuid`, `content`, `callToActionType` (default: Custom), `position?`, `generationUuid?` |
 | `UpdateScriptCallToActionRequestDTO` | `content?`, `callToActionType?` |
-| `CreateScriptRetentionCueRequestDTO` | `scriptUuid`, `content`, `retentionCueType` (default: Question), `position?` |
+| `CreateScriptRetentionCueRequestDTO` | `scriptUuid`, `content`, `retentionCueType` (default: Question), `position?`, `generationUuid?` |
 | `UpdateScriptRetentionCueRequestDTO` | `content?`, `retentionCueType?` |
 | `CreateDialogueSubjectRequestDTO` | `scriptDialogueUuid`, `speaker`, `content`, `position?` |
 | `UpdateDialogueSubjectRequestDTO` | `speaker?`, `content?` |
@@ -493,6 +496,13 @@ Script (1) ────── (N) ScriptShot
 Script (1) ────── (N) ScriptText
 Script (1) ────── (N) ScriptCallToAction
 Script (1) ────── (N) ScriptRetentionCue
+ScriptGeneration (1) ── (N) ScriptChapter     [ManyToOne, nullable]
+ScriptGeneration (1) ── (N) ScriptVoiceOver   [ManyToOne, nullable]
+ScriptGeneration (1) ── (N) ScriptDialogue    [ManyToOne, nullable]
+ScriptGeneration (1) ── (N) ScriptShot        [ManyToOne, nullable]
+ScriptGeneration (1) ── (N) ScriptText        [ManyToOne, nullable]
+ScriptGeneration (1) ── (N) ScriptCallToAction [ManyToOne, nullable]
+ScriptGeneration (1) ── (N) ScriptRetentionCue [ManyToOne, nullable]
 ScriptDialogue (1) ── (N) DialogueSubject
 ```
 
@@ -502,6 +512,7 @@ ScriptDialogue (1) ── (N) DialogueSubject
 
 Script parts (Chapter, VoiceOver, Dialogue, Shot, Text, CallToAction, RetentionCue) share a global `position` field for cross-type ordering within a script:
 
-- **Auto-assignment on create:** If no `position` is provided, the controller computes `max()` across all 7 part repos and assigns `max + 1`.
+- **Auto-assignment on create:** If no `position` is provided, the controller computes `max()` across all 7 part repos (scoped by generation when `generationUuid` is provided) and assigns `max + 1`.
+- **Generation scoping:** All part creation endpoints accept an optional `generationUuid`. When provided, the part is linked to the `ScriptGeneration` entity via `setScriptGeneration()`, and position auto-assignment uses `getMaxPositionByScriptAndGeneration()` to scope positions within that generation compartment. When `generationUuid` is not provided, `$generation` is `null` and positions are scoped to the script only.
 - **Unified list:** `GET /api/scripts/{uuid}/parts` fetches from all 7 repos, merges, sorts by `position`, and serializes with each entity's virtual `getType()` getter.
 - **Reorder:** `PATCH /api/scripts/{uuid}/reorder-parts` accepts `orderedParts: [{uuid, type}]`, dispatches to the correct repo via `ScriptPartType` enum, and sets `position = array index`.

@@ -18,13 +18,13 @@ ScriptPageView
   ├── ScriptEditorPanel (flex-1)
   │     ├── ScriptMetaHeader
   │     │     └── SparklesIcon button → toggles GenerateScriptPanel via shared store
+  │     ├── GenerationHistoryBar (shown when script has generations — navigate between compartments)
   │     ├── GenerationStatusBanner (shown when generation is active)
-  │     └── ScriptPartsList
+  │     └── ScriptPartsList (filtered by focusedGenerationUuid)
   ├── GenerateScriptPanel (SidePanel, w-96, right, collapsible)
   │     ├── Creator Profile banner → navigates to /settings
   │     ├── ScriptBriefForm (topic, goal, key points, opening style, duration, extra context)
   │     ├── SkillModuleToggles (7 toggleable modules with conditional inputs)
-  │     ├── Replace existing toggle (shown only if script has parts)
   │     └── Sticky footer with submit button
   └── HookTemplatePanel (SidePanel, w-72, right, collapsible)
 
@@ -68,16 +68,19 @@ front/app/
 │   └── scriptGenerations/
 │       ├── scriptGenerationQueryKeys.ts
 │       ├── useCreateScriptGeneration.ts  ← POST, returns ScriptGeneration
+│       ├── useListScriptGenerations.ts   ← GET, returns ScriptGeneration[] (all generations for a script)
+│       ├── useLatestScriptGeneration.ts  ← derives from useListScriptGenerations (first item)
 │       └── useShowScriptGeneration.ts    ← GET with polling (refetchInterval: 2s)
 ├── stores/scripts/
-│   ├── scriptGenerationStore.ts       ← activeGenerationUuid state
+│   ├── scriptGenerationStore.ts       ← activeGenerationUuid + focusedGenerationUuid state
 │   └── scriptRightPanelStore.ts       ← shared panel state (generate | hookTemplates)
 ├── components/scripts/
 │   ├── generation/
-│   │   ├── GenerateScriptPanel.tsx     ← collapsible right panel with brief + skills + replace toggle
+│   │   ├── GenerateScriptPanel.tsx     ← collapsible right panel with brief + skills
 │   │   ├── ScriptBriefForm.tsx         ← per-generation brief fields
 │   │   ├── SkillModuleToggles.tsx      ← skill module toggles with conditional inputs
-│   │   └── GenerationStatusBanner.tsx  ← inline status banner with auto-dismiss
+│   │   ├── GenerationStatusBanner.tsx  ← inline status banner with auto-dismiss
+│   │   └── GenerationHistoryBar.tsx    ← horizontal bar to navigate between generation compartments
 │   └── creatorProfile/
 │       └── CreatorProfileForm.tsx      ← full creator profile form (used in Settings page)
 ├── components/settings/
@@ -100,13 +103,23 @@ front/app/
 1. User clicks sparkle icon in `ScriptMetaHeader` → toggles `GenerateScriptPanel` via shared `scriptRightPanelStore`
 2. User fills brief (topic required, goal required, opening style required, duration required)
 3. User optionally toggles skill modules and configures extra inputs (CTA type, retention cue type, etc.)
-4. User optionally checks "Replace existing content" (shown only if script has parts)
-5. User clicks "Générer le script" → `useCreateScriptGeneration` fires
-6. On success, `activeGenerationUuid` is stored in `scriptGenerationStore`
-7. Panel closes, `GenerationStatusBanner` appears in the editor
-8. `useShowScriptGeneration` polls every 2 seconds while status is `pending` or `processing`
-9. On `completed` → invalidates `scriptQueryKeys.parts(scriptUuid)` → parts list re-fetches → banner auto-dismisses after 3 seconds
-10. On `failed` → banner shows error message with dismiss button
+4. User clicks "Générer le script" → `useCreateScriptGeneration` fires
+5. On success, `activeGenerationUuid` is stored in `scriptGenerationStore`
+6. Panel closes, `GenerationStatusBanner` appears in the editor
+7. `useShowScriptGeneration` polls every 2 seconds while status is `pending` or `processing`
+8. On `completed` → invalidates generation-scoped `scriptQueryKeys.parts(scriptUuid, generationUuid)` + `scriptGenerationQueryKeys.list(scriptUuid)` → parts list re-fetches → `focusedGenerationUuid` is switched to the newly completed generation → banner auto-dismisses after 3 seconds
+9. On `failed` → banner shows error message with dismiss button
+
+### Generation Compartments (History Navigation)
+
+Each generation creates an isolated compartment of parts with independent positions. Users navigate between compartments via the `GenerationHistoryBar`.
+
+- **Default view on script open:** latest completed generation (fallback to manual parts if none)
+- **"Manuel" chip:** shows manually created parts (`generationUuid = undefined`)
+- **Generation chips:** each shows a truncated topic + status color dot (yellow=pending, blue=processing, green=completed, red=failed)
+- **Adding a manual part:** the part is created in the currently viewed compartment (generation or manual)
+- **State management:** `focusedGenerationUuid` in `scriptGenerationStore` drives which compartment is displayed
+- **On generation completion:** `GenerationStatusBanner` automatically switches `focusedGenerationUuid` to the newly completed generation
 
 ### Shared Right Panel Store
 
@@ -129,7 +142,7 @@ Persistence key: `"app:scripts:right-panel"`
 `useShowScriptGeneration` uses React Query's `refetchInterval` callback:
 - Returns `2000` (ms) when status is `pending` or `processing`
 - Returns `false` to stop polling when status is `completed` or `failed`
-- On completion, automatically invalidates `scriptQueryKeys.parts(scriptUuid)` to refresh the parts list
+- On completion, automatically invalidates `scriptQueryKeys.parts(scriptUuid, generationUuid)` and `scriptGenerationQueryKeys.list(scriptUuid)` to refresh the parts list and generation list
 
 ### Creator Profile
 
@@ -193,7 +206,6 @@ class ScriptGeneration {
     extraContext: string | undefined
     activeSkills: string[]
     skillInputs: Record<string, string>
-    replaceExisting: boolean
     errorMessage: string | undefined
     createdAt: Date
     completedAt?: Date
@@ -207,6 +219,7 @@ creatorProfileQueryKeys.all                    // ['creatorProfiles']
 creatorProfileQueryKeys.show(projectUuid)      // ['creatorProfiles', 'show', projectUuid]
 
 scriptGenerationQueryKeys.all                  // ['scriptGenerations']
+scriptGenerationQueryKeys.list(scriptUuid)     // ['scriptGenerations', 'list', scriptUuid]
 scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', generationUuid]
 ```
 
@@ -215,9 +228,11 @@ scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', 
 ```ts
 // scriptGenerationStore.ts
 {
-    activeGenerationUuid: string | null
+    activeGenerationUuid: string | null           // currently processing generation (for polling)
+    focusedGenerationUuid: string | undefined     // viewed generation compartment (undefined = manual parts)
     setActiveGenerationUuid: (uuid: string | null) => void
     clearActiveGeneration: () => void
+    setFocusedGenerationUuid: (uuid: string | undefined) => void
 }
 
 // scriptRightPanelStore.ts (shared with hook templates) — uses ScriptRightPanel enum
@@ -240,7 +255,17 @@ scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', 
 | `scriptUuid` | `string` | Target script for generation |
 | `projectUuid` | `string` | Project UUID for creator profile |
 
-Reads `activePanel` from `useScriptRightPanelStore` internally. Resolves `hasExistingParts` via `useListScriptParts` (React Query cache reuse).
+Reads `activePanel` from `useScriptRightPanelStore` internally. Pre-fills form fields from the latest generation.
+
+### GenerationHistoryBar
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `scriptUuid` | `string` | Script UUID to fetch generations |
+| `selectedGenerationUuid` | `string \| undefined` | Currently focused generation (undefined = manual) |
+| `onSelectGeneration` | `(uuid: string \| undefined) => void` | Callback to switch compartment |
+
+Horizontal bar with "Manuel" chip + one chip per generation. Each generation chip shows a status color dot and truncated topic. Only rendered when the script has at least one generation.
 
 ### GenerationStatusBanner
 
@@ -248,4 +273,4 @@ Reads `activePanel` from `useScriptRightPanelStore` internally. Resolves `hasExi
 |------|------|-------------|
 | `scriptUuid` | `string` | Script UUID for polling invalidation |
 
-Reads `activeGenerationUuid` from `scriptGenerationStore` internally.
+Reads `activeGenerationUuid` from `scriptGenerationStore` internally. On completion, switches `focusedGenerationUuid` to the newly completed generation.

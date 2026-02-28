@@ -10,6 +10,7 @@ interface GenerationStatusBannerProps {
 export default function GenerationStatusBanner({ scriptUuid }: GenerationStatusBannerProps) {
     const activeGenerationUuid = useScriptGenerationStore((s) => s.activeGenerationUuid);
     const clearActiveGeneration = useScriptGenerationStore((s) => s.clearActiveGeneration);
+    const setFocusedGenerationUuid = useScriptGenerationStore((s) => s.setFocusedGenerationUuid);
 
     const { generation } = useShowScriptGeneration({
         generationUuid: activeGenerationUuid,
@@ -23,6 +24,7 @@ export default function GenerationStatusBanner({ scriptUuid }: GenerationStatusB
     const isCompleted = generation.status === ScriptGenerationStatus.Completed;
 
     if (isCompleted) {
+        setFocusedGenerationUuid(generation.uuid);
         setTimeout(() => clearActiveGeneration(), 3000);
     }
 

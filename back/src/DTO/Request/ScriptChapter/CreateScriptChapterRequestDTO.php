@@ -15,6 +15,7 @@ class CreateScriptChapterRequestDTO extends AbstractRequestDTO
     private ?string $description;
     private ChapterType $chapterType;
     private ?int $position;
+    private ?string $generationUuid = null;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -30,6 +31,7 @@ class CreateScriptChapterRequestDTO extends AbstractRequestDTO
         $this->description = $payload["description"] ?? null;
         $this->chapterType = ChapterType::tryFrom($payload["chapterType"] ?? "") ?? ChapterType::OnScreen;
         $this->position = $payload["position"] ?? null;
+        $this->generationUuid = $payload["generationUuid"] ?? null;
     }
 
     protected function buildObject(): ScriptChapter
@@ -70,5 +72,10 @@ class CreateScriptChapterRequestDTO extends AbstractRequestDTO
     public function getPosition(): ?int
     {
         return $this->position;
+    }
+
+    public function getGenerationUuid(): ?string
+    {
+        return $this->generationUuid;
     }
 }
