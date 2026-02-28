@@ -374,6 +374,47 @@ Modal backdrop with sidebar awareness.
 
 ---
 
+### SidePanel
+
+**Location:** `front/app/components/ui/SidePanel.tsx`
+
+Reusable side panel layout with header, optional toolbar, scrollable body, and optional sticky footer. Supports collapsible animation.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `title` | `string` | — | Header title |
+| `icon` | `HeroIcon` | — | Optional icon before the title |
+| `width` | `"w-72" \| "w-96"` | `"w-72"` | Panel width |
+| `side` | `"left" \| "right"` | `"right"` | Border side (`border-r` for left, `border-l` for right) |
+| `isOpen` | `boolean` | — | If provided, wraps in collapsible animation. If omitted, always visible |
+| `onClose` | `() => void` | — | If provided, shows close button in header |
+| `headerActions` | `ReactNode` | — | Extra buttons right of title, before close button |
+| `toolbar` | `ReactNode` | — | Fixed content between header and scrollable body |
+| `footer` | `ReactNode` | — | Sticky footer content (wrapped in `px-4 py-3 border-t`) |
+| `children` | `ReactNode` | — | Scrollable body content (consumer handles padding) |
+
+**Examples:**
+```tsx
+// Static left panel
+<SidePanel title="Scripts" side="left" headerActions={<button>+</button>}>
+    <div className="p-3 flex flex-col gap-1">{/* items */}</div>
+</SidePanel>
+
+// Collapsible right panel with footer
+<SidePanel title="Générer" icon={SparklesIcon} width="w-96"
+    isOpen={isOpen} onClose={closePanel} footer={<Button>Submit</Button>}>
+    <div className="p-4">{/* form */}</div>
+</SidePanel>
+
+// Collapsible right panel with toolbar
+<SidePanel title="Hooks" isOpen={isOpen} onClose={closePanel}
+    toolbar={<div className="px-4 py-3 border-b border-light-gray"><Input /></div>}>
+    <div className="p-3 flex flex-col gap-2">{/* list */}</div>
+</SidePanel>
+```
+
+---
+
 ### SelectItemModal
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/SelectItemModal.tsx`

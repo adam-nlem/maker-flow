@@ -4,6 +4,7 @@ import type { Script } from "~/models/Script";
 import ScriptListItem from "./ScriptListItem";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
+import { SidePanel } from "~/components/ui/SidePanel";
 
 interface ScriptListPanelProps {
     scripts: Script[];
@@ -45,22 +46,21 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     }, [hasMore, isLoadingMore, listMore]);
 
     return (
-        <div className="w-72 shrink-0 border-r border-light-gray h-full flex flex-col">
-            {/* Header */}
-            <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
-                <h2 className="text-heading-md">Scripts</h2>
+        <SidePanel
+            title="Scripts"
+            side="left"
+            headerActions={
                 <button
                     onClick={handleNewScript}
                     disabled={isPending}
-                    className="flex flex-row items-center gap-1 text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
+                    className="text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
                     title="Nouveau script"
                 >
                     <PlusIcon className="size-4" strokeWidth={2} />
                 </button>
-            </div>
-
-            {/* List */}
-            <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1 scrollbar-none">
+            }
+        >
+            <div className="p-3 flex flex-col gap-1">
                 {scripts.length === 0 ? (
                     <div className="flex flex-col items-center justify-center py-12 text-gray">
                         <p className="text-body-sm text-center">Aucun script.</p>
@@ -80,6 +80,6 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
                     </>
                 )}
             </div>
-        </div>
+        </SidePanel>
     );
 }

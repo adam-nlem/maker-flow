@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { SparklesIcon, UserCircleIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { SparklesIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/Button";
+import { SidePanel } from "~/components/ui/SidePanel";
 import ScriptBriefForm from "./ScriptBriefForm";
 import SkillModuleToggles from "./SkillModuleToggles";
 import { useCreateScriptGeneration } from "~/hooks/api/scriptGenerations/useCreateScriptGeneration";
@@ -85,106 +86,93 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
     };
 
     return (
-        <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? "w-96" : "w-0"}`}>
-            <div className="w-96 min-w-96 shrink-0 border-l border-light-gray h-full flex flex-col">
-                {/* Header */}
-                <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
-                    <div className="flex flex-row items-center gap-2">
-                        <SparklesIcon className="size-5 text-primary" strokeWidth={2} />
-                        <h2 className="text-heading-md">Générer avec l'IA</h2>
+        <SidePanel
+            title="Générer avec l'IA"
+            icon={SparklesIcon}
+            width="w-96"
+            isOpen={isOpen}
+            onClose={closePanel}
+            footer={
+                <Button
+                    type="submit"
+                    style="primary"
+                    isLoading={isPending}
+                    disabled={isPending || !canSubmit}
+                    onClick={() => {
+                        const form = document.getElementById('generate-panel-form') as HTMLFormElement;
+                        form?.requestSubmit();
+                    }}
+                >
+                    <div className="flex flex-row justify-center items-center gap-2">
+                        <SparklesIcon className="size-4 text-clear" strokeWidth={2} />
+                        <p className="text-sm">Générer le script</p>
                     </div>
-                    <button
-                        onClick={closePanel}
-                        className="text-gray hover:text-dark transition-colors cursor-pointer"
-                    >
-                        <XMarkIcon className="size-4" strokeWidth={2} />
-                    </button>
+                </Button>
+            }
+        >
+            <div className="p-4">
+                <div
+                    onClick={() => { closePanel(); navigate('/settings'); }}
+                    className="flex flex-row items-center gap-3 px-4 py-3 mb-5 rounded-xl border border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
+                >
+                    <UserCircleIcon className="size-5 text-primary shrink-0" strokeWidth={2} />
+                    <div className="flex flex-col">
+                        <span className="text-heading-xs">Configurez votre profil créateur</span>
+                        <span className="text-body-xs">Améliorez les résultats en ajoutant votre style et vos préférences</span>
+                    </div>
                 </div>
 
-                {/* Scrollable content */}
-                <div className="flex-1 overflow-y-auto p-4 scrollbar-none">
-                    <div
-                        onClick={() => { closePanel(); navigate('/settings'); }}
-                        className="flex flex-row items-center gap-3 px-4 py-3 mb-5 rounded-xl border border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
-                    >
-                        <UserCircleIcon className="size-5 text-primary shrink-0" strokeWidth={2} />
-                        <div className="flex flex-col">
-                            <span className="text-heading-xs">Configurez votre profil créateur</span>
-                            <span className="text-body-xs">Améliorez les résultats en ajoutant votre style et vos préférences</span>
-                        </div>
-                    </div>
+                <form id="generate-panel-form" className="flex flex-col gap-5" onSubmit={handleSubmit}>
+                    <ScriptBriefForm
+                        topic={topic}
+                        onTopicChange={setTopic}
+                        goal={goal}
+                        onGoalChange={setGoal}
+                        keyPoints={keyPoints}
+                        onKeyPointsChange={setKeyPoints}
+                        openingStyle={openingStyle}
+                        onOpeningStyleChange={setOpeningStyle}
+                        duration={duration}
+                        onDurationChange={setDuration}
+                        extraContext={extraContext}
+                        onExtraContextChange={setExtraContext}
+                    />
 
-                    <form id="generate-panel-form" className="flex flex-col gap-5" onSubmit={handleSubmit}>
-                        <ScriptBriefForm
-                            topic={topic}
-                            onTopicChange={setTopic}
-                            goal={goal}
-                            onGoalChange={setGoal}
-                            keyPoints={keyPoints}
-                            onKeyPointsChange={setKeyPoints}
-                            openingStyle={openingStyle}
-                            onOpeningStyleChange={setOpeningStyle}
-                            duration={duration}
-                            onDurationChange={setDuration}
-                            extraContext={extraContext}
-                            onExtraContextChange={setExtraContext}
-                        />
+                    <div className="border-t border-light-gray" />
 
-                        <div className="border-t border-light-gray" />
+                    <SkillModuleToggles
+                        activeSkills={activeSkills}
+                        onActiveSkillsChange={setActiveSkills}
+                        skillInputs={skillInputs}
+                        onSkillInputsChange={setSkillInputs}
+                        callToAction={callToAction}
+                        onCallToActionChange={setCallToAction}
+                    />
 
-                        <SkillModuleToggles
-                            activeSkills={activeSkills}
-                            onActiveSkillsChange={setActiveSkills}
-                            skillInputs={skillInputs}
-                            onSkillInputsChange={setSkillInputs}
-                            callToAction={callToAction}
-                            onCallToActionChange={setCallToAction}
-                        />
+                    {hasExistingParts && (
+                        <>
+                            <div className="border-t border-light-gray" />
 
-                        {hasExistingParts && (
-                            <>
-                                <div className="border-t border-light-gray" />
-
-                                <div
-                                    onClick={() => setReplaceExisting(!replaceExisting)}
-                                    className="flex flex-row items-center gap-3 cursor-pointer"
-                                >
-                                    <div className={`size-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${replaceExisting ? 'border-primary bg-primary' : 'border-light-gray'}`}>
-                                        {replaceExisting && (
-                                            <svg className="size-3 text-clear" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                        )}
-                                    </div>
-                                    <div className="flex flex-col">
-                                        <span className="text-heading-xs">Remplacer le contenu existant</span>
-                                        <span className="text-body-xs">Le contenu actuel du script sera remplacé par le contenu généré</span>
-                                    </div>
+                            <div
+                                onClick={() => setReplaceExisting(!replaceExisting)}
+                                className="flex flex-row items-center gap-3 cursor-pointer"
+                            >
+                                <div className={`size-5 rounded-md border-2 flex items-center justify-center shrink-0 transition-colors ${replaceExisting ? 'border-primary bg-primary' : 'border-light-gray'}`}>
+                                    {replaceExisting && (
+                                        <svg className="size-3 text-clear" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    )}
                                 </div>
-                            </>
-                        )}
-                    </form>
-                </div>
-
-                {/* Sticky footer */}
-                <div className="px-4 py-3 border-t border-light-gray">
-                    <Button
-                        type="submit"
-                        style="primary"
-                        isLoading={isPending}
-                        disabled={isPending || !canSubmit}
-                        onClick={() => {
-                            const form = document.getElementById('generate-panel-form') as HTMLFormElement;
-                            form?.requestSubmit();
-                        }}
-                    >
-                        <div className="flex flex-row justify-center items-center gap-2">
-                            <SparklesIcon className="size-4 text-clear" strokeWidth={2} />
-                            <p className="text-sm">Générer le script</p>
-                        </div>
-                    </Button>
-                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-heading-xs">Remplacer le contenu existant</span>
+                                    <span className="text-body-xs">Le contenu actuel du script sera remplacé par le contenu généré</span>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </form>
             </div>
-        </div>
+        </SidePanel>
     );
 }

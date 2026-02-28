@@ -14,26 +14,31 @@ The Script Generation feature adds AI-powered script writing to the existing scr
 
 ```
 ScriptPageView
-  ├── ScriptListPanel (w-72)
+  ├── ScriptListPanel (SidePanel, w-72, left, static)
   ├── ScriptEditorPanel (flex-1)
   │     ├── ScriptMetaHeader
   │     │     └── SparklesIcon button → toggles GenerateScriptPanel via shared store
   │     ├── GenerationStatusBanner (shown when generation is active)
   │     └── ScriptPartsList
-  ├── GenerateScriptPanel (w-96, collapsible right panel)
+  ├── GenerateScriptPanel (SidePanel, w-96, right, collapsible)
   │     ├── Creator Profile banner → navigates to /settings
   │     ├── ScriptBriefForm (topic, goal, key points, opening style, duration, extra context)
   │     ├── SkillModuleToggles (7 toggleable modules with conditional inputs)
   │     ├── Replace existing toggle (shown only if script has parts)
   │     └── Sticky footer with submit button
-  └── HookTemplatePanel (w-72, collapsible right panel)
+  └── HookTemplatePanel (SidePanel, w-72, right, collapsible)
 
 Settings Page (/settings)
-  ├── Left nav (SettingsSection enum: General, CreatorProfile, Project)
-  └── Right content
-        ├── GeneralSettings (placeholder)
-        ├── CreatorProfileSettings → CreatorProfileForm
-        └── ProjectSettings (placeholder)
+  ├── settings.tsx (thin route — SideBar + delegates to SettingsPageView)
+  └── SettingsPageView (flex-row h-screen overflow-hidden — mirrors ScriptPageView)
+        ├── SidePanel (w-72, left, static) with nav (SettingsSection enum)
+        └── flex-1 overflow-hidden
+              ├── GeneralSettings (header px-6 py-5 border-b + placeholder content)
+              ├── ProjectSettings (same pattern)
+              ├── IntegrationSettings (same pattern)
+              ├── CreatorProfileSettings (header + CreatorProfileForm)
+              │     └── CreatorProfileForm (flex-col: scrollable fields px-6 py-5 + fixed footer px-6 py-4 border-t)
+              └── SubscriptionSettings (same pattern)
 ```
 
 ### File Structure
@@ -76,11 +81,14 @@ front/app/
 │   └── creatorProfile/
 │       └── CreatorProfileForm.tsx      ← full creator profile form (used in Settings page)
 ├── components/settings/
-│   ├── GeneralSettings.tsx             ← placeholder
-│   ├── CreatorProfileSettings.tsx      ← wraps CreatorProfileForm
-│   └── ProjectSettings.tsx             ← placeholder
+│   ├── SettingsPageView.tsx            ← view component (mirrors ScriptPageView layout)
+│   ├── GeneralSettings.tsx             ← placeholder (header + content pattern)
+│   ├── ProjectSettings.tsx             ← placeholder (header + content pattern)
+│   ├── IntegrationSettings.tsx         ← placeholder (header + content pattern)
+│   ├── SubscriptionSettings.tsx        ← placeholder (header + content pattern)
+│   └── CreatorProfileSettings.tsx      ← header + delegates to CreatorProfileForm
 └── routes/
-    └── settings.tsx                    ← settings page with sidebar + content layout
+    └── settings.tsx                    ← thin route (SideBar + SettingsPageView)
 ```
 
 ---
@@ -128,6 +136,7 @@ Persistence key: `"app:scripts:right-panel"`
 - Creator Profile form lives in the **Settings page** (`/settings`, creator profile section)
 - `GenerateScriptPanel` shows a banner that navigates to `/settings` for profile configuration
 - `CreatorProfileForm` uses upsert pattern — same form for create and update
+- Form layout follows the ScriptPartsList pattern: scrollable fields (`flex-1 overflow-y-auto px-6 py-5`) + fixed footer (`px-6 py-4 border-t`) for save button
 - Dynamic array inputs for `signaturePhrases` and `neverList` (add with Enter or +, remove with ×)
 - Multi-select `ToggleChip` for `platforms` and `tones`
 

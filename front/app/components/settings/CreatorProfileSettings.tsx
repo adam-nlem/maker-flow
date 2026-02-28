@@ -11,16 +11,16 @@ export default function CreatorProfileSettings({ projectUuid }: CreatorProfileSe
     const { creatorProfile, isLoading } = useShowCreatorProfile({ projectUuid });
 
     return (
-        <div className="flex flex-col gap-3">
-            <h2 className="text-heading-xl">{settingsSectionToFrenchTranslation[SettingsSection.CreatorProfile]}</h2>
-            <p className="text-body-sm text-gray">
-                Configurez votre profil pour que l'IA génère du contenu adapté à votre style et votre audience.
-            </p>
-
-
+        <div className="h-full flex flex-col overflow-hidden">
+            <div className="px-6 py-5 border-b border-light-gray flex flex-col gap-1">
+                <h2 className="text-heading-xl">{settingsSectionToFrenchTranslation[SettingsSection.CreatorProfile]}</h2>
+                <p className="text-body-sm text-gray">
+                    Configurez votre profil pour que l'IA génère du contenu adapté à votre style et votre audience.
+                </p>
+            </div>
 
             {isLoading ? (
-                <div className="flex flex-col gap-5">
+                <div className="flex flex-col gap-5 px-6 py-5">
                     <div>
                         <Shimmer width="w-24" height="h-4" />
                         <div className="flex flex-wrap gap-2 mt-2">
@@ -53,15 +53,12 @@ export default function CreatorProfileSettings({ projectUuid }: CreatorProfileSe
                     <Shimmer width="w-48" height="h-10" radius="rounded-xl" />
                 </div>
             ) : (
-                <div className="flex-1 overflow-y-auto scrollbar-none">
-                    <CreatorProfileForm
-                        projectUuid={projectUuid}
-                        creatorProfile={creatorProfile}
-                        onSuccess={() => { }}
-                    />
-                </div>
+                <CreatorProfileForm
+                    projectUuid={projectUuid}
+                    creatorProfile={creatorProfile}
+                    onSuccess={() => { }}
+                />
             )}
-
         </div>
     );
 }

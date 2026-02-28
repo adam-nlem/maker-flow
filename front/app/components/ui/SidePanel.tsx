@@ -1,0 +1,89 @@
+import type { ComponentType, ReactNode, SVGProps } from "react";
+import { XMarkIcon } from "@heroicons/react/24/outline";
+
+type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
+type PanelWidth = "w-72" | "w-96";
+
+interface SidePanelProps {
+    title: string;
+    icon?: HeroIcon;
+    width?: PanelWidth;
+    side?: "left" | "right";
+    isOpen?: boolean;
+    onClose?: () => void;
+    headerActions?: ReactNode;
+    toolbar?: ReactNode;
+    footer?: ReactNode;
+    children: ReactNode;
+}
+
+const panelMinWidth: Record<PanelWidth, string> = {
+    "w-72": "min-w-72",
+    "w-96": "min-w-96",
+};
+
+export function SidePanel({
+    title,
+    icon: Icon,
+    width = "w-72",
+    side = "right",
+    isOpen,
+    onClose,
+    headerActions,
+    toolbar,
+    footer,
+    children,
+}: SidePanelProps) {
+    const borderClass = side === "left" ? "border-r" : "border-l";
+    const minWidthClass = panelMinWidth[width];
+    const isCollapsible = isOpen !== undefined;
+
+    const panel = (
+        <div className={`${width} ${minWidthClass} shrink-0 ${borderClass} border-light-gray h-full flex flex-col`}>
+            {/* Header */}
+            <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
+                <div className="flex flex-row items-center gap-2">
+                    {Icon && <Icon className="size-5 text-primary" strokeWidth={2} />}
+                    <h2 className="text-heading-md">{title}</h2>
+                </div>
+                {(headerActions || onClose) && (
+                    <div className="flex flex-row items-center gap-2">
+                        {headerActions}
+                        {onClose && (
+                            <button
+                                onClick={onClose}
+                                className="text-gray hover:text-dark transition-colors cursor-pointer"
+                            >
+                                <XMarkIcon className="size-4" strokeWidth={2} />
+                            </button>
+                        )}
+                    </div>
+                )}
+            </div>
+
+            {toolbar}
+
+            {/* Scrollable body */}
+            <div className="flex-1 overflow-y-auto scrollbar-none">
+                {children}
+            </div>
+
+            {/* Sticky footer */}
+            {footer && (
+                <div className="px-4 py-3 border-t border-light-gray">
+                    {footer}
+                </div>
+            )}
+        </div>
+    );
+
+    if (isCollapsible) {
+        return (
+            <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? width : "w-0"}`}>
+                {panel}
+            </div>
+        );
+    }
+
+    return panel;
+}

@@ -46,6 +46,16 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
 
     const { createOrUpdateCreatorProfile, isPending } = useCreateOrUpdateCreatorProfile();
 
+    const hasChanges =
+        JSON.stringify(platforms) !== JSON.stringify(creatorProfile?.platforms ?? []) ||
+        contentType !== creatorProfile?.contentType ||
+        niche !== (creatorProfile?.niche ?? "") ||
+        targetAudience !== (creatorProfile?.targetAudience ?? "") ||
+        JSON.stringify(tones) !== JSON.stringify(creatorProfile?.tones ?? []) ||
+        JSON.stringify(signaturePhrases) !== JSON.stringify(creatorProfile?.signaturePhrases ?? []) ||
+        JSON.stringify(neverList) !== JSON.stringify(creatorProfile?.neverList ?? []) ||
+        styleSample !== (creatorProfile?.styleSample ?? "");
+
     const handleAddPhrase = () => {
         if (newPhrase.trim()) {
             setSignaturePhrases([...signaturePhrases, newPhrase.trim()]);
@@ -85,7 +95,9 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
     };
 
     return (
-        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+        <form className="flex-1 flex flex-col min-h-0" onSubmit={handleSubmit}>
+            <div className="flex-1 overflow-y-auto scrollbar-none px-6 py-5">
+                <div className="flex flex-col gap-5">
             <div>
                 <h3 className="text-heading-sm">Plateformes</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -114,8 +126,8 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                             key={ct}
                             label={contentTypeToFrenchTranslation[ct]}
                             isSelected={contentType === ct}
-                            bgColorClassName="bg-primary/30"
-                            borderColorClassName="border border-light-gray"
+                            bgColorClassName="bg-primary/10"
+                            borderColorClassName="border border-primary/30"
                             onClick={() => setContentType(contentType === ct ? undefined : ct)}
                         />
                     ))}
@@ -146,8 +158,8 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                             key={t}
                             label={toneToFrenchTranslation[t]}
                             isSelected={tones.includes(t)}
-                            bgColorClassName="bg-primary/30"
-                            borderColorClassName="border border-light-gray"
+                            bgColorClassName="bg-primary/10"
+                            borderColorClassName="border border-primary/30"
                             onClick={() =>
                                 setTones((prev) =>
                                     prev.includes(t)
@@ -164,17 +176,7 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                 <h3 className="text-heading-sm">Phrases signatures</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
                     {signaturePhrases.map((phrase, index) => (
-                        <span
-                            key={index}
-                            className="flex flex-row items-center gap-1 px-3 py-1 rounded-full bg-primary/10 text-heading-xs"
-                        >
-                            {phrase}
-                            <XMarkIcon
-                                className="size-3 cursor-pointer hover:text-danger transition-colors"
-                                strokeWidth={2}
-                                onClick={() => handleRemovePhrase(index)}
-                            />
-                        </span>
+                        <Pill label={phrase} isSelected suffixIcon={XMarkIcon} onSuffixClick={() => handleRemovePhrase(index)} borderColorClassName="border border-primary/30" bgColorClassName="bg-primary/10" />
                     ))}
                 </div>
                 <div className="flex flex-row gap-2 mt-2">
@@ -203,18 +205,8 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
             <div>
                 <h3 className="text-heading-sm">Ne jamais utiliser</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
-                    {neverList.map((item, index) => (
-                        <span
-                            key={index}
-                            className="flex flex-row items-center gap-1 px-3 py-1 rounded-full bg-danger/10 text-heading-xs"
-                        >
-                            {item}
-                            <XMarkIcon
-                                className="size-3 cursor-pointer hover:text-danger transition-colors"
-                                strokeWidth={2}
-                                onClick={() => handleRemoveNeverItem(index)}
-                            />
-                        </span>
+                    {neverList.map((phrase, index) => (
+                        <Pill label={phrase} isSelected suffixIcon={XMarkIcon} onSuffixClick={() => handleRemoveNeverItem(index)} borderColorClassName="border border-red/30" bgColorClassName="bg-red/10" />
                     ))}
                 </div>
                 <div className="flex flex-row gap-2 mt-2">
@@ -247,16 +239,21 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                 onChange={(e) => setStyleSample(e.target.value)}
                 fullWidth
             />
+                </div>
+            </div>
 
-            <Button
-                type="submit"
-                style="primary"
-                isLoading={isPending}
-                disabled={isPending}
-                className="mt-2"
-            >
-                <p className="text-sm">{creatorProfile ? "Mettre à jour le profil" : "Créer le profil"}</p>
-            </Button>
+            {hasChanges && (
+                <div className="px-6 py-4 border-t border-light-gray">
+                    <Button
+                        type="submit"
+                        style="primary"
+                        isLoading={isPending}
+                        disabled={isPending}
+                    >
+                        <p className="text-sm">{creatorProfile ? "Mettre à jour le profil" : "Créer le profil"}</p>
+                    </Button>
+                </div>
+            )}
         </form>
     );
 }
