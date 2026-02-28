@@ -126,8 +126,6 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
                             onOpeningStyleChange={setOpeningStyle}
                             duration={duration}
                             onDurationChange={setDuration}
-                            callToAction={callToAction}
-                            onCallToActionChange={setCallToAction}
                             extraContext={extraContext}
                             onExtraContextChange={setExtraContext}
                         />
@@ -139,6 +137,8 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
                             onActiveSkillsChange={setActiveSkills}
                             skillInputs={skillInputs}
                             onSkillInputsChange={setSkillInputs}
+                            callToAction={callToAction}
+                            onCallToActionChange={setCallToAction}
                         />
 
                         {hasExistingParts && (

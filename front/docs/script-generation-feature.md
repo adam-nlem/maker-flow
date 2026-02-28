@@ -22,7 +22,7 @@ ScriptPageView
   │     └── ScriptPartsList
   ├── GenerateScriptPanel (w-96, collapsible right panel)
   │     ├── Creator Profile banner → navigates to /settings
-  │     ├── ScriptBriefForm (topic, goal, key points, opening style, duration, CTA, extra context)
+  │     ├── ScriptBriefForm (topic, goal, key points, opening style, duration, extra context)
   │     ├── SkillModuleToggles (7 toggleable modules with conditional inputs)
   │     ├── Replace existing toggle (shown only if script has parts)
   │     └── Sticky footer with submit button
@@ -143,7 +143,7 @@ Persistence key: `"app:scripts:right-panel"`
 | SEO Optimization | Yes | Input (target keyword) |
 | Script Format | Yes | ToggleChip select (ScriptFormat enum: full_script/outline/hybrid) |
 | B-Roll Cues | No | — |
-| Call to Action | Yes | ToggleChip select (CallToActionType enum: subscribe/like/comment/share/link/custom) |
+| Call to Action | Yes | ToggleChip select (CallToActionType enum: subscribe/like/comment/share/link/custom) + Input for custom CTA text (shown only when "custom" is selected) |
 
 Each module renders as a card with a radio-style toggle indicator. Active modules show a primary border/background. Conditional extra inputs appear below the module when active.
 

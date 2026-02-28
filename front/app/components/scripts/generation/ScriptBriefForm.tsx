@@ -1,4 +1,3 @@
-import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { type ScriptGoal, scriptGoalOptions, scriptGoalToFrenchTranslation } from "~/models/enums/ScriptGoal";
 import { type OpeningStyle, openingStyleOptions, openingStyleToFrenchTranslation } from "~/models/enums/OpeningStyle";
@@ -16,8 +15,6 @@ interface ScriptBriefFormProps {
     onOpeningStyleChange: (value: OpeningStyle) => void;
     duration: VideoDuration | undefined;
     onDurationChange: (value: VideoDuration) => void;
-    callToAction: string;
-    onCallToActionChange: (value: string) => void;
     extraContext: string;
     onExtraContextChange: (value: string) => void;
 }
@@ -33,8 +30,6 @@ export default function ScriptBriefForm({
     onOpeningStyleChange,
     duration,
     onDurationChange,
-    callToAction,
-    onCallToActionChange,
     extraContext,
     onExtraContextChange,
 }: ScriptBriefFormProps) {
@@ -104,14 +99,6 @@ export default function ScriptBriefForm({
                     ))}
                 </div>
             </div>
-
-            <Input
-                label="Call to action"
-                placeholder="Que voulez-vous que l'audience fasse ? (optionnel)"
-                value={callToAction}
-                onChange={(e) => onCallToActionChange(e.target.value)}
-                fullWidth
-            />
 
             <TextArea
                 label="Contexte supplémentaire"

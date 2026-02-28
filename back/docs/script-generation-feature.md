@@ -267,8 +267,8 @@ Builds the full prompt by concatenating structured blocks:
 
 1. Creator profile block — platform, content type, niche, audience, tones, signature phrases, never list
 2. Style sample block — creator's style sample (if provided)
-3. Script brief block — topic, goal, key points, opening style, duration, CTA, extra context
-4. Skill modules block — active skill instructions (strong hook, retention boosters, storytelling, SEO, format, B-Roll, call to action) + negative instructions for disabled skills. When a specific CTA type or retention cue type is selected via `skillInputs`, the instruction targets that specific type; otherwise, generic instructions are used
+3. Script brief block — topic, goal, key points, opening style, duration, extra context
+4. Skill modules block — active skill instructions (strong hook, retention boosters, storytelling, SEO, format, B-Roll, call to action) + negative instructions for disabled skills. When a specific CTA type or retention cue type is selected via `skillInputs`, the instruction targets that specific type; otherwise, generic instructions are used. When CTA type is "custom" and `callToAction` text is provided, the custom text is included in the CTA instruction
 5. JSON formatting instructions — structured JSON schema with conditionally included part types based on active skills
 6. Final instruction ("commence directement par le JSON")
 

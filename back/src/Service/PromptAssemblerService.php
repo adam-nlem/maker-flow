@@ -111,10 +111,6 @@ class PromptAssemblerService
         };
         $lines[] = "Durée cible de la vidéo : {$durationLabel}. Adapte la longueur et le niveau de détail du script en conséquence.";
 
-        if ($generation->getCallToAction() !== null && $generation->getCallToAction() !== '') {
-            $lines[] = "Appel à l'action : {$generation->getCallToAction()}";
-        }
-
         if ($generation->getExtraContext() !== null && $generation->getExtraContext() !== '') {
             $lines[] = "Contexte supplémentaire : {$generation->getExtraContext()}";
         }
@@ -142,7 +138,7 @@ class PromptAssemblerService
                     ? "Livre le script sous forme de {$skillInputs['format']}. Plan = points de discussion par section. Script complet = chaque mot tel qu'il serait prononcé. Hybride = titres de sections avec points de discussion détaillés."
                     : null,
                 SkillModule::BRollCues->value => $blocks[] = "Ajoute des éléments de type \"shot\" dans le JSON tout au long du script là où des images pertinentes (B-roll) renforceraient le propos.",
-                SkillModule::CallToAction->value => $blocks[] = $this->buildCallToActionInstruction($skillInputs),
+                SkillModule::CallToAction->value => $blocks[] = $this->buildCallToActionInstruction($skillInputs, $generation->getCallToAction()),
                 default => null,
             };
         }
@@ -171,11 +167,15 @@ class PromptAssemblerService
         return implode("\n\n", array_filter($blocks));
     }
 
-    private function buildCallToActionInstruction(array $skillInputs): string
+    private function buildCallToActionInstruction(array $skillInputs, ?string $callToAction): string
     {
         $selectedType = CallToActionType::tryFrom($skillInputs[SkillModule::CallToAction->value] ?? '');
 
         if ($selectedType !== null) {
+            if ($selectedType === CallToActionType::Custom && $callToAction !== null && $callToAction !== '') {
+                return "Intègre un appel à l'action personnalisé dans le script : \"{$callToAction}\". Utilise le type \"call_to_action\" dans le JSON avec callToActionType \"custom\".";
+            }
+
             $label = match ($selectedType) {
                 CallToActionType::Subscribe => 's\'abonner',
                 CallToActionType::Like => 'liker',

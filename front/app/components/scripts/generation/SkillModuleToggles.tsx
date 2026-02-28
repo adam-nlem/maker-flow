@@ -1,7 +1,7 @@
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import Pill from "~/components/ui/Pill";
-import { callToActionTypeOptions, callToActionTypeToFrenchTranslation } from "~/models/enums/CallToActionType";
+import { CallToActionType, callToActionTypeOptions, callToActionTypeToFrenchTranslation } from "~/models/enums/CallToActionType";
 import { retentionCueTypeOptions, retentionCueTypeToFrenchTranslation } from "~/models/enums/RetentionCueType";
 import { scriptFormatOptions, scriptFormatToFrenchTranslation } from "~/models/enums/ScriptFormat";
 import {
@@ -18,6 +18,8 @@ interface SkillModuleTogglesProps {
     onActiveSkillsChange: (skills: SkillModule[]) => void;
     skillInputs: Record<string, string>;
     onSkillInputsChange: (inputs: Record<string, string>) => void;
+    callToAction: string;
+    onCallToActionChange: (value: string) => void;
 }
 
 export default function SkillModuleToggles({
@@ -25,6 +27,8 @@ export default function SkillModuleToggles({
     onActiveSkillsChange,
     skillInputs,
     onSkillInputsChange,
+    callToAction,
+    onCallToActionChange,
 }: SkillModuleTogglesProps) {
     const toggleSkill = (skill: SkillModule) => {
         if (activeSkills.includes(skill)) {
@@ -101,17 +105,27 @@ export default function SkillModuleToggles({
                                         </div>
                                     )}
                                     {extraType === 'select' && skill === SkillModule.CallToAction && (
-                                        <div className="flex flex-wrap gap-2">
-                                            {callToActionTypeOptions.map((ctaType) => (
-                                                <Pill
-                                                    key={ctaType}
-                                                    label={callToActionTypeToFrenchTranslation[ctaType]}
-                                                    bgColorClassName="bg-primary/10"
-                                                    borderColorClassName="border border-primary/30"
-                                                    isSelected={skillInputs[skill] === ctaType}
-                                                    onClick={() => updateSkillInput(skill, ctaType)}
+                                        <div className="flex flex-col gap-2">
+                                            <div className="flex flex-wrap gap-2">
+                                                {callToActionTypeOptions.map((ctaType) => (
+                                                    <Pill
+                                                        key={ctaType}
+                                                        label={callToActionTypeToFrenchTranslation[ctaType]}
+                                                        bgColorClassName="bg-primary/10"
+                                                        borderColorClassName="border border-primary/30"
+                                                        isSelected={skillInputs[skill] === ctaType}
+                                                        onClick={() => updateSkillInput(skill, ctaType)}
+                                                    />
+                                                ))}
+                                            </div>
+                                            {skillInputs[skill] === CallToActionType.Custom && (
+                                                <Input
+                                                    placeholder="Décrivez votre call to action..."
+                                                    value={callToAction}
+                                                    onChange={(e) => onCallToActionChange(e.target.value)}
+                                                    fullWidth
                                                 />
-                                            ))}
+                                            )}
                                         </div>
                                     )}
                                     {extraType === 'select' && skill === SkillModule.RetentionBoosters && (
