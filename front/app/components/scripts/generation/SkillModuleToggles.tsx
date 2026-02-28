@@ -1,6 +1,6 @@
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
-import { ToggleChip } from "~/components/ui/ToggleChip";
+import Pill from "~/components/ui/Pill";
 import { callToActionTypeOptions, callToActionTypeToFrenchTranslation } from "~/models/enums/CallToActionType";
 import { retentionCueTypeOptions, retentionCueTypeToFrenchTranslation } from "~/models/enums/RetentionCueType";
 import { scriptFormatOptions, scriptFormatToFrenchTranslation } from "~/models/enums/ScriptFormat";
@@ -89,11 +89,13 @@ export default function SkillModuleToggles({
                                     {extraType === 'select' && skill === SkillModule.ScriptFormat && (
                                         <div className="flex flex-wrap gap-2">
                                             {scriptFormatOptions.map((format) => (
-                                                <ToggleChip
+                                                <Pill
                                                     key={format}
                                                     label={scriptFormatToFrenchTranslation[format]}
+                                                    bgColorClassName="bg-primary/10"
+                                                    borderColorClassName="border border-primary/30"
                                                     isSelected={skillInputs[skill] === format}
-                                                    onToggle={() => updateSkillInput(skill, format)}
+                                                    onClick={() => updateSkillInput(skill, format)}
                                                 />
                                             ))}
                                         </div>
@@ -101,11 +103,13 @@ export default function SkillModuleToggles({
                                     {extraType === 'select' && skill === SkillModule.CallToAction && (
                                         <div className="flex flex-wrap gap-2">
                                             {callToActionTypeOptions.map((ctaType) => (
-                                                <ToggleChip
+                                                <Pill
                                                     key={ctaType}
                                                     label={callToActionTypeToFrenchTranslation[ctaType]}
+                                                    bgColorClassName="bg-primary/10"
+                                                    borderColorClassName="border border-primary/30"
                                                     isSelected={skillInputs[skill] === ctaType}
-                                                    onToggle={() => updateSkillInput(skill, ctaType)}
+                                                    onClick={() => updateSkillInput(skill, ctaType)}
                                                 />
                                             ))}
                                         </div>
@@ -113,11 +117,13 @@ export default function SkillModuleToggles({
                                     {extraType === 'select' && skill === SkillModule.RetentionBoosters && (
                                         <div className="flex flex-wrap gap-2">
                                             {retentionCueTypeOptions.map((cueType) => (
-                                                <ToggleChip
+                                                <Pill
                                                     key={cueType}
                                                     label={retentionCueTypeToFrenchTranslation[cueType]}
+                                                    bgColorClassName="bg-primary/10"
+                                                    borderColorClassName="border border-primary/30"
                                                     isSelected={skillInputs[skill] === cueType}
-                                                    onToggle={() => updateSkillInput(skill, cueType)}
+                                                    onClick={() => updateSkillInput(skill, cueType)}
                                                 />
                                             ))}
                                         </div>
