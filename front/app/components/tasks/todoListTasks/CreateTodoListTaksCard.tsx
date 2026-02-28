@@ -8,7 +8,7 @@ import { useCreateTodoListTask } from "~/hooks/api/todoListTasks/useCreateTodoLi
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import type { TodoListTag } from "~/models/TodoListTag";
-import { todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoListPriorityToTextClass } from "~/models/enums/TodoListPriority";
+import { todoListPriorityOptions, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoListPriorityToTextClass } from "~/models/enums/TodoListPriority";
 import { TodoListPriority } from "~/models/enums/TodoListPriority";
 import AddDueDateDropdown from "./AddDueDateDropdown";
 import { Button } from "~/components/ui/Button";
@@ -18,8 +18,6 @@ interface CreateTodoListTaskCardProps {
     todoListUuid: string;
     onTaskCreated: () => void;
 }
-
-const todoListPriorityOptions = Object.values(TodoListPriority);
 
 
 export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: CreateTodoListTaskCardProps) {

@@ -4,8 +4,8 @@ import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { Badge } from "~/components/ui/Badge";
 import { useState } from "react";
-import { TodoListStatus, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
-import { TodoListPriority, todoListPriorityToFrenchTranslation } from "~/models/enums/TodoListPriority";
+import { TodoListStatus, todoListStatusOptions, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
+import { TodoListPriority, todoListPriorityOptions, todoListPriorityToFrenchTranslation } from "~/models/enums/TodoListPriority";
 import { useUpdateTodoListTask } from "~/hooks/api/todoListTasks/useUpdateTodoListTask";
 import { TagIcon, ExclamationTriangleIcon, CheckBadgeIcon, CalendarDateRangeIcon } from "@heroicons/react/24/solid";
 import { colorToTextClass, colorToBgClass } from "~/models/enums/Color";
@@ -137,7 +137,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                         <h2 className="text-heading-sm mb-1.5">Priorité</h2>
                         <div className="relative flex flex-col gap-1">
                             <SelectDropdown<TodoListPriority>
-                                items={Object.values(TodoListPriority)}
+                                items={todoListPriorityOptions}
                                 selectedItemId={priority}
                                 getItemId={(item) => item}
                                 onSelect={(item) => setPriority(item)}
@@ -175,7 +175,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                         <h2 className="text-heading-sm mb-1.5">Statut</h2>
                         <div className="relative flex flex-col gap-1">
                             <SelectDropdown<TodoListStatus>
-                                items={Object.values(TodoListStatus)}
+                                items={todoListStatusOptions}
                                 selectedItemId={status}
                                 getItemId={(item) => item}
                                 onSelect={(item) => setStatus(item)}

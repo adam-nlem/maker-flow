@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptCallToAction } from "~/models/ScriptCallToAction";
-import { CallToActionType, callToActionTypeToFrenchTranslation, callToActionTypeToBgClass, callToActionTypeToTextClass } from "~/models/enums/CallToActionType";
+import { CallToActionType, callToActionTypeOptions, callToActionTypeToFrenchTranslation, callToActionTypeToBgClass, callToActionTypeToTextClass } from "~/models/enums/CallToActionType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -43,7 +43,7 @@ export default function ScriptCallToActionCard({ callToAction, scriptUuid, dragH
             isDeleting={isDeleting}
         >
             <SelectDropdown
-                items={Object.values(CallToActionType)}
+                items={callToActionTypeOptions}
                 selectedItemId={callToActionType}
                 getItemId={(type) => type}
                 onSelect={(type) => handleCallToActionTypeChange(type)}

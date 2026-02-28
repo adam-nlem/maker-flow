@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
-import { ScriptPartType, scriptPartTypeToFrenchTranslation, scriptPartTypeToIcon } from "~/models/enums/ScriptPartType";
+import { ScriptPartType, scriptPartTypeOptions, scriptPartTypeToFrenchTranslation, scriptPartTypeToIcon } from "~/models/enums/ScriptPartType";
 import { useCreateScriptChapter } from "~/hooks/api/scriptChapters/useCreateScriptChapter";
 import { useCreateScriptVoiceOver } from "~/hooks/api/scriptVoiceOvers/useCreateScriptVoiceOver";
 import { useCreateScriptDialogue } from "~/hooks/api/scriptDialogues/useCreateScriptDialogue";
@@ -62,7 +62,7 @@ export default function AddScriptPartMenu({ scriptUuid }: AddScriptPartMenuProps
                 <>
                     <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
                     <div className="absolute bottom-full left-0 mb-2 z-30 border border-light-gray rounded-xl bg-clear shadow-lg p-1.5 flex flex-col gap-0.5 min-w-48">
-                        {Object.values(ScriptPartType).map((type) => {
+                        {scriptPartTypeOptions.map((type) => {
                             const Icon = scriptPartTypeToIcon[type];
                             return (
                                 <button

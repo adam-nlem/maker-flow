@@ -2,7 +2,7 @@ import { DndContext, DragOverlay, PointerSensor, type DragEndEvent, type DragSta
 import { useState } from "react";
 import type { TodoListTasksGroupedByStatusDTO } from "~/dtos/TodoListTasksGroupedByStatusDTO";
 import type { TodoListTask } from "~/models/TodoListTask";
-import { TodoListStatus } from "~/models/enums/TodoListStatus";
+import { TodoListStatus, todoListStatusOptions } from "~/models/enums/TodoListStatus";
 import TodoListStatusColumn from "./TodoListStatusColumn";
 import TodoListTaskCard from "./TodoListTaskCard";
 
@@ -54,7 +54,7 @@ export default function TodoListTasksBoard({
 
     return (
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragCancel={handleDragCancel}>
-            {Object.values(TodoListStatus).map((status) => (
+            {todoListStatusOptions.map((status) => (
                 <TodoListStatusColumn
                     key={status}
                     status={status}

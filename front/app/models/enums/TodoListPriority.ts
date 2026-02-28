@@ -24,3 +24,5 @@ export const todoListPriorityToBgClass: Record<TodoListPriority, string> = {
     [TodoListPriority.High]: "bg-danger/30",
 }
 
+export const todoListPriorityOptions = Object.values(TodoListPriority);
+

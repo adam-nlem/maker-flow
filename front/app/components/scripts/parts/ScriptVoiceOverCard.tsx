@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptVoiceOver } from "~/models/ScriptVoiceOver";
-import { Tone, toneToFrenchTranslation, toneToBgClass, toneToTextClass } from "~/models/enums/Tone";
+import { Tone, toneOptions, toneToFrenchTranslation, toneToBgClass, toneToTextClass } from "~/models/enums/Tone";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -43,7 +43,7 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
             isDeleting={isDeleting}
         >
             <SelectDropdown
-                items={Object.values(Tone)}
+                items={toneOptions}
                 selectedItemId={tone}
                 getItemId={(type) => type}
                 onSelect={(type) => handleToneChange(type)}

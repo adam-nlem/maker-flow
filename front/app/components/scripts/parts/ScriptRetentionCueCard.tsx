@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptRetentionCue } from "~/models/ScriptRetentionCue";
-import { RetentionCueType, retentionCueTypeToFrenchTranslation, retentionCueTypeToBgClass, retentionCueTypeToTextClass } from "~/models/enums/RetentionCueType";
+import { RetentionCueType, retentionCueTypeOptions, retentionCueTypeToFrenchTranslation, retentionCueTypeToBgClass, retentionCueTypeToTextClass } from "~/models/enums/RetentionCueType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -43,7 +43,7 @@ export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragH
             isDeleting={isDeleting}
         >
             <SelectDropdown
-                items={Object.values(RetentionCueType)}
+                items={retentionCueTypeOptions}
                 selectedItemId={retentionCueType}
                 getItemId={(type) => type}
                 onSelect={(type) => handleRetentionCueTypeChange(type)}

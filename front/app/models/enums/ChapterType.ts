@@ -17,3 +17,5 @@ export const chapterTypeToTextClass: Record<ChapterType, string> = {
     [ChapterType.OnScreen]: "text-blue",
     [ChapterType.OffScreen]: "text-purple",
 }
+
+export const chapterTypeOptions = Object.values(ChapterType);

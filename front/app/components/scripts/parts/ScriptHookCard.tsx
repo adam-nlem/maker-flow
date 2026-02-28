@@ -7,9 +7,10 @@ import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
 import { hasPlaceholders, replacePlaceholder } from "~/helpers/hookPlaceholderParser";
-import ScriptPartHeader from "./ScriptPartHeader";
+
 import HookContentRenderer from "./HookContentRenderer";
 import { useScriptEditorStore } from "~/stores/scripts/scriptEditorStore";
+import Pill from "~/components/ui/Pill";
 
 interface ScriptHookCardProps {
     script: Script;
@@ -37,9 +38,8 @@ export default function ScriptHookCard({ script }: ScriptHookCardProps) {
 
     return (
         <div className="group border border-red/30 rounded-xl p-4 bg-clear flex flex-col gap-2 mb-3">
-            {isExpanded &&
-                <ScriptPartHeader icon={CheckBadgeIcon} label="Hook" colorClassName="bg-red/10" borderClassName="border border-red/30" />}
-
+            <Pill icon={CheckBadgeIcon} isSelected label="Hook"  bgColorClassName="bg-red/10" borderColorClassName="border border-red/30" />
+            
             {hasPlaceholders(hook) ? (
                 <HookContentRenderer content={hook} onReplacePlaceholder={handleReplacePlaceholder} />
             ) : (

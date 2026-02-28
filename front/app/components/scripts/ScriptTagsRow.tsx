@@ -2,7 +2,7 @@ import { useState } from "react";
 import { TagIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import type { ScriptTag } from "~/models/ScriptTag";
-import { colorToBgClass, colorToTextClass, Color } from "~/models/enums/Color";
+import { colorToBgClass, colorToTextClass, Color, colorOptions } from "~/models/enums/Color";
 import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
 import { useCreateScriptTag } from "~/hooks/api/scriptTags/useCreateScriptTag";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
@@ -94,7 +94,7 @@ export default function ScriptTagsRow({ script, projectUuid }: Props) {
                                     onKeyDown={(e) => { if (e.key === "Enter") handleCreateTag(); }}
                                 />
                                 <div className="flex flex-row gap-1.5 flex-wrap">
-                                    {Object.values(Color).map((color) => (
+                                    {colorOptions.map((color) => (
                                         <button
                                             key={color}
                                             onClick={() => setNewTagColor(color)}

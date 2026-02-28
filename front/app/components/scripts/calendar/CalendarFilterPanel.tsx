@@ -1,5 +1,5 @@
 import { Platform, platformOptions, platformToFrenchTranslation } from "~/models/enums/Platform";
-import { ScriptStatus, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
+import { scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
 import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
@@ -55,7 +55,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
             <div className="flex flex-col gap-2">
                 <span className="text-heading-xs text-gray">Statuts</span>
                 <div className="flex flex-row flex-wrap gap-2">
-                    {Object.values(ScriptStatus).map((status) => (
+                    {scriptStatusOptions.map((status) => (
                         <Pill
                             key={status}
                             icon={scriptStatusToIcon[status]}

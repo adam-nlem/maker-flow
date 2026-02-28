@@ -25,3 +25,5 @@ export const projectTypeToFrenchTranslation: Record<ProjectType, string> = {
     [ProjectType.Hardware]: "Hardware",
     [ProjectType.Iot]: "IoT",
 };
+
+export const projectTypeOptions = Object.values(ProjectType);

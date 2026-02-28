@@ -36,7 +36,7 @@ class ScriptGeneration
     ])]
     private ?ScriptGenerationStatus $status = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT)]
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',

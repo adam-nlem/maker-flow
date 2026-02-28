@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { Badge } from "~/components/ui/Badge";
 import { useListTodoListTagsWithSearch } from "~/hooks/api/todoListTags/useListTodoListTagsWithSearch";
 import { TagIcon } from "@heroicons/react/16/solid";
-import { Color, colorToBgClass, colorToTextClass } from "~/models/enums/Color";
+import { Color, colorOptions, colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import { Input } from "~/components/ui/Input";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useCreateTodoListTag } from "~/hooks/api/todoListTags/useCreateTodoListTag";
@@ -76,7 +76,7 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
         if (title !== "") {
             return (<div>
                 <div className="flex flex-row gap-2 mb-3">
-                    {Object.values(Color).map((c) => (
+                    {colorOptions.map((c) => (
                         <div
                             key={c}
                             onClick={() => setColor(c)}

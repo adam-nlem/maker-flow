@@ -7,7 +7,7 @@ import Pill from "~/components/ui/Pill";
 import { ToggleChip } from "~/components/ui/ToggleChip";
 import ModalOverlay from "~/components/ui/ModalOverlay";
 import { useCreateHookTemplate } from "~/hooks/api/hookTemplates/useCreateHookTemplate";
-import { HookTemplatePlaceholder, hookTemplatePlaceholderToFrenchTranslation } from "~/models/enums/HookTemplatePlaceholder";
+import { HookTemplatePlaceholder, hookTemplatePlaceholderOptions, hookTemplatePlaceholderToFrenchTranslation } from "~/models/enums/HookTemplatePlaceholder";
 import { insertPlaceholder, formatPlaceholderToken } from "~/helpers/hookPlaceholderParser";
 
 interface CreateHookTemplateModalProps {
@@ -89,7 +89,7 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                         <div className="mt-3">
                             <p className="text-heading-sm">Placeholders</p>
                             <div className="flex flex-wrap gap-2 mt-2">
-                                {Object.values(HookTemplatePlaceholder).map((placeholder) => {
+                                {hookTemplatePlaceholderOptions.map((placeholder) => {
                                     const isUsed = content.includes(formatPlaceholderToken(placeholder));
                                     return (
                                         <button

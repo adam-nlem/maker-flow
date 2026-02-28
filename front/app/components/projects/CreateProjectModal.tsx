@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Input } from "~/components/ui/Input";
-import { ProjectType, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
+import { ProjectType, projectTypeOptions, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
 import { Button } from "~/components/ui/Button";
 import { TextArea } from "~/components/ui/TextArea";
 import { ToggleChip } from "~/components/ui/ToggleChip";
@@ -82,7 +82,7 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
                     <div>
                         <h1 className="text-heading-sm">Types</h1>
                         <div className="flex flex-wrap gap-2 mt-2">
-                            {Object.values(ProjectType).map((type) => (
+                            {projectTypeOptions.map((type) => (
                                 <ToggleChip
                                     key={type}
                                     label={projectTypeToFrenchTranslation[type]}

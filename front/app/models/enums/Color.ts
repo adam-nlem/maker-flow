@@ -24,3 +24,5 @@ export const colorToBgClass: Record<Color, string> = {
     [Color.Yellow]: "bg-yellow/30",
     [Color.Green]: "bg-green/30",
 }
+
+export const colorOptions = Object.values(Color);

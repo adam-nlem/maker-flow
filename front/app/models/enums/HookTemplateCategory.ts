@@ -11,3 +11,5 @@ export const hookTemplateCategoryToFrenchTranslation: Record<HookTemplateCategor
     [HookTemplateCategory.Private]: "Privés",
     [HookTemplateCategory.Recent]: "Récents",
 }
+
+export const hookTemplateCategoryOptions = Object.values(HookTemplateCategory);

@@ -60,3 +60,5 @@ export const scriptPartTypeToTextClass: Record<ScriptPartType, string> = {
     [ScriptPartType.CallToAction]: "text-orange",
     [ScriptPartType.RetentionCue]: "text-pink",
 }
+
+export const scriptPartTypeOptions = Object.values(ScriptPartType);

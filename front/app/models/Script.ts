@@ -1,7 +1,7 @@
 import { HookTemplate, type HookTemplateJSON } from "./HookTemplate";
 import { ScriptTag, type ScriptTagJSON } from "./ScriptTag";
 import { ContentType } from "./enums/ContentType";
-import { Platform } from "./enums/Platform";
+import { Platform, platformOptions } from "./enums/Platform";
 import { ScriptStatus } from "./enums/ScriptStatus";
 
 export interface ScriptJSON {
@@ -41,7 +41,7 @@ export class Script {
             json.hookTemplate ? HookTemplate.fromJSON(json.hookTemplate) : undefined,
             json.publishedAt ? new Date(json.publishedAt) : undefined,
             (json.tags ?? []).map(ScriptTag.fromJSON),
-            (json.platforms ?? []).filter(p => Object.values(Platform).includes(p as Platform)) as Platform[],
+            (json.platforms ?? []).filter(p => platformOptions.includes(p as Platform)) as Platform[],
             json.contentType ? json.contentType as ContentType : undefined,
             json.status ? json.status as ScriptStatus : undefined,
             new Date(json.createdAt),

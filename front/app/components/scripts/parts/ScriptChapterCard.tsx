@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptChapter } from "~/models/ScriptChapter";
-import { ChapterType, chapterTypeToFrenchTranslation, chapterTypeToBgClass, chapterTypeToTextClass } from "~/models/enums/ChapterType";
+import { ChapterType, chapterTypeOptions, chapterTypeToFrenchTranslation, chapterTypeToBgClass, chapterTypeToTextClass } from "~/models/enums/ChapterType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { Input } from "~/components/ui/Input";
@@ -51,7 +51,7 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
             isDeleting={isDeleting}
         >
             <SelectDropdown
-                items={Object.values(ChapterType)}
+                items={chapterTypeOptions}
                 selectedItemId={chapterType}
                 getItemId={(type) => type}
                 onSelect={(type) => handleChapterTypeChange(type)}

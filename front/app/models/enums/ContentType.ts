@@ -7,3 +7,5 @@ export const contentTypeToFrenchTranslation: Record<ContentType, string> = {
     [ContentType.ShortForm]: "Format court",
     [ContentType.LongForm]: "Format long",
 }
+
+export const contentTypeOptions = Object.values(ContentType);

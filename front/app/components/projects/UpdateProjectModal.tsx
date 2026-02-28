@@ -6,7 +6,7 @@ import { useState } from "react";
 import type { Project } from "~/models/Project";
 import { useDeleteProject } from "~/hooks/api/projects/useDeleteProject";
 import { useUpdateProject } from "~/hooks/api/projects/useUpdateProject";
-import { ProjectType, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
+import { ProjectType, projectTypeOptions, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
 import { TextArea } from "../ui/TextArea";
 import { ToggleChip } from "../ui/ToggleChip";
 
@@ -46,7 +46,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
 
     return (
         <ModalOverlay isOpen={showModal} onClose={onClose} className="justify-center items-center">
-            <div className="border rounded-xl border-light-gray w-[500px] h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
+            <div className="border rounded-xl border-light-gray w-125 h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
                 <h1 className="text-heading-lg">
                     Modifier le Projet
                 </h1>
@@ -79,7 +79,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                     <div>
                         <h1 className="text-heading-sm">Types</h1>
                         <div className="flex flex-wrap gap-2 mt-2">
-                            {Object.values(ProjectType).map((type) => (
+                            {projectTypeOptions.map((type) => (
                                 <ToggleChip
                                     key={type}
                                     label={projectTypeToFrenchTranslation[type]}

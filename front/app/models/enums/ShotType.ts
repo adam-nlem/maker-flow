@@ -17,3 +17,5 @@ export const shotTypeToTextClass: Record<ShotType, string> = {
     [ShotType.ARoll]: "text-primary",
     [ShotType.BRoll]: "text-gray",
 }
+
+export const shotTypeOptions = Object.values(ShotType);

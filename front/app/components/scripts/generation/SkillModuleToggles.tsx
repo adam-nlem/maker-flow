@@ -3,9 +3,10 @@ import { TextArea } from "~/components/ui/TextArea";
 import { ToggleChip } from "~/components/ui/ToggleChip";
 import { callToActionTypeOptions, callToActionTypeToFrenchTranslation } from "~/models/enums/CallToActionType";
 import { retentionCueTypeOptions, retentionCueTypeToFrenchTranslation } from "~/models/enums/RetentionCueType";
-import { ScriptFormat, scriptFormatToFrenchTranslation } from "~/models/enums/ScriptFormat";
+import { scriptFormatOptions, scriptFormatToFrenchTranslation } from "~/models/enums/ScriptFormat";
 import {
     SkillModule,
+    skillModuleOptions,
     skillModuleToFrenchTranslation,
     skillModuleToDescription,
     skillModuleHasExtraInput,
@@ -42,7 +43,7 @@ export default function SkillModuleToggles({
             <h3 className="text-heading-sm">Modules IA</h3>
 
             <div className="flex flex-col gap-2">
-                {Object.values(SkillModule).map((skill) => {
+                {skillModuleOptions.map((skill) => {
                     const isActive = activeSkills.includes(skill);
                     const hasExtra = skillModuleHasExtraInput[skill];
                     const extraType = skillModuleExtraInputType[skill];
@@ -87,7 +88,7 @@ export default function SkillModuleToggles({
                                     )}
                                     {extraType === 'select' && skill === SkillModule.ScriptFormat && (
                                         <div className="flex flex-wrap gap-2">
-                                            {Object.values(ScriptFormat).map((format) => (
+                                            {scriptFormatOptions.map((format) => (
                                                 <ToggleChip
                                                     key={format}
                                                     label={scriptFormatToFrenchTranslation[format]}

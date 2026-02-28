@@ -3,10 +3,10 @@ import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { Button } from "~/components/ui/Button";
-import { Platform, platformToFrenchTranslation } from "~/models/enums/Platform";
+import { Platform, platformOptions, platformToFrenchTranslation } from "~/models/enums/Platform";
 import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
-import { ContentType, contentTypeToFrenchTranslation } from "~/models/enums/ContentType";
-import { Tone, toneToFrenchTranslation } from "~/models/enums/Tone";
+import { ContentType, contentTypeOptions, contentTypeToFrenchTranslation } from "~/models/enums/ContentType";
+import { Tone, toneOptions, toneToFrenchTranslation } from "~/models/enums/Tone";
 import { useCreateOrUpdateCreatorProfile } from "~/hooks/api/creatorProfiles/useCreateOrUpdateCreatorProfile";
 import type { CreatorProfile } from "~/models/CreatorProfile";
 import Pill from "~/components/ui/Pill";
@@ -89,7 +89,7 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
             <div>
                 <h3 className="text-heading-sm">Plateformes</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
-                    {Object.values(Platform).map((p) => (
+                    {platformOptions.map((p) => (
                         <PlatformPill
                             key={p}
                             platform={p}
@@ -109,7 +109,7 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
             <div>
                 <h3 className="text-heading-sm">Type de contenu</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
-                    {Object.values(ContentType).map((ct) => (
+                    {contentTypeOptions.map((ct) => (
                         <Pill
                             key={ct}
                             label={contentTypeToFrenchTranslation[ct]}
@@ -141,7 +141,7 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
             <div>
                 <h3 className="text-heading-sm">Tons</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
-                    {Object.values(Tone).map((t) => (
+                    {toneOptions.map((t) => (
                         <Pill
                             key={t}
                             label={toneToFrenchTranslation[t]}

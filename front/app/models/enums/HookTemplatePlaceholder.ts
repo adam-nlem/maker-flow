@@ -26,3 +26,5 @@ export const hookTemplatePlaceholderToFrenchTranslation: Record<HookTemplatePlac
     [HookTemplatePlaceholder.Goal]: "Objectif",
     [HookTemplatePlaceholder.Date]: "Date",
 }
+
+export const hookTemplatePlaceholderOptions = Object.values(HookTemplatePlaceholder);

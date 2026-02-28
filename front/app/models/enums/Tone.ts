@@ -45,3 +45,5 @@ export const toneToTextClass: Record<Tone, string> = {
     [Tone.FunnySarcastic]: "text-pink",
     [Tone.StorytellingEmotional]: "text-teal",
 }
+
+export const toneOptions = Object.values(Tone);

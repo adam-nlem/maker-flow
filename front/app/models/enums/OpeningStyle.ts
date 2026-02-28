@@ -6,6 +6,8 @@ export enum OpeningStyle {
     JumpIntoContent = 'jump_into_content',
 }
 
+export const openingStyleOptions = Object.values(OpeningStyle);
+
 export const openingStyleToFrenchTranslation: Record<OpeningStyle, string> = {
     [OpeningStyle.BoldHook]: "Accroche audacieuse",
     [OpeningStyle.ShockingStat]: "Statistique choc",

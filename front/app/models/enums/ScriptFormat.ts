@@ -9,3 +9,5 @@ export const scriptFormatToFrenchTranslation: Record<ScriptFormat, string> = {
     [ScriptFormat.Outline]: "Plan détaillé",
     [ScriptFormat.Hybrid]: "Hybride",
 }
+
+export const scriptFormatOptions = Object.values(ScriptFormat);

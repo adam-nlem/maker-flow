@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptShot } from "~/models/ScriptShot";
-import { ShotType, shotTypeToFrenchTranslation, shotTypeToBgClass, shotTypeToTextClass } from "~/models/enums/ShotType";
+import { type ShotType, shotTypeOptions, shotTypeToFrenchTranslation, shotTypeToBgClass, shotTypeToTextClass } from "~/models/enums/ShotType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -43,7 +43,7 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
             isDeleting={isDeleting}
         >
             <SelectDropdown
-                items={Object.values(ShotType)}
+                items={shotTypeOptions}
                 selectedItemId={shotType}
                 getItemId={(type) => type}
                 onSelect={(type) => handleShotTypeChange(type)}

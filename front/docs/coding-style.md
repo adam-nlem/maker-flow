@@ -359,6 +359,18 @@ export const projectTypeToFrenchTranslation: Record<ProjectType, string> = {
 3. **snake_case** for string values
 4. **Translation records** for display labels
 5. **Mapping records** for styling (colors, classes)
+6. **Options constant** for iteration — every enum must export a pre-built array:
+   ```ts
+   export const projectTypeOptions = Object.values(ProjectType);
+   ```
+   Components must use this constant instead of calling `Object.values()` inline:
+   ```tsx
+   // Good
+   {projectTypeOptions.map((type) => ...)}
+
+   // Bad
+   {Object.values(ProjectType).map((type) => ...)}
+   ```
 
 ---
 

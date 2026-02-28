@@ -21,3 +21,5 @@ export const todoListStatusToBgClass: Record<TodoListStatus, string> = {
     [TodoListStatus.InProgress]: "bg-yellow/30",
     [TodoListStatus.Completed]: "bg-purple/30",
 }
+
+export const todoListStatusOptions = Object.values(TodoListStatus);

@@ -47,3 +47,5 @@ export const skillModuleExtraInputType: Partial<Record<SkillModule, SkillModuleE
     [SkillModule.CallToAction]: 'select',
     [SkillModule.RetentionBoosters]: 'select',
 }
+
+export const skillModuleOptions = Object.values(SkillModule);

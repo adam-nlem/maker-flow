@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, SwatchIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
-import { ScriptStatus, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
+import { type ScriptStatus, scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
 import Pill from "~/components/ui/Pill";
 import { DatePicker } from "~/components/ui/DatePicker";
@@ -72,7 +72,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                     <ScriptTagsRow script={script} projectUuid={projectUuid} />
 
                     <SelectDropdown
-                        items={Object.values(ScriptStatus)}
+                        items={scriptStatusOptions}
                         selectedItemId={status}
                         getItemId={(s) => s}
                         onSelect={handleStatusChange}

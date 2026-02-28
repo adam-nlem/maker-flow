@@ -4,7 +4,7 @@ import { Input } from "~/components/ui/Input";
 import { ToggleChip } from "~/components/ui/ToggleChip";
 import type { HookTemplate } from "~/models/HookTemplate";
 import type { Script } from "~/models/Script";
-import { HookTemplateCategory, hookTemplateCategoryToFrenchTranslation } from "~/models/enums/HookTemplateCategory";
+import { HookTemplateCategory, hookTemplateCategoryOptions, hookTemplateCategoryToFrenchTranslation } from "~/models/enums/HookTemplateCategory";
 import { useListPaginatedHookTemplates } from "~/hooks/api/hookTemplates/useListPaginatedHookTemplates";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
@@ -116,7 +116,7 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
 
                 {/* Category tabs */}
                 <div className="flex flex-row flex-wrap gap-2 px-4 py-3 border-b border-light-gray">
-                    {Object.values(HookTemplateCategory).map((category) => (
+                    {hookTemplateCategoryOptions.map((category) => (
                         <ToggleChip
                             key={category}
                             label={hookTemplateCategoryToFrenchTranslation[category]}

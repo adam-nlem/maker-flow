@@ -7,6 +7,8 @@ export enum ScriptGoal {
     StartConversation = 'start_conversation',
 }
 
+export const scriptGoalOptions = Object.values(ScriptGoal);
+
 export const scriptGoalToFrenchTranslation: Record<ScriptGoal, string> = {
     [ScriptGoal.Educate]: "Éduquer",
     [ScriptGoal.Entertain]: "Divertir",
