@@ -371,6 +371,18 @@ export const projectTypeToFrenchTranslation: Record<ProjectType, string> = {
    // Bad
    {Object.values(ProjectType).map((type) => ...)}
    ```
+7. **Icon map** (when applicable) — enums with associated icons export a Record mapping:
+   ```ts
+   import type { ComponentType, SVGProps } from "react";
+   import { ClockIcon, ArrowPathIcon, CheckIcon } from "@heroicons/react/24/outline";
+
+   export const scriptStatusToIcon: Record<ScriptStatus, ComponentType<SVGProps<SVGSVGElement>>> = {
+       [ScriptStatus.Pending]: ClockIcon,
+       [ScriptStatus.InProgress]: ArrowPathIcon,
+       [ScriptStatus.Completed]: CheckIcon,
+   };
+   ```
+   Components import the icon map from the enum file instead of defining it locally.
 
 ---
 

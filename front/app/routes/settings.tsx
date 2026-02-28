@@ -1,23 +1,14 @@
-import { useState } from "react";
-import { Cog6ToothIcon, UserCircleIcon, FolderIcon } from "@heroicons/react/24/outline";
+import { useState, type ReactNode } from "react";
 import SideBar from "~/components/sidebar/SideBar";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import IconWithTextTile from "~/components/ui/IconWithTextTile";
-import { SettingsSection, settingsSectionOptions, settingsSectionToFrenchTranslation } from "~/models/enums/SettingsSection";
+import { SettingsSection, settingsSectionOptions, settingsSectionToFrenchTranslation, settingsSectionToIcon } from "~/models/enums/SettingsSection";
 import GeneralSettings from "~/components/settings/GeneralSettings";
 import CreatorProfileSettings from "~/components/settings/CreatorProfileSettings";
 import ProjectSettings from "~/components/settings/ProjectSettings";
-
-import type { ComponentType, SVGProps } from "react";
-
-type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
-
-const settingsSectionIcons: Record<SettingsSection, HeroIcon> = {
-    [SettingsSection.General]: Cog6ToothIcon,
-    [SettingsSection.CreatorProfile]: UserCircleIcon,
-    [SettingsSection.Project]: FolderIcon,
-};
+import IntegrationSettings from "~/components/settings/IntegrationSettings";
+import SubscriptionSettings from "~/components/settings/SubscriptionSettings";
 
 export default function SettingsPage() {
     const { projects } = useListPaginatedProjects();
@@ -25,6 +16,14 @@ export default function SettingsPage() {
     const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null;
 
     const [activeSection, setActiveSection] = useState<SettingsSection>(SettingsSection.General);
+
+    const sectionContent: Record<SettingsSection, ReactNode> = {
+        [SettingsSection.General]: <GeneralSettings />,
+        [SettingsSection.Project]: <ProjectSettings />,
+        [SettingsSection.Integration]: <IntegrationSettings />,
+        [SettingsSection.CreatorProfile]: focusedProject && <CreatorProfileSettings projectUuid={focusedProject.uuid} />,
+        [SettingsSection.Subscription]: <SubscriptionSettings />,
+    };
 
     return (
         <div className="w-full">
@@ -38,7 +37,7 @@ export default function SettingsPage() {
                             {settingsSectionOptions.map((section) => (
                                 <IconWithTextTile
                                     key={section}
-                                    icon={settingsSectionIcons[section]}
+                                    icon={settingsSectionToIcon[section]}
                                     label={settingsSectionToFrenchTranslation[section]}
                                     isExpanded
                                     isSelected={activeSection === section}
@@ -48,11 +47,7 @@ export default function SettingsPage() {
                         </nav>
 
                         <div className="flex-1 min-w-0">
-                            {activeSection === SettingsSection.General && <GeneralSettings />}
-                            {activeSection === SettingsSection.CreatorProfile && focusedProject && (
-                                <CreatorProfileSettings projectUuid={focusedProject.uuid} />
-                            )}
-                            {activeSection === SettingsSection.Project && <ProjectSettings />}
+                            {sectionContent[activeSection]}
                         </div>
                     </div>
                 </div>
