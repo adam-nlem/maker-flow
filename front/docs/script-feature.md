@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Script feature provides a split-view editor for managing scripts per project. Users create scripts, edit their metadata (title, hook, publication date, tags, platforms, status), and build structured content with seven part types: chapters, voice-overs, dialogues, shots, texts, call-to-actions, and retention cues. Parts are reorderable via drag-and-drop. Text parts provide a notebook-style editing experience with auto-save on blur.
+The Script feature provides a split-view editor for managing scripts per project. Users create scripts, edit their metadata (title, publication date, tags, platforms, status), and build structured content with eight part types: hooks, chapters, voice-overs, dialogues, shots, texts, call-to-actions, and retention cues. Parts are reorderable via drag-and-drop. Text parts provide a notebook-style editing experience with auto-save on blur.
 
 **Route:** `/scripts`
 
@@ -17,15 +17,20 @@ ScriptPageView (flex-row h-screen)
   ├── ScriptListPanel (w-72, left panel)
   │     ├── ScriptListItem[] (per script, uses ScriptSimpleMetaCol)
   │     └── "+ New script" button (inline creation)
-  └── ScriptEditorPanel (flex-1, right panel)
-        ├── ScriptMetaHeader (collapsible via ChevronUp/Down toggle)
-        │     ├── [title input] + [toggle button] (always visible)
-        │     ├── Expanded: ScriptPlatformsRow, ScriptTagsRow, status, date picker
-        │     └── Collapsed: ScriptSimpleMetaCol (compact read-only summary)
-        ├── ScriptHookCard (hook textarea + template toggle)
-        └── ScriptPartsList (flex-1 overflow-y-auto)
-              ├── DnD-reorderable part cards
-              └── AddScriptPartMenu (sticky bottom)
+  ├── ScriptEditorPanel (flex-1, center panel)
+  │     ├── ScriptMetaHeader (collapsible via ChevronUp/Down toggle)
+  │     │     ├── [title input] + [toggle button] (always visible)
+  │     │     ├── Expanded: ScriptPlatformsRow, ScriptTagsRow, status, date picker
+  │     │     └── Collapsed: ScriptSimpleMetaCol (compact read-only summary)
+  │     └── ScriptPartsList (flex-1 overflow-y-auto)
+  │           ├── ScriptHookCard (hook part, InboxStackIcon → HookTemplatePanel toggle)
+  │           ├── DnD-reorderable part cards
+  │           └── AddScriptPartMenu (sticky bottom)
+  ├── GenerateScriptPanel (w-96, right, optional — via ScriptRightPanel.Generate)
+  └── HookTemplatePanel (w-72, right, optional — via ScriptRightPanel.HookTemplates)
+        ├── Search input + category filter (ToggleChip)
+        ├── HookTemplateCard[] (infinite scroll)
+        └── CreateHookTemplateModal (via + button)
 ```
 
 ### File Structure
@@ -45,6 +50,8 @@ front/app/
 │   ├── ScriptText.ts            ← type = 'text' as const
 │   ├── ScriptCallToAction.ts    ← type = 'call_to_action' as const
 │   ├── ScriptRetentionCue.ts    ← type = 'retention_cue' as const
+│   ├── ScriptHook.ts            ← type = 'hook' as const, optional hookTemplate
+│   ├── HookTemplate.ts          ← uuid, title, content, isPublic, createdAt, updatedAt
 │   ├── DialogueSubject.ts
 │   └── enums/
 │       ├── ScriptPartType.ts    ← with french translation + icon + bg/border/text class maps
@@ -53,7 +60,9 @@ front/app/
 │       ├── Tone.ts              ← with label/bg/text class maps (renamed from VoiceOverType)
 │       ├── ShotType.ts          ← with label/bg/text class maps
 │       ├── CallToActionType.ts  ← with label/bg/text class maps
-│       └── RetentionCueType.ts  ← with label/bg/text class maps
+│       ├── RetentionCueType.ts  ← with label/bg/text class maps
+│       ├── HookTemplatePlaceholder.ts ← 11 values (toFrenchTranslation map)
+│       └── HookTemplateCategory.ts    ← All, Public, Private (toFrenchTranslation map)
 ├── hooks/api/
 │   ├── scripts/
 │   │   ├── scriptQueryKeys.ts   ← all, list(projectUuid), calendar(projectUuid, year, month), parts(scriptUuid)
@@ -79,16 +88,25 @@ front/app/
 │   ├── scriptTexts/       (same CRUD pattern)
 │   ├── scriptCallToActions/  (same CRUD pattern)
 │   ├── scriptRetentionCues/  (same CRUD pattern)
+│   ├── scriptHooks/         (same CRUD pattern)
+│   ├── hookTemplates/
+│   │   ├── hookTemplateQueryKeys.ts
+│   │   ├── useListPaginatedHookTemplates.ts  ← infinite scroll (page/limit/hasMore)
+│   │   ├── useListHookTemplates.ts
+│   │   ├── useCreateHookTemplate.ts
+│   │   ├── useUpdateHookTemplate.ts
+│   │   └── useDeleteHookTemplate.ts
 │   └── dialogueSubjects/
 │       ├── useCreateDialogueSubject.ts  ← uses scriptDialogueUuid
 │       ├── useUpdateDialogueSubject.ts
 │       └── useDeleteDialogueSubject.ts
-├── helpers/
-│   └── hookPlaceholderParser.ts  ← shared parser for [placeholder] tokens
 ├── stores/scripts/
 │   ├── focusScriptStore.ts          ← persisted, key "app:scripts:focused"
 │   ├── scriptEditorStore.ts          ← persisted, key "app:scripts:editor" (meta header + parts expanded)
-│   └── calendarStore.ts             ← persisted, key "app:scripts:calendar" (month/year nav + filters)
+│   ├── calendarStore.ts             ← persisted, key "app:scripts:calendar" (month/year nav + filters)
+│   └── scriptRightPanelStore.ts    ← persisted, key "app:scripts:right-panel" (ScriptRightPanel.Generate, ScriptRightPanel.HookTemplates)
+├── helpers/
+│   └── hookPlaceholderParser.ts    ← parseHookPlaceholders, hasPlaceholders, replacePlaceholder, insertPlaceholder, formatPlaceholderToken
 ├── routes/
 │   └── scripts.tsx              ← thin route, delegates to ScriptPageView
 └── components/scripts/
@@ -107,11 +125,16 @@ front/app/
     │   ├── ScriptCalendarDayCell.tsx ← individual day cell (droppable)
     │   ├── ScriptCalendarCard.tsx   ← compact script card (draggable)
     │   └── ScriptDetailModal.tsx    ← full editor modal (wraps ScriptEditorPanel)
+    ├── hookTemplates/
+    │   ├── HookTemplatePanel.tsx     ← right-side panel (SidePanel, w-72) with search, category filter, infinite scroll
+    │   ├── HookTemplateCard.tsx      ← clickable card showing title + placeholder pills
+    │   ├── ApplyHookTemplateModal.tsx ← confirmation dialog (ModalOverlay)
+    │   └── CreateHookTemplateModal.tsx ← creation modal with placeholder palette
     └── parts/
-        ├── ScriptHookCard.tsx        ← hook card with template toggle + placeholder editing
-        ├── HookContentRenderer.tsx   ← rich text with clickable placeholder pills
+        ├── ScriptHookCard.tsx        ← hook part card (always first, not draggable, auto-save on blur, InboxStackIcon for template panel)
+        ├── HookContentRenderer.tsx   ← placeholder-aware rendering with popover input for replacement
         ├── ScriptPartsList.tsx       ← DnD orchestrator
-        ├── ScriptPartCard.tsx       ← reusable card wrapper (header, delete, animation)
+        ├── ScriptPartCard.tsx       ← reusable card wrapper (header, delete, headerActions, animation)
         ├── ScriptPartHeader.tsx     ← reusable colored header (icon + label, drag handle)
         ├── ScriptChapterCard.tsx
         ├── ScriptVoiceOverCard.tsx
@@ -122,7 +145,7 @@ front/app/
         ├── ScriptRetentionCueCard.tsx ← retention cue card with type selector + content
         ├── DialogueSubjectRow.tsx    ← inline-editable subject line
         ├── AddDialogueSubjectRow.tsx ← inline subject creation
-        └── AddScriptPartMenu.tsx     ← "+ Add part" dropdown
+        └── AddScriptPartMenu.tsx     ← "+ Add part" dropdown (hides Hook when one already exists)
 ```
 
 ---
@@ -138,6 +161,7 @@ Clicking "+ New script" in `ScriptListPanel` calls `useCreateScript` directly wi
 ### ScriptPart Discriminated Union
 Each part class has a `readonly type` literal field:
 ```ts
+class ScriptHook { public readonly type = 'hook' as const; ... }
 class ScriptChapter { public readonly type = 'chapter' as const; ... }
 class ScriptVoiceOver { public readonly type = 'voice_over' as const; ... }
 class ScriptDialogue { public readonly type = 'dialogue' as const; ... }
@@ -146,7 +170,7 @@ class ScriptText { public readonly type = 'text' as const; ... }
 class ScriptCallToAction { public readonly type = 'call_to_action' as const; ... }
 class ScriptRetentionCue { public readonly type = 'retention_cue' as const; ... }
 
-export type ScriptPart = ScriptChapter | ScriptVoiceOver | ScriptDialogue | ScriptShot | ScriptText | ScriptCallToAction | ScriptRetentionCue;
+export type ScriptPart = ScriptHook | ScriptChapter | ScriptVoiceOver | ScriptDialogue | ScriptShot | ScriptText | ScriptCallToAction | ScriptRetentionCue;
 ```
 `useListScriptParts` maps the heterogeneous API response via `scriptPartFromJSON(json)` which switches on `json.type`.
 
@@ -167,14 +191,35 @@ All part cards and `DialogueSubjectRow` use the same inline editing pattern — 
 - Optional card border (`bordered` prop, default true)
 - Store-driven header expand/collapse: reads `arePartsExpanded` from `useScriptEditorStore` — when false, the header + delete action are hidden with a smooth CSS grid animation (`grid-rows-[0fr]`/`[1fr]` + opacity transition); children (content) remain always visible
 
-Each part type has its own color: chapter (blue), voice-over (yellow), shot (primary), dialogue (purple), text (gray), call-to-action (orange), retention cue (pink). Hook uses hardcoded values (red) since it's not a `ScriptPartType` member.
+Each part type has its own color: hook (red), chapter (blue), voice-over (yellow), shot (primary), dialogue (purple), text (gray), call-to-action (orange), retention cue (pink).
 
 ### Hook Card
-`ScriptHookCard` is a standalone card rendered above the parts list inside `ScriptPartsList`. It uses the same visual pattern as structured part cards (`border border-light-gray rounded-xl p-4 bg-clear`) with a `ScriptPartHeader` (CheckBadgeIcon, primary color). It is not reorderable and has no delete button. A `Button` opens/closes the hook template panel.
+`ScriptHookCard` is a part-based card rendered above the DnD list inside `ScriptPartsList`. It follows the same pattern as other part cards — content auto-saves on blur via `useUpdateScriptHook`, delete via `useDeleteScriptHook`. Wrapped in `ScriptPartCard` with `partType={ScriptPartType.Hook}` (red color). Not draggable (always first, position 0). Only one hook is allowed per script per generation compartment — `AddScriptPartMenu` hides the Hook option when one already exists.
 
-**Placeholder editing:** When the hook text contains `[placeholder]` tokens, `HookContentRenderer` displays them as clickable `Pill` components inline with the text. Clicking a pill opens a popover input to replace the placeholder value. Once all placeholders are filled, the card switches to a plain `TextArea` for free-form editing. The component uses `key={script.hookTemplate?.uuid}` on mount to reset local state when a new template is applied.
+The card has an `InboxStackIcon` button (hover-revealed, passed via `headerActions` prop to `ScriptPartCard`) that toggles the `HookTemplatePanel` via `useScriptRightPanelStore.togglePanel(ScriptRightPanel.HookTemplates)`.
 
-**Shared parser:** `hookPlaceholderParser.ts` exports `parseHookPlaceholders(content)` (returns `HookPart[]` with `type: 'text' | 'placeholder'`) and `hasPlaceholders(content)`. Used by both `HookContentRenderer` (interactive editing) and `HookTemplateCard` (display preview).
+**Conditional rendering:** When the hook content has placeholders (`hasPlaceholders(content)`), `HookContentRenderer` is rendered instead of the plain `TextArea`. Once all placeholders are filled, the card switches back to the standard `TextArea`.
+
+### Hook Content Renderer
+`HookContentRenderer` is a placeholder-aware content display component used inside `ScriptHookCard`. It parses the hook content via `parseHookPlaceholders()` and renders text segments inline alongside placeholder tokens displayed as clickable `Pill` components (purple-tinted: `bg-primary/10`, `border-primary/30`, `text-primary`).
+
+Clicking a placeholder pill opens a popover input (positioned below the pill, `z-30`, with a fixed backdrop for dismiss). The user types a replacement value and confirms with Enter or blur — the placeholder is replaced in the content via `replacePlaceholder()` and auto-saved via `useUpdateScriptHook`. Escape cancels the popover.
+
+### Hook Template Integration
+`ScriptHook` has an optional `hookTemplate` field (`HookTemplate | undefined`). When a template is applied, this field references the source template. Template application calls `useUpdateScriptHook` with `{ content: template.content, hookTemplateUuid: template.uuid }`.
+
+### ScriptPartCard headerActions
+`ScriptPartCard` accepts an optional `headerActions` prop (`React.ReactNode`) rendered between the part type pill and the delete button. Used by `ScriptHookCard` to render the `InboxStackIcon` template library toggle button.
+
+### Hook Placeholder System
+Templates use `[placeholder]` tokens (e.g., `[topic]`, `[audience]`) that users fill in after applying a template.
+
+**Shared helper** (`~/helpers/hookPlaceholderParser.ts`):
+- `parseHookPlaceholders(content)`: Splits text into `HookPart[]` with `type: 'text' | 'placeholder'`
+- `hasPlaceholders(content)`: Returns `true` if any `[...]` tokens remain
+- `formatPlaceholderToken(placeholder)`: Returns `[key]` — single source of truth for the token format
+- `insertPlaceholder(content, placeholder, cursorStart, cursorEnd)`: Inserts `[key]` at cursor position, returns `{ content, cursorPosition }`
+- `replacePlaceholder(content, placeholder, value)`: Replaces all `[key]` occurrences with `value`
 
 ### Text Part (Notebook-Style)
 `ScriptTextCard` is a borderless, always-editable text block that blends into the page:
@@ -225,6 +270,36 @@ Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay
 | `useUpdateDialogueSubject` | Takes `{ subjectUuid, scriptUuid, speaker?, content? }` — no dialogueUuid |
 | `useDeleteDialogueSubject` | Takes `{ subjectUuid, scriptUuid }` — no dialogueUuid |
 | `useReorderScriptParts` | Takes `{ scriptUuid, orderedParts: { uuid, type }[] }` |
+| `useUpdateScriptHook` | Takes `{ hookUuid, scriptUuid, data: { content?, hookTemplateUuid? } }` |
+| `useListPaginatedHookTemplates` | Infinite scroll (page/limit/hasMore), optional `searchTerm` |
+
+### Models
+
+**ScriptHook** (updated):
+```ts
+class ScriptHook {
+    readonly type = 'hook' as const
+    uuid: string
+    content: string
+    position: number
+    createdAt: Date
+    updatedAt?: Date
+    generationUuid?: string
+    hookTemplate?: HookTemplate    // linked template reference (nullable)
+}
+```
+
+**HookTemplate:**
+```ts
+class HookTemplate {
+    uuid: string
+    title: string
+    content: string              // template text with [placeholder] tokens
+    isPublic: boolean
+    createdAt: Date
+    updatedAt?: Date
+}
+```
 
 ---
 
@@ -238,9 +313,12 @@ scriptQueryKeys.parts(uuid)                                  // ['scripts', 'par
 
 scriptTagQueryKeys.all        // ['script-tags']
 scriptTagQueryKeys.list(uuid) // ['script-tags', 'list', projectUuid]
+
+hookTemplateQueryKeys.all        // ['hookTemplates']
+hookTemplateQueryKeys.list(term) // ['hookTemplates', 'list', term ?? '']
 ```
 
-All part mutations (chapters, voice-overs, dialogues, shots, texts, call-to-actions, retention cues, dialogue subjects) invalidate `scriptQueryKeys.parts(scriptUuid)`.
+All part mutations (chapters, voice-overs, dialogues, shots, texts, call-to-actions, retention cues, hooks, dialogue subjects) invalidate `scriptQueryKeys.parts(scriptUuid)`. All hook template mutations invalidate `hookTemplateQueryKeys.all`.
 
 ---
 

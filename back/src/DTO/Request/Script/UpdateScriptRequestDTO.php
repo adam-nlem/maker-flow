@@ -9,15 +9,12 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class UpdateScriptRequestDTO extends AbstractRequestDTO
 {
     private ?string $title;
-    private ?string $hook;
     private ?string $publishedAt;
     private ?string $postGroupUuid;
-    private ?string $hookTemplateUuid;
     private ?array $tagUuids;
     private ?array $platforms;
     private ?string $status;
     private bool $hasPostGroupUuid = false;
-    private bool $hasHookTemplateUuid = false;
     private bool $hasPlatforms = false;
     private bool $hasStatus = false;
 
@@ -31,12 +28,9 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     protected function fromPayload(array $payload): void
     {
         $this->title = $payload["title"] ?? null;
-        $this->hook = $payload["hook"] ?? null;
         $this->publishedAt = $payload["publishedAt"] ?? null;
         $this->postGroupUuid = $payload["postGroupUuid"] ?? null;
         $this->hasPostGroupUuid = array_key_exists("postGroupUuid", $payload);
-        $this->hookTemplateUuid = $payload["hookTemplateUuid"] ?? null;
-        $this->hasHookTemplateUuid = array_key_exists("hookTemplateUuid", $payload);
         $this->tagUuids = $payload["tagUuids"] ?? null;
         $this->platforms = $payload["platforms"] ?? null;
         $this->hasPlatforms = array_key_exists("platforms", $payload);
@@ -48,10 +42,8 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     {
         return [
             'title' => $this->getTitle(),
-            'hook' => $this->getHook(),
             'publishedAt' => $this->getPublishedAt(),
             'postGroupUuid' => $this->getPostGroupUuid(),
-            'hookTemplateUuid' => $this->getHookTemplateUuid(),
             'tagUuids' => $this->getTagUuids(),
         ];
     }
@@ -59,11 +51,6 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     public function getTitle(): ?string
     {
         return $this->title;
-    }
-
-    public function getHook(): ?string
-    {
-        return $this->hook;
     }
 
     public function getPublishedAt(): ?string
@@ -79,16 +66,6 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     public function hasPostGroupUuid(): bool
     {
         return $this->hasPostGroupUuid;
-    }
-
-    public function getHookTemplateUuid(): ?string
-    {
-        return $this->hookTemplateUuid;
-    }
-
-    public function hasHookTemplateUuid(): bool
-    {
-        return $this->hasHookTemplateUuid;
     }
 
     public function getTagUuids(): ?array

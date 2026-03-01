@@ -9,6 +9,7 @@ import type { ScriptShot } from "~/models/ScriptShot";
 import type { ScriptText } from "~/models/ScriptText";
 import type { ScriptCallToAction } from "~/models/ScriptCallToAction";
 import type { ScriptRetentionCue } from "~/models/ScriptRetentionCue";
+import type { ScriptHook } from "~/models/ScriptHook";
 import ScriptChapterCard from "./ScriptChapterCard";
 import ScriptVoiceOverCard from "./ScriptVoiceOverCard";
 import ScriptDialogueCard from "./ScriptDialogueCard";
@@ -19,6 +20,7 @@ import ScriptRetentionCueCard from "./ScriptRetentionCueCard";
 import ScriptHookCard from "./ScriptHookCard";
 import AddScriptPartMenu from "./AddScriptPartMenu";
 import { useReorderScriptParts } from "~/hooks/api/scripts/useReorderScriptParts";
+import { ScriptPartType } from "~/models/enums/ScriptPartType";
 
 class InteractiveAwarePointerSensor extends PointerSensor {
     static activators = [{
@@ -66,32 +68,42 @@ function DroppableZone({ id, children }: { id: string; children: React.ReactNode
 
 function renderPartCard(part: ScriptPart, scriptUuid: string, dragHandleProps?: Record<string, unknown>) {
     switch (part.type) {
-        case "chapter":
+        case ScriptPartType.Chapter:
             return <ScriptChapterCard chapter={part as ScriptChapter} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
-        case "voice_over":
+        case ScriptPartType.VoiceOver:
             return <ScriptVoiceOverCard voiceOver={part as ScriptVoiceOver} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
-        case "dialogue":
+        case ScriptPartType.Dialogue:
             return <ScriptDialogueCard dialogue={part as ScriptDialogue} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
-        case "shot":
+        case ScriptPartType.Shot:
             return <ScriptShotCard shot={part as ScriptShot} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
-        case "text":
+        case ScriptPartType.Text:
             return <ScriptTextCard text={part as ScriptText} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
-        case "call_to_action":
+        case ScriptPartType.CallToAction:
             return <ScriptCallToActionCard callToAction={part as ScriptCallToAction} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
-        case "retention_cue":
+        case ScriptPartType.RetentionCue:
             return <ScriptRetentionCueCard retentionCue={part as ScriptRetentionCue} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+        case ScriptPartType.Hook:
+            return <ScriptHookCard hook={part as ScriptHook} scriptUuid={scriptUuid} />;
     }
 }
 
 export default function ScriptPartsList({ parts, script, generationUuid }: ScriptPartsListProps) {
     const scriptUuid = script.uuid;
-    const [localParts, setLocalParts] = useState<ScriptPart[]>(parts);
+
+    const hookPart = parts.find((p) => p.type === "hook") as ScriptHook | undefined;
+    const otherParts = parts.filter((p) => p.type !== "hook");
+
+    const [localParts, setLocalParts] = useState<ScriptPart[]>(otherParts);
     const [activePart, setActivePart] = useState<ScriptPart | null>(null);
     const { reorderScriptParts } = useReorderScriptParts();
 
     // Keep local state in sync when parts prop changes (e.g. after server invalidation)
-    if (parts !== localParts && !activePart) {
-        setLocalParts(parts);
+    if (otherParts !== localParts && !activePart) {
+        const otherPartsKey = otherParts.map((p) => p.uuid).join(",");
+        const localPartsKey = localParts.map((p) => p.uuid).join(",");
+        if (otherPartsKey !== localPartsKey) {
+            setLocalParts(otherParts);
+        }
     }
 
     const sensors = useSensors(
@@ -127,7 +139,11 @@ export default function ScriptPartsList({ parts, script, generationUuid }: Scrip
     return (
         <div className="flex flex-col h-full overflow-hidden bg-dot-pattern">
             <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-none">
-                <ScriptHookCard key={script.hookTemplate?.uuid} script={script} />
+                {hookPart && (
+                    <div className="mb-3">
+                        <ScriptHookCard key={`${hookPart.uuid}-${hookPart.hookTemplate?.uuid}`} hook={hookPart} scriptUuid={scriptUuid} />
+                    </div>
+                )}
 
                 <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                     <DroppableZone id="parts-list">
@@ -151,7 +167,7 @@ export default function ScriptPartsList({ parts, script, generationUuid }: Scrip
             </div>
 
             <div className="px-6 py-4 border-t border-light-gray">
-                <AddScriptPartMenu scriptUuid={scriptUuid} generationUuid={generationUuid} />
+                <AddScriptPartMenu scriptUuid={scriptUuid} generationUuid={generationUuid} hasHook={hookPart !== undefined} />
             </div>
         </div>
     );

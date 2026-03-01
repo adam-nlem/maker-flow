@@ -10,6 +10,7 @@ interface ScriptPartCardProps {
     bordered?: boolean;
     onDelete?: () => void;
     isDeleting?: boolean;
+    headerActions?: React.ReactNode;
     children: React.ReactNode;
 }
 
@@ -19,6 +20,7 @@ export default function ScriptPartCard({
     bordered = true,
     onDelete,
     isDeleting,
+    headerActions,
     children,
 }: ScriptPartCardProps) {
     return (
@@ -37,12 +39,15 @@ export default function ScriptPartCard({
                             bgColorClassName={scriptPartTypeToBgClass[partType]}
                             borderColorClassName={scriptPartTypeToBorderClass[partType]}
                         />
-                        <button
-                            onClick={onDelete}
-                            className={`hover:text-danger text-xs cursor-pointer transition opacity-0 group-hover:opacity-100 ${isDeleting ? "pointer-events-none opacity-40" : ""}`}
-                        >
-                            <XMarkIcon className="size-4" strokeWidth={2} />
-                        </button>
+                        <div className="flex items-center gap-1">
+                            {headerActions}
+                            <button
+                                onClick={onDelete}
+                                className={`hover:text-danger text-xs cursor-pointer transition opacity-0 group-hover:opacity-100 ${isDeleting ? "pointer-events-none opacity-40" : ""}`}
+                            >
+                                <XMarkIcon className="size-4" strokeWidth={2} />
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>

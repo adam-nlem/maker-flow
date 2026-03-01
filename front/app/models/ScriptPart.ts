@@ -6,8 +6,9 @@ import { ScriptShot, type ScriptShotJSON } from "./ScriptShot";
 import { ScriptText, type ScriptTextJSON } from "./ScriptText";
 import { ScriptCallToAction, type ScriptCallToActionJSON } from "./ScriptCallToAction";
 import { ScriptRetentionCue, type ScriptRetentionCueJSON } from "./ScriptRetentionCue";
+import { ScriptHook, type ScriptHookJSON } from "./ScriptHook";
 
-export type ScriptPart = ScriptChapter | ScriptVoiceOver | ScriptDialogue | ScriptShot | ScriptText | ScriptCallToAction | ScriptRetentionCue;
+export type ScriptPart = ScriptChapter | ScriptVoiceOver | ScriptDialogue | ScriptShot | ScriptText | ScriptCallToAction | ScriptRetentionCue | ScriptHook;
 
 export type ScriptPartJSON =
     | ScriptChapterJSON
@@ -16,7 +17,8 @@ export type ScriptPartJSON =
     | ScriptShotJSON
     | ScriptTextJSON
     | ScriptCallToActionJSON
-    | ScriptRetentionCueJSON;
+    | ScriptRetentionCueJSON
+    | ScriptHookJSON;
 
 export function scriptPartFromJSON(json: ScriptPartJSON): ScriptPart {
     switch (json.type) {
@@ -34,5 +36,7 @@ export function scriptPartFromJSON(json: ScriptPartJSON): ScriptPart {
             return ScriptCallToAction.fromJSON(json);
         case ScriptPartType.RetentionCue:
             return ScriptRetentionCue.fromJSON(json);
+        case ScriptPartType.Hook:
+            return ScriptHook.fromJSON(json);
     }
 }

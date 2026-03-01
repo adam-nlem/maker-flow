@@ -290,8 +290,8 @@ Parses the AI JSON response into typed script parts. The AI outputs a structured
 ```json
 {
   "title": "Script title",
-  "hook": "Script hook",
   "parts": [
+    { "type": "hook", "content": "Script hook opening line" },
     { "type": "chapter", "title": "...", "description": "..." },
     { "type": "voice_over", "content": "..." },
     { "type": "shot", "content": "..." },
@@ -304,6 +304,7 @@ Parses the AI JSON response into typed script parts. The AI outputs a structured
 
 | Part Type | Entity Created | Key Fields |
 |-----------|---------------|------------|
+| `hook` | `ScriptHook` | content |
 | `chapter` | `ScriptChapter` | title, description, ChapterType::OffScreen |
 | `voice_over` | `ScriptVoiceOver` | content, Tone::Neutral |
 | `shot` | `ScriptShot` | content, ShotType::BRoll |
@@ -311,10 +312,10 @@ Parses the AI JSON response into typed script parts. The AI outputs a structured
 | `retention_cue` | `ScriptRetentionCue` | content, RetentionCueType from retentionCueType field |
 | `text` | `ScriptText` | content |
 
-Returns a `ScriptOutputDTO` containing extracted `?title`, `?hook`, and `ScriptOutputPartDTO[]`.
+Returns a `ScriptOutputDTO` containing extracted `?title` and `ScriptOutputPartDTO[]`.
 
 **DTOs:**
-- `ScriptOutputDTO` (`back/src/DTO/ScriptOutputDTO.php`): Top-level parsed output with `title`, `hook`, and `parts` array. Static `fromArray()` factory.
+- `ScriptOutputDTO` (`back/src/DTO/ScriptOutputDTO.php`): Top-level parsed output with `title` and `parts` array. Static `fromArray()` factory.
 - `ScriptOutputPartDTO` (`back/src/DTO/ScriptOutputPartDTO.php`): Individual parsed part with `type`, `title`, `description`, `content`, `callToActionType`, `retentionCueType`. Static `fromArray()` factory.
 
 **Markdown code fence stripping:** The parser strips ```` ```json ``` ```` wrappers if the AI includes them.
@@ -384,12 +385,12 @@ Project (1) ───── (N) CreatorProfile
 Project + User ── (0..1) CreatorProfile    [Unique constraint]
 User (1) ──────── (N) ScriptGeneration
 Script (1) ────── (N) ScriptGeneration
-ScriptGeneration (1) ── (N) ScriptParts (all 7 types: Text, Chapter, VoiceOver, Dialogue, Shot, CallToAction, RetentionCue)
+ScriptGeneration (1) ── (N) ScriptParts (all 8 types: Text, Chapter, VoiceOver, Dialogue, Shot, CallToAction, RetentionCue, Hook)
 ```
 
 ### Part ↔ Generation Compartments
 
-Each of the 7 script part entities has an optional `scriptGeneration` ManyToOne:
+Each of the 8 script part entities has an optional `scriptGeneration` ManyToOne:
 
 ```php
 #[ORM\ManyToOne(targetEntity: ScriptGeneration::class)]

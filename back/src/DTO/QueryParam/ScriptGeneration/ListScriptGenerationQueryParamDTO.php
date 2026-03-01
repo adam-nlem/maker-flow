@@ -7,7 +7,7 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class LatestScriptGenerationQueryParamDTO extends AbstractQueryParamDTO
+class ListScriptGenerationQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
     private string $scriptUuid;

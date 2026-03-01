@@ -126,7 +126,7 @@ class PromptAssemblerService
 
         foreach ($activeSkills as $skill) {
             match ($skill) {
-                SkillModule::StrongHook->value => $blocks[] = "Commence par une accroche exceptionnellement forte. Les 3 premières secondes doivent créer de la curiosité, de la tension ou une affirmation audacieuse qui rend l'arrêt coûteux.",
+                SkillModule::StrongHook->value => $blocks[] = "Commence par une accroche exceptionnellement forte. Les 3 premières secondes doivent créer de la curiosité, de la tension ou une affirmation audacieuse qui rend l'arrêt coûteux. Utilise le type \"hook\" comme premier élément du tableau \"parts\".",
                 SkillModule::RetentionBoosters->value => $blocks[] = $this->buildRetentionBoostersInstruction($skillInputs),
                 SkillModule::StorytellingMode->value => $blocks[] = isset($skillInputs['story'])
                     ? "Ancre le script dans cette histoire : {$skillInputs['story']}. Tisse le contenu éducatif à travers elle plutôt que de le présenter sous forme de liste."
@@ -147,7 +147,7 @@ class PromptAssemblerService
         $negativeInstructions = [];
 
         if (!in_array(SkillModule::StrongHook->value, $activeSkills, true)) {
-            $negativeInstructions[] = "une accroche spécialement travaillée (strong hook)";
+            $negativeInstructions[] = "des éléments de type \"hook\"";
         }
         if (!in_array(SkillModule::RetentionBoosters->value, $activeSkills, true)) {
             $negativeInstructions[] = "des éléments de type \"retention_cue\"";
@@ -216,8 +216,12 @@ class PromptAssemblerService
         $lines[] = 'Formate ta sortie UNIQUEMENT en JSON valide, sans blocs de code markdown ni texte autour. Utilise cette structure exacte :';
         $lines[] = '{';
         $lines[] = '  "title": "Titre du script",';
-        $lines[] = '  "hook": "Accroche du script",';
         $lines[] = '  "parts": [';
+
+        if (in_array(SkillModule::StrongHook->value, $activeSkills, true)) {
+            $lines[] = '    { "type": "hook", "content": "Accroche du script" },';
+        }
+
         $lines[] = '    { "type": "chapter", "title": "Titre du chapitre", "description": "Description optionnelle ou null" },';
         $lines[] = '    { "type": "voice_over", "content": "Contenu narré/parlé", "tone": "calm|dynamic|dramatic|neutral|casual_friendly|educational_authoritative|hype_energetic|funny_sarcastic|storytelling_emotional" },';
 

@@ -9,7 +9,6 @@ class ScriptOutputDTO
      */
     public function __construct(
         private readonly ?string $title,
-        private readonly ?string $hook,
         private readonly array $parts,
     ) {}
 
@@ -22,7 +21,6 @@ class ScriptOutputDTO
 
         return new self(
             title: isset($data['title']) && $data['title'] !== '' ? trim($data['title']) : null,
-            hook: isset($data['hook']) && $data['hook'] !== '' ? trim($data['hook']) : null,
             parts: $parts,
         );
     }
@@ -30,11 +28,6 @@ class ScriptOutputDTO
     public function getTitle(): ?string
     {
         return $this->title;
-    }
-
-    public function getHook(): ?string
-    {
-        return $this->hook;
     }
 
     /**

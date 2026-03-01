@@ -8,6 +8,7 @@ import { useCreateScriptShot } from "~/hooks/api/scriptShots/useCreateScriptShot
 import { useCreateScriptText } from "~/hooks/api/scriptTexts/useCreateScriptText";
 import { useCreateScriptCallToAction } from "~/hooks/api/scriptCallToActions/useCreateScriptCallToAction";
 import { useCreateScriptRetentionCue } from "~/hooks/api/scriptRetentionCues/useCreateScriptRetentionCue";
+import { useCreateScriptHook } from "~/hooks/api/scriptHooks/useCreateScriptHook";
 import { ChapterType } from "~/models/enums/ChapterType";
 import { Tone } from "~/models/enums/Tone";
 import { ShotType } from "~/models/enums/ShotType";
@@ -17,9 +18,10 @@ import { RetentionCueType } from "~/models/enums/RetentionCueType";
 interface AddScriptPartMenuProps {
     scriptUuid: string;
     generationUuid?: string;
+    hasHook: boolean;
 }
 
-export default function AddScriptPartMenu({ scriptUuid, generationUuid }: AddScriptPartMenuProps) {
+export default function AddScriptPartMenu({ scriptUuid, generationUuid, hasHook }: AddScriptPartMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const { createScriptChapter } = useCreateScriptChapter();
@@ -29,10 +31,18 @@ export default function AddScriptPartMenu({ scriptUuid, generationUuid }: AddScr
     const { createScriptText } = useCreateScriptText();
     const { createScriptCallToAction } = useCreateScriptCallToAction();
     const { createScriptRetentionCue } = useCreateScriptRetentionCue();
+    const { createScriptHook } = useCreateScriptHook();
+
+    const availableOptions = hasHook
+        ? scriptPartTypeOptions.filter((type) => type !== ScriptPartType.Hook)
+        : scriptPartTypeOptions;
 
     const handleAdd = async (type: ScriptPartType) => {
         setIsOpen(false);
         switch (type) {
+            case ScriptPartType.Hook:
+                await createScriptHook({ scriptUuid, content: "", generationUuid });
+                break;
             case ScriptPartType.Text:
                 await createScriptText({ scriptUuid, content: "", generationUuid });
                 break;
@@ -63,7 +73,7 @@ export default function AddScriptPartMenu({ scriptUuid, generationUuid }: AddScr
                 <>
                     <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
                     <div className="absolute bottom-full left-0 mb-2 z-30 border border-light-gray rounded-xl bg-clear shadow-lg p-1.5 flex flex-col gap-0.5 min-w-48">
-                        {scriptPartTypeOptions.map((type) => {
+                        {availableOptions.map((type) => {
                             const Icon = scriptPartTypeToIcon[type];
                             return (
                                 <button

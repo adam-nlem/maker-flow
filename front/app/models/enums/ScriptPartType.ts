@@ -1,7 +1,8 @@
 import type { ComponentType, SVGProps } from "react";
-import { Bars3BottomLeftIcon, DocumentTextIcon, MicrophoneIcon, ChatBubbleLeftRightIcon, FilmIcon, MegaphoneIcon, ArrowPathIcon } from "@heroicons/react/24/outline";
+import { Bars3BottomLeftIcon, DocumentTextIcon, MicrophoneIcon, ChatBubbleLeftRightIcon, FilmIcon, MegaphoneIcon, ArrowPathIcon, CheckBadgeIcon } from "@heroicons/react/24/outline";
 
 export enum ScriptPartType {
+    Hook = 'hook',
     Text = 'text',
     Chapter = 'chapter',
     VoiceOver = 'voice_over',
@@ -12,6 +13,7 @@ export enum ScriptPartType {
 }
 
 export const scriptPartTypeToFrenchTranslation: Record<ScriptPartType, string> = {
+    [ScriptPartType.Hook]: "Hook",
     [ScriptPartType.Text]: "Texte",
     [ScriptPartType.Chapter]: "Chapitre",
     [ScriptPartType.VoiceOver]: "Voix off",
@@ -22,6 +24,7 @@ export const scriptPartTypeToFrenchTranslation: Record<ScriptPartType, string> =
 }
 
 export const scriptPartTypeToIcon: Record<ScriptPartType, ComponentType<SVGProps<SVGSVGElement>>> = {
+    [ScriptPartType.Hook]: CheckBadgeIcon,
     [ScriptPartType.Text]: Bars3BottomLeftIcon,
     [ScriptPartType.Chapter]: DocumentTextIcon,
     [ScriptPartType.VoiceOver]: MicrophoneIcon,
@@ -32,6 +35,7 @@ export const scriptPartTypeToIcon: Record<ScriptPartType, ComponentType<SVGProps
 }
 
 export const scriptPartTypeToBgClass: Record<ScriptPartType, string> = {
+    [ScriptPartType.Hook]: "bg-red/10",
     [ScriptPartType.Text]: "bg-gray/10",
     [ScriptPartType.Chapter]: "bg-blue/10",
     [ScriptPartType.VoiceOver]: "bg-yellow/10",
@@ -42,6 +46,7 @@ export const scriptPartTypeToBgClass: Record<ScriptPartType, string> = {
 }
 
 export const scriptPartTypeToBorderClass: Record<ScriptPartType, string> = {
+    [ScriptPartType.Hook]: "border border-red/30",
     [ScriptPartType.Text]: "border border-gray/30",
     [ScriptPartType.Chapter]: "border border-blue/30",
     [ScriptPartType.VoiceOver]: "border border-yellow/30",
@@ -52,6 +57,7 @@ export const scriptPartTypeToBorderClass: Record<ScriptPartType, string> = {
 }
 
 export const scriptPartTypeToTextClass: Record<ScriptPartType, string> = {
+    [ScriptPartType.Hook]: "text-red",
     [ScriptPartType.Text]: "text-gray",
     [ScriptPartType.Chapter]: "text-blue",
     [ScriptPartType.VoiceOver]: "text-yellow",

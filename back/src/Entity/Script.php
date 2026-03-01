@@ -42,16 +42,6 @@ class Script
     ])]
     private ?string $title = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([
-        'api_scripts_list',
-        'api_scripts_calendar',
-        'api_scripts_create',
-        'api_scripts_update',
-        'api_scripts_show',
-    ])]
-    private ?string $hook = null;
-
     #[ORM\Column(nullable: true)]
     #[Groups([
         'api_scripts_list',
@@ -131,17 +121,6 @@ class Script
     ])]
     private ?PostGroup $postGroup = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    #[Groups([
-        'api_scripts_list',
-        'api_scripts_calendar',
-        'api_scripts_create',
-        'api_scripts_update',
-        'api_scripts_show',
-    ])]
-    private ?HookTemplate $hookTemplate = null;
-
     /**
      * @var Collection<int, ScriptTag>
      */
@@ -198,6 +177,12 @@ class Script
     private Collection $scriptRetentionCues;
 
     /**
+     * @var Collection<int, ScriptHook>
+     */
+    #[ORM\OneToMany(targetEntity: ScriptHook::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptHooks;
+
+    /**
      * @var Collection<int, ScriptGeneration>
      */
     #[ORM\OneToMany(targetEntity: ScriptGeneration::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
@@ -221,6 +206,7 @@ class Script
         $this->scriptTexts = new ArrayCollection();
         $this->scriptCallToActions = new ArrayCollection();
         $this->scriptRetentionCues = new ArrayCollection();
+        $this->scriptHooks = new ArrayCollection();
         $this->scriptGenerations = new ArrayCollection();
     }
 
@@ -255,18 +241,6 @@ class Script
     public function setTitle(string $title): static
     {
         $this->title = $title;
-
-        return $this;
-    }
-
-    public function getHook(): ?string
-    {
-        return $this->hook;
-    }
-
-    public function setHook(?string $hook): static
-    {
-        $this->hook = $hook;
 
         return $this;
     }
@@ -375,18 +349,6 @@ class Script
     public function setPostGroup(?PostGroup $postGroup): static
     {
         $this->postGroup = $postGroup;
-
-        return $this;
-    }
-
-    public function getHookTemplate(): ?HookTemplate
-    {
-        return $this->hookTemplate;
-    }
-
-    public function setHookTemplate(?HookTemplate $hookTemplate): static
-    {
-        $this->hookTemplate = $hookTemplate;
 
         return $this;
     }
@@ -612,6 +574,35 @@ class Script
         if ($this->scriptRetentionCues->removeElement($scriptRetentionCue)) {
             if ($scriptRetentionCue->getScript() === $this) {
                 $scriptRetentionCue->setScript(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ScriptHook>
+     */
+    public function getScriptHooks(): Collection
+    {
+        return $this->scriptHooks;
+    }
+
+    public function addScriptHook(ScriptHook $scriptHook): static
+    {
+        if (!$this->scriptHooks->contains($scriptHook)) {
+            $this->scriptHooks->add($scriptHook);
+            $scriptHook->setScript($this);
+        }
+
+        return $this;
+    }
+
+    public function removeScriptHook(ScriptHook $scriptHook): static
+    {
+        if ($this->scriptHooks->removeElement($scriptHook)) {
+            if ($scriptHook->getScript() === $this) {
+                $scriptHook->setScript(null);
             }
         }
 

@@ -3,22 +3,17 @@ import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { Input } from "~/components/ui/Input";
 import { ToggleChip } from "~/components/ui/ToggleChip";
 import { SidePanel } from "~/components/ui/SidePanel";
-import type { HookTemplate } from "~/models/HookTemplate";
-import type { Script } from "~/models/Script";
 import { HookTemplateCategory, hookTemplateCategoryOptions, hookTemplateCategoryToFrenchTranslation } from "~/models/enums/HookTemplateCategory";
 import { useListPaginatedHookTemplates } from "~/hooks/api/hookTemplates/useListPaginatedHookTemplates";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
+import { useHookTemplateStore } from "~/stores/scripts/hookTemplateStore";
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
 import HookTemplateCard from "./HookTemplateCard";
 import CreateHookTemplateModal from "./CreateHookTemplateModal";
 
-interface HookTemplatePanelProps {
-    scripts: Script[];
-    focusedScript: Script;
-    onApplyTemplate: (template: HookTemplate) => void;
-}
-
-export default function HookTemplatePanel({ scripts, focusedScript, onApplyTemplate }: HookTemplatePanelProps) {
+export default function HookTemplatePanel() {
+    const focusedHookTemplateUuid = useHookTemplateStore((s) => s.focusedHookTemplateUuid);
+    const setSelectedTemplate = useHookTemplateStore((s) => s.setSelectedTemplate);
     const [activeCategory, setActiveCategory] = useState<HookTemplateCategory>(HookTemplateCategory.All);
     const [searchInput, setSearchInput] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
@@ -60,20 +55,12 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
         };
     }, [hasMore, isLoadingMore, listMore]);
 
-    const recentTemplateUuids = new Set(
-        scripts
-            .filter((s) => s.hookTemplate !== undefined)
-            .map((s) => s.hookTemplate!.uuid)
-    );
-
     const filteredTemplates = hookTemplates.filter((template) => {
         switch (activeCategory) {
             case HookTemplateCategory.Public:
                 return template.isPublic;
             case HookTemplateCategory.Private:
                 return !template.isPublic;
-            case HookTemplateCategory.Recent:
-                return recentTemplateUuids.has(template.uuid);
             case HookTemplateCategory.All:
             default:
                 return true;
@@ -131,8 +118,8 @@ export default function HookTemplatePanel({ scripts, focusedScript, onApplyTempl
                                 <HookTemplateCard
                                     key={template.uuid}
                                     template={template}
-                                    isSelected={focusedScript.hookTemplate?.uuid === template.uuid}
-                                    onClick={() => onApplyTemplate(template)}
+                                    isSelected={focusedHookTemplateUuid === template.uuid}
+                                    onClick={() => setSelectedTemplate(template)}
                                 />
                             ))}
                             <div ref={sentinelRef} className="h-1" />

@@ -2210,6 +2210,255 @@
         }
       ],
       "id": "a1b2c3d4-e5f6-7890-abcd-scriptgen001"
+    },
+    {
+      "name": "Script Hooks",
+      "item": [
+        {
+          "name": "List Script Hooks",
+          "id": "hook-list-0001-0000-0000-000000000001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/hooks?scriptUuid={{scriptUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "hooks"
+              ],
+              "query": [
+                {
+                  "key": "scriptUuid",
+                  "value": "{{scriptUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Script Hook",
+          "id": "hook-create-0001-0000-0000-000000000002",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"content\": \"\",\n  \"generationUuid\": \"{{generationUuid}}\",\n  \"hookTemplateUuid\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/hooks",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "hooks"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Script Hook",
+          "id": "hook-update-0001-0000-0000-000000000003",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"Updated hook content\",\n  \"hookTemplateUuid\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/hooks/{{hookUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "hooks",
+                "{{hookUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Script Hook",
+          "id": "hook-delete-0001-0000-0000-000000000004",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/scripts/hooks/{{hookUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "scripts",
+                "hooks",
+                "{{hookUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "hook-folder-0001-0000-0000-000000000000"
+    },
+    {
+      "name": "Hook Templates",
+      "item": [
+        {
+          "name": "List Hook Templates",
+          "id": "ht-list-0001-0000-0000-000000000001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/hook-templates?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "hook-templates"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Placeholders",
+          "id": "ht-placeholders-0001-0000-000000000002",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/hook-templates/placeholders",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "hook-templates",
+                "placeholders"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Hook Template",
+          "id": "ht-create-0001-0000-0000-000000000003",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mon template d'accroche\",\n  \"content\": \"Saviez-vous que {statistic} des {audience} ne connaissent pas {topic} ?\",\n  \"isPublic\": false\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/hook-templates",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "hook-templates"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Hook Template",
+          "id": "ht-update-0001-0000-0000-000000000004",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Nouveau titre\",\n  \"content\": \"Nouveau contenu avec {topic}\",\n  \"isPublic\": true\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/hook-templates/{{hookTemplateUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "hook-templates",
+                "{{hookTemplateUuid}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Hook Template",
+          "id": "ht-delete-0001-0000-0000-000000000005",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/hook-templates/{{hookTemplateUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "hook-templates",
+                "{{hookTemplateUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "ht-folder-0001-0000-0000-000000000000"
     }
   ],
   "auth": {
@@ -2310,6 +2559,16 @@
     {
       "id": "b2a3c4d5-e6f7-8901-abcd-777777777777",
       "key": "generationUuid",
+      "value": ""
+    },
+    {
+      "id": "b2a3c4d5-e6f7-8901-abcd-888888888888",
+      "key": "hookUuid",
+      "value": ""
+    },
+    {
+      "id": "b2a3c4d5-e6f7-8901-abcd-999999999999",
+      "key": "hookTemplateUuid",
       "value": ""
     }
   ]

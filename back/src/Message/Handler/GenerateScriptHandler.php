@@ -60,10 +60,6 @@ class GenerateScriptHandler
                 $script->setTitle($metadata->getTitle());
             }
 
-            if ($metadata->getHook() !== null) {
-                $script->setHook($metadata->getHook());
-            }
-
             // Mark as completed
             $generation->setStatus(ScriptGenerationStatus::Completed)
                 ->setCompletedAt(DateHelper::createUtcDateTimeImmutable());

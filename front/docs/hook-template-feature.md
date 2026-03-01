@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Hook Template feature provides a reusable library of video hook templates. Users can browse public and private templates from a toggleable right panel in the script editor, then apply a template to their script's hook field. Applying a template copies the template content into the hook text and links the template reference to the script.
+The Hook Template feature provides a reusable library of video hook templates. Users can browse public and private templates from a toggleable right panel in the script editor, then apply a template to a script hook part. Applying a template copies the template content into the hook's content and links the template reference to the `ScriptHook` entity.
 
 ---
 
@@ -19,9 +19,9 @@ The Hook Template feature provides a reusable library of video hook templates. U
 | `createdAt` | `Date` | Creation timestamp |
 | `updatedAt` | `Date \| undefined` | Last update timestamp |
 
-### `Script` Model Update (`~/models/Script.ts`)
+### `ScriptHook` Model Update (`~/models/ScriptHook.ts`)
 
-Added optional `hookTemplate` field (`HookTemplate | undefined`). When a template is applied, this field references the source template.
+Added optional `hookTemplate` field (`HookTemplate | undefined`). When a template is applied, this field references the source template on the hook part entity.
 
 ---
 
@@ -40,6 +40,7 @@ hookTemplateQueryKeys.list(term) // ['hookTemplates', 'list', term ?? '']
 
 | Hook | Method | Endpoint | Description |
 |------|--------|----------|-------------|
+| `useListPaginatedHookTemplates` | GET | `/hook-templates` | Infinite scroll (page/limit/hasMore), optional `searchTerm` |
 | `useListHookTemplates` | GET | `/hook-templates` | List all accessible templates, optional `searchTerm` |
 | `useCreateHookTemplate` | POST | `/hook-templates` | Create a new template (`title`, `content`, `isPublic?`) |
 | `useUpdateHookTemplate` | PATCH | `/hook-templates/{uuid}` | Update own template |
@@ -47,26 +48,37 @@ hookTemplateQueryKeys.list(term) // ['hookTemplates', 'list', term ?? '']
 
 All mutation hooks invalidate `hookTemplateQueryKeys.all` on success.
 
-### `useUpdateScript` Update (`~/hooks/api/scripts/useUpdateScript.ts`)
+### `useUpdateScriptHook` Update (`~/hooks/api/scriptHooks/useUpdateScriptHook.ts`)
 
-Added `hookTemplateUuid?: string | null` to `UpdateScriptData` to support linking/unlinking templates from scripts.
+Added `hookTemplateUuid?: string | null` to `UpdateScriptHookData` to support linking/unlinking templates from script hooks.
 
 ---
 
-## Zustand Store
+## Zustand Stores
 
 ### `useScriptRightPanelStore` (`~/stores/scripts/scriptRightPanelStore.ts`)
 
-Shared persisted store controlling both right panels (hook templates and script generation). Only one panel can be open at a time.
+Shared persisted store controlling both right panels (hook templates and script generation). Only one panel can be open at a time. Values: `ScriptRightPanel.Generate`, `ScriptRightPanel.HookTemplates`.
 
 | Field | Type | Description |
 |-------|------|-------------|
-| `activePanel` | `ScriptRightPanel \| null` | Currently open panel (`ScriptRightPanel` enum) |
+| `activePanel` | `ScriptRightPanel \| null` | Currently open panel (`ScriptRightPanel.Generate` or `ScriptRightPanel.HookTemplates`) |
 | `openPanel` | `(panel) => void` | Open a specific panel |
 | `closePanel` | `() => void` | Close the active panel |
 | `togglePanel` | `(panel) => void` | Toggle: if same → close, else → open |
 
 Persistence key: `"app:scripts:right-panel"`
+
+### `useHookTemplateStore` (`~/stores/scripts/hookTemplateStore.ts`)
+
+Transient store (no persistence) bridging communication between `HookTemplatePanel` and `ScriptHookCard`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `selectedTemplate` | `HookTemplate \| null` | Template clicked in panel, waiting for ScriptHookCard to process |
+| `focusedHookTemplateUuid` | `string \| null` | UUID of the currently applied template (for highlight in panel) |
+| `setSelectedTemplate` | `(template \| null) => void` | Set the selected template |
+| `setFocusedHookTemplateUuid` | `(uuid \| null) => void` | Set the focused template UUID |
 
 ---
 
@@ -74,14 +86,11 @@ Persistence key: `"app:scripts:right-panel"`
 
 ### `HookTemplatePanel` (`~/components/scripts/hookTemplates/HookTemplatePanel.tsx`)
 
-Right-side panel (w-72, border-l) displaying the template library.
+Right-side panel (w-72, border-l) displaying the template library. No props — reads from `useHookTemplateStore` and `useScriptRightPanelStore`.
 
-**Props:**
-| Prop | Type | Description |
-|------|------|-------------|
-| `scripts` | `Script[]` | All scripts in the project (for "Récents" filtering) |
-| `focusedScript` | `Script` | Currently selected script |
-| `onApplyTemplate` | `(template: HookTemplate) => void` | Apply template handler |
+**Store interactions:**
+- Reads `focusedHookTemplateUuid` from `useHookTemplateStore` to highlight the currently linked template
+- Calls `setSelectedTemplate(template)` on `useHookTemplateStore` when the user clicks a template card
 
 **Category Tabs (ToggleChip):**
 | Tab | Label | Filter Logic |
@@ -89,15 +98,14 @@ Right-side panel (w-72, border-l) displaying the template library.
 | `all` | Tous | No filter, show all |
 | `public` | Publics | `isPublic === true` |
 | `private` | Privés | `isPublic === false` |
-| `recent` | Récents | Template UUID found in any script's `hookTemplate` |
 
-Filtering is client-side — no extra API calls needed.
+Filtering is client-side — no extra API calls needed. Uses `useListPaginatedHookTemplates` with infinite scroll (IntersectionObserver sentinel, `rootMargin: 200px`). Debounced search input (300ms) filters via API `searchTerm` param.
 
 **Header actions:** `PlusIcon` button opens `CreateHookTemplateModal`, `XMarkIcon` closes the panel.
 
 ### `HookTemplateCard` (`~/components/scripts/hookTemplates/HookTemplateCard.tsx`)
 
-Clickable card in the panel list. Shows template title and content preview. Uses `parseHookPlaceholders()` from `~/helpers/hookPlaceholderParser` to render `[placeholder]` tokens as `Pill` components with French translations from `HookTemplatePlaceholder` enum.
+Clickable card in the panel list. Shows template title and content preview. Uses `parseHookPlaceholders()` from `~/helpers/hookPlaceholderParser` to render `[placeholder]` tokens as `Pill` components with French translations from `HookTemplatePlaceholder` enum. Accepts `isSelected` prop to highlight the currently linked template (matched via `focusedHookTemplateUuid`).
 
 ### `CreateHookTemplateModal` (`~/components/scripts/hookTemplates/CreateHookTemplateModal.tsx`)
 
@@ -105,26 +113,29 @@ Creation modal opened via the `+` button in the panel header. Form fields: title
 
 ### `ApplyHookTemplateModal` (`~/components/scripts/hookTemplates/ApplyHookTemplateModal.tsx`)
 
-Confirmation dialog using `ModalOverlay`. Shown when the user clicks a template and the script already has hook text. On confirm, updates the script's hook text and links the template.
+Confirmation dialog using `ModalOverlay`. Rendered by `ScriptHookCard` when the user clicks a template and the script hook already has content. Shows the template title and content preview (with placeholder pills). On confirm, updates the hook's content and links the template via `useUpdateScriptHook`.
 
 ---
 
-## Integration in ScriptPageView
+## Template Application Flow
 
-**`ScriptPageView.tsx`** orchestrates the apply flow:
+`ScriptHookCard` owns the template application logic via `useHookTemplateStore`:
 
-1. User clicks a template card in `HookTemplatePanel`
-2. If the script has existing hook text → show `ApplyHookTemplateModal`
-3. If the script has no hook text → apply directly (skip dialog)
-4. On confirm: `updateScript({ hook: template.content, hookTemplateUuid: template.uuid })`
+1. User clicks a template card in `HookTemplatePanel` → `setSelectedTemplate(template)` on the store
+2. `ScriptHookCard` reacts via `useEffect` on `selectedTemplate`:
+   - If the hook has no content → apply directly via `useUpdateScriptHook`
+   - If the hook already has content → show `ApplyHookTemplateModal`
+3. On confirm: `updateScriptHook({ hookUuid, scriptUuid, data: { content: template.content, hookTemplateUuid: template.uuid } })`
+4. On cancel: clear `pendingTemplate` and `selectedTemplate`
+5. `ScriptHookCard` syncs `hook.hookTemplate?.uuid` to `focusedHookTemplateUuid` in the store, so the panel highlights the applied template
 
-The right panel renders conditionally based on `useScriptRightPanelStore.activePanel === 'hookTemplates'`.
+`ScriptPageView` is a pure layout component — it renders `HookTemplatePanel` with no props.
 
 ---
 
 ## Toggle Button
 
-**`ScriptHookCard.tsx`** has a `Button` (secondary style) with `InboxStackIcon` to open the template library panel. Clicking calls `togglePanel('hookTemplates')` on `useScriptRightPanelStore`.
+`ScriptHookCard` has an `InboxStackIcon` button (hover-revealed via `opacity-0 group-hover:opacity-100`, passed as `headerActions` prop to `ScriptPartCard`) to toggle the template library panel. Clicking calls `togglePanel(ScriptRightPanel.HookTemplates)` on `useScriptRightPanelStore`.
 
 ---
 
@@ -148,13 +159,13 @@ Only one right panel (Generate or HookTemplate) can be open at a time via shared
 
 ### `HookTemplateCategory` (`~/models/enums/HookTemplateCategory.ts`)
 
-Category filter for the template panel. Values: `All`, `Public`, `Private`, `Recent`.
-- `hookTemplateCategoryToFrenchTranslation`: French labels (Tous, Publics, Privés, Récents)
+Category filter for the template panel. Values: `All`, `Public`, `Private`.
+- `hookTemplateCategoryToFrenchTranslation`: French labels (Tous, Publics, Privés)
 
 ### `HookTemplatePlaceholder` (`~/models/enums/HookTemplatePlaceholder.ts`)
 
-Represents `[placeholder]` tokens in template content. Values: `Topic`, `Audience`, `Benefit`, `Statistic`, `Problem`, `Product`, `Result`, `Emotion`.
-- `hookTemplatePlaceholderToFrenchTranslation`: French labels (Sujet, Audience, Bénéfice, Statistique, Problème, Produit, Résultat, Émotion)
+Represents `[placeholder]` tokens in template content. Values: `Topic`, `Audience`, `Benefit`, `Statistic`, `Problem`, `Product`, `Result`, `Emotion`, `Number`, `Goal`, `Date`.
+- `hookTemplatePlaceholderToFrenchTranslation`: French labels (Sujet, Audience, Bénéfice, Statistique, Problème, Produit, Résultat, Émotion, Nombre, Objectif, Date)
 
 ---
 
@@ -171,15 +182,21 @@ Templates use `[placeholder]` tokens (e.g., `[Sujet]`, `[Audience]`) that users 
 
 **Display in HookTemplateCard**: Placeholder tokens rendered as `Pill` with French translations.
 
-**Interactive editing in ScriptHookCard**: When hook text has placeholders, `HookContentRenderer` displays them as clickable `Pill` components. Clicking a pill opens a popover input to replace it with a value. Once all placeholders are filled, the hook switches to a plain `TextArea`.
+**Interactive editing in ScriptHookCard**: When hook content has placeholders (`hasPlaceholders(content)`), `ScriptHookCard` renders `HookContentRenderer` instead of the plain `TextArea`. `HookContentRenderer` displays placeholder tokens as clickable `Pill` components (purple-tinted). Clicking a pill opens a popover input (positioned below, `z-30`, with fixed backdrop) where the user types a replacement value. Confirm with Enter or blur replaces all occurrences of that placeholder via `replacePlaceholder()` and auto-saves via `useUpdateScriptHook`. Escape cancels. Once all placeholders are filled, the card switches back to the standard `TextArea`.
 
 ---
 
 ## Relationships
 
 ```
-Script (N) ──── (0..1) HookTemplate    [hookTemplate field, nullable]
-HookTemplatePanel ──── uses ──── useListHookTemplates
-ScriptPageView ──── contains ──── HookTemplatePanel + ApplyHookTemplateModal
-ScriptHookCard ──── toggles ──── useScriptRightPanelStore ('hookTemplates')
+ScriptHook (N) ──── (0..1) HookTemplate    [hookTemplate field, nullable]
+HookTemplatePanel ──── uses ──── useListPaginatedHookTemplates
+HookTemplatePanel ──── writes to ──── useHookTemplateStore.setSelectedTemplate
+HookTemplatePanel ──── reads from ──── useHookTemplateStore.focusedHookTemplateUuid
+ScriptHookCard ──── reads from ──── useHookTemplateStore.selectedTemplate
+ScriptHookCard ──── writes to ──── useHookTemplateStore.focusedHookTemplateUuid
+ScriptHookCard ──── renders ──── ApplyHookTemplateModal
+ScriptHookCard ──── toggles ──── useScriptRightPanelStore (ScriptRightPanel.HookTemplates)
+ScriptHookCard ──── uses ──── HookContentRenderer (when placeholders present)
+ScriptPageView ──── contains ──── HookTemplatePanel (no props)
 ```

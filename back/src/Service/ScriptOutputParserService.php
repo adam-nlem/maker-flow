@@ -15,12 +15,14 @@ use App\Entity\ScriptChapter;
 use App\Entity\ScriptGeneration;
 use App\Entity\ScriptRetentionCue;
 use App\Entity\ScriptShot;
+use App\Entity\ScriptHook;
 use App\Entity\ScriptText;
 use App\Entity\ScriptVoiceOver;
 use App\Entity\User;
 use App\Repository\ScriptCallToActionRepository;
 use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
+use App\Repository\ScriptHookRepository;
 use App\Repository\ScriptRetentionCueRepository;
 use App\Repository\ScriptShotRepository;
 use App\Repository\ScriptTextRepository;
@@ -36,6 +38,7 @@ class ScriptOutputParserService
         private readonly ScriptTextRepository $textRepository,
         private readonly ScriptCallToActionRepository $callToActionRepository,
         private readonly ScriptRetentionCueRepository $retentionCueRepository,
+        private readonly ScriptHookRepository $hookRepository,
     ) {}
 
     public function parseAndCreateParts(string $output, Script $script, User $user, ScriptGeneration $generation): ScriptOutputDTO
@@ -60,6 +63,7 @@ class ScriptOutputParserService
                 ScriptPartType::CallToAction->value => $content !== '' ? $this->createCallToAction($content, $part->getCallToActionType(), $script, $user, $position++, $generation) : null,
                 ScriptPartType::RetentionCue->value => $content !== '' ? $this->createRetentionCue($content, $part->getRetentionCueType(), $script, $user, $position++, $generation) : null,
                 ScriptPartType::Text->value => $content !== '' ? $this->createText($content, $script, $user, $position++, $generation) : null,
+                ScriptPartType::Hook->value => $content !== '' ? $this->createHook($content, $script, $user, 0, $generation) : null,
                 default => null,
             };
         }
@@ -159,5 +163,17 @@ class ScriptOutputParserService
             ->setPosition($position)
             ->setScriptGeneration($generation);
         $this->textRepository->save($text);
+    }
+
+    private function createHook(string $content, Script $script, User $user, int $position, ScriptGeneration $generation): void
+    {
+        $hook = new ScriptHook();
+        $hook
+            ->setScript($script)
+            ->setUser($user)
+            ->setContent($content)
+            ->setPosition($position)
+            ->setScriptGeneration($generation);
+        $this->hookRepository->save($hook);
     }
 }

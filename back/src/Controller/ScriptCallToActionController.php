@@ -12,6 +12,7 @@ use App\Repository\ScriptCallToActionRepository;
 use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptGenerationRepository;
+use App\Repository\ScriptHookRepository;
 use App\Repository\ScriptRepository;
 use App\Repository\ScriptRetentionCueRepository;
 use App\Repository\ScriptShotRepository;
@@ -62,6 +63,7 @@ final class ScriptCallToActionController extends AbstractController
         ScriptTextRepository $textRepository,
         ScriptCallToActionRepository $callToActionRepository,
         ScriptRetentionCueRepository $retentionCueRepository,
+        ScriptHookRepository $hookRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -103,6 +105,7 @@ final class ScriptCallToActionController extends AbstractController
                 $textRepository->getMaxPositionByScriptAndGeneration($script, $generation),
                 $callToActionRepository->getMaxPositionByScriptAndGeneration($script, $generation),
                 $retentionCueRepository->getMaxPositionByScriptAndGeneration($script, $generation),
+                $hookRepository->getMaxPositionByScriptAndGeneration($script, $generation),
             );
             $callToAction->setPosition($maxPosition + 1);
         }

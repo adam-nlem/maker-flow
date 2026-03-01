@@ -21,12 +21,15 @@ ScriptPageView
   │     ├── GenerationHistoryBar (shown when script has generations — navigate between compartments)
   │     ├── GenerationStatusBanner (shown when generation is active)
   │     └── ScriptPartsList (filtered by focusedGenerationUuid)
-  ├── GenerateScriptPanel (SidePanel, w-96, right, collapsible)
+  ├── GenerateScriptPanel (SidePanel, w-96, right, collapsible — via ScriptRightPanel.Generate)
   │     ├── Creator Profile banner → navigates to /settings
   │     ├── ScriptBriefForm (topic, goal, key points, opening style, duration, extra context)
   │     ├── SkillModuleToggles (7 toggleable modules with conditional inputs)
   │     └── Sticky footer with submit button
-  └── HookTemplatePanel (SidePanel, w-72, right, collapsible)
+  ├── HookTemplatePanel (SidePanel, w-72, right, collapsible — via ScriptRightPanel.HookTemplates)
+  │     ├── Search + category filter (ToggleChip)
+  │     ├── HookTemplateCard[] (infinite scroll)
+  │     └── CreateHookTemplateModal (via + button)
 
 Settings Page (/settings)
   ├── settings.tsx (thin route — SideBar + delegates to SettingsPageView)
@@ -73,7 +76,7 @@ front/app/
 │       └── useShowScriptGeneration.ts    ← GET with polling (refetchInterval: 2s)
 ├── stores/scripts/
 │   ├── scriptGenerationStore.ts       ← activeGenerationUuid + focusedGenerationUuid state
-│   └── scriptRightPanelStore.ts       ← shared panel state (generate | hookTemplates)
+│   └── scriptRightPanelStore.ts       ← right panel state (ScriptRightPanel.Generate, ScriptRightPanel.HookTemplates)
 ├── components/scripts/
 │   ├── generation/
 │   │   ├── GenerateScriptPanel.tsx     ← collapsible right panel with brief + skills
@@ -123,7 +126,7 @@ Each generation creates an isolated compartment of parts with independent positi
 
 ### Shared Right Panel Store
 
-Both `GenerateScriptPanel` and `HookTemplatePanel` share `useScriptRightPanelStore`. Only one panel can be open at a time — opening one automatically closes the other.
+`useScriptRightPanelStore` manages the right panel state. Only one panel can be open at a time. Used by both `GenerateScriptPanel` (`ScriptRightPanel.Generate`) and `HookTemplatePanel` (`ScriptRightPanel.HookTemplates`).
 
 ```ts
 // scriptRightPanelStore.ts — uses ScriptRightPanel enum (~/models/enums/ScriptRightPanel)
@@ -235,7 +238,7 @@ scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', 
     setFocusedGenerationUuid: (uuid: string | undefined) => void
 }
 
-// scriptRightPanelStore.ts (shared with hook templates) — uses ScriptRightPanel enum
+// scriptRightPanelStore.ts — uses ScriptRightPanel enum
 {
     activePanel: ScriptRightPanel | null   // ScriptRightPanel.Generate | ScriptRightPanel.HookTemplates
     openPanel: (panel: ScriptRightPanel) => void

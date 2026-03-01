@@ -4,10 +4,8 @@ import { scriptQueryKeys } from "./scriptQueryKeys";
 
 interface UpdateScriptData {
     title?: string;
-    hook?: string | null;
     publishedAt?: Date | null;
     postGroupUuid?: string | null;
-    hookTemplateUuid?: string | null;
     tagUuids?: string[];
     platforms?: string[] | null;
     status?: string | null;

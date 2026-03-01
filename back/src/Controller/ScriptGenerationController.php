@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\DTO\QueryParam\ScriptGeneration\LatestScriptGenerationQueryParamDTO;
+use App\DTO\QueryParam\ScriptGeneration\ListScriptGenerationQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptGeneration\GenerateScriptRequestDTO;
 use App\Entity\ScriptGeneration;
@@ -81,7 +81,7 @@ final class ScriptGenerationController extends AbstractController
 
     #[Route('', name: 'api_script_generations_list', methods: ['GET'])]
     public function list(
-        LatestScriptGenerationQueryParamDTO $queryParamDto,
+        ListScriptGenerationQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
         ScriptGenerationRepository $generationRepository,
     ): JsonResponse {

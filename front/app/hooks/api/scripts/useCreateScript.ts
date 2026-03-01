@@ -6,7 +6,6 @@ import { scriptQueryKeys } from "./scriptQueryKeys";
 interface CreateScriptData {
     projectUuid: string;
     title: string;
-    hook?: string;
     publishedAt?: string;
     tagUuids?: string[];
     platforms?: string[];

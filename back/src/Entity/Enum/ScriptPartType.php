@@ -11,4 +11,5 @@ enum ScriptPartType: string
     case Text = 'text';
     case CallToAction = 'call_to_action';
     case RetentionCue = 'retention_cue';
+    case Hook = 'hook';
 }

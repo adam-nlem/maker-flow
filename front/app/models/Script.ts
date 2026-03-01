@@ -1,4 +1,3 @@
-import { HookTemplate, type HookTemplateJSON } from "./HookTemplate";
 import { ScriptTag, type ScriptTagJSON } from "./ScriptTag";
 import { ContentType } from "./enums/ContentType";
 import { Platform, platformOptions } from "./enums/Platform";
@@ -7,8 +6,6 @@ import { ScriptStatus } from "./enums/ScriptStatus";
 export interface ScriptJSON {
     uuid: string;
     title: string;
-    hook?: string;
-    hookTemplate?: HookTemplateJSON;
     publishedAt?: string;
     tags?: ScriptTagJSON[];
     platforms?: string[];
@@ -22,8 +19,6 @@ export class Script {
     constructor(
         public readonly uuid: string,
         public title: string,
-        public hook: string | undefined,
-        public hookTemplate: HookTemplate | undefined,
         public publishedAt: Date | undefined,
         public tags: ScriptTag[],
         public platforms: Platform[],
@@ -37,8 +32,6 @@ export class Script {
         return new Script(
             json.uuid,
             json.title,
-            json.hook,
-            json.hookTemplate ? HookTemplate.fromJSON(json.hookTemplate) : undefined,
             json.publishedAt ? new Date(json.publishedAt) : undefined,
             (json.tags ?? []).map(ScriptTag.fromJSON),
             (json.platforms ?? []).filter(p => platformOptions.includes(p as Platform)) as Platform[],
@@ -53,8 +46,6 @@ export class Script {
         return {
             uuid: this.uuid,
             title: this.title,
-            hook: this.hook,
-            hookTemplate: this.hookTemplate?.toJSON(),
             publishedAt: this.publishedAt?.toISOString(),
             tags: this.tags.map(t => t.toJSON()),
             platforms: this.platforms,

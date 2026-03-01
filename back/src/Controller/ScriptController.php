@@ -14,7 +14,6 @@ use App\Entity\Enum\ScriptPartType;
 use App\Entity\Enum\ScriptStatus;
 use App\Entity\Script;
 use App\Entity\User;
-use App\Repository\HookTemplateRepository;
 use App\Repository\PostGroupRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\ScriptChapterRepository;
@@ -26,6 +25,7 @@ use App\Repository\ScriptTextRepository;
 use App\Repository\ScriptVoiceOverRepository;
 use App\Repository\ScriptCallToActionRepository;
 use App\Repository\ScriptGenerationRepository;
+use App\Repository\ScriptHookRepository;
 use App\Repository\ScriptRetentionCueRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -103,7 +103,6 @@ final class ScriptController extends AbstractController
         ProjectRepository $projectRepository,
         ScriptRepository $scriptRepository,
         PostGroupRepository $postGroupRepository,
-        HookTemplateRepository $hookTemplateRepository,
         ScriptTagRepository $scriptTagRepository,
     ): JsonResponse {
         /** @var User $user */
@@ -130,13 +129,6 @@ final class ScriptController extends AbstractController
             $postGroup = $postGroupRepository->getByUuidAndUser($dto->getPostGroupUuid(), $user);
             if ($postGroup !== null) {
                 $script->setPostGroup($postGroup);
-            }
-        }
-
-        if ($dto->getHookTemplateUuid() !== null) {
-            $hookTemplate = $hookTemplateRepository->getByUuid($dto->getHookTemplateUuid());
-            if ($hookTemplate !== null) {
-                $script->setHookTemplate($hookTemplate);
             }
         }
 
@@ -191,7 +183,6 @@ final class ScriptController extends AbstractController
         UpdateScriptRequestDTO $dto,
         ScriptRepository $scriptRepository,
         PostGroupRepository $postGroupRepository,
-        HookTemplateRepository $hookTemplateRepository,
         ScriptTagRepository $scriptTagRepository,
     ): JsonResponse {
         /** @var User $user */
@@ -207,10 +198,6 @@ final class ScriptController extends AbstractController
             $script->setTitle($dto->getTitle());
         }
 
-        if ($dto->getHook() !== null) {
-            $script->setHook($dto->getHook());
-        }
-
         if ($dto->getPublishedAt() !== null) {
             $script->setPublishedAt(new \DateTimeImmutable($dto->getPublishedAt()));
         }
@@ -222,17 +209,6 @@ final class ScriptController extends AbstractController
                 $postGroup = $postGroupRepository->getByUuidAndUser($dto->getPostGroupUuid(), $user);
                 if ($postGroup !== null) {
                     $script->setPostGroup($postGroup);
-                }
-            }
-        }
-
-        if ($dto->hasHookTemplateUuid()) {
-            if ($dto->getHookTemplateUuid() === null) {
-                $script->setHookTemplate(null);
-            } else {
-                $hookTemplate = $hookTemplateRepository->getByUuid($dto->getHookTemplateUuid());
-                if ($hookTemplate !== null) {
-                    $script->setHookTemplate($hookTemplate);
                 }
             }
         }
@@ -299,6 +275,7 @@ final class ScriptController extends AbstractController
         ScriptTextRepository $textRepository,
         ScriptCallToActionRepository $callToActionRepository,
         ScriptRetentionCueRepository $retentionCueRepository,
+        ScriptHookRepository $hookRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -327,8 +304,9 @@ final class ScriptController extends AbstractController
         $texts = $textRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
         $callToActions = $callToActionRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
         $retentionCues = $retentionCueRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
+        $hooks = $hookRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
 
-        $allParts = array_merge($chapters, $voiceOvers, $dialogues, $shots, $texts, $callToActions, $retentionCues);
+        $allParts = array_merge($chapters, $voiceOvers, $dialogues, $shots, $texts, $callToActions, $retentionCues, $hooks);
 
         usort($allParts, fn($a, $b) => $a->getPosition() <=> $b->getPosition());
 
@@ -351,6 +329,7 @@ final class ScriptController extends AbstractController
         ScriptTextRepository $textRepository,
         ScriptCallToActionRepository $callToActionRepository,
         ScriptRetentionCueRepository $retentionCueRepository,
+        ScriptHookRepository $hookRepository,
         EntityManagerInterface $entityManager,
     ): JsonResponse {
         /** @var User $user */
@@ -374,6 +353,7 @@ final class ScriptController extends AbstractController
                 ScriptPartType::Text => $textRepository->getByUuidAndUser($partUuid, $user),
                 ScriptPartType::CallToAction => $callToActionRepository->getByUuidAndUser($partUuid, $user),
                 ScriptPartType::RetentionCue => $retentionCueRepository->getByUuidAndUser($partUuid, $user),
+                ScriptPartType::Hook => $hookRepository->getByUuidAndUser($partUuid, $user),
                 default => null,
             };
 
@@ -388,6 +368,7 @@ final class ScriptController extends AbstractController
                     ScriptPartType::Text => $textRepository->save($entity),
                     ScriptPartType::CallToAction => $callToActionRepository->save($entity),
                     ScriptPartType::RetentionCue => $retentionCueRepository->save($entity),
+                    ScriptPartType::Hook => $hookRepository->save($entity),
                     default => null,
                 };
             }

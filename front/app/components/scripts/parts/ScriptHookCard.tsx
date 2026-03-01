@@ -1,70 +1,116 @@
-import { useState } from "react";
-import { BookOpenIcon, CheckBadgeIcon, InboxStackIcon } from "@heroicons/react/24/outline";
-import type { Script } from "~/models/Script";
-import { Button } from "~/components/ui/Button";
-import { TextArea } from "~/components/ui/TextArea";
-import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
-import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
+import { useState, useEffect } from "react";
+import { InboxStackIcon } from "@heroicons/react/24/outline";
+import type { ScriptHook } from "~/models/ScriptHook";
+import type { HookTemplate } from "~/models/HookTemplate";
+import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
+import { TextArea } from "~/components/ui/TextArea";
+import { useUpdateScriptHook } from "~/hooks/api/scriptHooks/useUpdateScriptHook";
+import { useDeleteScriptHook } from "~/hooks/api/scriptHooks/useDeleteScriptHook";
+import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
+import { useHookTemplateStore } from "~/stores/scripts/hookTemplateStore";
 import { hasPlaceholders, replacePlaceholder } from "~/helpers/hookPlaceholderParser";
-
 import HookContentRenderer from "./HookContentRenderer";
-import { useScriptEditorStore } from "~/stores/scripts/scriptEditorStore";
-import Pill from "~/components/ui/Pill";
+import ScriptPartCard from "./ScriptPartCard";
+import ApplyHookTemplateModal from "../hookTemplates/ApplyHookTemplateModal";
 
 interface ScriptHookCardProps {
-    script: Script;
+    hook: ScriptHook;
+    scriptUuid: string;
 }
 
-export default function ScriptHookCard({ script }: ScriptHookCardProps) {
-    const [hook, setHook] = useState(script.hook ?? "");
-    const { updateScript } = useUpdateScript();
-    const isExpanded = useScriptEditorStore((s) => s.isExpanded);
+export default function ScriptHookCard({ hook, scriptUuid }: ScriptHookCardProps) {
+    const [content, setContent] = useState(hook.content);
+    const [pendingTemplate, setPendingTemplate] = useState<HookTemplate | null>(null);
 
+    const { updateScriptHook } = useUpdateScriptHook();
+    const { deleteScriptHook, isPending: isDeleting } = useDeleteScriptHook();
     const togglePanel = useScriptRightPanelStore((s) => s.togglePanel);
 
-    const handleHookBlur = () => {
-        const newHook = hook.trim() || null;
-        if (newHook !== (script.hook ?? null)) {
-            updateScript({ scriptUuid: script.uuid, data: { hook: newHook } });
+    const selectedTemplate = useHookTemplateStore((s) => s.selectedTemplate);
+    const setSelectedTemplate = useHookTemplateStore((s) => s.setSelectedTemplate);
+    const setFocusedHookTemplateUuid = useHookTemplateStore((s) => s.setFocusedHookTemplateUuid);
+
+    // Sync the currently applied template UUID to the store (for highlight in HookTemplatePanel)
+    useEffect(() => {
+        setFocusedHookTemplateUuid(hook.hookTemplate?.uuid ?? null);
+        return () => setFocusedHookTemplateUuid(null);
+    }, [hook.hookTemplate?.uuid, setFocusedHookTemplateUuid]);
+
+    // React to template selection from HookTemplatePanel
+    useEffect(() => {
+        if (!selectedTemplate) return;
+
+        if (content.trim().length > 0) {
+            setPendingTemplate(selectedTemplate);
+        } else {
+            applyTemplate(selectedTemplate);
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [selectedTemplate]);
+
+    const applyTemplate = async (template: HookTemplate) => {
+        await updateScriptHook({
+            hookUuid: hook.uuid,
+            scriptUuid,
+            data: { content: template.content, hookTemplateUuid: template.uuid },
+        });
+        setPendingTemplate(null);
+        setSelectedTemplate(null);
+    };
+
+    const handleBlur = async () => {
+        if (content.trim() !== hook.content) {
+            await updateScriptHook({ hookUuid: hook.uuid, scriptUuid, data: { content: content.trim() } });
         }
     };
 
-    const handleReplacePlaceholder = (placeholder: string, value: string) => {
-        const updated = replacePlaceholder(hook, placeholder, value);
-        setHook(updated);
-        updateScript({ scriptUuid: script.uuid, data: { hook: updated } });
+    const handleReplacePlaceholder = async (placeholder: string, value: string) => {
+        const newContent = replacePlaceholder(content, placeholder, value);
+        setContent(newContent);
+        await updateScriptHook({ hookUuid: hook.uuid, scriptUuid, data: { content: newContent } });
     };
 
     return (
-        <div className="group border border-red/30 rounded-xl p-4 bg-clear flex flex-col gap-2 mb-3">
-            <Pill icon={CheckBadgeIcon} isSelected label="Hook"  bgColorClassName="bg-red/10" borderColorClassName="border border-red/30" />
-            
-            {hasPlaceholders(hook) ? (
-                <HookContentRenderer content={hook} onReplacePlaceholder={handleReplacePlaceholder} />
-            ) : (
-                <TextArea
-                    simple
-                    value={hook}
-                    onChange={(e) => setHook(e.target.value)}
-                    onBlur={handleHookBlur}
-                    placeholder="Hook..."
-                    textStyle="text-sm"
-                    fullWidth
-                />
-            )}
-            {isExpanded &&
-                <Button
-                    style={"secondary"}
-                    onClick={() => togglePanel(ScriptRightPanel.HookTemplates)}
-                    width="w-fit"
-                    height="h-7"
-                >
-                    <div className="flex flex-row justify-center items-center gap-2 shrink-0">
+        <>
+            <ScriptPartCard
+                partType={ScriptPartType.Hook}
+                onDelete={() => deleteScriptHook({ hookUuid: hook.uuid, scriptUuid })}
+                isDeleting={isDeleting}
+                headerActions={
+                    <button
+                        onClick={() => togglePanel(ScriptRightPanel.HookTemplates)}
+                        className="text-gray hover:text-dark transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
+                        title="Bibliothèque de hooks"
+                    >
                         <InboxStackIcon className="size-4" strokeWidth={2} />
-                        <p className="text-sm">Blibliothèque de hooks</p>
-                    </div>
-                </Button>}
-        </div>
+                    </button>
+                }
+            >
+                {hasPlaceholders(content) ? (
+                    <HookContentRenderer content={content} onReplacePlaceholder={handleReplacePlaceholder} />
+                ) : (
+                    <TextArea
+                        simple
+                        value={content}
+                        onChange={(e) => setContent(e.target.value)}
+                        onBlur={handleBlur}
+                        placeholder="Hook..."
+                        textStyle="text-sm"
+                        fullWidth
+                    />
+                )}
+            </ScriptPartCard>
+
+            <ApplyHookTemplateModal
+                isOpen={pendingTemplate !== null}
+                template={pendingTemplate}
+                onConfirm={() => pendingTemplate && applyTemplate(pendingTemplate)}
+                onCancel={() => {
+                    setPendingTemplate(null);
+                    setSelectedTemplate(null);
+                }}
+            />
+        </>
     );
 }

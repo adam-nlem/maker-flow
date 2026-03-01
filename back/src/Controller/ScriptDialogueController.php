@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptGenerationRepository;
+use App\Repository\ScriptHookRepository;
 use App\Repository\ScriptRepository;
 use App\Repository\ScriptShotRepository;
 use App\Repository\ScriptTextRepository;
@@ -58,6 +59,7 @@ final class ScriptDialogueController extends AbstractController
         ScriptDialogueRepository $dialogueRepository,
         ScriptShotRepository $shotRepository,
         ScriptTextRepository $textRepository,
+        ScriptHookRepository $hookRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -97,6 +99,7 @@ final class ScriptDialogueController extends AbstractController
                 $dialogueRepository->getMaxPositionByScriptAndGeneration($script, $generation),
                 $shotRepository->getMaxPositionByScriptAndGeneration($script, $generation),
                 $textRepository->getMaxPositionByScriptAndGeneration($script, $generation),
+                $hookRepository->getMaxPositionByScriptAndGeneration($script, $generation),
             );
             $dialogue->setPosition($maxPosition + 1);
         }
