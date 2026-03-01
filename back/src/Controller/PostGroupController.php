@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\PostGroupService;
+use App\Service\PostGroup\PostGroupService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Annotation\Route;
 

@@ -381,11 +381,16 @@ src/
 │       ├── FetchIntegrationInsightsHandler.php
 │       └── FetchPostInsightsHandler.php
 └── Service/
-    ├── IntegrationInsightService.php
-    ├── PostInsightService.php
-    ├── YoutubePostInsightService.php
-    ├── YoutubeReportingService.php
-    └── InstagramPostInsightService.php
+    ├── IntegrationInsight/
+    │   └── IntegrationInsightService.php
+    ├── PostInsight/
+    │   └── PostInsightService.php
+    ├── YoutubePostInsight/
+    │   └── YoutubePostInsightService.php
+    ├── YoutubeReporting/
+    │   └── YoutubeReportingService.php
+    └── InstagramPostInsight/
+        └── InstagramPostInsightService.php
 ```
 
 ---

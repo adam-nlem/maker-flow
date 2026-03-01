@@ -7,7 +7,7 @@ use App\DTO\QueryParam\IntegrationInsight\ListIntegrationInsightsQueryParamDTO;
 use App\DTO\QueryParam\IntegrationInsight\ShowIntegrationDetailQueryParamDTO;
 use App\Entity\Enum\TimePeriod;
 use App\Repository\IntegrationInsightRepository;
-use App\Service\IntegrationInsightService;
+use App\Service\IntegrationInsight\IntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;

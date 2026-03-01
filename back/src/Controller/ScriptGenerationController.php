@@ -36,6 +36,10 @@ final class ScriptGenerationController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
+        if ($generationRepository->hasActiveGeneration($user)) {
+            return $this->json(data: ["message" => "You already have a processing generation. Please wait until it is completed."], status: Response::HTTP_CONFLICT);
+        }
+
         try {
             /** @var ScriptGeneration $generation */
             $generation = $dto->build();

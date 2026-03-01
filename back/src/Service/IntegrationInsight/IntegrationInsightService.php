@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\IntegrationInsight;
 
 use App\Entity\Enum\Platform;
 use App\Entity\Integration;

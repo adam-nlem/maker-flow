@@ -151,7 +151,7 @@ Used in `skillInputs['format']` to control script output format.
 | Value | Description |
 |-------|-------------|
 | `pending` | Job dispatched, not yet picked up |
-| `processing` | Worker is generating content |
+| `processing` | Worker is generating content (also during retries) |
 | `completed` | Generation finished successfully |
 | `failed` | Generation failed (error stored in errorMessage) |
 
@@ -178,6 +178,7 @@ Used in `skillInputs['format']` to control script output format.
 | `save` | `ScriptGeneration $entity, bool $flush` | `void` | Persists a generation |
 | `getByUuidAndUser` | `string $uuid, User $user` | `?ScriptGeneration` | Finds generation by UUID |
 | `getByScriptAndUser` | `Script $script, User $user` | `ScriptGeneration[]` | All generations for a script, ordered by createdAt DESC |
+| `hasActiveGeneration` | `User $user` | `bool` | Returns true if user has any generation with status Pending or Processing |
 
 ---
 
@@ -198,9 +199,11 @@ Used in `skillInputs['format']` to control script output format.
 
 | Action | Method | Route | DTO | Description |
 |--------|--------|-------|-----|-------------|
-| create | POST | `` | `GenerateScriptRequestDTO` (build pattern) | Dispatch generation job. Returns ScriptGeneration with status `pending` |
+| create | POST | `` | `GenerateScriptRequestDTO` (build pattern) | Dispatch generation job. Returns 409 if user already has an active generation. Returns ScriptGeneration with status `pending` |
 | show | GET | `/{generationUuid}` | — | Get generation status (used for polling) |
-| list | GET | `` | `LatestScriptGenerationQueryParamDTO` | Get all generations for a script (ordered by createdAt DESC) |
+| list | GET | `` | `ListScriptGenerationQueryParamDTO` | Get all generations for a script (ordered by createdAt DESC) |
+
+**Concurrency limit:** Only one generation per user can be active (Pending or Processing) at a time. Attempting to create a second returns HTTP 409 with message `"Une génération est déjà en cours. Veuillez patienter."`.
 
 ---
 
@@ -261,7 +264,7 @@ Used in `skillInputs['format']` to control script output format.
 
 ### `PromptAssemblerService`
 
-**Location:** `back/src/Service/PromptAssemblerService.php`
+**Location:** `back/src/Service/PromptAssembler/PromptAssemblerService.php`
 
 Builds the full prompt by concatenating structured blocks:
 
@@ -274,16 +277,21 @@ Builds the full prompt by concatenating structured blocks:
 
 ### `GeminiClientService`
 
-**Location:** `back/src/Service/GeminiClientService.php`
+**Location:** `back/src/Service/GeminiClient/GeminiClientService.php`
 
-Calls the Google Gemini API (`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent`).
+Calls the Google Gemini API (`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent`).
 
-- Model: `gemini-3-pro-preview`
+- Model: `gemini-3.1-pro-preview`
 - Config: `GEMINI_API_KEY` env variable
+- Timeout: 120 seconds per request
+
+**Error classification:** The service makes one attempt per call and throws classified exceptions:
+- `GeminiRetryableException` — for transient errors: network timeouts (`TransportExceptionInterface`), HTTP 408/429/500/502/503/504
+- `GeminiPermanentException` — for permanent errors: HTTP 400/401/403, malformed response structure
 
 ### `ScriptOutputParserService`
 
-**Location:** `back/src/Service/ScriptOutputParserService.php`
+**Location:** `back/src/Service/ScriptOutputParser/ScriptOutputParserService.php`
 
 Parses the AI JSON response into typed script parts. The AI outputs a structured JSON object:
 
@@ -324,6 +332,27 @@ Parts are created with incrementing positions starting from 0 within their gener
 
 ---
 
+## Exception Hierarchy
+
+**Location:** `back/src/Service/GeminiClient/Exception/`
+
+Follows existing `ServiceException` pattern (service code `110200`):
+
+```
+ServiceException (abstract)
+└── GeminiApiException (abstract, service code 110200)
+    ├── GeminiRetryableException (code 1)
+    │   - Network timeouts (TransportExceptionInterface)
+    │   - HTTP 408, 429, 500, 502, 503, 504
+    └── GeminiPermanentException (code 2)
+        - HTTP 400, 401, 403
+        - Malformed API response structure
+```
+
+Both concrete exceptions expose `getHttpStatusCode(): ?int`.
+
+---
+
 ## Async Flow
 
 ### `GenerateScriptMessage`
@@ -332,20 +361,41 @@ Parts are created with incrementing positions starting from 0 within their gener
 
 Transport: `messages` (same RabbitMQ transport as other async tasks).
 
-Contains: `scriptGenerationId` (int).
+Contains: `scriptGenerationId` (int), `retryCount` (int, default 0).
 
 ### `GenerateScriptHandler`
 
 **Location:** `back/src/Message/Handler/GenerateScriptHandler.php`
 
-Flow:
-1. Load `ScriptGeneration` by ID → set status to `processing` → flush
+**Dependencies:** `ScriptGenerationRepository`, `CreatorProfileRepository`, `PromptAssemblerService`, `GeminiClientService`, `ScriptOutputParserService`, `MessageBusInterface`, `LoggerInterface`
+
+**Flow:**
+1. Load `ScriptGeneration` by ID → set status to `processing` → **flush immediately** (so frontend polls see it)
 2. Load `CreatorProfile` for the script's project + user (optional)
-3. Call `PromptAssemblerService::assemble()` → store in `assembledPrompt` → flush
+3. Call `PromptAssemblerService::assemble()` → store in `assembledPrompt`
 4. Call `GeminiClientService::generateScript()` → get AI response
-5. Parse response via `ScriptOutputParserService::parseAndCreateParts()` → creates typed parts linked to the generation (positions start at 0)
+5. Parse response via `ScriptOutputParserService::parseAndCreateParts()` → creates typed parts linked to the generation
 6. Set status to `completed`, set `completedAt` → flush
-7. **On error:** set status to `failed`, store `errorMessage` → flush
+7. **On `GeminiRetryableException`:**
+   - If `retryCount < MAX_RETRIES` (3): dispatch new `GenerateScriptMessage(id, retryCount + 1)` with `DelayStamp` → return (status stays `processing`, worker freed)
+   - If all retries exhausted: set status to `failed`, store `errorMessage` → flush
+8. **On any other exception:** set status to `failed`, store `errorMessage` → flush
+
+### Retry Strategy
+
+Retries are handled via **async message re-dispatch** with exponential backoff:
+
+| Attempt | Retry Count | Delay | Cumulative |
+|---------|-------------|-------|------------|
+| 1 (initial) | 0 | — | 0s |
+| 2 | 1 | 2s | 2s |
+| 3 | 2 | 4s | 6s |
+| 4 | 3 | 8s | 14s |
+
+- Max 4 total attempts (initial + 3 retries)
+- The worker is freed between retries (non-blocking)
+- Generation status stays at `processing` during retries (transparent to the user)
+- Only `GeminiRetryableException` triggers retries; all other exceptions mark as `failed` immediately
 
 ---
 

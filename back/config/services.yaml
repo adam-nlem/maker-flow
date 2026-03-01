@@ -83,10 +83,10 @@ services:
     App\Controller\IntegrationController:
         arguments:
             $frontendUrl: "%app.frontend_url%"
-    App\Service\PlatformService:
+    App\Service\Platform\PlatformService:
         arguments:
             $platformIconPath: "%app.platform.icon_path%"
-    App\Service\GeminiClientService:
+    App\Service\GeminiClient\GeminiClientService:
         arguments:
             $geminiApiKey: "%app.gemini.api_key%"
     # add more service definitions when explicit configuration is needed

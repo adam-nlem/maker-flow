@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Service\PlatformService;
+use App\Service\Platform\PlatformService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;

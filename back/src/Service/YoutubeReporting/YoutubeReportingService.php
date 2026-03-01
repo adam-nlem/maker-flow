@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\YoutubeReporting;
 
 use App\Entity\Integration;
 use App\Helper\DateHelper;

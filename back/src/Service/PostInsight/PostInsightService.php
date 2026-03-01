@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\PostInsight;
 
 use App\Entity\Enum\Platform;
 use App\Entity\Integration;
@@ -23,8 +23,11 @@ use App\Repository\PostInsightRepository;
 use App\Repository\PostRepository;
 use App\Repository\IntegrationRepository;
 use App\Entity\Enum\YoutubeReportType;
+use App\Service\InstagramPostInsight\InstagramPostInsightService;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
+use App\Service\YoutubePostInsight\YoutubePostInsightService;
+use App\Service\YoutubeReporting\YoutubeReportingService;
 use Google\Client;
 use Google\Service\YouTube;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;

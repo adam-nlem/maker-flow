@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\InstagramPostInsight;
 
 use App\Entity\Integration;
+use App\Service\Post\PostService;
 use App\DTO\External\Instagram\InstagramPostDTO;
 use App\DTO\External\Instagram\InstagramPostInsightDTO;
 use App\Entity\Enum\PostInsightType;

@@ -5,7 +5,7 @@ namespace App\Message\Handler;
 use App\Entity\Enum\Platform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Message\FetchIntegrationInsightsMessage;
-use App\Service\IntegrationInsightService;
+use App\Service\IntegrationInsight\IntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;

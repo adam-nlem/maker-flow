@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\ScriptOutputParser;
 
 use App\DTO\ScriptOutputDTO;
 use App\Entity\Enum\CallToActionType;

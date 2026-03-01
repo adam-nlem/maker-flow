@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\DTO\QueryParam\Post\ListPostsQueryParamDTO;
 use App\Repository\PostRepository;
-use App\Service\PostService;
+use App\Service\Post\PostService;
 use App\Entity\Enum\TimePeriod;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;

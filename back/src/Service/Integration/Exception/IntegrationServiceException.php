@@ -8,6 +8,6 @@ abstract class IntegrationServiceException extends ServiceException
 {
     protected function getServiceCode(): int
     {
-        return 100300;
+        return 100200;
     }
 }

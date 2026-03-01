@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\YoutubePostInsight;
 
 use App\Entity\Integration;
+use App\Service\Post\PostService;
 use App\DTO\External\Youtube\YoutubePostDTO;
 use App\DTO\External\Youtube\YoutubePostInsightDTO;
 use App\Entity\Enum\PostInsightType;

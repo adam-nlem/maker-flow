@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Post;
 
 use App\Entity\Integration;
 use App\Entity\User;

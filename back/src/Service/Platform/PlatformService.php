@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\Platform;
 
 use Symfony\Component\HttpFoundation\File\File;
 

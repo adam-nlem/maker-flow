@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Enum\ScriptGenerationStatus;
 use App\Entity\Script;
 use App\Entity\ScriptGeneration;
 use App\Entity\User;
@@ -54,6 +55,18 @@ class ScriptGenerationRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function hasActiveGeneration(User $user): bool
+    {
+        return $this->createQueryBuilder('sg')
+            ->select('COUNT(sg.id)')
+            ->where('sg.user = :user')
+            ->andWhere('sg.status IN (:statuses)')
+            ->setParameter('user', $user)
+            ->setParameter('statuses', [ScriptGenerationStatus::Pending, ScriptGenerationStatus::Processing])
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
     }
 
     /**

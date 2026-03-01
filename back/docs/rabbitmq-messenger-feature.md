@@ -111,7 +111,7 @@ Handlers process messages. Place them in `src/Message/Handler/`:
 namespace App\Message\Handler;
 
 use App\Message\FetchIntegrationInsightsMessage;
-use App\Service\IntegrationInsightService;
+use App\Service\IntegrationInsight\IntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 

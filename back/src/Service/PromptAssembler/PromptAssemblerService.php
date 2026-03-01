@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Service;
+namespace App\Service\PromptAssembler;
 
 use App\Entity\CreatorProfile;
 use App\Entity\Enum\CallToActionType;
