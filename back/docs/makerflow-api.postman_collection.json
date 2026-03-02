@@ -2459,6 +2459,138 @@
         }
       ],
       "id": "ht-folder-0001-0000-0000-000000000000"
+    },
+    {
+      "name": "Subscriptions",
+      "item": [
+        {
+          "name": "Create Subscription Checkout",
+          "id": "sub-checkout-0001-0000-000000000001",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"starter\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subscriptions/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscriptions",
+                "checkout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current Subscription",
+          "id": "sub-current-0001-0000-000000000002",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subscriptions/current",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscriptions",
+                "current"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "sub-folder-0001-0000-0000-000000000000"
+    },
+    {
+      "name": "Credits",
+      "item": [
+        {
+          "name": "Create Topup Checkout",
+          "id": "credit-topup-0001-0000-000000000001",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/credits/topup/checkout",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "credits",
+                "topup",
+                "checkout"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Get Credit Balance",
+          "id": "credit-balance-0001-0000-000000000002",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/credits/balance",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "credits",
+                "balance"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Credit Transactions",
+          "id": "credit-tx-0001-0000-0000-000000000003",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/credits/transactions?page=1&limit=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "credits",
+                "transactions"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "20"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "credit-folder-0001-0000-000000000000"
     }
   ],
   "auth": {

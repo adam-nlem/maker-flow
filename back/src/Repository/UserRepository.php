@@ -44,4 +44,14 @@ class UserRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    public function getByStripeCustomerId(string $stripeCustomerId): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.stripeCustomerId = :stripeCustomerId')
+            ->setParameter('stripeCustomerId', $stripeCustomerId)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

@@ -54,6 +54,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['api_user_me'])]
+    private ?string $stripeCustomerId = null;
+
     /**
      * @var Collection<int, Token>
      */
@@ -189,6 +193,18 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if (!in_array($role, $this->roles)) {
             $this->roles[] = $role;
         }
+        return $this;
+    }
+
+    public function getStripeCustomerId(): ?string
+    {
+        return $this->stripeCustomerId;
+    }
+
+    public function setStripeCustomerId(?string $stripeCustomerId): static
+    {
+        $this->stripeCustomerId = $stripeCustomerId;
+
         return $this;
     }
 

@@ -28,10 +28,6 @@ class Subscription
     #[Groups(['api_subscription_show'])]
     private ?string $stripeSubscriptionId = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['api_subscription_show'])]
-    private ?string $stripeCustomerId = null;
-
     #[ORM\Column(enumType: SubscriptionPlan::class)]
     #[Groups(['api_subscription_show'])]
     private ?SubscriptionPlan $plan = null;
@@ -106,18 +102,6 @@ class Subscription
     public function setStripeSubscriptionId(string $stripeSubscriptionId): static
     {
         $this->stripeSubscriptionId = $stripeSubscriptionId;
-
-        return $this;
-    }
-
-    public function getStripeCustomerId(): ?string
-    {
-        return $this->stripeCustomerId;
-    }
-
-    public function setStripeCustomerId(string $stripeCustomerId): static
-    {
-        $this->stripeCustomerId = $stripeCustomerId;
 
         return $this;
     }
