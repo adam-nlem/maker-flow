@@ -72,6 +72,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
     private Collection $projects;
 
+    #[ORM\OneToOne(targetEntity: CreditBalance::class, mappedBy: 'user', cascade: ['remove'])]
+    private ?CreditBalance $creditBalance = null;
+
+    #[ORM\OneToOne(targetEntity: Subscription::class, mappedBy: 'user', cascade: ['remove'])]
+    private ?Subscription $subscription = null;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -282,6 +288,30 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $project->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreditBalance(): ?CreditBalance
+    {
+        return $this->creditBalance;
+    }
+
+    public function setCreditBalance(?CreditBalance $creditBalance): static
+    {
+        $this->creditBalance = $creditBalance;
+
+        return $this;
+    }
+
+    public function getSubscription(): ?Subscription
+    {
+        return $this->subscription;
+    }
+
+    public function setSubscription(?Subscription $subscription): static
+    {
+        $this->subscription = $subscription;
 
         return $this;
     }
