@@ -227,11 +227,11 @@ Frontend                    Backend                         Stripe
    |                          |-- Session::create ----------->|
    |                          |<-- session {url} -------------|
    |                          |                               |
-   |<-- {"checkoutUrl":"..."} |                               |
+   |<-- {"checkout_url":"..."}|                               |
    |                          |                               |
    |-- redirect to Stripe ---------------------------------->|
    |                          |              Stripe hosted page
-   |<-- redirect to /settings?checkout=success --------------|
+   |<-- redirect to /settings/subscription?checkout=success -|
 ```
 
 ---

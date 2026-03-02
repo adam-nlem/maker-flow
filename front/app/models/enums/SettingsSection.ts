@@ -26,3 +26,11 @@ export const settingsSectionToIcon: Record<SettingsSection, ComponentType<SVGPro
     [SettingsSection.CreatorProfile]: UserCircleIcon,
     [SettingsSection.Subscription]: CreditCardIcon,
 }
+
+export const settingsSectionToPath: Record<SettingsSection, string> = {
+    [SettingsSection.General]: "general",
+    [SettingsSection.Project]: "project",
+    [SettingsSection.Integration]: "integration",
+    [SettingsSection.CreatorProfile]: "creator-profile",
+    [SettingsSection.Subscription]: "subscription",
+}

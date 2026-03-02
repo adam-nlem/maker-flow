@@ -20,12 +20,12 @@ class CreateSubscriptionCheckoutRequestDTO extends AbstractRequestDTO
 
     public function fromPayload(array $payload)
     {
-        $this->plan = SubscriptionPlan::from($payload["plan"]);
+        $this->plan = SubscriptionPlan::tryFrom($payload["plan"]);
     }
 
     public function buildObject(): mixed
     {
-        return null;
+        return ['plan' => $this->getPlan()];
     }
 
     public function getPlan(): SubscriptionPlan

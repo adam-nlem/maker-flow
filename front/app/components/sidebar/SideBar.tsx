@@ -164,11 +164,11 @@ export default function SideBar() {
               onClick={toggleTheme}
             />
             <IconWithTextTile
-              icon={location.pathname === '/settings' ? Cog6ToothIconSolid : Cog6ToothIcon}
+              icon={location.pathname.startsWith('/settings') ? Cog6ToothIconSolid : Cog6ToothIcon}
               label="Paramètres"
               isExpanded={isExpanded}
               isBold={false}
-              isSelected={location.pathname === '/settings'}
+              isSelected={location.pathname.startsWith('/settings')}
               onClick={() => navigate('/settings')}
             />
             <IconWithTextTile
@@ -187,8 +187,7 @@ export default function SideBar() {
             <Button
               type="button"
               style="primary"
-            // isLoading={isPending}
-            // disabled={isPending}
+              onClick={() => navigate('/settings/subscription')}
             >
               <div className="flex flex-row justify-center items-center gap-3">
                 <SparklesIcon className="size-4 text-clear" strokeWidth={2} />

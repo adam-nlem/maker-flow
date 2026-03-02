@@ -68,8 +68,8 @@ class StripeCheckoutService
                         'quantity' => 1,
                     ],
                 ],
-                'success_url' => $this->frontendUrl . '/settings?checkout=success',
-                'cancel_url' => $this->frontendUrl . '/settings?checkout=cancel',
+                'success_url' => $this->frontendUrl . '/settings/subscription?checkout=success',
+                'cancel_url' => $this->frontendUrl . '/settings/subscription?checkout=cancel',
                 'metadata' => [
                     'user_uuid' => $user->getUuid(),
                 ],
@@ -98,8 +98,8 @@ class StripeCheckoutService
                         'quantity' => 1,
                     ],
                 ],
-                'success_url' => $this->frontendUrl . '/settings?checkout=success',
-                'cancel_url' => $this->frontendUrl . '/settings?checkout=cancel',
+                'success_url' => $this->frontendUrl . '/settings/subscription?checkout=success',
+                'cancel_url' => $this->frontendUrl . '/settings/subscription?checkout=cancel',
                 'metadata' => [
                     'user_uuid' => $user->getUuid(),
                 ],
