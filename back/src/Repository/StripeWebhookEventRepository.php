@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\StripeWebhookEvent;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\Query;
 
 /**
  * @extends ServiceEntityRepository<StripeWebhookEvent>
@@ -23,6 +24,16 @@ class StripeWebhookEventRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getById(int $id): ?StripeWebhookEvent
+    {
+        return $this->createQueryBuilder('swe')
+            ->where('swe.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     public function existsByStripeEventId(string $stripeEventId): bool

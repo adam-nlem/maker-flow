@@ -32,7 +32,12 @@ class TokenAuthenticator extends AbstractAuthenticator
         // Skip login and explicitly public endpoints
         // access_control decides authorization, not whether authenticators run
         //TODO: Check if this is the best way to do it
-        if ($route === 'api_login' || str_starts_with($path, '/api/users/register') || $route === 'api_integrations_callback') {
+        if (
+            $route === 'api_login'
+            || str_starts_with($path, '/api/users/register')
+            || $route === 'api_integrations_callback'
+            || $route === 'api_stripe_webhook'
+        ) {
             return false;
         }
 

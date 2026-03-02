@@ -250,6 +250,9 @@ Abstract base exception for Stripe operations. Service code: `130100`.
 ### CheckoutSessionCreationException (`Service/Stripe/Exception/CheckoutSessionCreationException.php`)
 Thrown when Stripe Checkout Session creation fails. Wraps Stripe API errors.
 
+### WebhookSignatureVerificationException (`Service/Stripe/Exception/WebhookSignatureVerificationException.php`)
+Thrown when Stripe webhook signature verification fails.
+
 ---
 
 ## API Endpoints
@@ -289,6 +292,20 @@ Thrown when Stripe Checkout Session creation fails. Wraps Stripe API errors.
 - Query params: `page` (int), `limit` (int)
 - Response: Paginated CreditTransaction list with `api_credit_transactions_list` group
 - DTO: `ListCreditTransactionsQueryParamDTO`
+
+### Stripe Webhook Endpoint (`Controller/StripeWebhookController.php`)
+
+| Method | Path | Name | Description |
+|--------|------|------|-------------|
+| POST | `/api/stripe/webhook` | `api_stripe_webhook` | Receive Stripe webhook events |
+
+**POST /api/stripe/webhook**
+- Public access (no auth required, secured by Stripe signature verification)
+- Request body: Raw Stripe event payload
+- Header: `Stripe-Signature` (required)
+- Response: `{"message": "Webhook received"}` (200)
+- Unsupported event types and duplicates return 200 silently
+- Invalid signature returns 400
 
 ---
 
@@ -350,8 +367,9 @@ Stripe field:
 | `STRIPE_PRICE_CREATOR` | Stripe price ID for Creator plan | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 | `STRIPE_PRICE_AGENCY` | Stripe price ID for Agency plan | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 | `STRIPE_PRICE_TOPUP` | Stripe price ID for topup pack | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
+| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 
-Price IDs are resolved at runtime via `services.yaml` parameters injected into `StripeCheckoutService`.
+Price IDs are resolved at runtime via `services.yaml` parameters injected into `StripeCheckoutService` and `StripeWebhookService`.
 
 ---
 
@@ -365,3 +383,92 @@ Price IDs are resolved at runtime via `services.yaml` parameters injected into `
 6. **Webhook idempotency**: `StripeWebhookEvent.stripeEventId` unique constraint prevents duplicate processing
 7. **Metadata-driven pricing**: Plan name and credit amounts live in Stripe product metadata, not in app config
 8. **Stripe customer linkage**: `stripeCustomerId` on User entity (not Subscription) -- one customer per user across all Stripe interactions
+
+---
+
+## Stripe Webhook System
+
+### Architecture
+
+```
+Stripe  ──POST──▶  StripeWebhookController (synchronous, fast)
+                      │
+                      ├─ Verify signature (STRIPE_WEBHOOK_SECRET)
+                      ├─ Check event type is supported (StripeEventType::tryFrom)
+                      ├─ Check idempotency (existsByStripeEventId)
+                      ├─ Save StripeWebhookEvent to DB
+                      ├─ Dispatch ProcessStripeWebhookMessage to RabbitMQ
+                      └─ Return 200
+
+Worker  ◀─consume──  ProcessStripeWebhookHandler (async)
+                      │
+                      ├─ Load StripeWebhookEvent by ID
+                      └─ Call StripeWebhookService::processEvent()
+```
+
+### StripeWebhookService (`Service/Stripe/StripeWebhookService.php`)
+
+Handles signature verification and event processing. Injected with Stripe secret key, webhook secret, and price IDs for plan resolution.
+
+#### `constructEvent(string $payload, string $signature): \Stripe\Event`
+Verifies the webhook signature and constructs the Stripe event. Throws `WebhookSignatureVerificationException` on failure.
+
+#### `processEvent(StripeWebhookEvent $event): void`
+Processes the event based on its type:
+
+| Event Type | Action |
+|------------|--------|
+| `checkout.session.completed` (payment mode) | Fetch session line items via Stripe API, read `credit_amount` from price metadata, call `CreditService::addTopupCredits()` |
+| `customer.subscription.created` | Resolve plan from price ID, create local `Subscription` entity |
+| `customer.subscription.updated` | Update subscription status, period dates, cancelAtPeriodEnd, plan |
+| `customer.subscription.deleted` | Set subscription status to `Canceled` |
+| `invoice.paid` | Read `credit_amount` from invoice line item price metadata, call `CreditService::renewSubscriptionCredits()` |
+| `invoice.payment_failed` | Set subscription status to `PastDue` |
+
+### Async Processing
+
+| File | Description |
+|------|-------------|
+| `Message/ProcessStripeWebhookMessage.php` | Carries `webhookEventId`, routed to `messages` transport via `#[AsMessage('messages')]` |
+| `Message/Handler/ProcessStripeWebhookHandler.php` | Loads event from DB, calls `StripeWebhookService::processEvent()`, logs errors, re-throws for transport retry |
+
+Transport-level retry: 3 retries with exponential backoff (1s, 2s, 4s) configured in `messenger.yaml`.
+
+### Stripe Price Metadata Requirement
+
+Each Stripe price must have a `credit_amount` metadata field set in the Stripe dashboard:
+- Starter price → `credit_amount: 50`
+- Creator price → `credit_amount: 150`
+- Agency price → `credit_amount: 500`
+- Topup price → `credit_amount: <desired amount>`
+
+### Configuration
+
+Security (`config/packages/security.yaml`):
+```yaml
+- { path: ^/api/stripe/webhook, roles: PUBLIC_ACCESS }
+```
+
+Services (`config/services.yaml`):
+```yaml
+App\Service\Stripe\StripeWebhookService:
+    arguments:
+        $stripeSecretKey: "%app.stripe.secret_key%"
+        $stripeWebhookSecret: "%app.stripe.webhook_secret%"
+        $stripePriceStarter: "%app.stripe.price_starter%"
+        $stripePriceCreator: "%app.stripe.price_creator%"
+        $stripePriceAgency: "%app.stripe.price_agency%"
+```
+
+### Local Testing
+
+```bash
+# Install Stripe CLI and listen for webhooks
+stripe listen --forward-to localhost:80/api/stripe/webhook
+
+# Copy the signing secret from Stripe CLI output to .env
+STRIPE_WEBHOOK_SECRET=whsec_...
+
+# Start the messenger worker
+dce back php bin/console messenger:consume async -vv
+```

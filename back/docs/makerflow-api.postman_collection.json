@@ -2591,6 +2591,48 @@
         }
       ],
       "id": "credit-folder-0001-0000-000000000000"
+    },
+    {
+      "name": "Stripe Webhook",
+      "item": [
+        {
+          "name": "Receive Webhook",
+          "id": "stripe-webhook-0001-0000-000000000001",
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Stripe-Signature",
+                "value": "t=...,v1=..."
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"id\": \"evt_...\",\n  \"type\": \"checkout.session.completed\",\n  \"data\": {\n    \"object\": {}\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/stripe/webhook",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "stripe",
+                "webhook"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "stripe-webhook-folder-0001-000000000000"
     }
   ],
   "auth": {

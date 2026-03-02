@@ -24,6 +24,7 @@ parameters:
     app.stripe.price_creator: "%env(string:STRIPE_PRICE_CREATOR)%"
     app.stripe.price_agency: "%env(string:STRIPE_PRICE_AGENCY)%"
     app.stripe.price_topup: "%env(string:STRIPE_PRICE_TOPUP)%"
+    app.stripe.webhook_secret: "%env(string:STRIPE_WEBHOOK_SECRET)%"
 
     app.redis_store.scheme: "%env(string:REDIS_STORE_SCHEME)%"
     app.redis_store.host: "%env(string:REDIS_STORE_HOST)%"
@@ -103,5 +104,12 @@ services:
             $stripePriceAgency: "%app.stripe.price_agency%"
             $stripePriceTopup: "%app.stripe.price_topup%"
             $frontendUrl: "%app.frontend_url%"
+    App\Service\Stripe\StripeWebhookService:
+        arguments:
+            $stripeSecretKey: "%app.stripe.secret_key%"
+            $stripeWebhookSecret: "%app.stripe.webhook_secret%"
+            $stripePriceStarter: "%app.stripe.price_starter%"
+            $stripePriceCreator: "%app.stripe.price_creator%"
+            $stripePriceAgency: "%app.stripe.price_agency%"
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
