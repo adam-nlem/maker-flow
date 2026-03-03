@@ -100,6 +100,43 @@ class CreditService
         }
     }
 
+    public function refundCredit(
+        User $user,
+        int $amount,
+        CreditTransactionType $type,
+        SourceBucket $bucket,
+        ?string $description = null,
+    ): CreditTransaction {
+        $this->entityManager->beginTransaction();
+
+        try {
+            $balance = $this->getOrCreateBalance($user);
+
+            if ($bucket === SourceBucket::SubscriptionCredits) {
+                $balance->setSubscriptionCredits($balance->getSubscriptionCredits() + $amount);
+            } else {
+                $balance->setTopupCredits($balance->getTopupCredits() + $amount);
+            }
+
+            $transaction = $this->createTransaction(
+                user: $user,
+                balance: $balance,
+                amount: $amount,
+                type: $type,
+                bucket: $bucket,
+                description: $description,
+            );
+
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+
+            return $transaction;
+        } catch (\Throwable $e) {
+            $this->entityManager->rollback();
+            throw $e;
+        }
+    }
+
     /**
      * @return CreditTransaction[]
      * @throws InsufficientCreditsException
@@ -178,6 +215,7 @@ class CreditService
         SourceBucket $bucket,
         ?string $stripePaymentIntentId = null,
         ?string $stripeInvoiceId = null,
+        ?string $description = null,
     ): CreditTransaction {
         $transaction = new CreditTransaction();
         $transaction->setUser($user)
@@ -187,7 +225,8 @@ class CreditService
             ->setSourceBucket($bucket)
             ->setBalanceAfter($balance->getTotalCredits())
             ->setStripePaymentIntentId($stripePaymentIntentId)
-            ->setStripeInvoiceId($stripeInvoiceId);
+            ->setStripeInvoiceId($stripeInvoiceId)
+            ->setDescription($description);
 
         $this->creditTransactionRepository->save($transaction);
 

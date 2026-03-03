@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\Message\GenerateScriptMessage;
 use App\Repository\ScriptGenerationRepository;
 use App\Repository\ScriptRepository;
+use App\Service\Credit\CreditService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,6 +27,7 @@ final class ScriptGenerationController extends AbstractController
         ScriptRepository $scriptRepository,
         ScriptGenerationRepository $generationRepository,
         MessageBusInterface $messageBus,
+        CreditService $creditService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -38,6 +40,10 @@ final class ScriptGenerationController extends AbstractController
 
         if ($generationRepository->hasActiveGeneration($user)) {
             return $this->json(data: ["message" => "You already have a processing generation. Please wait until it is completed."], status: Response::HTTP_CONFLICT);
+        }
+
+        if ($creditService->getTotalCredits($user) < 1) {
+            return $this->json(data: ["message" => "You don't have enough credits to generate a script."], status: Response::HTTP_PAYMENT_REQUIRED);
         }
 
         try {

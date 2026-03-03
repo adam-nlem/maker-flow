@@ -2,11 +2,15 @@
 
 namespace App\Message\Handler;
 
+use App\Entity\Enum\CreditTransactionType;
 use App\Entity\Enum\ScriptGenerationStatus;
+use App\Entity\Enum\SourceBucket;
 use App\Helper\DateHelper;
 use App\Message\GenerateScriptMessage;
 use App\Repository\CreatorProfileRepository;
 use App\Repository\ScriptGenerationRepository;
+use App\Service\Credit\CreditService;
+use App\Service\Credit\Exception\InsufficientCreditsException;
 use App\Service\GeminiClient\Exception\GeminiRetryableException;
 use App\Service\GeminiClient\GeminiClientService;
 use App\Service\PromptAssembler\PromptAssemblerService;
@@ -30,6 +34,7 @@ class GenerateScriptHandler
         private readonly GeminiClientService $geminiClientService,
         private readonly ScriptOutputParserService $outputParserService,
         private readonly MessageBusInterface $messageBus,
+        private readonly CreditService $creditService,
         private readonly LoggerInterface $log,
     ) {}
 
@@ -47,6 +52,31 @@ class GenerateScriptHandler
         // Set status to processing and flush immediately so the frontend sees it
         $generation->setStatus(ScriptGenerationStatus::Processing);
         $this->generationRepository->save($generation, true);
+
+        // Track which buckets were debited so we can refund the exact same buckets on failure.
+        // On the first attempt (retryCount=0) we debit here; on retries the amounts are carried
+        // from the original message so we never double-charge.
+        $debitedFromSubscription = $message->getDebitedFromSubscription();
+        $debitedFromTopup = $message->getDebitedFromTopup();
+
+        if ($message->getRetryCount() === 0) {
+            try {
+                $transactions = $this->creditService->debitCredits($user, 1, CreditTransactionType::ScriptGeneration);
+                foreach ($transactions as $tx) {
+                    if ($tx->getSourceBucket() === SourceBucket::SubscriptionCredits) {
+                        $debitedFromSubscription = abs($tx->getAmount());
+                    } else {
+                        $debitedFromTopup = abs($tx->getAmount());
+                    }
+                }
+            } catch (InsufficientCreditsException $e) {
+                $generation->setStatus(ScriptGenerationStatus::Failed)
+                    ->setErrorMessage('Insuficient Credits.')
+                    ->setCompletedAt(DateHelper::createUtcDateTimeImmutable());
+                $this->generationRepository->save($generation, true);
+                return;
+            }
+        }
 
         try {
             // Load creator profile
@@ -77,11 +107,16 @@ class GenerateScriptHandler
                 $delay = $this->calculateRetryDelay($message->getRetryCount());
 
                 $this->messageBus->dispatch(
-                    new GenerateScriptMessage($generation->getId(), $message->getRetryCount() + 1),
+                    new GenerateScriptMessage(
+                        $generation->getId(),
+                        $message->getRetryCount() + 1,
+                        $debitedFromSubscription,
+                        $debitedFromTopup,
+                    ),
                     [new DelayStamp($delay)],
                 );
 
-                // Keep status at Processing — don't flush Failed
+                // Keep status at Processing — don't flush Failed, don't refund yet
                 return;
             }
 
@@ -92,6 +127,42 @@ class GenerateScriptHandler
             $generation->setStatus(ScriptGenerationStatus::Failed)
                 ->setErrorMessage($e->getMessage())
                 ->setCompletedAt(DateHelper::createUtcDateTimeImmutable());
+        }
+
+        // Refund credits to the original bucket(s) on permanent failure
+        if ($generation->getStatus() === ScriptGenerationStatus::Failed) {
+            if ($debitedFromSubscription > 0) {
+                try {
+                    $this->creditService->refundCredit(
+                        $user,
+                        $debitedFromSubscription,
+                        CreditTransactionType::ScriptGenerationRefund,
+                        SourceBucket::SubscriptionCredits,
+                    );
+                } catch (\Throwable $e) {
+                    $this->log->error('Failed to refund subscription credits after generation failure', [
+                        'generationId' => $generation->getId(),
+                        'amount' => $debitedFromSubscription,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
+            if ($debitedFromTopup > 0) {
+                try {
+                    $this->creditService->refundCredit(
+                        $user,
+                        $debitedFromTopup,
+                        CreditTransactionType::ScriptGenerationRefund,
+                        SourceBucket::TopupCredits,
+                    );
+                } catch (\Throwable $e) {
+                    $this->log->error('Failed to refund topup credits after generation failure', [
+                        'generationId' => $generation->getId(),
+                        'amount' => $debitedFromTopup,
+                        'error' => $e->getMessage(),
+                    ]);
+                }
+            }
         }
 
         $this->generationRepository->save($generation, true);

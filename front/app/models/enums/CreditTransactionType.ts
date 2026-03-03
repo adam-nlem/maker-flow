@@ -2,6 +2,7 @@ export enum CreditTransactionType {
     SubscriptionRenewal = 'subscription_renewal',
     TopupPurchase = 'topup_purchase',
     ScriptGeneration = 'script_generation',
+    ScriptGenerationRefund = 'script_generation_refund',
     Refund = 'refund',
     ManualAdjustment = 'manual_adjustment',
 }
@@ -12,6 +13,7 @@ export const creditTransactionTypeToFrenchTranslation: Record<CreditTransactionT
     [CreditTransactionType.SubscriptionRenewal]: "Renouvellement",
     [CreditTransactionType.TopupPurchase]: "Recharge",
     [CreditTransactionType.ScriptGeneration]: "Génération de script",
+    [CreditTransactionType.ScriptGenerationRefund]: "Remboursement suite a une génération de script echouée",
     [CreditTransactionType.Refund]: "Remboursement",
     [CreditTransactionType.ManualAdjustment]: "Ajustement",
 };

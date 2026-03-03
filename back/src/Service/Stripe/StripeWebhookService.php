@@ -2,6 +2,7 @@
 
 namespace App\Service\Stripe;
 
+use App\Entity\Enum\CreditTransactionType;
 use App\Entity\Enum\StripeEventType;
 use App\Entity\Enum\SubscriptionPlan;
 use App\Entity\Enum\SubscriptionStatus;
@@ -146,13 +147,6 @@ class StripeWebhookService
             ->setCancelAtPeriodEnd($subscriptionData['cancel_at_period_end'] ?? false);
 
         $this->subscriptionRepository->save($subscription, true);
-
-        $creditAmount = (int) ($item['price']['metadata']['credit_amount'] ?? 0);
-        $invoiceId = $subscriptionData['latest_invoice'] ?? null;
-
-        if ($creditAmount > 0) {
-            $this->creditService->renewSubscriptionCredits($user, $creditAmount, $invoiceId);
-        }
     }
 
     private function handleCustomerSubscriptionUpdated(array $payload): void
