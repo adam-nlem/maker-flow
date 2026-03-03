@@ -1,18 +1,13 @@
 import { useEffect, useRef, useState } from "react";
 import type { Script } from "~/models/Script";
-import { Platform, platformOptions, platformToFrenchTranslation } from "~/models/enums/Platform";
+import { Platform, platformOptions, platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform";
 import Pill from "~/components/ui/Pill";
-import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 
 function PlatformPill({ platform, isSelected, onToggle }: { platform: Platform; isSelected: boolean; onToggle: () => void }) {
-    const { iconUrl } = useShowPlatformIcon(platform);
-
-    if (!iconUrl) return null;
-
     return (
         <Pill
-            imageUrl={iconUrl}
+            imageUrl={platformToIcon[platform]}
             label={platformToFrenchTranslation[platform]}
             isSelected={isSelected}
             onClick={onToggle}

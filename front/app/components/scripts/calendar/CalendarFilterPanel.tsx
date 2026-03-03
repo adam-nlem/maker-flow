@@ -1,19 +1,14 @@
-import { Platform, platformOptions, platformToFrenchTranslation } from "~/models/enums/Platform";
+import { Platform, platformOptions, platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform";
 import { scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
-import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
 import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
 import Pill from "~/components/ui/Pill";
 
 function PlatformPill({ platform, isSelected, onToggle }: { platform: Platform; isSelected: boolean; onToggle: () => void }) {
-    const { iconUrl } = useShowPlatformIcon(platform);
-
-    if (!iconUrl) return null;
-
     return (
         <Pill
-            imageUrl={iconUrl}
+            imageUrl={platformToIcon[platform]}
             label={platformToFrenchTranslation[platform]}
             isSelected={isSelected}
             onClick={onToggle}

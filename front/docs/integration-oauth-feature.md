@@ -56,7 +56,6 @@ front/app/
 │   ├── api/integrations/
 │   │   ├── useAuthorizeInstagram.ts    # Contains useCreateIntegration hook
 │   │   ├── useListIntegrations.ts      # Hook to list integrations (flat list)
-│   │   ├── useShowPlatformIcon.ts         # Hook to fetch platform icons
 │   │   └── integrationQueryKeys.ts     # Query keys for integrations
 │   ├── useOAuthPopup.ts                # Utility hook for popup management
 │   └── useOAuthMessageListener.ts      # Utility hook for message listening
@@ -677,46 +676,40 @@ if (payload.platform !== platform) {
 
 ### Overview
 
-Platform icons (e.g., Instagram logo) are served from the backend as SVG files via a dedicated `PlatformController`.
+Platform icons are served as static SVG files from `front/public/icons/platforms/`. There is no API call involved — icons are resolved via a lookup in the `platformToIcon` map from the `Platform` enum.
 
-### API Endpoint
+### Static Assets
 
-`GET /api/platforms/{platform}/icon`
+Icons are located at `front/public/icons/platforms/{platform}.svg`:
+- `instagram.svg`
+- `youtube.svg`
+- `tiktok.svg`
+- `placeholder.svg` (fallback)
 
-Returns the SVG icon file for the specified platform.
+### platformToIcon
 
-### useShowPlatformIcon
+**Location:** `models/enums/Platform.ts`
 
-**Location:** `hooks/api/integrations/useShowPlatformIcon.ts`
-
-Fetches the icon for a specific platform.
-
-**Parameters:**
-
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `platform` | `string?` | The platform identifier |
-
-**Returns:**
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `iconUrl` | `string \| null` | Blob URL for the icon |
-| `isLoading` | `boolean` | Loading state |
-| `error` | `Error \| null` | Error if any |
-
-**Notes:**
-- Returns a blob URL created from the SVG response
-- Uses `staleTime: Infinity` to cache icons permanently
-- Query is disabled if `platform` is undefined
-- Used by both `IntegrationTile` (insights) and `ScriptPlatformsRow` (scripts)
-
-### Query Keys
+Maps each `Platform` enum value to its static asset path.
 
 ```typescript
-const integrationQueryKeys = {
-    all: ['integrations'] as const,
-    list: (projectUuid: string) => [...integrationQueryKeys.all, 'list', projectUuid] as const,
-    platformIcon: (platform: string) => [...integrationQueryKeys.all, 'platformIcon', platform] as const,
-};
+export const platformToIcon: Record<Platform, string> = {
+    [Platform.Instagram]: "/icons/platforms/instagram.svg",
+    [Platform.Youtube]: "/icons/platforms/youtube.svg",
+    [Platform.Tiktok]: "/icons/platforms/tiktok.svg",
+}
+
+export const PLATFORM_PLACEHOLDER_ICON = "/icons/platforms/placeholder.svg";
 ```
+
+**Usage:**
+```tsx
+import { platformToIcon, PLATFORM_PLACEHOLDER_ICON } from "~/models/enums/Platform";
+
+const iconUrl = platformToIcon[platform] ?? PLATFORM_PLACEHOLDER_ICON;
+<img src={iconUrl} alt={platform} />
+```
+
+**Notes:**
+- No network request — icons are bundled with the frontend static assets
+- Used by `IntegrationCard`, `IntegrationTile`, `CreateIntegrationCard`, and `ScriptPlatformsRow`

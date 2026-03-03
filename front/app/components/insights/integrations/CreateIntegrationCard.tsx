@@ -1,5 +1,5 @@
-import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
 import type { Platform } from "~/models/enums/Platform";
+import { platformToIcon, PLATFORM_PLACEHOLDER_ICON } from "~/models/enums/Platform";
 import Shimmer from "~/components/ui/Shimmer";
 import { Button } from "~/components/ui/Button";
 import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
@@ -15,7 +15,7 @@ export default function CreateIntegrationCard({ projectUuid, platform }: CreateI
     platform: platform,
   });
 
-  const { iconUrl } = useShowPlatformIcon(platform);
+  const iconUrl = platformToIcon[platform] ?? PLATFORM_PLACEHOLDER_ICON;
 
   return (
     <div className="border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 justify-between w-full">
@@ -29,13 +29,11 @@ export default function CreateIntegrationCard({ projectUuid, platform }: CreateI
           </div>
         </div>
 
-        {iconUrl && (
-          <img
-            src={iconUrl}
-            alt={platform}
-            className="size-7"
-          />
-        )}
+        <img
+          src={iconUrl}
+          alt={platform}
+          className="size-7"
+        />
       </div>
       <div className="border-t border-light-gray rounded w-full"></div>
       <Button style="secondary" width="w-full" height="h-7" onClick={() => {

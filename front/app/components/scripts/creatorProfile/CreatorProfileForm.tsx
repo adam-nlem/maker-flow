@@ -3,8 +3,7 @@ import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { Button } from "~/components/ui/Button";
-import { Platform, platformOptions, platformToFrenchTranslation } from "~/models/enums/Platform";
-import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
+import { Platform, platformOptions, platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform";
 import { ContentType, contentTypeOptions, contentTypeToFrenchTranslation } from "~/models/enums/ContentType";
 import { Tone, toneOptions, toneToFrenchTranslation } from "~/models/enums/Tone";
 import { useCreateOrUpdateCreatorProfile } from "~/hooks/api/creatorProfiles/useCreateOrUpdateCreatorProfile";
@@ -12,11 +11,9 @@ import type { CreatorProfile } from "~/models/CreatorProfile";
 import Pill from "~/components/ui/Pill";
 
 function PlatformPill({ platform, isSelected, onToggle }: { platform: Platform; isSelected: boolean; onToggle: () => void }) {
-    const { iconUrl } = useShowPlatformIcon(platform);
-    if (!iconUrl) return null;
     return (
         <Pill
-            imageUrl={iconUrl}
+            imageUrl={platformToIcon[platform]}
             label={platformToFrenchTranslation[platform]}
             isSelected={isSelected}
             onClick={onToggle}

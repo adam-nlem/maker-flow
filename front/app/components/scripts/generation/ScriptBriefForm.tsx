@@ -2,7 +2,7 @@ import { TextArea } from "~/components/ui/TextArea";
 import { type ScriptGoal, scriptGoalOptions, scriptGoalToFrenchTranslation } from "~/models/enums/ScriptGoal";
 import { type OpeningStyle, openingStyleOptions, openingStyleToFrenchTranslation } from "~/models/enums/OpeningStyle";
 import { type VideoDuration, videoDurationToFrenchTranslation, videoDurationOptions } from "~/models/enums/VideoDuration";
-import { type AiModel, aiModelOptions, aiModelToFrenchTranslation, aiModelToDescription } from "~/models/enums/AiModel";
+import { type AiModel, aiModelOptions, aiModelToFrenchTranslation, aiModelToDescription, aiModelToIcon } from "~/models/enums/AiModel";
 import Pill from "~/components/ui/Pill";
 
 interface ScriptBriefFormProps {
@@ -46,6 +46,7 @@ export default function ScriptBriefForm({
                     {aiModelOptions.map((m) => (
                         <Pill
                             key={m}
+                            imageUrl={aiModelToIcon[m]}
                             label={aiModelToFrenchTranslation[m]}
                             bgColorClassName="bg-primary/10"
                             borderColorClassName="border border-primary/30"

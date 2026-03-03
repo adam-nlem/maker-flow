@@ -23,3 +23,11 @@ export const platformToTextClass: Record<Platform, string> = {
     [Platform.Youtube]: "text-red",
     [Platform.Tiktok]: "text-dark",
 }
+
+export const platformToIcon: Record<Platform, string> = {
+    [Platform.Instagram]: "/icons/platforms/instagram.svg",
+    [Platform.Youtube]: "/icons/platforms/youtube.svg",
+    [Platform.Tiktok]: "/icons/platforms/tiktok.svg",
+}
+
+export const PLATFORM_PLACEHOLDER_ICON = "/icons/platforms/placeholder.svg";

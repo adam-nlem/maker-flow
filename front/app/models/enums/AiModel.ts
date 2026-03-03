@@ -17,3 +17,9 @@ export const aiModelToDescription: Record<AiModel, string> = {
     [AiModel.ChatGpt]: 'OpenAI — précis et structuré',
     [AiModel.Claude]: 'Anthropic — nuancé et détaillé',
 };
+
+export const aiModelToIcon: Record<AiModel, string> = {
+    [AiModel.Gemini]: '/icons/aiModels/gemini.png',
+    [AiModel.ChatGpt]: '/icons/aiModels/chat_gpt.svg',
+    [AiModel.Claude]: '/icons/aiModels/claude.svg',
+};

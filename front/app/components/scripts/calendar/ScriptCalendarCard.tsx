@@ -1,19 +1,15 @@
 import { useDraggable } from "@dnd-kit/core";
 import type { Script } from "~/models/Script";
 import type { Platform } from "~/models/enums/Platform";
+import { platformToIcon } from "~/models/enums/Platform";
 import { colorToBgClass } from "~/models/enums/Color";
-import { useShowPlatformIcon } from "~/hooks/api/integrations/useShowPlatformIcon";
 import Pill from "~/components/ui/Pill";
 import { scriptStatusToBgClass, scriptStatusToIcon, scriptStatusToTextClass } from "~/models/enums/ScriptStatus";
 
 function PlatformIcon({ platform }: { platform: Platform }) {
-    const { iconUrl } = useShowPlatformIcon(platform);
-
-    if (!iconUrl) return null;
-
     return (
         <img
-            src={iconUrl}
+            src={platformToIcon[platform]}
             alt={platform}
             className="size-3 rounded-sm object-cover"
         />
