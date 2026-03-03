@@ -2,6 +2,7 @@ import { ScriptGenerationStatus } from "./enums/ScriptGenerationStatus";
 import { ScriptGoal } from "./enums/ScriptGoal";
 import { OpeningStyle } from "./enums/OpeningStyle";
 import { VideoDuration } from "./enums/VideoDuration";
+import { AiModel } from "./enums/AiModel";
 
 export interface ScriptGenerationJSON {
     uuid: string;
@@ -15,6 +16,7 @@ export interface ScriptGenerationJSON {
     extraContext?: string;
     activeSkills: string[];
     skillInputs: Record<string, string>;
+    aiModel: string;
     errorMessage?: string;
     createdAt: string;
     completedAt?: string;
@@ -33,6 +35,7 @@ export class ScriptGeneration {
         public readonly extraContext: string | undefined,
         public readonly activeSkills: string[],
         public readonly skillInputs: Record<string, string>,
+        public readonly aiModel: AiModel,
         public readonly errorMessage: string | undefined,
         public readonly createdAt: Date,
         public readonly completedAt?: Date,
@@ -51,6 +54,7 @@ export class ScriptGeneration {
             json.extraContext,
             json.activeSkills,
             json.skillInputs,
+            (json.aiModel as AiModel) ?? AiModel.Gemini,
             json.errorMessage,
             new Date(json.createdAt),
             json.completedAt ? new Date(json.completedAt) : undefined,

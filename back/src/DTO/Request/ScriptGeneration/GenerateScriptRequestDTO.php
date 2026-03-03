@@ -3,6 +3,7 @@
 namespace App\DTO\Request\ScriptGeneration;
 
 use App\DTO\Request\AbstractRequestDTO;
+use App\Entity\Enum\AiModel;
 use App\Entity\Enum\OpeningStyle;
 use App\Entity\Enum\ScriptGenerationStatus;
 use App\Entity\Enum\ScriptGoal;
@@ -23,6 +24,7 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
     private ?string $extraContext;
     private array $activeSkills;
     private array $skillInputs;
+    private AiModel $aiModel;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -43,6 +45,7 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
         $this->extraContext = $payload["extraContext"] ?? null;
         $this->activeSkills = $payload["activeSkills"] ?? [];
         $this->skillInputs = $payload["skillInputs"] ?? [];
+        $this->aiModel = isset($payload["aiModel"]) ? AiModel::from($payload["aiModel"]) : AiModel::Gemini;
     }
 
     protected function buildObject(): ScriptGeneration
@@ -59,7 +62,8 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
             ->setCallToAction($this->callToAction)
             ->setExtraContext($this->extraContext)
             ->setActiveSkills($this->activeSkills)
-            ->setSkillInputs($this->skillInputs);
+            ->setSkillInputs($this->skillInputs)
+            ->setAiModel($this->aiModel);
     }
 
     public function getScriptUuid(): string
@@ -110,5 +114,10 @@ class GenerateScriptRequestDTO extends AbstractRequestDTO
     public function getSkillInputs(): array
     {
         return $this->skillInputs;
+    }
+
+    public function getAiModel(): AiModel
+    {
+        return $this->aiModel;
     }
 }

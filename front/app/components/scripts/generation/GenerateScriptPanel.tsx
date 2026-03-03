@@ -14,6 +14,7 @@ import type { ScriptGoal } from "~/models/enums/ScriptGoal";
 import type { OpeningStyle } from "~/models/enums/OpeningStyle";
 import type { VideoDuration } from "~/models/enums/VideoDuration";
 import type { SkillModule } from "~/models/enums/SkillModule";
+import { AiModel } from "~/models/enums/AiModel";
 
 interface GenerateScriptPanelProps {
     scriptUuid: string;
@@ -38,6 +39,8 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
     const [extraContext, setExtraContext] = useState("");
     const [activeSkills, setActiveSkills] = useState<SkillModule[]>([]);
     const [skillInputs, setSkillInputs] = useState<Record<string, string>>({});
+    const [aiModel, setAiModel] = useState<AiModel>(AiModel.Gemini);
+
     useEffect(() => {
         if (focusedGeneration && hasPreFilled.current !== focusedGeneration.uuid) {
             hasPreFilled.current = focusedGeneration.uuid;
@@ -50,6 +53,7 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
             setExtraContext(focusedGeneration.extraContext ?? "");
             setActiveSkills(focusedGeneration.activeSkills as SkillModule[]);
             setSkillInputs(focusedGeneration.skillInputs);
+            setAiModel(focusedGeneration.aiModel);
         }
     }, [focusedGeneration]);
 
@@ -73,6 +77,7 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
             extraContext: extraContext.trim() || undefined,
             activeSkills,
             skillInputs,
+            aiModel,
         });
 
         setActiveGenerationUuid(generation.uuid);
@@ -130,6 +135,8 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
                         onDurationChange={setDuration}
                         extraContext={extraContext}
                         onExtraContextChange={setExtraContext}
+                        aiModel={aiModel}
+                        onAiModelChange={setAiModel}
                     />
 
                     <div className="border-t border-light-gray" />

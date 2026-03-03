@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\AiModel;
 use App\Entity\Enum\OpeningStyle;
 use App\Entity\Enum\ScriptGenerationStatus;
 use App\Entity\Enum\ScriptGoal;
@@ -98,6 +99,13 @@ class ScriptGeneration
         'api_script_generations_create',
     ])]
     private array $skillInputs = [];
+
+    #[ORM\Column(enumType: AiModel::class, options: ['default' => 'gemini'])]
+    #[Groups([
+        'api_script_generations_show',
+        'api_script_generations_create',
+    ])]
+    private AiModel $aiModel = AiModel::Gemini;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $assembledPrompt = null;
@@ -273,6 +281,18 @@ class ScriptGeneration
     public function setSkillInputs(array $skillInputs): static
     {
         $this->skillInputs = $skillInputs;
+
+        return $this;
+    }
+
+    public function getAiModel(): AiModel
+    {
+        return $this->aiModel;
+    }
+
+    public function setAiModel(AiModel $aiModel): static
+    {
+        $this->aiModel = $aiModel;
 
         return $this;
     }

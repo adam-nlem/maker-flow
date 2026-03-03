@@ -5,6 +5,7 @@ import { scriptGenerationQueryKeys } from "./scriptGenerationQueryKeys";
 import type { ScriptGoal } from "~/models/enums/ScriptGoal";
 import type { OpeningStyle } from "~/models/enums/OpeningStyle";
 import type { VideoDuration } from "~/models/enums/VideoDuration";
+import type { AiModel } from "~/models/enums/AiModel";
 
 interface CreateScriptGenerationData {
     scriptUuid: string;
@@ -17,6 +18,7 @@ interface CreateScriptGenerationData {
     extraContext?: string;
     activeSkills: string[];
     skillInputs: Record<string, string>;
+    aiModel: AiModel;
 }
 
 export function useCreateScriptGeneration() {

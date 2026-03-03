@@ -1,48 +1,43 @@
 <?php
 
-namespace App\Service\GeminiClient;
+namespace App\Service\AiClient;
 
-use App\Service\AiClient\AiClientInterface;
 use App\Service\AiClient\Exception\AiClientPermanentException;
 use App\Service\AiClient\Exception\AiClientRetryableException;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class GeminiClientService implements AiClientInterface
+class OpenAiClientService implements AiClientInterface
 {
     private const REQUEST_TIMEOUT = 120;
+    private const MODEL = 'gpt-4o';
     private const RETRYABLE_STATUS_CODES = [408, 429, 500, 502, 503, 504];
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
-        private readonly string $geminiApiKey,
+        private readonly string $openAiApiKey,
     ) {
     }
 
     public function generateScript(string $prompt): string
     {
-        $this->logger->info('Gemini API request starting', [
-            'model' => 'gemini-3-pro-preview',
+        $this->logger->info('OpenAI API request starting', [
+            'model' => self::MODEL,
             'prompt_length' => strlen($prompt),
         ]);
 
         try {
-            $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent', [
-                'query' => [
-                    'key' => $this->geminiApiKey,
-                ],
+            $response = $this->httpClient->request('POST', 'https://api.openai.com/v1/chat/completions', [
                 'headers' => [
+                    'Authorization' => 'Bearer ' . $this->openAiApiKey,
                     'Content-Type' => 'application/json',
                 ],
                 'json' => [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                ['text' => $prompt],
-                            ],
-                        ],
+                    'model' => self::MODEL,
+                    'messages' => [
+                        ['role' => 'user', 'content' => $prompt],
                     ],
                 ],
                 'timeout' => self::REQUEST_TIMEOUT,
@@ -52,18 +47,18 @@ class GeminiClientService implements AiClientInterface
             $statusCode = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {
             throw new AiClientRetryableException(
-                'Gemini API network error: ' . $e->getMessage(),
+                'OpenAI API network error: ' . $e->getMessage(),
                 previous: $e,
             );
         }
 
-        $this->logger->info('Gemini API raw response', [
+        $this->logger->info('OpenAI API raw response', [
             'status_code' => $statusCode,
             'raw_response' => $rawContent,
         ]);
 
         if ($statusCode >= 400) {
-            $message = sprintf('Gemini API error (HTTP %d): %s', $statusCode, $rawContent);
+            $message = sprintf('OpenAI API error (HTTP %d): %s', $statusCode, $rawContent);
 
             if (in_array($statusCode, self::RETRYABLE_STATUS_CODES, true)) {
                 throw new AiClientRetryableException($message, $statusCode);
@@ -74,13 +69,13 @@ class GeminiClientService implements AiClientInterface
 
         $data = json_decode($rawContent, true);
 
-        if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-            throw new AiClientPermanentException('Unexpected response structure from Gemini API');
+        if (!isset($data['choices'][0]['message']['content'])) {
+            throw new AiClientPermanentException('Unexpected response structure from OpenAI API');
         }
 
-        $text = $data['candidates'][0]['content']['parts'][0]['text'];
+        $text = $data['choices'][0]['message']['content'];
 
-        $this->logger->info('Gemini API generation complete', [
+        $this->logger->info('OpenAI API generation complete', [
             'output_length' => strlen($text),
         ]);
 

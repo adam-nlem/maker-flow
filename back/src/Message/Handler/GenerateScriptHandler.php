@@ -9,10 +9,10 @@ use App\Helper\DateHelper;
 use App\Message\GenerateScriptMessage;
 use App\Repository\CreatorProfileRepository;
 use App\Repository\ScriptGenerationRepository;
+use App\Service\AiClient\AiClientResolver;
+use App\Service\AiClient\Exception\AiClientRetryableException;
 use App\Service\Credit\CreditService;
 use App\Service\Credit\Exception\InsufficientCreditsException;
-use App\Service\GeminiClient\Exception\GeminiRetryableException;
-use App\Service\GeminiClient\GeminiClientService;
 use App\Service\PromptAssembler\PromptAssemblerService;
 use App\Service\ScriptOutputParser\ScriptOutputParserService;
 use Psr\Log\LoggerInterface;
@@ -31,7 +31,7 @@ class GenerateScriptHandler
         private readonly ScriptGenerationRepository $generationRepository,
         private readonly CreatorProfileRepository $creatorProfileRepository,
         private readonly PromptAssemblerService $promptAssemblerService,
-        private readonly GeminiClientService $geminiClientService,
+        private readonly AiClientResolver $aiClientResolver,
         private readonly ScriptOutputParserService $outputParserService,
         private readonly MessageBusInterface $messageBus,
         private readonly CreditService $creditService,
@@ -89,8 +89,8 @@ class GenerateScriptHandler
             $prompt = $this->promptAssemblerService->assemble($creatorProfile, $generation);
             $generation->setAssembledPrompt($prompt);
 
-            // Call Gemini API
-            $output = $this->geminiClientService->generateScript($prompt);
+            // Call the selected AI model
+            $output = $this->aiClientResolver->resolve($generation->getAiModel())->generateScript($prompt);
 
             // Parse output and create parts (scoped to this generation)
             $metadata = $this->outputParserService->parseAndCreateParts($output, $script, $user, $generation);
@@ -102,7 +102,7 @@ class GenerateScriptHandler
             // Mark as completed
             $generation->setStatus(ScriptGenerationStatus::Completed)
                 ->setCompletedAt(DateHelper::createUtcDateTimeImmutable());
-        } catch (GeminiRetryableException $e) {
+        } catch (AiClientRetryableException $e) {
             if ($message->getRetryCount() < self::MAX_RETRIES) {
                 $delay = $this->calculateRetryDelay($message->getRetryCount());
 

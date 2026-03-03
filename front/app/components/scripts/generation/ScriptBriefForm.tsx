@@ -2,6 +2,7 @@ import { TextArea } from "~/components/ui/TextArea";
 import { type ScriptGoal, scriptGoalOptions, scriptGoalToFrenchTranslation } from "~/models/enums/ScriptGoal";
 import { type OpeningStyle, openingStyleOptions, openingStyleToFrenchTranslation } from "~/models/enums/OpeningStyle";
 import { type VideoDuration, videoDurationToFrenchTranslation, videoDurationOptions } from "~/models/enums/VideoDuration";
+import { type AiModel, aiModelOptions, aiModelToFrenchTranslation, aiModelToDescription } from "~/models/enums/AiModel";
 import Pill from "~/components/ui/Pill";
 
 interface ScriptBriefFormProps {
@@ -17,6 +18,8 @@ interface ScriptBriefFormProps {
     onDurationChange: (value: VideoDuration) => void;
     extraContext: string;
     onExtraContextChange: (value: string) => void;
+    aiModel: AiModel;
+    onAiModelChange: (value: AiModel) => void;
 }
 
 export default function ScriptBriefForm({
@@ -32,9 +35,28 @@ export default function ScriptBriefForm({
     onDurationChange,
     extraContext,
     onExtraContextChange,
+    aiModel,
+    onAiModelChange,
 }: ScriptBriefFormProps) {
     return (
         <div className="flex flex-col gap-5">
+            <div>
+                <h3 className="text-heading-sm">Modèle IA</h3>
+                <div className="flex flex-wrap gap-2 mt-2">
+                    {aiModelOptions.map((m) => (
+                        <Pill
+                            key={m}
+                            label={aiModelToFrenchTranslation[m]}
+                            bgColorClassName="bg-primary/10"
+                            borderColorClassName="border border-primary/30"
+                            isSelected={aiModel === m}
+                            onClick={() => onAiModelChange(m)}
+                        />
+                    ))}
+                </div>
+                <p className="text-body-xs text-gray-400 mt-1">{aiModelToDescription[aiModel]}</p>
+            </div>
+
             <TextArea
                 label="Sujet"
                 placeholder="De quoi parle cette vidéo ?"

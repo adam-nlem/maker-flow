@@ -1,48 +1,46 @@
 <?php
 
-namespace App\Service\GeminiClient;
+namespace App\Service\AiClient;
 
-use App\Service\AiClient\AiClientInterface;
 use App\Service\AiClient\Exception\AiClientPermanentException;
 use App\Service\AiClient\Exception\AiClientRetryableException;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
-class GeminiClientService implements AiClientInterface
+class ClaudeClientService implements AiClientInterface
 {
     private const REQUEST_TIMEOUT = 120;
-    private const RETRYABLE_STATUS_CODES = [408, 429, 500, 502, 503, 504];
+    private const MODEL = 'claude-sonnet-4-6';
+    private const MAX_TOKENS = 8096;
+    private const RETRYABLE_STATUS_CODES = [408, 429, 500, 502, 503, 504, 529];
 
     public function __construct(
         private readonly HttpClientInterface $httpClient,
         private readonly LoggerInterface $logger,
-        private readonly string $geminiApiKey,
+        private readonly string $claudeApiKey,
     ) {
     }
 
     public function generateScript(string $prompt): string
     {
-        $this->logger->info('Gemini API request starting', [
-            'model' => 'gemini-3-pro-preview',
+        $this->logger->info('Claude API request starting', [
+            'model' => self::MODEL,
             'prompt_length' => strlen($prompt),
         ]);
 
         try {
-            $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent', [
-                'query' => [
-                    'key' => $this->geminiApiKey,
-                ],
+            $response = $this->httpClient->request('POST', 'https://api.anthropic.com/v1/messages', [
                 'headers' => [
+                    'x-api-key' => $this->claudeApiKey,
+                    'anthropic-version' => '2023-06-01',
                     'Content-Type' => 'application/json',
                 ],
                 'json' => [
-                    'contents' => [
-                        [
-                            'parts' => [
-                                ['text' => $prompt],
-                            ],
-                        ],
+                    'model' => self::MODEL,
+                    'max_tokens' => self::MAX_TOKENS,
+                    'messages' => [
+                        ['role' => 'user', 'content' => $prompt],
                     ],
                 ],
                 'timeout' => self::REQUEST_TIMEOUT,
@@ -52,18 +50,18 @@ class GeminiClientService implements AiClientInterface
             $statusCode = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {
             throw new AiClientRetryableException(
-                'Gemini API network error: ' . $e->getMessage(),
+                'Claude API network error: ' . $e->getMessage(),
                 previous: $e,
             );
         }
 
-        $this->logger->info('Gemini API raw response', [
+        $this->logger->info('Claude API raw response', [
             'status_code' => $statusCode,
             'raw_response' => $rawContent,
         ]);
 
         if ($statusCode >= 400) {
-            $message = sprintf('Gemini API error (HTTP %d): %s', $statusCode, $rawContent);
+            $message = sprintf('Claude API error (HTTP %d): %s', $statusCode, $rawContent);
 
             if (in_array($statusCode, self::RETRYABLE_STATUS_CODES, true)) {
                 throw new AiClientRetryableException($message, $statusCode);
@@ -74,13 +72,13 @@ class GeminiClientService implements AiClientInterface
 
         $data = json_decode($rawContent, true);
 
-        if (!isset($data['candidates'][0]['content']['parts'][0]['text'])) {
-            throw new AiClientPermanentException('Unexpected response structure from Gemini API');
+        if (!isset($data['content'][0]['text'])) {
+            throw new AiClientPermanentException('Unexpected response structure from Claude API');
         }
 
-        $text = $data['candidates'][0]['content']['parts'][0]['text'];
+        $text = $data['content'][0]['text'];
 
-        $this->logger->info('Gemini API generation complete', [
+        $this->logger->info('Claude API generation complete', [
             'output_length' => strlen($text),
         ]);
 
