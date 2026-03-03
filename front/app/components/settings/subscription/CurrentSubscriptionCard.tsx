@@ -3,7 +3,6 @@ import { CheckBadgeIcon, ExclamationTriangleIcon } from "@heroicons/react/24/out
 import { Button } from "~/components/ui/Button";
 import { useCancelSubscription } from "~/hooks/api/subscriptions/useCancelSubscription";
 import { useResumeSubscription } from "~/hooks/api/subscriptions/useResumeSubscription";
-import { useChangePlan } from "~/hooks/api/subscriptions/useChangePlan";
 import type { Subscription } from "~/models/Subscription";
 import type { SubscriptionPlan } from "~/models/enums/SubscriptionPlan";
 import { subscriptionPlanToFrenchTranslation } from "~/models/enums/SubscriptionPlan";

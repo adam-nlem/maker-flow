@@ -15,6 +15,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
+use Stripe\Price;
 use Stripe\Stripe;
 use Stripe\Webhook;
 
@@ -62,12 +63,16 @@ class StripeWebhookService
 
     private function handleCheckoutSessionCompleted(array $payload): void
     {
+        $this->log->info('Processing Checkout');
         $session = $payload['data']['object'];
+        $this->log->info('Extracted session');
 
         // Subscriptions will be processed by the handleCustomerSubscriptionCreated method
         if ($session['mode'] !== 'payment') {
             return;
         }
+
+        $this->log->info('Is payment');
 
         $customerId = $session['customer'];
         $user = $this->userRepository->getByStripeCustomerId($customerId);
@@ -80,15 +85,16 @@ class StripeWebhookService
         $sessionId = $session['id'];
         $paymentIntentId = $session['payment_intent'] ?? null;
 
-        $stripeSession = Session::retrieve($sessionId, ['expand' => ['line_items.data.price']]);
-        $lineItems = $stripeSession->line_items->data;
+        $lineItems = Session::allLineItems($sessionId);
 
         if (empty($lineItems)) {
             $this->log->warning('Checkout session has no line items', ['sessionId' => $sessionId]);
             return;
         }
 
-        $creditAmount = (int) ($lineItems[0]->price->metadata['credit_amount'] ?? 0);
+        $priceId = $lineItems->data[0]->price->id;
+        $price = Price::retrieve($priceId);
+        $creditAmount = (int) ($price->metadata->credit_amount ?? 0);
 
         if ($creditAmount <= 0) {
             $this->log->warning('No credit_amount metadata on price', [
