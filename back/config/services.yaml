@@ -111,5 +111,11 @@ services:
             $stripePriceStarter: "%app.stripe.price_starter%"
             $stripePriceCreator: "%app.stripe.price_creator%"
             $stripePriceAgency: "%app.stripe.price_agency%"
+    App\Service\Stripe\StripeSubscriptionService:
+        arguments:
+            $stripeSecretKey: "%app.stripe.secret_key%"
+            $stripePriceStarter: "%app.stripe.price_starter%"
+            $stripePriceCreator: "%app.stripe.price_creator%"
+            $stripePriceAgency: "%app.stripe.price_agency%"
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

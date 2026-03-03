@@ -2511,6 +2511,75 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Cancel Subscription",
+          "id": "sub-cancel-0001-0000-000000000003",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subscriptions/cancel",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscriptions",
+                "cancel"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Resume Subscription",
+          "id": "sub-resume-0001-0000-000000000004",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/subscriptions/resume",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscriptions",
+                "resume"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Change Plan",
+          "id": "sub-change-plan-0001-0000-000000000005",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"plan\": \"creator\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/subscriptions/change-plan",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "subscriptions",
+                "change-plan"
+              ]
+            }
+          },
+          "response": []
         }
       ],
       "id": "sub-folder-0001-0000-0000-000000000000"

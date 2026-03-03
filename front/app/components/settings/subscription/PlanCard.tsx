@@ -6,10 +6,12 @@ import { formatPriceEur } from "~/utils/priceFormatters";
 interface PlanCardProps {
     config: PlanConfig;
     isPending: boolean;
+    disabled?: boolean;
     onSelect: () => void;
+    actionLabel?: string;
 }
 
-export default function PlanCard({ config, isPending, onSelect }: PlanCardProps) {
+export default function PlanCard({ config, isPending, disabled = false, onSelect, actionLabel = "Choisir" }: PlanCardProps) {
     return (
         <div className={`flex flex-col border rounded-xl p-5 ${config.isHighlighted ? 'border-primary' : 'border-light-gray'}`}>
             {config.isHighlighted && (
@@ -40,10 +42,10 @@ export default function PlanCard({ config, isPending, onSelect }: PlanCardProps)
                 <Button
                     style={config.isHighlighted ? "primary" : "secondary"}
                     isLoading={isPending}
-                    disabled={isPending}
+                    disabled={isPending || disabled}
                     onClick={onSelect}
                 >
-                    Choisir
+                    {actionLabel}
                 </Button>
             </div>
         </div>

@@ -1,10 +1,12 @@
 import { CreditCardIcon } from "@heroicons/react/24/outline";
-import type { CreditBalance } from "~/models/CreditBalance";
+import { Button } from "~/components/ui/Button";
 import Shimmer from "~/components/ui/Shimmer";
 import { useShowCreditBalance } from "~/hooks/api/credits/useShowCreditBalance";
+import { useCreateTopupCheckout } from "~/hooks/api/credits/useCreateTopupCheckout";
 
 export default function CreditBalanceCard() {
     const { creditBalance, isLoading } = useShowCreditBalance();
+    const { createTopupCheckout, isPending: isTopupPending } = useCreateTopupCheckout();
     if (isLoading) {
         return (
             <div className="border border-light-gray rounded-xl p-5">
@@ -22,9 +24,20 @@ export default function CreditBalanceCard() {
 
     return (
         <div className="border border-light-gray rounded-xl p-5">
-            <div className="flex flex-row items-center gap-2 mb-3">
-                <CreditCardIcon className="size-5 text-gray" strokeWidth={1.5} />
-                <h3 className="text-heading-md">Crédits</h3>
+            <div className="flex flex-row items-center justify-between mb-3">
+                <div className="flex flex-row items-center gap-2">
+                    <CreditCardIcon className="size-5 text-gray" strokeWidth={1.5} />
+                    <h3 className="text-heading-md">Crédits</h3>
+                </div>
+                <Button
+                    style="outline"
+                    width="w-auto"
+                    height="h-8"
+                    isLoading={isTopupPending}
+                    onClick={() => createTopupCheckout()}
+                >
+                    Recharger
+                </Button>
             </div>
 
             <p className="text-heading-2xl text-primary">{creditBalance.totalCredits}</p>

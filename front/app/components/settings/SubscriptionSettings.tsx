@@ -1,11 +1,11 @@
 import { useEffect } from "react";
 import { useSearchParams } from "react-router";
-import { useShowCreditBalance } from "~/hooks/api/credits/useShowCreditBalance";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { SettingsSection, settingsSectionToFrenchTranslation } from "~/models/enums/SettingsSection";
 import { useToastStore } from "~/stores/toast/toastStore";
 import Shimmer from "~/components/ui/Shimmer";
 import CreditBalanceCard from "./subscription/CreditBalanceCard";
+import CreditTransactionHistory from "./subscription/CreditTransactionHistory";
 import CurrentSubscriptionCard from "./subscription/CurrentSubscriptionCard";
 import PlanSelector from "./subscription/PlanSelector";
 
@@ -43,6 +43,8 @@ export default function SubscriptionSettings() {
                 ) : (
                     <PlanSelector />
                 )}
+
+                <CreditTransactionHistory />
             </div>
         </div>
     );

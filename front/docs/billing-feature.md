@@ -64,6 +64,27 @@ Exports: `subscriptionPlanOptions`, `subscriptionPlanToFrenchTranslation`
 
 Exports: `subscriptionStatusOptions`, `subscriptionStatusToFrenchTranslation`
 
+### CreditTransactionType (`models/enums/CreditTransactionType.ts`)
+
+| Case | Value |
+|------|-------|
+| SubscriptionRenewal | `subscription_renewal` |
+| TopupPurchase | `topup_purchase` |
+| ScriptGeneration | `script_generation` |
+| Refund | `refund` |
+| ManualAdjustment | `manual_adjustment` |
+
+Exports: `creditTransactionTypeOptions`, `creditTransactionTypeToFrenchTranslation`
+
+### SourceBucket (`models/enums/SourceBucket.ts`)
+
+| Case | Value |
+|------|-------|
+| SubscriptionCredits | `subscription_credits` |
+| TopupCredits | `topup_credits` |
+
+Exports: `sourceBucketOptions`, `sourceBucketToFrenchTranslation`
+
 ---
 
 ## Models
@@ -123,7 +144,7 @@ export const planConfigs: PlanConfig[];
 
 | File | Keys |
 |------|------|
-| `hooks/api/credits/creditQueryKeys.ts` | `all`, `balance()` |
+| `hooks/api/credits/creditQueryKeys.ts` | `all`, `balance()`, `transactions(page, limit)` |
 | `hooks/api/subscriptions/subscriptionQueryKeys.ts` | `all`, `current()` |
 
 ### Hooks
@@ -133,6 +154,10 @@ export const planConfigs: PlanConfig[];
 | `useShowCreditBalance` | `GET /api/credits/balance` | `{ creditBalance, isLoading, error }` |
 | `useShowCurrentSubscription` | `GET /api/subscriptions/current` | `{ subscription, isLoading, error }` (null if no subscription) |
 | `useCreateSubscriptionCheckout` | `POST /api/subscriptions/checkout` | `{ createCheckout, isPending, error }` (redirects to Stripe on success) |
+| `useCancelSubscription` | `POST /api/subscriptions/cancel` | `{ cancelSubscription, isPending, error }` (invalidates subscription query) |
+| `useResumeSubscription` | `POST /api/subscriptions/resume` | `{ resumeSubscription, isPending, error }` (invalidates subscription query) |
+| `useCreateTopupCheckout` | `POST /api/credits/topup/checkout` | `{ createTopupCheckout, isPending, error }` (redirects to Stripe on success) |
+| `useListCreditTransactions` | `GET /api/credits/transactions` | `{ transactions, isLoading, error }` (paginated) |
 
 ---
 
@@ -141,26 +166,34 @@ export const planConfigs: PlanConfig[];
 ### SubscriptionSettings (`components/settings/SubscriptionSettings.tsx`)
 
 Main orchestrator for the subscription page. Displays:
-1. Credit balance card (always)
-2. Current subscription card (if subscribed) OR Plan selector (if not)
+1. Credit balance card with topup button (always)
+2. Current subscription card with management actions (if subscribed) OR Plan selector (if not)
+3. Credit transaction history (always, hidden if no transactions)
 
 Handles `?checkout=success` query param to show a success toast after Stripe redirect.
 
 ### CreditBalanceCard (`components/settings/subscription/CreditBalanceCard.tsx`)
 
-Displays total credits with subscription/topup breakdown. Shows shimmer loading state.
+Displays total credits with subscription/topup breakdown and a "Recharger" topup button. Shows shimmer loading state.
 
 ### CurrentSubscriptionCard (`components/settings/subscription/CurrentSubscriptionCard.tsx`)
 
-Shows current subscription: plan name, status pill, billing period dates, cancellation warning.
+Shows current subscription: plan name, status pill, billing period dates, cancellation warning. Includes action buttons:
+- **Cancel** (danger): two-click confirmation, visible when active and not scheduled for cancellation
+- **Resume** (primary): visible when cancellation is scheduled
+- **Change plan** (outline): toggles a plan selector grid with the current plan disabled
 
 ### PlanSelector (`components/settings/subscription/PlanSelector.tsx`)
 
-Grid of plan cards. Uses `planConfigs` for data and `useCreateSubscriptionCheckout` for the checkout flow.
+Grid of plan cards for initial subscription. Uses `planConfigs` for data and `useCreateSubscriptionCheckout` for the checkout flow.
 
 ### PlanCard (`components/settings/subscription/PlanCard.tsx`)
 
-Individual plan card with name, price, credits, feature checklist, and "Choisir" button. Highlighted variant for recommended plan.
+Individual plan card with name, price, credits, feature checklist, and action button. Supports `disabled` and custom `actionLabel` props for reuse in the change-plan flow.
+
+### CreditTransactionHistory (`components/settings/subscription/CreditTransactionHistory.tsx`)
+
+Paginated transaction history. Shows type (French label), date, description, and color-coded amount (green for credits, red for debits). Includes page navigation.
 
 ---
 

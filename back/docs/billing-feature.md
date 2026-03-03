@@ -236,6 +236,27 @@ Frontend                    Backend                         Stripe
 
 ---
 
+## StripeSubscriptionService (`Service/Stripe/StripeSubscriptionService.php`)
+
+Handles subscription lifecycle management via the Stripe API: cancel, resume, and plan changes.
+
+### Dependencies
+
+- `string $stripeSecretKey` -- Stripe API key
+- `string $stripePriceStarter`, `$stripePriceCreator`, `$stripePriceAgency` -- subscription price IDs
+- `SubscriptionRepository`
+- `LoggerInterface`
+
+### Public Methods
+
+#### `cancelSubscription(Subscription $subscription): void`
+Sets `cancel_at_period_end = true` on the Stripe subscription and updates the local entity. The subscription remains active until the end of the current billing period.
+
+#### `resumeSubscription(Subscription $subscription): void`
+Removes the scheduled cancellation by setting `cancel_at_period_end = false`. Throws `SubscriptionManagementException` if not currently scheduled for cancellation.
+
+---
+
 ## Exceptions
 
 ### CreditServiceException (`Service/Credit/Exception/CreditServiceException.php`)
@@ -253,6 +274,9 @@ Thrown when Stripe Checkout Session creation fails. Wraps Stripe API errors.
 ### WebhookSignatureVerificationException (`Service/Stripe/Exception/WebhookSignatureVerificationException.php`)
 Thrown when Stripe webhook signature verification fails.
 
+### SubscriptionManagementException (`Service/Stripe/Exception/SubscriptionManagementException.php`)
+Thrown when a subscription management action fails (cancel, resume, or plan change). Wraps Stripe API errors.
+
 ---
 
 ## API Endpoints
@@ -263,6 +287,8 @@ Thrown when Stripe webhook signature verification fails.
 |--------|------|------|-------------|
 | POST | `/api/subscriptions/checkout` | `api_subscriptions_checkout` | Create Checkout Session for subscription |
 | GET | `/api/subscriptions/current` | `api_subscriptions_current` | Get current subscription |
+| POST | `/api/subscriptions/cancel` | `api_subscriptions_cancel` | Cancel subscription at period end |
+| POST | `/api/subscriptions/resume` | `api_subscriptions_resume` | Resume a canceled subscription |
 
 **POST /api/subscriptions/checkout**
 - Request body: `{"plan": "starter"}` (valid values: `starter`, `creator`, `agency`)
@@ -272,6 +298,18 @@ Thrown when Stripe webhook signature verification fails.
 **GET /api/subscriptions/current**
 - Response: Subscription entity with `api_subscription_show` group
 - Returns 404 if no subscription exists
+
+**POST /api/subscriptions/cancel**
+- No request body
+- Response: Updated Subscription entity with `api_subscription_show` group
+- Sets `cancel_at_period_end = true` (subscription stays active until period end)
+- Returns 404 if no subscription, 400 on Stripe error
+
+**POST /api/subscriptions/resume**
+- No request body
+- Response: Updated Subscription entity with `api_subscription_show` group
+- Sets `cancel_at_period_end = false` (undoes scheduled cancellation)
+- Returns 404 if no subscription, 400 if not scheduled for cancellation
 
 ### Credit Endpoints (`Controller/CreditController.php`)
 

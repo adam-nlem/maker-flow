@@ -28,7 +28,7 @@ class GeminiClientService
         ]);
 
         try {
-            $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent', [
+            $response = $this->httpClient->request('POST', 'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:generateContent', [
                 'query' => [
                     'key' => $this->geminiApiKey,
                 ],
