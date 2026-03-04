@@ -5,6 +5,8 @@ import { useListScriptGenerations } from "~/hooks/api/scriptGenerations/useListS
 import { useDeleteScriptGeneration } from "~/hooks/api/scriptGenerations/useDeleteScriptGeneration";
 import { ScriptGenerationStatus, scriptGenerationStatusToBgClass, scriptGenerationStatusToBorderClass, scriptGenerationStatusToIcon } from "~/models/enums/ScriptGenerationStatus";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
+import { aiModelToFrenchTranslation } from "~/models/enums/AiModel";
+import { formatToFrenchRelative, formatToNumericDate } from "~/utils/dateFormatters";
 
 interface GenerationHistoryBarProps {
     scriptUuid: string;
@@ -64,7 +66,7 @@ export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUui
                 {generations.map((gen) => (
                     <Pill
                         key={gen.uuid}
-                        label={gen.topic.length > 20 ? gen.topic.substring(0, 20) + '...' : gen.topic}
+                        label={`${aiModelToFrenchTranslation[gen.aiModel]} - ${formatToFrenchRelative(gen.createdAt)}`}
                         icon={scriptGenerationStatusToIcon[gen.status]}
                         suffixIcon={gen.status !== ScriptGenerationStatus.Pending && gen.status !== ScriptGenerationStatus.Processing ? XMarkIcon : undefined}
                         isSelected={selectedGenerationUuid === gen.uuid}

@@ -49,10 +49,8 @@ class ClaudeClientService implements AiClientInterface
             $rawContent = $response->getContent(false);
             $statusCode = $response->getStatusCode();
         } catch (TransportExceptionInterface $e) {
-            throw new AiClientRetryableException(
-                'Claude API network error: ' . $e->getMessage(),
-                previous: $e,
-            );
+            $this->logger->error('Claude API network error', ['error' => $e->getMessage()]);
+            throw new AiClientRetryableException('Claude API network error', previous: $e);
         }
 
         $this->logger->info('Claude API raw response', [
@@ -61,7 +59,8 @@ class ClaudeClientService implements AiClientInterface
         ]);
 
         if ($statusCode >= 400) {
-            $message = sprintf('Claude API error (HTTP %d): %s', $statusCode, $rawContent);
+            $this->logger->error('Claude API HTTP error', ['status_code' => $statusCode, 'raw_response' => $rawContent]);
+            $message = sprintf('Claude API error (HTTP %d)', $statusCode);
 
             if (in_array($statusCode, self::RETRYABLE_STATUS_CODES, true)) {
                 throw new AiClientRetryableException($message, $statusCode);

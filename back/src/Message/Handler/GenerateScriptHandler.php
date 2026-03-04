@@ -71,7 +71,7 @@ class GenerateScriptHandler
                 }
             } catch (InsufficientCreditsException $e) {
                 $generation->setStatus(ScriptGenerationStatus::Failed)
-                    ->setErrorMessage('Insuficient Credits.')
+                    ->setErrorMessage('Insufficient credits.')
                     ->setCompletedAt(DateHelper::createUtcDateTimeImmutable());
                 $this->generationRepository->save($generation, true);
                 return;
@@ -120,12 +120,20 @@ class GenerateScriptHandler
                 return;
             }
 
+            $this->log->error('AI generation failed after max retries', [
+                'generationId' => $generation->getId(),
+                'error' => $e->getMessage(),
+            ]);
             $generation->setStatus(ScriptGenerationStatus::Failed)
-                ->setErrorMessage($e->getMessage())
+                ->setErrorMessage('Script generation failed after multiple attempts.')
                 ->setCompletedAt(DateHelper::createUtcDateTimeImmutable());
         } catch (\Exception $e) {
+            $this->log->error('Unexpected error during script generation', [
+                'generationId' => $generation->getId(),
+                'error' => $e->getMessage(),
+            ]);
             $generation->setStatus(ScriptGenerationStatus::Failed)
-                ->setErrorMessage($e->getMessage())
+                ->setErrorMessage('An unexpected error occurred during script generation.')
                 ->setCompletedAt(DateHelper::createUtcDateTimeImmutable());
         }
 
