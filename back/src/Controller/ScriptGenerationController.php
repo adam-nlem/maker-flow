@@ -107,7 +107,7 @@ final class ScriptGenerationController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $generations = $generationRepository->getByScriptAndUser($script, $user);
+        $generations = $generationRepository->getByScriptAndUserPaginated($script, $user, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(
             data: $generations,

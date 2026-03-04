@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Pill from "~/components/ui/Pill";
 import { useListScriptGenerations } from "~/hooks/api/scriptGenerations/useListScriptGenerations";
@@ -13,9 +13,32 @@ interface GenerationHistoryBarProps {
 }
 
 export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUuid, onSelectGeneration }: GenerationHistoryBarProps) {
-    const { generations } = useListScriptGenerations({ scriptUuid });
+    const { generations, hasMore, isLoadingMore, listMore } = useListScriptGenerations({ scriptUuid });
     const { deleteScriptGeneration } = useDeleteScriptGeneration();
     const [pendingDeleteUuid, setPendingDeleteUuid] = useState<string | null>(null);
+    const containerRef = useRef<HTMLDivElement>(null);
+    const sentinelRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const sentinel = sentinelRef.current;
+        const container = containerRef.current;
+        if (!sentinel || !container) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+                    listMore();
+                }
+            },
+            { root: container, rootMargin: "0px 200px 0px 0px" },
+        );
+
+        observer.observe(sentinel);
+
+        return () => {
+            observer.disconnect();
+        };
+    }, [hasMore, isLoadingMore, listMore]);
 
     if (generations.length === 0) return null;
 
@@ -30,7 +53,7 @@ export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUui
 
     return (
         <>
-            <div className="flex flex-row items-center gap-2 px-6 py-2 border-b border-light-gray overflow-x-auto scrollbar-none">
+            <div ref={containerRef} className="flex flex-row items-center gap-2 px-6 py-2 border-b border-light-gray overflow-x-auto scrollbar-none">
                 <Pill
                     label="Manuel"
                     isSelected={selectedGenerationUuid === undefined}
@@ -51,6 +74,7 @@ export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUui
                         onSuffixClick={() => setPendingDeleteUuid(gen.uuid)}
                     />
                 ))}
+                <div ref={sentinelRef} className="w-1 shrink-0" />
             </div>
 
             <ConfirmDeleteDialog

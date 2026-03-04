@@ -98,4 +98,22 @@ class ScriptGenerationRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    /**
+     * @return ScriptGeneration[]
+     */
+    public function getByScriptAndUserPaginated(Script $script, User $user, int $page, int $limit): array
+    {
+        return $this->createQueryBuilder('sg')
+            ->where('sg.script = :script')
+            ->andWhere('sg.user = :user')
+            ->setParameter('script', $script)
+            ->setParameter('user', $user)
+            ->orderBy('sg.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }
