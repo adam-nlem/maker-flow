@@ -27,6 +27,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?string $uuid = null;
 
@@ -34,6 +36,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?ScriptGenerationStatus $status = null;
 
@@ -41,6 +45,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?string $topic = null;
 
@@ -48,6 +54,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?ScriptGoal $goal = null;
 
@@ -55,6 +63,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?string $keyPoints = null;
 
@@ -62,6 +72,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?OpeningStyle $openingStyle = null;
 
@@ -69,6 +81,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?VideoDuration $duration = null;
 
@@ -76,6 +90,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?string $callToAction = null;
 
@@ -83,6 +99,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?string $extraContext = null;
 
@@ -90,6 +108,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private array $activeSkills = [];
 
@@ -97,6 +117,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private array $skillInputs = [];
 
@@ -104,6 +126,8 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private AiModel $aiModel = AiModel::Gemini;
 
@@ -113,6 +137,8 @@ class ScriptGeneration
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
         'api_script_generations_show',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?string $errorMessage = null;
 
@@ -120,12 +146,16 @@ class ScriptGeneration
     #[Groups([
         'api_script_generations_show',
         'api_script_generations_create',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups([
         'api_script_generations_show',
+        'api_script_generations_list',
+        'api_script_generations_update',
     ])]
     private ?\DateTimeImmutable $completedAt = null;
 

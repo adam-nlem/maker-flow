@@ -89,4 +89,14 @@ class ScriptCallToActionRepository extends ServiceEntityRepository
 
         return (int) ($result ?? -1);
     }
+
+    public function deleteByGeneration(ScriptGeneration $generation): void
+    {
+        $this->createQueryBuilder('cta')
+            ->delete()
+            ->where('cta.scriptGeneration = :generation')
+            ->setParameter('generation', $generation)
+            ->getQuery()
+            ->execute();
+    }
 }

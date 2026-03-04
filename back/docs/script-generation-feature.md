@@ -179,6 +179,7 @@ Used in `skillInputs['format']` to control script output format.
 | `getByUuidAndUser` | `string $uuid, User $user` | `?ScriptGeneration` | Finds generation by UUID |
 | `getByScriptAndUser` | `Script $script, User $user` | `ScriptGeneration[]` | All generations for a script, ordered by createdAt DESC |
 | `hasActiveGeneration` | `User $user` | `bool` | Returns true if user has any generation with status Pending or Processing |
+| `hasActiveGenerationExcluding` | `User $user, ScriptGeneration $excluded` | `bool` | Same as above but ignores the specified generation (used when updating an existing one) |
 
 ---
 
@@ -202,8 +203,10 @@ Used in `skillInputs['format']` to control script output format.
 | create | POST | `` | `GenerateScriptRequestDTO` (build pattern) | Dispatch generation job. Returns 409 if user already has an active generation. Returns ScriptGeneration with status `pending` |
 | show | GET | `/{generationUuid}` | — | Get generation status (used for polling) |
 | list | GET | `` | `ListScriptGenerationQueryParamDTO` | Get all generations for a script (ordered by createdAt DESC) |
+| update | PATCH | `/{generationUuid}` | `UpdateScriptGenerationRequestDTO` | Delete existing parts, update fields, reset status to pending, re-dispatch. Returns 409 if another generation is active |
+| delete | DELETE | `/{generationUuid}` | — | Delete a generation and its parts (via DB cascade). Returns 409 if generation is active |
 
-**Concurrency limit:** Only one generation per user can be active (Pending or Processing) at a time. Attempting to create a second returns HTTP 409 with message `"Une génération est déjà en cours. Veuillez patienter."`.
+**Concurrency limit:** Only one generation per user can be active (Pending or Processing) at a time. Attempting to create or update while another is active returns HTTP 409.
 
 ---
 

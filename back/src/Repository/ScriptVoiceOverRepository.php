@@ -89,4 +89,14 @@ class ScriptVoiceOverRepository extends ServiceEntityRepository
 
         return (int) ($result ?? -1);
     }
+
+    public function deleteByGeneration(ScriptGeneration $generation): void
+    {
+        $this->createQueryBuilder('v')
+            ->delete()
+            ->where('v.scriptGeneration = :generation')
+            ->setParameter('generation', $generation)
+            ->getQuery()
+            ->execute();
+    }
 }

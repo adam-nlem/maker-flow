@@ -69,6 +69,20 @@ class ScriptGenerationRepository extends ServiceEntityRepository
             ->getSingleScalarResult() > 0;
     }
 
+    public function hasActiveGenerationExcluding(User $user, ScriptGeneration $excluded): bool
+    {
+        return $this->createQueryBuilder('sg')
+            ->select('COUNT(sg.id)')
+            ->where('sg.user = :user')
+            ->andWhere('sg.status IN (:statuses)')
+            ->andWhere('sg.id != :excludedId')
+            ->setParameter('user', $user)
+            ->setParameter('statuses', [ScriptGenerationStatus::Pending, ScriptGenerationStatus::Processing])
+            ->setParameter('excludedId', $excluded->getId())
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
+    }
+
     /**
      * @return ScriptGeneration[]
      */

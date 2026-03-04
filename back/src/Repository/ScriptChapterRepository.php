@@ -89,4 +89,14 @@ class ScriptChapterRepository extends ServiceEntityRepository
 
         return (int) ($result ?? -1);
     }
+
+    public function deleteByGeneration(ScriptGeneration $generation): void
+    {
+        $this->createQueryBuilder('c')
+            ->delete()
+            ->where('c.scriptGeneration = :generation')
+            ->setParameter('generation', $generation)
+            ->getQuery()
+            ->execute();
+    }
 }

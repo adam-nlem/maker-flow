@@ -108,4 +108,14 @@ class ScriptHookRepository extends ServiceEntityRepository
 
         return (int) $qb->getQuery()->getSingleScalarResult() > 0;
     }
+
+    public function deleteByGeneration(ScriptGeneration $generation): void
+    {
+        $this->createQueryBuilder('sh')
+            ->delete()
+            ->where('sh.scriptGeneration = :generation')
+            ->setParameter('generation', $generation)
+            ->getQuery()
+            ->execute();
+    }
 }

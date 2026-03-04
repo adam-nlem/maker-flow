@@ -6,6 +6,7 @@ import { SidePanel } from "~/components/ui/SidePanel";
 import ScriptBriefForm from "./ScriptBriefForm";
 import SkillModuleToggles from "./SkillModuleToggles";
 import { useCreateScriptGeneration } from "~/hooks/api/scriptGenerations/useCreateScriptGeneration";
+import { useUpdateScriptGeneration } from "~/hooks/api/scriptGenerations/useUpdateScriptGeneration";
 import { useShowScriptGeneration } from "~/hooks/api/scriptGenerations/useShowScriptGeneration";
 import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
@@ -57,28 +58,33 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
         }
     }, [focusedGeneration]);
 
-    const { createScriptGeneration, isPending } = useCreateScriptGeneration();
+    const { createScriptGeneration, isPending: isPendingCreate } = useCreateScriptGeneration();
+    const { updateScriptGeneration, isPending: isPendingUpdate } = useUpdateScriptGeneration();
     const setActiveGenerationUuid = useScriptGenerationStore((s) => s.setActiveGenerationUuid);
 
+    const isPending = isPendingCreate || isPendingUpdate;
     const canSubmit = topic.trim() !== "" && goal !== undefined && openingStyle !== undefined && duration !== undefined;
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!canSubmit) return;
+    const params = {
+        topic: topic.trim(),
+        goal,
+        keyPoints: keyPoints.trim() || undefined,
+        openingStyle,
+        duration,
+        callToAction: callToAction.trim() || undefined,
+        extraContext: extraContext.trim() || undefined,
+        activeSkills,
+        skillInputs,
+        aiModel,
+    } as const;
 
-        const generation = await createScriptGeneration({
-            scriptUuid,
-            topic: topic.trim(),
-            goal,
-            keyPoints: keyPoints.trim() || undefined,
-            openingStyle,
-            duration,
-            callToAction: callToAction.trim() || undefined,
-            extraContext: extraContext.trim() || undefined,
-            activeSkills,
-            skillInputs,
-            aiModel,
-        });
+    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!canSubmit || !goal || !openingStyle || !duration) return;
+
+        const generation = focusedGenerationUuid
+            ? await updateScriptGeneration({ generationUuid: focusedGenerationUuid, scriptUuid, ...params })
+            : await createScriptGeneration({ scriptUuid, ...params });
 
         setActiveGenerationUuid(generation.uuid);
         closePanel();

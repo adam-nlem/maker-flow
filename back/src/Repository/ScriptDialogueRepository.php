@@ -89,4 +89,14 @@ class ScriptDialogueRepository extends ServiceEntityRepository
 
         return (int) ($result ?? -1);
     }
+
+    public function deleteByGeneration(ScriptGeneration $generation): void
+    {
+        $this->createQueryBuilder('d')
+            ->delete()
+            ->where('d.scriptGeneration = :generation')
+            ->setParameter('generation', $generation)
+            ->getQuery()
+            ->execute();
+    }
 }

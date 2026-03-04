@@ -71,6 +71,8 @@ front/app/
 │   └── scriptGenerations/
 │       ├── scriptGenerationQueryKeys.ts
 │       ├── useCreateScriptGeneration.ts  ← POST, returns ScriptGeneration
+│       ├── useUpdateScriptGeneration.ts  ← PATCH /{uuid}, resets + re-dispatches existing generation
+│       ├── useDeleteScriptGeneration.ts  ← DELETE /{uuid}, removes generation and its parts
 │       ├── useListScriptGenerations.ts   ← GET, returns ScriptGeneration[] (all generations for a script)
 │       ├── useLatestScriptGeneration.ts  ← derives from useListScriptGenerations (first item)
 │       └── useShowScriptGeneration.ts    ← GET with polling (refetchInterval: 2s)
@@ -106,7 +108,7 @@ front/app/
 1. User clicks sparkle icon in `ScriptMetaHeader` → toggles `GenerateScriptPanel` via shared `scriptRightPanelStore`
 2. User fills brief (topic required, goal required, opening style required, duration required)
 3. User optionally toggles skill modules and configures extra inputs (CTA type, retention cue type, etc.)
-4. User clicks "Générer le script" → `useCreateScriptGeneration` fires
+4. User clicks "Générer le script" → if `focusedGenerationUuid` is set, `useUpdateScriptGeneration` fires (PATCH — resets and re-dispatches the existing generation); otherwise `useCreateScriptGeneration` fires (POST — creates a new one)
 5. On success, `activeGenerationUuid` is stored in `scriptGenerationStore`
 6. Panel closes, `GenerationStatusBanner` appears in the editor
 7. `useShowScriptGeneration` polls every 2 seconds while status is `pending` or `processing`

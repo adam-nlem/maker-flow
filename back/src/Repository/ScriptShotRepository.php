@@ -89,4 +89,14 @@ class ScriptShotRepository extends ServiceEntityRepository
 
         return (int) ($result ?? -1);
     }
+
+    public function deleteByGeneration(ScriptGeneration $generation): void
+    {
+        $this->createQueryBuilder('sh')
+            ->delete()
+            ->where('sh.scriptGeneration = :generation')
+            ->setParameter('generation', $generation)
+            ->getQuery()
+            ->execute();
+    }
 }
