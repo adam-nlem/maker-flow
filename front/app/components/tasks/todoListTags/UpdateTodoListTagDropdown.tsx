@@ -7,6 +7,7 @@ import type { TodoListTag } from "~/models/TodoListTag";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { useDeleteTodoListTag } from "~/hooks/api/todoListTags/useDeleteTodoListTag";
+import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 
 interface UpdateTodoListTagDropdownProps {
     tag: TodoListTag;
@@ -20,6 +21,7 @@ export default function UpdateTodoListTagDropdown({ tag, onClose, onTagDeleted }
 
     const { updateTodoListTag, isPending: isUpdating } = useUpdateTodoListTag();
     const { deleteTodoListTag, isPending: isDeleting } = useDeleteTodoListTag();
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -64,17 +66,25 @@ export default function UpdateTodoListTagDropdown({ tag, onClose, onTagDeleted }
                 Enregistrer
             </Button>
 
-            <SimpleTextButton onClick={async () => {
-                await deleteTodoListTag(tag.uuid);
-                onTagDeleted(tag.uuid);
-                onClose();
-            }}
-                hoverColor={"hover:text-danger"} children={
-                    <>
-                        <TrashIcon className="size-3.5" strokeWidth={2} />
-                        <p>Supprimer</p>
-                    </>
-                } />
+            <SimpleTextButton
+                onClick={() => setShowDeleteConfirm(true)}
+                hoverColor={"hover:text-danger"}
+            >
+                <TrashIcon className="size-3.5" strokeWidth={2} />
+                <p>Supprimer</p>
+            </SimpleTextButton>
+
+            <ConfirmDeleteDialog
+                isOpen={showDeleteConfirm}
+                onClose={() => setShowDeleteConfirm(false)}
+                onConfirm={async () => {
+                    await deleteTodoListTag(tag.uuid);
+                    onTagDeleted(tag.uuid);
+                    onClose();
+                }}
+                isPending={isDeleting}
+                message="Êtes-vous sûr de vouloir supprimer ce tag ? Cette action est irréversible."
+            />
         </div>
     );
 }

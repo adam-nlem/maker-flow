@@ -17,6 +17,7 @@ import type { TodoListTag } from "~/models/TodoListTag";
 import AddDueDateDropdown from "./AddDueDateDropdown";
 import { useDeleteTodoListTask } from "~/hooks/api/todoListTasks/useDeleteTodoListTask";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 
 interface DetailTodoListTaskModalProps {
     todoListUuid: string;
@@ -36,6 +37,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
 
     const [showTagsDropdown, setShowTagsDropdown] = useState(false);
     const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const { updateTodoListTask } = useUpdateTodoListTask()
     const { deleteTodoListTask } = useDeleteTodoListTask()
@@ -71,6 +73,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
     }
 
     return (
+        <>
         <ModalOverlay isOpen={showModal} onClose={handleClose} className="justify-center items-center">
             <div className="border rounded-xl border-light-gray w-1/2 h-3/4 flex flex-col min-h-0 min-w-0 gap-5 shadow-lg bg-clear"
                 onClick={(e) => e.stopPropagation()}
@@ -89,16 +92,13 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
-                        <SimpleTextButton onClick={async () => {
-                            await deleteTodoListTask({ taskUuid: task.uuid, todoListUuid });
-                            onTaskDeleted();
-                        }}
-                            hoverColor={"hover:text-danger"} children={
-                                <>
-                                    <TrashIcon className="size-3.5" strokeWidth={2} />
-                                    <p>Supprimer</p>
-                                </>
-                            } />
+                        <SimpleTextButton
+                            onClick={() => setShowDeleteConfirm(true)}
+                            hoverColor={"hover:text-danger"}
+                        >
+                            <TrashIcon className="size-3.5" strokeWidth={2} />
+                            <p>Supprimer</p>
+                        </SimpleTextButton>
                     </div>
 
                     <p className="text-body-xs mb-1.5">Crée le {task.createdAt.toLocaleDateString('fr-FR')} à {task.createdAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}{task.updatedAt && ` • Modifié le ${task.updatedAt.toLocaleDateString('fr-FR')} à ${task.updatedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`}</p>
@@ -245,5 +245,16 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                 </div>
             </div>
         </ModalOverlay>
+
+        <ConfirmDeleteDialog
+            isOpen={showDeleteConfirm}
+            onClose={() => setShowDeleteConfirm(false)}
+            onConfirm={async () => {
+                await deleteTodoListTask({ taskUuid: task.uuid, todoListUuid });
+                onTaskDeleted();
+            }}
+            message="Êtes-vous sûr de vouloir supprimer cette tâche ? Cette action est irréversible."
+        />
+        </>
     );
 }

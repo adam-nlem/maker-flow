@@ -1,4 +1,5 @@
 import ModalOverlay from "~/components/ui/ModalOverlay";
+import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { ChevronRightIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
 import { Input } from "~/components/ui/Input";
@@ -106,44 +107,30 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                     </Button>
                 </form>
                 <div className="w-full flex items-center">
-                    {showDeleteConfirmation ?
-                        <div className=" flex flex-col w-full items-center gap-2">
-                            <p className="text-body-xs text-center">Êtes-vous sûr de vouloir supprimer ce projet ? <br /> Cette action est irréversible.</p>
-                            <div className="flex flex-row w-full justify-center items-center gap-3">
-                                <Button
-                                    width="w-1/5"
-                                    isLoading={isDeleting}
-                                    disabled={isDeleting}
-                                    onClick={() => setShowDeleteConfirmation(false)}
-                                >
-                                    Annuler
-                                </Button>
-                                <Button
-                                    width="w-1/5"
-                                    style="danger"
-                                    isLoading={isDeleting}
-                                    disabled={isDeleting}
-                                    onClick={async () => {
-                                        await deleteProject(project.uuid);
-                                        onClose();
-                                    }}
-                                >
-                                    Supprimer
-                                </Button>
-                            </div>
-                        </div> : <Button
-                            width="w-1/2"
-                            style="danger"
-                            isLoading={isDeleting}
-                            disabled={isDeleting}
-                            onClick={() => setShowDeleteConfirmation(true)}
-                        >
-                            <div className="flex flex-row justify-center items-center gap-3">
-                                <p className="text-sm">Supprimer le Projet</p>
-                                <TrashIcon className="size-4 text-clear" strokeWidth={2} />
-                            </div>
-                        </Button>}
+                    <Button
+                        width="w-1/2"
+                        style="danger"
+                        isLoading={isDeleting}
+                        disabled={isDeleting}
+                        onClick={() => setShowDeleteConfirmation(true)}
+                    >
+                        <div className="flex flex-row justify-center items-center gap-3">
+                            <p className="text-sm">Supprimer le Projet</p>
+                            <TrashIcon className="size-4 text-clear" strokeWidth={2} />
+                        </div>
+                    </Button>
                 </div>
+
+                <ConfirmDeleteDialog
+                    isOpen={showDeleteConfirmation}
+                    onClose={() => setShowDeleteConfirmation(false)}
+                    onConfirm={async () => {
+                        await deleteProject(project.uuid);
+                        onClose();
+                    }}
+                    isPending={isDeleting}
+                    message="Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible."
+                />
 
             </div>
         </ModalOverlay>

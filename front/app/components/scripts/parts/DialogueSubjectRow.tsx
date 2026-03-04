@@ -5,6 +5,7 @@ import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { useUpdateDialogueSubject } from "~/hooks/api/dialogueSubjects/useUpdateDialogueSubject";
 import { useDeleteDialogueSubject } from "~/hooks/api/dialogueSubjects/useDeleteDialogueSubject";
+import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 
 interface DialogueSubjectRowProps {
     subject: DialogueSubject;
@@ -14,6 +15,7 @@ interface DialogueSubjectRowProps {
 export default function DialogueSubjectRow({ subject, scriptUuid }: DialogueSubjectRowProps) {
     const [speaker, setSpeaker] = useState(subject.speaker);
     const [content, setContent] = useState(subject.content);
+    const [showConfirm, setShowConfirm] = useState(false);
 
     const { updateDialogueSubject } = useUpdateDialogueSubject();
     const { deleteDialogueSubject, isPending: isDeleting } = useDeleteDialogueSubject();
@@ -53,12 +55,20 @@ export default function DialogueSubjectRow({ subject, scriptUuid }: DialogueSubj
                 />
             </div>
             <button
-                onClick={() => deleteDialogueSubject({ subjectUuid: subject.uuid, scriptUuid })}
+                onClick={() => setShowConfirm(true)}
                 disabled={isDeleting}
                 className="shrink-0 mt-1 text-gray hover:text-danger cursor-pointer opacity-0 group-hover:opacity-100 transition"
             >
                 <TrashIcon className="size-3.5" strokeWidth={2} />
             </button>
+
+            <ConfirmDeleteDialog
+                isOpen={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirm={() => deleteDialogueSubject({ subjectUuid: subject.uuid, scriptUuid })}
+                isPending={isDeleting}
+                message="Êtes-vous sûr de vouloir supprimer cet intervenant ? Cette action est irréversible."
+            />
         </div>
     );
 }

@@ -1,4 +1,5 @@
 import ModalOverlay from "~/components/ui/ModalOverlay";
+import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import type { TodoList } from "~/models/TodoList";
 import { ChevronRightIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
@@ -35,7 +36,7 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose }: Up
 
     return (
         <ModalOverlay isOpen={showModal} onClose={onClose} className="justify-center items-center">
-            <div className="border rounded-xl border-light-gray w-[500px] h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
+            <div className="border rounded-xl border-light-gray w-125 h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
                 <h1 className="text-heading-lg">
                     Modifier la Todo List
                 </h1>
@@ -66,44 +67,30 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose }: Up
                     </Button>
                 </form>
                 <div className="w-full flex items-center">
-                    {showDeleteConfirmation ?
-                        <div className=" flex flex-col w-full items-center gap-2">
-                            <p className="text-body-xs text-center">Êtes-vous sûr de vouloir supprimer cette todo list ? <br /> Cette action est irréversible.</p>
-                            <div className="flex flex-row w-full justify-center items-center gap-3">
-                                <Button
-                                    width="w-1/5"
-                                    isLoading={isDeleting}
-                                    disabled={isDeleting}
-                                    onClick={() => setShowDeleteConfirmation(false)}
-                                >
-                                    Annuler
-                                </Button>
-                                <Button
-                                    width="w-1/5"
-                                    style="danger"
-                                    isLoading={isDeleting}
-                                    disabled={isDeleting}
-                                    onClick={async () => {
-                                        await deleteTodoList(todoList.uuid);
-                                        onClose();
-                                    }}
-                                >
-                                    Supprimer
-                                </Button>
-                            </div>
-                        </div> : <Button
-                            width="w-1/2"
-                            style="danger"
-                            isLoading={isDeleting}
-                            disabled={isDeleting}
-                            onClick={() => setShowDeleteConfirmation(true)}
-                        >
-                            <div className="flex flex-row justify-center items-center gap-3">
-                                <p className="text-sm">Supprimer la Todo List</p>
-                                <TrashIcon className="size-4 text-clear" strokeWidth={2} />
-                            </div>
-                        </Button>}
+                    <Button
+                        width="w-1/2"
+                        style="danger"
+                        isLoading={isDeleting}
+                        disabled={isDeleting}
+                        onClick={() => setShowDeleteConfirmation(true)}
+                    >
+                        <div className="flex flex-row justify-center items-center gap-3">
+                            <p className="text-sm">Supprimer la Todo List</p>
+                            <TrashIcon className="size-4 text-clear" strokeWidth={2} />
+                        </div>
+                    </Button>
                 </div>
+
+                <ConfirmDeleteDialog
+                    isOpen={showDeleteConfirmation}
+                    onClose={() => setShowDeleteConfirmation(false)}
+                    onConfirm={async () => {
+                        await deleteTodoList(todoList.uuid);
+                        onClose();
+                    }}
+                    isPending={isDeleting}
+                    message="Êtes-vous sûr de vouloir supprimer cette todo list ? Cette action est irréversible."
+                />
 
             </div>
         </ModalOverlay>

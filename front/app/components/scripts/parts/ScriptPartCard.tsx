@@ -1,7 +1,8 @@
+import { useState } from "react";
 import type { ScriptPartType } from "~/models/enums/ScriptPartType";
 import { scriptPartTypeToIcon, scriptPartTypeToFrenchTranslation, scriptPartTypeToBgClass, scriptPartTypeToBorderClass } from "~/models/enums/ScriptPartType";
-import { useScriptEditorStore } from "~/stores/scripts/scriptEditorStore";
 import Pill from "~/components/ui/Pill";
+import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 interface ScriptPartCardProps {
@@ -23,6 +24,8 @@ export default function ScriptPartCard({
     headerActions,
     children,
 }: ScriptPartCardProps) {
+    const [showConfirm, setShowConfirm] = useState(false);
+
     return (
         <div
             {...dragHandleProps}
@@ -41,18 +44,28 @@ export default function ScriptPartCard({
                         />
                         <div className="flex items-center gap-1">
                             {headerActions}
-                            <button
-                                onClick={onDelete}
-                                className={`hover:text-danger text-xs cursor-pointer transition opacity-0 group-hover:opacity-100 ${isDeleting ? "pointer-events-none opacity-40" : ""}`}
-                            >
-                                <XMarkIcon className="size-4" strokeWidth={2} />
-                            </button>
+                            {onDelete && (
+                                <button
+                                    onClick={() => setShowConfirm(true)}
+                                    className={`hover:text-danger text-xs cursor-pointer transition opacity-0 group-hover:opacity-100 ${isDeleting ? "pointer-events-none opacity-40" : ""}`}
+                                >
+                                    <XMarkIcon className="size-4" strokeWidth={2} />
+                                </button>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
 
             {children}
+
+            <ConfirmDeleteDialog
+                isOpen={showConfirm}
+                onClose={() => setShowConfirm(false)}
+                onConfirm={onDelete!}
+                isPending={isDeleting}
+                message="Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible."
+            />
         </div>
     );
 }
