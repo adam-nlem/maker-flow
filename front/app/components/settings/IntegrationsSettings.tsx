@@ -4,11 +4,11 @@ import { useListIntegrations } from "~/hooks/api/integrations/useListIntegration
 import IntegrationSettingCard from "./integration/IntegrationSettingCard";
 import Shimmer from "~/components/ui/Shimmer";
 
-interface IntegrationSettingsProps {
+interface IntegrationsSettingsProps {
     projectUuid: string;
 }
 
-export default function IntegrationSettings({ projectUuid }: IntegrationSettingsProps) {
+export default function IntegrationsSettings({ projectUuid }: IntegrationsSettingsProps) {
     const { integrations, isLoading } = useListIntegrations({ projectUuid });
 
     return (

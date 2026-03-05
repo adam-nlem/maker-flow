@@ -3,7 +3,7 @@ import { Cog6ToothIcon, FolderIcon, GlobeAltIcon, UserCircleIcon, CreditCardIcon
 
 export enum SettingsSection {
     General = 'general',
-    Project = 'project',
+    Projects = 'projects',
     Integration = 'integration',
     CreatorProfile = 'creator_profile',
     Subscription = 'subscription',
@@ -13,7 +13,7 @@ export const settingsSectionOptions = Object.values(SettingsSection);
 
 export const settingsSectionToFrenchTranslation: Record<SettingsSection, string> = {
     [SettingsSection.General]: "Général",
-    [SettingsSection.Project]: "Projet",
+    [SettingsSection.Projects]: "Projets",
     [SettingsSection.Integration]: "Réseaux sociaux",
     [SettingsSection.CreatorProfile]: "Profil créateur",
     [SettingsSection.Subscription]: "Abonnement",
@@ -21,7 +21,7 @@ export const settingsSectionToFrenchTranslation: Record<SettingsSection, string>
 
 export const settingsSectionToIcon: Record<SettingsSection, ComponentType<SVGProps<SVGSVGElement>>> = {
     [SettingsSection.General]: Cog6ToothIcon,
-    [SettingsSection.Project]: FolderIcon,
+    [SettingsSection.Projects]: FolderIcon,
     [SettingsSection.Integration]: GlobeAltIcon,
     [SettingsSection.CreatorProfile]: UserCircleIcon,
     [SettingsSection.Subscription]: CreditCardIcon,
@@ -29,7 +29,7 @@ export const settingsSectionToIcon: Record<SettingsSection, ComponentType<SVGPro
 
 export const settingsSectionToPath: Record<SettingsSection, string> = {
     [SettingsSection.General]: "general",
-    [SettingsSection.Project]: "project",
+    [SettingsSection.Projects]: "projects",
     [SettingsSection.Integration]: "integration",
     [SettingsSection.CreatorProfile]: "creator-profile",
     [SettingsSection.Subscription]: "subscription",

@@ -294,6 +294,38 @@ Displays a project in a tile format (used in sidebar and selection modal).
 
 ---
 
+### `ProjectSettingsCard`
+
+**Location:** `front/app/components/settings/project/ProjectSettingsCard.tsx`
+
+Card used in the Project Settings page to display and manage a single project.
+
+**Props:**
+| Prop | Type | Required | Description |
+|------|------|----------|-------------|
+| `project` | `Project` | Yes | Project to display |
+
+**Features:**
+- Displays name, description (if set), type chips, and creation date
+- Pencil icon → opens `UpdateProjectModal`
+- Trash icon → opens `ConfirmDeleteDialog`, then calls `useDeleteProject`
+
+---
+
+### `ProjectSettings`
+
+**Location:** `front/app/components/settings/ProjectSettings.tsx`
+
+Settings page listing all of the user's projects. Accessible at `/settings/project`.
+
+**Features:**
+- Lists all projects via `useListPaginatedProjects()`
+- "Nouveau Projet" button in the header → opens `CreateProjectModal` (local state)
+- Shows shimmer skeletons while loading
+- Each project rendered as a `ProjectSettingsCard`
+
+---
+
 ## Integration with SideBar
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/sidebar/SideBar.tsx`

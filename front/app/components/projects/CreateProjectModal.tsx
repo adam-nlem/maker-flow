@@ -3,7 +3,7 @@ import { Input } from "~/components/ui/Input";
 import { ProjectType, projectTypeOptions, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
 import { Button } from "~/components/ui/Button";
 import { TextArea } from "~/components/ui/TextArea";
-import { ToggleChip } from "~/components/ui/ToggleChip";
+import Pill from "~/components/ui/Pill";
 import { StepBadge } from "~/components/ui/StepBadge";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useCreateProject } from "~/hooks/api/projects/useCreateProject";
@@ -92,11 +92,13 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
                         <h1 className="text-heading-sm">Types</h1>
                         <div className="flex flex-wrap gap-2 mt-2">
                             {projectTypeOptions.map((type) => (
-                                <ToggleChip
+                                <Pill
                                     key={type}
                                     label={projectTypeToFrenchTranslation[type]}
                                     isSelected={types.includes(type)}
-                                    onToggle={() => setTypes(prev =>
+                                    bgColorClassName="bg-primary/10"
+                                    borderColorClassName="border border-primary/30"
+                                    onClick={() => setTypes(prev =>
                                         prev.includes(type)
                                             ? prev.filter(t => t !== type)
                                             : [...prev, type]

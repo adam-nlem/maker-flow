@@ -3,8 +3,8 @@ import { Navigate, useParams } from "react-router";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import GeneralSettings from "~/components/settings/GeneralSettings";
-import ProjectSettings from "~/components/settings/ProjectSettings";
-import IntegrationSettings from "~/components/settings/IntegrationSettings";
+import ProjectsSettings from "~/components/settings/ProjectsSettings";
+import IntegrationsSettings from "~/components/settings/IntegrationsSettings";
 import CreatorProfileSettings from "~/components/settings/CreatorProfileSettings";
 import SubscriptionSettings from "~/components/settings/SubscriptionSettings";
 
@@ -19,8 +19,8 @@ export default function SettingsSectionRoute() {
 
     const sectionNodes: Record<string, ReactNode> = {
         "general": <GeneralSettings />,
-        "project": <ProjectSettings />,
-        "integration": <IntegrationSettings projectUuid={focusedProject.uuid} />,
+        "project": <ProjectsSettings />,
+        "integration": <IntegrationsSettings projectUuid={focusedProject.uuid} />,
         "creator-profile": <CreatorProfileSettings projectUuid={focusedProject.uuid} />,
         "subscription": <SubscriptionSettings />,
     };
