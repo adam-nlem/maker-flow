@@ -30,7 +30,7 @@ export const settingsSectionToIcon: Record<SettingsSection, ComponentType<SVGPro
 export const settingsSectionToPath: Record<SettingsSection, string> = {
     [SettingsSection.General]: "general",
     [SettingsSection.Projects]: "projects",
-    [SettingsSection.Integration]: "integration",
+    [SettingsSection.Integration]: "integrations",
     [SettingsSection.CreatorProfile]: "creator-profile",
     [SettingsSection.Subscription]: "subscription",
 }

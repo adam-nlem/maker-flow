@@ -13,6 +13,11 @@ export const chapterTypeToBgClass: Record<ChapterType, string> = {
     [ChapterType.OffScreen]: "bg-purple/10",
 }
 
+export const chapterTypeToBorderClass: Record<ChapterType, string> = {
+    [ChapterType.OnScreen]: "border border-blue/30",
+    [ChapterType.OffScreen]: "border border-purple/30",
+}
+
 export const chapterTypeToTextClass: Record<ChapterType, string> = {
     [ChapterType.OnScreen]: "text-blue",
     [ChapterType.OffScreen]: "text-purple",

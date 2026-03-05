@@ -15,10 +15,17 @@ export const retentionCueTypeToFrenchTranslation: Record<RetentionCueType, strin
 }
 
 export const retentionCueTypeToBgClass: Record<RetentionCueType, string> = {
-    [RetentionCueType.Question]: "bg-blue/30",
-    [RetentionCueType.Teaser]: "bg-purple/30",
-    [RetentionCueType.PatternBreak]: "bg-orange/30",
-    [RetentionCueType.Cliffhanger]: "bg-pink/30",
+    [RetentionCueType.Question]: "bg-blue/10",
+    [RetentionCueType.Teaser]: "bg-purple/10",
+    [RetentionCueType.PatternBreak]: "bg-orange/10",
+    [RetentionCueType.Cliffhanger]: "bg-pink/10",
+}
+
+export const retentionCueTypeToBorderClass: Record<RetentionCueType, string> = {
+    [RetentionCueType.Question]: "border border-blue/30",
+    [RetentionCueType.Teaser]: "border border-purple/30",
+    [RetentionCueType.PatternBreak]: "border border-orange/30",
+    [RetentionCueType.Cliffhanger]: "border border-pink/30",
 }
 
 export const retentionCueTypeToTextClass: Record<RetentionCueType, string> = {

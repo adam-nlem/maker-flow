@@ -23,15 +23,27 @@ export const toneToFrenchTranslation: Record<Tone, string> = {
 }
 
 export const toneToBgClass: Record<Tone, string> = {
-    [Tone.Calm]: "bg-blue/30",
-    [Tone.Dynamic]: "bg-yellow/30",
-    [Tone.Dramatic]: "bg-red/30",
-    [Tone.Neutral]: "bg-green/30",
-    [Tone.CasualFriendly]: "bg-purple/30",
-    [Tone.EducationalAuthoritative]: "bg-dark/30",
-    [Tone.HypeEnergetic]: "bg-orange/30",
-    [Tone.FunnySarcastic]: "bg-pink/30",
-    [Tone.StorytellingEmotional]: "bg-teal/30",
+    [Tone.Calm]: "bg-blue/10",
+    [Tone.Dynamic]: "bg-yellow/10",
+    [Tone.Dramatic]: "bg-red/10",
+    [Tone.Neutral]: "bg-green/10",
+    [Tone.CasualFriendly]: "bg-purple/10",
+    [Tone.EducationalAuthoritative]: "bg-dark/10",
+    [Tone.HypeEnergetic]: "bg-orange/10",
+    [Tone.FunnySarcastic]: "bg-pink/10",
+    [Tone.StorytellingEmotional]: "bg-teal/10",
+}
+
+export const toneToBorderClass: Record<Tone, string> = {
+    [Tone.Calm]: "border border-blue/30",
+    [Tone.Dynamic]: "border border-yellow/30",
+    [Tone.Dramatic]: "border border-red/30",
+    [Tone.Neutral]: "border border-green/30",
+    [Tone.CasualFriendly]: "border border-purple/30",
+    [Tone.EducationalAuthoritative]: "border border-dark/30",
+    [Tone.HypeEnergetic]: "border border-orange/30",
+    [Tone.FunnySarcastic]: "border border-pink/30",
+    [Tone.StorytellingEmotional]: "border border-teal/30",
 }
 
 export const toneToTextClass: Record<Tone, string> = {

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptRetentionCue } from "~/models/ScriptRetentionCue";
-import { RetentionCueType, retentionCueTypeOptions, retentionCueTypeToFrenchTranslation, retentionCueTypeToBgClass, retentionCueTypeToTextClass } from "~/models/enums/RetentionCueType";
+import { RetentionCueType, retentionCueTypeOptions, retentionCueTypeToFrenchTranslation, retentionCueTypeToBgClass, retentionCueTypeToBorderClass, retentionCueTypeToTextClass } from "~/models/enums/RetentionCueType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -49,6 +49,7 @@ export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragH
                     label={retentionCueTypeToFrenchTranslation[retentionCueType]}
                     isSelected
                     bgColorClassName={retentionCueTypeToBgClass[retentionCueType]}
+                    borderColorClassName={retentionCueTypeToBorderClass[retentionCueType]}
                     textColorClassName={retentionCueTypeToTextClass[retentionCueType]}
                 />
             ) : (
@@ -63,6 +64,7 @@ export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragH
                             label={retentionCueTypeToFrenchTranslation[retentionCueType]}
                             isSelected
                             bgColorClassName={retentionCueTypeToBgClass[retentionCueType]}
+                            borderColorClassName={retentionCueTypeToBorderClass[retentionCueType]}
                             textColorClassName={retentionCueTypeToTextClass[retentionCueType]}
                         />
                     )}
@@ -72,6 +74,7 @@ export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragH
                             isSelected
                             onClick={onSelect}
                             bgColorClassName={retentionCueTypeToBgClass[item]}
+                            borderColorClassName={retentionCueTypeToBorderClass[item]}
                             textColorClassName={retentionCueTypeToTextClass[item]}
                         /> : null
                     }}

@@ -1,6 +1,6 @@
 import { Platform, platformOptions, platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform";
-import { scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
-import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
+import { scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon, scriptStatusToBorderClass } from "~/models/enums/ScriptStatus";
+import { colorToBgClass, colorToBorderClass, colorToTextClass } from "~/models/enums/Color";
 import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
 import Pill from "~/components/ui/Pill";
@@ -59,7 +59,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
                             onClick={() => toggleStatus(status)}
                             bgColorClassName={scriptStatusToBgClass[status]}
                             textColorClassName={scriptStatusToTextClass[status]}
-                            borderColorClassName="border-light-gray"
+                            borderColorClassName={scriptStatusToBorderClass[status]}
                         />
                     ))}
                 </div>
@@ -78,7 +78,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
                                 onClick={() => toggleTag(tag.uuid)}
                                 bgColorClassName={colorToBgClass[tag.color]}
                                 textColorClassName={colorToTextClass[tag.color]}
-                                borderColorClassName="border-light-gray"
+                                borderColorClassName={colorToBorderClass[tag.color]}
                             />
                         ))}
                     </div>

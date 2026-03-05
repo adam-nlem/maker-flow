@@ -2,7 +2,7 @@ import { useState } from "react";
 import { TagIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import type { ScriptTag } from "~/models/ScriptTag";
-import { colorToBgClass, colorToTextClass, Color, colorOptions } from "~/models/enums/Color";
+import { colorToBgClass, colorToBorderClass, colorToTextClass, Color, colorOptions } from "~/models/enums/Color";
 import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
 import { useCreateScriptTag } from "~/hooks/api/scriptTags/useCreateScriptTag";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
@@ -56,6 +56,7 @@ export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props
                     label={tag.title}
                     isSelected
                     bgColorClassName={colorToBgClass[tag.color]}
+                    borderColorClassName={colorToBorderClass[tag.color]}
                     textColorClassName={colorToTextClass[tag.color]}
                     suffixIcon={isReadOnly ? undefined : XMarkIcon}
                     onSuffixClick={isReadOnly ? undefined : () => handleRemoveTag(tag.uuid)}

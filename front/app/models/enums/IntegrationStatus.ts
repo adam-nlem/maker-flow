@@ -16,6 +16,12 @@ export const integrationStatusToBgClass: Record<IntegrationStatus, string> = {
     [IntegrationStatus.Error]: "bg-danger/10",
 }
 
+export const integrationStatusToBorderClass: Record<IntegrationStatus, string> = {
+    [IntegrationStatus.Active]: "border border-primary/30",
+    [IntegrationStatus.Revoked]: "border border-yellow/30",
+    [IntegrationStatus.Error]: "border border-danger/30",
+}
+
 export const integrationStatusToTextClass: Record<IntegrationStatus, string> = {
     [IntegrationStatus.Active]: "text-primary",
     [IntegrationStatus.Revoked]: "text-yellow",

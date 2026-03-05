@@ -9,8 +9,13 @@ export const shotTypeToFrenchTranslation: Record<ShotType, string> = {
 }
 
 export const shotTypeToBgClass: Record<ShotType, string> = {
-    [ShotType.ARoll]: "bg-primary/30",
-    [ShotType.BRoll]: "bg-gray/30",
+    [ShotType.ARoll]: "bg-primary/10",
+    [ShotType.BRoll]: "bg-gray/10",
+}
+
+export const shotTypeToBorderClass: Record<ShotType, string> = {
+    [ShotType.ARoll]: "border border-primary/30",
+    [ShotType.BRoll]: "border border-gray/30",
 }
 
 export const shotTypeToTextClass: Record<ShotType, string> = {

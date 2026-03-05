@@ -19,8 +19,8 @@ export default function SettingsSectionRoute() {
 
     const sectionNodes: Record<string, ReactNode> = {
         "general": <GeneralSettings />,
-        "project": <ProjectsSettings />,
-        "integration": <IntegrationsSettings projectUuid={focusedProject.uuid} />,
+        "projects": <ProjectsSettings />,
+        "integrations": <IntegrationsSettings projectUuid={focusedProject.uuid} />,
         "creator-profile": <CreatorProfileSettings projectUuid={focusedProject.uuid} />,
         "subscription": <SubscriptionSettings />,
     };

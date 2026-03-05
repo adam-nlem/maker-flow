@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptShot } from "~/models/ScriptShot";
-import { type ShotType, shotTypeOptions, shotTypeToFrenchTranslation, shotTypeToBgClass, shotTypeToTextClass } from "~/models/enums/ShotType";
+import { type ShotType, shotTypeOptions, shotTypeToFrenchTranslation, shotTypeToBgClass, shotTypeToBorderClass, shotTypeToTextClass } from "~/models/enums/ShotType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -49,6 +49,7 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps, isRe
                     label={shotTypeToFrenchTranslation[shotType]}
                     isSelected
                     bgColorClassName={shotTypeToBgClass[shotType]}
+                    borderColorClassName={shotTypeToBorderClass[shotType]}
                     textColorClassName={shotTypeToTextClass[shotType]}
                 />
             ) : (
@@ -63,6 +64,7 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps, isRe
                             label={shotTypeToFrenchTranslation[shotType]}
                             isSelected
                             bgColorClassName={shotTypeToBgClass[shotType]}
+                            borderColorClassName={shotTypeToBorderClass[shotType]}
                             textColorClassName={shotTypeToTextClass[shotType]}
                         />
                     )}
@@ -72,6 +74,7 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps, isRe
                             isSelected
                             onClick={onSelect}
                             bgColorClassName={shotTypeToBgClass[item]}
+                            borderColorClassName={shotTypeToBorderClass[item]}
                             textColorClassName={shotTypeToTextClass[item]}
                         /> : null
                     }}

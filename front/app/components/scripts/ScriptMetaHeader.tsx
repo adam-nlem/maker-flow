@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
-import { type ScriptStatus, scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
+import { type ScriptStatus, scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToBorderClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
 import Pill from "~/components/ui/Pill";
 import { DatePicker } from "~/components/ui/DatePicker";
@@ -93,6 +93,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                             label={status ? scriptStatusToFrenchTranslation[status] : "Statut"}
                             isSelected={!!status}
                             bgColorClassName={status ? scriptStatusToBgClass[status] : ""}
+                            borderColorClassName={status ? scriptStatusToBorderClass[status] : ""}
                             textColorClassName={status ? scriptStatusToTextClass[status] : ""}
                         />
                     ) : (
@@ -108,6 +109,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                                     label={status ? scriptStatusToFrenchTranslation[status] : "Statut"}
                                     isSelected={!!status}
                                     bgColorClassName={status ? scriptStatusToBgClass[status] : ""}
+                                    borderColorClassName={status ? scriptStatusToBorderClass[status] : ""}
                                     textColorClassName={status ? scriptStatusToTextClass[status] : ""} />)
                             }
                             renderItem={({ item, isSelected, onSelect }) => {
@@ -117,6 +119,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                                     isSelected
                                     onClick={onSelect}
                                     bgColorClassName={scriptStatusToBgClass[item]}
+                                    borderColorClassName={scriptStatusToBorderClass[item]}
                                     textColorClassName={scriptStatusToTextClass[item]}
                                 /> : null
                             }}

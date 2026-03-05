@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
 import type { Integration } from "~/models/Integration";
-import { IntegrationStatus, integrationStatusToBgClass, integrationStatusToFrenchTranslation, integrationStatusToTextClass } from "~/models/enums/IntegrationStatus";
+import { IntegrationStatus, integrationStatusToBgClass, integrationStatusToBorderClass, integrationStatusToFrenchTranslation, integrationStatusToTextClass } from "~/models/enums/IntegrationStatus";
 import { type Platform, platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform";
 import { oAuthErrorCodeToFrenchTranslation } from "~/models/enums/OAuthErrorCode";
 import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
@@ -38,7 +38,7 @@ export default function IntegrationSettingCard({ projectUuid, platform, integrat
                     <h3 className="text-heading-md">{platformToFrenchTranslation[platform]}</h3>
                 </div>
                 {integration ? (
-                    <Pill isSelected label={integrationStatusToFrenchTranslation[integration.status]} textColorClassName={integrationStatusToTextClass[integration.status]} bgColorClassName={integrationStatusToBgClass[integration.status]} />
+                    <Pill isSelected label={integrationStatusToFrenchTranslation[integration.status]} textColorClassName={integrationStatusToTextClass[integration.status]} bgColorClassName={integrationStatusToBgClass[integration.status]} borderColorClassName={integrationStatusToBorderClass[integration.status]} />
                 ) : (
                     <Pill label="Non connecté" />
 

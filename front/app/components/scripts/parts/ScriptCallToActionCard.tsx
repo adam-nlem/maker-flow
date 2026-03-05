@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptCallToAction } from "~/models/ScriptCallToAction";
-import { CallToActionType, callToActionTypeOptions, callToActionTypeToFrenchTranslation, callToActionTypeToBgClass, callToActionTypeToTextClass } from "~/models/enums/CallToActionType";
+import { CallToActionType, callToActionTypeOptions, callToActionTypeToFrenchTranslation, callToActionTypeToBgClass, callToActionTypeToBorderClass, callToActionTypeToTextClass } from "~/models/enums/CallToActionType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { TextArea } from "~/components/ui/TextArea";
@@ -49,6 +49,7 @@ export default function ScriptCallToActionCard({ callToAction, scriptUuid, dragH
                     label={callToActionTypeToFrenchTranslation[callToActionType]}
                     isSelected
                     bgColorClassName={callToActionTypeToBgClass[callToActionType]}
+                    borderColorClassName={callToActionTypeToBorderClass[callToActionType]}
                     textColorClassName={callToActionTypeToTextClass[callToActionType]}
                 />
             ) : (
@@ -63,6 +64,7 @@ export default function ScriptCallToActionCard({ callToAction, scriptUuid, dragH
                             label={callToActionTypeToFrenchTranslation[callToActionType]}
                             isSelected
                             bgColorClassName={callToActionTypeToBgClass[callToActionType]}
+                            borderColorClassName={callToActionTypeToBorderClass[callToActionType]}
                             textColorClassName={callToActionTypeToTextClass[callToActionType]}
                         />
                     )}
@@ -72,6 +74,7 @@ export default function ScriptCallToActionCard({ callToAction, scriptUuid, dragH
                             isSelected
                             onClick={onSelect}
                             bgColorClassName={callToActionTypeToBgClass[item]}
+                            borderColorClassName={callToActionTypeToBorderClass[item]}
                             textColorClassName={callToActionTypeToTextClass[item]}
                         /> : null
                     }}

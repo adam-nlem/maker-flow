@@ -18,11 +18,19 @@ export const colorToTextClass: Record<Color, string> = {
 }
 
 export const colorToBgClass: Record<Color, string> = {
-    [Color.Red]: "bg-red/30",
-    [Color.Blue]: "bg-blue/30",
-    [Color.Purple]: "bg-purple/30",
-    [Color.Yellow]: "bg-yellow/30",
-    [Color.Green]: "bg-green/30",
+    [Color.Red]: "bg-red/10",
+    [Color.Blue]: "bg-blue/10",
+    [Color.Purple]: "bg-purple/10",
+    [Color.Yellow]: "bg-yellow/10",
+    [Color.Green]: "bg-green/10",
+}
+
+export const colorToBorderClass: Record<Color, string> = {
+    [Color.Red]: "border border-red/30",
+    [Color.Blue]: "border border-blue/30",
+    [Color.Purple]: "border border-purple/30",
+    [Color.Yellow]: "border border-yellow/30",
+    [Color.Green]: "border border-green/30",
 }
 
 export const colorOptions = Object.values(Color);

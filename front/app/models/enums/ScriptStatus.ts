@@ -22,9 +22,9 @@ export const scriptStatusToBgClass: Record<ScriptStatus, string> = {
 }
 
 export const scriptStatusToBorderClass: Record<ScriptStatus, string> = {
-    [ScriptStatus.Pending]: "bg-gray/30",
-    [ScriptStatus.InProgress]: "bg-yellow/30",
-    [ScriptStatus.Completed]: "bg-primary/30",
+    [ScriptStatus.Pending]: "border border-gray/30",
+    [ScriptStatus.InProgress]: "border border-yellow/30",
+    [ScriptStatus.Completed]: "border border-primary/30",
 }
 
 export const scriptStatusToTextClass: Record<ScriptStatus, string> = {

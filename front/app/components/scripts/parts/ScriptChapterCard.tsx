@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ScriptChapter } from "~/models/ScriptChapter";
-import { ChapterType, chapterTypeOptions, chapterTypeToFrenchTranslation, chapterTypeToBgClass, chapterTypeToTextClass } from "~/models/enums/ChapterType";
+import { ChapterType, chapterTypeOptions, chapterTypeToFrenchTranslation, chapterTypeToBgClass, chapterTypeToBorderClass, chapterTypeToTextClass } from "~/models/enums/ChapterType";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import { Input } from "~/components/ui/Input";
@@ -58,6 +58,7 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                     label={chapterTypeToFrenchTranslation[chapterType]}
                     isSelected
                     bgColorClassName={chapterTypeToBgClass[chapterType]}
+                    borderColorClassName={chapterTypeToBorderClass[chapterType]}
                     textColorClassName={chapterTypeToTextClass[chapterType]}
                 />
             ) : (
@@ -72,6 +73,7 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                             label={chapterTypeToFrenchTranslation[chapterType]}
                             isSelected
                             bgColorClassName={chapterTypeToBgClass[chapterType]}
+                            borderColorClassName={chapterTypeToBorderClass[chapterType]}
                             textColorClassName={chapterTypeToTextClass[chapterType]}
                         />
                     )}
@@ -81,6 +83,7 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                             isSelected
                             onClick={onSelect}
                             bgColorClassName={chapterTypeToBgClass[item]}
+                            borderColorClassName={chapterTypeToBorderClass[item]}
                             textColorClassName={chapterTypeToTextClass[item]}
                         /> : null
                     }}
