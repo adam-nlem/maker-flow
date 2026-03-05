@@ -27,7 +27,7 @@ class Integration
     #[Groups(['api_integrations_list', 'api_integrations_show'])]
     private ?Platform $platform = null;
 
-    #[ORM\Column(type: Types::TEXT)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
     private ?string $accessToken = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -134,7 +134,7 @@ class Integration
         return $this->accessToken;
     }
 
-    public function setAccessToken(string $accessToken): static
+    public function setAccessToken(?string $accessToken): static
     {
         $this->accessToken = $accessToken;
 

@@ -29,7 +29,7 @@ export default function ConfirmDeleteDialog({ isOpen, onClose, onConfirm, isPend
                         disabled={isPending}
                         onClick={onConfirm}
                     >
-                        Supprimer
+                        Continuer
                     </Button>
                 </div>
             </div>

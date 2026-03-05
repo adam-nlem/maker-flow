@@ -238,4 +238,34 @@ final class IntegrationController extends AbstractController
             status: Response::HTTP_OK
         );
     }
+
+    #[Route('/{integrationUuid}/tokens', name: 'api_integrations_revoke_tokens', methods: ['DELETE'])]
+    public function revokeTokens(string $integrationUuid, IntegrationRepository $integrationRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $integration = $integrationRepository->getByUuidAndUser($integrationUuid, $user);
+
+        if ($integration === null) {
+            return $this->json(
+                data: ["message" => "You don't have any integration with this uuid"],
+                status: Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $integration
+            ->setAccessToken(null)
+            ->setRefreshToken(null)
+            ->setRefreshTokenExpiresAt(null)
+            ->setExpiresAt(null)
+            ->setStatus(IntegrationStatus::Revoked);
+
+        $integrationRepository->save($integration, true);
+
+        return $this->json(
+            data: ["message" => "Integration tokens revoked successfully"],
+            status: Response::HTTP_OK
+        );
+    }
 }

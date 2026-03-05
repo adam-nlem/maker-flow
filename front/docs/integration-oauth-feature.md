@@ -712,4 +712,54 @@ const iconUrl = platformToIcon[platform] ?? PLATFORM_PLACEHOLDER_ICON;
 
 **Notes:**
 - No network request — icons are bundled with the frontend static assets
-- Used by `IntegrationCard`, `IntegrationTile`, `CreateIntegrationCard`, and `ScriptPlatformsRow`
+- Used by `IntegrationCard`, `IntegrationTile`, `CreateIntegrationCard`, `ScriptPlatformsRow`, and `IntegrationSettingCard`
+
+---
+
+## Integration Settings Page
+
+The `/settings/integration` route allows users to manage their social media connections from a dedicated settings section.
+
+### Location
+- **Page component:** `front/app/components/settings/IntegrationSettings.tsx`
+- **Card component:** `front/app/components/settings/integration/IntegrationSettingCard.tsx`
+- **Delete hook:** `front/app/hooks/api/integrations/useDeleteIntegration.ts`
+- **Route wrapper:** `IntegrationSettingsWrapper` in `front/app/routes/settings.section.tsx`
+
+### Architecture
+
+Integrations are per-project. `IntegrationSettingsWrapper` resolves the focused project UUID and passes it to `IntegrationSettings`, which then renders one `IntegrationSettingCard` per platform.
+
+```
+settings.section.tsx
+  └── IntegrationSettingsWrapper  (resolves projectUuid from focused project)
+        └── IntegrationSettings   (lists all platforms)
+              └── IntegrationSettingCard × 3  (one per platform)
+```
+
+### IntegrationSettingCard
+
+Each card shows:
+- Platform icon + name + status badge (Connecté / Expiré / Erreur / Non connecté)
+- Connected: profile picture, display name, `@username`, last sync date
+- Disconnected: "Aucun compte connecté."
+- Actions: `[Déconnecter]` (with confirm dialog) and/or `[Connecter / Reconnecter]`
+
+**Status badge classes:**
+| Status | Classes |
+|---|---|
+| `Active` | `bg-primary/10 text-primary` |
+| `Revoked` | `bg-yellow/10 text-yellow` |
+| `Error` | `bg-danger/10 text-danger` |
+| No integration | `bg-light-gray text-gray` |
+
+**Reconnect logic:** The reconnect button is shown when there is no integration OR when the integration status is not `Active` (i.e., `Revoked` or `Error`). Disconnect is available whenever an integration exists.
+
+### useDeleteIntegration
+
+```ts
+const { deleteIntegration, isPending } = useDeleteIntegration({ projectUuid });
+await deleteIntegration(integrationUuid);
+```
+
+Calls `DELETE /api/integrations/{integrationUuid}` and invalidates `integrationQueryKeys.list(projectUuid)` on success.

@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import type { ReactNode } from "react";
 import { Navigate, useParams } from "react-router";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
@@ -8,32 +8,24 @@ import IntegrationSettings from "~/components/settings/IntegrationSettings";
 import CreatorProfileSettings from "~/components/settings/CreatorProfileSettings";
 import SubscriptionSettings from "~/components/settings/SubscriptionSettings";
 
-function CreatorProfileSettingsWrapper() {
+export default function SettingsSectionRoute() {
+    const { section } = useParams();
     const { projects } = useListPaginatedProjects();
     const { focusedProjectUuid } = useSelectFocusedProject({ projects });
     const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null;
 
+    if (!section) return <Navigate to="/settings/general" replace />;
     if (!focusedProject) return null;
 
-    return <CreatorProfileSettings projectUuid={focusedProject.uuid} />;
-}
+    const sectionNodes: Record<string, ReactNode> = {
+        "general": <GeneralSettings />,
+        "project": <ProjectSettings />,
+        "integration": <IntegrationSettings projectUuid={focusedProject.uuid} />,
+        "creator-profile": <CreatorProfileSettings projectUuid={focusedProject.uuid} />,
+        "subscription": <SubscriptionSettings />,
+    };
 
-const sectionComponents: Record<string, ComponentType> = {
-    "general": GeneralSettings,
-    "project": ProjectSettings,
-    "integration": IntegrationSettings,
-    "creator-profile": CreatorProfileSettingsWrapper,
-    "subscription": SubscriptionSettings,
-};
-
-export default function SettingsSectionRoute() {
-    const { section } = useParams();
-
-    if (!section) return <Navigate to="/settings/general" replace />;
-
-    const Component = sectionComponents[section];
-
-    if (!Component) return <Navigate to="/settings/general" replace />;
-
-    return <Component />;
+    const node = sectionNodes[section];
+    if (!node) return <Navigate to="/settings/general" replace />;
+    return node;
 }

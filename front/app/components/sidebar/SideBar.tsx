@@ -121,13 +121,13 @@ export default function SideBar() {
               isSelected={location.pathname === '/'}
               onClick={() => navigate('/')}
             />
-            <IconWithTextTile
+            {/* <IconWithTextTile
               icon={location.pathname === '/tasks' ? GlobeEuropeAfricaIconSolid : GlobeEuropeAfricaIcon}
               label="Veille"
               isExpanded={isExpanded}
               isSelected={location.pathname === '/tasks'}
               onClick={() => navigate('/tasks')}
-            />
+            /> */}
             <IconWithTextTile
               icon={location.pathname.startsWith('/scripts') ? ClipboardDocumentCheckIconSolid : ClipboardDocumentCheckIcon}
               label="Script"
@@ -170,14 +170,6 @@ export default function SideBar() {
               isBold={false}
               isSelected={location.pathname.startsWith('/settings')}
               onClick={() => navigate('/settings')}
-            />
-            <IconWithTextTile
-              icon={location.pathname === '/help' ? LifebuoyIconSolid : LifebuoyIcon}
-              label="Aide"
-              isExpanded={isExpanded}
-              isBold={false}
-              isSelected={location.pathname === '/help'}
-              onClick={() => navigate('/help')}
             />
           </div>
 
