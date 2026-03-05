@@ -13,9 +13,10 @@ interface ScriptVoiceOverCardProps {
     voiceOver: ScriptVoiceOver;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
+    isReadOnly?: boolean;
 }
 
-export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleProps }: ScriptVoiceOverCardProps) {
+export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleProps, isReadOnly }: ScriptVoiceOverCardProps) {
     const [content, setContent] = useState(voiceOver.content);
     const [tone, setTone] = useState<Tone>(voiceOver.tone);
 
@@ -23,6 +24,7 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
     const { deleteScriptVoiceOver, isPending: isDeleting } = useDeleteScriptVoiceOver();
 
     const handleContentBlur = async () => {
+        if (isReadOnly) return;
         if (content.trim() !== voiceOver.content) {
             await updateScriptVoiceOver({ voiceOverUuid: voiceOver.uuid, scriptUuid, data: { content: content.trim() } });
         }
@@ -39,38 +41,48 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
         <ScriptPartCard
             partType={ScriptPartType.VoiceOver}
             dragHandleProps={dragHandleProps}
-            onDelete={() => deleteScriptVoiceOver({ voiceOverUuid: voiceOver.uuid, scriptUuid })}
+            onDelete={isReadOnly ? undefined : () => deleteScriptVoiceOver({ voiceOverUuid: voiceOver.uuid, scriptUuid })}
             isDeleting={isDeleting}
         >
-            <SelectDropdown
-                items={toneOptions}
-                selectedItemId={tone}
-                getItemId={(type) => type}
-                onSelect={(type) => handleToneChange(type)}
-                renderTrigger={({ onClick }) => (
-                    <Pill
-                        onClick={onClick}
-                        label={toneToFrenchTranslation[tone]}
-                        isSelected
-                        bgColorClassName={toneToBgClass[tone]}
-                        textColorClassName={toneToTextClass[tone]}
-                    />
-                )}
-                renderItem={({ item, isSelected, onSelect }) => {
-                    return !isSelected ? <Pill
-                        label={toneToFrenchTranslation[item]}
-                        isSelected
-                        onClick={onSelect}
-                        bgColorClassName={toneToBgClass[item]}
-                        textColorClassName={toneToTextClass[item]}
-                    /> : null
-                }}
-            />
+            {isReadOnly ? (
+                <Pill
+                    label={toneToFrenchTranslation[tone]}
+                    isSelected
+                    bgColorClassName={toneToBgClass[tone]}
+                    textColorClassName={toneToTextClass[tone]}
+                />
+            ) : (
+                <SelectDropdown
+                    items={toneOptions}
+                    selectedItemId={tone}
+                    getItemId={(type) => type}
+                    onSelect={(type) => handleToneChange(type)}
+                    renderTrigger={({ onClick }) => (
+                        <Pill
+                            onClick={onClick}
+                            label={toneToFrenchTranslation[tone]}
+                            isSelected
+                            bgColorClassName={toneToBgClass[tone]}
+                            textColorClassName={toneToTextClass[tone]}
+                        />
+                    )}
+                    renderItem={({ item, isSelected, onSelect }) => {
+                        return !isSelected ? <Pill
+                            label={toneToFrenchTranslation[item]}
+                            isSelected
+                            onClick={onSelect}
+                            bgColorClassName={toneToBgClass[item]}
+                            textColorClassName={toneToTextClass[item]}
+                        /> : null
+                    }}
+                />
+            )}
             <TextArea
                 simple
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 onBlur={handleContentBlur}
+                readOnly={isReadOnly}
                 placeholder="Contenu de la voix off..."
                 textStyle="text-sm"
                 fullWidth

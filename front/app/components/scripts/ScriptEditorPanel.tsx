@@ -15,9 +15,11 @@ import { ScriptGenerationStatus } from "~/models/enums/ScriptGenerationStatus";
 interface ScriptEditorPanelProps {
     script: Script;
     projectUuid: string;
+    isReadOnly?: boolean;
+    onOpenEditor?: () => void;
 }
 
-export default function ScriptEditorPanel({ script, projectUuid }: ScriptEditorPanelProps) {
+export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, onOpenEditor }: ScriptEditorPanelProps) {
     const focusedGenerationUuid = useScriptGenerationStore((s) => s.focusedGenerationUuid);
     const setFocusedGenerationUuid = useScriptGenerationStore((s) => s.setFocusedGenerationUuid);
     const { generations } = useListScriptGenerations({ scriptUuid: script.uuid });
@@ -26,6 +28,7 @@ export default function ScriptEditorPanel({ script, projectUuid }: ScriptEditorP
     useEffect(() => {
         if (hasInitialized.current || generations.length === 0) return;
         hasInitialized.current = true;
+        if (useScriptGenerationStore.getState().focusedGenerationUuid !== undefined) return;
         const latestCompleted = generations.find((g) => g.status === ScriptGenerationStatus.Completed);
         if (latestCompleted) {
             setFocusedGenerationUuid(latestCompleted.uuid);
@@ -41,12 +44,15 @@ export default function ScriptEditorPanel({ script, projectUuid }: ScriptEditorP
                 script={script}
                 projectUuid={projectUuid}
                 onOpenGenerateModal={() => togglePanel(ScriptRightPanel.Generate)}
+                isReadOnly={isReadOnly}
+                onOpenEditor={onOpenEditor}
             />
 
             <GenerationHistoryBar
                 scriptUuid={script.uuid}
                 selectedGenerationUuid={focusedGenerationUuid}
                 onSelectGeneration={setFocusedGenerationUuid}
+                isReadOnly={isReadOnly}
             />
 
             <GenerationStatusBanner scriptUuid={script.uuid} />
@@ -58,8 +64,8 @@ export default function ScriptEditorPanel({ script, projectUuid }: ScriptEditorP
                     <Shimmer height="h-16" width="w-full" />
                 </div>
             ) : (
-                <div className="flex-1 overflow-y-auto">
-                    <ScriptPartsList parts={parts} script={script} generationUuid={focusedGenerationUuid} />
+                <div className="flex-1 overflow-y-auto scrollbar-none">
+                    <ScriptPartsList parts={parts} script={script} generationUuid={focusedGenerationUuid} isReadOnly={isReadOnly} />
                 </div>
             )}
         </div>

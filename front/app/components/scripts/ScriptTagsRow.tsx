@@ -12,9 +12,10 @@ import Pill from "../ui/Pill";
 interface Props {
     script: Script;
     projectUuid: string;
+    isReadOnly?: boolean;
 }
 
-export default function ScriptTagsRow({ script, projectUuid }: Props) {
+export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props) {
     const [isOpen, setIsOpen] = useState(false);
     const [newTagTitle, setNewTagTitle] = useState("");
     const [newTagColor, setNewTagColor] = useState<Color>(Color.Blue);
@@ -56,12 +57,12 @@ export default function ScriptTagsRow({ script, projectUuid }: Props) {
                     isSelected
                     bgColorClassName={colorToBgClass[tag.color]}
                     textColorClassName={colorToTextClass[tag.color]}
-                    suffixIcon={XMarkIcon}
-                    onSuffixClick={() => handleRemoveTag(tag.uuid)}
+                    suffixIcon={isReadOnly ? undefined : XMarkIcon}
+                    onSuffixClick={isReadOnly ? undefined : () => handleRemoveTag(tag.uuid)}
                 />
             ))}
 
-            <div className="relative">
+            {!isReadOnly && <div className="relative">
                 <Pill
                     onClick={() => setIsOpen(!isOpen)}
                     icon={TagIcon}
@@ -113,7 +114,7 @@ export default function ScriptTagsRow({ script, projectUuid }: Props) {
                         </div>
                     </>
                 )}
-            </div>
+            </div>}
         </div>
     );
 }

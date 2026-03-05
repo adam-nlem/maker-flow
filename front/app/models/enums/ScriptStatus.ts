@@ -16,15 +16,21 @@ export const scriptStatusToFrenchTranslation: Record<ScriptStatus, string> = {
 }
 
 export const scriptStatusToBgClass: Record<ScriptStatus, string> = {
-    [ScriptStatus.Pending]: "bg-green/30",
+    [ScriptStatus.Pending]: "bg-gray/10",
+    [ScriptStatus.InProgress]: "bg-yellow/10",
+    [ScriptStatus.Completed]: "bg-primary/10",
+}
+
+export const scriptStatusToBorderClass: Record<ScriptStatus, string> = {
+    [ScriptStatus.Pending]: "bg-gray/30",
     [ScriptStatus.InProgress]: "bg-yellow/30",
-    [ScriptStatus.Completed]: "bg-purple/30",
+    [ScriptStatus.Completed]: "bg-primary/30",
 }
 
 export const scriptStatusToTextClass: Record<ScriptStatus, string> = {
-    [ScriptStatus.Pending]: "text-green",
+    [ScriptStatus.Pending]: "text-gray",
     [ScriptStatus.InProgress]: "text-yellow",
-    [ScriptStatus.Completed]: "text-purple",
+    [ScriptStatus.Completed]: "text-primary",
 }
 
 export const scriptStatusToIcon: Record<ScriptStatus, ComponentType<SVGProps<SVGSVGElement>>> = {

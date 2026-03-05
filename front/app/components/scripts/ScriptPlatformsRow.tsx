@@ -18,9 +18,10 @@ function PlatformPill({ platform, isSelected, onToggle }: { platform: Platform; 
 
 interface Props {
     script: Script;
+    isReadOnly?: boolean;
 }
 
-export default function ScriptPlatformsRow({ script }: Props) {
+export default function ScriptPlatformsRow({ script, isReadOnly }: Props) {
     const { updateScript } = useUpdateScript();
     const [localPlatforms, setLocalPlatforms] = useState<Platform[]>(script.platforms);
     const pendingMutations = useRef(0);
@@ -32,6 +33,7 @@ export default function ScriptPlatformsRow({ script }: Props) {
     }, [script.platforms]);
 
     const handleToggle = async (platform: Platform) => {
+        if (isReadOnly) return;
         const assignedPlatforms = new Set(localPlatforms);
         const newPlatforms = assignedPlatforms.has(platform)
             ? localPlatforms.filter((p) => p !== platform)

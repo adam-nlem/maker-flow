@@ -10,9 +10,10 @@ import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 interface DialogueSubjectRowProps {
     subject: DialogueSubject;
     scriptUuid: string;
+    isReadOnly?: boolean;
 }
 
-export default function DialogueSubjectRow({ subject, scriptUuid }: DialogueSubjectRowProps) {
+export default function DialogueSubjectRow({ subject, scriptUuid, isReadOnly }: DialogueSubjectRowProps) {
     const [speaker, setSpeaker] = useState(subject.speaker);
     const [content, setContent] = useState(subject.content);
     const [showConfirm, setShowConfirm] = useState(false);
@@ -21,12 +22,14 @@ export default function DialogueSubjectRow({ subject, scriptUuid }: DialogueSubj
     const { deleteDialogueSubject, isPending: isDeleting } = useDeleteDialogueSubject();
 
     const handleSpeakerBlur = async () => {
+        if (isReadOnly) return;
         if (speaker.trim() !== subject.speaker) {
             await updateDialogueSubject({ subjectUuid: subject.uuid, scriptUuid, data: { speaker: speaker.trim() } });
         }
     };
 
     const handleContentBlur = async () => {
+        if (isReadOnly) return;
         if (content.trim() !== subject.content) {
             await updateDialogueSubject({ subjectUuid: subject.uuid, scriptUuid, data: { content: content.trim() } });
         }
@@ -40,6 +43,7 @@ export default function DialogueSubjectRow({ subject, scriptUuid }: DialogueSubj
                     value={speaker}
                     onChange={(e) => setSpeaker(e.target.value)}
                     onBlur={handleSpeakerBlur}
+                    readOnly={isReadOnly}
                     placeholder="Intervenant"
                     textStyle="text-heading-sm"
                     fullWidth
@@ -49,18 +53,21 @@ export default function DialogueSubjectRow({ subject, scriptUuid }: DialogueSubj
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     onBlur={handleContentBlur}
+                    readOnly={isReadOnly}
                     placeholder="Contenu..."
                     textStyle="text-sm"
                     fullWidth
                 />
             </div>
-            <button
-                onClick={() => setShowConfirm(true)}
-                disabled={isDeleting}
-                className="shrink-0 mt-1 text-gray hover:text-danger cursor-pointer opacity-0 group-hover:opacity-100 transition"
-            >
-                <TrashIcon className="size-3.5" strokeWidth={2} />
-            </button>
+            {!isReadOnly && (
+                <button
+                    onClick={() => setShowConfirm(true)}
+                    disabled={isDeleting}
+                    className="shrink-0 mt-1 text-gray hover:text-danger cursor-pointer opacity-0 group-hover:opacity-100 transition"
+                >
+                    <TrashIcon className="size-3.5" strokeWidth={2} />
+                </button>
+            )}
 
             <ConfirmDeleteDialog
                 isOpen={showConfirm}

@@ -12,9 +12,10 @@ interface GenerationHistoryBarProps {
     scriptUuid: string;
     selectedGenerationUuid: string | undefined;
     onSelectGeneration: (generationUuid: string | undefined) => void;
+    isReadOnly?: boolean;
 }
 
-export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUuid, onSelectGeneration }: GenerationHistoryBarProps) {
+export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUuid, onSelectGeneration, isReadOnly }: GenerationHistoryBarProps) {
     const { generations, hasMore, isLoadingMore, listMore } = useListScriptGenerations({ scriptUuid });
     const { deleteScriptGeneration } = useDeleteScriptGeneration();
     const [pendingDeleteUuid, setPendingDeleteUuid] = useState<string | null>(null);
@@ -55,7 +56,7 @@ export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUui
 
     return (
         <>
-            <div ref={containerRef} className="flex flex-row items-center gap-2 px-6 py-2 border-b border-light-gray overflow-x-auto scrollbar-none">
+            <div ref={containerRef} className="shrink-0 flex flex-row items-center gap-2 px-6 py-2 border-b border-light-gray overflow-x-auto scrollbar-none">
                 <Pill
                     label="Manuel"
                     isSelected={selectedGenerationUuid === undefined}
@@ -68,12 +69,12 @@ export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUui
                         key={gen.uuid}
                         label={`${aiModelToFrenchTranslation[gen.aiModel]} - ${formatToFrenchRelative(gen.createdAt)}`}
                         icon={scriptGenerationStatusToIcon[gen.status]}
-                        suffixIcon={gen.status !== ScriptGenerationStatus.Pending && gen.status !== ScriptGenerationStatus.Processing ? XMarkIcon : undefined}
+                        suffixIcon={!isReadOnly && gen.status !== ScriptGenerationStatus.Pending && gen.status !== ScriptGenerationStatus.Processing ? XMarkIcon : undefined}
                         isSelected={selectedGenerationUuid === gen.uuid}
                         bgColorClassName={scriptGenerationStatusToBgClass[gen.status]}
                         borderColorClassName={scriptGenerationStatusToBorderClass[gen.status]}
                         onClick={() => onSelectGeneration(gen.uuid)}
-                        onSuffixClick={() => setPendingDeleteUuid(gen.uuid)}
+                        onSuffixClick={isReadOnly ? undefined : () => setPendingDeleteUuid(gen.uuid)}
                     />
                 ))}
                 <div ref={sentinelRef} className="w-1 shrink-0" />

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, SparklesIcon, SwatchIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import { type ScriptStatus, scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
@@ -16,9 +16,11 @@ interface ScriptMetaHeaderProps {
     script: Script;
     projectUuid: string;
     onOpenGenerateModal: () => void;
+    isReadOnly?: boolean;
+    onOpenEditor?: () => void;
 }
 
-export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal }: ScriptMetaHeaderProps) {
+export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal, isReadOnly, onOpenEditor }: ScriptMetaHeaderProps) {
     const [title, setTitle] = useState(script.title);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [status, setStatus] = useState<ScriptStatus | undefined>(script.status);
@@ -27,6 +29,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
     const { isExpanded, toggle } = useScriptEditorStore();
 
     const handleTitleBlur = () => {
+        if (isReadOnly) return;
         if (title.trim() !== script.title) {
             updateScript({ scriptUuid: script.uuid, data: { title: title.trim() || script.title } });
         }
@@ -50,13 +53,26 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
                     onBlur={handleTitleBlur}
+                    readOnly={isReadOnly}
                     placeholder="Titre du script"
                     textStyle="text-heading-xl"
                     fullWidth
                 />
-                <button onClick={onOpenGenerateModal} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Générer avec l'IA">
-                    <SparklesIcon className="size-5" strokeWidth={2} />
-                </button>
+                {isReadOnly ? (
+                    <Pill
+                        icon={PencilSquareIcon}
+                        label="Modifier"
+                        isSelected
+                        onClick={onOpenEditor}
+                        textColorClassName="text-primary"
+                        bgColorClassName="bg-primary/10"
+                        borderColorClassName="border border-primary/30"
+                    />
+                ) : (
+                    <button onClick={onOpenGenerateModal} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Générer avec l'IA">
+                        <SparklesIcon className="size-5" strokeWidth={2} />
+                    </button>
+                )}
                 <button onClick={toggle} className="shrink-0 text-gray hover:text-dark transition-colors cursor-pointer">
                     {isExpanded
                         ? <ChevronUpIcon className="size-5" strokeWidth={2} />
@@ -67,39 +83,49 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
 
             {isExpanded ? (
                 <div key="expanded" className="flex flex-col gap-4 animate-fade-in">
-                    <ScriptPlatformsRow script={script} />
+                    <ScriptPlatformsRow script={script} isReadOnly={isReadOnly} />
 
-                    <ScriptTagsRow script={script} projectUuid={projectUuid} />
+                    <ScriptTagsRow script={script} projectUuid={projectUuid} isReadOnly={isReadOnly} />
 
-                    <SelectDropdown
-                        items={scriptStatusOptions}
-                        selectedItemId={status}
-                        getItemId={(s) => s}
-                        onSelect={handleStatusChange}
-                        renderTrigger={({ onClick }) => (
-                            <Pill
-                                onClick={onClick}
-                                icon={status ? scriptStatusToIcon[status] : SwatchIcon}
-                                label={status ? scriptStatusToFrenchTranslation[status] : "Statut"}
-                                isSelected={!!status}
-                                bgColorClassName={status ? scriptStatusToBgClass[status] : ""}
-                                textColorClassName={status ? scriptStatusToTextClass[status] : ""} />)
-                        }
-                        renderItem={({ item, isSelected, onSelect }) => {
-                            return !isSelected ? <Pill
-                                label={scriptStatusToFrenchTranslation[item]}
-                                icon={scriptStatusToIcon[item]}
-                                isSelected
-                                onClick={onSelect}
-                                bgColorClassName={scriptStatusToBgClass[item]}
-                                textColorClassName={scriptStatusToTextClass[item]}
-                            /> : null
-                        }}
-                    />
+                    {isReadOnly ? (
+                        <Pill
+                            icon={status ? scriptStatusToIcon[status] : SwatchIcon}
+                            label={status ? scriptStatusToFrenchTranslation[status] : "Statut"}
+                            isSelected={!!status}
+                            bgColorClassName={status ? scriptStatusToBgClass[status] : ""}
+                            textColorClassName={status ? scriptStatusToTextClass[status] : ""}
+                        />
+                    ) : (
+                        <SelectDropdown
+                            items={scriptStatusOptions}
+                            selectedItemId={status}
+                            getItemId={(s) => s}
+                            onSelect={handleStatusChange}
+                            renderTrigger={({ onClick }) => (
+                                <Pill
+                                    onClick={onClick}
+                                    icon={status ? scriptStatusToIcon[status] : SwatchIcon}
+                                    label={status ? scriptStatusToFrenchTranslation[status] : "Statut"}
+                                    isSelected={!!status}
+                                    bgColorClassName={status ? scriptStatusToBgClass[status] : ""}
+                                    textColorClassName={status ? scriptStatusToTextClass[status] : ""} />)
+                            }
+                            renderItem={({ item, isSelected, onSelect }) => {
+                                return !isSelected ? <Pill
+                                    label={scriptStatusToFrenchTranslation[item]}
+                                    icon={scriptStatusToIcon[item]}
+                                    isSelected
+                                    onClick={onSelect}
+                                    bgColorClassName={scriptStatusToBgClass[item]}
+                                    textColorClassName={scriptStatusToTextClass[item]}
+                                /> : null
+                            }}
+                        />
+                    )}
 
                     <div className="relative shrink-0">
                         <Pill
-                            onClick={() => setIsDatePickerOpen(!isDatePickerOpen)}
+                            onClick={isReadOnly ? undefined : () => setIsDatePickerOpen(!isDatePickerOpen)}
                             icon={CalendarDaysIcon}
                             label={script.publishedAt
                                 ? script.publishedAt.toLocaleDateString("fr-FR",
@@ -113,7 +139,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                             isSelected={!!script.publishedAt}
                             borderColorClassName="border-light-gray" />
 
-                        {isDatePickerOpen && (
+                        {!isReadOnly && isDatePickerOpen && (
                             <>
                                 <div className="fixed inset-0 z-20" onClick={() => setIsDatePickerOpen(false)} />
                                 <div className="absolute top-full left-0 mt-2 z-30">

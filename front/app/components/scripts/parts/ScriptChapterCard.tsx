@@ -14,9 +14,10 @@ interface ScriptChapterCardProps {
     chapter: ScriptChapter;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
+    isReadOnly?: boolean;
 }
 
-export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps }: ScriptChapterCardProps) {
+export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps, isReadOnly }: ScriptChapterCardProps) {
     const [title, setTitle] = useState(chapter.title);
     const [description, setDescription] = useState(chapter.description ?? "");
     const [chapterType, setChapterType] = useState<ChapterType>(chapter.chapterType);
@@ -25,12 +26,14 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
     const { deleteScriptChapter, isPending: isDeleting } = useDeleteScriptChapter();
 
     const handleTitleBlur = async () => {
+        if (isReadOnly) return;
         if (title.trim() !== chapter.title) {
             await updateScriptChapter({ chapterUuid: chapter.uuid, scriptUuid, data: { title: title.trim() } });
         }
     };
 
     const handleDescriptionBlur = async () => {
+        if (isReadOnly) return;
         if (description.trim() !== (chapter.description ?? "")) {
             await updateScriptChapter({ chapterUuid: chapter.uuid, scriptUuid, data: { description: description.trim() || undefined } });
         }
@@ -47,38 +50,48 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
         <ScriptPartCard
             partType={ScriptPartType.Chapter}
             dragHandleProps={dragHandleProps}
-            onDelete={() => deleteScriptChapter({ chapterUuid: chapter.uuid, scriptUuid })}
+            onDelete={isReadOnly ? undefined : () => deleteScriptChapter({ chapterUuid: chapter.uuid, scriptUuid })}
             isDeleting={isDeleting}
         >
-            <SelectDropdown
-                items={chapterTypeOptions}
-                selectedItemId={chapterType}
-                getItemId={(type) => type}
-                onSelect={(type) => handleChapterTypeChange(type)}
-                renderTrigger={({ onClick }) => (
-                    <Pill
-                        onClick={onClick}
-                        label={chapterTypeToFrenchTranslation[chapterType]}
-                        isSelected
-                        bgColorClassName={chapterTypeToBgClass[chapterType]}
-                        textColorClassName={chapterTypeToTextClass[chapterType]}
-                    />
-                )}
-                renderItem={({ item, isSelected, onSelect }) => {
-                    return !isSelected ? <Pill
-                        label={chapterTypeToFrenchTranslation[item]}
-                        isSelected
-                        onClick={onSelect}
-                        bgColorClassName={chapterTypeToBgClass[item]}
-                        textColorClassName={chapterTypeToTextClass[item]}
-                    /> : null
-                }}
-            />
+            {isReadOnly ? (
+                <Pill
+                    label={chapterTypeToFrenchTranslation[chapterType]}
+                    isSelected
+                    bgColorClassName={chapterTypeToBgClass[chapterType]}
+                    textColorClassName={chapterTypeToTextClass[chapterType]}
+                />
+            ) : (
+                <SelectDropdown
+                    items={chapterTypeOptions}
+                    selectedItemId={chapterType}
+                    getItemId={(type) => type}
+                    onSelect={(type) => handleChapterTypeChange(type)}
+                    renderTrigger={({ onClick }) => (
+                        <Pill
+                            onClick={onClick}
+                            label={chapterTypeToFrenchTranslation[chapterType]}
+                            isSelected
+                            bgColorClassName={chapterTypeToBgClass[chapterType]}
+                            textColorClassName={chapterTypeToTextClass[chapterType]}
+                        />
+                    )}
+                    renderItem={({ item, isSelected, onSelect }) => {
+                        return !isSelected ? <Pill
+                            label={chapterTypeToFrenchTranslation[item]}
+                            isSelected
+                            onClick={onSelect}
+                            bgColorClassName={chapterTypeToBgClass[item]}
+                            textColorClassName={chapterTypeToTextClass[item]}
+                        /> : null
+                    }}
+                />
+            )}
             <Input
                 simple
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 onBlur={handleTitleBlur}
+                readOnly={isReadOnly}
                 placeholder="Titre du chapitre"
                 textStyle="text-heading-md"
                 fullWidth
@@ -88,6 +101,7 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 onBlur={handleDescriptionBlur}
+                readOnly={isReadOnly}
                 placeholder="Description (optionnel)"
                 textStyle="text-sm"
                 fullWidth

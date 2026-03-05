@@ -13,9 +13,10 @@ interface ScriptShotCardProps {
     shot: ScriptShot;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
+    isReadOnly?: boolean;
 }
 
-export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: ScriptShotCardProps) {
+export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps, isReadOnly }: ScriptShotCardProps) {
     const [content, setContent] = useState(shot.content);
     const [shotType, setShotType] = useState<ShotType>(shot.shotType);
 
@@ -23,6 +24,7 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
     const { deleteScriptShot, isPending: isDeleting } = useDeleteScriptShot();
 
     const handleContentBlur = async () => {
+        if (isReadOnly) return;
         if (content.trim() !== shot.content) {
             await updateScriptShot({ shotUuid: shot.uuid, scriptUuid, data: { content: content.trim() } });
         }
@@ -39,38 +41,48 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps }: Sc
         <ScriptPartCard
             partType={ScriptPartType.Shot}
             dragHandleProps={dragHandleProps}
-            onDelete={() => deleteScriptShot({ shotUuid: shot.uuid, scriptUuid })}
+            onDelete={isReadOnly ? undefined : () => deleteScriptShot({ shotUuid: shot.uuid, scriptUuid })}
             isDeleting={isDeleting}
         >
-            <SelectDropdown
-                items={shotTypeOptions}
-                selectedItemId={shotType}
-                getItemId={(type) => type}
-                onSelect={(type) => handleShotTypeChange(type)}
-                renderTrigger={({ onClick }) => (
-                    <Pill
-                        onClick={onClick}
-                        label={shotTypeToFrenchTranslation[shotType]}
-                        isSelected
-                        bgColorClassName={shotTypeToBgClass[shotType]}
-                        textColorClassName={shotTypeToTextClass[shotType]}
-                    />
-                )}
-                renderItem={({ item, isSelected, onSelect }) => {
-                    return !isSelected ? <Pill
-                        label={shotTypeToFrenchTranslation[item]}
-                        isSelected
-                        onClick={onSelect}
-                        bgColorClassName={shotTypeToBgClass[item]}
-                        textColorClassName={shotTypeToTextClass[item]}
-                    /> : null
-                }}
-            />
+            {isReadOnly ? (
+                <Pill
+                    label={shotTypeToFrenchTranslation[shotType]}
+                    isSelected
+                    bgColorClassName={shotTypeToBgClass[shotType]}
+                    textColorClassName={shotTypeToTextClass[shotType]}
+                />
+            ) : (
+                <SelectDropdown
+                    items={shotTypeOptions}
+                    selectedItemId={shotType}
+                    getItemId={(type) => type}
+                    onSelect={(type) => handleShotTypeChange(type)}
+                    renderTrigger={({ onClick }) => (
+                        <Pill
+                            onClick={onClick}
+                            label={shotTypeToFrenchTranslation[shotType]}
+                            isSelected
+                            bgColorClassName={shotTypeToBgClass[shotType]}
+                            textColorClassName={shotTypeToTextClass[shotType]}
+                        />
+                    )}
+                    renderItem={({ item, isSelected, onSelect }) => {
+                        return !isSelected ? <Pill
+                            label={shotTypeToFrenchTranslation[item]}
+                            isSelected
+                            onClick={onSelect}
+                            bgColorClassName={shotTypeToBgClass[item]}
+                            textColorClassName={shotTypeToTextClass[item]}
+                        /> : null
+                    }}
+                />
+            )}
             <TextArea
                 simple
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 onBlur={handleContentBlur}
+                readOnly={isReadOnly}
                 placeholder="Description du plan..."
                 textStyle="text-sm"
                 fullWidth

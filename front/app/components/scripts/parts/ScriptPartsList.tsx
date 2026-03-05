@@ -36,14 +36,16 @@ interface ScriptPartsListProps {
     parts: ScriptPart[];
     script: Script;
     generationUuid?: string;
+    isReadOnly?: boolean;
 }
 
 interface DraggablePartProps {
     part: ScriptPart;
     scriptUuid: string;
+    isReadOnly?: boolean;
 }
 
-function DraggablePart({ part, scriptUuid }: DraggablePartProps) {
+function DraggablePart({ part, scriptUuid, isReadOnly }: DraggablePartProps) {
     const { attributes, listeners, setNodeRef: setDragRef, isDragging } = useDraggable({ id: part.uuid });
     const { setNodeRef: setDropRef } = useDroppable({ id: part.uuid });
 
@@ -52,7 +54,7 @@ function DraggablePart({ part, scriptUuid }: DraggablePartProps) {
             ref={(node) => { setDragRef(node); setDropRef(node); }}
             className={isDragging ? "opacity-40" : ""}
         >
-            {renderPartCard(part, scriptUuid, { ...attributes, ...listeners })}
+            {renderPartCard(part, scriptUuid, isReadOnly ? undefined : { ...attributes, ...listeners }, isReadOnly)}
         </div>
     );
 }
@@ -66,28 +68,28 @@ function DroppableZone({ id, children }: { id: string; children: React.ReactNode
     );
 }
 
-function renderPartCard(part: ScriptPart, scriptUuid: string, dragHandleProps?: Record<string, unknown>) {
+function renderPartCard(part: ScriptPart, scriptUuid: string, dragHandleProps?: Record<string, unknown>, isReadOnly?: boolean) {
     switch (part.type) {
         case ScriptPartType.Chapter:
-            return <ScriptChapterCard chapter={part as ScriptChapter} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+            return <ScriptChapterCard chapter={part as ScriptChapter} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} isReadOnly={isReadOnly} />;
         case ScriptPartType.VoiceOver:
-            return <ScriptVoiceOverCard voiceOver={part as ScriptVoiceOver} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+            return <ScriptVoiceOverCard voiceOver={part as ScriptVoiceOver} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} isReadOnly={isReadOnly} />;
         case ScriptPartType.Dialogue:
-            return <ScriptDialogueCard dialogue={part as ScriptDialogue} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+            return <ScriptDialogueCard dialogue={part as ScriptDialogue} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} isReadOnly={isReadOnly} />;
         case ScriptPartType.Shot:
-            return <ScriptShotCard shot={part as ScriptShot} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+            return <ScriptShotCard shot={part as ScriptShot} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} isReadOnly={isReadOnly} />;
         case ScriptPartType.Text:
-            return <ScriptTextCard text={part as ScriptText} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+            return <ScriptTextCard text={part as ScriptText} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} isReadOnly={isReadOnly} />;
         case ScriptPartType.CallToAction:
-            return <ScriptCallToActionCard callToAction={part as ScriptCallToAction} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+            return <ScriptCallToActionCard callToAction={part as ScriptCallToAction} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} isReadOnly={isReadOnly} />;
         case ScriptPartType.RetentionCue:
-            return <ScriptRetentionCueCard retentionCue={part as ScriptRetentionCue} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} />;
+            return <ScriptRetentionCueCard retentionCue={part as ScriptRetentionCue} scriptUuid={scriptUuid} dragHandleProps={dragHandleProps} isReadOnly={isReadOnly} />;
         case ScriptPartType.Hook:
-            return <ScriptHookCard hook={part as ScriptHook} scriptUuid={scriptUuid} />;
+            return <ScriptHookCard hook={part as ScriptHook} scriptUuid={scriptUuid} isReadOnly={isReadOnly} />;
     }
 }
 
-export default function ScriptPartsList({ parts, script, generationUuid }: ScriptPartsListProps) {
+export default function ScriptPartsList({ parts, script, generationUuid, isReadOnly }: ScriptPartsListProps) {
     const scriptUuid = script.uuid;
 
     const hookPart = parts.find((p) => p.type === "hook") as ScriptHook | undefined;
@@ -118,7 +120,7 @@ export default function ScriptPartsList({ parts, script, generationUuid }: Scrip
     const handleDragEnd = async (event: DragEndEvent) => {
         const { active, over } = event;
         setActivePart(null);
-        if (!over || active.id === over.id) return;
+        if (isReadOnly || !over || active.id === over.id) return;
 
         const oldIndex = localParts.findIndex((p) => p.uuid === active.id);
         const newIndex = localParts.findIndex((p) => p.uuid === over.id);
@@ -141,18 +143,18 @@ export default function ScriptPartsList({ parts, script, generationUuid }: Scrip
             <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-none">
                 {hookPart && (
                     <div className="mb-3">
-                        <ScriptHookCard key={`${hookPart.uuid}-${hookPart.hookTemplate?.uuid}`} hook={hookPart} scriptUuid={scriptUuid} />
+                        <ScriptHookCard key={`${hookPart.uuid}-${hookPart.hookTemplate?.uuid}`} hook={hookPart} scriptUuid={scriptUuid} isReadOnly={isReadOnly} />
                     </div>
                 )}
 
                 <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
                     <DroppableZone id="parts-list">
                         {localParts.map((part) => (
-                            <DraggablePart key={part.uuid} part={part} scriptUuid={scriptUuid} />
+                            <DraggablePart key={part.uuid} part={part} scriptUuid={scriptUuid} isReadOnly={isReadOnly} />
                         ))}
                     </DroppableZone>
 
-                    {(localParts.length === 0 || localParts[localParts.length - 1].type !== "text") && (
+                    {!isReadOnly && (localParts.length === 0 || localParts[localParts.length - 1].type !== "text") && (
                         <ScriptTextCard scriptUuid={scriptUuid} />
                     )}
 
@@ -166,9 +168,11 @@ export default function ScriptPartsList({ parts, script, generationUuid }: Scrip
                 </DndContext>
             </div>
 
-            <div className="px-6 py-4 border-t border-light-gray">
-                <AddScriptPartMenu scriptUuid={scriptUuid} generationUuid={generationUuid} hasHook={hookPart !== undefined} />
-            </div>
+            {!isReadOnly && (
+                <div className="px-6 py-4 border-t border-light-gray">
+                    <AddScriptPartMenu scriptUuid={scriptUuid} generationUuid={generationUuid} hasHook={hookPart !== undefined} />
+                </div>
+            )}
         </div>
     );
 }

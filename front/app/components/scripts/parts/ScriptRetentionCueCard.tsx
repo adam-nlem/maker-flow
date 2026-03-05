@@ -13,9 +13,10 @@ interface ScriptRetentionCueCardProps {
     retentionCue: ScriptRetentionCue;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
+    isReadOnly?: boolean;
 }
 
-export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragHandleProps }: ScriptRetentionCueCardProps) {
+export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragHandleProps, isReadOnly }: ScriptRetentionCueCardProps) {
     const [content, setContent] = useState(retentionCue.content);
     const [retentionCueType, setRetentionCueType] = useState<RetentionCueType>(retentionCue.retentionCueType);
 
@@ -23,6 +24,7 @@ export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragH
     const { deleteScriptRetentionCue, isPending: isDeleting } = useDeleteScriptRetentionCue();
 
     const handleContentBlur = async () => {
+        if (isReadOnly) return;
         if (content.trim() !== retentionCue.content) {
             await updateScriptRetentionCue({ retentionCueUuid: retentionCue.uuid, scriptUuid, data: { content: content.trim() } });
         }
@@ -39,38 +41,48 @@ export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragH
         <ScriptPartCard
             partType={ScriptPartType.RetentionCue}
             dragHandleProps={dragHandleProps}
-            onDelete={() => deleteScriptRetentionCue({ retentionCueUuid: retentionCue.uuid, scriptUuid })}
+            onDelete={isReadOnly ? undefined : () => deleteScriptRetentionCue({ retentionCueUuid: retentionCue.uuid, scriptUuid })}
             isDeleting={isDeleting}
         >
-            <SelectDropdown
-                items={retentionCueTypeOptions}
-                selectedItemId={retentionCueType}
-                getItemId={(type) => type}
-                onSelect={(type) => handleRetentionCueTypeChange(type)}
-                renderTrigger={({ onClick }) => (
-                    <Pill
-                        onClick={onClick}
-                        label={retentionCueTypeToFrenchTranslation[retentionCueType]}
-                        isSelected
-                        bgColorClassName={retentionCueTypeToBgClass[retentionCueType]}
-                        textColorClassName={retentionCueTypeToTextClass[retentionCueType]}
-                    />
-                )}
-                renderItem={({ item, isSelected, onSelect }) => {
-                    return !isSelected ? <Pill
-                        label={retentionCueTypeToFrenchTranslation[item]}
-                        isSelected
-                        onClick={onSelect}
-                        bgColorClassName={retentionCueTypeToBgClass[item]}
-                        textColorClassName={retentionCueTypeToTextClass[item]}
-                    /> : null
-                }}
-            />
+            {isReadOnly ? (
+                <Pill
+                    label={retentionCueTypeToFrenchTranslation[retentionCueType]}
+                    isSelected
+                    bgColorClassName={retentionCueTypeToBgClass[retentionCueType]}
+                    textColorClassName={retentionCueTypeToTextClass[retentionCueType]}
+                />
+            ) : (
+                <SelectDropdown
+                    items={retentionCueTypeOptions}
+                    selectedItemId={retentionCueType}
+                    getItemId={(type) => type}
+                    onSelect={(type) => handleRetentionCueTypeChange(type)}
+                    renderTrigger={({ onClick }) => (
+                        <Pill
+                            onClick={onClick}
+                            label={retentionCueTypeToFrenchTranslation[retentionCueType]}
+                            isSelected
+                            bgColorClassName={retentionCueTypeToBgClass[retentionCueType]}
+                            textColorClassName={retentionCueTypeToTextClass[retentionCueType]}
+                        />
+                    )}
+                    renderItem={({ item, isSelected, onSelect }) => {
+                        return !isSelected ? <Pill
+                            label={retentionCueTypeToFrenchTranslation[item]}
+                            isSelected
+                            onClick={onSelect}
+                            bgColorClassName={retentionCueTypeToBgClass[item]}
+                            textColorClassName={retentionCueTypeToTextClass[item]}
+                        /> : null
+                    }}
+                />
+            )}
             <TextArea
                 simple
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 onBlur={handleContentBlur}
+                readOnly={isReadOnly}
                 placeholder="Contenu du signal de rétention..."
                 textStyle="text-sm"
                 fullWidth

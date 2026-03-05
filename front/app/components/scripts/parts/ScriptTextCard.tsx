@@ -11,9 +11,10 @@ interface ScriptTextCardProps {
     text?: ScriptText;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
+    isReadOnly?: boolean;
 }
 
-export default function ScriptTextCard({ text, scriptUuid, dragHandleProps }: ScriptTextCardProps) {
+export default function ScriptTextCard({ text, scriptUuid, dragHandleProps, isReadOnly }: ScriptTextCardProps) {
     const [content, setContent] = useState(text?.content ?? "");
 
     const { createScriptText } = useCreateScriptText();
@@ -21,6 +22,7 @@ export default function ScriptTextCard({ text, scriptUuid, dragHandleProps }: Sc
     const { deleteScriptText, isPending: isDeleting } = useDeleteScriptText();
 
     const handleBlur = async () => {
+        if (isReadOnly) return;
         if (text) {
             if (content.trim() !== text.content) {
                 await updateScriptText({ textUuid: text.uuid, scriptUuid, data: { content: content.trim() } });
@@ -38,7 +40,7 @@ export default function ScriptTextCard({ text, scriptUuid, dragHandleProps }: Sc
             partType={ScriptPartType.Text}
             dragHandleProps={dragHandleProps}
             bordered={false}
-            onDelete={text ? () => deleteScriptText({ textUuid: text.uuid, scriptUuid }) : undefined}
+            onDelete={isReadOnly ? undefined : (text ? () => deleteScriptText({ textUuid: text.uuid, scriptUuid }) : undefined)}
             isDeleting={isDeleting}
         >
             <TextArea
@@ -46,6 +48,7 @@ export default function ScriptTextCard({ text, scriptUuid, dragHandleProps }: Sc
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 onBlur={handleBlur}
+                readOnly={isReadOnly}
                 placeholder="Ecrivez ici..."
                 textStyle="text-sm"
                 fullWidth

@@ -13,9 +13,10 @@ interface ScriptDialogueCardProps {
     dialogue: ScriptDialogue;
     scriptUuid: string;
     dragHandleProps?: Record<string, unknown>;
+    isReadOnly?: boolean;
 }
 
-export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandleProps }: ScriptDialogueCardProps) {
+export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandleProps, isReadOnly }: ScriptDialogueCardProps) {
     const [title, setTitle] = useState(dialogue.title);
     const [description, setDescription] = useState(dialogue.description ?? "");
 
@@ -23,12 +24,14 @@ export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandlePro
     const { deleteScriptDialogue, isPending: isDeleting } = useDeleteScriptDialogue();
 
     const handleTitleBlur = async () => {
+        if (isReadOnly) return;
         if (title.trim() !== dialogue.title) {
             await updateScriptDialogue({ dialogueUuid: dialogue.uuid, scriptUuid, data: { title: title.trim() } });
         }
     };
 
     const handleDescriptionBlur = async () => {
+        if (isReadOnly) return;
         if (description.trim() !== (dialogue.description ?? "")) {
             await updateScriptDialogue({ dialogueUuid: dialogue.uuid, scriptUuid, data: { description: description.trim() || undefined } });
         }
@@ -38,7 +41,7 @@ export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandlePro
         <ScriptPartCard
             partType={ScriptPartType.Dialogue}
             dragHandleProps={dragHandleProps}
-            onDelete={() => deleteScriptDialogue({ dialogueUuid: dialogue.uuid, scriptUuid })}
+            onDelete={isReadOnly ? undefined : () => deleteScriptDialogue({ dialogueUuid: dialogue.uuid, scriptUuid })}
             isDeleting={isDeleting}
         >
             <Input
@@ -46,6 +49,7 @@ export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandlePro
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 onBlur={handleTitleBlur}
+                readOnly={isReadOnly}
                 placeholder="Titre du dialogue"
                 textStyle="text-heading-sm"
                 fullWidth
@@ -55,6 +59,7 @@ export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandlePro
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 onBlur={handleDescriptionBlur}
+                readOnly={isReadOnly}
                 placeholder="Description (optionnel)"
                 textStyle="text-sm"
                 fullWidth
@@ -68,15 +73,18 @@ export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandlePro
                             key={subject.uuid}
                             subject={subject}
                             scriptUuid={scriptUuid}
+                            isReadOnly={isReadOnly}
                         />
                     ))}
                 </div>
             )}
 
             {/* Add subject row */}
-            <div className={`-mx-4 ${dialogue.dialogueSubjects.length > 0 ? '' : 'border-t border-light-gray'} px-1 py-1 ${dialogue.dialogueSubjects.length === 0 ? '' : ''}`}>
-                <AddDialogueSubjectRow dialogueUuid={dialogue.uuid} scriptUuid={scriptUuid} />
-            </div>
+            {!isReadOnly && (
+                <div className={`-mx-4 ${dialogue.dialogueSubjects.length > 0 ? '' : 'border-t border-light-gray'} px-1 py-1`}>
+                    <AddDialogueSubjectRow dialogueUuid={dialogue.uuid} scriptUuid={scriptUuid} />
+                </div>
+            )}
         </ScriptPartCard>
     );
 }

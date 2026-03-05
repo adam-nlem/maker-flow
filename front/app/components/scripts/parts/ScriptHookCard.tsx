@@ -17,9 +17,10 @@ import ApplyHookTemplateModal from "../hookTemplates/ApplyHookTemplateModal";
 interface ScriptHookCardProps {
     hook: ScriptHook;
     scriptUuid: string;
+    isReadOnly?: boolean;
 }
 
-export default function ScriptHookCard({ hook, scriptUuid }: ScriptHookCardProps) {
+export default function ScriptHookCard({ hook, scriptUuid, isReadOnly }: ScriptHookCardProps) {
     const [content, setContent] = useState(hook.content);
     const [pendingTemplate, setPendingTemplate] = useState<HookTemplate | null>(null);
 
@@ -39,7 +40,7 @@ export default function ScriptHookCard({ hook, scriptUuid }: ScriptHookCardProps
 
     // React to template selection from HookTemplatePanel
     useEffect(() => {
-        if (!selectedTemplate) return;
+        if (isReadOnly || !selectedTemplate) return;
 
         if (content.trim().length > 0) {
             setPendingTemplate(selectedTemplate);
@@ -60,12 +61,14 @@ export default function ScriptHookCard({ hook, scriptUuid }: ScriptHookCardProps
     };
 
     const handleBlur = async () => {
+        if (isReadOnly) return;
         if (content.trim() !== hook.content) {
             await updateScriptHook({ hookUuid: hook.uuid, scriptUuid, data: { content: content.trim() } });
         }
     };
 
     const handleReplacePlaceholder = async (placeholder: string, value: string) => {
+        if (isReadOnly) return;
         const newContent = replacePlaceholder(content, placeholder, value);
         setContent(newContent);
         await updateScriptHook({ hookUuid: hook.uuid, scriptUuid, data: { content: newContent } });
@@ -75,9 +78,9 @@ export default function ScriptHookCard({ hook, scriptUuid }: ScriptHookCardProps
         <>
             <ScriptPartCard
                 partType={ScriptPartType.Hook}
-                onDelete={() => deleteScriptHook({ hookUuid: hook.uuid, scriptUuid })}
+                onDelete={isReadOnly ? undefined : () => deleteScriptHook({ hookUuid: hook.uuid, scriptUuid })}
                 isDeleting={isDeleting}
-                headerActions={
+                headerActions={!isReadOnly ? (
                     <button
                         onClick={() => togglePanel(ScriptRightPanel.HookTemplates)}
                         className="text-gray hover:text-dark transition-colors cursor-pointer opacity-0 group-hover:opacity-100"
@@ -85,7 +88,7 @@ export default function ScriptHookCard({ hook, scriptUuid }: ScriptHookCardProps
                     >
                         <InboxStackIcon className="size-4" strokeWidth={2} />
                     </button>
-                }
+                ) : undefined}
             >
                 {hasPlaceholders(content) ? (
                     <HookContentRenderer content={content} onReplacePlaceholder={handleReplacePlaceholder} />
@@ -95,6 +98,7 @@ export default function ScriptHookCard({ hook, scriptUuid }: ScriptHookCardProps
                         value={content}
                         onChange={(e) => setContent(e.target.value)}
                         onBlur={handleBlur}
+                        readOnly={isReadOnly}
                         placeholder="Hook..."
                         textStyle="text-sm"
                         fullWidth
