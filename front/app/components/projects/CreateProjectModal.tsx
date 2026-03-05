@@ -8,6 +8,7 @@ import { StepBadge } from "~/components/ui/StepBadge";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useCreateProject } from "~/hooks/api/projects/useCreateProject";
 import ModalOverlay from "~/components/ui/ModalOverlay";
+import { PaymentRequiredException } from "~/services/httpClient/customHttpExceptions";
 
 interface CreateProjectModalProps {
     showModal: boolean;
@@ -20,6 +21,7 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
     const [types, setTypes] = useState<ProjectType[]>([]);
+    const [limitError, setLimitError] = useState(false);
 
     const { createProject, isPending } = useCreateProject()
 
@@ -27,20 +29,27 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
         setName("");
         setDescription("");
         setTypes([]);
+        setLimitError(false);
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        await createProject({ name, description, types });
-        resetForm();
-        onProjectCreated();
+        try {
+            await createProject({ name, description, types });
+            resetForm();
+            onProjectCreated();
+        } catch (error) {
+            if (error instanceof PaymentRequiredException) {
+                setLimitError(true);
+            }
+        }
     }
 
     if (!showModal) return null;
 
     return (
         <ModalOverlay isOpen={showModal} onClose={onClose}>
-            <div className="border rounded-xl border-light-gray w-[500px] h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
+            <div className="border rounded-xl border-light-gray w-125 h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
                 {showStepHeader && (
                     <div className="flex flex-row items-center gap-3">
                         <StepBadge label="Introduction" completed={true} />
@@ -108,6 +117,12 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
                             <ChevronRightIcon className="size-4 text-clear" strokeWidth={2} />
                         </div>
                     </Button>
+
+                    {limitError && (
+                        <p className="text-body-xs text-danger text-center">
+                            Vous avez atteint la limite de projets pour votre abonnement. Passez à un abonnement supérieur pour en créer davantage.
+                        </p>
+                    )}
                 </form>
             </div>
         </ModalOverlay>

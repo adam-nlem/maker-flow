@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BadRequestException, ConflictException, ForbiddenException, InternalServerException, NotFoundException, TimeoutException, UnauthorizedException } from "./customHttpExceptions";
+import { BadRequestException, ConflictException, ForbiddenException, InternalServerException, NotFoundException, PaymentRequiredException, TimeoutException, UnauthorizedException } from "./customHttpExceptions";
 
 
 export const httpClient = axios.create(
@@ -28,7 +28,9 @@ httpClient.interceptors.response.use(
                     break;
                 case 401:
                     e = new UnauthorizedException(err.message, err.data);
-
+                    break;
+                case 402:
+                    e = new PaymentRequiredException(err.message, err.data);
                     break;
                 case 403:
                     e = new ForbiddenException(err.message, err.data);

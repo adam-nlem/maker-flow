@@ -5,6 +5,7 @@ import {
   ForbiddenException,
   InternalServerException,
   NotFoundException,
+  PaymentRequiredException,
   TimeoutException,
   UnauthorizedException,
 } from '~/services/httpClient/customHttpExceptions'
@@ -37,6 +38,9 @@ export function handleMutationError(error: CustomHttpException): void {
       break
     case ForbiddenException:
       message = "Vous n'avez pas les droits pour effectuer cette action"
+      break
+    case PaymentRequiredException:
+      message = "Votre abonnement ne vous permet pas d'effectuer cette action"
       break
     case NotFoundException:
       message = 'Ressource introuvable'

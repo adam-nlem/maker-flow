@@ -5,6 +5,7 @@ export interface PlanConfig {
     name: string;
     monthlyPrice: number;
     creditsPerMonth: number;
+    maxProjects: number | null;
     features: string[];
     isHighlighted: boolean;
 }
@@ -15,6 +16,7 @@ export const planConfigs: PlanConfig[] = [
         name: "Starter",
         monthlyPrice: 9.99,
         creditsPerMonth: 50,
+        maxProjects: 1,
         features: [
             "Génération de scripts IA",
             "Analytiques de base",
@@ -26,6 +28,7 @@ export const planConfigs: PlanConfig[] = [
         name: "Créateur",
         monthlyPrice: 19.99,
         creditsPerMonth: 150,
+        maxProjects: 3,
         features: [
             "Génération de scripts IA",
             "Analytiques avancées",
@@ -38,6 +41,7 @@ export const planConfigs: PlanConfig[] = [
         name: "Agence",
         monthlyPrice: 49.99,
         creditsPerMonth: 500,
+        maxProjects: null,
         features: [
             "Génération de scripts IA",
             "Analytiques avancées",
@@ -47,3 +51,8 @@ export const planConfigs: PlanConfig[] = [
         isHighlighted: false,
     },
 ];
+
+export function getMaxProjectsForPlan(plan: SubscriptionPlan | null | undefined): number | null {
+    if (!plan || plan === SubscriptionPlan.Free) return 1;
+    return planConfigs.find((c) => c.plan === plan)?.maxProjects ?? null;
+}

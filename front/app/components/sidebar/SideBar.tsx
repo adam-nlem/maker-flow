@@ -2,6 +2,8 @@ import { CalendarDaysIcon, ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, Che
 import { CalendarDaysIcon as CalendarDaysIconSolid, HomeIcon as HomeIconSolid, GlobeEuropeAfricaIcon as GlobeEuropeAfricaIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
+import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
+import { getMaxProjectsForPlan } from "~/models/PlanConfig";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { Button } from "../ui/Button";
 import { useEffect } from "react";
@@ -26,6 +28,10 @@ export default function SideBar() {
   const { user } = useCurrentUser()
 
   const { projects, isLoading: isLoadingProjects } = useListPaginatedProjects()
+  const { subscription } = useShowCurrentSubscription()
+  const maxProjects = getMaxProjectsForPlan(subscription?.plan)
+  const isAtProjectLimit = maxProjects !== null && projects.length >= maxProjects
+
   const { focusedProjectUuid, setFocusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
 
@@ -72,7 +78,7 @@ export default function SideBar() {
                 onSelect={(project) => {
                   setFocusedProjectUuid(project.uuid)
                 }}
-                onClickCreateButton={() => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
+                onClickCreateButton={isAtProjectLimit ? undefined : () => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
                 createButtonLabel="Créer un nouveau Projet"
                 renderTrigger={({ onClick }) => (
                   <ProjectTile
@@ -97,17 +103,29 @@ export default function SideBar() {
                 )}
               />
               :
-              <Button
-                type="button"
-                onClick={() => {
-                  setIsCreateProjectModalOpen(!isCreateProjectModalOpen)
-                }}
-              >
-                <div className="flex flex-row justify-center items-center gap-3 shrink-0 ">
-                  {isExpanded && <p className="text-sm ">Créer un nouveau Projet</p>}
-                  <PlusIcon className="size-4 text-clear" strokeWidth={2} />
+              isAtProjectLimit ? (
+                <div className="flex flex-col items-center gap-1">
+                  <Button type="button" disabled>
+                    <div className="flex flex-row justify-center items-center gap-3 shrink-0">
+                      {isExpanded && <p className="text-sm">Créer un nouveau Projet</p>}
+                      <PlusIcon className="size-4 text-clear" strokeWidth={2} />
+                    </div>
+                  </Button>
+                  {isExpanded && <p className="text-body-xs text-gray text-center">Limite de projets atteinte</p>}
                 </div>
-              </Button>
+              ) : (
+                <Button
+                  type="button"
+                  onClick={() => {
+                    setIsCreateProjectModalOpen(!isCreateProjectModalOpen)
+                  }}
+                >
+                  <div className="flex flex-row justify-center items-center gap-3 shrink-0">
+                    {isExpanded && <p className="text-sm">Créer un nouveau Projet</p>}
+                    <PlusIcon className="size-4 text-clear" strokeWidth={2} />
+                  </div>
+                </Button>
+              )
 
 
           }

@@ -60,6 +60,16 @@ class ProjectRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    public function countByUser(User $user): int
+    {
+        return (int) $this->createQueryBuilder('p')
+            ->select('COUNT(p.id)')
+            ->where('p.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function getByUserPaginated(User $user, int $page, int $limit): array
     {
         $query = $this->createQueryBuilder('p')

@@ -18,14 +18,11 @@ import "./app.css";
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error: Error) => {
-      console.log("In the query cache")
       handleMutationError(error)
-
     }
   }),
   mutationCache: new MutationCache({
     onError: (error) => {
-      console.log("In the mutation cache")
       handleMutationError(error)
     }
   }),

@@ -6,6 +6,7 @@ use App\DTO\QueryParam\Project\ListProjectsQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\Project\CreateProjectRequestDTO;
 use App\DTO\Request\Project\UpdateProjectRequestDTO;
+use App\Entity\Enum\SubscriptionPlan;
 use App\Entity\Project;
 use App\Entity\User;
 use App\Helper\DateHelper;
@@ -26,6 +27,16 @@ final class ProjectController extends AbstractController
     {
         /** @var User $user */
         $user = $this->getUser();
+
+        $plan = $user->getSubscription()?->getPlan() ?? SubscriptionPlan::Free;
+        $maxProjects = $plan->getMaxProjects();
+
+        if ($maxProjects !== null && $projectRepository->countByUser($user) >= $maxProjects) {
+            return $this->json(
+                data: ["message" => "You have reached the project limit for your plan."],
+                status: Response::HTTP_PAYMENT_REQUIRED
+            );
+        }
 
         try {
             /** @var Project $project */

@@ -18,6 +18,12 @@ export class UnauthorizedException extends CustomHttpException {
     }
 }
 
+export class PaymentRequiredException extends CustomHttpException {
+    constructor(message: string, data?: any) {
+        super(402, message, data);
+    }
+}
+
 export class ForbiddenException extends CustomHttpException {
     constructor(message: string, data?: any) {
         super(403, message, data);
