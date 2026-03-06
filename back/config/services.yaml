@@ -38,6 +38,8 @@ parameters:
     app.youtube.client_secret: "%env(string:YOUTUBE_CLIENT_SECRET)%"
     app.youtube.redirect_uri: "%env(string:YOUTUBE_REDIRECT_URI)%"
     app.youtube.javascript_origin: "%env(string:YOUTUBE_JAVASCRIPT_ORIGIN)%"
+
+    app.encryption.token_key: "%env(string:APP_ENCRYPTION_KEY)%"
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -120,5 +122,17 @@ services:
             $stripePriceStarter: "%app.stripe.price_starter%"
             $stripePriceCreator: "%app.stripe.price_creator%"
             $stripePriceAgency: "%app.stripe.price_agency%"
+    App\Service\Encryption\TokenEncryptionService:
+        arguments:
+            $encryptionKey: "%app.encryption.token_key%"
+
+    App\EventListener\IntegrationTokenEncryptionListener:
+        tags:
+            - { name: 'doctrine.orm.entity_listener', event: 'postLoad', entity: 'App\Entity\Integration', lazy: true }
+            - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Integration', lazy: true }
+            - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Integration', lazy: true }
+            - { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Integration', lazy: true }
+            - { name: 'doctrine.orm.entity_listener', event: 'postUpdate', entity: 'App\Entity\Integration', lazy: true }
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
