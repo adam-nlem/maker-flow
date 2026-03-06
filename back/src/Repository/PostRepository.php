@@ -3,8 +3,10 @@
 namespace App\Repository;
 
 use App\Entity\Integration;
-use App\Entity\User;
 use App\Entity\Post;
+use App\Entity\PostGroup;
+use App\Entity\Project;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -217,5 +219,65 @@ class PostRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return Post[]
+     */
+    public function getByProjectAndPublishedAtWindow(
+        Project $project,
+        User $user,
+        \DateTimeImmutable $publishedAt,
+        int $hoursWindow,
+        Integration $excludeIntegration,
+    ): array {
+        $from = $publishedAt->modify("-{$hoursWindow} hours");
+        $to = $publishedAt->modify("+{$hoursWindow} hours");
+
+        return $this->createQueryBuilder('p')
+            ->join('p.integration', 'i')
+            ->where('i.project = :project')
+            ->andWhere('p.user = :user')
+            ->andWhere('p.integration != :excludeIntegration')
+            ->andWhere('p.publishedAt BETWEEN :from AND :to')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->setParameter('excludeIntegration', $excludeIntegration)
+            ->setParameter('from', $from)
+            ->setParameter('to', $to)
+            ->orderBy('p.publishedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @param string[] $uuids
+     * @return Post[]
+     */
+    public function unlinkPostsByPostGroup(PostGroup $postGroup): void
+    {
+        $this->createQueryBuilder('p')
+            ->update()
+            ->set('p.postGroup', ':null')
+            ->where('p.postGroup = :postGroup')
+            ->setParameter('null', null)
+            ->setParameter('postGroup', $postGroup)
+            ->getQuery()
+            ->execute();
+    }
+
+    /**
+     * @param string[] $uuids
+     * @return Post[]
+     */
+    public function getByUuidsAndUser(array $uuids, User $user): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.uuid IN (:uuids)')
+            ->andWhere('p.user = :user')
+            ->setParameter('uuids', $uuids)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
     }
 }

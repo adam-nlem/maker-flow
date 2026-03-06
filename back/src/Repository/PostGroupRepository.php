@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\PostGroup;
+use App\Entity\Project;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
@@ -43,5 +44,22 @@ class PostGroupRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return PostGroup[]
+     */
+    public function getByProjectAndUser(Project $project, User $user): array
+    {
+        return $this->createQueryBuilder('pg')
+            ->leftJoin('pg.posts', 'p')
+            ->addSelect('p')
+            ->where('pg.project = :project')
+            ->andWhere('pg.user = :user')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->orderBy('pg.createdAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 }

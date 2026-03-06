@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
 #[ORM\Entity(repositoryClass: PostGroupRepository::class)]
@@ -21,15 +22,19 @@ class PostGroup
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
+    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
+    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update'])]
     private ?string $title = null;
 
     #[ORM\ManyToOne]
@@ -46,7 +51,8 @@ class PostGroup
     /**
      * @var Collection<int, Post>
      */
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'postGroup', cascade: ['remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'postGroup')]
+    #[Groups(['api_post_groups_list'])]
     private Collection $posts;
 
     public function __construct()

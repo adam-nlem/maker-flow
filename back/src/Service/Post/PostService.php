@@ -18,6 +18,7 @@ use App\Entity\Enum\IntegrationInsightType;
 use App\Repository\IntegrationInsightRepository;
 use App\Repository\PostInsightRepository;
 use App\Repository\PostRepository;
+use App\Service\PostGroup\PostGroupService;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
@@ -31,6 +32,7 @@ class PostService
         private readonly PostRepository $repository,
         private readonly PostInsightRepository $insightRepository,
         private readonly IntegrationInsightRepository $integrationInsightRepository,
+        private readonly PostGroupService $postGroupService,
         private readonly HttpClientInterface $httpClient,
         private readonly Filesystem $filesystem,
         private readonly ParameterBagInterface $parameterBag,
@@ -67,6 +69,7 @@ class PostService
         }
 
         $this->repository->save($post);
+        $this->postGroupService->tryAutoGroup($post);
 
         return $post;
     }
@@ -102,6 +105,7 @@ class PostService
         }
 
         $this->repository->save($post);
+        $this->postGroupService->tryAutoGroup($post);
 
         return $post;
     }
