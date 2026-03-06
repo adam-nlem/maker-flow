@@ -48,6 +48,12 @@ export class ConflictException extends CustomHttpException {
     }
 }
 
+export class UnprocessableEntityException extends CustomHttpException {
+    constructor(message: string, data?: any) {
+        super(422, message, data);
+    }
+}
+
 export class InternalServerException extends CustomHttpException {
     constructor(message: string, data?: any) {
         super(500, message, data);

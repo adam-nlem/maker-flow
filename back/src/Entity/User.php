@@ -28,34 +28,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_user_register', 'api_user_me'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_user_register', 'api_user_me'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_user_register', 'api_user_me'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\Email]
-    #[Groups(['api_user_register', 'api_user_me'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
     #[ORM\Column]
-    #[Groups(['api_user_register', 'api_user_me'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_user_me'])]
+    #[Groups(['api_user_me', 'api_user_update'])]
     private ?string $stripeCustomerId = null;
 
     /**
