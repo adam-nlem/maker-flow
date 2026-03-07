@@ -209,6 +209,33 @@ class PostInsightRepository extends ServiceEntityRepository
     }
 
     /**
+     * Returns the latest insight value per post per type.
+     *
+     * @param int[] $postIds
+     * @return array<array{postId: int, type: PostInsightType|string, value: string}>
+     */
+    public function getAggregatedLatestByPostIds(array $postIds): array
+    {
+        if (empty($postIds)) {
+            return [];
+        }
+
+        $sub = $this->createQueryBuilder('sub')
+            ->select('MAX(sub.id)')
+            ->where('sub.post IN (:postIds)')
+            ->groupBy('sub.post, sub.type')
+            ->getDQL();
+
+        return $this->createQueryBuilder('pi')
+            ->select('IDENTITY(pi.post) as postId, pi.type as type, pi.value as value')
+            ->where('pi.id IN (' . $sub . ')')
+            ->setParameter('postIds', $postIds)
+            ->groupBy('pi.post, pi.type')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Returns aggregated insight values (summed) per post group and per type,
      * using the latest insight per post per type.
      *

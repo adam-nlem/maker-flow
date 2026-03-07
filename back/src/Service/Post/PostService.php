@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Helper\DateHelper;
 use App\DTO\External\Instagram\InstagramPostDTO;
 use App\DTO\External\Youtube\YoutubePostDTO;
+use App\DTO\Response\Post\PostWithAggregatedInsightsResponseDTO;
 use App\DTO\Response\Post\PostWithInsightsDTO;
 use App\Entity\Enum\PostInsightType;
 use App\Entity\Enum\TimePeriod;
@@ -190,16 +191,39 @@ class PostService
     }
 
     /**
-     * @return PostWithInsightsDTO[]
+     * @return PostWithAggregatedInsightsResponseDTO[]
      */
     public function getRankedPosts(
         User $user,
         Integration $integration,
         int $limit,
     ): array {
-        $posts = $this->repository->getRankedByUserAndIntegrationSortedByInsightValue($user, $integration, PostInsightType::Views, $limit);
+        $postIds = $this->repository->getRankedIdsByUserAndIntegrationSortedByInsightValue(
+            $user,
+            $integration,
+            PostInsightType::Views,
+            $limit,
+        );
 
-        return $this->buildPostsWithInsightsDTOs($user, $integration, $posts);
+        if (empty($postIds)) {
+            return [];
+        }
+
+        $posts = $this->repository->getByIds($postIds);
+
+        $idOrder = array_flip($postIds);
+        usort($posts, fn(Post $a, Post $b) => ($idOrder[$a->getId()] ?? 0) <=> ($idOrder[$b->getId()] ?? 0));
+
+        $insightsByPostId = [];
+        foreach ($this->insightRepository->getAggregatedLatestByPostIds($postIds) as $row) {
+            $type = $row['type'] instanceof PostInsightType ? $row['type']->value : $row['type'];
+            $insightsByPostId[$row['postId']][] = ['type' => $type, 'value' => (float) $row['value']];
+        }
+
+        return array_map(fn(Post $p) => new PostWithAggregatedInsightsResponseDTO(
+            post: $p,
+            aggregatedInsights: $insightsByPostId[$p->getId()] ?? [],
+        ), $posts);
     }
 
     /**

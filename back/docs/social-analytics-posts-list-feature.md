@@ -64,7 +64,7 @@ Returns an array of posts with their insights and evolution data:
 
 **GET** `/api/posts/rank`
 
-Returns the top N posts for an integration, sorted by views (descending). Uses the same insight evolution and engagement calculation as the list endpoint.
+Returns the top N posts for an integration, sorted by views (descending). Uses a lightweight aggregated insights response (same pattern as `POST /api/post-groups/rank`).
 
 #### Query Parameters
 
@@ -75,7 +75,28 @@ Returns the top N posts for an integration, sorted by views (descending). Uses t
 
 #### Response
 
-Returns `PostWithInsightsDTO[]` — same shape as the list endpoint.
+Returns `PostWithAggregatedInsightsResponseDTO[]`:
+
+```json
+[
+  {
+    "post": {
+      "uuid": "550e8400-e29b-41d4-a716-446655440000",
+      "externalId": "17895695668004550",
+      "mediaType": "video",
+      "duration": 0,
+      "publishedAt": "2026-01-20T10:00:00+00:00",
+      "caption": "Check out this amazing content!",
+      "externalUrl": "https://www.instagram.com/p/..."
+    },
+    "aggregatedInsights": [
+      { "type": "views", "value": 15000 },
+      { "type": "likes", "value": 200 },
+      { "type": "comments", "value": 45 }
+    ]
+  }
+]
+```
 
 ---
 
@@ -120,12 +141,13 @@ src/
 │   └── Response/
 │       └── Post/
 │           ├── PostInsightWithEvolutionDTO.php
+│           ├── PostWithAggregatedInsightsResponseDTO.php
 │           └── PostWithInsightsDTO.php
 ├── Helper/
 │   └── InsightEvolutionHelper.php                 # Shared evolution calculation logic
 ├── Repository/
-│   ├── PostRepository.php          # getByUserAndIntegrationAndPublishedAfterPaginated(), getRankedByUserAndIntegrationSortedByInsightValue()
-│   └── PostInsightRepository.php   # getLatestByPostsAndTimePeriod()
+│   ├── PostRepository.php          # getByUserAndIntegrationAndPublishedAfterPaginated(), getRankedIdsByUserAndIntegrationSortedByInsightValue(), getByIds()
+│   └── PostInsightRepository.php   # getLatestByPostsAndTimePeriod(), getAggregatedLatestByPostIds()
 └── Service/
     └── PostService.php             # getPostsWithInsights(), getRankedPosts(), buildPostsWithInsightsDTOs()
 ```

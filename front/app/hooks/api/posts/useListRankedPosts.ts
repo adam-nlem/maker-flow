@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { PostWithInsightsDTO, type PostWithInsightsDTOJSON } from "~/dtos/posts/PostWithInsightsDTO";
+import { PostWithAggregatedInsightsDTO, type PostWithAggregatedInsightsDTOJSON } from "~/dtos/posts/PostWithAggregatedInsightsDTO";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { postQueryKeys } from "./postQueryKeys";
 
@@ -12,11 +12,11 @@ export function useListRankedPosts({ integrationUuid, limit = 10 }: UseListRanke
     const query = useQuery({
         queryKey: postQueryKeys.rank(integrationUuid),
         queryFn: async () => {
-            const res = await httpClient.get<PostWithInsightsDTOJSON[]>(`/posts/rank`, {
+            const res = await httpClient.get<PostWithAggregatedInsightsDTOJSON[]>(`/posts/rank`, {
                 params: { integrationUuid, limit },
             });
 
-            return res.data.map((json) => PostWithInsightsDTO.fromJSON(json));
+            return res.data.map((json) => PostWithAggregatedInsightsDTO.fromJSON(json));
         },
     });
 

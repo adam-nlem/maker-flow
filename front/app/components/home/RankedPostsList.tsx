@@ -47,7 +47,7 @@ export default function RankedPostsList({ integrationUuid }: RankedPostsListProp
           subtitle={formatToFrenchRelative(post.post.publishedAt)}
           metrics={DISPLAYED_METRIC_TYPES.map((type) => ({
             type,
-            value: post.insights.find((i) => i.insight.type === type)?.insight.value ?? 0,
+            value: post.aggregatedInsights.find((i) => i.type === type)?.value ?? 0,
           }))}
           isLast={index === posts.length - 1}
         />

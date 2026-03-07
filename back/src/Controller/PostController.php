@@ -80,7 +80,7 @@ final class PostController extends AbstractController
         return $this->json(
             data: $posts,
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_posts_list']],
+            context: ['groups' => ['api_posts_rank']],
         );
     }
 

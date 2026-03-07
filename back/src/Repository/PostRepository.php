@@ -6,6 +6,7 @@ use App\Entity\Enum\PostInsightType;
 use App\Entity\Integration;
 use App\Entity\Post;
 use App\Entity\PostGroup;
+use App\Entity\PostInsight;
 use App\Entity\Project;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -283,55 +284,49 @@ class PostRepository extends ServiceEntityRepository
     }
 
     /**
-     * @return Post[]
+     * @return int[]
      */
-    public function getRankedByUserAndIntegrationSortedByInsightValue(
+    public function getRankedIdsByUserAndIntegrationSortedByInsightValue(
         User $user,
         Integration $integration,
         PostInsightType $sortByType,
         int $limit,
     ): array {
-        $conn = $this->getEntityManager()->getConnection();
+        $sub = $this->getEntityManager()->createQueryBuilder()
+            ->select('MAX(sub.id)')
+            ->from(PostInsight::class, 'sub')
+            ->innerJoin('sub.post', 'subPost')
+            ->where('subPost.user = :user')
+            ->andWhere('subPost.integration = :integration')
+            ->andWhere('sub.type = :type')
+            ->groupBy('sub.post')
+            ->getDQL();
 
-        $sql = "
-            SELECT p.id
-            FROM post p
-            INNER JOIN post_insight pi ON pi.post_id = p.id
-                AND pi.type = :type
-                AND pi.id = (
-                    SELECT MAX(pi2.id) FROM post_insight pi2
-                    WHERE pi2.post_id = p.id AND pi2.type = :type
-                )
-            WHERE p.user_id = :user_id
-              AND p.integration_id = :integration_id
-            ORDER BY pi.value DESC
-            LIMIT :limit
-        ";
-
-        $postIds = $conn->executeQuery($sql, [
-            'type' => $sortByType->value,
-            'user_id' => $user->getId(),
-            'integration_id' => $integration->getId(),
-            'limit' => $limit,
-        ], [
-            'limit' => \Doctrine\DBAL\ParameterType::INTEGER,
-        ])->fetchFirstColumn();
-
-        if (empty($postIds)) {
-            return [];
-        }
-
-        $posts = $this->createQueryBuilder('p')
-            ->where('p.id IN (:ids)')
-            ->setParameter('ids', $postIds)
+        return $this->createQueryBuilder('p')
+            ->select('p.id')
+            ->innerJoin('p.postInsights', 'pi')
+            ->where('pi.id IN (' . $sub . ')')
+            ->andWhere('p.user = :user')
+            ->andWhere('p.integration = :integration')
+            ->setParameter('user', $user)
+            ->setParameter('integration', $integration)
+            ->setParameter('type', $sortByType)
+            ->orderBy('pi.value', 'DESC')
+            ->setMaxResults($limit)
             ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+            ->getSingleColumnResult();
+    }
 
-        // Re-sort by the original order from the SQL query
-        $idOrder = array_flip($postIds);
-        usort($posts, fn(Post $a, Post $b) => ($idOrder[$a->getId()] ?? 0) <=> ($idOrder[$b->getId()] ?? 0));
-
-        return $posts;
+    /**
+     * @param int[] $ids
+     * @return Post[]
+     */
+    public function getByIds(array $ids): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $ids)
+            ->getQuery()
+            ->getResult();
     }
 }

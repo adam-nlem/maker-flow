@@ -71,14 +71,15 @@ Zustand store with persist middleware (`app:home:filter-store`).
 | Hook | File | API Endpoint | Returns |
 |------|------|-------------|---------|
 | `useListIntegrationInsights` | `app/hooks/api/integrationInsights/useListIntegrationInsights.ts` | `GET /api/integration-insights` | `{ insightsOverview: IntegrationInsightsOverviewDTO \| null }` |
-| `useListRankedPosts` | `app/hooks/api/posts/useListRankedPosts.ts` | `GET /api/posts/rank` | `PostWithInsightsDTO[]` |
-| `useListRankedPostGroups` | `app/hooks/api/postGroups/useListRankedPostGroups.ts` | `GET /api/post-groups/rank` | `PostGroupWithAggregatedInsightsResponseDTO[]` |
+| `useListRankedPosts` | `app/hooks/api/posts/useListRankedPosts.ts` | `GET /api/posts/rank` | `{ posts: PostWithAggregatedInsightsDTO[] }` |
+| `useListRankedPostGroups` | `app/hooks/api/postGroups/useListRankedPostGroups.ts` | `GET /api/post-groups/rank` | `{ postGroups: PostGroupWithAggregatedInsightsDTO[] }` |
 
 ## Models & DTOs
 
 | File | Description |
 |------|-------------|
 | `app/models/PostGroup.ts` | PostGroup model (uuid, title, createdAt, updatedAt, posts?) |
+| `app/dtos/posts/PostWithAggregatedInsightsDTO.ts` | Post with aggregated insights (post, aggregatedInsights) |
 | `app/dtos/postGroups/PostGroupWithAggregatedInsightsDTO.ts` | Post group with aggregated insights (postGroup, aggregatedInsights) |
 | `app/dtos/integrationInsights/IntegrationInsightsOverviewDTO.ts` | Overview DTO: groups (per integration) + aggregatedInsights (summed across all) |
 | `app/dtos/integrationInsights/IntegrationInsightsGroupedByIntegrationDTO.ts` | Integration with its latest insights (integration, insights[]) |
