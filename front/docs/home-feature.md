@@ -8,8 +8,8 @@ The home page (`/`) is the main dashboard. It shows an overview of insights acro
 
 Two-column layout (`w-2/3` + `w-1/3`):
 
-- **Left column**: `HomeRankContent` — ranked posts or ranked post groups
-- **Right column**: `HomeInsightsOverview` — integration selector + aggregated insight tiles
+- **Left column**: (empty for now)
+- **Right column**: `HomeInsightsOverview` + ranked posts or ranked post groups
 
 ## Components
 
@@ -17,27 +17,20 @@ Two-column layout (`w-2/3` + `w-1/3`):
 
 **File:** `app/components/home/HomeInsightsOverview.tsx`
 
-Displays integration selection (Pill components) and aggregated insight tiles.
+Displays integration selection (Pill components) and aggregated insight tiles. Fetches its own data via `useListIntegrationInsights({ projectUuid })`.
 
 - Reads `focusedIntegrationUuid` from `useHomeFilterStore`
 - When an integration is focused: shows its insights + `IntegrationProfileInfo`
 - When "Toutes les plateformes" is selected (null): displays backend-provided `aggregatedInsights` (summed across all integrations per type)
 - Shows 4 `InsightTile` components: TotalFollowers, Views, Likes, Comments
 
-### HomeRankContent
-
-**File:** `app/components/home/HomeRankContent.tsx`
-
-Conditionally renders based on `focusedIntegrationUuid`:
-
-- **Integration focused**: renders `RankedPostsList`
-- **All platforms (null)**: renders `RankedPostGroupsList`
+Props: `projectUuid`
 
 ### RankedPostsList
 
 **File:** `app/components/home/RankedPostsList.tsx`
 
-Calls `useListRankedPosts({ integrationUuid })`, renders posts using `PostRankingItemTile` (with thumbnails).
+Calls `useListRankedPosts({ integrationUuid })`, renders posts using `HomeRankingItemTile`. Displays the Views metric for each post.
 
 Props: `integrationUuid`
 
@@ -45,17 +38,17 @@ Props: `integrationUuid`
 
 **File:** `app/components/home/RankedPostGroupsList.tsx`
 
-Calls `useListRankedPostGroups({ projectUuid })`, renders post groups using `PostRankingItemTile` (thumbnail from first post in group).
+Calls `useListRankedPostGroups({ projectUuid })`, renders post groups using `HomeRankingItemTile`. Displays group title, post count, and aggregated Views metric.
 
 Props: `projectUuid`
 
-### PostRankingItemTile (shared)
+### HomeRankingItemTile
 
-**File:** `app/components/insights/posts/PostRankingItemTile.tsx`
+**File:** `app/components/home/HomeRankingItemTile.tsx`
 
-Generic ranking item tile used by both the insights page (`PostsRankingCard`) and the home page (`HomeRankContent`).
+Ranking item tile for the home page. Displays rank number with a dotted connecting line, thumbnail, subtitle text, and a Views metric (eye icon + compact number).
 
-Props: `index`, `title`, `subtitle`, `postUuid?` (optional — drives thumbnail display)
+Props: `index`, `postUuid?`, `subtitle`, `secondarySubtitle?`, `metricValue`, `isLast`
 
 ## Store
 

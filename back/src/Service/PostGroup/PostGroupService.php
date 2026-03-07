@@ -29,7 +29,10 @@ class PostGroupService
     public function getRankedPostGroups(User $user, Project $project, int $limit): array
     {
         $postGroupIds = $this->postGroupRepository->getRankedIdsByProjectAndUserSortedByInsightValue(
-            $project, $user, PostInsightType::Views, $limit,
+            $project,
+            $user,
+            PostInsightType::Views,
+            $limit,
         );
 
         if (empty($postGroupIds)) {

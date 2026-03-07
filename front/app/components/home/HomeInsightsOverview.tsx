@@ -3,18 +3,19 @@ import { ChatBubbleLeftIcon, EyeIcon, HeartIcon, UsersIcon } from "@heroicons/re
 import IntegrationProfileInfo from "~/components/integrations/IntegrationProfileInfo"
 import Pill from "~/components/ui/Pill"
 import InsightTile from "~/components/insights/InsightTile"
+import { useListIntegrationInsights } from "~/hooks/api/integrationInsights/useListIntegrationInsights"
 import { useHomeFilterStore } from "~/stores/homeFilterStore"
 import { platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform"
 import { IntegrationInsightType, integrationInsightTypeToFrenchTranslation } from "~/models/enums/IntegrationInsightType"
-import type { IntegrationInsightsOverviewDTO } from "~/dtos/integrationInsights/IntegrationInsightsOverviewDTO"
 
 interface HomeInsightsOverviewProps {
-    insightsOverview: IntegrationInsightsOverviewDTO | null
+    projectUuid: string
 }
 
-export default function HomeInsightsOverview({ insightsOverview }: HomeInsightsOverviewProps) {
+export default function HomeInsightsOverview({ projectUuid }: HomeInsightsOverviewProps) {
     const focusedIntegrationUuid = useHomeFilterStore((state) => state.focusedIntegrationUuid)
     const setFocusedIntegrationUuid = useHomeFilterStore((state) => state.setFocusedIntegrationUuid)
+    const { insightsOverview } = useListIntegrationInsights({ projectUuid })
 
     if (!insightsOverview) return null
 
