@@ -2,11 +2,13 @@
 
 ## Overview
 
-This feature provides a paginated endpoint to list all posts for an integration with their insights and evolution percentages.
+This feature provides endpoints to list posts for an integration with their insights and evolution percentages.
 
 ---
 
-## Endpoint
+## Endpoints
+
+### List Posts
 
 **GET** `/api/posts`
 
@@ -56,6 +58,27 @@ Returns an array of posts with their insights and evolution data:
 ]
 ```
 
+---
+
+### Ranked Posts
+
+**GET** `/api/posts/rank`
+
+Returns the top N posts for an integration, sorted by views (descending). Uses the same insight evolution and engagement calculation as the list endpoint.
+
+#### Query Parameters
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `integrationUuid` | string | Yes | — | UUID of the integration |
+| `limit` | int | No | 10 | Number of ranked posts to return |
+
+#### Response
+
+Returns `PostWithInsightsDTO[]` — same shape as the list endpoint.
+
+---
+
 ### Evolution Calculation
 
 Evolution percentage is calculated by comparing the current period's latest insight value with the previous period's latest value:
@@ -88,11 +111,12 @@ Controller
 ```
 src/
 ├── Controller/
-│   └── PostController.php          # list() endpoint
+│   └── PostController.php          # list() and rank() endpoints
 ├── DTO/
 │   ├── QueryParam/
 │   │   └── Post/
-│   │       └── ListPostsQueryParamDTO.php
+│   │       ├── ListPostsQueryParamDTO.php
+│   │       └── RankPostsQueryParamDTO.php
 │   └── Response/
 │       └── Post/
 │           ├── PostInsightWithEvolutionDTO.php
@@ -100,10 +124,10 @@ src/
 ├── Helper/
 │   └── InsightEvolutionHelper.php                 # Shared evolution calculation logic
 ├── Repository/
-│   ├── PostRepository.php          # getByUserAndIntegrationAndPublishedAfterPaginated()
+│   ├── PostRepository.php          # getByUserAndIntegrationAndPublishedAfterPaginated(), getRankedByUserAndIntegrationSortedByInsightValue()
 │   └── PostInsightRepository.php   # getLatestByPostsAndTimePeriod()
 └── Service/
-    └── PostService.php             # getPostsWithInsights()
+    └── PostService.php             # getPostsWithInsights(), getRankedPosts(), buildPostsWithInsightsDTOs()
 ```
 
 ---

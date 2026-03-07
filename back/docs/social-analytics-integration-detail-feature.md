@@ -1,12 +1,81 @@
-# Social Analytics Integration Detail Feature
+# Social Analytics Integration Insights Feature
 
 ## Overview
 
-This feature provides a detail endpoint that returns aggregated Instagram integration insights, including current values with evolution percentages and daily data points for charting.
+This feature provides endpoints for listing and viewing integration insights. The list endpoint returns all insights for a project grouped by integration, while the detail endpoint returns aggregated insight data with evolution percentages and daily data points for charting.
 
 ---
 
-## Endpoint
+## List Endpoint
+
+**GET** `/api/integration-insights`
+
+### Query Parameters
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `projectUuid` | string (UUID) | Yes | UUID of the project |
+
+### Response
+
+Returns an object with integration insight groups (one per integration) and aggregated insights across all integrations:
+
+```json
+{
+  "groups": [
+    {
+      "integration": {
+        "uuid": "...",
+        "platform": "instagram",
+        "accountId": "12345",
+        "userName": "myaccount",
+        "name": "My Account",
+        "profilePictureUrl": "https://...",
+        "createdAt": "2026-01-01T00:00:00+00:00",
+        "updatedAt": null,
+        "expiresAt": "2026-06-01T00:00:00+00:00",
+        "lastSyncedAt": "2026-03-05T10:00:00+00:00",
+        "status": "active"
+      },
+      "insights": [
+        {
+          "uuid": "...",
+          "type": "views",
+          "value": 1234,
+          "valueFormat": "number",
+          "createdAt": "2026-03-05T10:00:00+00:00",
+          "updatedAt": null
+        }
+      ]
+    }
+  ],
+  "aggregatedInsights": [
+    { "type": "views", "value": 5678 },
+    { "type": "total_followers", "value": 12500 }
+  ]
+}
+```
+
+### Architecture
+
+```
+Controller
+    ├── ProjectRepository (project lookup)
+    └── IntegrationInsightService::list()
+        ├── IntegrationRepository::getByProjectAndUser() (integrations)
+        └── IntegrationInsightRepository
+            ├── getLatestByUserAndByIntegration() (latest insights per integration)
+            └── getAggregatedLatestByProjectAndUser() (summed across all integrations per type)
+```
+
+### Response DTOs
+
+- `ListIntegrationInsightsResponseDTO` wraps `groups` (array of `ListIntegrationInsightsGroupedByIntegrationResponseDTO`) and `aggregatedInsights` (array of `{type, value}`)
+- `ListIntegrationInsightsGroupedByIntegrationResponseDTO` groups an `Integration` entity with its latest `IntegrationInsight[]`. The `Integration` entity is serialized using the `api_integration_insights_list` serialization group.
+
+---
+
+## Detail Endpoint
 
 **GET** `/api/integration-insights/detail`
 
@@ -79,8 +148,13 @@ src/
 ├── Controller/
 │   └── IntegrationInsightController.php
 ├── DTO/
+│   ├── QueryParam/
+│   │   └── IntegrationInsight/
+│   │       ├── ListIntegrationInsightsQueryParamDTO.php
+│   │       └── ShowIntegrationDetailQueryParamDTO.php
 │   └── Response/
 │       └── IntegrationInsight/
+│           ├── ListIntegrationInsightsGroupedByIntegrationResponseDTO.php
 │           ├── ShowIntegrationDetailResponseDTO.php
 │           ├── IntegrationInsightTimelineDTO.php
 │           ├── IntegrationInsightTimelinePointDTO.php

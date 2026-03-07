@@ -11,6 +11,7 @@ import AreaChart from "~/components/ui/AreaChart";
 import { timePeriodToDays } from "~/models/enums/TimePeriod";
 import { computeTotalValue, getChartDataForInsightType, getFilteredPointsForType } from "~/helpers/insightChartDataHelper";
 import ListPostsTable from "../posts/ListPostsTable";
+import IntegrationProfileInfo from "~/components/integrations/IntegrationProfileInfo";
 
 
 
@@ -52,19 +53,7 @@ export default function IntegrationPageView({ integration }: IntegrationPageView
       )}
       <div className="flex flex-wrap gap-3 items-center">
         <div className="flex flex-col gap-3">
-          <div className="flex flex-row gap-1 items-center">
-            {integration.profilePictureUrl && (
-              <img
-                src={integration.profilePictureUrl}
-                alt="profile picture"
-                className="size-10 rounded-full object-cover"
-              />
-            )}
-            <div className="flex flex-col">
-              <h1 className="text-heading-sm">{integration.name}</h1>
-              <p className="text-body-sm text-gray">{integration.userName}</p>
-            </div>
-          </div>
+          <IntegrationProfileInfo integration={integration} />
 
           <div className="flex flex-wrap wrap-break-word gap-3">
             <InsightTile

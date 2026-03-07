@@ -2,9 +2,14 @@
 
 namespace App\Service\PostGroup;
 
+use App\DTO\Response\PostGroup\PostGroupWithAggregatedInsightsResponseDTO;
+use App\Entity\Enum\PostInsightType;
 use App\Entity\Post;
 use App\Entity\PostGroup;
+use App\Entity\Project;
+use App\Entity\User;
 use App\Repository\PostGroupRepository;
+use App\Repository\PostInsightRepository;
 use App\Repository\PostRepository;
 
 class PostGroupService
@@ -15,7 +20,38 @@ class PostGroupService
     public function __construct(
         private readonly PostRepository $postRepository,
         private readonly PostGroupRepository $postGroupRepository,
+        private readonly PostInsightRepository $postInsightRepository,
     ) {}
+
+    /**
+     * @return PostGroupWithAggregatedInsightsResponseDTO[]
+     */
+    public function getRankedPostGroups(User $user, Project $project, int $limit): array
+    {
+        $postGroupIds = $this->postGroupRepository->getRankedIdsByProjectAndUserSortedByInsightValue(
+            $project, $user, PostInsightType::Views, $limit,
+        );
+
+        if (empty($postGroupIds)) {
+            return [];
+        }
+
+        $postGroups = $this->postGroupRepository->getByIds($postGroupIds);
+
+        $idOrder = array_flip($postGroupIds);
+        usort($postGroups, fn(PostGroup $a, PostGroup $b) => ($idOrder[$a->getId()] ?? 0) <=> ($idOrder[$b->getId()] ?? 0));
+
+        $insightsByGroupId = [];
+        foreach ($this->postInsightRepository->getAggregatedLatestByPostGroupIds($postGroupIds) as $row) {
+            $type = $row['type'] instanceof PostInsightType ? $row['type']->value : $row['type'];
+            $insightsByGroupId[$row['postGroupId']][] = ['type' => $type, 'value' => (float) $row['totalValue']];
+        }
+
+        return array_map(fn(PostGroup $pg) => new PostGroupWithAggregatedInsightsResponseDTO(
+            postGroup: $pg,
+            aggregatedInsights: $insightsByGroupId[$pg->getId()] ?? [],
+        ), $postGroups);
+    }
 
     public function tryAutoGroup(Post $post): void
     {

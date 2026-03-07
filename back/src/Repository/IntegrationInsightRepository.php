@@ -6,6 +6,7 @@ use App\Entity\Integration;
 use App\Entity\User;
 use App\Entity\Enum\IntegrationInsightType;
 use App\Entity\IntegrationInsight;
+use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
@@ -126,6 +127,33 @@ class IntegrationInsightRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * Returns aggregated insight values (summed) across all integrations for a project,
+     * using the latest insight per integration per type.
+     *
+     * @return array<array{type: IntegrationInsightType|string, totalValue: string}>
+     */
+    public function getAggregatedLatestByProjectAndUser(Project $project, User $user): array
+    {
+        $sub = $this->getEntityManager()->createQueryBuilder()
+            ->select('MAX(sub.id)')
+            ->from(IntegrationInsight::class, 'sub')
+            ->innerJoin('sub.integration', 'subInt')
+            ->where('subInt.project = :project')
+            ->andWhere('sub.user = :user')
+            ->groupBy('sub.integration, sub.type')
+            ->getDQL();
+
+        return $this->createQueryBuilder('ii')
+            ->select('ii.type as type, SUM(ii.value) as totalValue')
+            ->where('ii.id IN (' . $sub . ')')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->groupBy('ii.type')
+            ->getQuery()
+            ->getResult();
     }
 
     /**

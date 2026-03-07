@@ -186,9 +186,33 @@ class PostService
 
         $posts = $this->repository->getByUserAndIntegrationAndPublishedAfterPaginated($user, $integration, $periodStart, $page, $limit);
 
+        return $this->buildPostsWithInsightsDTOs($user, $integration, $posts);
+    }
+
+    /**
+     * @return PostWithInsightsDTO[]
+     */
+    public function getRankedPosts(
+        User $user,
+        Integration $integration,
+        int $limit,
+    ): array {
+        $posts = $this->repository->getRankedByUserAndIntegrationSortedByInsightValue($user, $integration, PostInsightType::Views, $limit);
+
+        return $this->buildPostsWithInsightsDTOs($user, $integration, $posts);
+    }
+
+    /**
+     * @param Post[] $posts
+     * @return PostWithInsightsDTO[]
+     */
+    private function buildPostsWithInsightsDTOs(User $user, Integration $integration, array $posts): array
+    {
         if (empty($posts)) {
             return [];
         }
+
+        $now = DateHelper::createUtcDateTimeImmutable();
         $totalFollowers = $this->integrationInsightRepository->getLatestByUserAndByIntegrationAndByType($user, $integration, IntegrationInsightType::TotalFollowers);
 
         $result = [];

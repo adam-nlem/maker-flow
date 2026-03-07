@@ -26,6 +26,7 @@ Post Groups allow grouping posts together, either manually via API or automatica
 - `api_post_groups_list` — list endpoint (includes nested posts with uuid, externalId, mediaType, caption, publishedAt, externalUrl, duration)
 - `api_post_groups_create` — create endpoint (uuid, title, createdAt, updatedAt)
 - `api_post_groups_update` — update endpoint (uuid, title, createdAt, updatedAt)
+- `api_post_groups_rank` — rank endpoint (uuid, title, createdAt, updatedAt — no nested posts)
 
 ## API Endpoints
 
@@ -65,6 +66,45 @@ PATCH /api/post-groups/{postGroupUuid}
 
 All fields are optional. Updates title, adds posts, and/or removes posts from the group.
 
+### Rank Post Groups
+
+```
+GET /api/post-groups/rank?projectUuid={projectUuid}&limit=10
+```
+
+Returns the top N post groups for a project, sorted by total views (sum of latest view insights across all posts in each group).
+
+**Query Parameters:**
+
+| Parameter | Type | Required | Default | Description |
+|-----------|------|----------|---------|-------------|
+| `projectUuid` | string (UUID) | Yes | — | UUID of the project |
+| `limit` | int | No | 10 | Number of ranked groups to return |
+
+**Response:** `PostGroupWithAggregatedInsightsResponseDTO[]`
+
+```json
+[
+  {
+    "postGroup": {
+      "uuid": "...",
+      "title": "...",
+      "createdAt": "...",
+      "updatedAt": "...",
+      "posts": [
+        { "uuid": "...", "externalId": "...", "mediaType": "video", "caption": "...", "publishedAt": "...", "externalUrl": "...", "duration": 0 }
+      ]
+    },
+    "aggregatedInsights": [
+      { "type": "views", "value": 15000 },
+      { "type": "likes", "value": 800 }
+    ]
+  }
+]
+```
+
+Aggregated insights sum the latest value per type across all posts in the group. Posts are nested inside `postGroup` via the `api_post_groups_rank` serialization group.
+
 ### Delete Post Group
 
 ```
@@ -100,11 +140,14 @@ When a new post is created (via Instagram or YouTube insight fetch), the system 
 |------|---------|
 | `src/Entity/PostGroup.php` | Entity with serialization groups |
 | `src/Entity/Post.php` | Post entity (postGroup relationship) |
-| `src/Controller/PostGroupController.php` | 4 CRUD endpoints |
-| `src/Service/PostGroup/PostGroupService.php` | Auto-grouping logic |
+| `src/Controller/PostGroupController.php` | 4 CRUD endpoints + rank endpoint |
+| `src/Service/PostGroup/PostGroupService.php` | Auto-grouping logic + ranked post groups |
 | `src/Service/Post/PostService.php` | Calls auto-grouping after post creation |
-| `src/Repository/PostGroupRepository.php` | getByProjectAndUser |
+| `src/Repository/PostGroupRepository.php` | getByProjectAndUser, getRankedIdsByProjectAndUserSortedByInsightValue, getByIdsWithPosts |
+| `src/Repository/PostInsightRepository.php` | getAggregatedLatestByPostGroupIds |
 | `src/Repository/PostRepository.php` | getByProjectAndPublishedAtWindow |
 | `src/DTO/QueryParam/PostGroup/ListPostGroupsQueryParamDTO.php` | List query params |
+| `src/DTO/QueryParam/PostGroup/RankPostGroupsQueryParamDTO.php` | Rank query params |
+| `src/DTO/Response/PostGroup/PostGroupWithAggregatedInsightsResponseDTO.php` | Rank response DTO |
 | `src/DTO/Request/PostGroup/CreatePostGroupRequestDTO.php` | Create request |
 | `src/DTO/Request/PostGroup/UpdatePostGroupRequestDTO.php` | Update request |

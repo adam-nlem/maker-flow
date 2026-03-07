@@ -1,17 +1,20 @@
 <?php
 
-namespace App\DTO\QueryParam\IntegrationInsight;
+namespace App\DTO\QueryParam\Post;
 
 use App\DTO\QueryParam\AbstractQueryParamDTO;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ListIntegrationInsightsQueryParamDTO extends AbstractQueryParamDTO
+class RankPostsQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
-    #[Assert\Uuid]
-    private string $projectUuid;
+    private string $integrationUuid;
+
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private int $limit;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -22,11 +25,17 @@ class ListIntegrationInsightsQueryParamDTO extends AbstractQueryParamDTO
 
     protected function fromQueryParams(array $queryParams): void
     {
-        $this->projectUuid = $queryParams["projectUuid"] ?? "";
+        $this->integrationUuid = $queryParams["integrationUuid"] ?? "";
+        $this->limit = (int) ($queryParams["limit"] ?? 10);
     }
 
-    public function getProjectUuid(): string
+    public function getIntegrationUuid(): string
     {
-        return $this->projectUuid;
+        return $this->integrationUuid;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
     }
 }

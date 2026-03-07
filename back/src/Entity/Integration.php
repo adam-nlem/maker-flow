@@ -20,11 +20,11 @@ class Integration
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?string $uuid = null;
 
     #[ORM\Column(enumType: Platform::class)]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?Platform $platform = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -37,38 +37,38 @@ class Integration
     private ?array $scope = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?string $accountId = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?string $userName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?string $profilePictureUrl = null;
 
     #[ORM\Column]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?\DateTimeImmutable $expiresAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $refreshTokenExpiresAt = null;
 
     #[ORM\Column]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?\DateTimeImmutable $lastSyncedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'integrations')]
@@ -76,7 +76,7 @@ class Integration
     private ?User $user = null;
 
     #[ORM\Column(enumType: IntegrationStatus::class)]
-    #[Groups(['api_integrations_list', 'api_integrations_show'])]
+    #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?IntegrationStatus $status = null;
 
     #[ORM\ManyToOne(inversedBy: 'integrations')]

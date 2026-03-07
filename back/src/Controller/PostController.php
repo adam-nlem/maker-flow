@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\DTO\QueryParam\Post\ListPostsQueryParamDTO;
+use App\DTO\QueryParam\Post\RankPostsQueryParamDTO;
 use App\Repository\PostRepository;
 use App\Service\Post\PostService;
 use App\Entity\Enum\TimePeriod;
@@ -44,6 +45,36 @@ final class PostController extends AbstractController
             page: $queryParamDto->getPage(),
             limit: $queryParamDto->getLimit(),
             timePeriod: TimePeriod::LastYear,
+        );
+
+        return $this->json(
+            data: $posts,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_posts_list']],
+        );
+    }
+
+    #[Route('/rank', name: 'api_posts_rank', methods: ['GET'])]
+    public function rank(
+        RankPostsQueryParamDTO $queryParamDto,
+        IntegrationRepository $integrationRepository,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
+
+        if ($integration === null) {
+            return $this->json(
+                data: ["message" => "You don't have any integration with this uuid"],
+                status: Response::HTTP_NOT_FOUND
+            );
+        }
+
+        $posts = $this->service->getRankedPosts(
+            user: $user,
+            integration: $integration,
+            limit: $queryParamDto->getLimit(),
         );
 
         return $this->json(

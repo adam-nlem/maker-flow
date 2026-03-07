@@ -22,19 +22,19 @@ class PostGroup
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update'])]
+    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update', 'api_post_groups_rank'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
-    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update'])]
+    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update', 'api_post_groups_rank'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update'])]
+    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update', 'api_post_groups_rank'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update'])]
+    #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update', 'api_post_groups_rank'])]
     private ?string $title = null;
 
     #[ORM\ManyToOne]
@@ -52,7 +52,7 @@ class PostGroup
      * @var Collection<int, Post>
      */
     #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'postGroup')]
-    #[Groups(['api_post_groups_list'])]
+    #[Groups(['api_post_groups_list', 'api_post_groups_rank'])]
     private Collection $posts;
 
     public function __construct()

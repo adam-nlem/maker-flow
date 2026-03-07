@@ -9,7 +9,6 @@ import {
 import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { handleMutationError } from "~/services/apiErrorHandler/apiErrorHandler";
 import ToastContainer from "~/components/ui/ToastContainer";
-
 import { Settings } from 'luxon';
 
 import type { Route } from "./+types/root";

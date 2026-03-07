@@ -207,4 +207,34 @@ class PostInsightRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    /**
+     * Returns aggregated insight values (summed) per post group and per type,
+     * using the latest insight per post per type.
+     *
+     * @param int[] $postGroupIds
+     * @return array<array{postGroupId: int, type: PostInsightType|string, totalValue: string}>
+     */
+    public function getAggregatedLatestByPostGroupIds(array $postGroupIds): array
+    {
+        if (empty($postGroupIds)) {
+            return [];
+        }
+
+        $sub = $this->createQueryBuilder('sub')
+            ->select('MAX(sub.id)')
+            ->innerJoin('sub.post', 'subPost')
+            ->where('subPost.postGroup IN (:postGroupIds)')
+            ->groupBy('sub.post, sub.type')
+            ->getDQL();
+
+        return $this->createQueryBuilder('pi')
+            ->select('IDENTITY(p.postGroup) as postGroupId, pi.type as type, SUM(pi.value) as totalValue')
+            ->innerJoin('pi.post', 'p')
+            ->where('pi.id IN (' . $sub . ')')
+            ->setParameter('postGroupIds', $postGroupIds)
+            ->groupBy('p.postGroup, pi.type')
+            ->getQuery()
+            ->getResult();
+    }
 }

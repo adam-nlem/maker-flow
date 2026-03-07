@@ -93,8 +93,8 @@ InsightsPageView                 h-screen overflow-hidden, flex flex-col
 | `InsightTile` | `components/insights/InsightTile.tsx` | Metric tile with optional area chart |
 | `PostDetailPageView` | `components/insights/posts/PostDetailPageView.tsx` | Post detail page with insight tiles and timeline charts |
 | `PostInsightSummaryCard` | `components/insights/posts/PostInsightSummaryCard.tsx` | Visibility summary grid card (Views, Reach, AvgWatchTime, TotalWatchTime) with evolution badges; formats watch time values with `formatDurationToFrench` |
-| `DashboardContent` | `components/insights/DashboardContent.tsx` | Dashboard card grid: routes Active integrations to `IntegrationCard`, Revoked/missing to `CreateIntegrationCard` |
-| `IntegrationCard` | `components/insights/integrations/IntegrationCard.tsx` | Active integration card: profile picture, name, platform icon, insight value for selected type |
+| `InsightsDashboardContent` | `components/insights/InsightsDashboardContent.tsx` | Dashboard card grid: calls `useListIntegrationInsights` with `projectUuid` to get all insights grouped by integration, routes Active integrations to `IntegrationCard` (passing insights via props), Revoked/missing to `CreateIntegrationCard` |
+| `IntegrationCard` | `components/insights/integrations/IntegrationCard.tsx` | Active integration card: receives `integration` and `insights` as props, displays profile picture, name, platform icon, insight value for selected type |
 | `CreateIntegrationCard` | `components/insights/integrations/CreateIntegrationCard.tsx` | Placeholder card with shimmer + "Se connecter" button. Used for both new connections and re-auth of revoked integrations |
 | `FilterTile` | `components/insights/FilterTile.tsx` | Filter chip used in dropdowns |
 | `LineChart` | `~/components/ui/LineChart.tsx` | Recharts line chart with current vs average lines |
@@ -122,8 +122,13 @@ InsightsPageView                 h-screen overflow-hidden, flex flex-col
 
 - **`insightsFilterStore`** -- Zustand store holding `insightType`, `timePeriod`, and `focusedIntegrationUuid` filters.
 
+## DTOs (Integration Insights)
+
+- `IntegrationInsightsGroupedByIntegrationDTO` -- Groups an `Integration` with its `IntegrationInsight[]`. Returned as array from `GET /api/integration-insights?projectUuid=...`.
+
 ## API Hooks
 
+- `useListIntegrationInsights` -- Fetches all integration insights grouped by integration for a project (`projectUuid`). Returns `insightsOverview: IntegrationInsightsOverviewDTO | null`.
 - `useShowIntegrationDetail` -- Fetches integration detail (followers, daily points, post count, streak).
 - `useListPaginatedPosts` -- Paginated post list with `hasMore` / `listMore` for infinite scroll.
 - `useShowPostInsightDetail` -- Fetches post detail with insight tiles, evolution, engagement rates, timeline data for charts, and ranking data.
@@ -185,5 +190,5 @@ X-axis uses `formatDurationToFrench()` (via a local helper converting hours to s
 ## Cleanup Notes
 
 - **Design system colors**: Evolution badges and insight tiles use `text-green` / `bg-pastel-green` (positive) and `text-danger` / `bg-danger/10` (negative) from the design system instead of hardcoded Tailwind color classes.
-- **Dashboard integration routing**: `DashboardContent` iterates `platformOptions` and renders `IntegrationCard` for Active integrations or `CreateIntegrationCard` for Revoked/missing integrations. This means revoked integrations show the same shimmer + "Se connecter" card as platforms with no integration at all, reusing the existing OAuth flow for re-authentication.
+- **Dashboard integration routing**: `InsightsDashboardContent` fetches all insights grouped by integration via `useListIntegrationInsights({ projectUuid })`, iterates `platformOptions`, and renders `IntegrationCard` (passing `insights` via props) for Active integrations or `CreateIntegrationCard` for Revoked/missing integrations. This means revoked integrations show the same shimmer + "Se connecter" card as platforms with no integration at all, reusing the existing OAuth flow for re-authentication.
 - **Post detail safe rendering**: The timeline chart renders conditionally when the selected timeline exists. Engagement progress bars use `?? 0` fallback for nullable values. The empty placeholder div was removed and the chart section takes full width.

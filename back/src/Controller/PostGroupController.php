@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\PostGroup\ListPostGroupsQueryParamDTO;
+use App\DTO\QueryParam\PostGroup\RankPostGroupsQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\PostGroup\CreatePostGroupRequestDTO;
 use App\DTO\Request\PostGroup\UpdatePostGroupRequestDTO;
@@ -11,6 +12,7 @@ use App\Entity\User;
 use App\Repository\PostGroupRepository;
 use App\Repository\PostRepository;
 use App\Repository\ProjectRepository;
+use App\Service\PostGroup\PostGroupService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -20,6 +22,8 @@ use Symfony\Component\Routing\Requirement\Requirement;
 #[Route('/api/post-groups', requirements: ['postGroupUuid' => Requirement::UUID])]
 final class PostGroupController extends AbstractController
 {
+    public function __construct(private PostGroupService $service) {}
+
     #[Route('', name: 'api_post_groups_list', methods: ['GET'])]
     public function list(
         ListPostGroupsQueryParamDTO $queryParamDto,
@@ -41,6 +45,29 @@ final class PostGroupController extends AbstractController
             data: $postGroups,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_post_groups_list']]
+        );
+    }
+
+    #[Route('/rank', name: 'api_post_groups_rank', methods: ['GET'])]
+    public function rank(
+        RankPostGroupsQueryParamDTO $queryParamDto,
+        ProjectRepository $projectRepository,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+
+        if ($project === null) {
+            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        $result = $this->service->getRankedPostGroups($user, $project, $queryParamDto->getLimit());
+
+        return $this->json(
+            data: $result,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_post_groups_rank']],
         );
     }
 

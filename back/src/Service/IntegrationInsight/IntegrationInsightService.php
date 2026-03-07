@@ -4,12 +4,15 @@ namespace App\Service\IntegrationInsight;
 
 use App\Entity\Enum\Platform;
 use App\Entity\Integration;
+use App\Entity\Project;
 use App\Entity\User;
 use App\Helper\DateHelper;
 use App\DTO\External\Instagram\InstagramIntegrationInsightDTO;
 use App\DTO\External\Youtube\YoutubeIntegrationInsightDTO;
 use Google\Service\YouTube;
 use Google\Service\YouTubeAnalytics;
+use App\DTO\Response\IntegrationInsight\ListIntegrationInsightsGroupedByIntegrationResponseDTO;
+use App\DTO\Response\IntegrationInsight\ListIntegrationInsightsResponseDTO;
 use App\DTO\Response\IntegrationInsight\ShowIntegrationDetailResponseDTO;
 use App\DTO\Response\IntegrationInsight\IntegrationInsightTimelineDTO;
 use App\DTO\Response\IntegrationInsight\IntegrationInsightTimelinePointDTO;
@@ -58,6 +61,30 @@ class IntegrationInsightService
         private LoggerInterface $log
     ) {
         $this->instagramGraphUrl = $this->parameterBag->get('app.instagram.graph_url');
+    }
+
+    public function list(User $user, Project $project): ListIntegrationInsightsResponseDTO
+    {
+        $integrations = $this->integrationRepository->getByProjectAndUser($project, $user);
+
+        $groups = array_map(
+            fn(Integration $integration) => new ListIntegrationInsightsGroupedByIntegrationResponseDTO(
+                integration: $integration,
+                insights: $this->integrationInsightRepository->getLatestByUserAndByIntegration($user, $integration),
+            ),
+            $integrations,
+        );
+
+        $aggregatedInsights = [];
+        foreach ($this->integrationInsightRepository->getAggregatedLatestByProjectAndUser($project, $user) as $row) {
+            $type = $row['type'] instanceof IntegrationInsightType ? $row['type']->value : $row['type'];
+            $aggregatedInsights[] = ['type' => $type, 'value' => (float) $row['totalValue']];
+        }
+
+        return new ListIntegrationInsightsResponseDTO(
+            groups: $groups,
+            aggregatedInsights: $aggregatedInsights,
+        );
     }
 
     public function fetchInstagramProfileInsights(Integration $integration): void

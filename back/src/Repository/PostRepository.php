@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Enum\PostInsightType;
 use App\Entity\Integration;
 use App\Entity\Post;
 use App\Entity\PostGroup;
@@ -279,5 +280,58 @@ class PostRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->getQuery()
             ->getResult();
+    }
+
+    /**
+     * @return Post[]
+     */
+    public function getRankedByUserAndIntegrationSortedByInsightValue(
+        User $user,
+        Integration $integration,
+        PostInsightType $sortByType,
+        int $limit,
+    ): array {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            SELECT p.id
+            FROM post p
+            INNER JOIN post_insight pi ON pi.post_id = p.id
+                AND pi.type = :type
+                AND pi.id = (
+                    SELECT MAX(pi2.id) FROM post_insight pi2
+                    WHERE pi2.post_id = p.id AND pi2.type = :type
+                )
+            WHERE p.user_id = :user_id
+              AND p.integration_id = :integration_id
+            ORDER BY pi.value DESC
+            LIMIT :limit
+        ";
+
+        $postIds = $conn->executeQuery($sql, [
+            'type' => $sortByType->value,
+            'user_id' => $user->getId(),
+            'integration_id' => $integration->getId(),
+            'limit' => $limit,
+        ], [
+            'limit' => \Doctrine\DBAL\ParameterType::INTEGER,
+        ])->fetchFirstColumn();
+
+        if (empty($postIds)) {
+            return [];
+        }
+
+        $posts = $this->createQueryBuilder('p')
+            ->where('p.id IN (:ids)')
+            ->setParameter('ids', $postIds)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+
+        // Re-sort by the original order from the SQL query
+        $idOrder = array_flip($postIds);
+        usort($posts, fn(Post $a, Post $b) => ($idOrder[$a->getId()] ?? 0) <=> ($idOrder[$b->getId()] ?? 0));
+
+        return $posts;
     }
 }

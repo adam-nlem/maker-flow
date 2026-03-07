@@ -6,7 +6,7 @@ use App\Entity\User;
 use App\DTO\QueryParam\IntegrationInsight\ListIntegrationInsightsQueryParamDTO;
 use App\DTO\QueryParam\IntegrationInsight\ShowIntegrationDetailQueryParamDTO;
 use App\Entity\Enum\TimePeriod;
-use App\Repository\IntegrationInsightRepository;
+use App\Repository\ProjectRepository;
 use App\Service\IntegrationInsight\IntegrationInsightService;
 use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,25 +19,25 @@ final class IntegrationInsightController extends AbstractController
     #[Route('', name: 'api_integration_insights_list', methods: ['GET'])]
     public function list(
         ListIntegrationInsightsQueryParamDTO $queryParamDto,
-        IntegrationRepository $integrationRepository,
-        IntegrationInsightRepository $insightRepository,
+        ProjectRepository $projectRepository,
+        IntegrationInsightService $insightService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
 
-        $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
+        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
-        if ($integration === null) {
+        if ($project === null) {
             return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
+                data: ["message" => "You don't have any project with this uuid"],
                 status: Response::HTTP_NOT_FOUND
             );
         }
 
-        $insights = $insightRepository->getLatestByUserAndByIntegration($user, $integration);
+        $result = $insightService->list($user, $project);
 
         return $this->json(
-            data: $insights,
+            data: $result->getData(),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_integration_insights_list']],
         );

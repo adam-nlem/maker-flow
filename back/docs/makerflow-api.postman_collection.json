@@ -24,7 +24,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password\"\n}"
+              "raw": "{\n  \"email\": \"a@g.com\",\n  \"password\": \"a@g.com\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/login",
@@ -405,7 +405,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/integration-insights?integrationUuid={{integrationUuid}}",
+              "raw": "{{baseUrl}}/api/integration-insights?projectUuid={{projectUuid}}",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -415,8 +415,8 @@
               ],
               "query": [
                 {
-                  "key": "integrationUuid",
-                  "value": "{{integrationUuid}}"
+                  "key": "projectUuid",
+                  "value": "{{projectUuid}}"
                 }
               ]
             }
@@ -489,6 +489,36 @@
           "response": []
         },
         {
+          "name": "Rank Posts",
+          "id": "a1b2c3d4-rank-posts-endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/posts/rank?integrationUuid={{integrationUuid}}&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "posts",
+                "rank"
+              ],
+              "query": [
+                {
+                  "key": "integrationUuid",
+                  "value": "{{integrationUuid}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Get Post Thumbnail",
           "id": "2d7eddb9-4cf0-4a74-b842-81e8e1ff89be",
           "request": {
@@ -543,6 +573,42 @@
         }
       ],
       "id": "4810b0d0-7ba5-4142-8d2b-85c95289d5c0"
+    },
+    {
+      "name": "Post Groups",
+      "item": [
+        {
+          "name": "Rank Post Groups",
+          "id": "e5f6g7h8-rank-post-groups-endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/post-groups/rank?projectUuid={{projectUuid}}&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "post-groups",
+                "rank"
+              ],
+              "query": [
+                {
+                  "key": "projectUuid",
+                  "value": "{{projectUuid}}"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "b2c3d4e5-post-groups-folder"
     },
     {
       "name": "Todo Lists",
@@ -2121,15 +2187,24 @@
       "item": [
         {
           "name": "Show Creator Profile",
+          "id": "1bf92d1f-ec7a-481a-9f86-354a07cfb53b",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/creator-profiles?projectUuid={{projectUuid}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "creator-profiles"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "creator-profiles"
+              ],
               "query": [
-                { "key": "projectUuid", "value": "{{projectUuid}}" }
+                {
+                  "key": "projectUuid",
+                  "value": "{{projectUuid}}"
+                }
               ]
             }
           },
@@ -2137,10 +2212,14 @@
         },
         {
           "name": "Create or Update Creator Profile",
+          "id": "c21feaa3-fd18-407b-9cfb-3e057b67a15c",
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -2148,8 +2227,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/creator-profiles",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "creator-profiles"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "creator-profiles"
+              ]
             }
           },
           "response": []
@@ -2162,10 +2246,14 @@
       "item": [
         {
           "name": "Create Script Generation",
+          "id": "5b0916c3-5889-4226-93c8-68d6ed2d18df",
           "request": {
             "method": "POST",
             "header": [
-              { "key": "Content-Type", "value": "application/json" }
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
             ],
             "body": {
               "mode": "raw",
@@ -2173,36 +2261,57 @@
             },
             "url": {
               "raw": "{{baseUrl}}/api/script-generations",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "script-generations"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "script-generations"
+              ]
             }
           },
           "response": []
         },
         {
           "name": "Show Script Generation",
+          "id": "974dd353-eb30-46d8-bef5-40218ef9e71c",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/script-generations/{{generationUuid}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "script-generations", "{{generationUuid}}"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "script-generations",
+                "{{generationUuid}}"
+              ]
             }
           },
           "response": []
         },
         {
           "name": "Latest Script Generation",
+          "id": "0814d078-6d10-49f0-9da6-304442456fdb",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/api/script-generations?scriptUuid={{scriptUuid}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "script-generations"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "script-generations"
+              ],
               "query": [
-                { "key": "scriptUuid", "value": "{{scriptUuid}}" }
+                {
+                  "key": "scriptUuid",
+                  "value": "{{scriptUuid}}"
+                }
               ]
             }
           },
@@ -2704,9 +2813,6 @@
       "id": "stripe-webhook-folder-0001-000000000000"
     }
   ],
-  "auth": {
-    "type": "noauth"
-  },
   "event": [
     {
       "listen": "prerequest",
