@@ -1,6 +1,7 @@
+import { useEffect, useRef } from "react"
 import RankingItemTile from "~/components/ui/RankingItemTile"
 import Shimmer from "~/components/ui/Shimmer"
-import { useListRankedPosts } from "~/hooks/api/posts/useListRankedPosts"
+import { useListPaginatedRankedPosts } from "~/hooks/api/posts/useListPaginatedRankedPosts"
 import { PostInsightType } from "~/models/enums/PostInsightType"
 import { formatToFrenchRelative } from "~/utils/dateFormatters"
 
@@ -11,7 +12,29 @@ interface RankedPostsListProps {
 }
 
 export default function RankedPostsList({ integrationUuid }: RankedPostsListProps) {
-  const { posts, isLoading } = useListRankedPosts({ integrationUuid })
+  const { posts, isLoading, isLoadingMore, hasMore, listMore } = useListPaginatedRankedPosts({ integrationUuid })
+
+  const sentinelRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const sentinel = sentinelRef.current
+    if (!sentinel) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          listMore()
+        }
+      },
+      { rootMargin: "0px 0px 200px 0px" },
+    )
+
+    observer.observe(sentinel)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [hasMore, isLoadingMore, listMore, isLoading])
 
   if (isLoading) {
     return (
@@ -36,22 +59,25 @@ export default function RankedPostsList({ integrationUuid }: RankedPostsListProp
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col flex-1 min-h-0">
       <h2 className="text-heading-sm mb-2">Classement des posts</h2>
-      {posts.map((post, index) => ( 
-        <RankingItemTile
-          key={post.post.uuid}
-          index={index}
-          postUuid={post.post.uuid}
-          title={post.post.caption}
-          subtitle={formatToFrenchRelative(post.post.publishedAt)}
-          metrics={DISPLAYED_METRIC_TYPES.map((type) => ({
-            type,
-            value: post.aggregatedInsights.find((i) => i.type === type)?.value ?? 0,
-          }))}
-          isLast={index === posts.length - 1}
-        />
-      ))}
+      <div className="overflow-y-auto scrollbar-none flex-1 min-h-0">
+        {posts.map((post, index) => (
+          <RankingItemTile
+            key={post.post.uuid}
+            index={index}
+            postUuid={post.post.uuid}
+            title={post.post.caption}
+            subtitle={formatToFrenchRelative(post.post.publishedAt)}
+            metrics={DISPLAYED_METRIC_TYPES.map((type) => ({
+              type,
+              value: post.aggregatedInsights.find((i) => i.type === type)?.value ?? 0,
+            }))}
+            isLast={index === posts.length - 1 && !hasMore}
+          />
+        ))}
+        <div ref={sentinelRef} className="h-1" />
+      </div>
     </div>
   )
 }

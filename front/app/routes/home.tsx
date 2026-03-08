@@ -29,8 +29,8 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
   return (
     <div className="w-full">
       <SideBar />
-      <div className="w-full pl-16">
-        <div className="p-5 flex flex-row gap-5">
+      <div className="w-full pl-16 h-screen overflow-hidden">
+        <div className="p-5 flex flex-row gap-5 h-full">
           {isLoading ? (
             <>
               <div className="w-2/3" />
@@ -63,11 +63,11 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
             </>
           ) : focusedProject && (
             <>
-              <div className="w-2/3 flex flex-col gap-5">
+              <div className="w-2/3 flex flex-col gap-5 overflow-y-auto scrollbar-none">
                 <HomeScriptsList projectUuid={focusedProject.uuid} />
                 <ScriptCalendar projectUuid={focusedProject.uuid} />
               </div>
-              <div className="w-1/3 flex flex-col gap-5">
+              <div className="w-1/3 flex flex-col gap-5 min-h-0">
                 <HomeInsightsOverview
                   projectUuid={focusedProject.uuid}
                 />

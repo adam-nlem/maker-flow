@@ -6,10 +6,10 @@ The home page (`/`) is the main dashboard. It shows an overview of insights acro
 
 ## Layout
 
-Two-column layout (`w-2/3` + `w-1/3`):
+Two-column layout (`w-2/3` + `w-1/3`). The content wrapper uses `h-screen overflow-hidden` to constrain both columns to viewport height. The flex row has `h-full` to propagate the height.
 
-- **Left column**: `HomeScriptsList` (filtered scripts list with status pills) + `ScriptCalendar`
-- **Right column**: `HomeInsightsOverview` + ranked posts or ranked post groups
+- **Left column** (`overflow-y-auto scrollbar-none`): `HomeScriptsList` (filtered scripts list with status pills) + `ScriptCalendar`. Scrolls independently.
+- **Right column** (`min-h-0`): `HomeInsightsOverview` + ranked posts or ranked post groups. The `min-h-0` allows `flex-1 min-h-0` in child ranked list components to work, enabling their internal `overflow-y-auto` scrollable containers.
 
 ## Components
 
@@ -30,7 +30,7 @@ Props: `projectUuid`
 
 **File:** `app/components/home/RankedPostsList.tsx`
 
-Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `RankingItemTile` with infinite scroll (IntersectionObserver sentinel, vertical `rootMargin`). Displays Views, Likes, and Comments metrics for each post.
+Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `RankingItemTile` with infinite scroll (IntersectionObserver sentinel, vertical `rootMargin`). Outer container uses `flex-1 min-h-0`, inner scrollable div uses `overflow-y-auto scrollbar-none flex-1 min-h-0`. Displays Views, Likes, and Comments metrics for each post.
 
 Props: `integrationUuid`
 
@@ -38,7 +38,7 @@ Props: `integrationUuid`
 
 **File:** `app/components/home/RankedPostGroupsList.tsx`
 
-Calls `useListPaginatedRankedPostGroups({ projectUuid })`, renders post groups using `RankingItemTile` with infinite scroll (IntersectionObserver sentinel, vertical `rootMargin`). Displays group title, post count, and aggregated Views, Likes, and Comments metrics.
+Calls `useListPaginatedRankedPostGroups({ projectUuid })`, renders post groups using `RankingItemTile` with infinite scroll (IntersectionObserver sentinel, vertical `rootMargin`). Outer container uses `flex-1 min-h-0`, inner scrollable div uses `overflow-y-auto scrollbar-none flex-1 min-h-0`. Displays group title, post count, and aggregated Views, Likes, and Comments metrics.
 
 Props: `projectUuid`
 
