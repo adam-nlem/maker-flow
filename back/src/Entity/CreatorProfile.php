@@ -102,7 +102,7 @@ class CreatorProfile
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups([
         'api_creator_profiles_show',
         'api_creator_profiles_create',
@@ -126,6 +126,10 @@ class CreatorProfile
 
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if ($this->updatedAt === null) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
     }
 
@@ -265,7 +269,7 @@ class CreatorProfile
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

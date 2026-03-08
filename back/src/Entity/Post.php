@@ -31,7 +31,7 @@ class Post
     #[Groups(['api_post_insights_detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups(['api_post_insights_detail'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
@@ -87,6 +87,10 @@ class Post
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
 
+        if (null === $this->updatedAt) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
         $this->postInsights = new ArrayCollection();
     }
 
@@ -130,7 +134,7 @@ class Post
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

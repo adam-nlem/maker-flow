@@ -65,7 +65,7 @@ class ScriptRetentionCue
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups([
         'api_scripts_retention_cues_list',
         'api_scripts_retention_cues_create',
@@ -94,6 +94,10 @@ class ScriptRetentionCue
 
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if ($this->updatedAt === null) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
     }
 
@@ -184,7 +188,7 @@ class ScriptRetentionCue
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

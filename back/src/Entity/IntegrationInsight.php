@@ -36,7 +36,7 @@ class IntegrationInsight
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups([
         'api_integration_insights_list',
         'api_integration_insights_detail',
@@ -80,6 +80,10 @@ class IntegrationInsight
 
         if (null === $this->createdAt) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if (null === $this->updatedAt) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
     }
 

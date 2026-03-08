@@ -28,7 +28,7 @@ class PostInsightBreakdown
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(enumType: PostInsightType::class)]
@@ -68,6 +68,10 @@ class PostInsightBreakdown
 
         if (null === $this->createdAt) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if (null === $this->updatedAt) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
     }
 

@@ -29,7 +29,7 @@ class PostGroup
     #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update', 'api_post_groups_rank'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups(['api_post_groups_list', 'api_post_groups_create', 'api_post_groups_update', 'api_post_groups_rank'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
@@ -63,6 +63,10 @@ class PostGroup
 
         if (null === $this->createdAt) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if (null === $this->updatedAt) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
 
         $this->posts = new ArrayCollection();
@@ -108,7 +112,7 @@ class PostGroup
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

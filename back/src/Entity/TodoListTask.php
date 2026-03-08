@@ -71,7 +71,7 @@ class TodoListTask
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups([
         'api_todo_lists_tasks_list',
         'api_todo_lists_tasks_create'
@@ -121,6 +121,10 @@ class TodoListTask
 
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if ($this->updatedAt === null) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
         $this->tags = new ArrayCollection();
     }
@@ -216,7 +220,7 @@ class TodoListTask
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

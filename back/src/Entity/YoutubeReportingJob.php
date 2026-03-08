@@ -27,7 +27,7 @@ class YoutubeReportingJob
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
@@ -58,6 +58,10 @@ class YoutubeReportingJob
 
         if (null === $this->createdAt) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if (null === $this->updatedAt) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
     }
 

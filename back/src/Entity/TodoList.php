@@ -45,7 +45,7 @@ class TodoList
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups([
         'api_todo_lists_create',
         'api_todo_lists_list',
@@ -85,6 +85,10 @@ class TodoList
 
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if ($this->updatedAt === null) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
         $this->todoListTasks = new ArrayCollection();
         $this->todoListTags = new ArrayCollection();

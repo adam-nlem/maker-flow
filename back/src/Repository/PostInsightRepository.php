@@ -230,7 +230,6 @@ class PostInsightRepository extends ServiceEntityRepository
             ->select('IDENTITY(pi.post) as postId, pi.type as type, pi.value as value')
             ->where('pi.id IN (' . $sub . ')')
             ->setParameter('postIds', $postIds)
-            ->groupBy('pi.post, pi.type')
             ->getQuery()
             ->getResult();
     }

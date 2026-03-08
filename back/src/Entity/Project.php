@@ -67,7 +67,7 @@ class Project
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups([
         'api_project_create',
         'api_project_update',
@@ -143,6 +143,10 @@ class Project
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
+
+        if ($this->updatedAt === null) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
+        }
         $this->todoLists = new ArrayCollection();
         $this->integrations = new ArrayCollection();
         $this->scripts = new ArrayCollection();
@@ -214,7 +218,7 @@ class Project
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

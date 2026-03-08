@@ -29,6 +29,7 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private ?string $uuid = null;
 
@@ -39,6 +40,7 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private ?string $title = null;
 
@@ -49,6 +51,7 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private ?\DateTimeImmutable $publishedAt = null;
 
@@ -59,16 +62,18 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups([
         'api_scripts_list',
         'api_scripts_calendar',
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
@@ -79,6 +84,7 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private ?array $platforms = null;
 
@@ -89,6 +95,7 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private ?ContentType $contentType = null;
 
@@ -99,6 +106,7 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private ?ScriptStatus $status = null;
 
@@ -118,6 +126,7 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private ?PostGroup $postGroup = null;
 
@@ -131,6 +140,7 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
+        'api_scripts_by_status',
     ])]
     private Collection $tags;
 
@@ -196,6 +206,10 @@ class Script
 
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if ($this->updatedAt === null) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
 
         $this->tags = new ArrayCollection();
@@ -274,7 +288,7 @@ class Script
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

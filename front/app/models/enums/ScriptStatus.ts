@@ -2,9 +2,6 @@ import { ArrowPathIcon, CalendarDaysIcon, CheckBadgeIcon, CheckCircleIcon, Clock
 import type { ComponentType, SVGProps } from "react";
 
 export enum ScriptStatus {
-    Pending = 'pending',
-    InProgress = 'in_progress',
-    Completed = 'completed',
     Idea = 'idea',
     Scripting = 'scripting',
     Shooting = 'shooting',
@@ -16,9 +13,6 @@ export enum ScriptStatus {
 export const scriptStatusOptions = Object.values(ScriptStatus);
 
 export const scriptStatusToFrenchTranslation: Record<ScriptStatus, string> = {
-    [ScriptStatus.Pending]: "En attente",
-    [ScriptStatus.InProgress]: "En cours",
-    [ScriptStatus.Completed]: "Terminé",
     [ScriptStatus.Idea]: 'Idée',
     [ScriptStatus.Scripting]: 'Écriture du Script',
     [ScriptStatus.Shooting]: 'Tournage',
@@ -28,9 +22,6 @@ export const scriptStatusToFrenchTranslation: Record<ScriptStatus, string> = {
 }
 
 export const scriptStatusToBgClass: Record<ScriptStatus, string> = {
-    [ScriptStatus.Pending]: "bg-gray/10",
-    [ScriptStatus.InProgress]: "bg-yellow/10",
-    [ScriptStatus.Completed]: "bg-primary/10",
     [ScriptStatus.Idea]: "bg-gray/10",
     [ScriptStatus.Scripting]: "bg-purple/10",
     [ScriptStatus.Shooting]: "bg-blue/10",
@@ -40,9 +31,6 @@ export const scriptStatusToBgClass: Record<ScriptStatus, string> = {
 }
 
 export const scriptStatusToBorderClass: Record<ScriptStatus, string> = {
-    [ScriptStatus.Pending]: "border border-gray/30",
-    [ScriptStatus.InProgress]: "border border-yellow/30",
-    [ScriptStatus.Completed]: "border border-primary/30",
     [ScriptStatus.Idea]: "border border-gray/30",
     [ScriptStatus.Scripting]: "border border-purple/30",
     [ScriptStatus.Shooting]: "border border-blue/30",
@@ -52,9 +40,6 @@ export const scriptStatusToBorderClass: Record<ScriptStatus, string> = {
 }
 
 export const scriptStatusToTextClass: Record<ScriptStatus, string> = {
-    [ScriptStatus.Pending]: "text-gray",
-    [ScriptStatus.InProgress]: "text-yellow",
-    [ScriptStatus.Completed]: "text-primary",
     [ScriptStatus.Idea]: "text-gray",
     [ScriptStatus.Scripting]: "text-purple",
     [ScriptStatus.Shooting]: "text-blue",
@@ -64,9 +49,6 @@ export const scriptStatusToTextClass: Record<ScriptStatus, string> = {
 }
 
 export const scriptStatusToIcon: Record<ScriptStatus, ComponentType<SVGProps<SVGSVGElement>>> = {
-    [ScriptStatus.Pending]: ClockIcon,
-    [ScriptStatus.InProgress]: ArrowPathIcon,
-    [ScriptStatus.Completed]: CheckCircleIcon,
     [ScriptStatus.Idea]: LightBulbIcon,
     [ScriptStatus.Scripting]: PencilSquareIcon,
     [ScriptStatus.Shooting]: VideoCameraIcon,

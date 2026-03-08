@@ -208,6 +208,10 @@ class Resource
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
+
+        if ($this->updatedAt === null) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
+        }
     }
 
     #[ORM\PreUpdate]
@@ -224,7 +228,7 @@ class Resource
 
 1. **Auto-generate UUID** in constructor using `Uuid::v4()`
 2. **Auto-set createdAt** in constructor using `DateHelper::createUtcDateTimeImmutable()`
-3. **Auto-update updatedAt** using `#[ORM\PreUpdate]` lifecycle callback
+3. **Auto-set updatedAt** in constructor (same value as createdAt) and **auto-update** using `#[ORM\PreUpdate]` lifecycle callback. Both `createdAt` and `updatedAt` are NOT NULL.
 4. **Use `DateTimeImmutable`** for all date fields
 5. **All dates stored in UTC**
 6. **Serialization groups** defined on each property for API exposure

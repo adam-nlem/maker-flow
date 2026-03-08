@@ -8,7 +8,7 @@ The home page (`/`) is the main dashboard. It shows an overview of insights acro
 
 Two-column layout (`w-2/3` + `w-1/3`):
 
-- **Left column**: (empty for now)
+- **Left column**: `HomeScriptsByStatus` (scripts grouped by status)
 - **Right column**: `HomeInsightsOverview` + ranked posts or ranked post groups
 
 ## Components
@@ -39,6 +39,14 @@ Props: `integrationUuid`
 **File:** `app/components/home/RankedPostGroupsList.tsx`
 
 Calls `useListRankedPostGroups({ projectUuid })`, renders post groups using `HomeRankingItemTile`. Displays group title, post count, and aggregated Views metric.
+
+Props: `projectUuid`
+
+### HomeScriptsByStatus
+
+**File:** `app/components/home/HomeScriptsByStatus.tsx`
+
+Calls `useListScriptsByStatus({ projectUuid })`, renders scripts grouped by status. Each status group shows a header (icon + French label) and up to 3 script cards in a row. Clicking a card sets `focusedScriptUuid` in `useFocusScriptStore` and navigates to `/scripts`.
 
 Props: `projectUuid`
 
@@ -73,6 +81,7 @@ Zustand store with persist middleware (`app:home:filter-store`).
 | `useListIntegrationInsights` | `app/hooks/api/integrationInsights/useListIntegrationInsights.ts` | `GET /api/integration-insights` | `{ insightsOverview: IntegrationInsightsOverviewDTO \| null }` |
 | `useListRankedPosts` | `app/hooks/api/posts/useListRankedPosts.ts` | `GET /api/posts/rank` | `{ posts: PostWithAggregatedInsightsDTO[] }` |
 | `useListRankedPostGroups` | `app/hooks/api/postGroups/useListRankedPostGroups.ts` | `GET /api/post-groups/rank` | `{ postGroups: PostGroupWithAggregatedInsightsDTO[] }` |
+| `useListScriptsByStatus` | `app/hooks/api/scripts/useListScriptsByStatus.ts` | `GET /api/scripts/by-status` | `{ scriptsByStatus: ScriptsGroupedByStatusDTO[] }` |
 
 ## Models & DTOs
 
@@ -83,9 +92,11 @@ Zustand store with persist middleware (`app:home:filter-store`).
 | `app/dtos/postGroups/PostGroupWithAggregatedInsightsDTO.ts` | Post group with aggregated insights (postGroup, aggregatedInsights) |
 | `app/dtos/integrationInsights/IntegrationInsightsOverviewDTO.ts` | Overview DTO: groups (per integration) + aggregatedInsights (summed across all) |
 | `app/dtos/integrationInsights/IntegrationInsightsGroupedByIntegrationDTO.ts` | Integration with its latest insights (integration, insights[]) |
+| `app/dtos/scripts/ScriptsGroupedByStatusDTO.ts` | Scripts grouped by status (status, scripts[]) |
 
 ## Query Keys
 
 - `postQueryKeys.rank(integrationUuid)` — `["posts", "rank", integrationUuid]`
 - `postGroupQueryKeys.rank(projectUuid)` — `["postGroups", "rank", projectUuid]`
 - `integrationInsightQueryKeys.list(projectUuid)` — `["integrationInsights", "list", projectUuid]`
+- `scriptQueryKeys.byStatus(projectUuid)` — `["scripts", "byStatus", projectUuid]`

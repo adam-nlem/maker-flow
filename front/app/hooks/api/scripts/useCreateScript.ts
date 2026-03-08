@@ -20,8 +20,12 @@ export function useCreateScript() {
             const res = await httpClient.post('/scripts', data)
             return Script.fromJSON(res.data as ScriptJSON)
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: scriptQueryKeys.all })
+        onSuccess: (newScript, variables) => {
+            queryClient.setQueryData(
+                scriptQueryKeys.list(variables.projectUuid),
+                (old: Script[] | undefined) => old ? [newScript, ...old] : [newScript]
+            );
+            queryClient.invalidateQueries({ queryKey: scriptQueryKeys.all });
         },
     })
 

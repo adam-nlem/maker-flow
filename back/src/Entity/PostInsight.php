@@ -29,7 +29,7 @@ class PostInsight
     #[Groups(['api_posts_list', 'api_post_insights_detail'])]
     private ?\DateTimeImmutable $createdAt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column]
     #[Groups(['api_posts_list', 'api_post_insights_detail'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
@@ -61,6 +61,10 @@ class PostInsight
 
         if (null === $this->createdAt) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
+        }
+
+        if (null === $this->updatedAt) {
+            $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
     }
 

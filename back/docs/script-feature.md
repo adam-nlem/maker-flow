@@ -338,6 +338,7 @@ Used to list available placeholders that can be embedded in hook template conten
 | `getByUuidAndUser` | `string $uuid, User $user` | `?Script` | Finds script by UUID for a specific user |
 | `getByProjectAndUser` | `Project $project, User $user` | `array` | Returns all scripts for a project ordered by creation date DESC |
 | `getByProjectAndUserPaginated` | `Project $project, User $user, int $page, int $limit` | `array` | Paginated scripts ordered by creation date DESC |
+| `getByProjectAndUserGroupedByStatus` | `Project $project, User $user, int $limit` | `array<string, Script[]>` | Scripts grouped by status (native SQL with ROW_NUMBER), limited per group, ordered by updatedAt DESC |
 
 ### `ScriptTagRepository`
 
@@ -405,6 +406,7 @@ All follow the same pattern:
 | Action | Method | Route | Name | Description |
 |--------|--------|-------|------|-------------|
 | list | GET | `` | `api_scripts_list` | List scripts for a project (projectUuid QP) |
+| byStatus | GET | `/by-status` | `api_scripts_by_status` | List scripts grouped by status (projectUuid QP, optional limit, default 3) |
 | create | POST | `` | `api_scripts_create` | Create script with optional PostGroup link and tags |
 | show | GET | `/{uuid}` | `api_scripts_show` | Get script details |
 | update | PATCH | `/{uuid}` | `api_scripts_update` | Update script (supports PostGroup unlink via explicit null) |
@@ -496,6 +498,7 @@ All follow the same CRUD pattern:
 | DTO | Properties | Validation |
 |-----|------------|------------|
 | `ListScriptsQueryParamDTO` | `projectUuid`, `page`, `limit` | NotBlank, Positive |
+| `ListScriptsByStatusQueryParamDTO` | `projectUuid`, `limit` (default 3) | NotBlank, Positive |
 | `ListScriptTagsQueryParamDTO` | `projectUuid`, `searchTerm?` | NotBlank on projectUuid |
 | `ListScriptChaptersQueryParamDTO` | `scriptUuid` | NotBlank |
 | `ListScriptVoiceOversQueryParamDTO` | `scriptUuid` | NotBlank |
@@ -546,6 +549,7 @@ All follow the same CRUD pattern:
 | Group | Used In |
 |-------|---------|
 | `api_scripts_list` | Script list endpoint |
+| `api_scripts_by_status` | Scripts grouped by status endpoint |
 | `api_scripts_create` | Script create endpoint |
 | `api_scripts_update` | Script update endpoint |
 | `api_scripts_show` | Script show endpoint |
