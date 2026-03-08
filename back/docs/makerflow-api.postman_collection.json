@@ -982,6 +982,12 @@
                 {
                   "key": "projectUuid",
                   "value": "{{projectUuid}}"
+                },
+                {
+                  "key": "status",
+                  "value": "idea",
+                  "description": "Optional filter by ScriptStatus (idea, scripting, shooting, editing, scheduled, published)",
+                  "disabled": true
                 }
               ]
             }

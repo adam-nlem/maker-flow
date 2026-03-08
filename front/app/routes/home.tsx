@@ -8,6 +8,7 @@ import { useHomeFilterStore } from "~/stores/homeFilterStore";
 import RankedPostsList from "~/components/home/RankedPostsList";
 import RankedPostGroupsList from "~/components/home/RankedPostGroupsList";
 import HomeScriptsByStatus from "~/components/home/HomeScriptsByStatus";
+import { ScriptCalendar } from "~/components/scripts/calendar";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -63,7 +64,8 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
           ) : focusedProject && (
             <>
               <div className="w-2/3">
-                <HomeScriptsByStatus projectUuid={focusedProject.uuid} />
+                <ScriptCalendar projectUuid={focusedProject.uuid} />
+                {/*                <HomeScriptsByStatus projectUuid={focusedProject.uuid} />*/}
               </div>
               <div className="w-1/3 flex flex-col gap-5">
                 <HomeInsightsOverview
