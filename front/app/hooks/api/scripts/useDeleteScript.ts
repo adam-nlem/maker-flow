@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import type { Script } from "~/models/Script";
 import { scriptQueryKeys } from "./scriptQueryKeys";
 
 export function useDeleteScript() {
@@ -9,8 +10,13 @@ export function useDeleteScript() {
         mutationFn: async (scriptUuid: string) => {
             await httpClient.delete(`/scripts/${scriptUuid}`)
         },
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: scriptQueryKeys.all })
+        onSuccess: (_data, deletedScriptUuid) => {
+            queryClient.removeQueries({ queryKey: scriptQueryKeys.parts(deletedScriptUuid) });
+            queryClient.setQueriesData<Script[]>(
+                { queryKey: ['scripts', 'list'] },
+                (old) => old?.filter(s => s.uuid !== deletedScriptUuid)
+            );
+            queryClient.invalidateQueries({ queryKey: scriptQueryKeys.all });
         },
     })
 
