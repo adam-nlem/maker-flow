@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { scriptTagQueryKeys } from "./scriptTagQueryKeys";
+import { ScriptTag } from "~/models/ScriptTag";
 import type { Color } from "~/models/enums/Color";
 
 interface CreateScriptTagData {
@@ -14,7 +15,8 @@ export function useCreateScriptTag() {
 
     const mutation = useMutation({
         mutationFn: async (data: CreateScriptTagData) => {
-            await httpClient.post('/scripts/tags', data)
+            const res = await httpClient.post('/scripts/tags', data)
+            return ScriptTag.fromJSON(res.data);
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: scriptTagQueryKeys.all })

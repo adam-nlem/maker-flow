@@ -46,7 +46,8 @@ export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props
 
     const handleCreateTag = async () => {
         if (!newTagTitle.trim()) return;
-        await createScriptTag({ projectUuid, title: newTagTitle.trim(), color: newTagColor });
+        const newTag = await createScriptTag({ projectUuid, title: newTagTitle.trim(), color: newTagColor });
+        await updateScript({ scriptUuid: script.uuid, data: { tagUuids: [...script.tags.map((t) => t.uuid), newTag.uuid] } });
         setNewTagTitle("");
         setIsOpen(false);
     };

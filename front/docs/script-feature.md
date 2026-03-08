@@ -77,7 +77,9 @@ front/app/
 │   ├── scriptTags/
 │   │   ├── scriptTagQueryKeys.ts
 │   │   ├── useListScriptTags.ts ← returns { scriptTags }
-│   │   └── useCreateScriptTag.ts
+│   │   ├── useCreateScriptTag.ts
+│   │   ├── useUpdateScriptTag.ts
+│   │   └── useDeleteScriptTag.ts
 │   ├── scriptChapters/
 │   │   ├── useCreateScriptChapter.ts
 │   │   ├── useUpdateScriptChapter.ts
@@ -117,6 +119,7 @@ front/app/
     ├── ScriptEditorPanel.tsx
     ├── ScriptMetaHeader.tsx
     ├── ScriptTagsRow.tsx
+    ├── UpdateScriptTagDropdown.tsx
     ├── ScriptPlatformsRow.tsx
     ├── calendar/
     │   ├── index.ts                 ← barrel export
@@ -249,8 +252,11 @@ Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay
 ### Tag Management
 - `ScriptTagsRow` lists assigned tags as colored pills with `×` to remove
 - A `+` button opens a popover showing unassigned tags from `useListScriptTags`
+- Each unassigned tag in the popover is rendered as a `Badge` with an `onOptionClick` (`...` icon on hover) that opens `UpdateScriptTagDropdown`
+- `UpdateScriptTagDropdown` allows editing tag title/color and deleting the tag (with `ConfirmDeleteDialog` confirmation) — mirrors the `UpdateTodoListTagDropdown` pattern from the Tasks feature
 - The popover also has an inline form to create new tags via `useCreateScriptTag`
 - Toggle/remove calls `useUpdateScript` with the full new `tagUuids` array
+- Tag deletion uses `useDeleteScriptTag` which invalidates both `scriptTagQueryKeys.all` and `scriptQueryKeys.all`
 - **Note:** `useListScriptTags` returns `{ scriptTags }` (not `{ tags }`)
 
 ### Dialogue Subjects
@@ -266,6 +272,8 @@ Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay
 |------|---------------------------|
 | `useDeleteScript` | Takes raw `string` UUID (not an object) |
 | `useListScriptTags` | Returns `{ scriptTags }` |
+| `useUpdateScriptTag` | Takes `{ tagUuid, title, color }` |
+| `useDeleteScriptTag` | Takes raw `string` UUID |
 | `useCreateDialogueSubject` | Uses `scriptDialogueUuid` |
 | `useUpdateDialogueSubject` | Takes `{ subjectUuid, scriptUuid, speaker?, content? }` — no dialogueUuid |
 | `useDeleteDialogueSubject` | Takes `{ subjectUuid, scriptUuid }` — no dialogueUuid |
@@ -318,7 +326,7 @@ hookTemplateQueryKeys.all        // ['hookTemplates']
 hookTemplateQueryKeys.list(term) // ['hookTemplates', 'list', term ?? '']
 ```
 
-All part mutations (chapters, voice-overs, dialogues, shots, texts, call-to-actions, retention cues, hooks, dialogue subjects) invalidate `scriptQueryKeys.parts(scriptUuid)`. All hook template mutations invalidate `hookTemplateQueryKeys.all`.
+All part mutations (chapters, voice-overs, dialogues, shots, texts, call-to-actions, retention cues, hooks, dialogue subjects) invalidate `scriptQueryKeys.parts(scriptUuid)`. All hook template mutations invalidate `hookTemplateQueryKeys.all`. Script tag mutations (`useUpdateScriptTag`, `useDeleteScriptTag`) invalidate both `scriptTagQueryKeys.all` and `scriptQueryKeys.all`.
 
 ---
 
