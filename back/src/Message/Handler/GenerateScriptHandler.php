@@ -93,11 +93,7 @@ class GenerateScriptHandler
             $output = $this->aiClientResolver->resolve($generation->getAiModel())->generateScript($prompt);
 
             // Parse output and create parts (scoped to this generation)
-            $metadata = $this->outputParserService->parseAndCreateParts($output, $script, $user, $generation);
-
-            if ($metadata->getTitle() !== null) {
-                $script->setTitle($metadata->getTitle());
-            }
+            $this->outputParserService->parseAndCreateParts($output, $script, $user, $generation);
 
             // Mark as completed
             $generation->setStatus(ScriptGenerationStatus::Completed)

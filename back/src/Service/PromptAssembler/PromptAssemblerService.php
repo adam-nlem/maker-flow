@@ -215,7 +215,6 @@ class PromptAssemblerService
         $lines = [];
         $lines[] = 'Formate ta sortie UNIQUEMENT en JSON valide, sans blocs de code markdown ni texte autour. Utilise cette structure exacte :';
         $lines[] = '{';
-        $lines[] = '  "title": "Titre du script",';
         $lines[] = '  "parts": [';
 
         if (in_array(SkillModule::StrongHook->value, $activeSkills, true)) {

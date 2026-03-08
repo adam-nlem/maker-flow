@@ -8,7 +8,6 @@ class ScriptOutputDTO
      * @param ScriptOutputPartDTO[] $parts
      */
     public function __construct(
-        private readonly ?string $title,
         private readonly array $parts,
     ) {}
 
@@ -20,14 +19,8 @@ class ScriptOutputDTO
         );
 
         return new self(
-            title: isset($data['title']) && $data['title'] !== '' ? trim($data['title']) : null,
             parts: $parts,
         );
-    }
-
-    public function getTitle(): ?string
-    {
-        return $this->title;
     }
 
     /**
