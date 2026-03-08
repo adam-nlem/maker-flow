@@ -196,12 +196,14 @@ class PostService
     public function getRankedPosts(
         User $user,
         Integration $integration,
+        int $page,
         int $limit,
     ): array {
         $postIds = $this->repository->getRankedIdsByUserAndIntegrationSortedByInsightValue(
             $user,
             $integration,
             PostInsightType::Views,
+            $page,
             $limit,
         );
 

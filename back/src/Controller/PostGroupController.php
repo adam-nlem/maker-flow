@@ -62,7 +62,7 @@ final class PostGroupController extends AbstractController
             return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $result = $this->service->getRankedPostGroups($user, $project, $queryParamDto->getLimit());
+        $result = $this->service->getRankedPostGroups($user, $project, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(
             data: $result,

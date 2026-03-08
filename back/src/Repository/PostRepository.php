@@ -290,6 +290,7 @@ class PostRepository extends ServiceEntityRepository
         User $user,
         Integration $integration,
         PostInsightType $sortByType,
+        int $page,
         int $limit,
     ): array {
         $sub = $this->getEntityManager()->createQueryBuilder()
@@ -312,6 +313,7 @@ class PostRepository extends ServiceEntityRepository
             ->setParameter('integration', $integration)
             ->setParameter('type', $sortByType)
             ->orderBy('pi.value', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
             ->getQuery()
             ->getSingleColumnResult();

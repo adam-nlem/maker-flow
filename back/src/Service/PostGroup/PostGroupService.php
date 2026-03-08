@@ -26,12 +26,13 @@ class PostGroupService
     /**
      * @return PostGroupWithAggregatedInsightsResponseDTO[]
      */
-    public function getRankedPostGroups(User $user, Project $project, int $limit): array
+    public function getRankedPostGroups(User $user, Project $project, int $page, int $limit): array
     {
         $postGroupIds = $this->postGroupRepository->getRankedIdsByProjectAndUserSortedByInsightValue(
             $project,
             $user,
             PostInsightType::Views,
+            $page,
             $limit,
         );
 

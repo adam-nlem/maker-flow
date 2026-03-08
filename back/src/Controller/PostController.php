@@ -74,6 +74,7 @@ final class PostController extends AbstractController
         $posts = $this->service->getRankedPosts(
             user: $user,
             integration: $integration,
+            page: $queryParamDto->getPage(),
             limit: $queryParamDto->getLimit(),
         );
 

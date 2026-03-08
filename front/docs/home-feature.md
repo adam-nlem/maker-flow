@@ -30,7 +30,7 @@ Props: `projectUuid`
 
 **File:** `app/components/home/RankedPostsList.tsx`
 
-Calls `useListRankedPosts({ integrationUuid })`, renders posts using `HomeRankingItemTile`. Displays the Views metric for each post.
+Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `RankingItemTile` with infinite scroll (IntersectionObserver sentinel, vertical `rootMargin`). Displays Views, Likes, and Comments metrics for each post.
 
 Props: `integrationUuid`
 
@@ -38,7 +38,7 @@ Props: `integrationUuid`
 
 **File:** `app/components/home/RankedPostGroupsList.tsx`
 
-Calls `useListRankedPostGroups({ projectUuid })`, renders post groups using `HomeRankingItemTile`. Displays group title, post count, and aggregated Views metric.
+Calls `useListPaginatedRankedPostGroups({ projectUuid })`, renders post groups using `RankingItemTile` with infinite scroll (IntersectionObserver sentinel, vertical `rootMargin`). Displays group title, post count, and aggregated Views, Likes, and Comments metrics.
 
 Props: `projectUuid`
 
@@ -111,8 +111,8 @@ Props: `integrations: Integration[]`
 | Hook | File | API Endpoint | Returns |
 |------|------|-------------|---------|
 | `useListIntegrationInsights` | `app/hooks/api/integrationInsights/useListIntegrationInsights.ts` | `GET /api/integration-insights` | `{ insightsOverview: IntegrationInsightsOverviewDTO \| null }` |
-| `useListRankedPosts` | `app/hooks/api/posts/useListRankedPosts.ts` | `GET /api/posts/rank` | `{ posts: PostWithAggregatedInsightsDTO[] }` |
-| `useListRankedPostGroups` | `app/hooks/api/postGroups/useListRankedPostGroups.ts` | `GET /api/post-groups/rank` | `{ postGroups: PostGroupWithAggregatedInsightsDTO[] }` |
+| `useListPaginatedRankedPosts` | `app/hooks/api/posts/useListPaginatedRankedPosts.ts` | `GET /api/posts/rank` | `{ posts, isLoading, isLoadingMore, hasMore, error, listMore }` |
+| `useListPaginatedRankedPostGroups` | `app/hooks/api/postGroups/useListPaginatedRankedPostGroups.ts` | `GET /api/post-groups/rank` | `{ postGroups, isLoading, isLoadingMore, hasMore, error, listMore }` |
 | `useListScriptsByStatus` | `app/hooks/api/scripts/useListScriptsByStatus.ts` | `GET /api/scripts/by-status` | `{ scriptsByStatus: ScriptsGroupedByStatusDTO[] }` |
 | `useListPaginatedScripts` | `app/hooks/api/scripts/useListPaginatedScripts.ts` | `GET /api/scripts` | `{ scripts, isLoading, isLoadingMore, hasMore, listMore }` |
 

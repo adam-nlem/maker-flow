@@ -79,7 +79,8 @@ Returns the top N post groups for a project, sorted by total views (sum of lates
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `projectUuid` | string (UUID) | Yes | — | UUID of the project |
-| `limit` | int | No | 10 | Number of ranked groups to return |
+| `page` | int | No | 1 | Page number (1-indexed) |
+| `limit` | int | No | 10 | Number of ranked groups per page |
 
 **Response:** `PostGroupWithAggregatedInsightsResponseDTO[]`
 

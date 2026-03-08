@@ -117,7 +117,7 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
         >
             <div className="p-4">
                 <div
-                    onClick={() => { closePanel(); navigate('/settings'); }}
+                    onClick={() => { closePanel(); navigate('/settings/creator-profile'); }}
                     className="flex flex-row items-center gap-3 px-4 py-3 mb-5 rounded-xl border border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
                 >
                     <UserCircleIcon className="size-5 text-primary shrink-0" strokeWidth={2} />

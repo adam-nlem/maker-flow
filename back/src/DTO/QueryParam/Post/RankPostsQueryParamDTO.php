@@ -14,6 +14,10 @@ class RankPostsQueryParamDTO extends AbstractQueryParamDTO
 
     #[Assert\NotBlank]
     #[Assert\Positive]
+    private int $page;
+
+    #[Assert\NotBlank]
+    #[Assert\Positive]
     private int $limit;
 
     public function __construct(
@@ -26,12 +30,18 @@ class RankPostsQueryParamDTO extends AbstractQueryParamDTO
     protected function fromQueryParams(array $queryParams): void
     {
         $this->integrationUuid = $queryParams["integrationUuid"] ?? "";
+        $this->page = (int) ($queryParams["page"] ?? 1);
         $this->limit = (int) ($queryParams["limit"] ?? 10);
     }
 
     public function getIntegrationUuid(): string
     {
         return $this->integrationUuid;
+    }
+
+    public function getPage(): int
+    {
+        return $this->page;
     }
 
     public function getLimit(): int

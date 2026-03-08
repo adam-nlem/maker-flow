@@ -71,7 +71,8 @@ Returns the top N posts for an integration, sorted by views (descending). Uses a
 | Parameter | Type | Required | Default | Description |
 |-----------|------|----------|---------|-------------|
 | `integrationUuid` | string | Yes | — | UUID of the integration |
-| `limit` | int | No | 10 | Number of ranked posts to return |
+| `page` | int | No | 1 | Page number (1-indexed) |
+| `limit` | int | No | 10 | Number of ranked posts per page |
 
 #### Response
 

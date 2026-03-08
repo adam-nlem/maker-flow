@@ -72,6 +72,7 @@ class PostGroupRepository extends ServiceEntityRepository
         Project $project,
         User $user,
         PostInsightType $sortByType,
+        int $page,
         int $limit,
     ): array {
         $sub = $this->getEntityManager()->createQueryBuilder()
@@ -97,6 +98,7 @@ class PostGroupRepository extends ServiceEntityRepository
             ->setParameter('type', $sortByType)
             ->groupBy('pg.id')
             ->orderBy('SUM(pi.value)', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
             ->getQuery()
             ->getSingleColumnResult();

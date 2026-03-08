@@ -15,6 +15,10 @@ class RankPostGroupsQueryParamDTO extends AbstractQueryParamDTO
 
     #[Assert\NotBlank]
     #[Assert\Positive]
+    private int $page;
+
+    #[Assert\NotBlank]
+    #[Assert\Positive]
     private int $limit;
 
     public function __construct(
@@ -27,12 +31,18 @@ class RankPostGroupsQueryParamDTO extends AbstractQueryParamDTO
     protected function fromQueryParams(array $queryParams): void
     {
         $this->projectUuid = $queryParams["projectUuid"] ?? "";
+        $this->page = (int) ($queryParams["page"] ?? 1);
         $this->limit = (int) ($queryParams["limit"] ?? 10);
     }
 
     public function getProjectUuid(): string
     {
         return $this->projectUuid;
+    }
+
+    public function getPage(): int
+    {
+        return $this->page;
     }
 
     public function getLimit(): int
