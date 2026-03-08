@@ -10,6 +10,8 @@ use App\Repository\IntegrationRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+use function Sentry\captureException;
+
 #[AsMessageHandler]
 class FetchIntegrationInsightsHandler
 {
@@ -35,7 +37,7 @@ class FetchIntegrationInsightsHandler
             };
 
         } catch (\Exception $e) {
-            $this->log->error($e);
+            captureException($e);
         }
     }
 }

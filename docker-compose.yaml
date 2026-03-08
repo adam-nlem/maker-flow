@@ -14,6 +14,11 @@ services:
       - NODE_ENV=development
       - PORT=3000
       - VITE_API_URL=${API_URL}
+      - VITE_SENTRY_DSN=${SENTRY_DSN_FRONT}
+      - SENTRY_DSN=${SENTRY_DSN_FRONT}
+      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
+      - SENTRY_ORG=${SENTRY_ORG}
+      - SENTRY_PROJECT=${SENTRY_PROJECT_FRONT}
     networks:
       - maker_flow
     depends_on:
@@ -69,6 +74,8 @@ services:
       STRIPE_PRICE_AGENCY: ${STRIPE_PRICE_AGENCY}
       STRIPE_PRICE_TOPUP: ${STRIPE_PRICE_TOPUP}
       STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET}
+
+      SENTRY_DSN: ${SENTRY_DSN_BACK}
     ports:
       - "80:80"
     networks:

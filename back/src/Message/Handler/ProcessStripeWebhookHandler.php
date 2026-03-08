@@ -8,6 +8,8 @@ use App\Service\Stripe\StripeWebhookService;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 
+use function Sentry\captureException;
+
 #[AsMessageHandler]
 class ProcessStripeWebhookHandler
 {
@@ -28,11 +30,7 @@ class ProcessStripeWebhookHandler
         try {
             $this->stripeWebhookService->processEvent($event);
         } catch (\Exception $e) {
-            $this->log->error('Stripe webhook processing failed', [
-                'eventId' => $event->getStripeEventId(),
-                'eventType' => $event->getEventType()->value,
-                'error' => $e->getMessage(),
-            ]);
+            captureException($e);
 
             throw $e;
         }

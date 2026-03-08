@@ -20,6 +20,8 @@ use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Messenger\Stamp\DelayStamp;
 
+use function Sentry\captureException;
+
 #[AsMessageHandler]
 class GenerateScriptHandler
 {
@@ -116,18 +118,13 @@ class GenerateScriptHandler
                 return;
             }
 
-            $this->log->error('AI generation failed after max retries', [
-                'generationId' => $generation->getId(),
-                'error' => $e->getMessage(),
-            ]);
+            captureException($e);
+
             $generation->setStatus(ScriptGenerationStatus::Failed)
                 ->setErrorMessage('Script generation failed after multiple attempts.')
                 ->setCompletedAt(DateHelper::createUtcDateTimeImmutable());
         } catch (\Exception $e) {
-            $this->log->error('Unexpected error during script generation', [
-                'generationId' => $generation->getId(),
-                'error' => $e->getMessage(),
-            ]);
+            captureException($e);
             $generation->setStatus(ScriptGenerationStatus::Failed)
                 ->setErrorMessage('An unexpected error occurred during script generation.')
                 ->setCompletedAt(DateHelper::createUtcDateTimeImmutable());
@@ -144,11 +141,7 @@ class GenerateScriptHandler
                         SourceBucket::SubscriptionCredits,
                     );
                 } catch (\Throwable $e) {
-                    $this->log->error('Failed to refund subscription credits after generation failure', [
-                        'generationId' => $generation->getId(),
-                        'amount' => $debitedFromSubscription,
-                        'error' => $e->getMessage(),
-                    ]);
+                    captureException($e);
                 }
             }
             if ($debitedFromTopup > 0) {
@@ -160,11 +153,7 @@ class GenerateScriptHandler
                         SourceBucket::TopupCredits,
                     );
                 } catch (\Throwable $e) {
-                    $this->log->error('Failed to refund topup credits after generation failure', [
-                        'generationId' => $generation->getId(),
-                        'amount' => $debitedFromTopup,
-                        'error' => $e->getMessage(),
-                    ]);
+                    captureException($e);
                 }
             }
         }

@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/react";
 import {
   BadRequestException,
   ConflictException,
@@ -52,6 +53,7 @@ export function handleMutationError(error: CustomHttpException): void {
       message = extractBackendMessage((error as CustomHttpException).data) ?? 'Un conflit est survenu'
       break
     case InternalServerException:
+      Sentry.captureException(error);
       message = 'Une erreur interne est survenue'
       break
     default:
