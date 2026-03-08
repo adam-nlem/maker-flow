@@ -3,7 +3,7 @@ import { useNavigate } from "react-router";
 import DataTable, { type DataTableColumn } from "~/components/ui/DataTable";
 import { PostInsightType, postInsightTypeToFrenchTranslation } from "~/models/enums/PostInsightType";
 import { useListPaginatedPosts } from "~/hooks/api/posts/useListPaginatedPosts";
-import { useInsightsFilterStore } from "~/stores/insightsFilterStore";
+import { useInsightsFilterStore } from "~/stores/insights/insightsFilterStore";
 import { timePeriodToDays } from "~/models/enums/TimePeriod";
 import { filterPostsByDays } from "~/helpers/postFilterHelper";
 import type { PostWithInsightsDTO } from "~/dtos/posts/PostWithInsightsDTO";

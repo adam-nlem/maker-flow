@@ -4,7 +4,7 @@ import HomeInsightsOverview from "~/components/home/HomeInsightsOverview";
 import Shimmer from "~/components/ui/Shimmer";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import { useHomeFilterStore } from "~/stores/homeFilterStore";
+import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegrationStore";
 import RankedPostsList from "~/components/home/RankedPostsList";
 import RankedPostGroupsList from "~/components/home/RankedPostGroupsList";
 import HomeScriptsList from "~/components/home/HomeScriptsList";
@@ -24,7 +24,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
   const { projects, isLoading } = useListPaginatedProjects()
   const { focusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
-  const focusedIntegrationUuid = useHomeFilterStore((state) => state.focusedIntegrationUuid)
+  const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
 
   return (
     <div className="w-full">

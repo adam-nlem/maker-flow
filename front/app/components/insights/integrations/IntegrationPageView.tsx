@@ -2,7 +2,7 @@ import type { Integration } from "~/models/Integration";
 import InsightTile from "../InsightTile";
 import { IntegrationInsightType, integrationInsightTypeToFrenchTranslation, integrationInsightTypeToIcon } from "~/models/enums/IntegrationInsightType";
 import { ArrowTrendingUpIcon, DocumentTextIcon, UserIcon } from "@heroicons/react/24/solid";
-import { useInsightsFilterStore } from "~/stores/insightsFilterStore";
+import { useInsightsFilterStore } from "~/stores/insights/insightsFilterStore";
 import { useShowIntegrationDetail } from "~/hooks/api/integrationInsights/useShowIntegrationDetail";
 import { ArrowPathIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { Platform } from "~/models/enums/Platform";
@@ -53,7 +53,7 @@ export default function IntegrationPageView({ integration }: IntegrationPageView
       )}
       <div className="flex flex-wrap gap-3 items-center">
         <div className="flex flex-col gap-3">
-          <IntegrationProfileInfo integration={integration} />
+          <IntegrationProfileInfo integration={integration}/>
 
           <div className="flex flex-wrap wrap-break-word gap-3">
             <InsightTile

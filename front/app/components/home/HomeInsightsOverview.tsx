@@ -1,11 +1,9 @@
-import { RectangleStackIcon } from "@heroicons/react/24/outline"
 import { ChatBubbleLeftIcon, EyeIcon, HeartIcon, UsersIcon } from "@heroicons/react/24/solid"
 import IntegrationProfileInfo from "~/components/integrations/IntegrationProfileInfo"
-import Pill from "~/components/ui/Pill"
+import IntegrationPillRow from "~/components/integrations/IntegrationPillRow"
 import InsightTile from "~/components/insights/InsightTile"
 import { useListIntegrationInsights } from "~/hooks/api/integrationInsights/useListIntegrationInsights"
-import { useHomeFilterStore } from "~/stores/homeFilterStore"
-import { platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform"
+import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegrationStore"
 import { IntegrationInsightType, integrationInsightTypeToFrenchTranslation } from "~/models/enums/IntegrationInsightType"
 
 interface HomeInsightsOverviewProps {
@@ -13,8 +11,7 @@ interface HomeInsightsOverviewProps {
 }
 
 export default function HomeInsightsOverview({ projectUuid }: HomeInsightsOverviewProps) {
-    const focusedIntegrationUuid = useHomeFilterStore((state) => state.focusedIntegrationUuid)
-    const setFocusedIntegrationUuid = useHomeFilterStore((state) => state.setFocusedIntegrationUuid)
+    const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
     const { insightsOverview } = useListIntegrationInsights({ projectUuid })
 
     if (!insightsOverview) return null
@@ -26,25 +23,7 @@ export default function HomeInsightsOverview({ projectUuid }: HomeInsightsOvervi
 
     return (
         <div className="flex flex-col gap-5">
-            <div className="flex flex-row flex-wrap gap-3">
-                {insightsOverview.groups.map((group) => (
-                    <Pill
-                        key={group.integration.uuid}
-                        imageUrl={platformToIcon[group.integration.platform]}
-                        label={platformToFrenchTranslation[group.integration.platform]}
-                        isSelected={group.integration.uuid === focusedIntegrationUuid}
-                        onClick={() => setFocusedIntegrationUuid(group.integration.uuid)}
-                        borderColorClassName="border-light-gray"
-                    />
-                ))}
-                <Pill
-                    icon={RectangleStackIcon}
-                    label="Toutes les plateformes"
-                    isSelected={focusedIntegrationUuid === null}
-                    onClick={() => setFocusedIntegrationUuid(null)}
-                    borderColorClassName="border-light-gray"
-                />
-            </div>
+            <IntegrationPillRow integrations={insightsOverview.groups.map((g) => g.integration)} />
 
             {focusedGroup && (
                 <IntegrationProfileInfo integration={focusedGroup.integration} />

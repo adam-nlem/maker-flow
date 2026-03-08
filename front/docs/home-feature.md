@@ -17,9 +17,9 @@ Two-column layout (`w-2/3` + `w-1/3`):
 
 **File:** `app/components/home/HomeInsightsOverview.tsx`
 
-Displays integration selection (Pill components) and aggregated insight tiles. Fetches its own data via `useListIntegrationInsights({ projectUuid })`.
+Displays integration selection via `IntegrationPillRow` and aggregated insight tiles. Fetches its own data via `useListIntegrationInsights({ projectUuid })`.
 
-- Reads `focusedIntegrationUuid` from `useHomeFilterStore`
+- Reads `focusedIntegrationUuid` from `useFocusIntegrationStore`
 - When an integration is focused: shows its insights + `IntegrationProfileInfo`
 - When "Toutes les plateformes" is selected (null): displays backend-provided `aggregatedInsights` (summed across all integrations per type)
 - Shows 4 `InsightTile` components: TotalFollowers, Views, Likes, Comments
@@ -46,7 +46,7 @@ Props: `projectUuid`
 
 **File:** `app/components/home/HomeScriptsList.tsx`
 
-Displays a filtered, paginated list of scripts. A row of `Pill` components lets the user select a `ScriptStatus` filter (persisted via `useHomeFilterStore.focusedScriptStatus`). Uses `useListPaginatedScripts({ projectUuid, status, limit: 10 })` to fetch filtered scripts. Renders `ScriptListItem` components in a horizontal list (`overflow-x-auto`) with infinite scroll (IntersectionObserver sentinel, horizontal `rootMargin`). Fixed height (`h-40`). Clicking a script opens a `ScriptDetailModal` (read-only preview with "open editor" button).
+Displays a filtered, paginated list of scripts. A row of `Pill` components lets the user select a `ScriptStatus` filter (persisted via `useScriptFilterStore.focusedScriptStatus`). Uses `useListPaginatedScripts({ projectUuid, status, limit: 10 })` to fetch filtered scripts. Renders `ScriptListItem` components in a horizontal list (`overflow-x-auto`) with infinite scroll (IntersectionObserver sentinel, horizontal `rootMargin`). Fixed height (`h-40`). Clicking a script opens a `ScriptDetailModal` (read-only preview with "open editor" button).
 
 Props: `projectUuid`
 
@@ -66,23 +66,45 @@ Ranking item tile for the home page. Displays rank number with a dotted connecti
 
 Props: `index`, `postUuid?`, `subtitle`, `secondarySubtitle?`, `metricValue`, `isLast`
 
-## Store
+## Stores
 
-### useHomeFilterStore
+### useFocusIntegrationStore
 
-**File:** `app/stores/homeFilterStore.ts`
+**File:** `app/stores/integrations/focusIntegrationStore.ts`
 
-Zustand store with persist middleware (`app:home:filter-store`).
+Zustand store with persist middleware (`app:integrations:focus`). Shared across home and insights pages.
 
 | State | Type | Description |
 |-------|------|-------------|
 | `focusedIntegrationUuid` | `string \| null` | UUID of the focused integration, or null for all platforms |
-| `focusedScriptStatus` | `ScriptStatus` | Selected script status filter (default: `Idea`) |
 
 | Action | Description |
 |--------|-------------|
 | `setFocusedIntegrationUuid(uuid)` | Sets the focused integration |
+
+### useScriptFilterStore
+
+**File:** `app/stores/scripts/scriptFilterStore.ts`
+
+Zustand store with persist middleware (`app:scripts:filter`).
+
+| State | Type | Description |
+|-------|------|-------------|
+| `focusedScriptStatus` | `ScriptStatus` | Selected script status filter (default: `Idea`) |
+
+| Action | Description |
+|--------|-------------|
 | `setFocusedScriptStatus(status)` | Sets the script status filter |
+
+## Shared Components
+
+### IntegrationPillRow
+
+**File:** `app/components/integrations/IntegrationPillRow.tsx`
+
+Reusable row of `Pill` components for selecting an integration. Reads/writes `focusedIntegrationUuid` from `useFocusIntegrationStore` directly. Includes a "Toutes les plateformes" option (sets UUID to null). Used in `HomeInsightsOverview` and `InsightsPageView`.
+
+Props: `integrations: Integration[]`
 
 ## Hooks
 

@@ -1,25 +1,12 @@
-import { CalendarDaysIcon, ChartBarSquareIcon, ChevronUpDownIcon, RectangleStackIcon } from "@heroicons/react/24/outline";
-import IntegrationTile from "~/components/integrations/IntegrationTile";
-import IconWithTextTile from "~/components/ui/IconWithTextTile";
-import SelectDropdown from "~/components/ui/SelectDropdown";
+import IntegrationPillRow from "~/components/integrations/IntegrationPillRow";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
-import { insightTypeOptions, insightTypeToFrenchTranslation, type InsightType } from "~/models/enums/InsightType";
-import { useInsightsFilterStore } from "~/stores/insightsFilterStore";
-import FilterTile from "./FilterTile";
+import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegrationStore";
 import IntegrationPageView from "./integrations/IntegrationPageView";
-import { TimePeriod, timePeriodOptions, timePeriodToFrenchTranslation } from "~/models/enums/TimePeriod";
 
 export default function InsightsPageView({ projectUuid }: { projectUuid: string }) {
     const { integrations, isLoading } = useListIntegrations({ projectUuid });
 
-    const insightType = useInsightsFilterStore((state) => state.insightType);
-    const setInsightType = useInsightsFilterStore((state) => state.setInsightType);
-
-    const timePeriod = useInsightsFilterStore((state) => state.timePeriod);
-    const setTimePeriod = useInsightsFilterStore((state) => state.setTimePeriod);
-
-    const focusedIntegrationUuid = useInsightsFilterStore((state) => state.focusedIntegrationUuid)
-    const setFocusedIntegrationUuid = useInsightsFilterStore((state) => state.setFocusedIntegrationUuid)
+    const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
 
     const focusedIntegration = integrations.find((integration) => integration.uuid === focusedIntegrationUuid);
     const displayedIntegration = focusedIntegration ?? integrations[0];
@@ -29,61 +16,7 @@ export default function InsightsPageView({ projectUuid }: { projectUuid: string 
     }
 
     return <div className="p-5 flex flex-col gap-3 h-screen overflow-hidden">
-        <div className="flex flex-row justify-between">
-            <div className="flex flex-row flex-wrap gap-3">
-                {integrations.map((integration) => (
-                    <IntegrationTile integration={integration} isSelected={integration.uuid === focusedIntegrationUuid} onClick={() => setFocusedIntegrationUuid(integration.uuid)} />
-                ))}
-
-                <IconWithTextTile icon={RectangleStackIcon} label={"Toutes les plateformes"} isExpanded isBold isSelected={focusedIntegrationUuid === null} onClick={() => setFocusedIntegrationUuid(null)} />
-            </div>
-            <div className="flex flex-row flex-wrap gap-3">
-                <SelectDropdown<InsightType>
-                    items={insightTypeOptions}
-                    selectedItemId={insightType}
-                    getItemId={(item) => item}
-                    onSelect={(item) => setInsightType(item)}
-                    renderTrigger={({ onClick }) => (
-                        <FilterTile
-                            icon={ChartBarSquareIcon}
-                            label={insightTypeToFrenchTranslation[insightType]}
-                            rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
-                            onClick={onClick}
-                        />
-                    )}
-                    renderItem={({ item, isSelected, onSelect }) => (
-                        <FilterTile
-                            label={insightTypeToFrenchTranslation[item]}
-                            isSelected={isSelected}
-                            onClick={onSelect}
-                        />
-                    )}
-                />
-
-                <SelectDropdown<TimePeriod>
-                    items={timePeriodOptions}
-                    selectedItemId={timePeriod}
-                    getItemId={(item) => item}
-                    onSelect={(item) => setTimePeriod(item)}
-                    renderTrigger={({ onClick }) => (
-                        <FilterTile
-                            icon={CalendarDaysIcon}
-                            label={timePeriodToFrenchTranslation[timePeriod]}
-                            rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
-                            onClick={onClick}
-                        />
-                    )}
-                    renderItem={({ item, isSelected, onSelect }) => (
-                        <FilterTile
-                            label={timePeriodToFrenchTranslation[item]}
-                            isSelected={isSelected}
-                            onClick={onSelect}
-                        />
-                    )}
-                />
-            </div>
-
-        </div>
+        <IntegrationPillRow integrations={integrations} />
 
         <IntegrationPageView integration={displayedIntegration} />
     </div >;

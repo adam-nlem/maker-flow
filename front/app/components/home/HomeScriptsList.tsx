@@ -6,15 +6,15 @@ import ScriptDetailModal from "~/components/scripts/ScriptDetailModal"
 import type { Script } from "~/models/Script"
 import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts"
 import { scriptStatusOptions, scriptStatusToBgClass, scriptStatusToBorderClass, scriptStatusToFrenchTranslation, scriptStatusToIcon, scriptStatusToTextClass } from "~/models/enums/ScriptStatus"
-import { useHomeFilterStore } from "~/stores/homeFilterStore"
+import { useScriptFilterStore } from "~/stores/scripts/scriptFilterStore"
 
 interface HomeScriptsListProps {
     projectUuid: string
 }
 
 export default function HomeScriptsList({ projectUuid }: HomeScriptsListProps) {
-    const focusedScriptStatus = useHomeFilterStore((state) => state.focusedScriptStatus)
-    const setFocusedScriptStatus = useHomeFilterStore((state) => state.setFocusedScriptStatus)
+    const focusedScriptStatus = useScriptFilterStore((state) => state.focusedScriptStatus)
+    const setFocusedScriptStatus = useScriptFilterStore((state) => state.setFocusedScriptStatus)
     const [selectedScript, setSelectedScript] = useState<Script | null>(null)
 
     const { scripts, isLoading, isLoadingMore, hasMore, listMore } = useListPaginatedScripts({
