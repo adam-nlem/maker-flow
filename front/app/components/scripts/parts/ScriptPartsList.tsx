@@ -19,6 +19,7 @@ import ScriptCallToActionCard from "./ScriptCallToActionCard";
 import ScriptRetentionCueCard from "./ScriptRetentionCueCard";
 import ScriptHookCard from "./ScriptHookCard";
 import AddScriptPartMenu from "./AddScriptPartMenu";
+import ScriptPartTypeMenu from "./ScriptPartTypeMenu";
 import { useReorderScriptParts } from "~/hooks/api/scripts/useReorderScriptParts";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 
@@ -154,8 +155,11 @@ export default function ScriptPartsList({ parts, script, generationUuid, isReadO
                         ))}
                     </DroppableZone>
 
-                    {!isReadOnly && (localParts.length === 0 || localParts[localParts.length - 1].type !== "text") && (
-                        <ScriptTextCard scriptUuid={scriptUuid} />
+                    {!isReadOnly && (localParts.length === 0) && (
+                        <div className="flex flex-col items-center justify-center py-12 text-gray">
+                            <p className="text-body-sm text-center mb-4">Vous n'avez pas encore d'éléments dans votre script.</p>
+                            <ScriptPartTypeMenu scriptUuid={scriptUuid} generationUuid={generationUuid} hasHook={hookPart !== undefined} />
+                        </div>
                     )}
 
                     <DragOverlay>
