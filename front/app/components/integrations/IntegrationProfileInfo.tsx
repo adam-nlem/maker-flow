@@ -2,14 +2,16 @@ import { IntegrationStatus, integrationStatusToBgClass, integrationStatusToBorde
 import type { Integration } from "~/models/Integration"
 import Pill from "../ui/Pill"
 import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
+import { useFocusProjectStore } from "~/stores/project/focusProjectStore";
 
 interface IntegrationProfileInfoProps {
-    projectUuid: string,
     integration: Integration
 }
 
-export default function IntegrationProfileInfo({ projectUuid, integration }: IntegrationProfileInfoProps) {
-    const { createIntegration, isPending: isConnecting, oauthError } = useCreateIntegration({ projectUuid, platform: integration.platform });
+export default function IntegrationProfileInfo({ integration }: IntegrationProfileInfoProps) {
+    const focusedProjectUuid = useFocusProjectStore((state) => state.focusedProjectUuid)
+
+    const { createIntegration, isPending: isConnecting, oauthError } = useCreateIntegration({ projectUuid: focusedProjectUuid!, platform: integration.platform });
     return (
         <div className="flex flex-row gap-5 items-center">
             <div className="flex flex-row gap-1 items-center">
@@ -25,7 +27,7 @@ export default function IntegrationProfileInfo({ projectUuid, integration }: Int
                     <p className="text-body-sm text-gray">{integration.userName}</p>
                 </div>
             </div>
-            {integration.status !== IntegrationStatus.Active && <div className="flex flex-col gap-1">
+            {integration.status !== IntegrationStatus.Active && focusedProjectUuid && <div className="flex flex-col gap-1">
                 <Pill isSelected
                     label={integrationStatusToFrenchTranslation[integration.status]}
                     textColorClassName={integrationStatusToTextClass[integration.status]}
