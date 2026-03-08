@@ -50,14 +50,6 @@ Displays a filtered, paginated list of scripts. A row of `Pill` components lets 
 
 Props: `projectUuid`
 
-### HomeScriptsByStatus (unused)
-
-**File:** `app/components/home/HomeScriptsByStatus.tsx`
-
-Previously used to render scripts grouped by status. Now replaced by `HomeScriptsList`.
-
-Props: `projectUuid`
-
 ### HomeRankingItemTile
 
 **File:** `app/components/home/HomeRankingItemTile.tsx`
@@ -113,7 +105,6 @@ Props: `integrations: Integration[]`
 | `useListIntegrationInsights` | `app/hooks/api/integrationInsights/useListIntegrationInsights.ts` | `GET /api/integration-insights` | `{ insightsOverview: IntegrationInsightsOverviewDTO \| null }` |
 | `useListPaginatedRankedPosts` | `app/hooks/api/posts/useListPaginatedRankedPosts.ts` | `GET /api/posts/rank` | `{ posts, isLoading, isLoadingMore, hasMore, error, listMore }` |
 | `useListPaginatedRankedPostGroups` | `app/hooks/api/postGroups/useListPaginatedRankedPostGroups.ts` | `GET /api/post-groups/rank` | `{ postGroups, isLoading, isLoadingMore, hasMore, error, listMore }` |
-| `useListScriptsByStatus` | `app/hooks/api/scripts/useListScriptsByStatus.ts` | `GET /api/scripts/by-status` | `{ scriptsByStatus: ScriptsGroupedByStatusDTO[] }` |
 | `useListPaginatedScripts` | `app/hooks/api/scripts/useListPaginatedScripts.ts` | `GET /api/scripts` | `{ scripts, isLoading, isLoadingMore, hasMore, listMore }` |
 
 ## Models & DTOs
@@ -125,11 +116,9 @@ Props: `integrations: Integration[]`
 | `app/dtos/postGroups/PostGroupWithAggregatedInsightsDTO.ts` | Post group with aggregated insights (postGroup, aggregatedInsights) |
 | `app/dtos/integrationInsights/IntegrationInsightsOverviewDTO.ts` | Overview DTO: groups (per integration) + aggregatedInsights (summed across all) |
 | `app/dtos/integrationInsights/IntegrationInsightsGroupedByIntegrationDTO.ts` | Integration with its latest insights (integration, insights[]) |
-| `app/dtos/scripts/ScriptsGroupedByStatusDTO.ts` | Scripts grouped by status (status, scripts[]) |
 
 ## Query Keys
 
 - `postQueryKeys.rank(integrationUuid)` — `["posts", "rank", integrationUuid]`
 - `postGroupQueryKeys.rank(projectUuid)` — `["postGroups", "rank", projectUuid]`
 - `integrationInsightQueryKeys.list(projectUuid)` — `["integrationInsights", "list", projectUuid]`
-- `scriptQueryKeys.byStatus(projectUuid)` — `["scripts", "byStatus", projectUuid]`

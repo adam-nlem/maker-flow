@@ -5,7 +5,6 @@ export const scriptQueryKeys = {
     list: (projectUuid: string, status?: ScriptStatus) => [...scriptQueryKeys.all, 'list', projectUuid, ...(status ? [status] : [])] as const,
     calendar: (projectUuid: string, year: number, month: number) =>
         [...scriptQueryKeys.all, 'calendar', projectUuid, year, month] as const,
-    byStatus: (projectUuid: string) => [...scriptQueryKeys.all, 'byStatus', projectUuid] as const,
     parts: (scriptUuid: string, generationUuid?: string) =>
         generationUuid
             ? [...scriptQueryKeys.all, 'parts', scriptUuid, generationUuid] as const

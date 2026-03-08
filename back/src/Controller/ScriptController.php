@@ -4,11 +4,9 @@ namespace App\Controller;
 
 use App\DTO\QueryParam\Script\ListCalendarScriptsQueryParamDTO;
 use App\DTO\QueryParam\Script\ListScriptPartsQueryParamDTO;
-use App\DTO\QueryParam\Script\ListScriptsByStatusQueryParamDTO;
 use App\DTO\QueryParam\Script\ListScriptsQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Response\Script\ListScriptsGroupedByDayResponseDTO;
-use App\DTO\Response\Script\ListScriptsGroupedByStatusResponseDTO;
 use App\DTO\Request\Script\CreateScriptRequestDTO;
 use App\DTO\Request\Script\ReorderScriptPartsRequestDTO;
 use App\DTO\Request\Script\UpdateScriptRequestDTO;
@@ -96,36 +94,6 @@ final class ScriptController extends AbstractController
             data: $result,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_scripts_calendar']]
-        );
-    }
-
-    #[Route('/by-status', name: 'api_scripts_by_status', methods: ['GET'])]
-    public function byStatus(
-        ListScriptsByStatusQueryParamDTO $queryParamDto,
-        ScriptRepository $scriptRepository,
-        ProjectRepository $projectRepository,
-    ): JsonResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
-
-        if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
-        }
-
-        $grouped = $scriptRepository->getByProjectAndUserGroupedByStatus($project, $user, $queryParamDto->getLimit());
-
-        $result = array_map(
-            fn(string $status, array $scripts) => (new ListScriptsGroupedByStatusResponseDTO($status, $scripts))->getData(),
-            array_keys($grouped),
-            array_values($grouped),
-        );
-
-        return $this->json(
-            data: $result,
-            status: Response::HTTP_OK,
-            context: ['groups' => ['api_scripts_by_status']]
         );
     }
 

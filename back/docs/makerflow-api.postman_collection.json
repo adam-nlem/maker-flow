@@ -995,37 +995,6 @@
           "response": []
         },
         {
-          "name": "Scripts By Status",
-          "id": "c7a8e1f2-3b4d-4a5e-9f6c-1d2e3f4a5b6c",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/scripts/by-status?projectUuid={{projectUuid}}",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "scripts",
-                "by-status"
-              ],
-              "query": [
-                {
-                  "key": "projectUuid",
-                  "value": "{{projectUuid}}"
-                },
-                {
-                  "key": "limit",
-                  "value": "3",
-                  "disabled": true
-                }
-              ]
-            }
-          },
-          "response": []
-        },
-        {
           "name": "Create Script",
           "id": "111e351c-8fe9-4eb1-91a4-28ad3dfc7f32",
           "request": {

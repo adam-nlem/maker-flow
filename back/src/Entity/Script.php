@@ -29,7 +29,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private ?string $uuid = null;
 
@@ -40,7 +39,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private ?string $title = null;
 
@@ -51,7 +49,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private ?\DateTimeImmutable $publishedAt = null;
 
@@ -62,7 +59,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -73,7 +69,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
@@ -84,7 +79,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private ?array $platforms = null;
 
@@ -95,7 +89,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private ?ContentType $contentType = null;
 
@@ -106,7 +99,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private ?ScriptStatus $status = null;
 
@@ -126,7 +118,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private ?PostGroup $postGroup = null;
 
@@ -140,7 +131,6 @@ class Script
         'api_scripts_create',
         'api_scripts_update',
         'api_scripts_show',
-        'api_scripts_by_status',
     ])]
     private Collection $tags;
 
