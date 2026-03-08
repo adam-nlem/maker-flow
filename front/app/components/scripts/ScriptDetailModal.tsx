@@ -3,7 +3,7 @@ import type { Script } from "~/models/Script";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore";
 import ModalOverlay from "~/components/ui/ModalOverlay";
-import ScriptEditorPanel from "../ScriptEditorPanel";
+import ScriptEditorPanel from "./ScriptEditorPanel";
 
 interface ScriptDetailModalProps {
     script: Script | null;

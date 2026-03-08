@@ -16,12 +16,12 @@ function PlatformIcon({ platform }: { platform: Platform }) {
     );
 }
 
-interface ScriptCalendarCardProps {
+interface ScriptCalendarTileProps {
     script: Script;
     onClick: () => void;
 }
 
-export default function ScriptCalendarCard({ script, onClick }: ScriptCalendarCardProps) {
+export default function ScriptCalendarTile({ script, onClick }: ScriptCalendarTileProps) {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: script.uuid });
 
     return (

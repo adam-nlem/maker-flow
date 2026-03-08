@@ -1,17 +1,17 @@
 import { useState } from "react";
-import { TrashIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import { useDeleteScript } from "~/hooks/api/scripts/useDeleteScript";
 import ScriptSimpleMetaColumn from "./ScriptSimpleMetaCol";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 
-interface ScriptListItemProps {
+interface ScriptCardProps {
     script: Script;
     isSelected: boolean;
     onClick: () => void;
 }
 
-export default function ScriptListItem({ script, isSelected, onClick }: ScriptListItemProps) {
+export default function ScriptCard({ script, isSelected, onClick }: ScriptCardProps) {
     const { deleteScript, isPending: isDeleting } = useDeleteScript();
     const [showConfirm, setShowConfirm] = useState(false);
 
@@ -19,7 +19,7 @@ export default function ScriptListItem({ script, isSelected, onClick }: ScriptLi
         <>
             <div
                 onClick={onClick}
-                className={`group relative flex flex-col gap-1.5 px-3 py-2.5 rounded-xl cursor-pointer transition-colors ${isSelected ? "bg-primary/10 border border-primary/30" : "hover:bg-surface-hover border border-transparent"}`}
+                className={`group relative flex flex-col gap-1.5 p-3 rounded-md cursor-pointer transition-colors ${isSelected ? "bg-primary/10 border border-primary/30" : "hover:bg-surface-hover border border-light-gray"}`}
             >
                 <p className={`text-heading-sm truncate ${isSelected ? "text-primary" : ""}`}>{script.title}</p>
 
@@ -30,7 +30,7 @@ export default function ScriptListItem({ script, isSelected, onClick }: ScriptLi
                     disabled={isDeleting}
                     className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray hover:text-danger cursor-pointer"
                 >
-                    <TrashIcon className="size-3.5" strokeWidth={2} />
+                    <XMarkIcon className="size-4" strokeWidth={2} />
                 </button>
             </div>
 

@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
-import ScriptListItem from "./ScriptListItem";
+import ScriptCard from "./ScriptCard";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { SidePanel } from "~/components/ui/SidePanel";
@@ -69,7 +69,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
                 ) : (
                     <>
                         {scripts.map((script) => (
-                            <ScriptListItem
+                            <ScriptCard
                                 key={script.uuid}
                                 script={script}
                                 isSelected={script.uuid === focusedScriptUuid}

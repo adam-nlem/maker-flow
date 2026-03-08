@@ -38,7 +38,7 @@ export default function RankedPostsList({ integrationUuid }: RankedPostsListProp
   return (
     <div className="flex flex-col">
       <h2 className="text-heading-sm mb-2">Classement des posts</h2>
-      {posts.map((post, index) => (
+      {posts.map((post, index) => ( 
         <RankingItemTile
           key={post.post.uuid}
           index={index}

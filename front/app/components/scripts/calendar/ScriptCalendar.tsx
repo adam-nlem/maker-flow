@@ -11,8 +11,8 @@ import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
 import { DAYS_FR, MONTHS_FR, getDaysInMonth, getFirstDayOfMonth, isSameDay, toDateKey } from "~/utils/dateHelpers";
 import ScriptCalendarDayCell from "./ScriptCalendarDayCell";
-import ScriptCalendarCard from "./ScriptCalendarCard";
-import ScriptDetailModal from "./ScriptDetailModal";
+import ScriptCalendarTile from "./ScriptCalendarTile";
+import ScriptDetailModal from "../ScriptDetailModal";
 import Pill from "~/components/ui/Pill";
 
 
@@ -137,7 +137,7 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
     const isCurrentMonth = currentMonth === today.getMonth() && currentYear === today.getFullYear();
 
     return (
-        <div className="flex flex-col flex-1">
+        <div className="flex flex-col flex-1 min-h-[calc(100vh-12.5rem)] overflow-hidden">
             {/* Header */}
             <div className="flex flex-row items-center justify-between px-2 pb-4">
                 <h2 className="text-heading-md">
@@ -172,10 +172,10 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
 
             {/* Day grid */}
             <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                <div className="grid grid-cols-7 border-l border-light-gray">
+                <div className="grid grid-cols-7 auto-rows-fr flex-1 min-h-0 border-l border-light-gray">
                     {days.map((day, index) => {
                         if (day === null) {
-                            return <div key={`empty-${index}`} className="min-h-25 border-b border-r border-light-gray" />;
+                            return <div key={`empty-${index}`} className="border-b border-r border-light-gray" />;
                         }
 
                         const date = new Date(currentYear, currentMonth, day);
@@ -199,7 +199,7 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
                 <DragOverlay dropAnimation={null}>
                     {draggedScript && (
                         <div className="opacity-90 rotate-1 shadow-lg">
-                            <ScriptCalendarCard script={draggedScript} onClick={() => { }} />
+                            <ScriptCalendarTile script={draggedScript} onClick={() => { }} />
                         </div>
                     )}
                 </DragOverlay>

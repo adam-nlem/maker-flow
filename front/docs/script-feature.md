@@ -65,7 +65,7 @@ front/app/
 │       └── HookTemplateCategory.ts    ← All, Public, Private (toFrenchTranslation map)
 ├── hooks/api/
 │   ├── scripts/
-│   │   ├── scriptQueryKeys.ts   ← all, list(projectUuid), calendar(projectUuid, year, month), parts(scriptUuid)
+│   │   ├── scriptQueryKeys.ts   ← all, list(projectUuid, status?), calendar(projectUuid, year, month), parts(scriptUuid)
 │   │   ├── useListPaginatedScripts.ts  ← infinite scroll (page/limit/hasMore)
 │   │   ├── useListCalendarScripts.ts   ← monthly scripts grouped by day
 │   │   ├── useCreateScript.ts   ← returns Script (for immediate focus)
@@ -153,7 +153,7 @@ front/app/
 ## Key Patterns
 
 ### Infinite Scroll Pagination
-`ScriptListPanel` uses infinite scroll to load scripts page by page. `useListPaginatedScripts` manages page/additionalScripts/hasMore/isLoadingMore state (same pattern as `useListPaginatedPosts`). A sentinel `<div>` at the bottom of the list triggers an `IntersectionObserver` (rootMargin `200px`) to call `listMore()` when the user scrolls near the end. The API sends `page` and `limit` query params; `hasMore` is determined by `count === limit`.
+`ScriptListPanel` uses infinite scroll to load scripts page by page. `useListPaginatedScripts` manages page/additionalScripts/hasMore/isLoadingMore state (same pattern as `useListPaginatedPosts`). Accepts an optional `status?: ScriptStatus` prop to filter scripts by status — when provided, only scripts matching that status are returned. The query key includes the status so React Query refetches when the filter changes. A sentinel `<div>` at the bottom of the list triggers an `IntersectionObserver` (rootMargin `200px`) to call `listMore()` when the user scrolls near the end. The API sends `page`, `limit`, and optionally `status` query params; `hasMore` is determined by `count === limit`.
 
 ### Script Creation (no modal)
 Clicking "+ New script" in `ScriptListPanel` calls `useCreateScript` directly with a default title `"Nouveau script"`. Since `useCreateScript.mutationFn` returns the full `Script` object, the new UUID is immediately available to set as focused, opening the editor instantly.
@@ -307,7 +307,7 @@ class HookTemplate {
 
 ```ts
 scriptQueryKeys.all                                          // ['scripts']
-scriptQueryKeys.list(uuid)                                   // ['scripts', 'list', projectUuid]
+scriptQueryKeys.list(uuid, status?)                           // ['scripts', 'list', projectUuid, status?]
 scriptQueryKeys.calendar(uuid, year, month)                  // ['scripts', 'calendar', projectUuid, year, month]
 scriptQueryKeys.parts(uuid)                                  // ['scripts', 'parts', scriptUuid]
 
@@ -399,7 +399,7 @@ front/app/components/scripts/calendar/
 - **Server-side grouping:** Scripts are grouped by day on the backend. The frontend receives pre-grouped `ListScriptsGroupedByDayDTO[]` and converts to `Map<string, Script[]>`.
 - **Month navigation:** Local `useState` (not persisted), `<` / `>` arrows + "Aujourd'hui" reset button. Month is 0-indexed in JS, converted to 1-indexed for the API.
 - **Drag-and-drop:** Uses `@dnd-kit/core` — cards are `useDraggable`, day cells are `useDroppable`. Same pattern as `TodoListTasksBoard` (Kanban status change). `PointerSensor` with 8px activation constraint to avoid interfering with clicks. `DragOverlay` shows a rotated shadow preview.
-- **Day cells:** `min-h-25`, overflow scroll with `scrollbar-none` for many scripts
+- **Day cells:** flex-col layout with `overflow-hidden`, scripts list uses `flex-1 min-h-0 overflow-y-auto scrollbar-none`
 - **"+" button:** Hover-revealed (`opacity-0 group-hover:opacity-100`), creates a "Nouveau script" with the day's date pre-filled
 - **Detail modal:** `ScriptDetailModal` wraps `ScriptEditorPanel` inside `ModalOverlay`. Clicking a script card opens the full editor (title, platforms, tags, status, date, hook, parts). Uses `key={script.uuid}` to reset on script change.
 

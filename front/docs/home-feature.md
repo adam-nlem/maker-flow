@@ -8,7 +8,7 @@ The home page (`/`) is the main dashboard. It shows an overview of insights acro
 
 Two-column layout (`w-2/3` + `w-1/3`):
 
-- **Left column**: `HomeScriptsByStatus` (scripts grouped by status)
+- **Left column**: `HomeScriptsList` (filtered scripts list with status pills) + `ScriptCalendar`
 - **Right column**: `HomeInsightsOverview` + ranked posts or ranked post groups
 
 ## Components
@@ -42,11 +42,19 @@ Calls `useListRankedPostGroups({ projectUuid })`, renders post groups using `Hom
 
 Props: `projectUuid`
 
-### HomeScriptsByStatus
+### HomeScriptsList
+
+**File:** `app/components/home/HomeScriptsList.tsx`
+
+Displays a filtered, paginated list of scripts. A row of `Pill` components lets the user select a `ScriptStatus` filter (persisted via `useHomeFilterStore.focusedScriptStatus`). Uses `useListPaginatedScripts({ projectUuid, status, limit: 10 })` to fetch filtered scripts. Renders `ScriptListItem` components in a horizontal list (`overflow-x-auto`) with infinite scroll (IntersectionObserver sentinel, horizontal `rootMargin`). Fixed height (`h-40`). Clicking a script opens a `ScriptDetailModal` (read-only preview with "open editor" button).
+
+Props: `projectUuid`
+
+### HomeScriptsByStatus (unused)
 
 **File:** `app/components/home/HomeScriptsByStatus.tsx`
 
-Calls `useListScriptsByStatus({ projectUuid })`, renders scripts grouped by status. Each status group shows a header (icon + French label) and up to 3 script cards in a row. Clicking a card sets `focusedScriptUuid` in `useFocusScriptStore` and navigates to `/scripts`.
+Previously used to render scripts grouped by status. Now replaced by `HomeScriptsList`.
 
 Props: `projectUuid`
 
@@ -69,10 +77,12 @@ Zustand store with persist middleware (`app:home:filter-store`).
 | State | Type | Description |
 |-------|------|-------------|
 | `focusedIntegrationUuid` | `string \| null` | UUID of the focused integration, or null for all platforms |
+| `focusedScriptStatus` | `ScriptStatus` | Selected script status filter (default: `Idea`) |
 
 | Action | Description |
 |--------|-------------|
 | `setFocusedIntegrationUuid(uuid)` | Sets the focused integration |
+| `setFocusedScriptStatus(status)` | Sets the script status filter |
 
 ## Hooks
 
@@ -82,6 +92,7 @@ Zustand store with persist middleware (`app:home:filter-store`).
 | `useListRankedPosts` | `app/hooks/api/posts/useListRankedPosts.ts` | `GET /api/posts/rank` | `{ posts: PostWithAggregatedInsightsDTO[] }` |
 | `useListRankedPostGroups` | `app/hooks/api/postGroups/useListRankedPostGroups.ts` | `GET /api/post-groups/rank` | `{ postGroups: PostGroupWithAggregatedInsightsDTO[] }` |
 | `useListScriptsByStatus` | `app/hooks/api/scripts/useListScriptsByStatus.ts` | `GET /api/scripts/by-status` | `{ scriptsByStatus: ScriptsGroupedByStatusDTO[] }` |
+| `useListPaginatedScripts` | `app/hooks/api/scripts/useListPaginatedScripts.ts` | `GET /api/scripts` | `{ scripts, isLoading, isLoadingMore, hasMore, listMore }` |
 
 ## Models & DTOs
 
