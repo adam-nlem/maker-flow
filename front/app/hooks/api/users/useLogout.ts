@@ -7,7 +7,7 @@ export function useLogout() {
 
     const mutation = useMutation({
         mutationFn: async () => {
-            await httpClient.get('/logout')
+            await httpClient.get('/users/logout')
         },
         onSuccess: () => {
             queryClient.setQueryData(userQueryKeys.me, null)

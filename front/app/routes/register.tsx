@@ -3,9 +3,11 @@ import { Link, useNavigate } from "react-router";
 
 import { Button } from '~/components/ui/Button';
 import { Input } from '~/components/ui/Input';
+import PasswordRules from '~/components/ui/PasswordRules';
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useLogin } from "~/hooks/api/users/useLogin";
 import { useRegister } from "~/hooks/api/users/useRegister";
+import { getPasswordRules, isPasswordValid } from "~/utils/passwordValidation";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
@@ -42,6 +44,10 @@ export default function RegisterPage() {
         }
         if (!password.trim()) {
             setValidationError("Le mot de passe est requis");
+            return false;
+        }
+        if (!isPasswordValid(password)) {
+            setValidationError("Le mot de passe ne respecte pas les critères de sécurité");
             return false;
         }
         if (!confirmPassword.trim()) {
@@ -131,6 +137,9 @@ export default function RegisterPage() {
                         onChange={(e) => setPassword(e.target.value)}
                         fullWidth
                     />
+                    {password.length > 0 && (
+                        <PasswordRules rules={getPasswordRules(password)} />
+                    )}
 
                     <Input
                         label="Confirmer le mot de passe"

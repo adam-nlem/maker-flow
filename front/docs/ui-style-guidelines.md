@@ -352,6 +352,25 @@ Step indicator for multi-step flows.
 
 ---
 
+### PasswordRules
+
+**Location:** `app/components/ui/PasswordRules.tsx`
+
+Real-time password strength feedback. Displays a list of rules with pass/fail indicators.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `rules` | `PasswordRule[]` | Array from `getPasswordRules()` |
+
+**Visual:**
+- Passing: `CheckIcon` (outline, `size-3.5`, `text-primary`, `strokeWidth={2}`) + `text-body-xs text-primary`
+- Failing: `XMarkIcon` (outline, `size-3.5`, `text-danger`, `strokeWidth={2}`) + `text-body-xs text-danger`
+- Layout: `flex flex-col gap-1.5`
+
+**Usage:** Shown below password inputs when `password.length > 0`. Used in registration and settings pages.
+
+---
+
 ### ModalOverlay
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/ModalOverlay.tsx`

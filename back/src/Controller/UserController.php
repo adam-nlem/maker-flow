@@ -6,9 +6,13 @@ use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\User\RegisterUserRequestDTO;
 use App\DTO\Request\User\UpdateUserRequestDTO;
 use App\Entity\User;
+use App\Helper\PasswordHelper;
+use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
+use App\Service\Cookie\CookieService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
@@ -16,11 +20,34 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/users')]
 final class UserController extends AbstractController
 {
+    #[Route('/logout', name: 'api_user_logout', methods: ["GET"])]
+    public function logout(
+        Request $request,
+        CookieService $cookieService,
+        TokenRepository $tokenRepository,
+    ): JsonResponse {
+        $token = $cookieService->getApiToken($request);
+
+        if ($token) {
+            $tokenRepository->remove($token, true);
+        }
+
+        $response = new JsonResponse(status: Response::HTTP_OK);
+        $cookieService->clearCookie($request, $response);
+
+        return $response;
+    }
+
     #[Route('/register', name: 'api_user_register', methods: ["POST"])]
     public function register(
         RegisterUserRequestDTO $dto,
         UserRepository $userRepository,
     ): Response {
+        $passwordErrors = PasswordHelper::validate($dto->getPlainPassword());
+        if (!empty($passwordErrors)) {
+            return $this->json(data: ["message" => $passwordErrors[0]], status: Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
         try {
             /** @var User $user */
             $user = $dto->build();
@@ -72,8 +99,9 @@ final class UserController extends AbstractController
                 return $this->json(data: ["message" => "Passwords do not match."], status: Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
-            if (strlen($dto->getNewPassword()) < 8) {
-                return $this->json(data: ["message" => "New password must be at least 8 characters long."], status: Response::HTTP_UNPROCESSABLE_ENTITY);
+            $passwordErrors = PasswordHelper::validate($dto->getNewPassword());
+            if (!empty($passwordErrors)) {
+                return $this->json(data: ["message" => $passwordErrors[0]], status: Response::HTTP_UNPROCESSABLE_ENTITY);
             }
 
             $user->setPassword($passwordHasher->hashPassword($user, $dto->getNewPassword()));

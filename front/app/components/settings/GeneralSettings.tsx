@@ -3,9 +3,11 @@ import { UnprocessableEntityException } from "~/services/httpClient/customHttpEx
 import { SettingsSection, settingsSectionToFrenchTranslation } from "~/models/enums/SettingsSection";
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
+import PasswordRules from "~/components/ui/PasswordRules";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useUpdateUser } from "~/hooks/api/users/useUpdateUser";
 import { useLogout } from "~/hooks/api/users/useLogout";
+import { getPasswordRules, isPasswordValid } from "~/utils/passwordValidation";
 
 export default function GeneralSettings() {
     const { user } = useCurrentUser();
@@ -43,6 +45,10 @@ export default function GeneralSettings() {
         e.preventDefault();
         if (hasPasswordChanges && (!currentPassword || !newPassword || !confirmNewPassword)) {
             setValidationError('Veuillez remplir tous les champs de mots de passe');
+            return;
+        }
+        if (newPassword && !isPasswordValid(newPassword)) {
+            setValidationError('Le mot de passe ne respecte pas les critères de sécurité');
             return;
         }
         const data: Parameters<typeof updateUser>[0] = { firstName, lastName };
@@ -112,6 +118,9 @@ export default function GeneralSettings() {
                             autoComplete="new-password"
                             fullWidth
                         />
+                        {newPassword.length > 0 && (
+                            <PasswordRules rules={getPasswordRules(newPassword)} />
+                        )}
                         <Input
                             label="Confirmer le mot de passe"
                             type="password"
