@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { TagIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { EllipsisHorizontalIcon, TagIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { TagIcon as TagIconSolid } from "@heroicons/react/16/solid";
 import type { Script } from "~/models/Script";
 import type { ScriptTag } from "~/models/ScriptTag";
 import { colorToBgClass, colorToBorderClass, colorToTextClass, Color, colorOptions } from "~/models/enums/Color";
@@ -8,6 +9,8 @@ import { useCreateScriptTag } from "~/hooks/api/scriptTags/useCreateScriptTag";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { Input } from "~/components/ui/Input";
 import Pill from "../ui/Pill";
+import { Badge } from "~/components/ui/Badge";
+import UpdateScriptTagDropdown from "./UpdateScriptTagDropdown";
 
 interface Props {
     script: Script;
@@ -19,10 +22,10 @@ export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props
     const [isOpen, setIsOpen] = useState(false);
     const [newTagTitle, setNewTagTitle] = useState("");
     const [newTagColor, setNewTagColor] = useState<Color>(Color.Blue);
+    const [updatingTag, setUpdatingTag] = useState<ScriptTag | null>(null);
 
     const { scriptTags: allTags } = useListScriptTags({ projectUuid });
 
-    console.log("all tags", allTags);
     const { createScriptTag, isPending: isCreating } = useCreateScriptTag();
     const { updateScript } = useUpdateScript();
 
@@ -75,14 +78,27 @@ export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props
                         <div className="absolute top-full left-0 mt-1 z-30 border border-light-gray rounded-xl bg-clear shadow-lg p-3 flex flex-col gap-2 min-w-52">
                             {/* Existing tags */}
                             {allTags.filter((t) => !assignedUuids.has(t.uuid)).map((tag) => (
-                                <button
-                                    key={tag.uuid}
-                                    onClick={() => { handleToggleTag(tag); setIsOpen(false); }}
-                                    className={`flex flex-row items-center gap-2 px-2 py-1 rounded-lg hover:bg-surface-hover transition-colors text-left w-full cursor-pointer`}
-                                >
-                                    <div className={`w-2 h-2 rounded-full ${colorToBgClass[tag.color]}`} />
-                                    <span className="text-heading-sm">{tag.title}</span>
-                                </button>
+                                <div key={tag.uuid} className="relative">
+                                    <Pill
+                                    isSelected
+                                        label={tag.title}
+                                        textColorClassName={colorToTextClass[tag.color]}
+                                        bgColorClassName={colorToBgClass[tag.color]}
+                                        borderColorClassName={colorToBorderClass[tag.color]}
+                                        suffixIcon={EllipsisHorizontalIcon}
+                                        onSuffixClick={() => setUpdatingTag(tag)}
+                                        onClick={() => { handleToggleTag(tag); setIsOpen(false); }}
+                                    />
+                                    {updatingTag?.uuid === tag.uuid && (
+                                        <UpdateScriptTagDropdown
+                                            tag={tag}
+                                            onClose={() => setUpdatingTag(null)}
+                                            onTagDeleted={() => {
+                                                setUpdatingTag(null);
+                                            }}
+                                        />
+                                    )}
+                                </div>
                             ))}
 
                             {/* Create new tag */}

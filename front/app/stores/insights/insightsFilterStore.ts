@@ -13,7 +13,7 @@ type InsightsFilterAction = {
 export const useInsightsFilterStore = create<InsightsFilterState & InsightsFilterAction>()(
     persist(
         (set) => ({
-            timePeriod: TimePeriod.Last30Days,
+            timePeriod: TimePeriod.LastYear,
             setTimePeriod: (timePeriod) => set({ timePeriod }),
         }),
         {
