@@ -1,7 +1,6 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
-import { User } from "~/models/User"
+import { useMutation } from "@tanstack/react-query"
+import { LoginResponseDTO } from "~/models/dtos/LoginResponseDTO"
 import { httpClient } from "~/services/httpClient/httpClient"
-import { userQueryKeys } from "./userQueryKeys"
 
 interface LoginData {
     email: string
@@ -9,18 +8,13 @@ interface LoginData {
 }
 
 export function useLogin() {
-    const queryClient = useQueryClient()
-
     const mutation = useMutation({
-        mutationFn: async (data: LoginData) => {
+        mutationFn: async (data: LoginData): Promise<LoginResponseDTO> => {
             const res = await httpClient.post('/login', {
                 email: data.email,
                 password: data.password
             })
-            return User.fromJSON(res.data)
-        },
-        onSuccess: (user) => {
-            queryClient.setQueryData(userQueryKeys.me, user)
+            return LoginResponseDTO.fromJSON(res.data)
         },
     })
 

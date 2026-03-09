@@ -28,31 +28,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\Email]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
     #[ORM\Column]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
+
+    #[ORM\Column(nullable: true)]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_login', 'api_otp_verify_login', 'api_otp_verify_email'])]
+    private ?\DateTimeImmutable $verifiedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['api_user_me', 'api_user_update'])]
@@ -82,6 +86,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(targetEntity: Subscription::class, mappedBy: 'user', cascade: ['remove'])]
     private ?Subscription $subscription = null;
 
+    /**
+     * @var Collection<int, Otp>
+     */
+    #[ORM\OneToMany(targetEntity: Otp::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $otps;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -97,6 +107,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->tokens = new ArrayCollection();
         $this->integrations = new ArrayCollection();
         $this->projects = new ArrayCollection();
+        $this->otps = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -194,6 +205,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->roles[] = $role;
         }
         return $this;
+    }
+
+    public function getVerifiedAt(): ?\DateTimeImmutable
+    {
+        return $this->verifiedAt;
+    }
+
+    public function setVerifiedAt(?\DateTimeImmutable $verifiedAt): static
+    {
+        $this->verifiedAt = $verifiedAt;
+
+        return $this;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->verifiedAt !== null;
     }
 
     public function getStripeCustomerId(): ?string
@@ -330,5 +358,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->subscription = $subscription;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Otp>
+     */
+    public function getOtps(): Collection
+    {
+        return $this->otps;
     }
 }

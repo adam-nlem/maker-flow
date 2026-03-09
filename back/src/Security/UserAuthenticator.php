@@ -2,12 +2,10 @@
 
 namespace App\Security;
 
-use App\DTO\Response\LoginResponseDTO;
-use App\Entity\Token;
+use App\DTO\Response\User\LoginResponseDTO;
+use App\Entity\Enum\OtpType;
 use App\Entity\User;
-use App\Repository\TokenRepository;
-use App\Service\Cookie\CookieService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\Otp\OtpService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -18,16 +16,13 @@ use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
 use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Serializer\SerializerInterface;
 
 class UserAuthenticator extends AbstractAuthenticator
 {
     public function __construct(
-        private TokenRepository $tokenRepository,
-        private EntityManagerInterface $em,
-        private SerializerInterface $serializer,
-        private CookieService $cookieService,
+        private readonly OtpService $otpService,
     ) {}
+
     public function supports(Request $request): ?bool
     {
         return $request->attributes->get('_route') === 'api_login';
@@ -52,27 +47,24 @@ class UserAuthenticator extends AbstractAuthenticator
         /** @var User $user */
         $user = $tokenInterface->getUser();
 
-        $token = $this->tokenRepository->getByUser($user);
+        if (!$user->isVerified()) {
+            $otp = $this->otpService->createAndSend($user, OtpType::EmailVerification);
+            $responseDto = new LoginResponseDTO(false, true, $otp->getPendingOtpToken(), $user->getEmail());
 
-        if (null === $token) {
-            $token = new Token();
-
-            $user->addToken($token);
-            $this->em->persist($token);
-        } else {
-            if ($token->isExpired()) {
-                $token
-                    ->resetToken();
-            }
+            return new JsonResponse(
+                $responseDto->getData(),
+                Response::HTTP_OK,
+            );
         }
 
-        $this->em->flush();
+        $otp = $this->otpService->createAndSend($user, OtpType::Login);
 
-        $jsonData = $this->serializer->serialize($user, 'json', ['groups' => ['api_login']]);
+        $responseDto = new LoginResponseDTO(true, false, $otp->getPendingOtpToken());
 
-        $res = new JsonResponse($jsonData, Response::HTTP_OK, [], true);
-        $this->cookieService->addCookieToHeaders($token, $request, $res);
-        return $res;
+        return new JsonResponse(
+            $responseDto->getData(),
+            Response::HTTP_OK,
+        );
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response

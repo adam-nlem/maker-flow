@@ -4,6 +4,7 @@ interface UserJSON {
     lastName: string;
     email: string;
     createdAt: string;
+    verifiedAt: string | null;
 }
 
 export class User {
@@ -13,6 +14,7 @@ export class User {
         public lastName: string,
         public email: string,
         public readonly createdAt: Date,
+        public readonly verifiedAt: Date | null,
     ) { }
 
     static fromJSON(json: UserJSON): User {
@@ -22,6 +24,7 @@ export class User {
             json.lastName,
             json.email,
             new Date(json.createdAt),
+            json.verifiedAt ? new Date(json.verifiedAt) : null,
         );
     }
 
@@ -32,10 +35,15 @@ export class User {
             lastName: this.lastName,
             email: this.email,
             createdAt: this.createdAt.toISOString(),
+            verifiedAt: this.verifiedAt?.toISOString() ?? null,
         };
     }
 
     get fullName(): string {
         return `${this.firstName} ${this.lastName}`;
+    }
+
+    get isVerified(): boolean {
+        return this.verifiedAt !== null;
     }
 }

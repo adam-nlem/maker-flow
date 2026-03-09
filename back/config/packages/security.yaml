@@ -28,6 +28,7 @@ security:
         - { path: ^/api/users/register, roles: PUBLIC_ACCESS }
         - { path: ^/api/integrations/[^/]+/callback, roles: PUBLIC_ACCESS  }
         - { path: ^/api/stripe/webhook, roles: PUBLIC_ACCESS }
+        - { path: ^/api/otp/, roles: PUBLIC_ACCESS }
         - { path: ^/api/, roles: ROLE_USER }
 
 when@test:

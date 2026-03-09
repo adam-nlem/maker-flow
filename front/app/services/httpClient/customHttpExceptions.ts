@@ -54,6 +54,12 @@ export class UnprocessableEntityException extends CustomHttpException {
     }
 }
 
+export class TooManyRequestsException extends CustomHttpException {
+    constructor(message: string, data?: any) {
+        super(429, message, data);
+    }
+}
+
 export class InternalServerException extends CustomHttpException {
     constructor(message: string, data?: any) {
         super(500, message, data);

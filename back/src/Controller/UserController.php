@@ -5,11 +5,14 @@ namespace App\Controller;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\User\RegisterUserRequestDTO;
 use App\DTO\Request\User\UpdateUserRequestDTO;
+use App\DTO\Response\User\RegisterResponseDTO;
+use App\Entity\Enum\OtpType;
 use App\Entity\User;
 use App\Helper\PasswordHelper;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Service\Cookie\CookieService;
+use App\Service\Otp\OtpService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,6 +45,7 @@ final class UserController extends AbstractController
     public function register(
         RegisterUserRequestDTO $dto,
         UserRepository $userRepository,
+        OtpService $otpService,
     ): Response {
         $passwordErrors = PasswordHelper::validate($dto->getPlainPassword());
         if (!empty($passwordErrors)) {
@@ -57,7 +61,14 @@ final class UserController extends AbstractController
 
         $userRepository->save($user, true);
 
-        return $this->json(data: $user, status: Response::HTTP_OK, context: ['groups' => ['api_user_register']]);
+        $otp = $otpService->createAndSend($user, OtpType::EmailVerification);
+
+        $responseDto = new RegisterResponseDTO(true, $otp->getPendingOtpToken(), $user->getEmail());
+
+        return $this->json(
+            data: $responseDto->getData(),
+            status: Response::HTTP_OK,
+        );
     }
 
     #[Route('/me', name: 'api_user_me', methods: ["GET"])]

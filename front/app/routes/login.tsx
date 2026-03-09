@@ -5,6 +5,7 @@ import { Button } from '~/components/ui/Button';
 import { Input } from '~/components/ui/Input';
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useLogin } from "~/hooks/api/users/useLogin";
+import { OtpType } from "~/models/enums/OtpType";
 
 export default function LoginPage() {
     const [email, setEmail] = useState<string>("");
@@ -22,9 +23,26 @@ export default function LoginPage() {
         }
     }, [user])
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        login({ email, password });
+        const response = await login({ email, password });
+        if (response.requiresOtp) {
+            navigate("/verify-otp", {
+                state: {
+                    pendingOtpToken: response.pendingOtpToken,
+                    purpose: OtpType.Login,
+                    email,
+                },
+            });
+        } else if (response.requiresEmailVerification) {
+            navigate("/verify-otp", {
+                state: {
+                    pendingOtpToken: response.pendingOtpToken,
+                    purpose: OtpType.EmailVerification,
+                    email: response.email,
+                },
+            });
+        }
     }
 
 

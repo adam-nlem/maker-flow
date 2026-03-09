@@ -1,5 +1,5 @@
 import axios from "axios";
-import { BadRequestException, ConflictException, ForbiddenException, InternalServerException, NotFoundException, PaymentRequiredException, TimeoutException, UnauthorizedException, UnprocessableEntityException } from "./customHttpExceptions";
+import { BadRequestException, ConflictException, ForbiddenException, InternalServerException, NotFoundException, PaymentRequiredException, TimeoutException, TooManyRequestsException, UnauthorizedException, UnprocessableEntityException } from "./customHttpExceptions";
 
 
 export const httpClient = axios.create(
@@ -44,6 +44,9 @@ httpClient.interceptors.response.use(
                     break;
                 case 422:
                     e = new UnprocessableEntityException(err.message, err.data);
+                    break;
+                case 429:
+                    e = new TooManyRequestsException(err.message, err.data);
                     break;
                 case 500:
                     e = new InternalServerException(err.message, err.data);

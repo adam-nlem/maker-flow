@@ -5,14 +5,13 @@ import { Button } from '~/components/ui/Button';
 import { Input } from '~/components/ui/Input';
 import PasswordRules from '~/components/ui/PasswordRules';
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
-import { useLogin } from "~/hooks/api/users/useLogin";
 import { useRegister } from "~/hooks/api/users/useRegister";
+import { OtpType } from "~/models/enums/OtpType";
 import { getPasswordRules, isPasswordValid } from "~/utils/passwordValidation";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
     const { user, isLoading: authLoading } = useCurrentUser()
-    const { login } = useLogin()
 
     const [firstName, setFirstName] = useState("");
     const [lastName, setLastName] = useState("");
@@ -65,8 +64,16 @@ export default function RegisterPage() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!validateForm()) return;
-        await register({ firstName, lastName, email, password });
-        await login({ email, password });
+        const response = await register({ firstName, lastName, email, password });
+        if (response.requiresEmailVerification) {
+            navigate("/verify-otp", {
+                state: {
+                    pendingOtpToken: response.pendingOtpToken,
+                    purpose: OtpType.EmailVerification,
+                    email: response.email,
+                },
+            });
+        }
     }
 
     const errorMessage = validationError || (error?.message ?? null);

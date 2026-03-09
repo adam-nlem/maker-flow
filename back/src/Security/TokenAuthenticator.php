@@ -18,31 +18,29 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 
 class TokenAuthenticator extends AbstractAuthenticator
 {
+    private const EXCLUDED_ROUTES = [
+        'api_login',
+        'api_user_register',
+        'api_integrations_callback',
+        'api_stripe_webhook',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+        'api_otp_resend',
+    ];
+
     public function __construct(
-        private readonly TokenRepository   $tokenRepository,
+        private readonly TokenRepository $tokenRepository,
         private readonly UserRepository $userRepository,
         private readonly CookieService $cookieService,
     ) {}
 
     public function supports(Request $request): ?bool
     {
-        $path = $request->getPathInfo();
-        $route = $request->attributes->get('_route');
-
-        // Skip login and explicitly public endpoints
-        // access_control decides authorization, not whether authenticators run
-        //TODO: Check if this is the best way to do it
-        if (
-            $route === 'api_login'
-            || str_starts_with($path, '/api/users/register')
-            || $route === 'api_integrations_callback'
-            || $route === 'api_stripe_webhook'
-        ) {
+        if (!str_starts_with($request->getPathInfo(), '/api/')) {
             return false;
         }
 
-        // Only handle API routes; for protected endpoints we want to run even if the cookie is missing
-        return str_starts_with($path, '/api/');
+        return !in_array($request->attributes->get('_route'), self::EXCLUDED_ROUTES, true);
     }
 
     public function authenticate(Request $request): Passport
@@ -64,6 +62,10 @@ class TokenAuthenticator extends AbstractAuthenticator
 
             if (null === $user) {
                 throw new HttpException(Response::HTTP_UNAUTHORIZED, "No user for this token");
+            }
+
+            if (!$user->isVerified()) {
+                throw new HttpException(Response::HTTP_FORBIDDEN, "Email not verified");
             }
 
             return $user;
