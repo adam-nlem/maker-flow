@@ -11,7 +11,6 @@ use App\DTO\Request\Script\CreateScriptRequestDTO;
 use App\DTO\Request\Script\ReorderScriptPartsRequestDTO;
 use App\DTO\Request\Script\UpdateScriptRequestDTO;
 use App\Entity\Enum\ScriptPartType;
-use App\Entity\Enum\ScriptStatus;
 use App\Entity\Script;
 use App\Entity\User;
 use App\Repository\PostGroupRepository;
@@ -139,14 +138,6 @@ final class ScriptController extends AbstractController
             }
         }
 
-        if ($dto->getPlatforms() !== null) {
-            $script->setPlatforms($dto->getPlatforms());
-        }
-
-        if ($dto->getStatus() !== null) {
-            $script->setStatus(ScriptStatus::from($dto->getStatus()));
-        }
-
         $scriptRepository->save($script, true);
 
         return $this->json(
@@ -199,7 +190,7 @@ final class ScriptController extends AbstractController
         }
 
         if ($dto->getPublishedAt() !== null) {
-            $script->setPublishedAt(new \DateTimeImmutable($dto->getPublishedAt()));
+            $script->setPublishedAt($dto->getPublishedAt());
         }
 
         if ($dto->hasPostGroupUuid()) {
@@ -231,7 +222,7 @@ final class ScriptController extends AbstractController
         }
 
         if ($dto->hasStatus()) {
-            $script->setStatus($dto->getStatus() !== null ? ScriptStatus::from($dto->getStatus()) : null);
+            $script->setStatus($dto->getStatus());
         }
 
         $scriptRepository->save($script, true);

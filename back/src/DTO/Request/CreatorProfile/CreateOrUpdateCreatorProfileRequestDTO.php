@@ -5,6 +5,7 @@ namespace App\DTO\Request\CreatorProfile;
 use App\DTO\Request\AbstractRequestDTO;
 use App\Entity\CreatorProfile;
 use App\Entity\Enum\ContentType;
+use App\Entity\Enum\Platform;
 use App\Entity\Enum\Tone;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -31,7 +32,9 @@ class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
     protected function fromPayload(array $payload): void
     {
         $this->projectUuid = $payload["projectUuid"];
-        $this->platforms = $payload["platforms"] ?? null;
+        $this->platforms = isset($payload["platforms"])
+            ? array_filter(array_map(fn(string $platform) => Platform::tryFrom($platform), $payload["platforms"]))
+            : null;
         $this->contentType = isset($payload["contentType"]) ? ContentType::tryFrom($payload["contentType"]) : null;
         $this->niche = $payload["niche"] ?? null;
         $this->targetAudience = $payload["targetAudience"] ?? null;

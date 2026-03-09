@@ -415,7 +415,7 @@ front/app/components/scripts/calendar/
 - **Monday-first grid:** Same weekday logic as `DatePicker`
 - **Server-side grouping:** Scripts are grouped by day on the backend. The frontend receives pre-grouped `ListScriptsGroupedByDayDTO[]` and converts to `Map<string, Script[]>`.
 - **Month navigation:** Local `useState` (not persisted), `<` / `>` arrows + "Aujourd'hui" reset button. Month is 0-indexed in JS, converted to 1-indexed for the API.
-- **Drag-and-drop:** Uses `@dnd-kit/core` — cards are `useDraggable`, day cells are `useDroppable`. Same pattern as `TodoListTasksBoard` (Kanban status change). `PointerSensor` with 8px activation constraint to avoid interfering with clicks. `DragOverlay` shows a rotated shadow preview.
+- **Drag-and-drop:** Uses `@dnd-kit/core` — `ScriptTile` is `useDraggable`, day cells are `useDroppable`. The `DndContext` is provided by each consumer: `HomeScriptsSection` (home page, enables dragging from the unscheduled list onto the calendar) and `calendar.tsx` route (enables rescheduling scripts between days). Both use `PointerSensor` with 8px activation constraint, `DragOverlay` with rotated shadow preview, and `useUpdateScript` to persist the new `publishedAt` date.
 - **Day cells:** flex-col layout with `overflow-hidden`, scripts list uses `flex-1 min-h-0 overflow-y-auto scrollbar-none`
 - **"+" button:** Hover-revealed (`opacity-0 group-hover:opacity-100`), creates a "Nouveau script" with the day's date pre-filled
 - **Detail modal:** `ScriptDetailModal` wraps `ScriptEditorPanel` inside `ModalOverlay`. Clicking a script card opens the full editor (title, platforms, tags, status, date, hook, parts). Uses `key={script.uuid}` to reset on script change.
