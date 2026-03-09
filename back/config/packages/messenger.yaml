@@ -16,3 +16,4 @@ framework:
 
         routing:
             # Messages are routed via #[AsMessage('async')] attribute on message classes
+            'Symfony\Component\Mailer\Messenger\SendEmailMessage': messages

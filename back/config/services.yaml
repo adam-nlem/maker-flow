@@ -40,6 +40,9 @@ parameters:
     app.youtube.javascript_origin: "%env(string:YOUTUBE_JAVASCRIPT_ORIGIN)%"
 
     app.encryption.token_key: "%env(string:APP_ENCRYPTION_KEY)%"
+
+    app.mailing.from_address: "%env(string:MAILING_FROM_ADDRESS)%"
+    app.mailing.from_name: "%env(string:MAILING_FROM_NAME)%"
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -125,6 +128,10 @@ services:
     App\Service\Encryption\TokenEncryptionService:
         arguments:
             $encryptionKey: "%app.encryption.token_key%"
+    App\Service\Mailing\MailingService:
+        arguments:
+            $fromAddress: "%app.mailing.from_address%"
+            $fromName: "%app.mailing.from_name%"
 
     App\EventListener\IntegrationTokenEncryptionListener:
         tags:
