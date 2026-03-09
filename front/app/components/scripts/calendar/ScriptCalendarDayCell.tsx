@@ -1,7 +1,7 @@
 import { useDroppable } from "@dnd-kit/core";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
-import ScriptCalendarTile from "./ScriptCalendarTile";
+import ScriptTile from "~/components/scripts/ScriptTile";
 
 interface ScriptCalendarDayCellProps {
     droppableId: string;
@@ -36,7 +36,7 @@ export default function ScriptCalendarDayCell({ droppableId, day, isToday, scrip
 
             <div className="flex flex-col gap-0.5 overflow-y-auto scrollbar-none flex-1 min-h-0">
                 {scripts.map((script) => (
-                    <ScriptCalendarTile
+                    <ScriptTile
                         key={script.uuid}
                         script={script}
                         onClick={() => onScriptClick(script)}

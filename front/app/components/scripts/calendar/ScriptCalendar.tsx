@@ -1,17 +1,15 @@
 import { useMemo, useState } from "react";
-import { DndContext, DragOverlay, PointerSensor, type DragEndEvent, type DragStartEvent, useSensor, useSensors } from "@dnd-kit/core";
+
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
 import type { Script } from "~/models/Script";
 import { platformOptions } from "~/models/enums/Platform";
-import { ScriptStatus, scriptStatusOptions } from "~/models/enums/ScriptStatus";
-import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
+import { scriptStatusOptions } from "~/models/enums/ScriptStatus";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
 import { useListCalendarScripts } from "~/hooks/api/scripts/useListCalendarScripts";
 import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
 import { DAYS_FR, MONTHS_FR, getDaysInMonth, getFirstDayOfMonth, isSameDay, toDateKey } from "~/utils/dateHelpers";
 import ScriptCalendarDayCell from "./ScriptCalendarDayCell";
-import ScriptCalendarTile from "./ScriptCalendarTile";
 import ScriptDetailModal from "../ScriptDetailModal";
 import Pill from "~/components/ui/Pill";
 
@@ -24,7 +22,6 @@ interface ScriptCalendarProps {
 export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
     const today = new Date();
     const { currentMonth, currentYear, setCurrentMonth, setCurrentYear, selectedPlatforms, selectedStatuses, selectedTagUuids } = useCalendarStore();
-    const [draggedScript, setDraggedScript] = useState<Script | null>(null);
     const [selectedScript, setSelectedScript] = useState<Script | null>(null);
 
     const { scriptTags } = useListScriptTags({ projectUuid });
@@ -55,12 +52,7 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
             .filter((group) => group.scripts.length > 0);
     }, [fetchedScriptsByDay, selectedPlatforms, selectedStatuses, selectedTagUuids, noPlatformFilter, noStatusFilter, noTagFilter]);
 
-    const { updateScript } = useUpdateScript();
     const { createScript } = useCreateScript();
-
-    const sensors = useSensors(
-        useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
-    );
 
     const scriptsByDay = useMemo(() => {
         const map = new Map<string, Script[]>();
@@ -69,31 +61,6 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
         }
         return map;
     }, [filteredScriptsByDay]);
-
-    const handleDragStart = (event: DragStartEvent) => {
-        for (const group of filteredScriptsByDay) {
-            const script = group.scripts.find((s) => s.uuid === event.active.id);
-            if (script) {
-                setDraggedScript(script);
-                return;
-            }
-        }
-        setDraggedScript(null);
-    };
-
-    const handleDragEnd = async (event: DragEndEvent) => {
-        const { active, over } = event;
-        setDraggedScript(null);
-        if (!over) return;
-
-        const dayStr = (over.id as string).replace("day-", "");
-        const day = parseInt(dayStr, 10);
-        if (isNaN(day)) return;
-
-        const newDate = new Date(currentYear, currentMonth, day);
-
-        await updateScript({ scriptUuid: active.id as string, data: { publishedAt: newDate } });
-    };
 
     const handleCreateScript = (date: Date) => {
         createScript({ projectUuid, title: "Nouveau script", publishedAt: date.toLocaleDateString("sv-SE") });
@@ -171,39 +138,29 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
             </div>
 
             {/* Day grid */}
-            <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                <div className="grid grid-cols-7 auto-rows-fr flex-1 min-h-0 border-l border-light-gray">
-                    {days.map((day, index) => {
-                        if (day === null) {
-                            return <div key={`empty-${index}`} className="border-b border-r border-light-gray" />;
-                        }
+            <div className="grid grid-cols-7 auto-rows-fr flex-1 min-h-0 border-l border-light-gray">
+                {days.map((day, index) => {
+                    if (day === null) {
+                        return <div key={`empty-${index}`} className="border-b border-r border-light-gray" />;
+                    }
 
-                        const date = new Date(currentYear, currentMonth, day);
-                        const dateKey = toDateKey(date);
-                        const dayScripts = scriptsByDay.get(dateKey) ?? [];
+                    const date = new Date(currentYear, currentMonth, day);
+                    const dateKey = toDateKey(date);
+                    const dayScripts = scriptsByDay.get(dateKey) ?? [];
 
-                        return (
-                            <ScriptCalendarDayCell
-                                key={day}
-                                droppableId={`day-${day}`}
-                                day={day}
-                                isToday={isSameDay(date, today)}
-                                scripts={dayScripts}
-                                onScriptClick={setSelectedScript}
-                                onCreateScript={() => handleCreateScript(date)}
-                            />
-                        );
-                    })}
-                </div>
-
-                <DragOverlay dropAnimation={null}>
-                    {draggedScript && (
-                        <div className="opacity-90 rotate-1 shadow-lg">
-                            <ScriptCalendarTile script={draggedScript} onClick={() => { }} />
-                        </div>
-                    )}
-                </DragOverlay>
-            </DndContext>
+                    return (
+                        <ScriptCalendarDayCell
+                            key={day}
+                            droppableId={`day-${day}`}
+                            day={day}
+                            isToday={isSameDay(date, today)}
+                            scripts={dayScripts}
+                            onScriptClick={setSelectedScript}
+                            onCreateScript={() => handleCreateScript(date)}
+                        />
+                    );
+                })}
+            </div>
 
             <ScriptDetailModal
                 script={selectedScript}

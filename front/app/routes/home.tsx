@@ -7,8 +7,7 @@ import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProjec
 import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegrationStore";
 import RankedPostsList from "~/components/home/RankedPostsList";
 import RankedPostGroupsList from "~/components/home/RankedPostGroupsList";
-import HomeScriptsList from "~/components/home/HomeScriptsList";
-import { ScriptCalendar } from "~/components/scripts/calendar";
+import HomeScriptsSection from "~/components/home/HomeScriptsSection";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -64,8 +63,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
           ) : focusedProject && (
             <>
               <div className="w-2/3 flex flex-col gap-5 overflow-y-auto scrollbar-none">
-                <HomeScriptsList projectUuid={focusedProject.uuid} />
-                <ScriptCalendar projectUuid={focusedProject.uuid} />
+                <HomeScriptsSection projectUuid={focusedProject.uuid} />
               </div>
               <div className="w-1/3 flex flex-col gap-5 min-h-0">
                 <HomeInsightsOverview

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 import Pill from "~/components/ui/Pill"
 import Shimmer from "~/components/ui/Shimmer"
-import ScriptCard from "~/components/scripts/ScriptCard"
+import ScriptTile from "~/components/scripts/ScriptTile"
 import ScriptDetailModal from "~/components/scripts/ScriptDetailModal"
 import type { Script } from "~/models/Script"
 import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts"
@@ -76,12 +76,12 @@ export default function HomeScriptsList({ projectUuid }: HomeScriptsListProps) {
                 scripts.length === 0 ? (
                     <p className="text-body-sm text-medium-gray">Aucun script trouvé pour ce statut.</p>
                 ) : (
-                    <div className="flex flex-row gap-2 overflow-x-auto scrollbar-none flex-1 min-h-0">
+                    <div className="flex flex-row flex-wrap gap-2 overflow-x-auto scrollbar-none flex-1 min-h-0">
                         {scripts.map((script) => (
-                            <ScriptCard
+                            <ScriptTile
                                 key={script.uuid}
                                 script={script}
-                                isSelected={false}
+                                isDraggable={!script.publishedAt}
                                 onClick={() => setSelectedScript(script)}
                             />
                         ))}

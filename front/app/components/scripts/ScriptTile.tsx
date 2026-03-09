@@ -16,21 +16,21 @@ function PlatformIcon({ platform }: { platform: Platform }) {
     );
 }
 
-interface ScriptCalendarTileProps {
+interface ScriptTileProps {
     script: Script;
     onClick: () => void;
+    isDraggable?: boolean;
 }
 
-export default function ScriptCalendarTile({ script, onClick }: ScriptCalendarTileProps) {
-    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: script.uuid });
+export default function ScriptTile({ script, onClick, isDraggable = true }: ScriptTileProps) {
+    const { attributes, listeners, setNodeRef, isDragging } = useDraggable({ id: script.uuid, data: { script }, disabled: !isDraggable });
 
     return (
         <div
             ref={setNodeRef}
-            {...listeners}
-            {...attributes}
+            {...(isDraggable ? { ...listeners, ...attributes } : {})}
             onClick={(e) => { e.stopPropagation(); onClick(); }}
-            className={`px-1.5 py-1 border border-light-gray rounded-md hover:bg-surface-hover cursor-pointer transition-colors gap-1 ${isDragging ? "opacity-40" : ""}`}
+            className={`px-1.5 max-h-fit py-1 border border-light-gray rounded-md hover:bg-surface-hover cursor-pointer transition-colors gap-1 ${isDragging ? "opacity-40" : ""}`}
         >
             <p className="text-heading-xs truncate">{script.title}</p>
 
