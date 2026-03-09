@@ -105,7 +105,7 @@ class Token
     {
         $dateTime = DateHelper::createUtcDateTimeImmutable();
         // DateTimeImmutable returns a new instance when modified, so we need to capture the result
-        $dateTime = $dateTime->modify('+1 day');
+        $dateTime = $dateTime->modify('+1 month');
 
         $this->expiresAt = $dateTime;
     }
