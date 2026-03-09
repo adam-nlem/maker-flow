@@ -1,16 +1,11 @@
-import { useState } from "react";
-import { EllipsisHorizontalIcon, TagIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import { TagIcon as TagIconSolid } from "@heroicons/react/16/solid";
+import { useEffect, useRef, useState } from "react";
+import { TagIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import type { ScriptTag } from "~/models/ScriptTag";
-import { colorToBgClass, colorToBorderClass, colorToTextClass, Color, colorOptions } from "~/models/enums/Color";
-import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
-import { useCreateScriptTag } from "~/hooks/api/scriptTags/useCreateScriptTag";
+import { colorToBgClass, colorToBorderClass, colorToTextClass } from "~/models/enums/Color";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
-import { Input } from "~/components/ui/Input";
 import Pill from "../ui/Pill";
-import { Badge } from "~/components/ui/Badge";
-import UpdateScriptTagDropdown from "./UpdateScriptTagDropdown";
+import ListScriptTagsDropdown from "./ListScriptTagsDropdown";
 
 interface Props {
     script: Script;
@@ -19,42 +14,46 @@ interface Props {
 }
 
 export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props) {
-    const [isOpen, setIsOpen] = useState(false);
-    const [newTagTitle, setNewTagTitle] = useState("");
-    const [newTagColor, setNewTagColor] = useState<Color>(Color.Blue);
-    const [updatingTag, setUpdatingTag] = useState<ScriptTag | null>(null);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [localTags, setLocalTags] = useState<ScriptTag[]>(script.tags);
+    const pendingMutations = useRef(0);
 
-    const { scriptTags: allTags } = useListScriptTags({ projectUuid });
-
-    const { createScriptTag, isPending: isCreating } = useCreateScriptTag();
     const { updateScript } = useUpdateScript();
 
-    const assignedUuids = new Set(script.tags.map((t) => t.uuid));
+    // Sync local state from server when no mutations are in flight
+    useEffect(() => {
+        if (pendingMutations.current === 0) {
+            setLocalTags(script.tags);
+        }
+    }, [script.tags]);
 
-    const handleToggleTag = async (tag: ScriptTag) => {
-        const isAssigned = assignedUuids.has(tag.uuid);
-        const newTagUuids = isAssigned
-            ? script.tags.filter((t) => t.uuid !== tag.uuid).map((t) => t.uuid)
-            : [...script.tags.map((t) => t.uuid), tag.uuid];
-        await updateScript({ scriptUuid: script.uuid, data: { tagUuids: newTagUuids } });
+    const updateTags = async (newTags: ScriptTag[]) => {
+        const previousTags = localTags;
+        setLocalTags(newTags);
+        pendingMutations.current++;
+
+        try {
+            await updateScript({ scriptUuid: script.uuid, data: { tagUuids: newTags.map(t => t.uuid) } });
+        } catch {
+            setLocalTags(previousTags);
+        } finally {
+            pendingMutations.current--;
+        }
     };
 
-    const handleRemoveTag = async (tagUuid: string) => {
-        const newTagUuids = script.tags.filter((t) => t.uuid !== tagUuid).map((t) => t.uuid);
-        await updateScript({ scriptUuid: script.uuid, data: { tagUuids: newTagUuids } });
-    };
+    const handleTagSelected = (selectedTag: ScriptTag) =>
+        updateTags([...localTags, selectedTag]);
 
-    const handleCreateTag = async () => {
-        if (!newTagTitle.trim()) return;
-        const newTag = await createScriptTag({ projectUuid, title: newTagTitle.trim(), color: newTagColor });
-        await updateScript({ scriptUuid: script.uuid, data: { tagUuids: [...script.tags.map((t) => t.uuid), newTag.uuid] } });
-        setNewTagTitle("");
-        setIsOpen(false);
+    const handleRemoveTag = (tagUuid: string) =>
+        updateTags(localTags.filter(t => t.uuid !== tagUuid));
+
+    const handleTagDeleted = (deletedTagUuid: string) => {
+        setLocalTags(localTags.filter(t => t.uuid !== deletedTagUuid));
     };
 
     return (
         <div className="flex flex-row flex-wrap items-center gap-2">
-            {script.tags.map((tag) => (
+            {localTags.map((tag) => (
                 <Pill
                     key={tag.uuid}
                     label={tag.title}
@@ -67,72 +66,24 @@ export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props
                 />
             ))}
 
-            {!isReadOnly && <div className="relative">
-                <Pill
-                    onClick={() => setIsOpen(!isOpen)}
-                    icon={TagIcon}
-                    label={"Tag"} />
-
-                {isOpen && (
-                    <>
-                        <div className="fixed inset-0 z-20" onClick={() => setIsOpen(false)} />
-                        <div className="absolute top-full left-0 mt-1 z-30 border border-light-gray rounded-xl bg-clear shadow-lg p-3 flex flex-col gap-2 min-w-52">
-                            {/* Existing tags */}
-                            {allTags.filter((t) => !assignedUuids.has(t.uuid)).map((tag) => (
-                                <div key={tag.uuid} className="relative">
-                                    <Pill
-                                    isSelected
-                                        label={tag.title}
-                                        textColorClassName={colorToTextClass[tag.color]}
-                                        bgColorClassName={colorToBgClass[tag.color]}
-                                        borderColorClassName={colorToBorderClass[tag.color]}
-                                        suffixIcon={EllipsisHorizontalIcon}
-                                        onSuffixClick={() => setUpdatingTag(tag)}
-                                        onClick={() => { handleToggleTag(tag); setIsOpen(false); }}
-                                    />
-                                    {updatingTag?.uuid === tag.uuid && (
-                                        <UpdateScriptTagDropdown
-                                            tag={tag}
-                                            onClose={() => setUpdatingTag(null)}
-                                            onTagDeleted={() => {
-                                                setUpdatingTag(null);
-                                            }}
-                                        />
-                                    )}
-                                </div>
-                            ))}
-
-                            {/* Create new tag */}
-                            <div className="border-t border-light-gray pt-2 flex flex-col gap-2">
-                                <Input
-                                    simple
-                                    value={newTagTitle}
-                                    onChange={(e) => setNewTagTitle(e.target.value)}
-                                    placeholder="Nouveau tag..."
-                                    fullWidth
-                                    onKeyDown={(e) => { if (e.key === "Enter") handleCreateTag(); }}
-                                />
-                                <div className="flex flex-row gap-1.5 flex-wrap">
-                                    {colorOptions.map((color) => (
-                                        <button
-                                            key={color}
-                                            onClick={() => setNewTagColor(color)}
-                                            className={`w-5 h-5 rounded-full ${colorToBgClass[color]} cursor-pointer ${newTagColor === color ? "ring-2 ring-offset-1 ring-primary" : ""}`}
-                                        />
-                                    ))}
-                                </div>
-                                <button
-                                    onClick={handleCreateTag}
-                                    disabled={isCreating || !newTagTitle.trim()}
-                                    className="text-heading-xs text-primary hover:text-primary/80 disabled:opacity-50 cursor-pointer text-left"
-                                >
-                                    {isCreating ? "Création..." : "Créer le tag"}
-                                </button>
-                            </div>
-                        </div>
-                    </>
-                )}
-            </div>}
+            {!isReadOnly && (
+                <div className="relative">
+                    <Pill
+                        onClick={() => setShowDropdown(!showDropdown)}
+                        icon={TagIcon}
+                        label="Tag"
+                    />
+                    {showDropdown && (
+                        <ListScriptTagsDropdown
+                            projectUuid={projectUuid}
+                            selectedTags={localTags}
+                            onClose={() => setShowDropdown(false)}
+                            onTagSelected={handleTagSelected}
+                            onTagDeleted={handleTagDeleted}
+                        />
+                    )}
+                </div>
+            )}
         </div>
     );
 }

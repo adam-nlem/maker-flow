@@ -250,14 +250,21 @@ Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay
 - Colors: Pending (green), InProgress (yellow), Completed (purple)
 
 ### Tag Management
-- `ScriptTagsRow` lists assigned tags as colored pills with `×` to remove
-- A `+` button opens a popover showing unassigned tags from `useListScriptTags`
-- Each unassigned tag in the popover is rendered as a `Badge` with an `onOptionClick` (`...` icon on hover) that opens `UpdateScriptTagDropdown`
+- Architecture mirrors the TodoListTag system (same component/hook decomposition)
+- `ScriptTagsRow` shows assigned tags as colored `Pill` components with `×` to remove, and a trigger `Pill` ("Tag") to open the dropdown
+- Uses optimistic local state with `useRef` pending counter (same pattern as `ScriptPlatformsRow`) for immediate UI feedback
+- `ListScriptTagsDropdown` is a reusable dropdown component (mirrors `ListTodoListTagsDropdown`):
+  - Props: `{ projectUuid, selectedTags, onClose, onTagSelected, onTagDeleted? }`
+  - Search input doubles as the "create" title field
+  - Uses `useListScriptTagsWithSearch` (debounced 300ms search via `GET /scripts/tags?projectUuid=...&searchTerm=...`)
+  - Shows matching tags as `Pill` (filtered by `selectedTags`), each with `...` suffix icon to open `UpdateScriptTagDropdown`
+  - When no matches and title is not empty: shows color picker + "Créer {title}" button via `useCreateScriptTag`
+  - When nothing typed and no tags: shows hint "Commencez à écrire pour créer un nouveau tag."
 - `UpdateScriptTagDropdown` allows editing tag title/color and deleting the tag (with `ConfirmDeleteDialog` confirmation) — mirrors the `UpdateTodoListTagDropdown` pattern from the Tasks feature
-- The popover also has an inline form to create new tags via `useCreateScriptTag`
+- `useCreateScriptTag` takes `{ projectUuid }` as hook constructor param (mirroring `useCreateTodoListTag`)
 - Toggle/remove calls `useUpdateScript` with the full new `tagUuids` array
 - Tag deletion uses `useDeleteScriptTag` which invalidates both `scriptTagQueryKeys.all` and `scriptQueryKeys.all`
-- **Note:** `useListScriptTags` returns `{ scriptTags }` (not `{ tags }`)
+- `useListScriptTags` (without search) remains available for calendar filtering
 
 ### Dialogue Subjects
 `ScriptDialogueCard` always renders the subjects list below the header. `DialogueSubjectRow` is always inline-editable (speaker + content fields auto-save on blur). `AddDialogueSubjectRow` provides inline creation. The create hook uses `scriptDialogueUuid` (not `dialogueUuid`).
@@ -271,7 +278,9 @@ Uses `@dnd-kit/core` (`useDraggable`, `useDroppable`, `DndContext`, `DragOverlay
 | Hook | Data Interface Key Points |
 |------|---------------------------|
 | `useDeleteScript` | Takes raw `string` UUID (not an object) |
-| `useListScriptTags` | Returns `{ scriptTags }` |
+| `useListScriptTags` | Returns `{ scriptTags }` — for calendar (no search) |
+| `useListScriptTagsWithSearch` | Returns `{ searchTerm, setSearchTerm, scriptTags, isLoading }` — for dropdown |
+| `useCreateScriptTag` | Takes `{ projectUuid }` as hook constructor, mutation data: `{ title, color }` |
 | `useUpdateScriptTag` | Takes `{ tagUuid, title, color }` |
 | `useDeleteScriptTag` | Takes raw `string` UUID |
 | `useCreateDialogueSubject` | Uses `scriptDialogueUuid` |
@@ -319,8 +328,8 @@ scriptQueryKeys.list(uuid, status?)                           // ['scripts', 'li
 scriptQueryKeys.calendar(uuid, year, month)                  // ['scripts', 'calendar', projectUuid, year, month]
 scriptQueryKeys.parts(uuid)                                  // ['scripts', 'parts', scriptUuid]
 
-scriptTagQueryKeys.all        // ['script-tags']
-scriptTagQueryKeys.list(uuid) // ['script-tags', 'list', projectUuid]
+scriptTagQueryKeys.all                   // ['scriptTags']
+scriptTagQueryKeys.list(uuid, search?)   // ['scriptTags', 'list', projectUuid, searchTerm?]
 
 hookTemplateQueryKeys.all        // ['hookTemplates']
 hookTemplateQueryKeys.list(term) // ['hookTemplates', 'list', term ?? '']

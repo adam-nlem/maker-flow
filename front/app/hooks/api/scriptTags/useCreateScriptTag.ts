@@ -5,17 +5,20 @@ import { ScriptTag } from "~/models/ScriptTag";
 import type { Color } from "~/models/enums/Color";
 
 interface CreateScriptTagData {
-    projectUuid: string;
     title: string;
     color: Color;
 }
 
-export function useCreateScriptTag() {
+export function useCreateScriptTag({ projectUuid }: { projectUuid: string }) {
     const queryClient = useQueryClient()
 
     const mutation = useMutation({
         mutationFn: async (data: CreateScriptTagData) => {
-            const res = await httpClient.post('/scripts/tags', data)
+            const res = await httpClient.post('/scripts/tags', {
+                "projectUuid": projectUuid,
+                "title": data.title,
+                "color": data.color,
+            })
             return ScriptTag.fromJSON(res.data);
         },
         onSuccess: () => {
