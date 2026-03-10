@@ -3,6 +3,7 @@ import { SparklesIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router";
 import { Button } from "~/components/ui/Button";
 import { SidePanel } from "~/components/ui/SidePanel";
+import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import ScriptBriefForm from "./ScriptBriefForm";
 import SkillModuleToggles from "./SkillModuleToggles";
 import { useCreateScriptGeneration } from "~/hooks/api/scriptGenerations/useCreateScriptGeneration";
@@ -41,6 +42,7 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
     const [activeSkills, setActiveSkills] = useState<SkillModule[]>([]);
     const [skillInputs, setSkillInputs] = useState<Record<string, string>>({});
     const [aiModel, setAiModel] = useState<AiModel>(AiModel.Gemini);
+    const [showUpdateConfirm, setShowUpdateConfirm] = useState(false);
 
     useEffect(() => {
         if (focusedGeneration && hasPreFilled.current !== focusedGeneration.uuid) {
@@ -82,15 +84,27 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
         e.preventDefault();
         if (!canSubmit || !goal || !openingStyle || !duration) return;
 
-        const generation = focusedGenerationUuid
-            ? await updateScriptGeneration({ generationUuid: focusedGenerationUuid, scriptUuid, ...params })
-            : await createScriptGeneration({ scriptUuid, ...params });
+        if (focusedGenerationUuid) {
+            setShowUpdateConfirm(true);
+            return;
+        }
 
+        const generation = await createScriptGeneration({ scriptUuid, ...params, goal, openingStyle, duration });
         setActiveGenerationUuid(generation.uuid);
         closePanel();
     };
 
+    const handleConfirmUpdate = async () => {
+        if (!focusedGenerationUuid || !goal || !openingStyle || !duration) return;
+
+        const generation = await updateScriptGeneration({ generationUuid: focusedGenerationUuid, scriptUuid, ...params, goal, openingStyle, duration });
+        setActiveGenerationUuid(generation.uuid);
+        setShowUpdateConfirm(false);
+        closePanel();
+    };
+
     return (
+        <>
         <SidePanel
             title="Générer avec l'IA"
             icon={SparklesIcon}
@@ -159,5 +173,14 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
                 </form>
             </div>
         </SidePanel>
+
+        <ConfirmDeleteDialog
+            isOpen={showUpdateConfirm}
+            onClose={() => setShowUpdateConfirm(false)}
+            onConfirm={handleConfirmUpdate}
+            isPending={isPendingUpdate}
+            message="Êtes-vous sûr de vouloir relancer cette génération ? Le script généré précédemment sera supprimé. Cette action est irréversible."
+        />
+        </>
     );
 }

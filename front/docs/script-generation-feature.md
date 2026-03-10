@@ -260,7 +260,7 @@ scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', 
 | `scriptUuid` | `string` | Target script for generation |
 | `projectUuid` | `string` | Project UUID for creator profile |
 
-Reads `activePanel` from `useScriptRightPanelStore` internally. Pre-fills form fields from the latest generation.
+Reads `activePanel` from `useScriptRightPanelStore` internally. Pre-fills form fields from the latest generation. When updating an existing generation (i.e. `focusedGenerationUuid` is set), a `ConfirmDeleteDialog` is shown before proceeding, warning the user that the previously generated script will be deleted.
 
 ### GenerationHistoryBar
 
