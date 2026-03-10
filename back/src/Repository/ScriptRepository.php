@@ -91,6 +91,18 @@ class ScriptRepository extends ServiceEntityRepository
     /**
      * @return Script[]
      */
+    public function countByProjectAndUser(Project $project, User $user): int
+    {
+        return (int) $this->createQueryBuilder('s')
+            ->select('COUNT(s.id)')
+            ->where('s.project = :project')
+            ->andWhere('s.user = :user')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
     public function getByProjectAndUserAndMonth(Project $project, User $user, int $year, int $month): array
     {
         $startOfMonth = new \DateTimeImmutable("$year-$month-01");

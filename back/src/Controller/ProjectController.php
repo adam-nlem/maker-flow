@@ -6,11 +6,11 @@ use App\DTO\QueryParam\Project\ListProjectsQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\Project\CreateProjectRequestDTO;
 use App\DTO\Request\Project\UpdateProjectRequestDTO;
-use App\Entity\Enum\SubscriptionPlan;
 use App\Entity\Project;
 use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Repository\ProjectRepository;
+use App\Repository\SubscriptionRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
@@ -23,13 +23,13 @@ use Symfony\Component\Routing\Requirement\Requirement;
 final class ProjectController extends AbstractController
 {
     #[Route('', name: 'api_projects_create', methods: ['POST'])]
-    public function create(CreateProjectRequestDTO $dto, ProjectRepository $projectRepository): JsonResponse
+    public function create(CreateProjectRequestDTO $dto, ProjectRepository $projectRepository, SubscriptionRepository $subscriptionRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $plan = $user->getSubscription()?->getPlan() ?? SubscriptionPlan::Free;
-        $maxProjects = $plan->getMaxProjects();
+        $plan = $subscriptionRepository->getActiveByUser($user)?->getPlan();
+        $maxProjects = $plan?->getMaxProjects() ?? 1;
 
         if ($maxProjects !== null && $projectRepository->countByUser($user) >= $maxProjects) {
             return $this->json(

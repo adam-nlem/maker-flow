@@ -113,10 +113,11 @@ No UUID (stripeEventId serves as public identifier). No serialization groups (no
 
 | Case | Value |
 |------|-------|
-| Free | `free` |
 | Starter | `starter` |
 | Creator | `creator` |
 | Agency | `agency` |
+
+> **Note:** There is no `Free` case. A "free user" is simply a user with no active subscription.
 
 ### SubscriptionStatus (`Entity/Enum/SubscriptionStatus.php`)
 
@@ -374,6 +375,7 @@ Thrown when a subscription management action fails (cancel, resume, or plan chan
 - `getByUserPaginated(User $user, int $page, int $limit): array` -- paginated transaction history
 
 ### SubscriptionRepository
+- `getActiveByUser(User $user): ?Subscription` -- returns only if status is `Active` AND `currentPeriodEnd >= now`
 - `getByUser(User $user): ?Subscription`
 - `getByStripeSubscriptionId(string $stripeSubscriptionId): ?Subscription`
 
@@ -408,6 +410,69 @@ Stripe field:
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 
 Price IDs are resolved at runtime via `services.yaml` parameters injected into `StripeCheckoutService` and `StripeWebhookService`.
+
+---
+
+## Plan-Based Feature Limits
+
+The `SubscriptionPlan` enum defines per-plan limits. When no active subscription exists, the user is treated as a free user with default limits.
+
+### Subscription Resolution
+
+Controllers use `SubscriptionRepository::getActiveByUser($user)` to get the subscription. This method validates both status (`Active`) and expiry (`currentPeriodEnd >= now`). If it returns `null`, the user is treated as free.
+
+### SubscriptionPlan Methods
+
+| Method | Starter | Creator | Agency |
+|--------|---------|---------|--------|
+| `getMaxProjects()` | 1 | 1 | null (unlimited) |
+| `getMaxScriptsPerProject()` | null (unlimited) | null (unlimited) | null (unlimited) |
+
+**Free user defaults** (no active subscription): max 1 project, max 1 script per project.
+
+### Limit Enforcement Pattern
+
+Limits are checked in controllers before calling services:
+
+```php
+$plan = $subscriptionRepository->getActiveByUser($user)?->getPlan();
+$maxX = $plan?->getMaxX() ?? 1; // defaults to 1 for free users
+
+if ($maxX !== null && $repository->countBy...($user) >= $maxX) {
+    return $this->json(
+        data: ["message" => "You have reached the X limit for your plan."],
+        status: Response::HTTP_PAYMENT_REQUIRED // 402
+    );
+}
+```
+
+### Feature Restrictions for Free Users
+
+Premium detail endpoints return **402 Payment Required** directly from controllers. No data is served to free users — the check happens before calling the service.
+
+| Endpoint | Controller | Behavior |
+|----------|-----------|----------|
+| `GET /api/post-insights/detail` | `PostInsightController::detail()` | Returns 402 if `getActiveByUser()` is null |
+| `GET /api/integration-insights/detail` | `IntegrationInsightController::detail()` | Returns 402 if `getActiveByUser()` is null |
+
+Services no longer receive an `isSubscribed` parameter — they are only called for subscribed users:
+
+| Service Method | Behavior |
+|---------------|----------|
+| `PostInsightService::getDetail()` | Always computes full detail (previous post, timelines, ranking, engagement) |
+| `IntegrationInsightService::getDetail()` | Always computes full detail (previous period, evolution percentages) |
+| `PostService::getPostsWithInsights()` | Still receives `isSubscribed` param — post list is accessible to free users with null evolution data |
+
+### Current Limits
+
+| Feature | Where checked | Trigger |
+|---------|--------------|---------|
+| Project creation | `ProjectController::create()` | Before entity creation |
+| Script creation | `ScriptController::create()` | Before entity creation |
+| Script generation | `ScriptGenerationController::create()` | Before message dispatch |
+| Post detail insights | `PostInsightController::detail()` | 402 from controller if not subscribed |
+| Integration detail insights | `IntegrationInsightController::detail()` | 402 from controller if not subscribed |
+| Evolution percentages (post list) | `PostService::getPostsWithInsights()` | `isSubscribed` param from controller |
 
 ---
 

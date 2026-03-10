@@ -5,13 +5,16 @@ import { PostInsightDetailDTO, type PostInsightDetailDTOJSON } from "~/dtos/post
 
 interface UseShowPostInsightDetailProps {
     postUuid: string;
+    enabled?: boolean;
 }
 
 export function useShowPostInsightDetail({
     postUuid,
+    enabled = true,
 }: UseShowPostInsightDetailProps) {
     const query = useQuery({
         queryKey: postInsightQueryKeys.detail(postUuid),
+        enabled: enabled,
         queryFn: async () => {
             const res = await httpClient.get<PostInsightDetailDTOJSON>('/post-insights/detail', {
                 params: {

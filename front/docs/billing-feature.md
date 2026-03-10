@@ -44,10 +44,11 @@ route("settings", "routes/settings.tsx", [
 
 | Case | Value |
 |------|-------|
-| Free | `free` |
 | Starter | `starter` |
 | Creator | `creator` |
 | Agency | `agency` |
+
+> **Note:** There is no `Free` case. A "free user" is simply a user with no subscription (API returns 404).
 
 Exports: `subscriptionPlanOptions`, `subscriptionPlanToFrenchTranslation`
 
@@ -129,12 +130,49 @@ export interface PlanConfig {
     name: string;
     monthlyPrice: number;       // in euros
     creditsPerMonth: number;
+    maxProjects: number | null;
+    maxScriptsPerProject: number | null;
     features: string[];
     isHighlighted: boolean;
 }
 
 export const planConfigs: PlanConfig[];
 ```
+
+Helper functions:
+- `getMaxProjectsForPlan(plan)` -- returns max projects for a plan (defaults to 1 for null/no subscription)
+- `getMaxScriptsPerProjectForPlan(plan)` -- returns max scripts per project (defaults to 1 for null/no subscription)
+
+---
+
+## Plan-Based Feature Restrictions
+
+### `useIsSubscribed` Hook (`hooks/useIsSubscribed.ts`)
+
+Convenience hook that wraps `useShowCurrentSubscription`. Returns `{ isSubscribed: boolean, isLoading: boolean }`. A user is considered subscribed if they have a subscription AND it is active (`subscription.isActive`). The API returns any subscription (including inactive/expired) so the settings page can display it.
+
+### `PremiumOverlay` Component (`components/ui/PremiumOverlay.tsx`)
+
+Reusable overlay for premium-only content. Wraps children with a blur effect and upgrade CTA when `isRestricted` is true.
+
+Props:
+- `isRestricted: boolean` -- whether to show the overlay
+- `title?: string` -- overlay heading (default: "Fonctionnalite Premium")
+- `description?: string` -- overlay description
+- `children: ReactNode` -- content to blur/show
+
+When restricted, children are rendered with `blur-sm pointer-events-none select-none` and an absolute overlay shows a lock icon, heading, description, and a primary Button navigating to `/settings/subscription`.
+
+### Current Frontend Restrictions
+
+Premium pages **do not call the API** when the user is not subscribed — they show `PremiumOverlay` as the full page content. This prevents data leaks (no premium data in the DOM). The `enabled` option in React Query hooks controls whether the API call is made.
+
+| Feature | Component | Behavior |
+|---------|-----------|----------|
+| Script creation | `ScriptListPanel` | "+" button disabled when `scripts.length >= maxScriptsPerProject`. Catches 402 from backend. |
+| Post detail page | `PostDetailPageView` | API call skipped via `enabled: isSubscribed`. Full `PremiumOverlay` shown instead of page content. Breadcrumb remains visible. |
+| Integration detail page | `IntegrationPageView` | API call skipped via `enabled: isSubscribed`. Full `PremiumOverlay` shown instead of detail content. |
+| Evolution percentages | All insight components | Backend returns null for `evolutionPercentage` in post list. Existing components (`PostEvolutionBadge`, `InsightTile`, `PostInsightSummaryCard`) already hide when null. |
 
 ---
 

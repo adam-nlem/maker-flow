@@ -120,7 +120,6 @@ class StripeCheckoutService
             SubscriptionPlan::Starter => $this->stripePriceStarter,
             SubscriptionPlan::Creator => $this->stripePriceCreator,
             SubscriptionPlan::Agency => $this->stripePriceAgency,
-            SubscriptionPlan::Free => throw new CheckoutSessionCreationException('Cannot create checkout session for free plan'),
         };
     }
 }

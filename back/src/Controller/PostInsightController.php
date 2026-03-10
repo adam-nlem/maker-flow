@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\DTO\QueryParam\PostInsight\ShowPostInsightDetailQueryParamDTO;
 use App\Repository\PostRepository;
+use App\Repository\SubscriptionRepository;
 use App\Service\PostInsight\PostInsightService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,6 +21,7 @@ final class PostInsightController extends AbstractController
         ShowPostInsightDetailQueryParamDTO $queryParamDto,
         PostRepository $postRepository,
         PostInsightService $postInsightService,
+        SubscriptionRepository $subscriptionRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -30,6 +32,13 @@ final class PostInsightController extends AbstractController
             return $this->json(
                 data: ["message" => "Post not found"],
                 status: Response::HTTP_NOT_FOUND,
+            );
+        }
+
+        if ($subscriptionRepository->getActiveByUser($user) === null) {
+            return $this->json(
+                data: ["message" => "Active subscription required."],
+                status: Response::HTTP_PAYMENT_REQUIRED,
             );
         }
 

@@ -1,4 +1,5 @@
 import type { ComponentType, ReactNode, SVGProps } from "react";
+import { formatCompactNumber } from "~/utils/numberFormatters";
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 
@@ -21,7 +22,7 @@ export default function InsightTile({
     <div className="flex flex-row gap-3 border border-light-gray rounded-lg p-2 w-fit items-center">
       <div>
         <p className="text-xs whitespace-nowrap">{label}</p>
-        <h1 className="text-heading-sm">{value}</h1>
+        <h1 className="text-heading-sm">{formatCompactNumber(value)}</h1>
       </div>
       {chart && <div>{chart}</div>}
       {!chart && (

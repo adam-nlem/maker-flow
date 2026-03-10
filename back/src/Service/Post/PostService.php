@@ -181,13 +181,14 @@ class PostService
         int $page,
         int $limit,
         TimePeriod $timePeriod,
+        bool $isSubscribed = true,
     ): array {
         $now = DateHelper::createUtcDateTimeImmutable();
         $periodStart = $now->modify("-{$timePeriod->getDaysCount()} days");
 
         $posts = $this->repository->getByUserAndIntegrationAndPublishedAfterPaginated($user, $integration, $periodStart, $page, $limit);
 
-        return $this->buildPostsWithInsightsDTOs($user, $integration, $posts);
+        return $this->buildPostsWithInsightsDTOs($user, $integration, $posts, $isSubscribed);
     }
 
     /**
@@ -232,7 +233,7 @@ class PostService
      * @param Post[] $posts
      * @return PostWithInsightsDTO[]
      */
-    private function buildPostsWithInsightsDTOs(User $user, Integration $integration, array $posts): array
+    private function buildPostsWithInsightsDTOs(User $user, Integration $integration, array $posts, bool $isSubscribed = true): array
     {
         if (empty($posts)) {
             return [];
@@ -240,6 +241,16 @@ class PostService
 
         $now = DateHelper::createUtcDateTimeImmutable();
         $totalFollowers = $this->integrationInsightRepository->getLatestByUserAndByIntegrationAndByType($user, $integration, IntegrationInsightType::TotalFollowers);
+
+        $insightTypeValues = [
+            PostInsightType::Views->value,
+            PostInsightType::Likes->value,
+            PostInsightType::Comments->value,
+            PostInsightType::Shares->value,
+            PostInsightType::Saved->value,
+            PostInsightType::AverageWatchTime->value,
+            PostInsightType::TotalWatchTime->value,
+        ];
 
         $result = [];
         foreach ($posts as $post) {
@@ -256,33 +267,27 @@ class PostService
                 fn(PostInsight $insight) => !in_array($insight->getType(), self::EXCLUDED_INSIGHT_TYPES),
             );
 
-            $previousPost = $this->repository->getSingleByIntegrationAndPublishedBeforeDate(
-                $post->getIntegration(),
-                $post->getPublishedAt(),
-            );
             $previousInsights = [];
-
-            if ($previousPost !== null) {
-                $previousInsightsCreatedBefore = $previousPost->getPublishedAt()->add($postAgeDuration);
-                $previousInsights = $this->insightRepository->getLatestByPostGroupedByTypeBeforeDate(
-                    $previousPost,
-                    $previousInsightsCreatedBefore,
-                    self::EXCLUDED_INSIGHT_TYPES,
+            if ($isSubscribed) {
+                $previousPost = $this->repository->getSingleByIntegrationAndPublishedBeforeDate(
+                    $post->getIntegration(),
+                    $post->getPublishedAt(),
                 );
+
+                if ($previousPost !== null) {
+                    $previousInsightsCreatedBefore = $previousPost->getPublishedAt()->add($postAgeDuration);
+                    $previousInsights = $this->insightRepository->getLatestByPostGroupedByTypeBeforeDate(
+                        $previousPost,
+                        $previousInsightsCreatedBefore,
+                        self::EXCLUDED_INSIGHT_TYPES,
+                    );
+                }
             }
 
             $insightsWithEvolution = InsightEvolutionHelper::buildPostInsightsWithEvolution(
                 $currentInsights,
                 $previousInsights,
-                [
-                    PostInsightType::Views->value,
-                    PostInsightType::Likes->value,
-                    PostInsightType::Comments->value,
-                    PostInsightType::Shares->value,
-                    PostInsightType::Saved->value,
-                    PostInsightType::AverageWatchTime->value,
-                    PostInsightType::TotalWatchTime->value,
-                ],
+                $insightTypeValues,
             );
 
             $totalInteractions = InsightHelper::getInsightValueByType($allInsights, PostInsightType::TotalInteractions);

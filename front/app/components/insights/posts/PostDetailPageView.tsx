@@ -13,6 +13,8 @@ import PostInsightSummaryCard from "./PostInsightSummaryCard";
 import { BreadCrumbNavbar } from "~/components/ui/BreadCrumbNavBar";
 import { PercentageProgressBar } from "~/components/ui/PercentageProgressBar";
 import PostsRankingCard from "./PostsRankingCard";
+import PremiumOverlay from "~/components/ui/PremiumOverlay";
+import { useIsSubscribed } from "~/hooks/useIsSubscribed";
 
 interface PostDetailPageViewProps {
   postUuid: string;
@@ -30,14 +32,29 @@ type EngagementType = PostInsightType.Likes | PostInsightType.Comments | PostIns
 
 export default function PostDetailPageView({ postUuid }: PostDetailPageViewProps) {
 
-  const { detail, isLoading } = useShowPostInsightDetail({ postUuid });
+  const { isSubscribed, isLoading: isSubscriptionLoading } = useIsSubscribed();
+  const { detail, isLoading } = useShowPostInsightDetail({ postUuid, enabled: isSubscribed });
   const { thumbnailUrl } = useShowPostThumbnail(postUuid);
   const [lineChartInsightType, setLineChartInsightType] = useState<PostInsightType>(PostInsightType.Views);
 
-  if (isLoading) {
+  if (isSubscriptionLoading || isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p className="text-body-sm">Chargement...</p>
+      </div>
+    );
+  }
+
+  if (!isSubscribed && !isSubscriptionLoading) {
+    return (
+      <div className="h-screen overflow-auto p-6 flex flex-col gap-5">
+        <BreadCrumbNavbar pages={[
+          { route: "/insights", name: "Plateformes" },
+          { route: "#", name: "Detail de contenu" },
+        ]} />
+        <PremiumOverlay isRestricted>
+          <div className="h-96" />
+        </PremiumOverlay>
       </div>
     );
   }
@@ -111,54 +128,56 @@ export default function PostDetailPageView({ postUuid }: PostDetailPageViewProps
       </div>
 
 
-      <div className="flex flex-row gap-3 w-full">
+        <div className="flex flex-col gap-5">
+          <div className="flex flex-row gap-3 w-full">
 
-        {/* Visibility */}
-        <PostInsightSummaryCard title="Résumé de la visibilité" insights={visibilitySummaryInsights} />
-        <PostInsightSummaryCard title="Résumé des intéractions" insights={engagementSummaryInsights} />
+            {/* Visibility */}
+            <PostInsightSummaryCard title="Résumé de la visibilité" insights={visibilitySummaryInsights} />
+            <PostInsightSummaryCard title="Résumé des intéractions" insights={engagementSummaryInsights} />
 
-        {/* Engagement */}
-        <div className="flex flex-col gap-1 w-1/3 border border-light-gray rounded-xl p-3">
-          <h1 className="text-heading-md mb-3">Résumé de l'engagement</h1>
-          <PercentageProgressBar name="Par abonnés" percentage={detail.engagementByFollowers ?? 0} />
-          <PercentageProgressBar name="Par comptes touchés" percentage={detail.engagementByReach ?? 0} />
-        </div>
-      </div>
-      <div className="flex flex-row gap-3 min-h-0">
-        <div className="w-2/3 min-h-0 p-3 border border-light-gray rounded-lg flex flex-col gap-3">
-          <div className="flex flex-row justify-between">
-            <p className="text-heading-sm">Contenu actuel en fonction de la moyenne des 10 contenus précédents</p>
-            <SelectDropdown<PostInsightType>
-              items={detail.timelines.map((tl) => tl.type)}
-              selectedItemId={lineChartInsightType}
-              getItemId={(item) => item}
-              onSelect={(item) => setLineChartInsightType(item)}
-              renderTrigger={({ onClick }) => (
-                <FilterTile
-                  icon={ChartBarSquareIcon}
-                  label={postInsightTypeToFrenchTranslation[lineChartInsightType]}
-                  rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
-                  onClick={onClick}
-                />
-              )}
-              renderItem={({ item, isSelected, onSelect }) => (
-                <FilterTile
-                  label={postInsightTypeToFrenchTranslation[item]}
-                  isSelected={isSelected}
-                  onClick={onSelect}
-                />
-              )}
-            />
+            {/* Engagement */}
+            <div className="flex flex-col gap-1 w-1/3 border border-light-gray rounded-xl p-3">
+              <h1 className="text-heading-md mb-3">Résumé de l'engagement</h1>
+              <PercentageProgressBar name="Par abonnés" percentage={detail.engagementByFollowers ?? 0} />
+              <PercentageProgressBar name="Par comptes touchés" percentage={detail.engagementByReach ?? 0} />
+            </div>
           </div>
+          <div className="flex flex-row gap-3 min-h-0">
+            <div className="w-2/3 min-h-0 p-3 border border-light-gray rounded-lg flex flex-col gap-3">
+              <div className="flex flex-row justify-between">
+                <p className="text-heading-sm">Contenu actuel en fonction de la moyenne des 10 contenus précédents</p>
+                <SelectDropdown<PostInsightType>
+                  items={detail.timelines.map((tl) => tl.type)}
+                  selectedItemId={lineChartInsightType}
+                  getItemId={(item) => item}
+                  onSelect={(item) => setLineChartInsightType(item)}
+                  renderTrigger={({ onClick }) => (
+                    <FilterTile
+                      icon={ChartBarSquareIcon}
+                      label={postInsightTypeToFrenchTranslation[lineChartInsightType]}
+                      rightIcon={<ChevronUpDownIcon className="size-5 text-dark -mb-0.5" strokeWidth={2} />}
+                      onClick={onClick}
+                    />
+                  )}
+                  renderItem={({ item, isSelected, onSelect }) => (
+                    <FilterTile
+                      label={postInsightTypeToFrenchTranslation[item]}
+                      isSelected={isSelected}
+                      onClick={onSelect}
+                    />
+                  )}
+                />
+              </div>
 
-          {selectedTimeline && (
-            <LineChart
-              data={selectedTimeline.points}
-            />
-          )}
+              {selectedTimeline && (
+                <LineChart
+                  data={selectedTimeline.points}
+                />
+              )}
+            </div>
+            <PostsRankingCard items={detail.ranking} />
+          </div>
         </div>
-        <PostsRankingCard items={detail.ranking} />
-      </div>
 
     </div>
   );

@@ -19,6 +19,7 @@ use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptRepository;
 use App\Repository\ScriptShotRepository;
+use App\Repository\SubscriptionRepository;
 use App\Repository\ScriptTagRepository;
 use App\Repository\ScriptTextRepository;
 use App\Repository\ScriptVoiceOverRepository;
@@ -103,6 +104,7 @@ final class ScriptController extends AbstractController
         ScriptRepository $scriptRepository,
         PostGroupRepository $postGroupRepository,
         ScriptTagRepository $scriptTagRepository,
+        SubscriptionRepository $subscriptionRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -111,6 +113,16 @@ final class ScriptController extends AbstractController
 
         if ($project === null) {
             return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+        }
+
+        $plan = $subscriptionRepository->getActiveByUser($user)?->getPlan();
+        $maxScripts = $plan?->getMaxScriptsPerProject() ?? 1;
+
+        if ($maxScripts !== null && $scriptRepository->countByProjectAndUser($project, $user) >= $maxScripts) {
+            return $this->json(
+                data: ["message" => "You have reached the script limit for your plan."],
+                status: Response::HTTP_PAYMENT_REQUIRED
+            );
         }
 
         try {

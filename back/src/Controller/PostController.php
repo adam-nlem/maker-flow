@@ -9,6 +9,7 @@ use App\Repository\PostRepository;
 use App\Service\Post\PostService;
 use App\Entity\Enum\TimePeriod;
 use App\Repository\IntegrationRepository;
+use App\Repository\SubscriptionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -26,6 +27,7 @@ final class PostController extends AbstractController
     public function list(
         ListPostsQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
+        SubscriptionRepository $subscriptionRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -39,12 +41,15 @@ final class PostController extends AbstractController
             );
         }
 
+        $isSubscribed = $subscriptionRepository->getActiveByUser($user) !== null;
+
         $posts = $this->service->getPostsWithInsights(
             user: $user,
             integration: $integration,
             page: $queryParamDto->getPage(),
             limit: $queryParamDto->getLimit(),
             timePeriod: TimePeriod::LastYear,
+            isSubscribed: $isSubscribed,
         );
 
         return $this->json(

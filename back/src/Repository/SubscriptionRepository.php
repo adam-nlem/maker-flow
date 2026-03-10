@@ -2,8 +2,10 @@
 
 namespace App\Repository;
 
+use App\Entity\Enum\SubscriptionStatus;
 use App\Entity\Subscription;
 use App\Entity\User;
+use App\Helper\DateHelper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -34,6 +36,20 @@ class SubscriptionRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getActiveByUser(User $user): ?Subscription
+    {
+        return $this->createQueryBuilder('s')
+            ->where('s.user = :user')
+            ->andWhere('s.status = :status')
+            ->andWhere('s.currentPeriodEnd >= :now')
+            ->setParameter('user', $user)
+            ->setParameter('status', SubscriptionStatus::Active)
+            ->setParameter('now', DateHelper::createUtcDateTimeImmutable())
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     public function getByUser(User $user): ?Subscription

@@ -81,7 +81,6 @@ class StripeSubscriptionService
             SubscriptionPlan::Starter => $this->stripePriceStarter,
             SubscriptionPlan::Creator => $this->stripePriceCreator,
             SubscriptionPlan::Agency => $this->stripePriceAgency,
-            SubscriptionPlan::Free => throw new SubscriptionManagementException('Cannot change to free plan'),
         };
     }
 }

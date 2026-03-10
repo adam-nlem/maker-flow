@@ -335,6 +335,28 @@ See detailed Pill documentation below in the **Script Feature Components** secti
 
 ---
 
+### PremiumOverlay
+
+**Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/PremiumOverlay.tsx`
+
+Overlay for premium-only content. Blurs children and shows an upgrade CTA when restricted.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `isRestricted` | `boolean` | - | Whether to show the overlay |
+| `title` | `string` | `"Fonctionnalite Premium"` | Overlay heading |
+| `description` | `string` | `"Passez a un abonnement..."` | Overlay description |
+| `children` | `ReactNode` | - | Content to blur/show |
+
+**When restricted:**
+- Children: `blur-sm pointer-events-none select-none`
+- Overlay: `absolute inset-0 bg-clear/60 z-10 rounded-xl`
+- Content: `LockClosedIcon` (size-6, text-gray) + heading (`text-heading-md`) + description (`text-body-sm text-gray`) + primary Button to `/settings/subscription`
+
+**When not restricted:** Renders children as-is.
+
+---
+
 ### StepBadge
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/StepBadge.tsx`

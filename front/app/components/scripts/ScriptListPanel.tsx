@@ -5,6 +5,9 @@ import ScriptCard from "./ScriptCard";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { SidePanel } from "~/components/ui/SidePanel";
+import { getMaxScriptsPerProjectForPlan } from "~/models/PlanConfig";
+import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
+import { PaymentRequiredException } from "~/services/httpClient/customHttpExceptions";
 
 interface ScriptListPanelProps {
     scripts: Script[];
@@ -19,10 +22,21 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     const focusedScriptUuid = useFocusScriptStore((state) => state.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
     const sentinelRef = useRef<HTMLDivElement>(null);
+    const { subscription } = useShowCurrentSubscription();
+
+    const maxScripts = getMaxScriptsPerProjectForPlan(subscription?.plan);
+    const isLimitReached = maxScripts !== null && scripts.length >= maxScripts;
 
     const handleNewScript = async () => {
-        const newScript = await createScript({ projectUuid, title: "Nouveau script" });
-        setFocusedScriptUuid(newScript.uuid);
+        try {
+            const newScript = await createScript({ projectUuid, title: "Nouveau script" });
+            setFocusedScriptUuid(newScript.uuid);
+        } catch (error) {
+            if (error instanceof PaymentRequiredException) {
+                return;
+            }
+            throw error;
+        }
     };
 
     useEffect(() => {
@@ -52,9 +66,9 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
             headerActions={
                 <button
                     onClick={handleNewScript}
-                    disabled={isPending}
+                    disabled={isPending || isLimitReached}
                     className="text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
-                    title="Nouveau script"
+                    title={isLimitReached ? "Limite atteinte pour votre abonnement" : "Nouveau script"}
                 >
                     <PlusIcon className="size-4" strokeWidth={2} />
                 </button>
