@@ -1,6 +1,7 @@
 import { ArrowDownIcon, ArrowUpIcon } from "@heroicons/react/24/outline";
 import { PostInsightType, postInsightTypeToFrenchTranslation } from "~/models/enums/PostInsightType";
 import { formatDurationToFrench } from "~/utils/durationFormatters";
+import { formatCompactNumber } from "~/utils/numberFormatters";
 import type { PostInsightWithEvolutionDTO } from "~/dtos/posts/PostInsightWithEvolutionDTO";
 
 interface PostInsightSummaryCardProps {
@@ -17,7 +18,7 @@ function formatInsightValue(type: PostInsightType, value: number): string {
     if (WATCH_TIME_TYPES.includes(type)) {
         return formatDurationToFrench(value);
     }
-    return String(value);
+    return formatCompactNumber(value);
 }
 
 export default function PostInsightSummaryCard({ title, insights }: PostInsightSummaryCardProps) {

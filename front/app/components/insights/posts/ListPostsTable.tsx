@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import DataTable, { type DataTableColumn } from "~/components/ui/DataTable";
 import { PostInsightType, postInsightTypeToFrenchTranslation } from "~/models/enums/PostInsightType";
 import { useListPaginatedPosts } from "~/hooks/api/posts/useListPaginatedPosts";
+import { formatCompactNumber } from "~/utils/numberFormatters";
 import { useInsightsFilterStore } from "~/stores/insights/insightsFilterStore";
 import { timePeriodToDays } from "~/models/enums/TimePeriod";
 import { filterPostsByDays } from "~/helpers/postFilterHelper";
@@ -42,9 +43,9 @@ const columns: DataTableColumn<PostWithInsightsDTO>[] = [
           insight={findInsight(postWithInsights.insights, PostInsightType.TotalInteractions)}
           tooltip={
             <div className="flex flex-col gap-1">
-              <p>{postInsightTypeToFrenchTranslation[PostInsightType.Likes]}: {likesInsight?.insight.value ?? "—"}</p>
-              <p>{postInsightTypeToFrenchTranslation[PostInsightType.Comments]}: {commentsInsight?.insight.value ?? "—"}</p>
-              <p>{postInsightTypeToFrenchTranslation[PostInsightType.Shares]}: {sharesInsight?.insight.value ?? "—"}</p>
+              <p>{postInsightTypeToFrenchTranslation[PostInsightType.Likes]}: {likesInsight ? formatCompactNumber(likesInsight.insight.value) : "—"}</p>
+              <p>{postInsightTypeToFrenchTranslation[PostInsightType.Comments]}: {commentsInsight ? formatCompactNumber(commentsInsight.insight.value) : "—"}</p>
+              <p>{postInsightTypeToFrenchTranslation[PostInsightType.Shares]}: {sharesInsight ? formatCompactNumber(sharesInsight.insight.value) : "—"}</p>
             </div>
           }
         />
