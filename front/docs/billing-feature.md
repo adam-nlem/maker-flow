@@ -172,6 +172,8 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 | Script creation | `ScriptListPanel` | "+" button disabled when `scripts.length >= maxScriptsPerProject`. Catches 402 from backend. |
 | Post detail page | `PostDetailPageView` | API call skipped via `enabled: isSubscribed`. Full `PremiumOverlay` shown instead of page content. Breadcrumb remains visible. |
 | Integration detail page | `IntegrationPageView` | API call skipped via `enabled: isSubscribed`. Full `PremiumOverlay` shown instead of detail content. |
+| Home aggregated view | `home.tsx` (parent) | Full `PremiumOverlay` replaces both `HomeInsightsOverview` and `RankedPostGroupsList` when "Toutes les plateformes" is selected and user is not subscribed. No API calls made. Pill row stays visible. Per-integration views remain accessible. |
+| Insights aggregated view | `InsightsPageView` | Full `PremiumOverlay` shown when "Toutes les plateformes" is selected and user is not subscribed. Per-integration views remain accessible. |
 | Evolution percentages | All insight components | Backend returns null for `evolutionPercentage` in post list. Existing components (`PostEvolutionBadge`, `InsightTile`, `PostInsightSummaryCard`) already hide when null. |
 
 ---

@@ -455,13 +455,14 @@ Premium detail endpoints return **402 Payment Required** directly from controlle
 | `GET /api/post-insights/detail` | `PostInsightController::detail()` | Returns 402 if `getActiveByUser()` is null |
 | `GET /api/integration-insights/detail` | `IntegrationInsightController::detail()` | Returns 402 if `getActiveByUser()` is null |
 
-Services no longer receive an `isSubscribed` parameter — they are only called for subscribed users:
+Services that receive an `isSubscribed` parameter skip premium computations for free users:
 
 | Service Method | Behavior |
 |---------------|----------|
 | `PostInsightService::getDetail()` | Always computes full detail (previous post, timelines, ranking, engagement) |
 | `IntegrationInsightService::getDetail()` | Always computes full detail (previous period, evolution percentages) |
-| `PostService::getPostsWithInsights()` | Still receives `isSubscribed` param — post list is accessible to free users with null evolution data |
+| `IntegrationInsightService::list()` | Receives `isSubscribed` param — skips aggregation for free users (returns empty `aggregatedInsights`) |
+| `PostService::getPostsWithInsights()` | Receives `isSubscribed` param — post list is accessible to free users with null evolution data |
 
 ### Current Limits
 
@@ -472,6 +473,8 @@ Services no longer receive an `isSubscribed` parameter — they are only called 
 | Script generation | `ScriptGenerationController::create()` | Before message dispatch |
 | Post detail insights | `PostInsightController::detail()` | 402 from controller if not subscribed |
 | Integration detail insights | `IntegrationInsightController::detail()` | 402 from controller if not subscribed |
+| Aggregated insights | `IntegrationInsightService::list()` | `isSubscribed` param — empty `aggregatedInsights` for free users |
+| Ranked post groups | `PostGroupController::rank()` | 402 from controller if not subscribed |
 | Evolution percentages (post list) | `PostService::getPostsWithInsights()` | `isSubscribed` param from controller |
 
 ---

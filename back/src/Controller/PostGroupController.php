@@ -12,6 +12,7 @@ use App\Entity\User;
 use App\Repository\PostGroupRepository;
 use App\Repository\PostRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\SubscriptionRepository;
 use App\Service\PostGroup\PostGroupService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -52,9 +53,17 @@ final class PostGroupController extends AbstractController
     public function rank(
         RankPostGroupsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
+        SubscriptionRepository $subscriptionRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
+
+        if ($subscriptionRepository->getActiveByUser($user) === null) {
+            return $this->json(
+                data: ["message" => "Active subscription required."],
+                status: Response::HTTP_PAYMENT_REQUIRED,
+            );
+        }
 
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 

@@ -8,6 +8,10 @@ import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegration
 import RankedPostsList from "~/components/home/RankedPostsList";
 import RankedPostGroupsList from "~/components/home/RankedPostGroupsList";
 import HomeScriptsSection from "~/components/home/HomeScriptsSection";
+import PremiumOverlay from "~/components/ui/PremiumOverlay";
+import IntegrationPillRow from "~/components/integrations/IntegrationPillRow";
+import { useIsSubscribed } from "~/hooks/useIsSubscribed";
+import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -24,6 +28,8 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
   const { focusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
   const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
+  const { isSubscribed } = useIsSubscribed()
+  const { integrations } = useListIntegrations({ projectUuid: focusedProject?.uuid ?? "" })
 
   return (
     <div className="w-full">
@@ -66,10 +72,22 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 <HomeScriptsSection projectUuid={focusedProject.uuid} />
               </div>
               <div className="w-1/3 flex flex-col gap-5 min-h-0">
-                <HomeInsightsOverview
-                  projectUuid={focusedProject.uuid}
-                />
-                {focusedIntegrationUuid ? <RankedPostsList integrationUuid={focusedIntegrationUuid} /> : <RankedPostGroupsList projectUuid={focusedProject.uuid} />}
+                {focusedIntegrationUuid === null && !isSubscribed ? (
+                  <>
+                    <IntegrationPillRow integrations={integrations} />
+                    <PremiumOverlay isRestricted>
+                      <div className="h-96" />
+                    </PremiumOverlay>
+                  </>
+                ) : (
+                  <>
+                    <HomeInsightsOverview projectUuid={focusedProject.uuid} />
+                    {focusedIntegrationUuid
+                      ? <RankedPostsList integrationUuid={focusedIntegrationUuid} />
+                      : <RankedPostGroupsList projectUuid={focusedProject.uuid} />
+                    }
+                  </>
+                )}
               </div>
             </>
           )}

@@ -67,7 +67,7 @@ class IntegrationInsightService
         $this->instagramGraphUrl = $this->parameterBag->get('app.instagram.graph_url');
     }
 
-    public function list(User $user, Project $project): ListIntegrationInsightsResponseDTO
+    public function list(User $user, Project $project, bool $isSubscribed = true): ListIntegrationInsightsResponseDTO
     {
         $integrations = $this->integrationRepository->getByProjectAndUser($project, $user);
 
@@ -80,9 +80,11 @@ class IntegrationInsightService
         );
 
         $aggregatedInsights = [];
-        foreach ($this->integrationInsightRepository->getAggregatedLatestByProjectAndUser($project, $user) as $row) {
-            $type = $row['type'] instanceof IntegrationInsightType ? $row['type']->value : $row['type'];
-            $aggregatedInsights[] = ['type' => $type, 'value' => (float) $row['totalValue']];
+        if ($isSubscribed) {
+            foreach ($this->integrationInsightRepository->getAggregatedLatestByProjectAndUser($project, $user) as $row) {
+                $type = $row['type'] instanceof IntegrationInsightType ? $row['type']->value : $row['type'];
+                $aggregatedInsights[] = ['type' => $type, 'value' => (float) $row['totalValue']];
+            }
         }
 
         return new ListIntegrationInsightsResponseDTO(

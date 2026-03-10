@@ -9,6 +9,7 @@ use App\Entity\Enum\TimePeriod;
 use App\Repository\ProjectRepository;
 use App\Service\IntegrationInsight\IntegrationInsightService;
 use App\Repository\IntegrationRepository;
+use App\Repository\SubscriptionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,6 +22,7 @@ final class IntegrationInsightController extends AbstractController
         ListIntegrationInsightsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
         IntegrationInsightService $insightService,
+        SubscriptionRepository $subscriptionRepository,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -34,7 +36,9 @@ final class IntegrationInsightController extends AbstractController
             );
         }
 
-        $result = $insightService->list($user, $project);
+        $isSubscribed = $subscriptionRepository->getActiveByUser($user) !== null;
+
+        $result = $insightService->list($user, $project, $isSubscribed);
 
         return $this->json(
             data: $result->getData(),
