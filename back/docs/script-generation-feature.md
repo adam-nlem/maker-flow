@@ -278,19 +278,53 @@ Builds the full prompt by concatenating structured blocks:
 5. JSON formatting instructions — structured JSON schema with conditionally included part types based on active skills
 6. Final instruction ("commence directement par le JSON")
 
-### `GeminiClientService`
+### AI Client Services
+
+All three AI client services use **streaming** (Server-Sent Events) to avoid total-request-timeout issues. Instead of waiting for the full response with a fixed 120s timeout, each service streams chunks with a **60-second idle timeout** between chunks. This means a generation that takes several minutes but keeps sending data will succeed, and only a genuine stall triggers a timeout.
+
+**Common pattern** (applies to all three services):
+1. Send the request with streaming enabled
+2. Read status code from headers (arrives immediately)
+3. Stream response chunks via `HttpClientInterface::stream()` with 60s per-chunk idle timeout
+4. Parse the accumulated SSE data into the final text using a provider-specific `parseStreamedResponse()` method
+5. On `TransportExceptionInterface` during streaming → throw `AiClientRetryableException`
+
+#### `GeminiClientService`
 
 **Location:** `back/src/Service/GeminiClient/GeminiClientService.php`
 
-Calls the Google Gemini API (`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro-preview:generateContent`).
+Calls the Google Gemini API streaming endpoint (`https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-preview:streamGenerateContent?alt=sse`).
 
-- Model: `gemini-3.1-pro-preview`
+- Model: `gemini-3-pro-preview`
 - Config: `GEMINI_API_KEY` env variable
-- Timeout: 120 seconds per request
+- Idle timeout: 60 seconds between SSE chunks
+- SSE format: `data: {"candidates":[{"content":{"parts":[{"text":"..."}]}}]}`
 
-**Error classification:** The service makes one attempt per call and throws classified exceptions:
-- `GeminiRetryableException` — for transient errors: network timeouts (`TransportExceptionInterface`), HTTP 408/429/500/502/503/504
-- `GeminiPermanentException` — for permanent errors: HTTP 400/401/403, malformed response structure
+#### `OpenAiClientService`
+
+**Location:** `back/src/Service/AiClient/OpenAiClientService.php`
+
+Calls the OpenAI API with `stream: true` (`https://api.openai.com/v1/chat/completions`).
+
+- Model: `gpt-4o`
+- Config: `OPENAI_API_KEY` env variable
+- Idle timeout: 60 seconds between SSE chunks
+- SSE format: `data: {"choices":[{"delta":{"content":"..."}}]}`, terminated by `data: [DONE]`
+
+#### `ClaudeClientService`
+
+**Location:** `back/src/Service/AiClient/ClaudeClientService.php`
+
+Calls the Anthropic API with `stream: true` (`https://api.anthropic.com/v1/messages`).
+
+- Model: `claude-sonnet-4-6`
+- Config: `CLAUDE_API_KEY` env variable
+- Idle timeout: 60 seconds between SSE chunks
+- SSE format: `event: content_block_delta` with `data: {"delta":{"text":"..."}}`
+
+**Error classification** (all services): Each service throws classified exceptions:
+- `AiClientRetryableException` — for transient errors: network timeouts/streaming interruptions (`TransportExceptionInterface`), HTTP 408/429/500/502/503/504
+- `AiClientPermanentException` — for permanent errors: HTTP 400/401/403, malformed response structure
 
 ### `ScriptOutputParserService`
 
@@ -337,17 +371,18 @@ Parts are created with incrementing positions starting from 0 within their gener
 
 ## Exception Hierarchy
 
-**Location:** `back/src/Service/GeminiClient/Exception/`
+**Location:** `back/src/Service/AiClient/Exception/`
 
 Follows existing `ServiceException` pattern (service code `110200`):
 
 ```
 ServiceException (abstract)
-└── GeminiApiException (abstract, service code 110200)
-    ├── GeminiRetryableException (code 1)
+└── AiClientServiceException (abstract, service code 110200)
+    ├── AiClientRetryableException (code 1)
     │   - Network timeouts (TransportExceptionInterface)
-    │   - HTTP 408, 429, 500, 502, 503, 504
-    └── GeminiPermanentException (code 2)
+    │   - Streaming interruptions
+    │   - HTTP 408, 429, 500, 502, 503, 504 (+ 529 for Claude)
+    └── AiClientPermanentException (code 2)
         - HTTP 400, 401, 403
         - Malformed API response structure
 ```
@@ -376,10 +411,10 @@ Contains: `scriptGenerationId` (int), `retryCount` (int, default 0).
 1. Load `ScriptGeneration` by ID → set status to `processing` → **flush immediately** (so frontend polls see it)
 2. Load `CreatorProfile` for the script's project + user (optional)
 3. Call `PromptAssemblerService::assemble()` → store in `assembledPrompt`
-4. Call `GeminiClientService::generateScript()` → get AI response
+4. Call the selected AI client's `generateScript()` via `AiClientResolver` → get AI response (streamed)
 5. Parse response via `ScriptOutputParserService::parseAndCreateParts()` → creates typed parts linked to the generation
 6. Set status to `completed`, set `completedAt` → flush
-7. **On `GeminiRetryableException`:**
+7. **On `AiClientRetryableException`:**
    - If `retryCount < MAX_RETRIES` (3): dispatch new `GenerateScriptMessage(id, retryCount + 1)` with `DelayStamp` → return (status stays `processing`, worker freed)
    - If all retries exhausted: set status to `failed`, store `errorMessage` → flush
 8. **On any other exception:** set status to `failed`, store `errorMessage` → flush
@@ -398,7 +433,7 @@ Retries are handled via **async message re-dispatch** with exponential backoff:
 - Max 4 total attempts (initial + 3 retries)
 - The worker is freed between retries (non-blocking)
 - Generation status stays at `processing` during retries (transparent to the user)
-- Only `GeminiRetryableException` triggers retries; all other exceptions mark as `failed` immediately
+- Only `AiClientRetryableException` triggers retries; all other exceptions mark as `failed` immediately
 
 ---
 
@@ -421,12 +456,17 @@ Retries are handled via **async message re-dispatch** with exponential backoff:
 | Variable | Description |
 |----------|-------------|
 | `GEMINI_API_KEY` | API key for Google Gemini |
+| `OPENAI_API_KEY` | API key for OpenAI |
+| `CLAUDE_API_KEY` | API key for Anthropic Claude |
 
 ### Services Configuration
 
 In `config/services.yaml`:
 - `app.gemini.api_key` parameter bound from `%env(GEMINI_API_KEY)%`
-- `GeminiClientService` configured with the API key argument
+- `app.openai.api_key` parameter bound from `%env(OPENAI_API_KEY)%`
+- `app.claude.api_key` parameter bound from `%env(CLAUDE_API_KEY)%`
+- Each AI client service is configured with its respective API key argument
+- `AiClientResolver` autowires all three clients and resolves based on `AiModel` enum
 
 ---
 
