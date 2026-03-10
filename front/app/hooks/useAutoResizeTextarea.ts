@@ -1,26 +1,40 @@
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import type { RefObject } from 'react';
 
 /**
- * Custom hook to automatically resize a textarea based on its content
- * 
- * @param textareaRef - React ref object pointing to the textarea element
- * @param value - The current value of the textarea (used to trigger resize on change)
- * @param minHeight - Minimum height in pixels (default: 60px)
+ * Custom hook to automatically resize a textarea based on its content.
+ * Also observes width changes (e.g. when a side panel opens/closes)
+ * so the height adapts when text reflows.
  */
 export function useAutoResizeTextarea(
   textareaRef: RefObject<HTMLTextAreaElement | null>,
   value: string,
   minHeight: number = 60
 ): void {
-  useEffect(() => {
+  const resize = useCallback(() => {
     const textarea = textareaRef.current;
     if (textarea) {
-      // Reset height to auto to get the correct scrollHeight
       textarea.style.height = 'auto';
-      // Set the height to match the content (with a minimum height)
       textarea.style.height = `${Math.max(textarea.scrollHeight, minHeight)}px`;
     }
-  }, [value, minHeight, textareaRef]);
+  }, [textareaRef, minHeight]);
+
+  // Resize on value change
+  useEffect(() => {
+    resize();
+  }, [value, resize]);
+
+  // Resize on width change (e.g. side panel open/close)
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const observer = new ResizeObserver(() => {
+      resize();
+    });
+    observer.observe(textarea);
+
+    return () => observer.disconnect();
+  }, [textareaRef, resize]);
 }
     
