@@ -2,6 +2,7 @@
 
 namespace App\Service\PostInsight;
 
+use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Enum\Platform;
 use App\Entity\Integration;
 use App\Entity\User;
@@ -24,13 +25,16 @@ use App\Repository\PostRepository;
 use App\Repository\IntegrationRepository;
 use App\Entity\Enum\YoutubeReportType;
 use App\Service\InstagramPostInsight\InstagramPostInsightService;
+use App\Service\Integration\Exception\OAuthTokenRevokedException;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
 use App\Service\YoutubePostInsight\YoutubePostInsightService;
 use App\Service\YoutubeReporting\YoutubeReportingService;
 use Google\Client;
+use Google\Service\Exception;
 use Google\Service\YouTube;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class PostInsightService
@@ -89,17 +93,23 @@ class PostInsightService
             'access_token' => $integration->getAccessToken(),
         ];
 
-        do {
-            $response = $this->httpClient->request('GET', $url, ['query' => $queryParams]);
-            $data = $response->toArray();
+        try {
+            do {
+                $response = $this->httpClient->request('GET', $url, ['query' => $queryParams]);
+                $data = $response->toArray();
 
-            foreach ($data['data'] as $postData) {
-                $this->instagramPostInsightService->processPostData($integration, $postData);
-            }
+                foreach ($data['data'] as $postData) {
+                    $this->instagramPostInsightService->processPostData($integration, $postData);
+                }
 
-            $url = $data['paging']['next'] ?? null;
-            $queryParams = [];
-        } while ($url !== null);
+                $url = $data['paging']['next'] ?? null;
+                $queryParams = [];
+            } while ($url !== null);
+        } catch (\Exception $e) {
+            $this->throwIfOAuthAuthError($e, $integration);
+
+            throw $e;
+        }
 
         $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
         $this->integrationRepository->save($integration, true);
@@ -117,72 +127,78 @@ class PostInsightService
 
         $youtube = new YouTube($this->googleClient);
 
-        // Step 1: Get uploads playlist
-        $uploadsPlaylistId = $this->youtubePostInsightService->getUploadsPlaylistId($youtube);
-        if ($uploadsPlaylistId === null) {
-            return;
-        }
-
-        // Step 2: Get video IDs
-        $videoIds = $this->youtubePostInsightService->fetchVideoIds($youtube, $uploadsPlaylistId);
-        if (empty($videoIds)) {
-            return;
-        }
-
-        // Step 3: Build PostDTOs with metadata from Data API
-        $postDTOs = $this->youtubePostInsightService->buildPostDTOs($youtube, $videoIds);
-
-        // Step 4: Create/get posts first so we have Post entities for the reporting service
-        foreach ($postDTOs as $postDTO) {
-            $this->youtubePostInsightService->processPostData($integration, $postDTO);
-        }
-
-        // Step 5: Ensure Reporting API jobs exist
-        $reportingJobs = $this->youtubeReportingService->ensureJobsExist($integration);
-
-        // Step 6: Build a map of externalId → Post for breakdown storage
-        $posts = $this->postRepository->getByExternalIdsAndIntegration(
-            array_keys($postDTOs),
-            $integration,
-        );
-
-        // We create an array like this one in order to optimize the search in later methods
-        $postsByExternalId = [];
-        foreach ($posts as $post) {
-            $postsByExternalId[$post->getExternalId()] = $post;
-        }
-
-        // Step 7: Process reports from Reporting API
-        $aggregatedData = [];
-
-        foreach ($reportingJobs as $job) {
-            $report = $this->youtubeReportingService->getLatestUnprocessedReport($job);
-
-            if ($report === null) {
-                continue;
+        try {
+            // Step 1: Get uploads playlist
+            $uploadsPlaylistId = $this->youtubePostInsightService->getUploadsPlaylistId($youtube);
+            if ($uploadsPlaylistId === null) {
+                return;
             }
 
-            $csvContent = $this->youtubeReportingService->downloadReportCsv($report, $integration->getAccessToken());
-            $rows = $this->youtubeReportingService->parseCsvToRows($csvContent);
-
-            if ($job->getReportType() === YoutubeReportType::ChannelBasic) {
-                $aggregatedData = $this->youtubeReportingService->processBasicReportRows(
-                    $rows,
-                    $postsByExternalId,
-                    $integration,
-                );
+            // Step 2: Get video IDs
+            $videoIds = $this->youtubePostInsightService->fetchVideoIds($youtube, $uploadsPlaylistId);
+            if (empty($videoIds)) {
+                return;
             }
 
-            $this->youtubeReportingService->markReportProcessed($job, $report);
-        }
+            // Step 3: Build PostDTOs with metadata from Data API
+            $postDTOs = $this->youtubePostInsightService->buildPostDTOs($youtube, $videoIds);
 
-        // Step 8: Enrich PostDTOs with aggregated report data and persist insights
-        if (!empty($aggregatedData)) {
-            $this->youtubePostInsightService->enrichPostDTOsFromReports($postDTOs, $aggregatedData);
-
+            // Step 4: Create/get posts first so we have Post entities for the reporting service
             foreach ($postDTOs as $postDTO) {
                 $this->youtubePostInsightService->processPostData($integration, $postDTO);
             }
+
+            // Step 5: Ensure Reporting API jobs exist
+            $reportingJobs = $this->youtubeReportingService->ensureJobsExist($integration);
+
+            // Step 6: Build a map of externalId → Post for breakdown storage
+            $posts = $this->postRepository->getByExternalIdsAndIntegration(
+                array_keys($postDTOs),
+                $integration,
+            );
+
+            // We create an array like this one in order to optimize the search in later methods
+            $postsByExternalId = [];
+            foreach ($posts as $post) {
+                $postsByExternalId[$post->getExternalId()] = $post;
+            }
+
+            // Step 7: Process reports from Reporting API
+            $aggregatedData = [];
+
+            foreach ($reportingJobs as $job) {
+                $report = $this->youtubeReportingService->getLatestUnprocessedReport($job);
+
+                if ($report === null) {
+                    continue;
+                }
+
+                $csvContent = $this->youtubeReportingService->downloadReportCsv($report, $integration->getAccessToken());
+                $rows = $this->youtubeReportingService->parseCsvToRows($csvContent);
+
+                if ($job->getReportType() === YoutubeReportType::ChannelBasic) {
+                    $aggregatedData = $this->youtubeReportingService->processBasicReportRows(
+                        $rows,
+                        $postsByExternalId,
+                        $integration,
+                    );
+                }
+
+                $this->youtubeReportingService->markReportProcessed($job, $report);
+            }
+
+            // Step 8: Enrich PostDTOs with aggregated report data and persist insights
+            if (!empty($aggregatedData)) {
+                $this->youtubePostInsightService->enrichPostDTOsFromReports($postDTOs, $aggregatedData);
+
+                foreach ($postDTOs as $postDTO) {
+                    $this->youtubePostInsightService->processPostData($integration, $postDTO);
+                }
+            }
+        } catch (\Exception $e) {
+            $this->throwIfOAuthAuthError($e, $integration);
+
+            throw $e;
         }
 
         $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
@@ -449,5 +465,24 @@ class PostInsightService
         }
 
         return round($score, 2);
+    }
+
+    /**
+     * @throws OAuthTokenRevokedException
+     */
+    private function throwIfOAuthAuthError(\Exception $e, Integration $integration): void
+    {
+        $isAuthError = match (true) {
+            $e instanceof ClientExceptionInterface => in_array($e->getResponse()->getStatusCode(), [401, 403], true),
+            $e instanceof Exception => in_array($e->getCode(), [401, 403], true),
+            default => false,
+        };
+
+        if ($isAuthError) {
+            $integration->setStatus(IntegrationStatus::Revoked);
+            $this->integrationRepository->save($integration, true);
+
+            throw new OAuthTokenRevokedException($integration->getId());
+        }
     }
 }

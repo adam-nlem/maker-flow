@@ -17,6 +17,7 @@ use App\DTO\Response\IntegrationInsight\ShowIntegrationDetailResponseDTO;
 use App\DTO\Response\IntegrationInsight\IntegrationInsightTimelineDTO;
 use App\DTO\Response\IntegrationInsight\IntegrationInsightTimelinePointDTO;
 use App\DTO\Response\IntegrationInsight\IntegrationInsightWithEvolutionDTO;
+use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Enum\IntegrationInsightType;
 use App\Entity\Enum\TimePeriod;
 use App\Entity\IntegrationInsight;
@@ -27,11 +28,14 @@ use App\Repository\IntegrationInsightRepository;
 use App\Repository\PostRepository;
 use App\Repository\YoutubeReportingJobRepository;
 use App\Repository\IntegrationRepository;
+use App\Service\Integration\Exception\OAuthTokenRevokedException;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
 use Google\Client;
+use Google\Service\Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
+use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 class IntegrationInsightService
@@ -99,14 +103,20 @@ class IntegrationInsightService
 
         // Single API call with nested insights to reduce API calls
         // Also fetches profile_picture_url to refresh it on each sync (prevents expiration issues)
-        $response = $this->httpClient->request('GET', sprintf('%s/%s', $this->instagramGraphUrl, $integration->getAccountId()), [
-            'query' => [
-                'fields' => sprintf('followers_count,profile_picture_url,insights.metric(%s).period(day).metric_type(total_value)', $metrics),
-                'access_token' => $integration->getAccessToken(),
-            ],
-        ]);
+        try {
+            $response = $this->httpClient->request('GET', sprintf('%s/%s', $this->instagramGraphUrl, $integration->getAccountId()), [
+                'query' => [
+                    'fields' => sprintf('followers_count,profile_picture_url,insights.metric(%s).period(day).metric_type(total_value)', $metrics),
+                    'access_token' => $integration->getAccessToken(),
+                ],
+            ]);
 
-        $data = $response->toArray();
+            $data = $response->toArray();
+        } catch (\Exception $e) {
+            $this->throwIfOAuthAuthError($e, $integration);
+
+            throw $e;
+        }
 
         // Update profile picture URL on the integration to prevent expiration issues
         if (isset($data['profile_picture_url'])) {
@@ -143,42 +153,47 @@ class IntegrationInsightService
 
         $this->googleClient->setAccessToken($integration->getAccessToken());
 
-        // Fetch subscriber count from YouTube Data API
-        $youtube = new YouTube($this->googleClient);
-        $channelResponse = $youtube->channels->listChannels('statistics', ['mine' => true]);
-        $channels = $channelResponse->getItems();
-        //dd($channelResponse);
-        $insightDTOs = [];
+        try {
+            // Fetch subscriber count from YouTube Data API
+            $youtube = new YouTube($this->googleClient);
+            $channelResponse = $youtube->channels->listChannels('statistics', ['mine' => true]);
+            $channels = $channelResponse->getItems();
+            $insightDTOs = [];
 
-        if (!empty($channels)) {
-            $statistics = $channels[0]->getStatistics();
-            $subscriberCount = (float) $statistics->getSubscriberCount();
-            $insightDTOs[] = new YoutubeIntegrationInsightDTO('subscriberCount', $subscriberCount);
-        }
-
-        // Fetch analytics metrics from YouTube Analytics API
-        $analytics = new YouTubeAnalytics($this->googleClient);
-        $now = DateHelper::createUtcDateTimeImmutable();
-        $startDate = $now->modify('-1 month')->format('Y-m-d');
-        $endDate = $now->format('Y-m-d');
-
-        $metrics = implode(',', YoutubeIntegrationInsightDTO::getAnalyticsMetrics());
-        $analyticsResponse = $analytics->reports->query([
-            'ids' => 'channel==MINE',
-            'startDate' => $startDate,
-            'endDate' => $endDate,
-            'metrics' => $metrics,
-        ]);
-        $columnHeaders = $analyticsResponse->getColumnHeaders();
-        $rows = $analyticsResponse->getRows();
-
-        if (!empty($rows) && !empty($columnHeaders)) {
-            $row = $rows[0];
-            foreach ($columnHeaders as $index => $header) {
-                $metricName = $header->getName();
-                $value = (float) ($row[$index] ?? 0);
-                $insightDTOs[] = new YoutubeIntegrationInsightDTO($metricName, $value);
+            if (!empty($channels)) {
+                $statistics = $channels[0]->getStatistics();
+                $subscriberCount = (float) $statistics->getSubscriberCount();
+                $insightDTOs[] = new YoutubeIntegrationInsightDTO('subscriberCount', $subscriberCount);
             }
+
+            // Fetch analytics metrics from YouTube Analytics API
+            $analytics = new YouTubeAnalytics($this->googleClient);
+            $now = DateHelper::createUtcDateTimeImmutable();
+            $startDate = $now->modify('-1 month')->format('Y-m-d');
+            $endDate = $now->format('Y-m-d');
+
+            $metrics = implode(',', YoutubeIntegrationInsightDTO::getAnalyticsMetrics());
+            $analyticsResponse = $analytics->reports->query([
+                'ids' => 'channel==MINE',
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'metrics' => $metrics,
+            ]);
+            $columnHeaders = $analyticsResponse->getColumnHeaders();
+            $rows = $analyticsResponse->getRows();
+
+            if (!empty($rows) && !empty($columnHeaders)) {
+                $row = $rows[0];
+                foreach ($columnHeaders as $index => $header) {
+                    $metricName = $header->getName();
+                    $value = (float) ($row[$index] ?? 0);
+                    $insightDTOs[] = new YoutubeIntegrationInsightDTO($metricName, $value);
+                }
+            }
+        } catch (\Exception $e) {
+            $this->throwIfOAuthAuthError($e, $integration);
+
+            throw $e;
         }
 
         $this->createInsightEntitiesFromDTOs($integration, $insightDTOs, YoutubeIntegrationInsightDTO::getMetricMapping());
@@ -374,5 +389,24 @@ class IntegrationInsightService
         }
 
         return false;
+    }
+
+    /**
+     * @throws OAuthTokenRevokedException
+     */
+    private function throwIfOAuthAuthError(\Exception $e, Integration $integration): void
+    {
+        $isAuthError = match (true) {
+            $e instanceof ClientExceptionInterface => in_array($e->getResponse()->getStatusCode(), [401, 403], true),
+            $e instanceof Exception => in_array($e->getCode(), [401, 403], true),
+            default => false,
+        };
+
+        if ($isAuthError) {
+            $integration->setStatus(IntegrationStatus::Revoked);
+            $this->integrationRepository->save($integration, true);
+
+            throw new OAuthTokenRevokedException($integration->getId());
+        }
     }
 }
