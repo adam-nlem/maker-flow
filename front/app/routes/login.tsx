@@ -16,18 +16,11 @@ export default function LoginPage() {
     const [password, setPassword] = useState<string>("");
     const navigate = useNavigate();
 
-    const { user, isLoading } = useCurrentUser()
     const { login, isPending, error } = useLogin()
 
     const errorMessage = error?.message ?? null
 
-    useEffect(() => {
-        if (isLoading === false && user) {
-            navigate("/");
-        }
-    }, [user])
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         setStoredEmail(email);
         const response = await login({ email, password });

@@ -1,78 +1,94 @@
 import { useState } from "react"
-import { DocumentTextIcon } from "@heroicons/react/24/outline"
+import { DocumentPlusIcon } from "@heroicons/react/24/outline"
 
 import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
+import { TextArea } from "~/components/ui/TextArea"
+import PlatformPill from "~/components/ui/PlatformPill"
 import { Button } from "~/components/ui/Button"
-import { Input } from "~/components/ui/Input"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript"
+import { Platform, platformOptions } from "~/models/enums/Platform"
 
-interface Props {
+
+interface OnboardingCreateScriptStepProps {
     projectUuid: string
+    onScriptCreated: (scriptUuid: string) => void
     onNext: () => void
 }
 
-export default function OnboardingCreateScriptStep({ projectUuid, onNext }: Props) {
+export default function OnboardingCreateScriptStep({ projectUuid, onScriptCreated, onNext }: OnboardingCreateScriptStepProps) {
     const [title, setTitle] = useState("")
-    const [created, setCreated] = useState(false)
+    const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([])
 
     const { createScript, isPending } = useCreateScript()
 
-    const handleCreate = async (e: React.SubmitEvent) => {
-        e.preventDefault()
-        await createScript({ projectUuid, title: title.trim() || "Nouveau script" })
-        setCreated(true)
+    const togglePlatform = (platform: Platform) => {
+        setSelectedPlatforms((prev) =>
+            prev.includes(platform)
+                ? prev.filter((p) => p !== platform)
+                : [...prev, platform]
+        )
+    }
+
+    const handleSubmit = async () => {
+        const script = await createScript({
+            projectUuid,
+            title,
+            platforms: selectedPlatforms.length > 0 ? selectedPlatforms : undefined,
+        })
+        onScriptCreated(script.uuid)
+        onNext()
     }
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
-            <div className="w-full max-w-md">
+            <div className="w-full max-w-lg">
                 <OnboardingStepHeader
-                    icon={DocumentTextIcon}
+                    icon={DocumentPlusIcon}
                     title="Créez votre premier script"
-                    description="Les scripts vous permettent de rédiger et organiser vos contenus vidéo."
+                    description="Définissez le sujet et les plateformes de votre premier script vidéo."
                 />
 
-                {created ? (
-                    <div className="flex flex-col items-center gap-6">
-                        <p className="text-heading-sm text-primary">
-                            Script créé avec succès !
-                        </p>
-                        <Button style="primary" onClick={onNext}>
-                            Suivant
-                        </Button>
-                    </div>
-                ) : (
-                    <>
-                        <form className="space-y-4" onSubmit={handleCreate}>
-                            <Input
-                                label="Titre du script"
-                                placeholder="Nouveau script"
-                                id="onboarding-script-title"
-                                name="title"
-                                type="text"
-                                fullWidth
-                                value={title}
-                                onChange={(e) => setTitle(e.target.value)}
-                            />
+                <div className="flex flex-col gap-6">
+                    <TextArea
+                        label="Titre du script"
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                        placeholder="Ex : 5 astuces pour gagner du temps sur Instagram"
+                        fullWidth
+                    />
 
-                            <Button
-                                type="submit"
-                                style="primary"
-                                isLoading={isPending}
-                                disabled={isPending}
-                            >
-                                Créer mon premier script
-                            </Button>
-                        </form>
-
-                        <div className="mt-6 flex justify-center">
-                            <SimpleTextButton onClick={onNext}>
-                                Passer
-                            </SimpleTextButton>
+                    <div>
+                        <label className="text-heading-sm text-dark mb-2 block">
+                            Plateformes
+                        </label>
+                        <div className="flex flex-wrap gap-2">
+                            {platformOptions.map((platform) => (
+                                <PlatformPill
+                                    key={platform}
+                                    platform={platform}
+                                    isSelected={selectedPlatforms.includes(platform)}
+                                    onToggle={() => togglePlatform(platform)}
+                                />
+                            ))}
                         </div>
-                    </>
-                )}
+                    </div>
+
+                    <Button
+                        style="primary"
+                        onClick={handleSubmit}
+                        disabled={!title.trim() || isPending}
+                        isLoading={isPending}
+                    >
+                        Créer le script
+                    </Button>
+                </div>
+
+                <div className="mt-6 flex justify-center">
+                    <SimpleTextButton onClick={onNext}>
+                        Passer
+                    </SimpleTextButton>
+                </div>
             </div>
         </div>
     )

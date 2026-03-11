@@ -12,6 +12,7 @@ use App\Helper\PasswordHelper;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Service\Cookie\CookieService;
+use App\Service\Credit\CreditService;
 use App\Service\Otp\OtpService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -46,6 +47,7 @@ final class UserController extends AbstractController
         RegisterUserRequestDTO $dto,
         UserRepository $userRepository,
         OtpService $otpService,
+        CreditService $creditService,
     ): Response {
         $passwordErrors = PasswordHelper::validate($dto->getPlainPassword());
         if (!empty($passwordErrors)) {
@@ -60,6 +62,8 @@ final class UserController extends AbstractController
         }
 
         $userRepository->save($user, true);
+
+        $creditService->addWelcomeCredits($user, 3);
 
         $otp = $otpService->createAndSend($user, OtpType::EmailVerification);
 

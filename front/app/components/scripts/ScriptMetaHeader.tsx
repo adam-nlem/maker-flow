@@ -11,6 +11,7 @@ import ScriptPlatformsRow from "./ScriptPlatformsRow";
 import ScriptSimpleMetaColumn from "./ScriptSimpleMetaCol";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useScriptEditorStore } from "~/stores/scripts/scriptEditorStore";
+import { TextArea } from "../ui/TextArea";
 
 interface ScriptMetaHeaderProps {
     script: Script;
@@ -48,7 +49,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
     return (
         <div className="px-6 py-5 border-b border-light-gray flex flex-col gap-4">
             <div className="flex flex-row items-center gap-2">
-                <Input
+                <TextArea
                     simple
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
@@ -58,8 +59,8 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                     textStyle="text-heading-xl"
                     fullWidth
                 />
-                {isReadOnly ? (
-                    <Pill
+                {isReadOnly && onOpenEditor ? (
+                     <Pill
                         icon={PencilSquareIcon}
                         label="Modifier"
                         isSelected
@@ -68,11 +69,11 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                         bgColorClassName="bg-primary/10"
                         borderColorClassName="border border-primary/30"
                     />
-                ) : (
+                ) : !isReadOnly ? (
                     <button onClick={onOpenGenerateModal} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Générer avec l'IA">
                         <SparklesIcon className="size-5" strokeWidth={2} />
                     </button>
-                )}
+                ) : null}
                 <button onClick={toggle} className="shrink-0 text-gray hover:text-dark transition-colors cursor-pointer">
                     {isExpanded
                         ? <ChevronUpIcon className="size-5" strokeWidth={2} />

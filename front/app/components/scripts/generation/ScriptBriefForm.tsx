@@ -1,68 +1,104 @@
-import { TextArea } from "~/components/ui/TextArea";
-import { type ScriptGoal, scriptGoalOptions, scriptGoalToFrenchTranslation } from "~/models/enums/ScriptGoal";
-import { type OpeningStyle, openingStyleOptions, openingStyleToFrenchTranslation } from "~/models/enums/OpeningStyle";
-import { type VideoDuration, videoDurationToFrenchTranslation, videoDurationOptions } from "~/models/enums/VideoDuration";
-import { type AiModel, aiModelOptions, aiModelToFrenchTranslation, aiModelToDescription, aiModelToIcon } from "~/models/enums/AiModel";
-import Pill from "~/components/ui/Pill";
+import { useState } from "react"
+
+import { Button } from "~/components/ui/Button"
+import { TextArea } from "~/components/ui/TextArea"
+import Pill from "~/components/ui/Pill"
+import { type ScriptGoal, scriptGoalOptions, scriptGoalToFrenchTranslation } from "~/models/enums/ScriptGoal"
+import { type OpeningStyle, openingStyleOptions, openingStyleToFrenchTranslation } from "~/models/enums/OpeningStyle"
+import { type VideoDuration, videoDurationToFrenchTranslation, videoDurationOptions } from "~/models/enums/VideoDuration"
+import { AiModel, aiModelOptions, aiModelToFrenchTranslation, aiModelToDescription, aiModelToIcon } from "~/models/enums/AiModel"
+
+export interface ScriptBriefValues {
+    topic: string
+    goal: ScriptGoal
+    keyPoints: string
+    openingStyle: OpeningStyle
+    duration: VideoDuration
+    extraContext: string
+    aiModel: AiModel
+}
 
 interface ScriptBriefFormProps {
-    topic: string;
-    onTopicChange: (value: string) => void;
-    goal: ScriptGoal | undefined;
-    onGoalChange: (value: ScriptGoal) => void;
-    keyPoints: string;
-    onKeyPointsChange: (value: string) => void;
-    openingStyle: OpeningStyle | undefined;
-    onOpeningStyleChange: (value: OpeningStyle) => void;
-    duration: VideoDuration | undefined;
-    onDurationChange: (value: VideoDuration) => void;
-    extraContext: string;
-    onExtraContextChange: (value: string) => void;
-    aiModel: AiModel;
-    onAiModelChange: (value: AiModel) => void;
+    initialValues?: {
+        topic?: string
+        goal?: ScriptGoal
+        keyPoints?: string
+        openingStyle?: OpeningStyle
+        duration?: VideoDuration
+        extraContext?: string
+        aiModel?: AiModel
+    }
+    onSubmit: (values: ScriptBriefValues) => void
+    isPending?: boolean
+    submitLabel?: string
+    submitIcon?: React.ComponentType<{ className?: string }>
+    formId?: string
+    variant?: 'full' | 'onboarding'
 }
 
 export default function ScriptBriefForm({
-    topic,
-    onTopicChange,
-    goal,
-    onGoalChange,
-    keyPoints,
-    onKeyPointsChange,
-    openingStyle,
-    onOpeningStyleChange,
-    duration,
-    onDurationChange,
-    extraContext,
-    onExtraContextChange,
-    aiModel,
-    onAiModelChange,
+    initialValues,
+    onSubmit,
+    isPending = false,
+    submitLabel,
+    submitIcon: SubmitIcon,
+    formId,
+    variant = 'full',
 }: ScriptBriefFormProps) {
+    const isOnboarding = variant === 'onboarding'
+
+    const [topic, setTopic] = useState(initialValues?.topic ?? "")
+    const [goal, setGoal] = useState<ScriptGoal | undefined>(initialValues?.goal)
+    const [keyPoints, setKeyPoints] = useState(initialValues?.keyPoints ?? "")
+    const [openingStyle, setOpeningStyle] = useState<OpeningStyle | undefined>(initialValues?.openingStyle)
+    const [duration, setDuration] = useState<VideoDuration | undefined>(initialValues?.duration)
+    const [extraContext, setExtraContext] = useState(initialValues?.extraContext ?? "")
+    const [aiModel, setAiModel] = useState<AiModel>(initialValues?.aiModel ?? (isOnboarding ? AiModel.Claude : AiModel.Gemini))
+
+    const canSubmit = topic.trim() !== "" && goal !== undefined && openingStyle !== undefined && duration !== undefined
+
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault()
+        if (!canSubmit || !goal || !openingStyle || !duration) return
+
+        onSubmit({
+            topic: topic.trim(),
+            goal,
+            keyPoints: keyPoints.trim(),
+            openingStyle,
+            duration,
+            extraContext: extraContext.trim(),
+            aiModel,
+        })
+    }
+
     return (
-        <div className="flex flex-col gap-5">
-            <div>
-                <h3 className="text-heading-sm">Modèle IA</h3>
-                <div className="flex flex-wrap gap-2 mt-2">
-                    {aiModelOptions.map((m) => (
-                        <Pill
-                            key={m}
-                            imageUrl={aiModelToIcon[m]}
-                            label={aiModelToFrenchTranslation[m]}
-                            bgColorClassName="bg-primary/10"
-                            borderColorClassName="border border-primary/30"
-                            isSelected={aiModel === m}
-                            onClick={() => onAiModelChange(m)}
-                        />
-                    ))}
+        <form id={formId} className="flex flex-col gap-5" onSubmit={handleSubmit}>
+            {!isOnboarding && (
+                <div>
+                    <h3 className="text-heading-sm">Modèle IA</h3>
+                    <div className="flex flex-wrap gap-2 mt-2">
+                        {aiModelOptions.map((m) => (
+                            <Pill
+                                key={m}
+                                imageUrl={aiModelToIcon[m]}
+                                label={aiModelToFrenchTranslation[m]}
+                                bgColorClassName="bg-primary/10"
+                                borderColorClassName="border border-primary/30"
+                                isSelected={aiModel === m}
+                                onClick={() => setAiModel(m)}
+                            />
+                        ))}
+                    </div>
+                    <p className="text-body-xs text-gray-400 mt-1">{aiModelToDescription[aiModel]}</p>
                 </div>
-                <p className="text-body-xs text-gray-400 mt-1">{aiModelToDescription[aiModel]}</p>
-            </div>
+            )}
 
             <TextArea
                 label="Sujet"
                 placeholder="De quoi parle cette vidéo ?"
                 value={topic}
-                onChange={(e) => onTopicChange(e.target.value)}
+                onChange={(e) => setTopic(e.target.value)}
                 fullWidth
                 required
             />
@@ -77,7 +113,7 @@ export default function ScriptBriefForm({
                             bgColorClassName="bg-primary/10"
                             borderColorClassName="border border-primary/30"
                             isSelected={goal === g}
-                            onClick={() => onGoalChange(g)}
+                            onClick={() => setGoal(g)}
                         />
                     ))}
                 </div>
@@ -87,7 +123,7 @@ export default function ScriptBriefForm({
                 label="Points clés"
                 placeholder="Les points importants à aborder (optionnel)"
                 value={keyPoints}
-                onChange={(e) => onKeyPointsChange(e.target.value)}
+                onChange={(e) => setKeyPoints(e.target.value)}
                 fullWidth
             />
 
@@ -101,7 +137,7 @@ export default function ScriptBriefForm({
                             bgColorClassName="bg-primary/10"
                             borderColorClassName="border border-primary/30"
                             isSelected={openingStyle === s}
-                            onClick={() => onOpeningStyleChange(s)}
+                            onClick={() => setOpeningStyle(s)}
                         />
                     ))}
                 </div>
@@ -117,19 +153,35 @@ export default function ScriptBriefForm({
                             bgColorClassName="bg-primary/10"
                             borderColorClassName="border border-primary/30"
                             isSelected={duration === d}
-                            onClick={() => onDurationChange(d)}
+                            onClick={() => setDuration(d)}
                         />
                     ))}
                 </div>
             </div>
 
-            <TextArea
-                label="Contexte supplémentaire"
-                placeholder="Informations additionnelles pour l'IA (optionnel)"
-                value={extraContext}
-                onChange={(e) => onExtraContextChange(e.target.value)}
-                fullWidth
-            />
-        </div>
-    );
+            {!isOnboarding && (
+                <TextArea
+                    label="Contexte supplémentaire"
+                    placeholder="Informations additionnelles pour l'IA (optionnel)"
+                    value={extraContext}
+                    onChange={(e) => setExtraContext(e.target.value)}
+                    fullWidth
+                />
+            )}
+
+            {submitLabel && (
+                <Button
+                    type="submit"
+                    style="primary"
+                    isLoading={isPending}
+                    disabled={isPending || !canSubmit}
+                >
+                    <div className="flex flex-row justify-center items-center gap-2">
+                        {SubmitIcon && <SubmitIcon className="size-4 text-clear" />}
+                        <p className="text-sm">{submitLabel}</p>
+                    </div>
+                </Button>
+            )}
+        </form>
+    )
 }

@@ -1,21 +1,10 @@
-import { Platform, platformOptions, platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform";
+import { platformOptions } from "~/models/enums/Platform";
 import { scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon, scriptStatusToBorderClass } from "~/models/enums/ScriptStatus";
 import { colorToBgClass, colorToBorderClass, colorToTextClass } from "~/models/enums/Color";
 import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
 import Pill from "~/components/ui/Pill";
-
-function PlatformPill({ platform, isSelected, onToggle }: { platform: Platform; isSelected: boolean; onToggle: () => void }) {
-    return (
-        <Pill
-            imageUrl={platformToIcon[platform]}
-            label={platformToFrenchTranslation[platform]}
-            isSelected={isSelected}
-            onClick={onToggle}
-            borderColorClassName="border-light-gray"
-        />
-    );
-}
+import PlatformPill from "~/components/ui/PlatformPill";
 
 interface CalendarFilterPanelProps {
     projectUuid: string;

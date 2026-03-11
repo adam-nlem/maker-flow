@@ -1,20 +1,8 @@
 import { useEffect, useRef, useState } from "react";
 import type { Script } from "~/models/Script";
-import { Platform, platformOptions, platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform";
-import Pill from "~/components/ui/Pill";
+import { Platform, platformOptions } from "~/models/enums/Platform";
+import PlatformPill from "~/components/ui/PlatformPill";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
-
-function PlatformPill({ platform, isSelected, onToggle }: { platform: Platform; isSelected: boolean; onToggle: () => void }) {
-    return (
-        <Pill
-            imageUrl={platformToIcon[platform]}
-            label={platformToFrenchTranslation[platform]}
-            isSelected={isSelected}
-            onClick={onToggle}
-            borderColorClassName="border-light-gray"
-        />
-    );
-}
 
 interface Props {
     script: Script;

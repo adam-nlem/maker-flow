@@ -23,9 +23,9 @@ ScriptPageView
   │     └── ScriptPartsList (filtered by focusedGenerationUuid)
   ├── GenerateScriptPanel (SidePanel, w-96, right, collapsible — via ScriptRightPanel.Generate)
   │     ├── Creator Profile banner → navigates to /settings
-  │     ├── ScriptBriefForm (topic, goal, key points, opening style, duration, extra context)
+  │     ├── ScriptBriefForm (self-contained: manages own state, onSubmit callback, formId for external submit)
   │     ├── SkillModuleToggles (7 toggleable modules with conditional inputs)
-  │     └── Sticky footer with submit button
+  │     └── Sticky footer with submit button (triggers ScriptBriefForm via formId)
   ├── HookTemplatePanel (SidePanel, w-72, right, collapsible — via ScriptRightPanel.HookTemplates)
   │     ├── Search + category filter (ToggleChip)
   │     ├── HookTemplateCard[] (infinite scroll)
@@ -82,7 +82,7 @@ front/app/
 ├── components/scripts/
 │   ├── generation/
 │   │   ├── GenerateScriptPanel.tsx     ← collapsible right panel with brief + skills
-│   │   ├── ScriptBriefForm.tsx         ← per-generation brief fields
+│   │   ├── ScriptBriefForm.tsx         ← self-contained brief form (internal state, onSubmit, optional formId)
 │   │   ├── SkillModuleToggles.tsx      ← skill module toggles with conditional inputs
 │   │   ├── GenerationStatusBanner.tsx  ← inline status banner with auto-dismiss
 │   │   └── GenerationHistoryBar.tsx    ← horizontal bar to navigate between generation compartments
@@ -253,6 +253,23 @@ scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', 
 
 ## Component Props
 
+### ScriptBriefForm
+
+Self-contained form component that manages its own state internally. Exports `ScriptBriefValues` type.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `initialValues` | `Partial<ScriptBriefValues>` | Optional initial values (for pre-filling from existing generation) |
+| `onSubmit` | `(values: ScriptBriefValues) => void` | Called with validated values on form submit |
+| `isPending` | `boolean` | Shows loading state on submit button |
+| `submitLabel` | `string` (optional) | Button text. If omitted, no submit button is rendered (use `formId` for external trigger) |
+| `submitIcon` | `React.ComponentType` (optional) | Icon component for the submit button |
+| `formId` | `string` (optional) | HTML form id for external submit trigger via `form.requestSubmit()` |
+
+**Usage patterns:**
+- **OnboardingGenerateScriptStep:** uses `submitLabel` + `submitIcon` (button inside form)
+- **GenerateScriptPanel:** uses `formId` (external button in SidePanel sticky footer), `key={generation?.uuid}` for re-mount on generation change
+
 ### GenerateScriptPanel
 
 | Prop | Type | Description |
@@ -260,7 +277,7 @@ scriptGenerationQueryKeys.show(generationUuid) // ['scriptGenerations', 'show', 
 | `scriptUuid` | `string` | Target script for generation |
 | `projectUuid` | `string` | Project UUID for creator profile |
 
-Reads `activePanel` from `useScriptRightPanelStore` internally. Pre-fills form fields from the latest generation. When updating an existing generation (i.e. `focusedGenerationUuid` is set), a `ConfirmDeleteDialog` is shown before proceeding, warning the user that the previously generated script will be deleted.
+Reads `activePanel` from `useScriptRightPanelStore` internally. Pre-fills form fields via `ScriptBriefForm`'s `initialValues` prop (keyed by `focusedGeneration?.uuid` for re-mount). When updating an existing generation (i.e. `focusedGenerationUuid` is set), a `ConfirmDeleteDialog` is shown before proceeding, warning the user that the previously generated script will be deleted.
 
 ### GenerationHistoryBar
 

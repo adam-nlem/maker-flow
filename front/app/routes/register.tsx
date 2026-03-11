@@ -9,14 +9,7 @@ import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
-    const { user, isLoading: authLoading } = useCurrentUser()
     const prefillEmail = useAuthPrefillStore((s) => s.email);
-
-    useEffect(() => {
-        if (authLoading === false && user) {
-            navigate("/");
-        }
-    }, [user, authLoading, navigate])
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">

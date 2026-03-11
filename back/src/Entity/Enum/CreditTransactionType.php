@@ -10,4 +10,5 @@ enum CreditTransactionType: string
     case ScriptGenerationRefund = 'script_generation_refund';
     case Refund = 'refund';
     case ManualAdjustment = 'manual_adjustment';
+    case WelcomeBonus = 'welcome_bonus';
 }

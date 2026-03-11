@@ -2,7 +2,7 @@
 
 ## Overview
 
-The onboarding system tracks new user progress through key app features. It stores completion state in a dedicated `onboarding` table, enabling cross-device persistence. Analytics are handled externally via PostHog.
+The onboarding system tracks new user progress through key app features. It stores completion state in a dedicated `onboarding` table, enabling cross-device persistence. New users receive 3 free credits at registration to enable the AI script generation step.
 
 ## Entity: `Onboarding`
 
@@ -28,10 +28,16 @@ The onboarding system tracks new user progress through key app features. It stor
 |------|-------|
 | CreateFirstProject | `create_first_project` |
 | ConnectIntegration | `connect_integration` |
+| CreateCreatorProfile | `create_creator_profile` |
 | CreateFirstScript | `create_first_script` |
+| GenerateFirstScript | `generate_first_script` |
 | ShowSubscriptions | `show_subscriptions` |
 
 To add a new step: add a case here and update the frontend `OnboardingStep` enum const maps.
+
+## Welcome Credits
+
+New users receive **3 free credits** at registration via `CreditService::addWelcomeCredits()`, called from `UserController::register()`. This uses `CreditTransactionType::WelcomeBonus` and `SourceBucket::TopupCredits`.
 
 ## API Endpoints
 
@@ -57,7 +63,10 @@ All steps are completed by the frontend via `POST /api/onboarding/complete-step`
 
 - `src/Entity/Onboarding.php`
 - `src/Entity/Enum/OnboardingStep.php`
+- `src/Entity/Enum/CreditTransactionType.php` (WelcomeBonus case)
 - `src/Repository/OnboardingRepository.php`
 - `src/Service/OnboardingService.php`
+- `src/Service/Credit/CreditService.php` (addWelcomeCredits method)
 - `src/Controller/OnboardingController.php`
+- `src/Controller/UserController.php` (register action grants welcome credits)
 - `src/DTO/Request/Onboarding/CompleteOnboardingStepRequestDTO.php`

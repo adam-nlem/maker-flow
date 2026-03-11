@@ -1,107 +1,89 @@
-import { useEffect, useRef, useState } from "react";
-import { SparklesIcon, UserCircleIcon } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router";
-import { Button } from "~/components/ui/Button";
-import { SidePanel } from "~/components/ui/SidePanel";
-import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
-import ScriptBriefForm from "./ScriptBriefForm";
-import SkillModuleToggles from "./SkillModuleToggles";
-import { useCreateScriptGeneration } from "~/hooks/api/scriptGenerations/useCreateScriptGeneration";
-import { useUpdateScriptGeneration } from "~/hooks/api/scriptGenerations/useUpdateScriptGeneration";
-import { useShowScriptGeneration } from "~/hooks/api/scriptGenerations/useShowScriptGeneration";
-import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore";
-import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
-import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
-import type { ScriptGoal } from "~/models/enums/ScriptGoal";
-import type { OpeningStyle } from "~/models/enums/OpeningStyle";
-import type { VideoDuration } from "~/models/enums/VideoDuration";
-import type { SkillModule } from "~/models/enums/SkillModule";
-import { AiModel } from "~/models/enums/AiModel";
+import { useRef, useState } from "react"
+import { SparklesIcon, UserCircleIcon } from "@heroicons/react/24/outline"
+import { useNavigate } from "react-router"
+import { Button } from "~/components/ui/Button"
+import { SidePanel } from "~/components/ui/SidePanel"
+import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog"
+import ScriptBriefForm, { type ScriptBriefValues } from "./ScriptBriefForm"
+import SkillModuleToggles from "./SkillModuleToggles"
+import { useCreateScriptGeneration } from "~/hooks/api/scriptGenerations/useCreateScriptGeneration"
+import { useUpdateScriptGeneration } from "~/hooks/api/scriptGenerations/useUpdateScriptGeneration"
+import { useShowScriptGeneration } from "~/hooks/api/scriptGenerations/useShowScriptGeneration"
+import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore"
+import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore"
+import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel"
+import type { SkillModule } from "~/models/enums/SkillModule"
 
 interface GenerateScriptPanelProps {
-    scriptUuid: string;
-    projectUuid: string;
+    scriptUuid: string
+    projectUuid: string
 }
 
 export default function GenerateScriptPanel({ scriptUuid, projectUuid }: GenerateScriptPanelProps) {
-    const navigate = useNavigate();
-    const focusedGenerationUuid = useScriptGenerationStore((s) => s.focusedGenerationUuid);
-    const { generation: focusedGeneration } = useShowScriptGeneration({ generationUuid: focusedGenerationUuid ?? null, scriptUuid });
-    const hasPreFilled = useRef<string | undefined>(undefined);
+    const navigate = useNavigate()
+    const focusedGenerationUuid = useScriptGenerationStore((s) => s.focusedGenerationUuid)
+    const { generation: focusedGeneration } = useShowScriptGeneration({ generationUuid: focusedGenerationUuid ?? null, scriptUuid })
 
-    const isOpen = useScriptRightPanelStore((s) => s.activePanel === ScriptRightPanel.Generate);
-    const closePanel = useScriptRightPanelStore((s) => s.closePanel);
+    const isOpen = useScriptRightPanelStore((s) => s.activePanel === ScriptRightPanel.Generate)
+    const closePanel = useScriptRightPanelStore((s) => s.closePanel)
 
-    const [topic, setTopic] = useState("");
-    const [goal, setGoal] = useState<ScriptGoal | undefined>(undefined);
-    const [keyPoints, setKeyPoints] = useState("");
-    const [openingStyle, setOpeningStyle] = useState<OpeningStyle | undefined>(undefined);
-    const [duration, setDuration] = useState<VideoDuration | undefined>(undefined);
-    const [callToAction, setCallToAction] = useState("");
-    const [extraContext, setExtraContext] = useState("");
-    const [activeSkills, setActiveSkills] = useState<SkillModule[]>([]);
-    const [skillInputs, setSkillInputs] = useState<Record<string, string>>({});
-    const [aiModel, setAiModel] = useState<AiModel>(AiModel.Gemini);
-    const [showUpdateConfirm, setShowUpdateConfirm] = useState(false);
+    const [callToAction, setCallToAction] = useState("")
+    const [activeSkills, setActiveSkills] = useState<SkillModule[]>([])
+    const [skillInputs, setSkillInputs] = useState<Record<string, string>>({})
+    const [showUpdateConfirm, setShowUpdateConfirm] = useState(false)
 
-    useEffect(() => {
-        if (focusedGeneration && hasPreFilled.current !== focusedGeneration.uuid) {
-            hasPreFilled.current = focusedGeneration.uuid;
-            setTopic(focusedGeneration.topic);
-            setGoal(focusedGeneration.goal);
-            setKeyPoints(focusedGeneration.keyPoints ?? "");
-            setOpeningStyle(focusedGeneration.openingStyle);
-            setDuration(focusedGeneration.duration);
-            setCallToAction(focusedGeneration.callToAction ?? "");
-            setExtraContext(focusedGeneration.extraContext ?? "");
-            setActiveSkills(focusedGeneration.activeSkills as SkillModule[]);
-            setSkillInputs(focusedGeneration.skillInputs);
-            setAiModel(focusedGeneration.aiModel);
-        }
-    }, [focusedGeneration]);
+    const pendingBriefValues = useRef<ScriptBriefValues | null>(null)
 
-    const { createScriptGeneration, isPending: isPendingCreate } = useCreateScriptGeneration();
-    const { updateScriptGeneration, isPending: isPendingUpdate } = useUpdateScriptGeneration();
-    const setActiveGenerationUuid = useScriptGenerationStore((s) => s.setActiveGenerationUuid);
+    const { createScriptGeneration, isPending: isPendingCreate } = useCreateScriptGeneration()
+    const { updateScriptGeneration, isPending: isPendingUpdate } = useUpdateScriptGeneration()
+    const setActiveGenerationUuid = useScriptGenerationStore((s) => s.setActiveGenerationUuid)
 
-    const isPending = isPendingCreate || isPendingUpdate;
-    const canSubmit = topic.trim() !== "" && goal !== undefined && openingStyle !== undefined && duration !== undefined;
+    const isPending = isPendingCreate || isPendingUpdate
 
-    const params = {
-        topic: topic.trim(),
-        goal,
-        keyPoints: keyPoints.trim() || undefined,
-        openingStyle,
-        duration,
+    const buildParams = (values: ScriptBriefValues) => ({
+        ...values,
+        keyPoints: values.keyPoints || undefined,
+        extraContext: values.extraContext || undefined,
         callToAction: callToAction.trim() || undefined,
-        extraContext: extraContext.trim() || undefined,
         activeSkills,
         skillInputs,
-        aiModel,
-    } as const;
+    })
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!canSubmit || !goal || !openingStyle || !duration) return;
-
+    const handleBriefSubmit = async (values: ScriptBriefValues) => {
         if (focusedGenerationUuid) {
-            setShowUpdateConfirm(true);
-            return;
+            pendingBriefValues.current = values
+            setShowUpdateConfirm(true)
+            return
         }
 
-        const generation = await createScriptGeneration({ scriptUuid, ...params, goal, openingStyle, duration });
-        setActiveGenerationUuid(generation.uuid);
-        closePanel();
-    };
+        const generation = await createScriptGeneration({ scriptUuid, ...buildParams(values) })
+        setActiveGenerationUuid(generation.uuid)
+        closePanel()
+    }
 
     const handleConfirmUpdate = async () => {
-        if (!focusedGenerationUuid || !goal || !openingStyle || !duration) return;
+        if (!focusedGenerationUuid || !pendingBriefValues.current) return
 
-        const generation = await updateScriptGeneration({ generationUuid: focusedGenerationUuid, scriptUuid, ...params, goal, openingStyle, duration });
-        setActiveGenerationUuid(generation.uuid);
-        setShowUpdateConfirm(false);
-        closePanel();
-    };
+        const generation = await updateScriptGeneration({
+            generationUuid: focusedGenerationUuid,
+            scriptUuid,
+            ...buildParams(pendingBriefValues.current),
+        })
+        setActiveGenerationUuid(generation.uuid)
+        setShowUpdateConfirm(false)
+        pendingBriefValues.current = null
+        closePanel()
+    }
+
+    const briefInitialValues = focusedGeneration ? {
+        topic: focusedGeneration.topic,
+        goal: focusedGeneration.goal,
+        keyPoints: focusedGeneration.keyPoints ?? "",
+        openingStyle: focusedGeneration.openingStyle,
+        duration: focusedGeneration.duration,
+        extraContext: focusedGeneration.extraContext ?? "",
+        aiModel: focusedGeneration.aiModel,
+    } : undefined
 
     return (
         <>
@@ -116,10 +98,10 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
                     type="submit"
                     style="primary"
                     isLoading={isPending}
-                    disabled={isPending || !canSubmit}
+                    disabled={isPending}
                     onClick={() => {
-                        const form = document.getElementById('generate-panel-form') as HTMLFormElement;
-                        form?.requestSubmit();
+                        const form = document.getElementById('generate-panel-form') as HTMLFormElement
+                        form?.requestSubmit()
                     }}
                 >
                     <div className="flex flex-row justify-center items-center gap-2">
@@ -131,7 +113,7 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
         >
             <div className="p-4">
                 <div
-                    onClick={() => { closePanel(); navigate('/settings/creator-profile'); }}
+                    onClick={() => { closePanel(); navigate('/settings/creator-profile') }}
                     className="flex flex-row items-center gap-3 px-4 py-3 mb-5 rounded-xl border border-primary/30 bg-primary/5 cursor-pointer hover:bg-primary/10 transition-colors"
                 >
                     <UserCircleIcon className="size-5 text-primary shrink-0" strokeWidth={2} />
@@ -141,36 +123,24 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
                     </div>
                 </div>
 
-                <form id="generate-panel-form" className="flex flex-col gap-5" onSubmit={handleSubmit}>
-                    <ScriptBriefForm
-                        topic={topic}
-                        onTopicChange={setTopic}
-                        goal={goal}
-                        onGoalChange={setGoal}
-                        keyPoints={keyPoints}
-                        onKeyPointsChange={setKeyPoints}
-                        openingStyle={openingStyle}
-                        onOpeningStyleChange={setOpeningStyle}
-                        duration={duration}
-                        onDurationChange={setDuration}
-                        extraContext={extraContext}
-                        onExtraContextChange={setExtraContext}
-                        aiModel={aiModel}
-                        onAiModelChange={setAiModel}
-                    />
+                <ScriptBriefForm
+                    key={focusedGeneration?.uuid ?? "new"}
+                    initialValues={briefInitialValues}
+                    onSubmit={handleBriefSubmit}
+                    isPending={isPending}
+                    formId="generate-panel-form"
+                />
 
-                    <div className="border-t border-light-gray" />
+                <div className="border-t border-light-gray my-5" />
 
-                    <SkillModuleToggles
-                        activeSkills={activeSkills}
-                        onActiveSkillsChange={setActiveSkills}
-                        skillInputs={skillInputs}
-                        onSkillInputsChange={setSkillInputs}
-                        callToAction={callToAction}
-                        onCallToActionChange={setCallToAction}
-                    />
-
-                </form>
+                <SkillModuleToggles
+                    activeSkills={activeSkills}
+                    onActiveSkillsChange={setActiveSkills}
+                    skillInputs={skillInputs}
+                    onSkillInputsChange={setSkillInputs}
+                    callToAction={callToAction}
+                    onCallToActionChange={setCallToAction}
+                />
             </div>
         </SidePanel>
 
@@ -182,5 +152,5 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
             message="Êtes-vous sûr de vouloir relancer cette génération ? Le script généré précédemment sera supprimé. Cette action est irréversible."
         />
         </>
-    );
+    )
 }

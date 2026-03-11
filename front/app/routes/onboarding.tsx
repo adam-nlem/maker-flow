@@ -5,7 +5,9 @@ import OnboardingRegisterStep from "~/components/onboarding/OnboardingRegisterSt
 import OnboardingVerifyOtpStep from "~/components/onboarding/OnboardingVerifyOtpStep"
 import OnboardingCreateProjectStep from "~/components/onboarding/OnboardingCreateProjectStep"
 import OnboardingConnectIntegrationStep from "~/components/onboarding/OnboardingConnectIntegrationStep"
+import OnboardingCreatorProfileStep from "~/components/onboarding/OnboardingCreatorProfileStep"
 import OnboardingCreateScriptStep from "~/components/onboarding/OnboardingCreateScriptStep"
+import OnboardingGenerateScriptStep from "~/components/onboarding/OnboardingGenerateScriptStep"
 import OnboardingSubscriptionStep from "~/components/onboarding/OnboardingSubscriptionStep"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 
@@ -49,9 +51,17 @@ export default function OnboardingPage() {
                     : null
             case 2:
                 return flow.focusedProjectUuid
-                    ? <OnboardingCreateScriptStep projectUuid={flow.focusedProjectUuid} onNext={flow.advanceStep} />
+                    ? <OnboardingCreatorProfileStep projectUuid={flow.focusedProjectUuid} onNext={flow.advanceStep} />
                     : null
             case 3:
+                return flow.focusedProjectUuid
+                    ? <OnboardingCreateScriptStep projectUuid={flow.focusedProjectUuid} onScriptCreated={flow.handleScriptCreated} onNext={flow.advanceStep} />
+                    : null
+            case 4:
+                return flow.focusedProjectUuid
+                    ? <OnboardingGenerateScriptStep projectUuid={flow.focusedProjectUuid} scriptUuid={flow.onboardingScriptUuid} onNext={flow.advanceStep} />
+                    : null
+            case 5:
                 return <OnboardingSubscriptionStep />
             default:
                 return null

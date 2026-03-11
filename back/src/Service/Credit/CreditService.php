@@ -200,6 +200,33 @@ class CreditService
         }
     }
 
+    public function addWelcomeCredits(User $user, int $amount): CreditTransaction
+    {
+        $this->entityManager->beginTransaction();
+
+        try {
+            $balance = $this->getOrCreateBalance($user);
+
+            $balance->setTopupCredits($balance->getTopupCredits() + $amount);
+
+            $transaction = $this->createTransaction(
+                user: $user,
+                balance: $balance,
+                amount: $amount,
+                type: CreditTransactionType::WelcomeBonus,
+                bucket: SourceBucket::TopupCredits,
+            );
+
+            $this->entityManager->flush();
+            $this->entityManager->commit();
+
+            return $transaction;
+        } catch (\Throwable $e) {
+            $this->entityManager->rollback();
+            throw $e;
+        }
+    }
+
     public function getTotalCredits(User $user): int
     {
         $balance = $this->getOrCreateBalance($user);

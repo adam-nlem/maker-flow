@@ -6,14 +6,17 @@ import { useShowOnboarding } from "~/hooks/api/onboarding/useShowOnboarding"
 import { useCompleteOnboardingStep } from "~/hooks/api/onboarding/useCompleteOnboardingStep"
 import { OnboardingStep } from "~/models/enums/OnboardingStep"
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
+import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore"
 
 const PRE_AUTH_STEPS = 5
-const POST_AUTH_STEPS = 4
+const POST_AUTH_STEPS = 6
 
 const POST_AUTH_STEP_ORDER = [
     OnboardingStep.CreateFirstProject,
     OnboardingStep.ConnectIntegration,
+    OnboardingStep.CreateCreatorProfile,
     OnboardingStep.CreateFirstScript,
+    OnboardingStep.GenerateFirstScript,
     OnboardingStep.ShowSubscriptions,
 ]
 
@@ -25,6 +28,9 @@ export function useOnboardingFlow() {
 
     const focusedProjectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
     const setFocusedProjectUuid = useFocusProjectStore((s) => s.setFocusedProjectUuid)
+
+    const focusedScriptUuid = useFocusScriptStore((s) => s.focusedScriptUuid)
+    const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid)
 
     const [preAuthStep, setPreAuthStep] = useState(0)
     const [pendingOtpToken, setPendingOtpToken] = useState<string | null>(null)
@@ -57,6 +63,10 @@ export function useOnboardingFlow() {
         setFocusedProjectUuid(projectUuid)
     }
 
+    const handleScriptCreated = (scriptUuid: string) => {
+        setFocusedScriptUuid(scriptUuid)
+    }
+
     const advanceStep = async () => {
         const currentStepEnum = POST_AUTH_STEP_ORDER[postAuthStep]
         if (currentStepEnum && !onboarding?.isStepCompleted(currentStepEnum)) {
@@ -78,6 +88,8 @@ export function useOnboardingFlow() {
         setPreAuthStep,
         handleRegistered,
         handleProjectCreated,
+        handleScriptCreated,
+        onboardingScriptUuid: focusedScriptUuid,
         advanceStep,
     }
 }

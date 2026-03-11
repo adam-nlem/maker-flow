@@ -3,32 +3,22 @@ import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { Button } from "~/components/ui/Button";
-import { Platform, platformOptions, platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform";
+import { Platform, platformOptions } from "~/models/enums/Platform";
 import { ContentType, contentTypeOptions, contentTypeToFrenchTranslation } from "~/models/enums/ContentType";
 import { Tone, toneOptions, toneToFrenchTranslation } from "~/models/enums/Tone";
 import { useCreateOrUpdateCreatorProfile } from "~/hooks/api/creatorProfiles/useCreateOrUpdateCreatorProfile";
 import type { CreatorProfile } from "~/models/CreatorProfile";
 import Pill from "~/components/ui/Pill";
-
-function PlatformPill({ platform, isSelected, onToggle }: { platform: Platform; isSelected: boolean; onToggle: () => void }) {
-    return (
-        <Pill
-            imageUrl={platformToIcon[platform]}
-            label={platformToFrenchTranslation[platform]}
-            isSelected={isSelected}
-            onClick={onToggle}
-            borderColorClassName="border-light-gray"
-        />
-    );
-}
+import PlatformPill from "~/components/ui/PlatformPill";
 
 interface CreatorProfileFormProps {
     projectUuid: string;
     creatorProfile: CreatorProfile | null;
     onSuccess: () => void;
+    variant?: 'settings' | 'onboarding';
 }
 
-export default function CreatorProfileForm({ projectUuid, creatorProfile, onSuccess }: CreatorProfileFormProps) {
+export default function CreatorProfileForm({ projectUuid, creatorProfile, onSuccess, variant = 'settings' }: CreatorProfileFormProps) {
     const [platforms, setPlatforms] = useState<Platform[]>(creatorProfile?.platforms ?? []);
     const [contentType, setContentType] = useState<ContentType | undefined>(creatorProfile?.contentType);
     const [niche, setNiche] = useState(creatorProfile?.niche ?? "");
@@ -42,6 +32,8 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
     const [newNeverItem, setNewNeverItem] = useState("");
 
     const { createOrUpdateCreatorProfile, isPending } = useCreateOrUpdateCreatorProfile();
+
+    const isOnboarding = variant === 'onboarding';
 
     const hasChanges =
         JSON.stringify(platforms) !== JSON.stringify(creatorProfile?.platforms ?? []) ||
@@ -84,16 +76,24 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
             niche: niche.trim() || undefined,
             targetAudience: targetAudience.trim() || undefined,
             tones,
-            signaturePhrases,
-            neverList,
+            signaturePhrases: isOnboarding ? [] : signaturePhrases,
+            neverList: isOnboarding ? [] : neverList,
             styleSample: styleSample.trim() || undefined,
         });
         onSuccess();
     };
 
+    const formContainerClassName = isOnboarding
+        ? "flex flex-col gap-5"
+        : "flex-1 flex flex-col min-h-0";
+
+    const fieldsContainerClassName = isOnboarding
+        ? ""
+        : "flex-1 overflow-y-auto scrollbar-none px-6 py-5";
+
     return (
-        <form className="flex-1 flex flex-col min-h-0" onSubmit={handleSubmit}>
-            <div className="flex-1 overflow-y-auto scrollbar-none px-6 py-5">
+        <form className={formContainerClassName} onSubmit={handleSubmit}>
+            <div className={fieldsContainerClassName}>
                 <div className="flex flex-col gap-5">
             <div>
                 <h3 className="text-heading-sm">Plateformes</h3>
@@ -169,6 +169,7 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                 </div>
             </div>
 
+            {!isOnboarding && (
             <div>
                 <h3 className="text-heading-sm">Phrases signatures</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -198,7 +199,9 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                     </button>
                 </div>
             </div>
+            )}
 
+            {!isOnboarding && (
             <div>
                 <h3 className="text-heading-sm">Ne jamais utiliser</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
@@ -228,6 +231,7 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                     </button>
                 </div>
             </div>
+            )}
 
             <TextArea
                 label="Échantillon de style"
@@ -239,17 +243,28 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                 </div>
             </div>
 
-            {hasChanges && (
-                <div className="px-6 py-4 border-t border-light-gray">
-                    <Button
-                        type="submit"
-                        style="primary"
-                        isLoading={isPending}
-                        disabled={isPending}
-                    >
-                        <p className="text-sm">{creatorProfile ? "Mettre à jour le profil" : "Créer le profil"}</p>
-                    </Button>
-                </div>
+            {isOnboarding ? (
+                <Button
+                    type="submit"
+                    style="primary"
+                    isLoading={isPending}
+                    disabled={isPending}
+                >
+                    Continuer
+                </Button>
+            ) : (
+                hasChanges && (
+                    <div className="px-6 py-4 border-t border-light-gray">
+                        <Button
+                            type="submit"
+                            style="primary"
+                            isLoading={isPending}
+                            disabled={isPending}
+                        >
+                            <p className="text-sm">{creatorProfile ? "Mettre à jour le profil" : "Créer le profil"}</p>
+                        </Button>
+                    </div>
+                )
             )}
         </form>
     );
