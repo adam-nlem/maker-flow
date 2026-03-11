@@ -33,6 +33,7 @@ use App\Service\YoutubeReporting\YoutubeReportingService;
 use Google\Client;
 use Google\Service\Exception;
 use Google\Service\YouTube;
+use Google\Service\YouTubeAnalytics;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -140,8 +141,12 @@ class PostInsightService
                 return;
             }
 
-            // Step 3: Build PostDTOs with metadata from Data API
+            // Step 3: Build PostDTOs with metadata and lifetime statistics from Data API
             $postDTOs = $this->youtubePostInsightService->buildPostDTOs($youtube, $videoIds);
+
+            // Step 3b: Fetch lifetime per-video metrics from Analytics API (shares, watch time, etc.)
+            $analytics = new YouTubeAnalytics($this->googleClient);
+            $this->youtubePostInsightService->fetchAnalyticsInsights($analytics, $postDTOs);
 
             // Step 4: Create/get posts first so we have Post entities for the reporting service
             foreach ($postDTOs as $postDTO) {

@@ -164,11 +164,54 @@ Returns channel statistics including:
 
 The response contains `columnHeaders` (metric names) and `rows` (values).
 
-### Post Insights (YouTube Reporting API)
+### Post Insights (3 data sources)
 
-YouTube post insights use the **YouTube Reporting API** instead of the real-time Analytics API. The Reporting API provides bulk daily CSV reports with per-video breakdowns by country, subscriber status, and live/on-demand.
+YouTube post insights use three complementary data sources:
 
-#### Reporting API Flow
+1. **YouTube Data API** (`videos.list` with `part=statistics`) — Real-time lifetime totals for views, likes, comments. Zero extra API calls (fetched alongside video metadata).
+2. **YouTube Analytics API** (`reports.query` with `dimensions=video`) — Lifetime totals for shares, watch time, average watch time, dislikes, subscribers gained/lost. Paginated (200 videos per call).
+3. **YouTube Reporting API** — Daily CSV reports with dimensional breakdowns (by country, subscriber status, live/on-demand) and metrics only available here (thumbnail impressions, CTR).
+
+When metrics overlap, priority is: Data API > Analytics API > Reporting API. The Reporting API is only used for metrics not already populated by the other two sources.
+
+#### Data API Statistics
+
+Added to the existing `videos.list` call (no extra API calls):
+
+| Data API Field | PostInsightType | Notes |
+|---|---|---|
+| `viewCount` | `Views` | Real-time lifetime total |
+| `likeCount` | `Likes` | Real-time lifetime total |
+| `commentCount` | `Comments` | Real-time lifetime total |
+
+#### Analytics API (Lifetime Per-Video)
+
+**Service:** `Google\Service\YouTubeAnalytics`
+**Method:** `reports->query()`
+
+**Parameters:**
+- `ids`: `channel==MINE`
+- `startDate`: `2005-01-01` (earliest possible, captures all historical data)
+- `endDate`: Current day (YYYY-MM-DD)
+- `dimensions`: `video`
+- `metrics`: `shares,estimatedMinutesWatched,averageViewDuration,dislikes,subscribersGained,subscribersLost`
+- `maxResults`: `200` (paginated with `startIndex`)
+- `sort`: `-estimatedMinutesWatched`
+
+| Analytics API Metric | PostInsightType | Notes |
+|---|---|---|
+| `shares` | `Shares` | Lifetime total |
+| `estimatedMinutesWatched` | `TotalWatchTime` | Converted from minutes to seconds (x60) |
+| `averageViewDuration` | `AverageWatchTime` | Already in seconds |
+| `dislikes` | `Dislikes` | Lifetime total |
+| `subscribersGained` | `FollowersGained` | Lifetime total |
+| `subscribersLost` | `FollowersLost` | Lifetime total |
+
+#### Reporting API (Breakdowns + Thumbnail Metrics)
+
+The Reporting API continues to provide bulk daily CSV reports with per-video breakdowns by country, subscriber status, and live/on-demand. It is the only source for thumbnail impression metrics.
+
+##### Reporting API Flow
 
 ```
 1. Ensure reporting jobs exist (lazy creation)
@@ -177,7 +220,7 @@ YouTube post insights use the **YouTube Reporting API** instead of the real-time
    └── List reports → Filter by lastProcessedReportDate
 3. Download CSV report
 4. Parse CSV → aggregate per video + store breakdowns
-5. Enrich PostDTOs with aggregated data
+5. Enrich PostDTOs with aggregated data (skip metrics already from Data/Analytics API)
 6. Persist insights
 ```
 
@@ -213,12 +256,13 @@ When Reporting API jobs are first created, reports are **not immediately availab
 
 1. **`channels.list(part=contentDetails, mine=true)`** — get the uploads playlist ID (1 call)
 2. **`playlistItems.list(part=contentDetails, playlistId=..., maxResults=50)`** — get video IDs (paginated, 50 per page)
-3. **`videos.list(id=batch, part=snippet,contentDetails)`** — get video metadata (title, duration, thumbnail) in batches of 50
-4. **Reporting API: `jobs.list()` / `jobs.create()`** — ensure reporting jobs exist (1-2 calls, only on first run)
-5. **Reporting API: `jobs.reports.list()`** — poll for new reports (1 call per job)
-6. **Reporting API: download CSV** — download report content (1 call per report)
+3. **`videos.list(id=batch, part=snippet,contentDetails,statistics)`** — get video metadata + lifetime views/likes/comments in batches of 50
+4. **Analytics API: `reports.query(dimensions=video, maxResults=200)`** — get lifetime shares/watch time/etc. per video (paginated, 200 per page)
+5. **Reporting API: `jobs.list()` / `jobs.create()`** — ensure reporting jobs exist (1-2 calls, only on first run)
+6. **Reporting API: `jobs.reports.list()`** — poll for new reports (1 call per job)
+7. **Reporting API: download CSV** — download report content (1 call per report)
 
-**Total for N videos (after initial setup)**: `1 + ceil(N/50) + ceil(N/50) + 2 + 2` calls. For 100 videos: ~10 calls.
+**Total for N videos (after initial setup)**: `1 + ceil(N/50) + ceil(N/50) + ceil(N/200) + 2 + 2` calls. For 100 videos: ~11 calls.
 
 #### Reporting API Metrics (from CSV)
 
@@ -317,19 +361,19 @@ YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNee
 
 ### YouTube Post Insight Types
 
-| Reporting API CSV Column | PostInsightType | Notes |
-|---|---|---|
-| `views` | `Views` | Reporting API |
-| `likes` | `Likes` | Reporting API |
-| `dislikes` | `Dislikes` | Reporting API |
-| `comments` | `Comments` | Reporting API |
-| `shares` | `Shares` | Reporting API |
-| `average_view_duration_seconds` | `AverageWatchTime` | Reporting API (already in seconds) |
-| `watch_time_minutes` | `TotalWatchTime` | Reporting API (converted from minutes to seconds) |
-| `video_thumbnail_impressions` | `ThumbnailImpressions` | Reporting API |
-| `video_thumbnail_impressions_ctr` | `ThumbnailImpressionsClickRate` | Reporting API (stored as 0.0-1.0 ratio) |
-| `subscribers_gained` | `FollowersGained` | Reporting API |
-| `subscribers_lost` | `FollowersLost` | Reporting API |
+| Metric | PostInsightType | Source | Notes |
+|---|---|---|---|
+| `viewCount` | `Views` | Data API | Real-time lifetime total |
+| `likeCount` | `Likes` | Data API | Real-time lifetime total |
+| `commentCount` | `Comments` | Data API | Real-time lifetime total |
+| `shares` | `Shares` | Analytics API | Lifetime total |
+| `estimatedMinutesWatched` | `TotalWatchTime` | Analytics API | Converted minutes → seconds |
+| `averageViewDuration` | `AverageWatchTime` | Analytics API | Already in seconds |
+| `dislikes` | `Dislikes` | Analytics API | Lifetime total |
+| `subscribersGained` | `FollowersGained` | Analytics API | Lifetime total |
+| `subscribersLost` | `FollowersLost` | Analytics API | Lifetime total |
+| `video_thumbnail_impressions` | `ThumbnailImpressions` | Reporting API | Only source for this metric |
+| `video_thumbnail_impressions_ctr` | `ThumbnailImpressionsClickRate` | Reporting API | Stored as 0.0-1.0 ratio |
 
 ---
 

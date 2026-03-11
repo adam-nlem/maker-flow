@@ -24,6 +24,29 @@ class YoutubePostInsightDTO
         'video_thumbnail_impressions_ctr' => PostInsightType::ThumbnailImpressionsClickRate,
     ];
 
+    /**
+     * Maps YouTube Data API statistics field names to insight types.
+     * Provides real-time lifetime totals per video.
+     */
+    private const DATA_API_STATISTICS_MAPPING = [
+        'viewCount' => PostInsightType::Views,
+        'likeCount' => PostInsightType::Likes,
+        'commentCount' => PostInsightType::Comments,
+    ];
+
+    /**
+     * Maps YouTube Analytics API metric names to insight types.
+     * Provides lifetime totals for metrics not available in the Data API.
+     */
+    private const ANALYTICS_API_METRIC_MAPPING = [
+        'shares' => PostInsightType::Shares,
+        'estimatedMinutesWatched' => PostInsightType::TotalWatchTime,
+        'averageViewDuration' => PostInsightType::AverageWatchTime,
+        'dislikes' => PostInsightType::Dislikes,
+        'subscribersGained' => PostInsightType::FollowersGained,
+        'subscribersLost' => PostInsightType::FollowersLost,
+    ];
+
     public function __construct(
         private readonly ?PostInsightType $type,
         private readonly float $value,
@@ -66,5 +89,39 @@ class YoutubePostInsightDTO
         };
 
         return new self(type: $type, value: $value);
+    }
+
+    /**
+     * Creates a DTO from a YouTube Data API statistics field.
+     */
+    public static function fromDataApiStatistic(string $statisticName, float $value): self
+    {
+        $type = self::DATA_API_STATISTICS_MAPPING[$statisticName] ?? null;
+
+        return new self(type: $type, value: $value);
+    }
+
+    /**
+     * Creates a DTO from a YouTube Analytics API metric.
+     * Handles unit conversions where needed.
+     */
+    public static function fromAnalyticsMetric(string $metricName, float $rawValue): self
+    {
+        $type = self::ANALYTICS_API_METRIC_MAPPING[$metricName] ?? null;
+
+        $value = match ($metricName) {
+            'estimatedMinutesWatched' => $rawValue * 60, // minutes → seconds
+            default => $rawValue,
+        };
+
+        return new self(type: $type, value: $value);
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getAnalyticsMetrics(): array
+    {
+        return array_keys(self::ANALYTICS_API_METRIC_MAPPING);
     }
 }
