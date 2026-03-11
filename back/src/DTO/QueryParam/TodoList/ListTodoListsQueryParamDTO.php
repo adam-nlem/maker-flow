@@ -22,7 +22,7 @@ class ListTodoListsQueryParamDTO extends AbstractQueryParamDTO
 
     protected function fromQueryParams(array $queryParams): void
     {
-        $this->projectUuid = $queryParams["projectUuid"];
+        $this->projectUuid = $queryParams["projectUuid"] ?? "";
     }
 
     public function getProjectUuid(): string

@@ -23,7 +23,7 @@ export default function HomeInsightsOverview({ projectUuid }: HomeInsightsOvervi
 
     return (
         <div className="flex flex-col gap-5">
-            <IntegrationPillRow integrations={insightsOverview.groups.map((g) => g.integration)} />
+            <IntegrationPillRow integrations={insightsOverview.groups.map(g => g.integration)} />
 
             {focusedGroup && (
                 <IntegrationProfileInfo integration={focusedGroup.integration} />
