@@ -83,12 +83,7 @@ Step metadata defined as const maps: `onboardingStepToFrenchTranslation`, `onboa
 
 ## Step Completion
 
-| Step | Detection |
-|------|-----------|
-| CreateFirstProject | Auto (backend, on project creation) |
-| ConnectIntegration | Auto (backend, on integration OAuth) |
-| CreateFirstScript | Auto (backend, on script creation) |
-| ShowSubscriptions | Frontend (onboarding subscription step on mount) |
+All steps are completed by the frontend via `advanceStep` in `useOnboardingFlow`, which calls `POST /api/onboarding/complete-step`. Each step is marked complete when the user clicks "Suivant" or "Passer".
 
 ## Shared Components
 

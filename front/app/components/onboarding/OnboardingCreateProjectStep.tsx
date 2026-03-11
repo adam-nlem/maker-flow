@@ -5,9 +5,10 @@ import CreateProjectForm from "~/components/projects/CreateProjectForm"
 
 interface OnboardingCreateProjectStepProps {
     onProjectCreated: (projectUuid: string) => void
+    onNext: () => void
 }
 
-export default function OnboardingCreateProjectStep({ onProjectCreated }: OnboardingCreateProjectStepProps) {
+export default function OnboardingCreateProjectStep({ onProjectCreated, onNext }: OnboardingCreateProjectStepProps) {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-md">
@@ -17,7 +18,7 @@ export default function OnboardingCreateProjectStep({ onProjectCreated }: Onboar
                     description="Les projets vous permettent de regrouper vos contenus et vos réseaux sociaux."
                 />
 
-                <CreateProjectForm onProjectCreated={onProjectCreated} buttonStyle="primary" />
+                <CreateProjectForm onProjectCreated={(uuid) => { onProjectCreated(uuid); onNext() }} buttonStyle="primary" />
             </div>
         </div>
     )

@@ -6,13 +6,11 @@ use App\DTO\QueryParam\Project\ListProjectsQueryParamDTO;
 use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\Project\CreateProjectRequestDTO;
 use App\DTO\Request\Project\UpdateProjectRequestDTO;
-use App\Entity\Enum\OnboardingStep;
 use App\Entity\Project;
 use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Repository\ProjectRepository;
 use App\Repository\SubscriptionRepository;
-use App\Service\OnboardingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
@@ -21,13 +19,11 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 
-use function Sentry\captureException;
-
 #[Route('/api/projects', requirements: ['projectUuid' => Requirement::UUID])]
 final class ProjectController extends AbstractController
 {
     #[Route('', name: 'api_projects_create', methods: ['POST'])]
-    public function create(CreateProjectRequestDTO $dto, ProjectRepository $projectRepository, SubscriptionRepository $subscriptionRepository, OnboardingService $onboardingService): JsonResponse
+    public function create(CreateProjectRequestDTO $dto, ProjectRepository $projectRepository, SubscriptionRepository $subscriptionRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -52,13 +48,6 @@ final class ProjectController extends AbstractController
         $project->setUser($user);
 
         $projectRepository->save($project, true);
-
-        try {
-            $onboarding = $onboardingService->getOrCreateOnboarding($user);
-            $onboardingService->completeStep($onboarding, OnboardingStep::CreateFirstProject);
-        } catch (\Exception $e) {
-            captureException($e);
-        }
 
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_create']]);
     }

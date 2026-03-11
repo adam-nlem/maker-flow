@@ -51,11 +51,6 @@ export default function WelcomeHowItWorksStep({ onNext, onBack }: WelcomeHowItWo
                             <h3 className="text-heading-sm text-dark  mb-1">{step.title}</h3>
                             <p className="text-body-sm text-medium-gray">{step.description}</p>
                         </div>
-                        {index < steps.length - 1 && (
-                            <div className="hidden sm:flex items-center">
-                                <div className="w-8 border-t border-dashed border-light-gray" />
-                            </div>
-                        )}
                     </Fragment>
                 ))}
             </div>

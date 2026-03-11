@@ -42,7 +42,7 @@ export default function OnboardingPage() {
     const renderPostAuthStep = () => { 
         switch (flow.postAuthStep) {
             case 0:
-                return <OnboardingCreateProjectStep onProjectCreated={flow.handleProjectCreated} />
+                return <OnboardingCreateProjectStep onProjectCreated={flow.handleProjectCreated} onNext={flow.advanceStep} />
             case 1:
                 return flow.focusedProjectUuid
                     ? <OnboardingConnectIntegrationStep projectUuid={flow.focusedProjectUuid} onNext={flow.advanceStep} />

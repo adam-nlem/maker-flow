@@ -49,16 +49,9 @@ To add a new step: add a case here and update the frontend `OnboardingStep` enum
 - `completeStep(Onboarding, OnboardingStep)` — Adds step if not already completed. Auto-dismisses when all steps done.
 - `dismiss(Onboarding)` — Sets `dismissedAt`
 
-## Auto-Completion Hooks
+## Step Completion
 
-| Step | Trigger |
-|------|---------|
-| CreateFirstProject | `ProjectController::create` — after successful project save |
-| ConnectIntegration | `OnboardingStepSubscriber` — subscribes to `IntegrationCreatedEvent` |
-| CreateFirstScript | `ScriptController::create` — after successful script save |
-| ShowSubscriptions | Frontend only — onboarding subscription step calls API on mount |
-
-All auto-completion hooks are wrapped in `try/catch (\Throwable)` to never break the main flow.
+All steps are completed by the frontend via `POST /api/onboarding/complete-step`. The `useOnboardingFlow` hook calls `advanceStep` → `completeStep` when the user advances through each onboarding step.
 
 ## Key Files
 
@@ -68,4 +61,3 @@ All auto-completion hooks are wrapped in `try/catch (\Throwable)` to never break
 - `src/Service/OnboardingService.php`
 - `src/Controller/OnboardingController.php`
 - `src/DTO/Request/Onboarding/CompleteOnboardingStepRequestDTO.php`
-- `src/EventSubscriber/OnboardingStepSubscriber.php`
