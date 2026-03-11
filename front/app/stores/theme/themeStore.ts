@@ -18,7 +18,7 @@ function applyThemeClass(isDark: boolean) {
 export const useThemeStore = create<ThemeState & ThemeAction>()(
     persist(
         (set) => ({
-            isDark: false,
+            isDark: true,
             toggleTheme: () =>
                 set((state) => {
                     const next = !state.isDark

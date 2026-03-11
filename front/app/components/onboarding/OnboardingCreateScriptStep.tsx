@@ -18,7 +18,7 @@ export default function OnboardingCreateScriptStep({ projectUuid, onNext }: Prop
 
     const { createScript, isPending } = useCreateScript()
 
-    const handleCreate = async (e: React.FormEvent) => {
+    const handleCreate = async (e: React.SubmitEvent) => {
         e.preventDefault()
         await createScript({ projectUuid, title: title.trim() || "Nouveau script" })
         setCreated(true)

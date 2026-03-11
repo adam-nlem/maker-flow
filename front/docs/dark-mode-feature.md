@@ -27,17 +27,17 @@ The `body` rule sets `color: var(--color-dark)` so all text inherits the correct
 
 ### Theme Store (`stores/theme/themeStore.ts`)
 
-Zustand store with `persist` middleware. Stores `isDark` boolean in `localStorage` under key `app:theme`.
+Zustand store with `persist` middleware. Stores `isDark` boolean in `localStorage` under key `app:theme`. **Defaults to dark mode** (`isDark: true`).
 
 **API:**
-- `isDark: boolean` — current theme state
+- `isDark: boolean` — current theme state (default: `true`)
 - `toggleTheme()` — toggles dark/light, syncs `.dark` class on `<html>`
 
 The `onRehydrateStorage` callback re-applies the `.dark` class after Zustand hydrates from localStorage.
 
 ### Anti-Flash Script (`root.tsx`)
 
-A blocking `<script>` in `<head>` reads `localStorage('app:theme')`, parses the Zustand state shape, and adds `.dark` to `<html>` before paint. This prevents a flash of light mode on page load when the user has dark mode enabled.
+A blocking `<script>` in `<head>` reads `localStorage('app:theme')`, parses the Zustand state shape, and adds `.dark` to `<html>` before paint. Since dark mode is the default, the script adds `.dark` unless localStorage explicitly has `isDark: false`. This prevents a flash of the wrong theme on page load.
 
 ### Theme Toggle (Sidebar)
 

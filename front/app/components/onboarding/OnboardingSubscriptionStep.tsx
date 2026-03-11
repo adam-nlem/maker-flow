@@ -11,15 +11,10 @@ import { OnboardingStep } from "~/models/enums/OnboardingStep"
 
 export default function OnboardingSubscriptionStep() {
     const navigate = useNavigate()
-    const { completeStep } = useCompleteOnboardingStep()
-    const { dismiss, isPending } = useDismissOnboarding()
-
-    useEffect(() => {
-        completeStep(OnboardingStep.ShowSubscriptions)
-    }, [completeStep])
+    const { completeStep, isPending } = useCompleteOnboardingStep()
 
     const handleFinish = async () => {
-        await dismiss()
+        await completeStep(OnboardingStep.ShowSubscriptions)
         navigate('/', { replace: true })
     }
 
