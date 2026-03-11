@@ -23,7 +23,6 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
     const sentinelRef = useRef<HTMLDivElement>(null);
     const { subscription } = useShowCurrentSubscription();
-
     const maxScripts = getMaxScriptsPerProjectForPlan(subscription?.plan);
     const isLimitReached = maxScripts !== null && scripts.length >= maxScripts;
 

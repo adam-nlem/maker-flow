@@ -2817,6 +2817,80 @@
         }
       ],
       "id": "stripe-webhook-folder-0001-000000000000"
+    },
+    {
+      "name": "Onboarding",
+      "item": [
+        {
+          "name": "Show Onboarding",
+          "id": "onboarding-show-0001-000000000001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/onboarding",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "onboarding"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Onboarding Step",
+          "id": "onboarding-complete-step-0001-000000000002",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"step\": \"create_first_project\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/onboarding/complete-step",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "onboarding",
+                "complete-step"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Dismiss Onboarding",
+          "id": "onboarding-dismiss-0001-000000000003",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/onboarding/dismiss",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "onboarding",
+                "dismiss"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "onboarding-folder-0001-000000000000"
     }
   ],
   "event": [

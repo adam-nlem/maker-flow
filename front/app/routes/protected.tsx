@@ -1,39 +1,53 @@
 import { Outlet, useLocation, useNavigate } from "react-router";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
+import { useShowOnboarding } from "~/hooks/api/onboarding/useShowOnboarding";
+import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore";
 import { useRef, useEffect } from "react";
 
 export default function ProtectedLayout() {
     const { user, isLoading } = useCurrentUser()
+    const { onboarding, isLoading: onboardingLoading } = useShowOnboarding({ enabled: !!user })
     const location = useLocation();
     const navigate = useNavigate();
-    // Use ref to track if we've already initiated a redirect
     const hasRedirected = useRef(false);
 
-    // Handle navigation and auth state changes
     useEffect(() => {
-        // Only proceed if we're not in a loading state
         if (!isLoading) {
-            // If user is logged in, reset redirect flag
             if (user) {
                 hasRedirected.current = false;
             }
-            // If not authenticated and not already redirecting, redirect to signin
             else if (!hasRedirected.current) {
                 hasRedirected.current = true;
-                navigate('/login', { state: { from: location.pathname }, replace: true });
+                const prefillEmail = useAuthPrefillStore.getState().email;
+                if (prefillEmail) {
+                    navigate('/login', { state: { from: location.pathname }, replace: true });
+                } else {
+                    navigate('/onboarding', { replace: true });
+                }
             }
         }
     }, [user, isLoading, navigate, location.pathname]);
 
-    // If we're authenticated, render the outlet wrapped with ProjectProvider
+    useEffect(() => {
+        if (user && !onboardingLoading && onboarding && !onboarding.isDismissed) {
+            navigate('/onboarding', { replace: true });
+        }
+    }, [user, onboarding, onboardingLoading, navigate]);
+
     if (user) {
+        if (onboardingLoading || (onboarding && !onboarding.isDismissed)) {
+            return (
+                <div className="flex min-h-screen items-center justify-center">
+                    <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+                </div>
+            );
+        }
         return <Outlet />;
     }
 
-    // If we're not authenticated but already redirecting, show loading
     return (
         <div className="flex min-h-screen items-center justify-center">
-            <div className="h-12 w-12 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+            <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
         </div>
     );
 }

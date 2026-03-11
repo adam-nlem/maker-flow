@@ -2,6 +2,7 @@ import { type RouteConfig, index, layout, route } from "@react-router/dev/routes
 
 export default [
   // Public routes
+  route("onboarding", "routes/onboarding.tsx"),
   route("login", "routes/login.tsx"),
   route("register", "routes/register.tsx"),
   route("verify-otp", "routes/verify-otp.tsx"),

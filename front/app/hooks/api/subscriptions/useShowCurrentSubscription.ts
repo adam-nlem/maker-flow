@@ -7,15 +7,8 @@ export function useShowCurrentSubscription() {
     const query = useQuery({
         queryKey: subscriptionQueryKeys.current(),
         queryFn: async () => {
-            try {
-                const res = await httpClient.get<SubscriptionJSON>('/subscriptions/current');
-                return Subscription.fromJSON(res.data);
-            } catch (error: any) {
-                if (error?.statusCode === 404) {
-                    return null;
-                }
-                throw error;
-            }
+            const res = await httpClient.get<SubscriptionJSON | null>('/subscriptions/current');
+            return res.data ? Subscription.fromJSON(res.data) : null;
         },
     });
 

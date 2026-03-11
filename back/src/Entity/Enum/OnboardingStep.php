@@ -1,0 +1,11 @@
+<?php
+
+namespace App\Entity\Enum;
+
+enum OnboardingStep: string
+{
+    case CreateFirstProject = 'create_first_project';
+    case ConnectIntegration = 'connect_integration';
+    case CreateFirstScript = 'create_first_script';
+    case ShowSubscriptions = 'show_subscriptions';
+}

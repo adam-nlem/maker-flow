@@ -86,6 +86,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(targetEntity: Subscription::class, mappedBy: 'user', cascade: ['remove'])]
     private ?Subscription $subscription = null;
 
+    #[ORM\OneToOne(targetEntity: Onboarding::class, mappedBy: 'user', cascade: ['remove'])]
+    private ?Onboarding $onboarding = null;
+
     /**
      * @var Collection<int, Otp>
      */
@@ -366,5 +369,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getOtps(): Collection
     {
         return $this->otps;
+    }
+
+    public function getOnboarding(): ?Onboarding
+    {
+        return $this->onboarding;
+    }
+
+    public function setOnboarding(?Onboarding $onboarding): static
+    {
+        $this->onboarding = $onboarding;
+
+        return $this;
     }
 }

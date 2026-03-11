@@ -25,7 +25,6 @@ import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
 export default function SideBar() {
   const navigate = useNavigate();
   const location = useLocation();
-  const { user } = useCurrentUser()
 
   const { projects, isLoading: isLoadingProjects } = useListPaginatedProjects()
   const { subscription } = useShowCurrentSubscription()
@@ -68,9 +67,9 @@ export default function SideBar() {
         <div className={`p-3 ${isExpanded ? '' : 'flex flex-col items-center'}`}>
           {/* PROJECT SELECTOR */}
 
-          {isLoadingProjects ? <Shimmer width="w-10" height="h-10" /> :
+          {isLoadingProjects ? <Shimmer width="w-10" height="h-10" /> : <div>
 
-            focusedProject ?
+            {focusedProject ?
               <SelectDropdown<Project>
                 items={projects}
                 selectedItemId={focusedProject?.uuid}
@@ -126,9 +125,9 @@ export default function SideBar() {
                   </div>
                 </Button>
               )
+            }
 
-
-          }
+          </div>}
 
           {/* NAVIGATION SECTION */}
           <div className={`mt-10 flex flex-col gap-1 ${isExpanded ? '' : 'items-center'}`}>
@@ -139,13 +138,6 @@ export default function SideBar() {
               isSelected={location.pathname === '/'}
               onClick={() => navigate('/')}
             />
-            {/* <IconWithTextTile
-              icon={location.pathname === '/tasks' ? GlobeEuropeAfricaIconSolid : GlobeEuropeAfricaIcon}
-              label="Veille"
-              isExpanded={isExpanded}
-              isSelected={location.pathname === '/tasks'}
-              onClick={() => navigate('/tasks')}
-            /> */}
             <IconWithTextTile
               icon={location.pathname.startsWith('/scripts') ? ClipboardDocumentCheckIconSolid : ClipboardDocumentCheckIcon}
               label="Script"

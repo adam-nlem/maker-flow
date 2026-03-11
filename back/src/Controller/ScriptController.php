@@ -10,6 +10,7 @@ use App\DTO\Response\Script\ListScriptsGroupedByDayResponseDTO;
 use App\DTO\Request\Script\CreateScriptRequestDTO;
 use App\DTO\Request\Script\ReorderScriptPartsRequestDTO;
 use App\DTO\Request\Script\UpdateScriptRequestDTO;
+use App\Entity\Enum\OnboardingStep;
 use App\Entity\Enum\ScriptPartType;
 use App\Entity\Script;
 use App\Entity\User;
@@ -27,12 +28,15 @@ use App\Repository\ScriptCallToActionRepository;
 use App\Repository\ScriptGenerationRepository;
 use App\Repository\ScriptHookRepository;
 use App\Repository\ScriptRetentionCueRepository;
+use App\Service\OnboardingService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+
+use function Sentry\captureException;
 
 #[Route('/api/scripts', requirements: ['scriptUuid' => Requirement::UUID])]
 final class ScriptController extends AbstractController
@@ -105,6 +109,7 @@ final class ScriptController extends AbstractController
         PostGroupRepository $postGroupRepository,
         ScriptTagRepository $scriptTagRepository,
         SubscriptionRepository $subscriptionRepository,
+        OnboardingService $onboardingService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -151,6 +156,13 @@ final class ScriptController extends AbstractController
         }
 
         $scriptRepository->save($script, true);
+
+        try {
+            $onboarding = $onboardingService->getOrCreateOnboarding($user);
+            $onboardingService->completeStep($onboarding, OnboardingStep::CreateFirstScript);
+        } catch (\Exception $e) {
+            captureException($e);
+        }
 
         return $this->json(
             data: $script,

@@ -298,7 +298,7 @@ Thrown when a subscription management action fails (cancel, resume, or plan chan
 
 **GET /api/subscriptions/current**
 - Response: Subscription entity with `api_subscription_show` group
-- Returns 404 if no subscription exists
+- Returns 200 with `null` body if no active subscription exists
 
 **POST /api/subscriptions/cancel**
 - No request body

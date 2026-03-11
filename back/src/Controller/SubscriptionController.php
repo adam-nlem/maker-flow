@@ -46,10 +46,6 @@ final class SubscriptionController extends AbstractController
 
         $subscription = $subscriptionRepository->getActiveByUser($user);
 
-        if ($subscription === null) {
-            return $this->json(data: ["message" => "No active subscription found"], status: Response::HTTP_NOT_FOUND);
-        }
-
         return $this->json(data: $subscription, status: Response::HTTP_OK, context: ['groups' => ['api_subscription_show']]);
     }
 

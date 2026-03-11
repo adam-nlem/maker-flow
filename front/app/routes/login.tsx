@@ -6,9 +6,13 @@ import { Input } from '~/components/ui/Input';
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useLogin } from "~/hooks/api/users/useLogin";
 import { OtpType } from "~/models/enums/OtpType";
+import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore";
 
 export default function LoginPage() {
-    const [email, setEmail] = useState<string>("");
+    const prefillEmail = useAuthPrefillStore((s) => s.email);
+    const setStoredEmail = useAuthPrefillStore((s) => s.setEmail);
+
+    const [email, setEmail] = useState<string>(prefillEmail ?? "");
     const [password, setPassword] = useState<string>("");
     const navigate = useNavigate();
 
@@ -25,6 +29,7 @@ export default function LoginPage() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        setStoredEmail(email);
         const response = await login({ email, password });
         if (response.requiresOtp) {
             navigate("/verify-otp", {
@@ -117,6 +122,12 @@ export default function LoginPage() {
                         Créer un compte
                     </Link>
                 </p>
+
+                <div className="mt-3 flex justify-center">
+                    <Button style="outline" width="w-auto" height="h-8" className="text-body-xs" onClick={() => navigate('/onboarding')}>
+                        Découvrir MakerFlow
+                    </Button>
+                </div>
             </div>
         </div>
     );

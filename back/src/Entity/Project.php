@@ -14,7 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints as ORMAssert;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[ORMAssert\UniqueEntity('name', 'user')]
+#[ORMAssert\UniqueEntity(fields: ['name', 'user'])]
 #[ORM\HasLifecycleCallbacks]
 class Project
 {

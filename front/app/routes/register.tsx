@@ -1,83 +1,22 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 
+import RegisterForm from "~/components/auth/RegisterForm";
 import { Button } from '~/components/ui/Button';
-import { Input } from '~/components/ui/Input';
-import PasswordRules from '~/components/ui/PasswordRules';
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
-import { useRegister } from "~/hooks/api/users/useRegister";
 import { OtpType } from "~/models/enums/OtpType";
-import { getPasswordRules, isPasswordValid } from "~/utils/passwordValidation";
+import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore";
 
 export default function RegisterPage() {
     const navigate = useNavigate();
     const { user, isLoading: authLoading } = useCurrentUser()
-
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [validationError, setValidationError] = useState<string | null>(null);
-
-    const { register, isPending, error } = useRegister();
+    const prefillEmail = useAuthPrefillStore((s) => s.email);
 
     useEffect(() => {
         if (authLoading === false && user) {
             navigate("/");
         }
     }, [user, authLoading, navigate])
-
-    const validateForm = () => {
-        if (!firstName.trim()) {
-            setValidationError("Le prénom est requis");
-            return false;
-        }
-        if (!lastName.trim()) {
-            setValidationError("Le nom est requis");
-            return false;
-        }
-        if (!email.trim()) {
-            setValidationError("L'email est requis");
-            return false;
-        }
-        if (!password.trim()) {
-            setValidationError("Le mot de passe est requis");
-            return false;
-        }
-        if (!isPasswordValid(password)) {
-            setValidationError("Le mot de passe ne respecte pas les critères de sécurité");
-            return false;
-        }
-        if (!confirmPassword.trim()) {
-            setValidationError("La confirmation du mot de passe est requise");
-            return false;
-        }
-        if (password !== confirmPassword) {
-            setValidationError("Les mots de passe ne correspondent pas");
-            return false;
-        }
-        setValidationError(null);
-        return true;
-    };
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!validateForm()) return;
-        const response = await register({ firstName, lastName, email, password });
-        if (response.requiresEmailVerification) {
-            navigate("/verify-otp", {
-                state: {
-                    pendingOtpToken: response.pendingOtpToken,
-                    purpose: OtpType.EmailVerification,
-                    email: response.email,
-                },
-            });
-        }
-    }
-
-    const errorMessage = validationError || (error?.message ?? null);
-
 
     return (
         <div className="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
@@ -88,91 +27,19 @@ export default function RegisterPage() {
             </div>
 
             <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-                {errorMessage && (
-                    <div className="mb-4 rounded-md bg-danger/10 p-4">
-                        <div className="flex">
-                            <div className="text-body-sm text-danger">{errorMessage}</div>
-                        </div>
-                    </div>
-                )}
-
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                    <Input
-                        label="Prénom"
-                        id="firstName"
-                        name="firstName"
-                        type="text"
-                        autoComplete="given-name"
-                        required
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        fullWidth
-                    />
-
-                    <Input
-                        label="Nom"
-                        id="lastName"
-                        name="lastName"
-                        type="text"
-                        autoComplete="family-name"
-                        required
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        fullWidth
-                    />
-
-                    <Input
-                        label="Adresse email"
-                        id="email"
-                        name="email"
-                        type="email"
-                        autoComplete="email"
-                        required
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        fullWidth
-                    />
-
-                    <Input
-                        label="Mot de passe"
-                        id="password"
-                        name="password"
-                        type="password"
-                        autoComplete="new-password"
-                        required
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        fullWidth
-                    />
-                    {password.length > 0 && (
-                        <PasswordRules rules={getPasswordRules(password)} />
-                    )}
-
-                    <Input
-                        label="Confirmer le mot de passe"
-                        id="confirmPassword"
-                        name="confirmPassword"
-                        type="password"
-                        autoComplete="new-password"
-                        required
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        fullWidth
-                    />
-
-                    <div>
-                        <Button
-                            type="submit"
-                            style="primary"
-                            isLoading={isPending}
-                            disabled={isPending}
-                        >
-                            Créer mon compte
-                        </Button>
-                    </div>
-                </form>
-
-
+                <RegisterForm
+                    initialEmail={prefillEmail ?? ""}
+                    formSpacing="space-y-6"
+                    onRegistered={({ pendingOtpToken, email }) => {
+                        navigate("/verify-otp", {
+                            state: {
+                                pendingOtpToken,
+                                purpose: OtpType.EmailVerification,
+                                email,
+                            },
+                        });
+                    }}
+                />
 
                 <p className="mt-10 text-center text-body-sm">
                     Vous avez déjà un compte ?{' '}
@@ -180,6 +47,12 @@ export default function RegisterPage() {
                         Se connecter
                     </Link>
                 </p>
+
+                <div className="mt-3 flex justify-center">
+                    <Button style="outline" width="w-auto" height="h-8" className="text-body-xs" onClick={() => navigate('/onboarding')}>
+                        Découvrir MakerFlow
+                    </Button>
+                </div>
             </div>
         </div>
     );

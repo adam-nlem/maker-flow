@@ -32,7 +32,7 @@ export default function IntegrationSettingCard({ projectUuid, platform, integrat
     return (
         <div className="border border-light-gray rounded-xl p-5">
             {/* Header: platform name + status badge */}
-            <div className="flex flex-row items-center justify-between mb-4">
+            <div className="flex flex-row items-center justify-between gap-20 mb-4">
                 <div className="flex flex-row items-center gap-3">
                     <img src={platformToIcon[platform]} className="size-6" alt={platformToFrenchTranslation[platform]} />
                     <h3 className="text-heading-md">{platformToFrenchTranslation[platform]}</h3>
