@@ -1,19 +1,36 @@
-import { CheckCircleIcon, ChevronRightIcon } from "@heroicons/react/24/solid"
+import { ChevronRightIcon } from "@heroicons/react/24/solid"
 
 import { useShowOnboarding } from "~/hooks/api/onboarding/useShowOnboarding"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
-import { ONBOARDING_STEP_ORDER, onboardingStepToIcon, onboardingStepToShortLabel } from "~/models/enums/OnboardingStep"
+import { type OnboardingStep, ONBOARDING_STEP_ORDER, onboardingStepToIcon, onboardingStepToShortLabel } from "~/models/enums/OnboardingStep"
+import { WELCOME_STEP_ORDER, welcomeStepToIcon, welcomeStepToShortLabel } from "~/models/enums/WelcomeStep"
 
 export default function OnboardingProgressBar() {
     const { onboarding } = useShowOnboarding()
-    const { currentOnboardingStep } = useOnboardingFlow()
+    const { isAuthenticated, currentOnboardingStep, currentWelcomeStep } = useOnboardingFlow()
+
+    const steps = isAuthenticated ? ONBOARDING_STEP_ORDER : WELCOME_STEP_ORDER
+    const iconMap = isAuthenticated ? onboardingStepToIcon : welcomeStepToIcon
+    const labelMap = isAuthenticated ? onboardingStepToShortLabel : welcomeStepToShortLabel
+
+    const currentWelcomeIndex = WELCOME_STEP_ORDER.indexOf(currentWelcomeStep)
+
+    const isCompleted = (step: string, index: number) =>
+        isAuthenticated
+            ? onboarding?.isStepCompleted(step as OnboardingStep) ?? false
+            : index < currentWelcomeIndex
+
+    const isCurrent = (step: string) =>
+        isAuthenticated
+            ? step === currentOnboardingStep
+            : step === currentWelcomeStep
 
     return (
         <div className="flex items-center gap-2">
-            {ONBOARDING_STEP_ORDER.map((step, index) => {
-                const isCompleted = onboarding?.isStepCompleted(step) ?? false
-                const isCurrent = step === currentOnboardingStep
-                const Icon = onboardingStepToIcon[step]
+            {steps.map((step, index) => {
+                const completed = isCompleted(step, index)
+                const current = isCurrent(step)
+                const Icon = iconMap[step as keyof typeof iconMap] as React.ComponentType<React.SVGProps<SVGSVGElement>>
 
                 return (
                     <div key={step} className="flex items-center gap-2">
@@ -22,9 +39,9 @@ export default function OnboardingProgressBar() {
                         )}
 
                         <div className="flex items-center gap-1.5 shrink-0">
-                                <Icon className={`size-5 shrink-0 ${isCompleted ? 'text-primary' : 'text-gray'}`} />
-                            <span className={`text-body-xs whitespace-nowrap ${isCurrent ? 'text-dark ' : isCompleted ? 'text-dark' : 'text-gray'}`}>
-                                {onboardingStepToShortLabel[step]}
+                            <Icon className={`size-5 shrink-0 ${completed ? 'text-primary' : 'text-gray'}`} />
+                            <span className={`text-body-xs whitespace-nowrap ${current ? 'text-dark' : completed ? 'text-dark' : 'text-gray'}`}>
+                                {labelMap[step as keyof typeof labelMap]}
                             </span>
                         </div>
                     </div>

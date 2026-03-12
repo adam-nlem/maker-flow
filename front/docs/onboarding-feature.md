@@ -33,7 +33,7 @@ This follows the same pattern as `settings.section.tsx`.
 - **`useFocusProjectStore`**: Post-auth components read `focusedProjectUuid` from this store.
 - **`useFocusScriptStore`**: `OnboardingGenerateScriptStep` reads `focusedScriptUuid` from this store.
 - **`useAdvanceOnboardingStep`** (`app/hooks/api/onboarding/useAdvanceOnboardingStep.ts`): Hook that encapsulates step completion logic. Post-auth components call `advanceStep()` internally.
-- **`useOnboardingFlow`** (`app/hooks/useOnboardingFlow.ts`): Thin orchestrator hook used only by the route. Provides auth state, current step enum values, and progress dot data.
+- **`useOnboardingFlow`** (`app/hooks/useOnboardingFlow.ts`): Thin orchestrator hook used by the route, `OnboardingStepHeader`, and `OnboardingProgressBar`. Returns `isAuthLoading`, `isAuthenticated`, `currentOnboardingStep`, `currentWelcomeStep`. Uses `.find()` on step arrays to determine current step.
 
 ## Auth Prefill Store
 
@@ -63,7 +63,7 @@ Two redirect layers:
 
 **File:** `app/models/enums/WelcomeStep.ts`
 
-Values: `hero`, `features`, `how_it_works`, `register`, `verify_otp`. Exports `WELCOME_STEP_ORDER` array and metadata maps: `welcomeStepToTitle`, `welcomeStepToDescription` (partial, only for steps using `OnboardingStepHeader`).
+Values: `hero`, `features`, `how_it_works`, `register`, `verify_otp`. Exports `WELCOME_STEP_ORDER` array and metadata maps: `welcomeStepToTitle`, `welcomeStepToDescription` (partial, only for steps using `OnboardingStepHeader`), `welcomeStepToIcon`, `welcomeStepToShortLabel`.
 
 ### `OnboardingStep`
 
