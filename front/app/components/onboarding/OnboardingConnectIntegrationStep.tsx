@@ -7,14 +7,15 @@ import IntegrationSettingCard from "~/components/settings/integration/Integratio
 import { platformOptions } from "~/models/enums/Platform"
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations"
 import Shimmer from "~/components/ui/Shimmer"
+import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
+import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 
-interface Props {
-    projectUuid: string
-    onNext: () => void
-}
+export default function OnboardingConnectIntegrationStep() {
+    const projectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
+    const { advanceStep } = useAdvanceOnboardingStep()
+    const { integrations, isLoading } = useListIntegrations({ projectUuid: projectUuid! })
 
-export default function OnboardingConnectIntegrationStep({ projectUuid, onNext }: Props) {
-    const { integrations, isLoading } = useListIntegrations({ projectUuid })
+    if (!projectUuid) return null
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
@@ -40,10 +41,10 @@ export default function OnboardingConnectIntegrationStep({ projectUuid, onNext }
             </div>
 
             <div className="flex flex-col items-center gap-3">
-                <Button style="primary" onClick={onNext}>
+                <Button style="primary" onClick={advanceStep}>
                     Suivant
                 </Button>
-                <SimpleTextButton onClick={onNext}>
+                <SimpleTextButton onClick={advanceStep}>
                     Passer
                 </SimpleTextButton>
             </div>

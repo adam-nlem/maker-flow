@@ -3,13 +3,14 @@ import { ShieldCheckIcon } from "@heroicons/react/24/outline"
 import VerifyOtpForm from "~/components/auth/VerifyOtpForm"
 import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
 import { OtpType } from "~/models/enums/OtpType"
+import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
 
-interface OnboardingVerifyOtpStepProps {
-    pendingOtpToken: string
-    email: string
-}
+export default function OnboardingVerifyOtpStep() {
+    const pendingOtpToken = useOnboardingStore((s) => s.pendingOtpToken)
+    const email = useOnboardingStore((s) => s.otpEmail)
 
-export default function OnboardingVerifyOtpStep({ pendingOtpToken, email }: OnboardingVerifyOtpStepProps) {
+    if (!pendingOtpToken || !email) return null
+
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-sm">

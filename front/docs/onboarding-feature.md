@@ -4,6 +4,37 @@
 
 The onboarding system is a **unified full-page step flow** at `/onboarding` that covers the entire user journey: welcome presentation → registration → OTP verification → in-app setup (project, integrations, creator profile, AI script generation, subscriptions). The existing standalone login/register pages remain as fallbacks for returning users.
 
+## Architecture
+
+All onboarding step components are **self-contained** (zero props). They read state from Zustand stores and hooks internally, and the route file uses `Record<Enum, ReactNode>` mappings instead of switch statements.
+
+### Component Mapping Pattern
+
+The route (`app/routes/onboarding.tsx`) maps enum values to components using Records:
+
+```tsx
+const preAuthNodes: Record<PreAuthStep, ReactNode> = {
+    [PreAuthStep.Hero]: <WelcomeHeroStep />,
+    [PreAuthStep.Features]: <WelcomeFeatureStep />,
+    // ...
+}
+
+const postAuthNodes: Record<OnboardingStep, ReactNode> = {
+    [OnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
+    // ...
+}
+```
+
+This follows the same pattern as `settings.section.tsx`.
+
+### State Management
+
+- **`useOnboardingStore`** (`app/stores/onboarding/onboardingStore.ts`): Ephemeral Zustand store (no persist) for pre-auth navigation (`preAuthStep`) and OTP credentials (`pendingOtpToken`, `otpEmail`). Pre-auth components read/write this store for navigation.
+- **`useFocusProjectStore`**: Post-auth components read `focusedProjectUuid` from this store.
+- **`useFocusScriptStore`**: `OnboardingGenerateScriptStep` reads `focusedScriptUuid` from this store.
+- **`useAdvanceOnboardingStep`** (`app/hooks/api/onboarding/useAdvanceOnboardingStep.ts`): Hook that encapsulates step completion logic. Post-auth components call `advanceStep()` internally.
+- **`useOnboardingFlow`** (`app/hooks/useOnboardingFlow.ts`): Thin orchestrator hook used only by the route. Provides auth state, current step enum values, and progress dot data.
+
 ## Auth Prefill Store
 
 **File:** `app/stores/auth/authPrefillStore.ts`
@@ -26,48 +57,15 @@ Two redirect layers:
 1. **Unauthenticated**: checks `authPrefillStore.email` → redirects to `/onboarding` (no email) or `/login` (has email)
 2. **Onboarding guard**: fetches onboarding via `useShowOnboarding({ enabled: !!user })` → if not dismissed, redirects to `/onboarding`
 
-## Unified Onboarding Page
+## Enums
 
-**File:** `app/routes/onboarding.tsx`
+### `PreAuthStep`
 
-Uses `useOnboardingFlow()` hook to manage all state and logic. Renders the appropriate phase based on auth state:
-- **Not authenticated** → pre-auth steps (welcome + register + OTP)
-- **Authenticated** → post-auth steps (project + integrations + creator profile + script generation + subscriptions)
+**File:** `app/models/enums/PreAuthStep.ts`
 
-### `useOnboardingFlow` hook
+Values: `hero`, `features`, `how_it_works`, `register`, `verify_otp`. Exports `PRE_AUTH_STEP_ORDER` array.
 
-**File:** `app/hooks/useOnboardingFlow.ts`
-
-Encapsulates all onboarding page logic: auth detection, step state, redirect on dismissed, and transition handlers.
-
-### Pre-Auth Steps
-
-| Step | Component | Description |
-|------|-----------|-------------|
-| 0 | `WelcomeHeroStep` | Hero section with value proposition |
-| 1 | `WelcomeFeatureStep` | Feature cards grid |
-| 2 | `WelcomeHowItWorksStep` | 3-step visual guide |
-| 3 | `OnboardingRegisterStep` | Embedded register form, "J'ai déjà un compte" link to `/login` |
-| 4 | `OnboardingVerifyOtpStep` | 6-digit OTP verification, resend button |
-
-After OTP verification, `useVerifyOtp` sets user in React Query cache → component detects auth → switches to post-auth steps.
-
-### Post-Auth Steps
-
-| Step | Component | Required | Description |
-|------|-----------|----------|-------------|
-| 0 | `OnboardingCreateProjectStep` | Yes | Reuses same form as `CreateProjectModal` |
-| 1 | `OnboardingConnectIntegrationStep` | No (skippable) | Reuses `IntegrationSettingCard` components |
-| 2 | `OnboardingCreatorProfileStep` | No (skippable) | Reuses `CreatorProfileForm` with `variant="onboarding"` (6 fields) |
-| 3 | `OnboardingCreateScriptStep` | No (skippable) | Creates a script with title + platforms before generation |
-| 4 | `OnboardingGenerateScriptStep` | No (skippable) | 3-phase step: brief form → AI generation animation → script preview. Uses script from step 3 if available. |
-| 5 | `OnboardingSubscriptionStep` | No | Reuses `PlanSelector`, "Terminer" dismisses onboarding |
-
-## Model & Enum
-
-**File:** `app/models/Onboarding.ts`
-
-Class with `fromJSON`, computed getters: `isCompleted`, `isDismissed`, `completionCount`, `totalSteps`, `isStepCompleted(step)`.
+### `OnboardingStep`
 
 **File:** `app/models/enums/OnboardingStep.ts`
 
@@ -75,17 +73,47 @@ Values: `create_first_project`, `connect_integration`, `create_creator_profile`,
 
 Step metadata defined as const maps: `onboardingStepToFrenchTranslation`, `onboardingStepToDescription`, `onboardingStepToIcon`, `onboardingStepToActionLabel`, `onboardingStepToNavigateTo`.
 
+## Pre-Auth Steps
+
+| Step | Enum | Component | Description |
+|------|------|-----------|-------------|
+| 0 | `PreAuthStep.Hero` | `WelcomeHeroStep` | Hero section with value proposition |
+| 1 | `PreAuthStep.Features` | `WelcomeFeatureStep` | Feature cards grid |
+| 2 | `PreAuthStep.HowItWorks` | `WelcomeHowItWorksStep` | 3-step visual guide |
+| 3 | `PreAuthStep.Register` | `OnboardingRegisterStep` | Embedded register form, "J'ai déjà un compte" link to `/login` |
+| 4 | `PreAuthStep.VerifyOtp` | `OnboardingVerifyOtpStep` | 6-digit OTP verification, resend button |
+
+All pre-auth components navigate via `useOnboardingStore.setPreAuthStep()`. Register step also calls `setOtpCredentials()` before navigating to OTP.
+
+After OTP verification, `useVerifyOtp` sets user in React Query cache → component detects auth → switches to post-auth steps.
+
+## Post-Auth Steps
+
+| Step | Enum | Component | Required | Description |
+|------|------|-----------|----------|-------------|
+| 0 | `CreateFirstProject` | `OnboardingCreateProjectStep` | Yes | Reuses `CreateProjectForm`, sets `focusedProjectUuid` in store |
+| 1 | `ConnectIntegration` | `OnboardingConnectIntegrationStep` | No (skippable) | Reuses `IntegrationSettingCard` components |
+| 2 | `CreateCreatorProfile` | `OnboardingCreatorProfileStep` | No (skippable) | Reuses `CreatorProfileForm` with `variant="onboarding"` |
+| 3 | `CreateFirstScript` | `OnboardingCreateScriptStep` | No (skippable) | Creates a script with title + platforms, sets `focusedScriptUuid` in store |
+| 4 | `GenerateFirstScript` | `OnboardingGenerateScriptStep` | No (skippable) | 3-phase: brief form → AI generation → preview |
+| 5 | `ShowSubscriptions` | `OnboardingSubscriptionStep` | No | Reuses `PlanSelector`, "Terminer" dismisses onboarding |
+
+All post-auth components read `projectUuid` from `useFocusProjectStore` and advance via `useAdvanceOnboardingStep().advanceStep()`.
+
+## Model
+
+**File:** `app/models/Onboarding.ts`
+
+Class with `fromJSON`, computed getters: `isCompleted`, `isDismissed`, `completionCount`, `totalSteps`, `isStepCompleted(step)`.
+
 ## React Query Hooks
 
 **Directory:** `app/hooks/api/onboarding/`
 - `onboardingQueryKeys.ts` — Query key factory
 - `useShowOnboarding.ts` — `GET /api/onboarding` (supports `enabled` option)
 - `useCompleteOnboardingStep.ts` — `POST /api/onboarding/complete-step`
+- `useAdvanceOnboardingStep.ts` — Encapsulates advance logic (determines current step, calls `completeStep`)
 - `useDismissOnboarding.ts` — `POST /api/onboarding/dismiss`
-
-## Step Completion
-
-All steps are completed by the frontend via `advanceStep` in `useOnboardingFlow`, which calls `POST /api/onboarding/complete-step`. Each step is marked complete when the user clicks "Suivant" or "Passer".
 
 ## Shared Components
 
@@ -101,7 +129,7 @@ Props: `icon` (React component), `title` (string), `description` (string or Reac
 
 **File:** `app/components/ui/PlatformPill.tsx`
 
-Shared pill component for platform selection. Used by `CreatorProfileForm`, `ScriptPlatformsRow`, `CalendarFilterPanel`, and `OnboardingCreatorProfileStep`.
+Shared pill component for platform selection.
 
 Props: `platform` (Platform), `isSelected` (boolean), `onToggle` (() => void).
 
@@ -119,13 +147,13 @@ Props: `projectUuid`, `creatorProfile`, `onSuccess`, `variant?`.
 
 **File:** `app/components/scripts/generation/ScriptBriefForm.tsx`
 
-Self-contained brief form that manages its own state internally. Accepts `initialValues` for pre-filling, `onSubmit` callback with validated `ScriptBriefValues`, optional `submitLabel`/`submitIcon` (renders submit button inside form), and optional `formId` (for external submit trigger). Reused in both `GenerateScriptPanel` (with `formId`) and `OnboardingGenerateScriptStep` (with `submitLabel`).
+Self-contained brief form that manages its own state internally. Accepts `initialValues` for pre-filling, `onSubmit` callback with validated `ScriptBriefValues`, optional `submitLabel`/`submitIcon` (renders submit button inside form), and optional `formId` (for external submit trigger).
 
 ### `CreateProjectForm`
 
 **File:** `app/components/projects/CreateProjectForm.tsx`
 
-Shared project creation form used by both `CreateProjectModal` and `OnboardingCreateProjectStep`. Contains all form state, validation, fields (name, description, type pills), and submit logic.
+Shared project creation form. Contains all form state, validation, fields (name, description, type pills), and submit logic.
 
 Props: `onProjectCreated(projectUuid)`, `formSpacing?`, `buttonStyle?`.
 
@@ -133,7 +161,7 @@ Props: `onProjectCreated(projectUuid)`, `formSpacing?`, `buttonStyle?`.
 
 **File:** `app/components/auth/RegisterForm.tsx`
 
-Shared register form used by both `routes/register.tsx` and `OnboardingRegisterStep`. Contains all form state, validation, fields, and submit logic.
+Shared register form. Contains all form state, validation, fields, and submit logic.
 
 Props: `onRegistered({ pendingOtpToken, email })`, `initialEmail?`, `formSpacing?`.
 
@@ -141,42 +169,18 @@ Props: `onRegistered({ pendingOtpToken, email })`, `initialEmail?`, `formSpacing
 
 **File:** `app/components/auth/VerifyOtpForm.tsx`
 
-Shared OTP verification form used by both `routes/verify-otp.tsx` and `OnboardingVerifyOtpStep`. Contains code input, cooldown timer, verify/resend logic.
+Shared OTP verification form. Contains code input, cooldown timer, verify/resend logic.
 
 Props: `pendingOtpToken`, `purpose`, `onVerified?`, `formSpacing?`.
 
-### Welcome Components (reused in pre-auth steps)
+### Welcome Components
 
 **Directory:** `app/components/welcome/`
 - `WelcomeHeroStep` — Hero section
 - `WelcomeFeatureStep` — Feature cards
 - `WelcomeHowItWorksStep` — How it works guide
 
-## Shared Utilities
-
-### `validateRegisterForm`
-
-**File:** `app/utils/registerValidation.ts`
-
-Shared validation logic used by `RegisterForm`. Returns the first error message or `null` if valid.
-
-## OnboardingCreateScriptStep Detail
-
-**File:** `app/components/onboarding/OnboardingCreateScriptStep.tsx`
-
-Simple form component for creating a script before generation. Uses `OnboardingStepHeader` with `DocumentPlusIcon`. Contains:
-- **Title** (required textarea)
-- **Platforms** (optional, row of `PlatformPill` components)
-- Submit button: "Créer le script" → calls `useCreateScript`, then `onScriptCreated(scriptUuid)`, then `onNext()`
-- Skip button: "Passer" → calls `onNext()` without creating (generation step will create its own script as fallback)
-
-Props: `projectUuid`, `onScriptCreated(scriptUuid)`, `onNext`.
-
 ## OnboardingGenerateScriptStep Detail
-
-**File:** `app/components/onboarding/OnboardingGenerateScriptStep.tsx`
-
-Thin orchestrator component that delegates logic to `useGenerateScriptFlow` hook and rendering to phase sub-components. Accepts an optional `scriptUuid` prop from the previous step (persisted via `useFocusScriptStore`).
 
 ### `useGenerateScriptFlow` hook
 
@@ -200,9 +204,16 @@ Returns: `{ phase, script, isPending, isFailed, messageIndex, handleBriefSubmit 
 
 ## Key Files
 
-- `app/stores/auth/authPrefillStore.ts`
 - `app/routes/onboarding.tsx`
 - `app/hooks/useOnboardingFlow.ts`
+- `app/stores/onboarding/onboardingStore.ts`
+- `app/stores/auth/authPrefillStore.ts`
+- `app/models/enums/PreAuthStep.ts`
+- `app/models/enums/OnboardingStep.ts`
+- `app/hooks/api/onboarding/useAdvanceOnboardingStep.ts`
+- `app/hooks/api/onboarding/useCompleteOnboardingStep.ts`
+- `app/hooks/api/onboarding/useShowOnboarding.ts`
+- `app/hooks/api/onboarding/useDismissOnboarding.ts`
 - `app/components/onboarding/OnboardingStepHeader.tsx`
 - `app/components/onboarding/OnboardingRegisterStep.tsx`
 - `app/components/onboarding/OnboardingVerifyOtpStep.tsx`
@@ -223,6 +234,4 @@ Returns: `{ phase, script, isPending, isFailed, messageIndex, handleBriefSubmit 
 - `app/components/auth/VerifyOtpForm.tsx`
 - `app/utils/registerValidation.ts`
 - `app/models/Onboarding.ts`
-- `app/models/enums/OnboardingStep.ts`
-- `app/hooks/api/onboarding/`
 - `app/routes/protected.tsx`

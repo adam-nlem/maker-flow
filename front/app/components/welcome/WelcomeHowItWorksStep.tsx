@@ -1,11 +1,8 @@
 import { Fragment } from "react"
 import { FolderPlusIcon, LinkIcon, ChartBarIcon } from "@heroicons/react/24/outline"
 import { Button } from "~/components/ui/Button"
-
-interface WelcomeHowItWorksStepProps {
-    onNext: () => void
-    onBack: () => void
-}
+import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
+import { PreAuthStep } from "~/models/enums/PreAuthStep"
 
 const steps = [
     {
@@ -28,7 +25,8 @@ const steps = [
     },
 ]
 
-export default function WelcomeHowItWorksStep({ onNext, onBack }: WelcomeHowItWorksStepProps) {
+export default function WelcomeHowItWorksStep() {
+    const setPreAuthStep = useOnboardingStore((s) => s.setPreAuthStep)
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <h2 className="text-heading-2xl text-dark  mb-2 text-center">
@@ -56,10 +54,10 @@ export default function WelcomeHowItWorksStep({ onNext, onBack }: WelcomeHowItWo
             </div>
 
             <div className="flex gap-3">
-                <Button style="outline" width="w-auto" onClick={onBack}>
+                <Button style="outline" width="w-auto" onClick={() => setPreAuthStep(PreAuthStep.Features)}>
                     Retour
                 </Button>
-                <Button style="primary" width="w-auto" onClick={onNext}>
+                <Button style="primary" width="w-auto" onClick={() => setPreAuthStep(PreAuthStep.Register)}>
                     Suivant
                 </Button>
             </div>

@@ -8,21 +8,24 @@ import ScriptEditorPanel from "~/components/scripts/ScriptEditorPanel"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { useGenerateScriptFlow } from "~/hooks/useGenerateScriptFlow"
 import { GenerateScriptPhase } from "~/models/enums/GenerateScriptPhase"
+import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
+import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore"
+import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 
-interface OnboardingGenerateScriptStepProps {
-    projectUuid: string
-    scriptUuid: string | null
-    onNext: () => void
-}
+export default function OnboardingGenerateScriptStep() {
+    const projectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
+    const initialScriptUuid = useFocusScriptStore((s) => s.focusedScriptUuid)
+    const { advanceStep } = useAdvanceOnboardingStep()
 
-export default function OnboardingGenerateScriptStep({ projectUuid, scriptUuid: initialScriptUuid, onNext }: OnboardingGenerateScriptStepProps) {
     const { phase, script, isPending, isFailed, messageIndex, handleBriefSubmit } = useGenerateScriptFlow({
-        projectUuid,
+        projectUuid: projectUuid!,
         initialScriptUuid,
     })
 
+    if (!projectUuid) return null
+
     if (phase === GenerateScriptPhase.Preview) {
-        return <GenerateScriptPreviewPhase script={script} projectUuid={projectUuid} onNext={onNext} />
+        return <GenerateScriptPreviewPhase script={script} projectUuid={projectUuid} onNext={advanceStep} />
     }
 
     return (
@@ -47,7 +50,7 @@ export default function OnboardingGenerateScriptStep({ projectUuid, scriptUuid: 
 
                     <div className="flex-1 flex flex-col overflow-y-auto max-h-150 scrollbar-none">
                         {phase === GenerateScriptPhase.Generating ? (
-                            <GenerateScriptGeneratingPhase isFailed={isFailed} messageIndex={messageIndex} onNext={onNext} />
+                            <GenerateScriptGeneratingPhase isFailed={isFailed} messageIndex={messageIndex} onNext={advanceStep} />
                         ) : (
                             <>
                                 <ScriptBriefForm
@@ -59,7 +62,7 @@ export default function OnboardingGenerateScriptStep({ projectUuid, scriptUuid: 
                                 />
 
                                 <div className="mt-6 flex justify-center">
-                                    <SimpleTextButton onClick={onNext}>
+                                    <SimpleTextButton onClick={advanceStep}>
                                         Passer
                                     </SimpleTextButton>
                                 </div>

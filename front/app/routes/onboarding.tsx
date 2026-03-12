@@ -1,3 +1,5 @@
+import type { ReactNode } from "react"
+
 import WelcomeHeroStep from "~/components/welcome/WelcomeHeroStep"
 import WelcomeFeatureStep from "~/components/welcome/WelcomeFeatureStep"
 import WelcomeHowItWorksStep from "~/components/welcome/WelcomeHowItWorksStep"
@@ -10,11 +12,37 @@ import OnboardingCreateScriptStep from "~/components/onboarding/OnboardingCreate
 import OnboardingGenerateScriptStep from "~/components/onboarding/OnboardingGenerateScriptStep"
 import OnboardingSubscriptionStep from "~/components/onboarding/OnboardingSubscriptionStep"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
+import { OnboardingStep } from "~/models/enums/OnboardingStep"
+import { PreAuthStep } from "~/models/enums/PreAuthStep"
+
+const preAuthNodes: Record<PreAuthStep, ReactNode> = {
+    [PreAuthStep.Hero]: <WelcomeHeroStep />,
+    [PreAuthStep.Features]: <WelcomeFeatureStep />,
+    [PreAuthStep.HowItWorks]: <WelcomeHowItWorksStep />,
+    [PreAuthStep.Register]: <OnboardingRegisterStep />,
+    [PreAuthStep.VerifyOtp]: <OnboardingVerifyOtpStep />,
+}
+
+const postAuthNodes: Record<OnboardingStep, ReactNode> = {
+    [OnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
+    [OnboardingStep.ConnectIntegration]: <OnboardingConnectIntegrationStep />,
+    [OnboardingStep.CreateCreatorProfile]: <OnboardingCreatorProfileStep />,
+    [OnboardingStep.CreateFirstScript]: <OnboardingCreateScriptStep />,
+    [OnboardingStep.GenerateFirstScript]: <OnboardingGenerateScriptStep />,
+    [OnboardingStep.ShowSubscriptions]: <OnboardingSubscriptionStep />,
+}
 
 export default function OnboardingPage() {
-    const flow = useOnboardingFlow()
+    const {
+        isAuthLoading,
+        isAuthenticated,
+        currentStep,
+        totalSteps,
+        currentPostAuthStep,
+        currentPreAuthStep,
+    } = useOnboardingFlow()
 
-    if (flow.isAuthLoading) {
+    if (isAuthLoading) {
         return (
             <div className="flex min-h-screen items-center justify-center">
                 <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -22,63 +50,20 @@ export default function OnboardingPage() {
         )
     }
 
-    const renderPreAuthStep = () => {
-        switch (flow.preAuthStep) {
-            case 0:
-                return <WelcomeHeroStep onNext={() => flow.setPreAuthStep(1)} />
-            case 1:
-                return <WelcomeFeatureStep onNext={() => flow.setPreAuthStep(2)} onBack={() => flow.setPreAuthStep(0)} />
-            case 2:
-                return <WelcomeHowItWorksStep onNext={() => flow.setPreAuthStep(3)} onBack={() => flow.setPreAuthStep(1)} />
-            case 3:
-                return <OnboardingRegisterStep onRegistered={flow.handleRegistered} onBack={() => flow.setPreAuthStep(2)} />
-            case 4:
-                return flow.pendingOtpToken && flow.otpEmail
-                    ? <OnboardingVerifyOtpStep pendingOtpToken={flow.pendingOtpToken} email={flow.otpEmail} />
-                    : null
-            default:
-                return null
-        }
-    }
-
-    const renderPostAuthStep = () => { 
-        switch (flow.postAuthStep) {
-            case 0:
-                return <OnboardingCreateProjectStep onProjectCreated={flow.handleProjectCreated} onNext={flow.advanceStep} />
-            case 1:
-                return flow.focusedProjectUuid
-                    ? <OnboardingConnectIntegrationStep projectUuid={flow.focusedProjectUuid} onNext={flow.advanceStep} />
-                    : null
-            case 2:
-                return flow.focusedProjectUuid
-                    ? <OnboardingCreatorProfileStep projectUuid={flow.focusedProjectUuid} onNext={flow.advanceStep} />
-                    : null
-            case 3:
-                return flow.focusedProjectUuid
-                    ? <OnboardingCreateScriptStep projectUuid={flow.focusedProjectUuid} onScriptCreated={flow.handleScriptCreated} onNext={flow.advanceStep} />
-                    : null
-            case 4:
-                return flow.focusedProjectUuid
-                    ? <OnboardingGenerateScriptStep projectUuid={flow.focusedProjectUuid} scriptUuid={flow.onboardingScriptUuid} onNext={flow.advanceStep} />
-                    : null
-            case 5:
-                return <OnboardingSubscriptionStep />
-            default:
-                return null
-        }
-    }
+    const node = isAuthenticated
+        ? postAuthNodes[currentPostAuthStep]
+        : preAuthNodes[currentPreAuthStep]
 
     return (
         <div className="bg-clear bg-dot-pattern min-h-screen relative">
-            {flow.isAuthenticated ? renderPostAuthStep() : renderPreAuthStep()}
+            {node}
 
             <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-                {Array.from({ length: flow.totalSteps }).map((_, i) => (
+                {Array.from({ length: totalSteps }).map((_, i) => (
                     <div
                         key={i}
-                        className={`h-2 rounded-full transition-all ${
-                            i === flow.currentStep ? 'bg-primary w-6' : 'bg-light-gray w-2'
-                        }`}
+                        className={`h-2 rounded-full transition-all ${i === currentStep ? 'bg-primary w-6' : 'bg-light-gray w-2'
+                            }`}
                     />
                 ))}
             </div>

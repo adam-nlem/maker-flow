@@ -8,19 +8,21 @@ import { Button } from "~/components/ui/Button"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript"
 import { Platform, platformOptions } from "~/models/enums/Platform"
+import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
+import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore"
+import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 
+export default function OnboardingCreateScriptStep() {
+    const projectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
+    const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid)
+    const { advanceStep } = useAdvanceOnboardingStep()
 
-interface OnboardingCreateScriptStepProps {
-    projectUuid: string
-    onScriptCreated: (scriptUuid: string) => void
-    onNext: () => void
-}
-
-export default function OnboardingCreateScriptStep({ projectUuid, onScriptCreated, onNext }: OnboardingCreateScriptStepProps) {
     const [title, setTitle] = useState("")
     const [selectedPlatforms, setSelectedPlatforms] = useState<Platform[]>([])
 
     const { createScript, isPending } = useCreateScript()
+
+    if (!projectUuid) return null
 
     const togglePlatform = (platform: Platform) => {
         setSelectedPlatforms((prev) =>
@@ -36,8 +38,8 @@ export default function OnboardingCreateScriptStep({ projectUuid, onScriptCreate
             title,
             platforms: selectedPlatforms.length > 0 ? selectedPlatforms : undefined,
         })
-        onScriptCreated(script.uuid)
-        onNext()
+        setFocusedScriptUuid(script.uuid)
+        await advanceStep()
     }
 
     return (
@@ -85,7 +87,7 @@ export default function OnboardingCreateScriptStep({ projectUuid, onScriptCreate
                 </div>
 
                 <div className="mt-6 flex justify-center">
-                    <SimpleTextButton onClick={onNext}>
+                    <SimpleTextButton onClick={advanceStep}>
                         Passer
                     </SimpleTextButton>
                 </div>
