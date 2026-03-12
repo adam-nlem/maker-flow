@@ -105,7 +105,7 @@ export default function GenerateScriptPanel({ scriptUuid, projectUuid }: Generat
                     }}
                 >
                     <div className="flex flex-row justify-center items-center gap-2">
-                        <SparklesIcon className="size-4 text-clear" strokeWidth={2} />
+                        <SparklesIcon className="size-4" strokeWidth={2} />
                         <p className="text-sm">Générer le script</p>
                     </div>
                 </Button>

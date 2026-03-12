@@ -56,7 +56,7 @@ export default function CreateTodoListModal({ projectUuid, showModal, onClose, o
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
                             <p className="text-sm">Créer la Todo List</p>
-                            <ChevronRightIcon className="size-4 text-clear" strokeWidth={2} />
+                            <ChevronRightIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>
                 </form>

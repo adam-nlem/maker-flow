@@ -107,7 +107,7 @@ export default function SideBar() {
                   <Button type="button" disabled>
                     <div className="flex flex-row justify-center items-center gap-3 shrink-0">
                       {isExpanded && <p className="text-sm">Créer un nouveau Projet</p>}
-                      <PlusIcon className="size-4 text-clear" strokeWidth={2} />
+                      <PlusIcon className="size-4" strokeWidth={2} />
                     </div>
                   </Button>
                   {isExpanded && <p className="text-body-xs text-gray text-center">Limite de projets atteinte</p>}
@@ -121,7 +121,7 @@ export default function SideBar() {
                 >
                   <div className="flex flex-row justify-center items-center gap-3 shrink-0">
                     {isExpanded && <p className="text-sm">Créer un nouveau Projet</p>}
-                    <PlusIcon className="size-4 text-clear" strokeWidth={2} />
+                    <PlusIcon className="size-4" strokeWidth={2} />
                   </div>
                 </Button>
               )
@@ -192,7 +192,7 @@ export default function SideBar() {
               onClick={() => navigate('/settings/subscription')}
             >
               <div className="flex flex-row justify-center items-center gap-3">
-                <SparklesIcon className="size-4 text-clear" strokeWidth={2} />
+                <SparklesIcon className="size-4" strokeWidth={2} />
                 {isExpanded ? <p className="text-sm">Passer Premium ?</p> : null}
               </div>
             </Button>

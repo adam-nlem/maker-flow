@@ -177,7 +177,7 @@ export default function ScriptBriefForm({
                     disabled={isPending || !canSubmit}
                 >
                     <div className="flex flex-row justify-center items-center gap-2">
-                        {SubmitIcon && <SubmitIcon className="size-4 text-clear" />}
+                        {SubmitIcon && <SubmitIcon className="size-4" />}
                         <p className="text-sm">{submitLabel}</p>
                     </div>
                 </Button>

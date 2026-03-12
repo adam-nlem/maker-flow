@@ -22,7 +22,7 @@ export default function OnboardingStepHeader({ disableNextButton }: OnboardingSt
                     <Button style="primary" onClick={advanceStep} disabled={disableNextButton} width="w-fit">
                         <div className="flex flex-row justify-center items-center gap-3">
                             <p className="text-sm">Continuer</p>
-                            <ArrowRightIcon className="size-4 text-clear" strokeWidth={2} />
+                            <ArrowRightIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>
                 </div>

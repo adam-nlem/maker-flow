@@ -119,7 +119,7 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
                             <p className="text-sm">Créer le template</p>
-                            <ChevronRightIcon className="size-4 text-clear" strokeWidth={2} />
+                            <ChevronRightIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>
                 </form>

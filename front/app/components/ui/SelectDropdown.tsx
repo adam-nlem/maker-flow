@@ -64,7 +64,7 @@ export default function SelectDropdown<T>({
               >
                 <div className="flex flex-row justify-center items-center gap-3">
                   <p className="text-sm whitespace-nowrap">{createButtonLabel}</p>
-                  <PlusIcon className="size-4 text-clear" strokeWidth={2} />
+                  <PlusIcon className="size-4" strokeWidth={2} />
                 </div>
               </Button>
             )}

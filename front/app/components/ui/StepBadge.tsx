@@ -11,7 +11,7 @@ export function StepBadge({ label, completed }: StepBadgeProps) {
         <div className="flex flex-row items-center gap-1">
             {completed ? (
                 <div className="rounded-full bg-primary h-min p-0.5">
-                    <CheckIcon className="size-4 text-clear" strokeWidth={2} />
+                    <CheckIcon className="size-4" strokeWidth={2} />
                 </div>
             ) : (
                 <CircularProgress size={20} />

@@ -92,7 +92,7 @@ export default function CreateProjectForm({ onProjectCreated, formSpacing = "spa
             >
                 <div className="flex flex-row justify-center items-center gap-3">
                     <p className="text-sm">Créer le projet</p>
-                    <ChevronRightIcon className="size-4 text-clear" strokeWidth={2} />
+                    <ChevronRightIcon className="size-4" strokeWidth={2} />
                 </div>
             </Button>
 

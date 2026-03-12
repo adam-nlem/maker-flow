@@ -62,7 +62,7 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose }: Up
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
                             <p className="text-sm">Modifier la Todo List</p>
-                            <ChevronRightIcon className="size-4 text-clear" strokeWidth={2} />
+                            <ChevronRightIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>
                 </form>
@@ -76,7 +76,7 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose }: Up
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
                             <p className="text-sm">Supprimer la Todo List</p>
-                            <TrashIcon className="size-4 text-clear" strokeWidth={2} />
+                            <TrashIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>
                 </div>
