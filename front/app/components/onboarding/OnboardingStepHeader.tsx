@@ -13,23 +13,7 @@ interface OnboardingStepHeaderProps {
 
 export default function OnboardingStepHeader({ disableNextButton }: OnboardingStepHeaderProps) {
     const { advanceStep } = useAdvanceOnboardingStep()
-    const { isAuthenticated, currentOnboardingStep, currentWelcomeStep } = useOnboardingFlow()
-    const email = useOnboardingStore((s) => s.otpEmail)
-
-    const title = isAuthenticated
-        ? onboardingStepToFrenchTranslation[currentOnboardingStep]
-        : welcomeStepToTitle[currentWelcomeStep] ?? ""
-
-    const description = (() => {
-        if (isAuthenticated) {
-            return onboardingStepToDescription[currentOnboardingStep]
-        }
-        if (currentWelcomeStep === WelcomeStep.VerifyOtp) {
-            return <>Un code à 6 chiffres a été envoyé à{" "}<span className="font-semibold text-dark">{email}</span></>
-        }
-        return welcomeStepToDescription[currentWelcomeStep] ?? ""
-    })()
-
+    const { currentOnboardingStep } = useOnboardingFlow()
     return (
         <>
             <div className="fixed top-0 left-0 right-0 flex items-center justify-center p-5">
@@ -47,10 +31,10 @@ export default function OnboardingStepHeader({ disableNextButton }: OnboardingSt
 
             <div className="mb-8 flex flex-col gap-2 items-center text-center">
                 <h2 className="text-heading-3xl text-dark">
-                    {title}
+                    {onboardingStepToFrenchTranslation[currentOnboardingStep]}
                 </h2>
                 <p className="text-body-sm text-gray">
-                    {description}
+                    {onboardingStepToDescription[currentOnboardingStep]}
                 </p>
             </div>
         </>
