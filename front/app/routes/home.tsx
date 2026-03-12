@@ -30,6 +30,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
   const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
   const { isSubscribed } = useIsSubscribed()
+  const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid ?? "" })
 
   return (
     <div className="w-full">
@@ -75,7 +76,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                 <div className="w-1/3 flex flex-col gap-5 min-h-0">
                   {focusedIntegrationUuid === null && !isSubscribed ? (
                     <>
-                      <IntegrationPillRow projectUuid={focusedProject.uuid} />
+                      <IntegrationPillRow integrations={integrations} />
                       <PremiumOverlay isRestricted>
                         <div className="h-96" />
                       </PremiumOverlay>
