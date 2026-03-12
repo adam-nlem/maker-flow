@@ -19,7 +19,7 @@ const welcomeNodes: Record<WelcomeStep, ReactNode> = {
     // ...
 }
 
-const postAuthNodes: Record<OnboardingStep, ReactNode> = {
+const onboardingNodes: Record<OnboardingStep, ReactNode> = {
     [OnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
     // ...
 }

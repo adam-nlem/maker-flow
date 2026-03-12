@@ -12,6 +12,15 @@ export enum OnboardingStep {
 
 export const onboardingStepOptions = Object.values(OnboardingStep);
 
+export const ONBOARDING_STEP_ORDER = [
+    OnboardingStep.CreateFirstProject,
+    OnboardingStep.ConnectIntegration,
+    OnboardingStep.CreateCreatorProfile,
+    OnboardingStep.CreateFirstScript,
+    OnboardingStep.GenerateFirstScript,
+    OnboardingStep.ShowSubscriptions,
+]
+
 export const onboardingStepToFrenchTranslation: Record<OnboardingStep, string> = {
     [OnboardingStep.CreateFirstProject]: "Créez votre premier projet",
     [OnboardingStep.ConnectIntegration]: "Connectez un réseau social",

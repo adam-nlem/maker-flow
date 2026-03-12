@@ -23,7 +23,7 @@ const welcomeNodes: Record<WelcomeStep, ReactNode> = {
     [WelcomeStep.VerifyOtp]: <OnboardingVerifyOtpStep />,
 }
 
-const postAuthNodes: Record<OnboardingStep, ReactNode> = {
+const onboardingNodes: Record<OnboardingStep, ReactNode> = {
     [OnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
     [OnboardingStep.ConnectIntegration]: <OnboardingConnectIntegrationStep />,
     [OnboardingStep.CreateCreatorProfile]: <OnboardingCreatorProfileStep />,
@@ -38,7 +38,7 @@ export default function OnboardingPage() {
         isAuthenticated,
         currentStep,
         totalSteps,
-        currentPostAuthStep,
+        currentOnboardingStep,
         currentWelcomeStep,
     } = useOnboardingFlow()
 
@@ -51,7 +51,7 @@ export default function OnboardingPage() {
     }
 
     const node = isAuthenticated
-        ? postAuthNodes[currentPostAuthStep]
+        ? onboardingNodes[currentOnboardingStep]
         : welcomeNodes[currentWelcomeStep]
 
     return (
