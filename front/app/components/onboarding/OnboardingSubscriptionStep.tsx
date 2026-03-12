@@ -19,10 +19,7 @@ export default function OnboardingSubscriptionStep() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-3xl">
-                <OnboardingStepHeader
-                    title="Découvrez nos offres"
-                    description="Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités."
-                />
+                <OnboardingStepHeader />
 
                 <div className="mb-8">
                     <PlanSelector />

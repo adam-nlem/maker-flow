@@ -23,20 +23,20 @@ export const ONBOARDING_STEP_ORDER = [
 
 export const onboardingStepToFrenchTranslation: Record<OnboardingStep, string> = {
     [OnboardingStep.CreateFirstProject]: "Créez votre premier projet",
-    [OnboardingStep.ConnectIntegration]: "Connectez un réseau social",
-    [OnboardingStep.CreateCreatorProfile]: "Configurez votre profil créateur",
+    [OnboardingStep.ConnectIntegration]: "Connectez vos réseaux sociaux",
+    [OnboardingStep.CreateCreatorProfile]: "Personnalisez votre compte créateur",
     [OnboardingStep.CreateFirstScript]: "Créez votre premier script",
     [OnboardingStep.GenerateFirstScript]: "Générez votre premier script",
-    [OnboardingStep.ShowSubscriptions]: "Découvrez les abonnements",
+    [OnboardingStep.ShowSubscriptions]: "Découvrez nos offres",
 }
 
 export const onboardingStepToDescription: Record<OnboardingStep, string> = {
-    [OnboardingStep.CreateFirstProject]: "Les projets regroupent vos scripts, analytics et intégrations.",
-    [OnboardingStep.ConnectIntegration]: "Liez votre compte Instagram ou YouTube pour suivre vos performances.",
-    [OnboardingStep.CreateCreatorProfile]: "Personnalisez l'IA pour qu'elle s'adapte à votre style et votre audience.",
-    [OnboardingStep.CreateFirstScript]: "Définissez le sujet et les plateformes de votre premier script vidéo.",
-    [OnboardingStep.GenerateFirstScript]: "Créez un script vidéo généré par l'IA en quelques clics.",
-    [OnboardingStep.ShowSubscriptions]: "Explorez les fonctionnalités premium disponibles.",
+    [OnboardingStep.CreateFirstProject]: "Les projets vous permettent de regrouper vos contenus et vos réseaux sociaux.",
+    [OnboardingStep.ConnectIntegration]: "Connectez vos comptes pour analyser vos performances et centraliser vos contenus.",
+    [OnboardingStep.CreateCreatorProfile]: "Ces informations permettent à l'IA de s'adapter à votre style.",
+    [OnboardingStep.CreateFirstScript]: "Voici votre premier script vidéo. Vous pourrez le modifier plus tard.",
+    [OnboardingStep.GenerateFirstScript]: "L'IA va créer un script vidéo complet basé sur vos indications.",
+    [OnboardingStep.ShowSubscriptions]: "Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités.",
 }
 
 export const onboardingStepToIcon: Record<OnboardingStep, ComponentType<SVGProps<SVGSVGElement>>> = {

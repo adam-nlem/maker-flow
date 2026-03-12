@@ -17,10 +17,7 @@ export default function OnboardingConnectIntegrationStep() {
 
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
-            <OnboardingStepHeader
-                title="Connectez vos réseaux sociaux"
-                description="Connectez vos comptes pour analyser vos performances et centraliser vos contenus."
-            />
+            <OnboardingStepHeader />
 
             <div className="flex flex-row justify-center gap-3 mb-8 w-full">
                 {isLoading ? (

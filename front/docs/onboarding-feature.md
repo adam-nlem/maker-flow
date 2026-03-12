@@ -63,7 +63,7 @@ Two redirect layers:
 
 **File:** `app/models/enums/WelcomeStep.ts`
 
-Values: `hero`, `features`, `how_it_works`, `register`, `verify_otp`. Exports `WELCOME_STEP_ORDER` array.
+Values: `hero`, `features`, `how_it_works`, `register`, `verify_otp`. Exports `WELCOME_STEP_ORDER` array and metadata maps: `welcomeStepToTitle`, `welcomeStepToDescription` (partial, only for steps using `OnboardingStepHeader`).
 
 ### `OnboardingStep`
 
@@ -121,9 +121,9 @@ Class with `fromJSON`, computed getters: `isCompleted`, `isDismissed`, `completi
 
 **File:** `app/components/onboarding/OnboardingStepHeader.tsx`
 
-Reusable header used by all onboarding step components. Renders the icon circle, title, and description.
+Self-contained header used by all onboarding step components. Reads the current step from `useOnboardingFlow` and looks up title/description from enum metadata (`onboardingStepToFrenchTranslation`, `onboardingStepToDescription`, `welcomeStepToTitle`, `welcomeStepToDescription`). Handles the VerifyOtp dynamic description (includes email from `useOnboardingStore`) internally. Also renders the progress bar and "Continuer" button.
 
-Props: `icon` (React component), `title` (string), `description` (string or ReactNode).
+Props: `disableNextButton?` (optional, used by `OnboardingCreateScriptStep`).
 
 ### `PlatformPill`
 

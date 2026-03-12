@@ -13,3 +13,12 @@ export const WELCOME_STEP_ORDER = [
     WelcomeStep.Register,
     WelcomeStep.VerifyOtp,
 ]
+
+export const welcomeStepToTitle: Partial<Record<WelcomeStep, string>> = {
+    [WelcomeStep.Register]: "Créez votre compte",
+    [WelcomeStep.VerifyOtp]: "Vérification de l'email",
+}
+
+export const welcomeStepToDescription: Partial<Record<WelcomeStep, string>> = {
+    [WelcomeStep.Register]: "Commencez gratuitement et gérez vos contenus dès maintenant.",
+}

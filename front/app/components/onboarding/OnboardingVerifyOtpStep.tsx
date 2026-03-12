@@ -12,10 +12,7 @@ export default function OnboardingVerifyOtpStep() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-sm">
-                <OnboardingStepHeader
-                    title="Vérification de l'email"
-                    description={<>Un code à 6 chiffres a été envoyé à{" "}<span className="font-semibold text-dark ">{email}</span></>}
-                />
+                <OnboardingStepHeader />
 
                 <VerifyOtpForm pendingOtpToken={pendingOtpToken} purpose={OtpType.EmailVerification} />
             </div>

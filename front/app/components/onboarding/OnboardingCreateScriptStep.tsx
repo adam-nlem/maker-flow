@@ -42,11 +42,7 @@ export default function OnboardingCreateScriptStep() {
     return (
         <div className="h-screen flex flex-col items-center px-6 pt-24 pb-6">
             <div className="w-full max-w-xl shrink-0">
-                <OnboardingStepHeader
-                    title="Créez votre premier script"
-                    description="Voici votre premier script vidéo. Vous pourrez le modifier plus tard."
-                    disableNextButton={!script}
-                />
+                <OnboardingStepHeader disableNextButton={!script} />
             </div>
 
             {script ? (

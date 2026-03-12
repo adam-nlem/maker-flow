@@ -13,10 +13,7 @@ export default function OnboardingCreatorProfileStep() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-lg">
-                <OnboardingStepHeader
-                    title="Personnalisez votre compte créateur"
-                    description="Ces informations permettent à l'IA de s'adapter à votre style."
-                />
+                <OnboardingStepHeader />
 
                 <CreatorProfileForm
                     projectUuid={projectUuid}

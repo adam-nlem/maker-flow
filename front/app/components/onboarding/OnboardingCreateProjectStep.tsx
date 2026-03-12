@@ -15,10 +15,7 @@ export default function OnboardingCreateProjectStep() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-md">
-                <OnboardingStepHeader
-                    title="Créez votre premier projet"
-                    description="Les projets vous permettent de regrouper vos contenus et vos réseaux sociaux."
-                />
+                <OnboardingStepHeader />
 
                 <CreateProjectForm onProjectCreated={handleProjectCreated} buttonStyle="primary" />
             </div>

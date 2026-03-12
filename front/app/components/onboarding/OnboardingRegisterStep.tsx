@@ -13,10 +13,7 @@ export default function OnboardingRegisterStep() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-sm">
-                <OnboardingStepHeader
-                    title="Créez votre compte"
-                    description="Commencez gratuitement et gérez vos contenus dès maintenant."
-                />
+                <OnboardingStepHeader />
 
                 <RegisterForm
                     onRegistered={({ pendingOtpToken, email }) => {

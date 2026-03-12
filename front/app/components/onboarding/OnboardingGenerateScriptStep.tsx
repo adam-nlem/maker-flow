@@ -30,10 +30,7 @@ export default function OnboardingGenerateScriptStep() {
     return (
         <div className="min-h-screen flex items-center justify-center px-8">
             <div className="flex flex-col">
-                <OnboardingStepHeader
-                    title="Générez votre premier script"
-                    description="L'IA va créer un script vidéo complet basé sur vos indications."
-                />
+                <OnboardingStepHeader />
 
                 <div className="flex gap-10 w-full max-w-5xl">
                     <div className="flex-1 rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden max-h-[75vh]">
