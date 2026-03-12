@@ -13,14 +13,14 @@ import OnboardingGenerateScriptStep from "~/components/onboarding/OnboardingGene
 import OnboardingSubscriptionStep from "~/components/onboarding/OnboardingSubscriptionStep"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 import { OnboardingStep } from "~/models/enums/OnboardingStep"
-import { PreAuthStep } from "~/models/enums/PreAuthStep"
+import { WelcomeStep } from "~/models/enums/WelcomeStep"
 
-const preAuthNodes: Record<PreAuthStep, ReactNode> = {
-    [PreAuthStep.Hero]: <WelcomeHeroStep />,
-    [PreAuthStep.Features]: <WelcomeFeatureStep />,
-    [PreAuthStep.HowItWorks]: <WelcomeHowItWorksStep />,
-    [PreAuthStep.Register]: <OnboardingRegisterStep />,
-    [PreAuthStep.VerifyOtp]: <OnboardingVerifyOtpStep />,
+const welcomeNodes: Record<WelcomeStep, ReactNode> = {
+    [WelcomeStep.Hero]: <WelcomeHeroStep />,
+    [WelcomeStep.Features]: <WelcomeFeatureStep />,
+    [WelcomeStep.HowItWorks]: <WelcomeHowItWorksStep />,
+    [WelcomeStep.Register]: <OnboardingRegisterStep />,
+    [WelcomeStep.VerifyOtp]: <OnboardingVerifyOtpStep />,
 }
 
 const postAuthNodes: Record<OnboardingStep, ReactNode> = {
@@ -39,7 +39,7 @@ export default function OnboardingPage() {
         currentStep,
         totalSteps,
         currentPostAuthStep,
-        currentPreAuthStep,
+        currentWelcomeStep,
     } = useOnboardingFlow()
 
     if (isAuthLoading) {
@@ -52,7 +52,7 @@ export default function OnboardingPage() {
 
     const node = isAuthenticated
         ? postAuthNodes[currentPostAuthStep]
-        : preAuthNodes[currentPreAuthStep]
+        : welcomeNodes[currentWelcomeStep]
 
     return (
         <div className="bg-clear bg-dot-pattern min-h-screen relative">

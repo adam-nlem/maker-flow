@@ -5,7 +5,7 @@ import { useCurrentUser } from "~/hooks/api/users/useCurrentUser"
 import { useShowOnboarding } from "~/hooks/api/onboarding/useShowOnboarding"
 import { OnboardingStep } from "~/models/enums/OnboardingStep"
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
-import { PRE_AUTH_STEP_ORDER } from "~/models/enums/PreAuthStep"
+import { WELCOME_STEP_ORDER } from "~/models/enums/WelcomeStep"
 
 const POST_AUTH_STEP_ORDER = [
     OnboardingStep.CreateFirstProject,
@@ -21,7 +21,7 @@ export function useOnboardingFlow() {
     const { user, isLoading: isAuthLoading } = useCurrentUser()
     const { onboarding, isLoading: isOnboardingLoading } = useShowOnboarding({ enabled: !!user })
 
-    const preAuthStep = useOnboardingStore((s) => s.preAuthStep)
+    const welcomeStep = useOnboardingStore((s) => s.welcomeStep)
 
     useEffect(() => {
         if (!isAuthLoading && user && !isOnboardingLoading && onboarding?.isDismissed) {
@@ -37,13 +37,13 @@ export function useOnboardingFlow() {
         return idx === -1 ? POST_AUTH_STEP_ORDER.length - 1 : idx
     })()
 
-    const preAuthStepIndex = PRE_AUTH_STEP_ORDER.indexOf(preAuthStep)
+    const welcomeStepIndex = WELCOME_STEP_ORDER.indexOf(welcomeStep)
 
-    const totalSteps = isAuthenticated ? POST_AUTH_STEP_ORDER.length : PRE_AUTH_STEP_ORDER.length
-    const currentStep = isAuthenticated ? postAuthStepIndex : preAuthStepIndex
+    const totalSteps = isAuthenticated ? POST_AUTH_STEP_ORDER.length : WELCOME_STEP_ORDER.length
+    const currentStep = isAuthenticated ? postAuthStepIndex : welcomeStepIndex
 
     const currentPostAuthStep = POST_AUTH_STEP_ORDER[postAuthStepIndex]
-    const currentPreAuthStep = preAuthStep
+    const currentWelcomeStep = welcomeStep
 
     return {
         isAuthLoading,
@@ -51,6 +51,6 @@ export function useOnboardingFlow() {
         currentStep,
         totalSteps,
         currentPostAuthStep,
-        currentPreAuthStep,
+        currentWelcomeStep,
     }
 }

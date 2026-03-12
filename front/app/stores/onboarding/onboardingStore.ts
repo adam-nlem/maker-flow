@@ -1,25 +1,25 @@
 import { create } from 'zustand'
 
-import { PreAuthStep } from '~/models/enums/PreAuthStep'
+import { WelcomeStep } from '~/models/enums/WelcomeStep'
 
 type OnboardingState = {
-    preAuthStep: PreAuthStep
+    welcomeStep: WelcomeStep
     pendingOtpToken: string | null
     otpEmail: string | null
 }
 
 type OnboardingAction = {
-    setPreAuthStep: (step: PreAuthStep) => void
+    setWelcomeStep: (step: WelcomeStep) => void
     setOtpCredentials: (token: string, email: string) => void
     clearOtpCredentials: () => void
 }
 
 export const useOnboardingStore = create<OnboardingState & OnboardingAction>()(
     (set) => ({
-        preAuthStep: PreAuthStep.Hero,
+        welcomeStep: WelcomeStep.Hero,
         pendingOtpToken: null,
         otpEmail: null,
-        setPreAuthStep: (step) => set({ preAuthStep: step }),
+        setWelcomeStep: (step) => set({ welcomeStep: step }),
         setOtpCredentials: (token, email) => set({ pendingOtpToken: token, otpEmail: email }),
         clearOtpCredentials: () => set({ pendingOtpToken: null, otpEmail: null }),
     })

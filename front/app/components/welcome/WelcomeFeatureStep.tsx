@@ -1,7 +1,7 @@
 import { ClipboardDocumentCheckIcon, ChartBarIcon, CalendarDaysIcon, SparklesIcon } from "@heroicons/react/24/outline"
 import { Button } from "~/components/ui/Button"
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
-import { PreAuthStep } from "~/models/enums/PreAuthStep"
+import { WelcomeStep } from "~/models/enums/WelcomeStep"
 
 const features = [
     {
@@ -27,7 +27,7 @@ const features = [
 ]
 
 export default function WelcomeFeatureStep() {
-    const setPreAuthStep = useOnboardingStore((s) => s.setPreAuthStep)
+    const setWelcomeStep = useOnboardingStore((s) => s.setWelcomeStep)
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <h2 className="text-heading-2xl text-dark  mb-2 text-center">
@@ -53,10 +53,10 @@ export default function WelcomeFeatureStep() {
             </div>
 
             <div className="flex gap-3">
-                <Button style="outline" width="w-auto" onClick={() => setPreAuthStep(PreAuthStep.Hero)}>
+                <Button style="outline" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Hero)}>
                     Retour
                 </Button>
-                <Button style="primary" width="w-auto" onClick={() => setPreAuthStep(PreAuthStep.HowItWorks)}>
+                <Button style="primary" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.HowItWorks)}>
                     Suivant
                 </Button>
             </div>

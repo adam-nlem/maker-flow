@@ -1,10 +1,10 @@
 import { RocketLaunchIcon } from "@heroicons/react/24/outline"
 import { Button } from "~/components/ui/Button"
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
-import { PreAuthStep } from "~/models/enums/PreAuthStep"
+import { WelcomeStep } from "~/models/enums/WelcomeStep"
 
 export default function WelcomeHeroStep() {
-    const setPreAuthStep = useOnboardingStore((s) => s.setPreAuthStep)
+    const setWelcomeStep = useOnboardingStore((s) => s.setWelcomeStep)
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
             <div className="mb-8 w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
@@ -19,7 +19,7 @@ export default function WelcomeHeroStep() {
                 MakerFlow vous aide à planifier, rédiger et analyser vos contenus vidéo sur Instagram et YouTube.
             </p>
 
-            <Button style="primary" width="w-auto" onClick={() => setPreAuthStep(PreAuthStep.Features)}>
+            <Button style="primary" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Features)}>
                 Découvrir
             </Button>
         </div>

@@ -13,9 +13,9 @@ All onboarding step components are **self-contained** (zero props). They read st
 The route (`app/routes/onboarding.tsx`) maps enum values to components using Records:
 
 ```tsx
-const preAuthNodes: Record<PreAuthStep, ReactNode> = {
-    [PreAuthStep.Hero]: <WelcomeHeroStep />,
-    [PreAuthStep.Features]: <WelcomeFeatureStep />,
+const welcomeNodes: Record<WelcomeStep, ReactNode> = {
+    [WelcomeStep.Hero]: <WelcomeHeroStep />,
+    [WelcomeStep.Features]: <WelcomeFeatureStep />,
     // ...
 }
 
@@ -29,7 +29,7 @@ This follows the same pattern as `settings.section.tsx`.
 
 ### State Management
 
-- **`useOnboardingStore`** (`app/stores/onboarding/onboardingStore.ts`): Ephemeral Zustand store (no persist) for pre-auth navigation (`preAuthStep`) and OTP credentials (`pendingOtpToken`, `otpEmail`). Pre-auth components read/write this store for navigation.
+- **`useOnboardingStore`** (`app/stores/onboarding/onboardingStore.ts`): Ephemeral Zustand store (no persist) for pre-auth navigation (`welcomeStep`) and OTP credentials (`pendingOtpToken`, `otpEmail`). Pre-auth components read/write this store for navigation.
 - **`useFocusProjectStore`**: Post-auth components read `focusedProjectUuid` from this store.
 - **`useFocusScriptStore`**: `OnboardingGenerateScriptStep` reads `focusedScriptUuid` from this store.
 - **`useAdvanceOnboardingStep`** (`app/hooks/api/onboarding/useAdvanceOnboardingStep.ts`): Hook that encapsulates step completion logic. Post-auth components call `advanceStep()` internally.
@@ -59,11 +59,11 @@ Two redirect layers:
 
 ## Enums
 
-### `PreAuthStep`
+### `WelcomeStep`
 
-**File:** `app/models/enums/PreAuthStep.ts`
+**File:** `app/models/enums/WelcomeStep.ts`
 
-Values: `hero`, `features`, `how_it_works`, `register`, `verify_otp`. Exports `PRE_AUTH_STEP_ORDER` array.
+Values: `hero`, `features`, `how_it_works`, `register`, `verify_otp`. Exports `WELCOME_STEP_ORDER` array.
 
 ### `OnboardingStep`
 
@@ -77,13 +77,13 @@ Step metadata defined as const maps: `onboardingStepToFrenchTranslation`, `onboa
 
 | Step | Enum | Component | Description |
 |------|------|-----------|-------------|
-| 0 | `PreAuthStep.Hero` | `WelcomeHeroStep` | Hero section with value proposition |
-| 1 | `PreAuthStep.Features` | `WelcomeFeatureStep` | Feature cards grid |
-| 2 | `PreAuthStep.HowItWorks` | `WelcomeHowItWorksStep` | 3-step visual guide |
-| 3 | `PreAuthStep.Register` | `OnboardingRegisterStep` | Embedded register form, "J'ai déjà un compte" link to `/login` |
-| 4 | `PreAuthStep.VerifyOtp` | `OnboardingVerifyOtpStep` | 6-digit OTP verification, resend button |
+| 0 | `WelcomeStep.Hero` | `WelcomeHeroStep` | Hero section with value proposition |
+| 1 | `WelcomeStep.Features` | `WelcomeFeatureStep` | Feature cards grid |
+| 2 | `WelcomeStep.HowItWorks` | `WelcomeHowItWorksStep` | 3-step visual guide |
+| 3 | `WelcomeStep.Register` | `OnboardingRegisterStep` | Embedded register form, "J'ai déjà un compte" link to `/login` |
+| 4 | `WelcomeStep.VerifyOtp` | `OnboardingVerifyOtpStep` | 6-digit OTP verification, resend button |
 
-All pre-auth components navigate via `useOnboardingStore.setPreAuthStep()`. Register step also calls `setOtpCredentials()` before navigating to OTP.
+All pre-auth components navigate via `useOnboardingStore.setWelcomeStep()`. Register step also calls `setOtpCredentials()` before navigating to OTP.
 
 After OTP verification, `useVerifyOtp` sets user in React Query cache → component detects auth → switches to post-auth steps.
 
@@ -208,7 +208,7 @@ Returns: `{ phase, script, isPending, isFailed, messageIndex, handleBriefSubmit 
 - `app/hooks/useOnboardingFlow.ts`
 - `app/stores/onboarding/onboardingStore.ts`
 - `app/stores/auth/authPrefillStore.ts`
-- `app/models/enums/PreAuthStep.ts`
+- `app/models/enums/WelcomeStep.ts`
 - `app/models/enums/OnboardingStep.ts`
 - `app/hooks/api/onboarding/useAdvanceOnboardingStep.ts`
 - `app/hooks/api/onboarding/useCompleteOnboardingStep.ts`

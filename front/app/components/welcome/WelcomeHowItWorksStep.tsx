@@ -2,7 +2,7 @@ import { Fragment } from "react"
 import { FolderPlusIcon, LinkIcon, ChartBarIcon } from "@heroicons/react/24/outline"
 import { Button } from "~/components/ui/Button"
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
-import { PreAuthStep } from "~/models/enums/PreAuthStep"
+import { WelcomeStep } from "~/models/enums/WelcomeStep"
 
 const steps = [
     {
@@ -26,7 +26,7 @@ const steps = [
 ]
 
 export default function WelcomeHowItWorksStep() {
-    const setPreAuthStep = useOnboardingStore((s) => s.setPreAuthStep)
+    const setWelcomeStep = useOnboardingStore((s) => s.setWelcomeStep)
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <h2 className="text-heading-2xl text-dark  mb-2 text-center">
@@ -54,10 +54,10 @@ export default function WelcomeHowItWorksStep() {
             </div>
 
             <div className="flex gap-3">
-                <Button style="outline" width="w-auto" onClick={() => setPreAuthStep(PreAuthStep.Features)}>
+                <Button style="outline" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Features)}>
                     Retour
                 </Button>
-                <Button style="primary" width="w-auto" onClick={() => setPreAuthStep(PreAuthStep.Register)}>
+                <Button style="primary" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Register)}>
                     Suivant
                 </Button>
             </div>
