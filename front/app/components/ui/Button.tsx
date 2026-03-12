@@ -28,6 +28,7 @@ export function Button({
         primary: 'bg-primary/10 border-primary/30 text-primary hover:bg-primary/30',
         secondary: 'bg-dark/10 border-dark/30 text-dark hover:bg-dark/30',
         danger: 'bg-danger/10 border-danger/30 text-danger hover:bg-danger/30',
+        outline: 'bg-transparent border-light-gray text-dark hover:bg-dark/5',
     };
 
 
@@ -36,7 +37,7 @@ export function Button({
             type={type}
             onClick={onClick}
             disabled={disabled || isLoading}
-            className={`inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 border focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ${variantStyles[style]} ${width} ${height} ${className}  px-4 rounded-xl text-heading-sm cursor-pointer`}
+            className={`inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 border focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ${variantStyles[style]} ${width} ${height} ${className}  px-4 py-2 rounded-xl text-heading-sm cursor-pointer`}
         >
             {isLoading ? (
                 <span className="mr-2">

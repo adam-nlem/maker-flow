@@ -1,8 +1,8 @@
 import { Fragment } from "react"
 import { FolderPlusIcon, LinkIcon, ChartBarIcon } from "@heroicons/react/24/outline"
-import { Button } from "~/components/ui/Button"
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
 import { WelcomeStep } from "~/models/enums/WelcomeStep"
+import WelcomeStepLayout from "~/components/welcome/WelcomeStepLayout"
 
 const steps = [
     {
@@ -27,17 +27,16 @@ const steps = [
 
 export default function WelcomeHowItWorksStep() {
     const setWelcomeStep = useOnboardingStore((s) => s.setWelcomeStep)
-    return (
-        <div className="min-h-screen flex flex-col items-center justify-center px-6">
-            <h2 className="text-heading-2xl text-dark  mb-2 text-center">
-                Comment ça marche ?
-            </h2>
-            <p className="text-body-md text-gray mb-10 text-center">
-                Trois étapes pour commencer.
-            </p>
 
-            <div className="flex flex-col sm:flex-row gap-8 max-w-3xl w-full mb-10">
-                {steps.map((step, index) => (
+    return (
+        <WelcomeStepLayout
+            title="Comment ça marche ?"
+            subtitle="Trois étapes pour commencer."
+            onBack={() => setWelcomeStep(WelcomeStep.Features)}
+            onNext={() => setWelcomeStep(WelcomeStep.Register)}
+        >
+            <div className="flex flex-col sm:flex-row gap-8 max-w-3xl w-full">
+                {steps.map((step) => (
                     <Fragment key={step.number}>
                         <div className="flex-1 flex flex-col items-center text-center">
                             <div className="w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
@@ -46,21 +45,12 @@ export default function WelcomeHowItWorksStep() {
                             <div className="w-8 h-8 rounded-full bg-primary text-clear flex items-center justify-center text-heading-xs mb-3">
                                 {step.number}
                             </div>
-                            <h3 className="text-heading-sm text-dark  mb-1">{step.title}</h3>
+                            <h3 className="text-heading-sm text-dark mb-1">{step.title}</h3>
                             <p className="text-body-sm text-gray">{step.description}</p>
                         </div>
                     </Fragment>
                 ))}
             </div>
-
-            <div className="flex gap-3">
-                <Button style="secondary" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Features)}>
-                    Retour
-                </Button>
-                <Button style="primary" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Register)}>
-                    Suivant
-                </Button>
-            </div>
-        </div>
+        </WelcomeStepLayout>
     )
 }

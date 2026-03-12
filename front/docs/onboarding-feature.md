@@ -14,7 +14,6 @@ The route (`app/routes/onboarding.tsx`) maps enum values to components using Rec
 
 ```tsx
 const welcomeNodes: Record<WelcomeStep, ReactNode> = {
-    [WelcomeStep.Hero]: <WelcomeHeroStep />,
     [WelcomeStep.Features]: <WelcomeFeatureStep />,
     // ...
 }
@@ -63,7 +62,7 @@ Two redirect layers:
 
 **File:** `app/models/enums/WelcomeStep.ts`
 
-Values: `hero`, `features`, `how_it_works`, `register`, `verify_otp`. Exports `WELCOME_STEP_ORDER` array and metadata maps: `welcomeStepToTitle`, `welcomeStepToDescription` (partial, only for steps using `OnboardingStepHeader`).
+Values: `features`, `how_it_works`, `register`, `verify_otp`. Exports `WELCOME_STEP_ORDER` array and metadata maps: `welcomeStepToTitle`, `welcomeStepToDescription` (partial, only for steps using `OnboardingStepHeader`).
 
 ### `OnboardingStep`
 
@@ -77,11 +76,10 @@ Step metadata defined as const maps: `onboardingStepToFrenchTranslation`, `onboa
 
 | Step | Enum | Component | Description |
 |------|------|-----------|-------------|
-| 0 | `WelcomeStep.Hero` | `WelcomeHeroStep` | Hero section with value proposition |
-| 1 | `WelcomeStep.Features` | `WelcomeFeatureStep` | Feature cards grid |
-| 2 | `WelcomeStep.HowItWorks` | `WelcomeHowItWorksStep` | 3-step visual guide |
-| 3 | `WelcomeStep.Register` | `WelcomeRegisterStep` | Register form with icon/title/description, Back + "J'ai déjà un compte" buttons |
-| 4 | `WelcomeStep.VerifyOtp` | `WelcomeVerifyOtpStep` | OTP verification with icon/title/dynamic email description, Back button |
+| 0 | `WelcomeStep.Features` | `WelcomeFeatureStep` | Feature cards grid |
+| 1 | `WelcomeStep.HowItWorks` | `WelcomeHowItWorksStep` | 3-step visual guide |
+| 2 | `WelcomeStep.Register` | `WelcomeRegisterStep` | Register form with icon/title/description, Back + "J'ai déjà un compte" buttons |
+| 3 | `WelcomeStep.VerifyOtp` | `WelcomeVerifyOtpStep` | OTP verification with icon/title/dynamic email description, Back button |
 
 All pre-auth components navigate via `useOnboardingStore.setWelcomeStep()`. Register step also calls `setOtpCredentials()` before navigating to OTP.
 
@@ -173,14 +171,23 @@ Shared OTP verification form. Contains code input, cooldown timer, verify/resend
 
 Props: `pendingOtpToken`, `purpose`, `onVerified?`, `formSpacing?`.
 
+### WelcomeStepLayout
+
+**File:** `app/components/welcome/WelcomeStepLayout.tsx`
+
+Shared layout component used by all welcome step components. Provides consistent structure: full-screen centered layout, optional icon badge, title, subtitle, content wrapper (`max-w-sm`), and standardized button footer.
+
+Props: `icon?` (HeroIcon), `title` (string), `subtitle` (ReactNode), `onBack?` (() => void), `onNext?` (() => void), `nextLabel?` (string, defaults to "Suivant"), `children?` (ReactNode).
+
 ### Welcome Components
 
 **Directory:** `app/components/welcome/`
-- `WelcomeHeroStep` — Hero section
 - `WelcomeFeatureStep` — Feature cards
 - `WelcomeHowItWorksStep` — How it works guide
 - `WelcomeRegisterStep` — Register form
 - `WelcomeVerifyOtpStep` — OTP verification
+
+All welcome components use `WelcomeStepLayout` for consistent layout and navigation.
 
 ## OnboardingGenerateScriptStep Detail
 
@@ -217,6 +224,7 @@ Returns: `{ phase, script, isPending, isFailed, messageIndex, handleBriefSubmit 
 - `app/hooks/api/onboarding/useShowOnboarding.ts`
 - `app/hooks/api/onboarding/useDismissOnboarding.ts`
 - `app/components/onboarding/OnboardingStepHeader.tsx`
+- `app/components/welcome/WelcomeStepLayout.tsx`
 - `app/components/welcome/WelcomeRegisterStep.tsx`
 - `app/components/welcome/WelcomeVerifyOtpStep.tsx`
 - `app/components/onboarding/OnboardingCreateProjectStep.tsx`

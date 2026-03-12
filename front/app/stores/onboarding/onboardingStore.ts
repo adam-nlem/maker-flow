@@ -16,7 +16,7 @@ type OnboardingAction = {
 
 export const useOnboardingStore = create<OnboardingState & OnboardingAction>()(
     (set) => ({
-        welcomeStep: WelcomeStep.Hero,
+        welcomeStep: WelcomeStep.Features,
         pendingOtpToken: null,
         otpEmail: null,
         setWelcomeStep: (step) => set({ welcomeStep: step }),

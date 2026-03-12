@@ -1,8 +1,7 @@
-import { RocketLaunchIcon, SparklesIcon, ListBulletIcon, UserPlusIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
+import { SparklesIcon, ListBulletIcon, UserPlusIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
 import type { ComponentType, SVGProps } from "react"
 
 export enum WelcomeStep {
-    Hero = 'hero',
     Features = 'features',
     HowItWorks = 'how_it_works',
     Register = 'register',
@@ -10,7 +9,6 @@ export enum WelcomeStep {
 }
 
 export const WELCOME_STEP_ORDER = [
-    WelcomeStep.Hero,
     WelcomeStep.Features,
     WelcomeStep.HowItWorks,
     WelcomeStep.Register,
@@ -27,7 +25,6 @@ export const welcomeStepToDescription: Partial<Record<WelcomeStep, string>> = {
 }
 
 export const welcomeStepToIcon: Record<WelcomeStep, ComponentType<SVGProps<SVGSVGElement>>> = {
-    [WelcomeStep.Hero]: RocketLaunchIcon,
     [WelcomeStep.Features]: SparklesIcon,
     [WelcomeStep.HowItWorks]: ListBulletIcon,
     [WelcomeStep.Register]: UserPlusIcon,
@@ -35,7 +32,6 @@ export const welcomeStepToIcon: Record<WelcomeStep, ComponentType<SVGProps<SVGSV
 }
 
 export const welcomeStepToShortLabel: Record<WelcomeStep, string> = {
-    [WelcomeStep.Hero]: "Accueil",
     [WelcomeStep.Features]: "Fonctionnalités",
     [WelcomeStep.HowItWorks]: "Guide",
     [WelcomeStep.Register]: "Inscription",

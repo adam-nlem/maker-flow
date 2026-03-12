@@ -1,6 +1,5 @@
 import type { ReactNode } from "react"
 
-import WelcomeHeroStep from "~/components/welcome/WelcomeHeroStep"
 import WelcomeFeatureStep from "~/components/welcome/WelcomeFeatureStep"
 import WelcomeHowItWorksStep from "~/components/welcome/WelcomeHowItWorksStep"
 import WelcomeRegisterStep from "~/components/welcome/WelcomeRegisterStep"
@@ -16,7 +15,6 @@ import { OnboardingStep } from "~/models/enums/OnboardingStep"
 import { WelcomeStep } from "~/models/enums/WelcomeStep"
 
 const welcomeNodes: Record<WelcomeStep, ReactNode> = {
-    [WelcomeStep.Hero]: <WelcomeHeroStep />,
     [WelcomeStep.Features]: <WelcomeFeatureStep />,
     [WelcomeStep.HowItWorks]: <WelcomeHowItWorksStep />,
     [WelcomeStep.Register]: <WelcomeRegisterStep />,
