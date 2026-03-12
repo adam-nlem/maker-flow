@@ -16,7 +16,7 @@ export default function OnboardingStepLayout({
         <div className="h-screen flex flex-col items-center justify-between p-6">
             <OnboardingStepHeader disableNextButton={disableNextButton} />
 
-            <div className={`w-full bg-clear ${maxWidth} h-full`}>
+            <div className={`${maxWidth} w-full bg-clear flex flex-col items-center justify-center`}>
                 {children}
             </div>
 

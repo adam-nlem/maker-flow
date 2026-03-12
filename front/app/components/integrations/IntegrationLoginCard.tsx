@@ -30,7 +30,7 @@ export default function IntegrationLoginCard({ projectUuid, platform, integratio
     };
 
     return (
-        <div className="border border-light-gray max-h-fit rounded-xl p-5">
+        <div className="border border-light-gray max-h-fit rounded-xl bg-clear p-5">
             {/* Header: platform name + status badge */}
             <div className="flex flex-row items-center justify-between gap-20 mb-4">
                 <div className="flex flex-row items-center gap-3">
