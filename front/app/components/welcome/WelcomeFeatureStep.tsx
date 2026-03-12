@@ -53,7 +53,7 @@ export default function WelcomeFeatureStep() {
             </div>
 
             <div className="flex gap-3">
-                <Button style="outline" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Hero)}>
+                <Button style="secondary" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Hero)}>
                     Retour
                 </Button>
                 <Button style="primary" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.HowItWorks)}>

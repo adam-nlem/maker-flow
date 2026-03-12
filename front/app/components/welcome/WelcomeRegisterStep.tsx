@@ -23,23 +23,24 @@ export default function WelcomeRegisterStep() {
                 Commencez gratuitement et gérez vos contenus dès maintenant.
             </p>
 
-            <div className="w-full max-w-sm mb-10">
+            <div className="w-full max-w-sm flex flex-col gap-4 bg-clear">
                 <RegisterForm
                     onRegistered={({ pendingOtpToken, email }) => {
                         setOtpCredentials(pendingOtpToken, email)
                         setWelcomeStep(WelcomeStep.VerifyOtp)
                     }}
                 />
+                <div className="flex flex-row gap-2">
+                    <Button style="secondary" width="w-1/4" onClick={() => setWelcomeStep(WelcomeStep.HowItWorks)}>
+                        Retour
+                    </Button>
+                    <Button style="secondary" width="w-3/4" onClick={() => navigate('/login')}>
+                        J'ai déjà un compte
+                    </Button>
+                </div>
             </div>
 
-            <div className="flex gap-3">
-                <Button style="outline" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.HowItWorks)}>
-                    Retour
-                </Button>
-                <Button style="secondary" width="w-auto" onClick={() => navigate('/login')}>
-                    J'ai déjà un compte
-                </Button>
-            </div>
+
         </div>
     )
 }

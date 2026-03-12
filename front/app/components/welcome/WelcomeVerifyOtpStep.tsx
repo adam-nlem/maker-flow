@@ -30,7 +30,7 @@ export default function WelcomeVerifyOtpStep() {
             </div>
 
             <div className="flex gap-3">
-                <Button style="outline" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Register)}>
+                <Button style="secondary" width="w-auto" onClick={() => setWelcomeStep(WelcomeStep.Register)}>
                     Retour
                 </Button>
             </div>

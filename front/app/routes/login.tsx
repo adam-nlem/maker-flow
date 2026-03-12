@@ -117,7 +117,7 @@ export default function LoginPage() {
                 </p>
 
                 <div className="mt-3 flex justify-center">
-                    <Button style="outline" width="w-auto" height="h-8" className="text-body-xs" onClick={() => navigate('/onboarding')}>
+                    <Button style="secondary" width="w-auto" height="h-8" className="text-body-xs" onClick={() => navigate('/onboarding')}>
                         Découvrir MakerFlow
                     </Button>
                 </div>

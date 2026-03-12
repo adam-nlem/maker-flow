@@ -20,17 +20,14 @@ export function Button({
     disabled = false,
     onClick,
     width = 'w-full',
-    height = 'h-10',
+    height = 'h-9',
     className = '',
 }: ButtonProps) {
 
-    const baseStyles = 'inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none';
-
     const variantStyles = {
-        primary: 'inline-flex items-center gap-x-1.5 bg-primary px-3 py-2 text-clear shadow-xs hover:bg-primary-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary-600',
-        secondary: 'bg-dark text-clear hover:bg-gray',
-        danger: 'bg-danger text-clear hover:bg-danger-600',
-        outline: 'border border-primary bg-transparent hover:bg-primary hover:text-clear text-primary',
+        primary: 'bg-primary/10 border-primary/30 text-primary hover:bg-primary/30',
+        secondary: 'bg-dark/10 border-dark/30 text-dark hover:bg-dark/30',
+        danger: 'bg-danger/10 border-danger/30 text-danger hover:bg-danger/30',
     };
 
 
@@ -39,7 +36,7 @@ export function Button({
             type={type}
             onClick={onClick}
             disabled={disabled || isLoading}
-            className={`${baseStyles} ${variantStyles[style]} ${width} ${height} ${className}  px-4 rounded-xl text-heading-sm cursor-pointer`}
+            className={`inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 border focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ${variantStyles[style]} ${width} ${height} ${className}  px-4 rounded-xl text-heading-sm cursor-pointer`}
         >
             {isLoading ? (
                 <span className="mr-2">

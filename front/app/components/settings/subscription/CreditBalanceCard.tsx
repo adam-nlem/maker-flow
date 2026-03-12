@@ -30,7 +30,7 @@ export default function CreditBalanceCard() {
                     <h3 className="text-heading-md">Crédits</h3>
                 </div>
                 <Button
-                    style="outline"
+                    style="secondary"
                     width="w-auto"
                     height="h-8"
                     isLoading={isTopupPending}
