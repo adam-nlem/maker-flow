@@ -1,5 +1,4 @@
 import { SparklesIcon } from "@heroicons/react/24/outline"
-
 import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
 import GenerateScriptPreviewPhase from "~/components/onboarding/GenerateScriptPreviewPhase"
 import GenerateScriptGeneratingPhase from "~/components/onboarding/GenerateScriptGeneratingPhase"
@@ -32,7 +31,6 @@ export default function OnboardingGenerateScriptStep() {
         <div className="min-h-screen flex items-center justify-center px-8">
             <div className="flex flex-col">
                 <OnboardingStepHeader
-                    icon={SparklesIcon}
                     title="Générez votre premier script"
                     description="L'IA va créer un script vidéo complet basé sur vos indications."
                 />
@@ -42,7 +40,7 @@ export default function OnboardingGenerateScriptStep() {
                         {script ? (
                             <ScriptEditorPanel key={script.uuid} script={script} projectUuid={projectUuid} isReadOnly />
                         ) : (
-                            <div className="flex items-center justify-center h-64 text-body-sm text-medium-gray">
+                            <div className="flex items-center justify-center h-64 text-body-sm text-gray">
                                 Le script apparaîtra ici...
                             </div>
                         )}

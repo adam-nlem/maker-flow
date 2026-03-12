@@ -1,5 +1,3 @@
-import { LinkIcon } from "@heroicons/react/24/outline"
-
 import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
 import { Button } from "~/components/ui/Button"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
@@ -20,7 +18,6 @@ export default function OnboardingConnectIntegrationStep() {
     return (
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <OnboardingStepHeader
-                icon={LinkIcon}
                 title="Connectez vos réseaux sociaux"
                 description="Connectez vos comptes pour analyser vos performances et centraliser vos contenus."
             />

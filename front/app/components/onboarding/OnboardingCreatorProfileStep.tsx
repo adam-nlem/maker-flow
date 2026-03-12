@@ -1,5 +1,3 @@
-import { UserCircleIcon } from "@heroicons/react/24/outline"
-
 import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import CreatorProfileForm from "~/components/scripts/creatorProfile/CreatorProfileForm"
@@ -16,7 +14,6 @@ export default function OnboardingCreatorProfileStep() {
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-lg">
                 <OnboardingStepHeader
-                    icon={UserCircleIcon}
                     title="Personnalisez votre compte créateur"
                     description="Ces informations permettent à l'IA de s'adapter à votre style."
                 />

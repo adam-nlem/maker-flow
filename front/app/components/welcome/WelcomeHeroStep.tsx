@@ -15,7 +15,7 @@ export default function WelcomeHeroStep() {
                 Gérez vos contenus comme un pro
             </h1>
 
-            <p className="text-body-lg text-medium-gray max-w-lg mb-8">
+            <p className="text-body-lg text-gray max-w-lg mb-8">
                 MakerFlow vous aide à planifier, rédiger et analyser vos contenus vidéo sur Instagram et YouTube.
             </p>
 

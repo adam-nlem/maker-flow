@@ -1,7 +1,5 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router"
-import { SparklesIcon } from "@heroicons/react/24/outline"
-
 import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
 import { Button } from "~/components/ui/Button"
 import PlanSelector from "~/components/settings/subscription/PlanSelector"
@@ -22,7 +20,6 @@ export default function OnboardingSubscriptionStep() {
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-3xl">
                 <OnboardingStepHeader
-                    icon={SparklesIcon}
                     title="Découvrez nos offres"
                     description="Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités."
                 />

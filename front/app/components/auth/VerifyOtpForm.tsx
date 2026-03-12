@@ -121,8 +121,8 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, purpose, 
             <div className="mt-6 flex justify-center">
                 <SimpleTextButton
                     onClick={handleResend}
-                    color={isResendDisabled ? "text-medium-gray" : "text-primary"}
-                    hoverColor={isResendDisabled ? "hover:text-medium-gray" : "hover:text-dark"}
+                    color={isResendDisabled ? "text-gray" : "text-primary"}
+                    hoverColor={isResendDisabled ? "hover:text-gray" : "hover:text-dark"}
                 >
                     {resendCooldown > 0
                         ? `Renvoyer le code (${resendCooldown}s)`

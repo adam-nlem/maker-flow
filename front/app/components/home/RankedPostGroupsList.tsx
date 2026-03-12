@@ -55,7 +55,7 @@ export default function RankedPostGroupsList({ projectUuid }: RankedPostGroupsLi
   }
 
   if (postGroups.length === 0) {
-    return <p className="text-body-sm text-medium-gray">Aucun groupe de posts trouvé.</p>
+    return <p className="text-body-sm text-gray">Aucun groupe de posts trouvé.</p>
   }
 
   return (

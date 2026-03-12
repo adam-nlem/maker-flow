@@ -74,7 +74,7 @@ export default function HomeScriptsList({ projectUuid }: HomeScriptsListProps) {
                 ))}
             </div> :
                 scripts.length === 0 ? (
-                    <p className="text-body-sm text-medium-gray">Aucun script trouvé pour ce statut.</p>
+                    <p className="text-body-sm text-gray">Aucun script trouvé pour ce statut.</p>
                 ) : (
                     <div className="flex flex-row flex-wrap gap-2 overflow-x-auto scrollbar-none flex-1 min-h-0">
                         {scripts.map((script) => (

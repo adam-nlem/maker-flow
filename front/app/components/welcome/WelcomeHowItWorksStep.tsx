@@ -32,7 +32,7 @@ export default function WelcomeHowItWorksStep() {
             <h2 className="text-heading-2xl text-dark  mb-2 text-center">
                 Comment ça marche ?
             </h2>
-            <p className="text-body-md text-medium-gray mb-10 text-center">
+            <p className="text-body-md text-gray mb-10 text-center">
                 Trois étapes pour commencer.
             </p>
 
@@ -47,7 +47,7 @@ export default function WelcomeHowItWorksStep() {
                                 {step.number}
                             </div>
                             <h3 className="text-heading-sm text-dark  mb-1">{step.title}</h3>
-                            <p className="text-body-sm text-medium-gray">{step.description}</p>
+                            <p className="text-body-sm text-gray">{step.description}</p>
                         </div>
                     </Fragment>
                 ))}

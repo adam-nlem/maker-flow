@@ -55,7 +55,7 @@ export default function RankedPostsList({ integrationUuid }: RankedPostsListProp
   }
 
   if (posts.length === 0) {
-    return <p className="text-body-sm text-medium-gray">Aucun post trouvé.</p>
+    return <p className="text-body-sm text-gray">Aucun post trouvé.</p>
   }
 
   return (

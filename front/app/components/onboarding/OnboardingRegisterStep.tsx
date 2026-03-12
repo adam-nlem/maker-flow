@@ -1,6 +1,4 @@
 import { useNavigate } from "react-router"
-import { UserPlusIcon } from "@heroicons/react/24/outline"
-
 import RegisterForm from "~/components/auth/RegisterForm"
 import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
@@ -16,7 +14,6 @@ export default function OnboardingRegisterStep() {
         <div className="min-h-screen flex flex-col items-center justify-center px-6">
             <div className="w-full max-w-sm">
                 <OnboardingStepHeader
-                    icon={UserPlusIcon}
                     title="Créez votre compte"
                     description="Commencez gratuitement et gérez vos contenus dès maintenant."
                 />

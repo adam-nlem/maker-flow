@@ -156,9 +156,9 @@ export default function ScriptPartsList({ parts, script, generationUuid, isReadO
                     </DroppableZone>
 
                     {!isReadOnly && (localParts.length === 0) && (
-                        <div className="flex flex-col items-center justify-center py-12 text-gray">
-                            <p className="text-body-sm text-center mb-4">Vous n'avez pas encore d'éléments dans votre script.</p>
-                            <ScriptPartTypeMenu scriptUuid={scriptUuid} generationUuid={generationUuid} hasHook={hookPart !== undefined} />
+                        <div className="flex flex-col items-center justify-center text-gray">
+                            <p className="text-body-sm text-center">Vous n'avez pas encore d'éléments dans votre script.</p>
+                            <p className="text-body-sm text-center">Utilisez « + Ajouter un élément » pour commencer.</p>
                         </div>
                     )}
 

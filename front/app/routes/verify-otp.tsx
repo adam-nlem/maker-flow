@@ -31,7 +31,7 @@ export default function VerifyOtpPage() {
                 <h2 className="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-dark">
                     {title}
                 </h2>
-                <p className="mt-2 text-center text-body-sm text-medium-gray">
+                <p className="mt-2 text-center text-body-sm text-gray">
                     Un code à 6 chiffres a été envoyé à{" "}
                     <span className="font-semibold text-dark">{state.email}</span>
                 </p>

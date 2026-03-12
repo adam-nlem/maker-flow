@@ -33,7 +33,7 @@ export default function WelcomeFeatureStep() {
             <h2 className="text-heading-2xl text-dark  mb-2 text-center">
                 Tout ce dont vous avez besoin
             </h2>
-            <p className="text-body-md text-medium-gray mb-10 text-center max-w-lg">
+            <p className="text-body-md text-gray mb-10 text-center max-w-lg">
                 Des outils pensés pour les créateurs de contenu.
             </p>
 
@@ -47,7 +47,7 @@ export default function WelcomeFeatureStep() {
                             <feature.icon className="w-5 h-5 text-primary" />
                         </div>
                         <h3 className="text-heading-sm text-dark ">{feature.title}</h3>
-                        <p className="text-body-sm text-medium-gray">{feature.description}</p>
+                        <p className="text-body-sm text-gray">{feature.description}</p>
                     </div>
                 ))}
             </div>

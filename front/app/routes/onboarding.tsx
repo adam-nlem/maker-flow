@@ -50,23 +50,11 @@ export default function OnboardingPage() {
         )
     }
 
-    const node = isAuthenticated
-        ? onboardingNodes[currentOnboardingStep]
-        : welcomeNodes[currentWelcomeStep]
-
     return (
         <div className="bg-clear bg-dot-pattern min-h-screen relative">
-            {node}
-
-            <div className="fixed bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
-                {Array.from({ length: totalSteps }).map((_, i) => (
-                    <div
-                        key={i}
-                        className={`h-2 rounded-full transition-all ${i === currentStep ? 'bg-primary w-6' : 'bg-light-gray w-2'
-                            }`}
-                    />
-                ))}
-            </div>
+            {isAuthenticated
+                ? onboardingNodes[currentOnboardingStep]
+                : welcomeNodes[currentWelcomeStep]}
         </div>
     )
 }

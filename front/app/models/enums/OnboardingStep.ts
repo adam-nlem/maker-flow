@@ -48,13 +48,13 @@ export const onboardingStepToIcon: Record<OnboardingStep, ComponentType<SVGProps
     [OnboardingStep.ShowSubscriptions]: SparklesIcon,
 }
 
-export const onboardingStepToActionLabel: Record<OnboardingStep, string> = {
-    [OnboardingStep.CreateFirstProject]: "Créer un projet",
-    [OnboardingStep.ConnectIntegration]: "Connecter",
-    [OnboardingStep.CreateCreatorProfile]: "Configurer",
-    [OnboardingStep.CreateFirstScript]: "Créer",
-    [OnboardingStep.GenerateFirstScript]: "Générer",
-    [OnboardingStep.ShowSubscriptions]: "Voir les offres",
+export const onboardingStepToShortLabel: Record<OnboardingStep, string> = {
+    [OnboardingStep.CreateFirstProject]: "Projet",
+    [OnboardingStep.ConnectIntegration]: "Réseau social",
+    [OnboardingStep.CreateCreatorProfile]: "Profil créateur",
+    [OnboardingStep.CreateFirstScript]: "Script",
+    [OnboardingStep.GenerateFirstScript]: "Génération",
+    [OnboardingStep.ShowSubscriptions]: "Abonnements",
 }
 
 export const onboardingStepToNavigateTo: Partial<Record<OnboardingStep, string>> = {
