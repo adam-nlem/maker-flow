@@ -36,6 +36,8 @@ export default function OnboardingPage() {
     const {
         isAuthLoading,
         isAuthenticated,
+        currentStep,
+        totalSteps,
         currentOnboardingStep,
         currentWelcomeStep,
     } = useOnboardingFlow()

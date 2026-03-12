@@ -6,11 +6,16 @@ export function useAdvanceOnboardingStep() {
     const { onboarding } = useShowOnboarding()
     const { completeStep } = useCompleteOnboardingStep()
 
-    const currentStep = ONBOARDING_STEP_ORDER.find((s) => !onboarding?.isStepCompleted(s))
+    const currentStepIndex = (() => {
+        if (!onboarding) return 0
+        const idx = ONBOARDING_STEP_ORDER.findIndex((s) => !onboarding.isStepCompleted(s))
+        return idx === -1 ? ONBOARDING_STEP_ORDER.length - 1 : idx
+    })()
 
     const advanceStep = async () => {
-        if (currentStep) {
-            await completeStep(currentStep)
+        const currentStepEnum = ONBOARDING_STEP_ORDER[currentStepIndex]
+        if (currentStepEnum && !onboarding?.isStepCompleted(currentStepEnum)) {
+            await completeStep(currentStepEnum)
         }
     }
 
