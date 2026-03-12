@@ -11,13 +11,13 @@ import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { formatToFrenchRelative } from "~/utils/dateFormatters";
 import Pill from "~/components/ui/Pill";
 
-interface IntegrationSettingCardProps {
+interface IntegrationLoginCardProps {
     projectUuid: string;
     platform: Platform;
     integration: Integration | null;
 }
 
-export default function IntegrationSettingCard({ projectUuid, platform, integration }: IntegrationSettingCardProps) {
+export default function IntegrationLoginCard({ projectUuid, platform, integration }: IntegrationLoginCardProps) {
     const [isPendingRevoke, setIsPendingRevoke] = useState(false);
 
     const { createIntegration, isPending: isConnecting, oauthError } = useCreateIntegration({ projectUuid, platform });
@@ -30,7 +30,7 @@ export default function IntegrationSettingCard({ projectUuid, platform, integrat
     };
 
     return (
-        <div className="border border-light-gray rounded-xl p-5">
+        <div className="border border-light-gray max-h-fit rounded-xl p-5">
             {/* Header: platform name + status badge */}
             <div className="flex flex-row items-center justify-between gap-20 mb-4">
                 <div className="flex flex-row items-center gap-3">

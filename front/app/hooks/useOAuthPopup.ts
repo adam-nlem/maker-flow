@@ -10,6 +10,7 @@ const POPUP_CHECK_INTERVAL_MS = 500;
 interface UseOAuthPopupProps {
     platform: Platform;
     onSuccess?: () => void;
+    onPopupClosed?: () => void;
 }
 
 /**
@@ -18,10 +19,12 @@ interface UseOAuthPopupProps {
  * @param platform - The integration platform (e.g., Instagram)
  * @returns Object with openPopup function, isOpen state, integrationUuid, oauthError, and reset function
  */
-export function useOAuthPopup({ platform, onSuccess }: UseOAuthPopupProps) {
+export function useOAuthPopup({ platform, onSuccess, onPopupClosed }: UseOAuthPopupProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [popupError, setPopupError] = useState<OAuthErrorCode | null>(null);
     const popupRef = useRef<Window | null>(null);
+    const onPopupClosedRef = useRef(onPopupClosed);
+    onPopupClosedRef.current = onPopupClosed;
 
     const {
         integrationUuid,
@@ -69,6 +72,7 @@ export function useOAuthPopup({ platform, onSuccess }: UseOAuthPopupProps) {
                 clearInterval(checkPopupClosed);
                 setIsOpen(false);
                 popupRef.current = null;
+                onPopupClosedRef.current?.();
             }
         }, POPUP_CHECK_INTERVAL_MS);
     }, [isOpen, platform, resetMessageListener]);

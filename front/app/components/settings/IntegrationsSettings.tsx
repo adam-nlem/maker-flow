@@ -1,7 +1,7 @@
 import { platformOptions } from "~/models/enums/Platform";
 import { SettingsSection, settingsSectionToFrenchTranslation } from "~/models/enums/SettingsSection";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
-import IntegrationSettingCard from "./integration/IntegrationSettingCard";
+import IntegrationLoginCard from "../integrations/IntegrationLoginCard";
 import Shimmer from "~/components/ui/Shimmer";
 
 interface IntegrationsSettingsProps {
@@ -22,7 +22,7 @@ export default function IntegrationsSettings({ projectUuid }: IntegrationsSettin
                     <Shimmer height="h-32" width="w-full" />
                 ) : (
                     platformOptions.map((platform) => (
-                        <IntegrationSettingCard
+                        <IntegrationLoginCard
                             key={platform}
                             projectUuid={projectUuid}
                             platform={platform}

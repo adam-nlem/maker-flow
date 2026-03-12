@@ -18,6 +18,10 @@ interface UseCreateIntegrationProps {
 export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegrationProps) {
     const queryClient = useQueryClient();
 
+    const handleOAuthSuccess = useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
+    }, [queryClient, projectUuid]);
+
     const {
         openPopup,
         isOpen,
@@ -26,9 +30,8 @@ export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegra
         reset: resetOAuth,
     } = useOAuthPopup({
         platform,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
-        },
+        onSuccess: handleOAuthSuccess,
+        onPopupClosed: handleOAuthSuccess,
     });
 
     const mutation = useMutation({

@@ -43,7 +43,7 @@ This document describes the frontend OAuth integration system used in MakerFlow 
 |                   useOAuthMessageListener                         |
 |                                                                   |
 |  - Listens for postMessage from popup                            |
-|  - Validates origin and message type                             |
+|  - Validates origin, message type, and platform                  |
 |  - Extracts integrationUuid or errorCode                         |
 +------------------------------------------------------------------+
 ```
@@ -130,8 +130,9 @@ front/app/
 7. **Backend callback** - Instagram redirects to backend callback endpoint (`/api/integrations/callback`)
 8. **Backend processes** - Exchanges code for token, creates integration, links to project
 9. **Frontend callback** - Backend redirects to `/integrations/callback?status=success&...`
-10. **postMessage** - Callback route sends message to opener window
+10. **postMessage** - Callback route sends message to opener window (may fail if `window.opener` is severed by COOP headers)
 11. **Message received** - `useOAuthMessageListener` receives and validates message
+11b. **Popup closed** - `useOAuthPopup` detects popup closure and triggers query invalidation as a fallback
 12. **State update** - `integrationUuid` or `oauthError` state is set
 13. **Query invalidation** - `useCreateIntegration` invalidates integrations query
 14. **Component reacts** - Component renders success/error UI
@@ -155,6 +156,10 @@ interface UseCreateIntegrationProps {
 export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegrationProps) {
     const queryClient = useQueryClient();
 
+    const handleOAuthSuccess = useCallback(() => {
+        queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
+    }, [queryClient, projectUuid]);
+
     const {
         openPopup,
         isOpen,
@@ -163,9 +168,8 @@ export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegra
         reset: resetOAuth,
     } = useOAuthPopup({
         platform,
-        onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
-        },
+        onSuccess: handleOAuthSuccess,
+        onPopupClosed: handleOAuthSuccess,
     });
 
     const mutation = useMutation({
@@ -275,14 +279,15 @@ export function useOAuthPopup({ platform, onSuccess }: UseOAuthPopupProps) {
 | Property | Type | Description |
 |----------|------|-------------|
 | `platform` | `Platform` | The integration platform |
-| `onSuccess` | `() => void` | Optional callback called when integration is created |
+| `onSuccess` | `() => void` | Optional callback called when integration is created (via postMessage) |
+| `onPopupClosed` | `() => void` | Optional callback called when the popup window closes (reliable fallback) |
 
 **Features:**
 - Opens centered popup window (600x700)
 - Detects popup blocked by browser
-- Detects manual popup close
+- Detects manual popup close and calls `onPopupClosed`
 - Combines popup errors with message listener errors
-- Calls `onSuccess` callback when integration is successfully created
+- Calls `onSuccess` callback when integration is successfully created via postMessage
 
 ---
 
@@ -293,33 +298,17 @@ Utility hook that listens for postMessage from the OAuth callback popup.
 ```typescript
 // Location: hooks/useOAuthMessageListener.ts
 
-interface OAuthCallbackMessage {
-    type: WindowMessageType.OAuthCallback;
-    payload: OAuthCallbackReponseDTO;
-}
-
 export function useOAuthMessageListener({ platform }: UseOAuthMessageListenerProps) {
     const [integrationUuid, setIntegrationUuid] = useState<string | null>(null);
     const [oauthError, setOauthError] = useState<OAuthErrorCode | null>(null);
 
     const handleMessage = useCallback((event: MessageEvent<OAuthCallbackMessage>) => {
-        // 1. Validate origin (security)
-        if (event.origin !== window.location.origin) {
-            return;
-        }
+        if (event.origin !== window.location.origin) return;
+        if (event.data?.type !== WindowMessageType.OAuthCallback) return;
 
-        // 2. Validate message type
-        if (event.data?.type !== WindowMessageType.OAuthCallback) {
-            return;
-        }
-
-        // 3. Validate platform
         const { payload } = event.data;
-        if (payload.platform !== platform) {
-            return;
-        }
+        if (payload.platform !== platform) return;
 
-        // 4. Handle success or error
         if (payload.status === OAuthCallbackStatus.Success && payload.integrationUuid) {
             setIntegrationUuid(payload.integrationUuid);
             setOauthError(null);
@@ -342,6 +331,8 @@ export function useOAuthMessageListener({ platform }: UseOAuthMessageListenerPro
 - Validates `event.origin` matches current origin
 - Validates message type using enum
 - Filters by platform to support multiple integrations
+
+**Note:** The postMessage mechanism may fail when OAuth providers set `Cross-Origin-Opener-Policy` headers that sever `window.opener`. The `onPopupClosed` callback in `useOAuthPopup` provides a reliable fallback by invalidating the query when the popup closes.
 
 ---
 

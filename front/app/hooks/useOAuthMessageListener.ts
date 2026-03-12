@@ -19,8 +19,6 @@ export function useOAuthMessageListener({ platform }: UseOAuthMessageListenerPro
     const [oauthError, setOauthError] = useState<OAuthErrorCode | null>(null);
 
     const handleMessage = useCallback((event: MessageEvent<OAuthCallbackMessage>) => {
-
-        console.log(event)
         if (event.origin !== window.location.origin) {
             return;
         }

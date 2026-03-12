@@ -1,5 +1,5 @@
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
-import IntegrationSettingCard from "~/components/settings/integration/IntegrationSettingCard"
+import IntegrationLoginCard from "~/components/integrations/IntegrationLoginCard"
 import Shimmer from "~/components/ui/Shimmer"
 import { platformOptions } from "~/models/enums/Platform"
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations"
@@ -18,7 +18,7 @@ export default function OnboardingConnectIntegrationStep() {
                     <Shimmer height="h-32" width="w-full" />
                 ) : (
                     platformOptions.map((platform) => (
-                        <IntegrationSettingCard
+                        <IntegrationLoginCard
                             key={platform}
                             projectUuid={projectUuid}
                             platform={platform}
