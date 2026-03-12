@@ -1,9 +1,9 @@
 import { ONBOARDING_STEP_ORDER } from "~/models/enums/OnboardingStep"
-import { useShowOnboarding } from "./useShowOnboarding"
+import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 import { useCompleteOnboardingStep } from "./useCompleteOnboardingStep"
 
 export function useAdvanceOnboardingStep() {
-    const { onboarding } = useShowOnboarding()
+    const { onboarding } = useOnboardingFlow()
     const { completeStep } = useCompleteOnboardingStep()
 
     const currentStepIndex = (() => {

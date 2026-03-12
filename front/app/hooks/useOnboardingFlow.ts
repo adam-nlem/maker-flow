@@ -39,6 +39,7 @@ export function useOnboardingFlow() {
     return {
         isAuthLoading,
         isAuthenticated,
+        onboarding,
         currentStep,
         totalSteps,
         currentOnboardingStep,

@@ -1,13 +1,11 @@
 import { ChevronRightIcon } from "@heroicons/react/24/solid"
 
-import { useShowOnboarding } from "~/hooks/api/onboarding/useShowOnboarding"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 import { type OnboardingStep, ONBOARDING_STEP_ORDER, onboardingStepToIcon, onboardingStepToShortLabel } from "~/models/enums/OnboardingStep"
 import { WELCOME_STEP_ORDER, welcomeStepToIcon, welcomeStepToShortLabel } from "~/models/enums/WelcomeStep"
 
 export default function OnboardingProgressBar() {
-    const { onboarding } = useShowOnboarding()
-    const { isAuthenticated, currentOnboardingStep, currentWelcomeStep } = useOnboardingFlow()
+    const { isAuthenticated, onboarding, currentOnboardingStep, currentWelcomeStep } = useOnboardingFlow()
 
     const steps = isAuthenticated ? ONBOARDING_STEP_ORDER : WELCOME_STEP_ORDER
     const iconMap = isAuthenticated ? onboardingStepToIcon : welcomeStepToIcon

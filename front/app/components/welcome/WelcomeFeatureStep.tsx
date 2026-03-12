@@ -12,7 +12,7 @@ const features = [
     {
         icon: ChartBarIcon,
         title: "Statistiques",
-        description: "Suivez vos performances Instagram et YouTube avec des insights détaillés en temps réel.",
+        description: "Suivez vos performances Instagram et YouTube avec des statistiques détaillés en temps réel.",
     },
     {
         icon: CalendarDaysIcon,
