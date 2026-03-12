@@ -47,7 +47,7 @@ export default function OnboardingCreateScriptStep() {
 
             {script ? (
                 <div className="w-full max-w-xl flex-1 min-h-0 rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden flex flex-col">
-                    <ScriptEditorPanel key={script.uuid} script={script} projectUuid={projectUuid} />
+                    <ScriptEditorPanel key={script.uuid} script={script} projectUuid={projectUuid} hidePanelTriggers />
                 </div>
             ) : (
                 <div className="w-full max-w-xl flex flex-col gap-3 px-6 py-4">

@@ -16,10 +16,11 @@ interface ScriptEditorPanelProps {
     script: Script;
     projectUuid: string;
     isReadOnly?: boolean;
+    hidePanelTriggers?: boolean;
     onOpenEditor?: () => void;
 }
 
-export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, onOpenEditor }: ScriptEditorPanelProps) {
+export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, hidePanelTriggers, onOpenEditor }: ScriptEditorPanelProps) {
     const focusedGenerationUuid = useScriptGenerationStore((s) => s.focusedGenerationUuid);
     const setFocusedGenerationUuid = useScriptGenerationStore((s) => s.setFocusedGenerationUuid);
     const { generations } = useListScriptGenerations({ scriptUuid: script.uuid });
@@ -45,6 +46,7 @@ export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, onO
                 projectUuid={projectUuid}
                 onOpenGenerateModal={() => togglePanel(ScriptRightPanel.Generate)}
                 isReadOnly={isReadOnly}
+                hidePanelTriggers={hidePanelTriggers}
                 onOpenEditor={onOpenEditor}
             />
 
@@ -65,7 +67,7 @@ export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, onO
                 </div>
             ) : (
                 <div className="flex-1 overflow-y-auto scrollbar-none">
-                    <ScriptPartsList parts={parts} script={script} generationUuid={focusedGenerationUuid} isReadOnly={isReadOnly} />
+                    <ScriptPartsList parts={parts} script={script} generationUuid={focusedGenerationUuid} isReadOnly={isReadOnly} hidePanelTriggers={hidePanelTriggers} />
                 </div>
             )}
         </div>

@@ -38,6 +38,7 @@ interface ScriptPartsListProps {
     script: Script;
     generationUuid?: string;
     isReadOnly?: boolean;
+    hidePanelTriggers?: boolean;
 }
 
 interface DraggablePartProps {
@@ -90,7 +91,7 @@ function renderPartCard(part: ScriptPart, scriptUuid: string, dragHandleProps?: 
     }
 }
 
-export default function ScriptPartsList({ parts, script, generationUuid, isReadOnly }: ScriptPartsListProps) {
+export default function ScriptPartsList({ parts, script, generationUuid, isReadOnly, hidePanelTriggers }: ScriptPartsListProps) {
     const scriptUuid = script.uuid;
 
     const hookPart = parts.find((p) => p.type === "hook") as ScriptHook | undefined;
@@ -144,7 +145,7 @@ export default function ScriptPartsList({ parts, script, generationUuid, isReadO
             <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-none">
                 {hookPart && (
                     <div className="mb-3">
-                        <ScriptHookCard key={`${hookPart.uuid}-${hookPart.hookTemplate?.uuid}`} hook={hookPart} scriptUuid={scriptUuid} isReadOnly={isReadOnly} />
+                        <ScriptHookCard key={`${hookPart.uuid}-${hookPart.hookTemplate?.uuid}`} hook={hookPart} scriptUuid={scriptUuid} isReadOnly={isReadOnly} hidePanelTriggers={hidePanelTriggers} />
                     </div>
                 )}
 
@@ -173,7 +174,7 @@ export default function ScriptPartsList({ parts, script, generationUuid, isReadO
             </div>
 
             {!isReadOnly && (
-                <div className="px-6 py-4 border-t border-light-gray">
+                <div className="px-6 py-4 border-t border-light-gray bg-clear">
                     <AddScriptPartMenu scriptUuid={scriptUuid} generationUuid={generationUuid} hasHook={hookPart !== undefined} />
                 </div>
             )}

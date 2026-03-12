@@ -18,9 +18,10 @@ interface ScriptHookCardProps {
     hook: ScriptHook;
     scriptUuid: string;
     isReadOnly?: boolean;
+    hidePanelTriggers?: boolean;
 }
 
-export default function ScriptHookCard({ hook, scriptUuid, isReadOnly }: ScriptHookCardProps) {
+export default function ScriptHookCard({ hook, scriptUuid, isReadOnly, hidePanelTriggers }: ScriptHookCardProps) {
     const [content, setContent] = useState(hook.content);
     const [pendingTemplate, setPendingTemplate] = useState<HookTemplate | null>(null);
 
@@ -80,7 +81,7 @@ export default function ScriptHookCard({ hook, scriptUuid, isReadOnly }: ScriptH
                 partType={ScriptPartType.Hook}
                 onDelete={isReadOnly ? undefined : () => deleteScriptHook({ hookUuid: hook.uuid, scriptUuid })}
                 isDeleting={isDeleting}
-                headerActions={!isReadOnly ? (
+                headerActions={!isReadOnly && !hidePanelTriggers ? (
                     <button
                         onClick={() => togglePanel(ScriptRightPanel.HookTemplates)}
                         className="text-gray hover:text-dark transition-colors cursor-pointer opacity-0 group-hover:opacity-100"

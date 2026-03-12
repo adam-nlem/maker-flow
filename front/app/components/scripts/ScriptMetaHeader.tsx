@@ -18,10 +18,11 @@ interface ScriptMetaHeaderProps {
     projectUuid: string;
     onOpenGenerateModal: () => void;
     isReadOnly?: boolean;
+    hidePanelTriggers?: boolean;
     onOpenEditor?: () => void;
 }
 
-export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal, isReadOnly, onOpenEditor }: ScriptMetaHeaderProps) {
+export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal, isReadOnly, hidePanelTriggers, onOpenEditor }: ScriptMetaHeaderProps) {
     const [title, setTitle] = useState(script.title);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [status, setStatus] = useState<ScriptStatus | undefined>(script.status);
@@ -49,7 +50,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
     return (
         <div className="px-6 py-5 border-b border-light-gray flex flex-col gap-4">
             <div className="flex flex-row items-center gap-2">
-                <TextArea
+                <Input
                     simple
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
@@ -69,7 +70,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                         bgColorClassName="bg-primary/10"
                         borderColorClassName="border border-primary/30"
                     />
-                ) : !isReadOnly ? (
+                ) : !isReadOnly && !hidePanelTriggers ? (
                     <button onClick={onOpenGenerateModal} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Générer avec l'IA">
                         <SparklesIcon className="size-5" strokeWidth={2} />
                     </button>

@@ -29,7 +29,7 @@ export default function AddScriptPartMenu({ scriptUuid, generationUuid, hasHook 
 
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="flex flex-row items-center gap-2 px-4 py-2.5 border border-light-gray rounded-xl bg-clear hover:bg-surface-hover transition-colors text-gray hover:text-dark cursor-pointer w-full"
+                className="flex flex-row items-center gap-2 px-4 py-2.5 border border-primary/30 rounded-xl bg-primary/10 hover:bg-surface-hover transition-colors text-primary hover:text-dark cursor-pointer w-full"
             >
                 <PlusIcon className="size-4 shrink-0" strokeWidth={2} />
                 <span className="text-heading-sm">Ajouter un élément</span>
