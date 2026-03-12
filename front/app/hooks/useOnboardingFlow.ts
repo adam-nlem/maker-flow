@@ -22,18 +22,15 @@ export function useOnboardingFlow() {
 
     const isAuthenticated = !!user
 
-    const onboardingStepIndex = (() => {
-        if (!onboarding) return 0
-        const idx = ONBOARDING_STEP_ORDER.findIndex((s) => !onboarding.isStepCompleted(s))
-        return idx === -1 ? ONBOARDING_STEP_ORDER.length - 1 : idx
-    })()
+    const currentOnboardingStep = onboarding
+        ? ONBOARDING_STEP_ORDER.find((s) => !onboarding.isStepCompleted(s)) ?? ONBOARDING_STEP_ORDER[ONBOARDING_STEP_ORDER.length - 1]
+        : ONBOARDING_STEP_ORDER[0]
 
     const welcomeStepIndex = WELCOME_STEP_ORDER.indexOf(welcomeStep)
 
     const totalSteps = isAuthenticated ? ONBOARDING_STEP_ORDER.length : WELCOME_STEP_ORDER.length
-    const currentStep = isAuthenticated ? onboardingStepIndex : welcomeStepIndex
+    const currentStep = isAuthenticated ? ONBOARDING_STEP_ORDER.indexOf(currentOnboardingStep) : welcomeStepIndex
 
-    const currentOnboardingStep = ONBOARDING_STEP_ORDER[onboardingStepIndex]
     const currentWelcomeStep = welcomeStep
 
     return {

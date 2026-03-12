@@ -80,8 +80,8 @@ Step metadata defined as const maps: `onboardingStepToFrenchTranslation`, `onboa
 | 0 | `WelcomeStep.Hero` | `WelcomeHeroStep` | Hero section with value proposition |
 | 1 | `WelcomeStep.Features` | `WelcomeFeatureStep` | Feature cards grid |
 | 2 | `WelcomeStep.HowItWorks` | `WelcomeHowItWorksStep` | 3-step visual guide |
-| 3 | `WelcomeStep.Register` | `OnboardingRegisterStep` | Embedded register form, "J'ai déjà un compte" link to `/login` |
-| 4 | `WelcomeStep.VerifyOtp` | `OnboardingVerifyOtpStep` | 6-digit OTP verification, resend button |
+| 3 | `WelcomeStep.Register` | `WelcomeRegisterStep` | Register form with icon/title/description, Back + "J'ai déjà un compte" buttons |
+| 4 | `WelcomeStep.VerifyOtp` | `WelcomeVerifyOtpStep` | OTP verification with icon/title/dynamic email description, Back button |
 
 All pre-auth components navigate via `useOnboardingStore.setWelcomeStep()`. Register step also calls `setOtpCredentials()` before navigating to OTP.
 
@@ -179,6 +179,8 @@ Props: `pendingOtpToken`, `purpose`, `onVerified?`, `formSpacing?`.
 - `WelcomeHeroStep` — Hero section
 - `WelcomeFeatureStep` — Feature cards
 - `WelcomeHowItWorksStep` — How it works guide
+- `WelcomeRegisterStep` — Register form
+- `WelcomeVerifyOtpStep` — OTP verification
 
 ## OnboardingGenerateScriptStep Detail
 
@@ -215,8 +217,8 @@ Returns: `{ phase, script, isPending, isFailed, messageIndex, handleBriefSubmit 
 - `app/hooks/api/onboarding/useShowOnboarding.ts`
 - `app/hooks/api/onboarding/useDismissOnboarding.ts`
 - `app/components/onboarding/OnboardingStepHeader.tsx`
-- `app/components/onboarding/OnboardingRegisterStep.tsx`
-- `app/components/onboarding/OnboardingVerifyOtpStep.tsx`
+- `app/components/welcome/WelcomeRegisterStep.tsx`
+- `app/components/welcome/WelcomeVerifyOtpStep.tsx`
 - `app/components/onboarding/OnboardingCreateProjectStep.tsx`
 - `app/components/onboarding/OnboardingConnectIntegrationStep.tsx`
 - `app/components/onboarding/OnboardingCreatorProfileStep.tsx`

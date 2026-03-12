@@ -3,8 +3,8 @@ import type { ReactNode } from "react"
 import WelcomeHeroStep from "~/components/welcome/WelcomeHeroStep"
 import WelcomeFeatureStep from "~/components/welcome/WelcomeFeatureStep"
 import WelcomeHowItWorksStep from "~/components/welcome/WelcomeHowItWorksStep"
-import OnboardingRegisterStep from "~/components/onboarding/OnboardingRegisterStep"
-import OnboardingVerifyOtpStep from "~/components/onboarding/OnboardingVerifyOtpStep"
+import WelcomeRegisterStep from "~/components/welcome/WelcomeRegisterStep"
+import WelcomeVerifyOtpStep from "~/components/welcome/WelcomeVerifyOtpStep"
 import OnboardingCreateProjectStep from "~/components/onboarding/OnboardingCreateProjectStep"
 import OnboardingConnectIntegrationStep from "~/components/onboarding/OnboardingConnectIntegrationStep"
 import OnboardingCreatorProfileStep from "~/components/onboarding/OnboardingCreatorProfileStep"
@@ -19,8 +19,8 @@ const welcomeNodes: Record<WelcomeStep, ReactNode> = {
     [WelcomeStep.Hero]: <WelcomeHeroStep />,
     [WelcomeStep.Features]: <WelcomeFeatureStep />,
     [WelcomeStep.HowItWorks]: <WelcomeHowItWorksStep />,
-    [WelcomeStep.Register]: <OnboardingRegisterStep />,
-    [WelcomeStep.VerifyOtp]: <OnboardingVerifyOtpStep />,
+    [WelcomeStep.Register]: <WelcomeRegisterStep />,
+    [WelcomeStep.VerifyOtp]: <WelcomeVerifyOtpStep />,
 }
 
 const onboardingNodes: Record<OnboardingStep, ReactNode> = {
