@@ -1,4 +1,4 @@
-import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
+import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import CreateProjectForm from "~/components/projects/CreateProjectForm"
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
@@ -13,12 +13,8 @@ export default function OnboardingCreateProjectStep() {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center px-6">
-            <div className="w-full max-w-md">
-                <OnboardingStepHeader />
-
-                <CreateProjectForm onProjectCreated={handleProjectCreated} buttonStyle="primary" />
-            </div>
-        </div>
+        <OnboardingStepLayout maxWidth="max-w-md">
+            <CreateProjectForm onProjectCreated={handleProjectCreated} buttonStyle="primary" />
+        </OnboardingStepLayout>
     )
 }

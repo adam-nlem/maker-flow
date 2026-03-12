@@ -1,8 +1,6 @@
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
-import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
 import { onboardingStepToFrenchTranslation, onboardingStepToDescription } from "~/models/enums/OnboardingStep"
-import { welcomeStepToTitle, welcomeStepToDescription, WelcomeStep } from "~/models/enums/WelcomeStep"
 import { Button } from "../ui/Button"
 import { ArrowRightIcon } from "@heroicons/react/24/outline"
 import OnboardingProgressBar from "./OnboardingProgressBar"
@@ -14,9 +12,10 @@ interface OnboardingStepHeaderProps {
 export default function OnboardingStepHeader({ disableNextButton }: OnboardingStepHeaderProps) {
     const { advanceStep } = useAdvanceOnboardingStep()
     const { currentOnboardingStep } = useOnboardingFlow()
+
     return (
-        <>
-            <div className="fixed top-0 left-0 right-0 flex items-center justify-center p-5">
+        <div className="flex flex-col items-center w-full mb-5">
+            <div className="flex items-center justify-center w-full mb-5">
                 <div className="flex-1" />
                 <OnboardingProgressBar />
                 <div className="flex-1 flex justify-end">
@@ -29,14 +28,12 @@ export default function OnboardingStepHeader({ disableNextButton }: OnboardingSt
                 </div>
             </div>
 
-            <div className="mb-8 flex flex-col gap-2 items-center text-center">
-                <h2 className="text-heading-3xl text-dark">
-                    {onboardingStepToFrenchTranslation[currentOnboardingStep]}
-                </h2>
-                <p className="text-body-sm text-gray">
-                    {onboardingStepToDescription[currentOnboardingStep]}
-                </p>
-            </div>
-        </>
+            <h2 className="text-heading-3xl text-dark mb-2 text-center">
+                {onboardingStepToFrenchTranslation[currentOnboardingStep]}
+            </h2>
+            <p className="text-body-sm text-gray text-center">
+                {onboardingStepToDescription[currentOnboardingStep]}
+            </p>
+        </div>
     )
 }

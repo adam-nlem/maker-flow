@@ -1,5 +1,4 @@
-import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
-import SimpleTextButton from "~/components/ui/SimpleTextButton"
+import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import CreatorProfileForm from "~/components/scripts/creatorProfile/CreatorProfileForm"
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
@@ -11,23 +10,13 @@ export default function OnboardingCreatorProfileStep() {
     if (!projectUuid) return null
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center px-6">
-            <div className="w-full max-w-lg">
-                <OnboardingStepHeader />
-
-                <CreatorProfileForm
-                    projectUuid={projectUuid}
-                    creatorProfile={null}
-                    onSuccess={advanceStep}
-                    variant="onboarding"
-                />
-
-                <div className="mt-6 flex justify-center">
-                    <SimpleTextButton onClick={advanceStep}>
-                        Passer
-                    </SimpleTextButton>
-                </div>
-            </div>
-        </div>
+        <OnboardingStepLayout maxWidth="max-w-lg">
+            <CreatorProfileForm
+                projectUuid={projectUuid}
+                creatorProfile={null}
+                onSuccess={advanceStep}
+                variant="onboarding"
+            />
+        </OnboardingStepLayout>
     )
 }

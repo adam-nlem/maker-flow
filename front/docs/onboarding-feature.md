@@ -115,11 +115,19 @@ Class with `fromJSON`, computed getters: `isCompleted`, `isDismissed`, `completi
 
 ## Shared Components
 
+### `OnboardingStepLayout`
+
+**File:** `app/components/onboarding/OnboardingStepLayout.tsx`
+
+Shared layout component used by all onboarding step components. Provides consistent structure: full-screen centered layout with `OnboardingStepHeader` and content area.
+
+Props: `maxWidth?` (string, defaults to `"max-w-lg"`), `disableNextButton?` (boolean), `fullHeight?` (boolean, uses `h-screen` with top padding instead of `min-h-screen` centered), `padding?` (string, defaults to `"px-6"`), `children` (ReactNode).
+
 ### `OnboardingStepHeader`
 
 **File:** `app/components/onboarding/OnboardingStepHeader.tsx`
 
-Self-contained header used by all onboarding step components. Reads the current step from `useOnboardingFlow` and looks up title/description from enum metadata (`onboardingStepToFrenchTranslation`, `onboardingStepToDescription`, `welcomeStepToTitle`, `welcomeStepToDescription`). Handles the VerifyOtp dynamic description (includes email from `useOnboardingStore`) internally. Also renders the progress bar and "Continuer" button.
+Self-contained header used by `OnboardingStepLayout`. Reads the current step from `useOnboardingFlow` and looks up title/description from enum metadata (`onboardingStepToFrenchTranslation`, `onboardingStepToDescription`, `welcomeStepToTitle`, `welcomeStepToDescription`). Handles the VerifyOtp dynamic description (includes email from `useOnboardingStore`) internally. Also renders the progress bar and "Continuer" button.
 
 Props: `disableNextButton?` (optional, used by `OnboardingCreateScriptStep`).
 

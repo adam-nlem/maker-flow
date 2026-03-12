@@ -66,9 +66,7 @@ export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, hid
                     <Shimmer height="h-16" width="w-full" />
                 </div>
             ) : (
-                <div className="flex-1 overflow-y-auto scrollbar-none">
-                    <ScriptPartsList parts={parts} script={script} generationUuid={focusedGenerationUuid} isReadOnly={isReadOnly} hidePanelTriggers={hidePanelTriggers} />
-                </div>
+                <ScriptPartsList parts={parts} script={script} generationUuid={focusedGenerationUuid} isReadOnly={isReadOnly} hidePanelTriggers={hidePanelTriggers} />
             )}
         </div>
     );

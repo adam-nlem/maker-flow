@@ -1,12 +1,9 @@
 import { useEffect, useRef, useState } from "react"
-import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
+import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import ScriptEditorPanel from "~/components/scripts/ScriptEditorPanel"
 import Shimmer from "~/components/ui/Shimmer"
-import { Button } from "~/components/ui/Button"
-import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript"
 import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts"
-import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore"
 import type { Script } from "~/models/Script"
@@ -14,7 +11,6 @@ import type { Script } from "~/models/Script"
 export default function OnboardingCreateScriptStep() {
     const projectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
     const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid)
-
 
     const [script, setScript] = useState<Script | null>(null)
     const hasResolved = useRef(false)
@@ -40,13 +36,9 @@ export default function OnboardingCreateScriptStep() {
     if (!projectUuid) return null
 
     return (
-        <div className="h-screen flex flex-col items-center px-6 pt-24 pb-6">
-            <div className="w-full max-w-xl shrink-0">
-                <OnboardingStepHeader disableNextButton={!script} />
-            </div>
-
+        <OnboardingStepLayout maxWidth="max-w-xl" disableNextButton={!script}>
             {script ? (
-                <div className="w-full max-w-xl flex-1 min-h-0 rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden flex flex-col">
+                <div className="w-full max-w-xl flex-1 min-h-[75vh]  max-h-[75vh] rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden flex flex-col">
                     <ScriptEditorPanel key={script.uuid} script={script} projectUuid={projectUuid} hidePanelTriggers />
                 </div>
             ) : (
@@ -56,6 +48,6 @@ export default function OnboardingCreateScriptStep() {
                     <Shimmer height="h-16" width="w-full" />
                 </div>
             )}
-        </div>
+        </OnboardingStepLayout>
     )
 }

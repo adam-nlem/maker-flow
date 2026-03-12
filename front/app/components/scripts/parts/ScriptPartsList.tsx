@@ -141,40 +141,39 @@ export default function ScriptPartsList({ parts, script, generationUuid, isReadO
     };
 
     return (
-        <div className="flex flex-col h-full overflow-hidden bg-dot-pattern">
-            <div className="flex-1 overflow-y-auto px-6 py-4 scrollbar-none">
+        <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-dot-pattern">
+            <div className="flex-1 overflow-y-auto px-6 py-4 h-full scrollbar-none">
                 {hookPart && (
                     <div className="mb-3">
                         <ScriptHookCard key={`${hookPart.uuid}-${hookPart.hookTemplate?.uuid}`} hook={hookPart} scriptUuid={scriptUuid} isReadOnly={isReadOnly} hidePanelTriggers={hidePanelTriggers} />
                     </div>
                 )}
+                    <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+                        <DroppableZone id="parts-list">
+                            {localParts.map((part) => (
+                                <DraggablePart key={part.uuid} part={part} scriptUuid={scriptUuid} isReadOnly={isReadOnly} />
+                            ))}
+                        </DroppableZone>
 
-                <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-                    <DroppableZone id="parts-list">
-                        {localParts.map((part) => (
-                            <DraggablePart key={part.uuid} part={part} scriptUuid={scriptUuid} isReadOnly={isReadOnly} />
-                        ))}
-                    </DroppableZone>
-
-                    {!isReadOnly && (localParts.length === 0) && (
-                        <div className="flex flex-col items-center justify-center text-gray">
-                            <p className="text-body-sm text-center">Vous n'avez pas encore d'éléments dans votre script.</p>
-                            <p className="text-body-sm text-center">Utilisez « + Ajouter un élément » pour commencer.</p>
-                        </div>
-                    )}
-
-                    <DragOverlay>
-                        {activePart && (
-                            <div className="opacity-90 rotate-1 shadow-lg">
-                                {renderPartCard(activePart, scriptUuid)}
+                        {!isReadOnly && (localParts.length === 0) && (
+                            <div className="flex flex-col items-center justify-center text-gray">
+                                <p className="text-body-sm text-center">Vous n'avez pas encore d'éléments dans votre script.</p>
+                                <p className="text-body-sm text-center">Utilisez « + Ajouter un élément » pour commencer.</p>
                             </div>
                         )}
-                    </DragOverlay>
-                </DndContext>
-            </div>
+
+                        <DragOverlay>
+                            {activePart && (
+                                <div className="opacity-90 rotate-1 shadow-lg">
+                                    {renderPartCard(activePart, scriptUuid)}
+                                </div>
+                            )}
+                        </DragOverlay>
+                    </DndContext>
+                </div>
 
             {!isReadOnly && (
-                <div className="px-6 py-4 border-t border-light-gray bg-clear">
+                <div className="min-h-0 px-6 py-4 border-t border-light-gray bg-clear">
                     <AddScriptPartMenu scriptUuid={scriptUuid} generationUuid={generationUuid} hasHook={hookPart !== undefined} />
                 </div>
             )}

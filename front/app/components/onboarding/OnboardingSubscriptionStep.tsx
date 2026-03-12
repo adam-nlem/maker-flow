@@ -1,42 +1,10 @@
-import { useEffect } from "react"
-import { useNavigate } from "react-router"
-import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
-import { Button } from "~/components/ui/Button"
+import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import PlanSelector from "~/components/settings/subscription/PlanSelector"
-import { useCompleteOnboardingStep } from "~/hooks/api/onboarding/useCompleteOnboardingStep"
-import { useDismissOnboarding } from "~/hooks/api/onboarding/useDismissOnboarding"
-import { OnboardingStep } from "~/models/enums/OnboardingStep"
 
 export default function OnboardingSubscriptionStep() {
-    const navigate = useNavigate()
-    const { completeStep, isPending } = useCompleteOnboardingStep()
-
-    const handleFinish = async () => {
-        await completeStep(OnboardingStep.ShowSubscriptions)
-        navigate('/', { replace: true })
-    }
-
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center px-6">
-            <div className="w-full max-w-3xl">
-                <OnboardingStepHeader />
-
-                <div className="mb-8">
-                    <PlanSelector />
-                </div>
-
-                <div className="flex justify-center">
-                    <Button
-                        style="primary"
-                        width="w-auto"
-                        onClick={handleFinish}
-                        isLoading={isPending}
-                        disabled={isPending}
-                    >
-                        Terminer
-                    </Button>
-                </div>
-            </div>
-        </div>
+        <OnboardingStepLayout maxWidth="max-w-3xl">
+            <PlanSelector />
+        </OnboardingStepLayout>
     )
 }
