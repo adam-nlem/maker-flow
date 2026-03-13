@@ -2591,7 +2591,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"plan\": \"starter\"\n}"
+              "raw": "{\n  \"plan\": \"starter\",\n  \"checkout_redirect_path\": \"/onboarding\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/subscriptions/checkout",

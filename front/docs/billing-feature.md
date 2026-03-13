@@ -192,8 +192,8 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 | Hook | Endpoint | Returns |
 |------|----------|---------|
 | `useShowCreditBalance` | `GET /api/credits/balance` | `{ creditBalance, isLoading, error }` |
-| `useShowCurrentSubscription` | `GET /api/subscriptions/current` | `{ subscription, isLoading, error }` (null if no subscription) |
-| `useCreateSubscriptionCheckout` | `POST /api/subscriptions/checkout` | `{ createCheckout, isPending, error }` (redirects to Stripe on success) |
+| `useShowCurrentSubscription` | `GET /api/subscriptions/current` | `{ subscription, isLoading, error }` (null if no subscription). Accepts optional `{ refetchInterval }` for polling. |
+| `useCreateSubscriptionCheckout` | `POST /api/subscriptions/checkout` | `{ createCheckout, isPending, error }` (redirects to Stripe on success). `createCheckout({ plan, checkoutRedirectPath? })` — optional base path for Stripe redirect (backend appends `?checkout=success` / `?checkout=cancel`). |
 | `useCancelSubscription` | `POST /api/subscriptions/cancel` | `{ cancelSubscription, isPending, error }` (invalidates subscription query) |
 | `useResumeSubscription` | `POST /api/subscriptions/resume` | `{ resumeSubscription, isPending, error }` (invalidates subscription query) |
 | `useCreateTopupCheckout` | `POST /api/credits/topup/checkout` | `{ createTopupCheckout, isPending, error }` (redirects to Stripe on success) |
@@ -205,12 +205,22 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 
 ### SubscriptionSettings (`components/settings/SubscriptionSettings.tsx`)
 
-Main orchestrator for the subscription page. Displays:
+Layout component for the subscription settings page. Displays:
 1. Credit balance card with topup button (always)
-2. Current subscription card with management actions (if subscribed) OR Plan selector (if not)
+2. `SubscriptionOverview` — handles subscription status and plan selection
 3. Credit transaction history (always, hidden if no transactions)
 
-Handles `?checkout=success` query param to show a success toast after Stripe redirect.
+### SubscriptionOverview (`components/settings/subscription/SubscriptionOverview.tsx`)
+
+Shared component used by both the settings page and the onboarding flow. Encapsulates:
+- Subscription fetching via `useShowCurrentSubscription()` (with polling when `?checkout=success` is detected)
+- Checkout success handling: shows toast + clears search params once subscription is confirmed
+- Conditional rendering: loading shimmer → subscribed view → plan selector
+
+Props:
+- `checkoutRedirectPath?: string` — base path for Stripe redirect (backend appends `?checkout=success` / `?checkout=cancel`), passed to `PlanSelector`
+- `subscribedView?: (subscription: Subscription) => ReactNode` — custom render when subscribed. Defaults to `CurrentSubscriptionCard`.
+- `loadingView?: ReactNode` — custom loading shimmer. Defaults to a bordered shimmer card.
 
 ### CreditBalanceCard (`components/settings/subscription/CreditBalanceCard.tsx`)
 
@@ -225,7 +235,7 @@ Shows current subscription: plan name, status pill, billing period dates, cancel
 
 ### PlanSelector (`components/settings/subscription/PlanSelector.tsx`)
 
-Grid of plan cards for initial subscription. Uses `planConfigs` for data and `useCreateSubscriptionCheckout` for the checkout flow.
+Grid of plan cards for initial subscription. Uses `planConfigs` for data and `useCreateSubscriptionCheckout` for the checkout flow. Accepts optional `checkoutRedirectPath` prop to override the base redirect path (used by `OnboardingSubscriptionStep` to redirect back to `/onboarding`).
 
 ### PlanCard (`components/settings/subscription/PlanCard.tsx`)
 
@@ -241,14 +251,14 @@ Paginated transaction history. Shows type (French label), date, description, and
 
 ```
 User clicks "Choisir" on a plan
-  -> useCreateSubscriptionCheckout.createCheckout(plan)
-  -> POST /api/subscriptions/checkout { plan: "starter" }
-  -> Backend creates Stripe Checkout Session
+  -> useCreateSubscriptionCheckout.createCheckout({ plan, checkoutRedirectPath? })
+  -> POST /api/subscriptions/checkout { plan: "starter", checkout_redirect_path?: "/onboarding" }
+  -> Backend creates Stripe Checkout Session (appends ?checkout=success / ?checkout=cancel to the redirect path, defaults to /settings/subscription)
   <- { checkout_url: "https://checkout.stripe.com/..." }
   -> window.location.href = checkout_url (redirect to Stripe)
   -> User completes payment on Stripe
-  -> Stripe redirects to /settings/subscription?checkout=success
-  -> SubscriptionSettings shows success toast
+  -> Stripe redirects to success_url (settings or onboarding)
+  -> Target page shows success toast
 ```
 
 ---

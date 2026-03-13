@@ -4,13 +4,17 @@ import type { SubscriptionPlan } from "~/models/enums/SubscriptionPlan";
 import { planConfigs } from "~/models/PlanConfig";
 import PlanCard from "./PlanCard";
 
-export default function PlanSelector() {
+interface PlanSelectorProps {
+    checkoutRedirectPath?: string;
+}
+
+export default function PlanSelector({ checkoutRedirectPath }: PlanSelectorProps) {
     const { createCheckout, isPending } = useCreateSubscriptionCheckout();
     const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
 
     const handleSelect = (plan: SubscriptionPlan) => {
         setSelectedPlan(plan);
-        createCheckout(plan);
+        createCheckout({ plan, checkoutRedirectPath });
     };
 
     return (

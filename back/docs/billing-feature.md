@@ -208,8 +208,8 @@ Handles Stripe Checkout Session creation for subscriptions and topup purchases.
 #### `getOrCreateStripeCustomer(User $user): string`
 Returns the user's Stripe customer ID. If none exists, creates a Stripe customer and persists the ID to the User entity.
 
-#### `createSubscriptionCheckoutSession(User $user, SubscriptionPlan $plan): string`
-Creates a Stripe Checkout Session in `subscription` mode. Resolves the price ID from env vars based on the plan. Returns the checkout URL.
+#### `createSubscriptionCheckoutSession(User $user, SubscriptionPlan $plan, string $checkoutRedirectPath = '/settings/subscription'): string`
+Creates a Stripe Checkout Session in `subscription` mode. Resolves the price ID from env vars based on the plan. Returns the checkout URL. `$checkoutRedirectPath` is the base path for both success and cancel redirects — the backend appends `?checkout=success` or `?checkout=cancel` automatically. Defaults to `/settings/subscription`.
 
 #### `createTopupCheckoutSession(User $user): string`
 Creates a Stripe Checkout Session in `payment` mode using the single topup price. Returns the checkout URL.
@@ -355,7 +355,9 @@ Thrown when a subscription management action fails (cancel, resume, or plan chan
 #### CreateSubscriptionCheckoutRequestDTO (`DTO/Request/Subscription/`)
 - Extends `AbstractRequestDTO`
 - Property: `plan` (string, NotBlank)
+- Property: `checkoutRedirectPath` (string, optional) -- base path for Stripe success/cancel redirects. Defaults to `/settings/subscription`.
 - `getPlan(): SubscriptionPlan` -- converts string to enum
+- `getCheckoutRedirectPath(): string` -- returns the base redirect path
 
 ### QueryParam DTOs
 

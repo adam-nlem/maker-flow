@@ -10,6 +10,7 @@ import {
   TimeoutException,
   UnauthorizedException,
 } from '~/services/httpClient/customHttpExceptions'
+import { ToastType } from '~/models/enums/ToastType'
 import { useToastStore } from '~/stores/toast/toastStore'
 
 function extractBackendMessage(data: unknown): string | null {
@@ -60,5 +61,5 @@ export function handleMutationError(error: CustomHttpException): void {
       message = 'Une erreur est survenue'
   }
 
-  useToastStore.getState().addToast('error', message)
+  useToastStore.getState().addToast(ToastType.Error, message)
 }

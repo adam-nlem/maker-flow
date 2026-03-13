@@ -6,11 +6,17 @@ interface CreateSubscriptionCheckoutResponse {
     checkout_url: string;
 }
 
+interface CreateSubscriptionCheckoutParams {
+    plan: SubscriptionPlan;
+    checkoutRedirectPath?: string;
+}
+
 export function useCreateSubscriptionCheckout() {
     const mutation = useMutation({
-        mutationFn: async (plan: SubscriptionPlan) => {
+        mutationFn: async ({ plan, checkoutRedirectPath }: CreateSubscriptionCheckoutParams) => {
             const res = await httpClient.post<CreateSubscriptionCheckoutResponse>('/subscriptions/checkout', {
                 plan,
+                checkoutRedirectPath,
             });
             return res.data;
         },

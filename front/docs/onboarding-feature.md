@@ -94,7 +94,7 @@ After OTP verification, `useVerifyOtp` sets user in React Query cache → compon
 | 2 | `CreateCreatorProfile` | `OnboardingCreatorProfileStep` | No (skippable) | Reuses `CreatorProfileForm` with `variant="onboarding"` |
 | 3 | `CreateFirstScript` | `OnboardingCreateScriptStep` | No (skippable) | Creates a script with title + platforms, sets `focusedScriptUuid` in store |
 | 4 | `GenerateFirstScript` | `OnboardingGenerateScriptStep` | No (skippable) | 3-phase: brief form → AI generation → preview |
-| 5 | `ShowSubscriptions` | `OnboardingSubscriptionStep` | No | Reuses `PlanSelector`, "Terminer" dismisses onboarding |
+| 5 | `ShowSubscriptions` | `OnboardingSubscriptionStep` | No | Uses shared `SubscriptionOverview` with `successUrl="/onboarding?checkout=success"` and a custom `subscribedView` (success confirmation with CheckCircleIcon + plan name). |
 
 All post-auth components read `projectUuid` from `useFocusProjectStore` and advance via `useAdvanceOnboardingStep().advanceStep()`.
 

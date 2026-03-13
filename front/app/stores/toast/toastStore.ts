@@ -1,6 +1,5 @@
 import { create } from 'zustand'
-
-export type ToastType = 'success' | 'error'
+import { ToastType } from '~/models/enums/ToastType'
 
 export type Toast = {
     id: string

@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import { XMarkIcon } from '@heroicons/react/20/solid'
+import { ToastType } from '~/models/enums/ToastType'
 import { useToastStore, type Toast } from '~/stores/toast/toastStore'
 
 const AUTO_DISMISS_MS = 5000
@@ -13,7 +14,7 @@ function ToastItem({ toast }: { toast: Toast }) {
     return () => clearTimeout(timer)
   }, [toast.id, removeToast])
 
-  const isError = toast.type === 'error'
+  const isError = toast.type === ToastType.Error
 
   return (
     <div className="pointer-events-auto w-full max-w-sm rounded-xl bg-clear shadow-lg ring-1 ring-dark/5 animate-toast-in">

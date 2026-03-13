@@ -28,7 +28,7 @@ final class SubscriptionController extends AbstractController
         $dto->build();
 
         try {
-            $checkoutUrl = $stripeCheckoutService->createSubscriptionCheckoutSession($user, $dto->getPlan());
+            $checkoutUrl = $stripeCheckoutService->createSubscriptionCheckoutSession($user, $dto->getPlan(), $dto->getCheckoutRedirectPath());
         } catch (CheckoutSessionCreationException $e) {
             return $this->json(data: ["message" => $e->getMessage()], status: Response::HTTP_BAD_REQUEST);
         }
