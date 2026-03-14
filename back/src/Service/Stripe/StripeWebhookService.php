@@ -101,7 +101,7 @@ class StripeWebhookService
             return;
         }
 
-        $this->creditService->addTopupCredits($user, $creditAmount, $paymentIntentId);
+        $this->creditService->addRefillCredits($user, $creditAmount, $paymentIntentId);
     }
 
     private function handleCustomerSubscriptionCreated(array $payload): void

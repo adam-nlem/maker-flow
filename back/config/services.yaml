@@ -114,7 +114,7 @@ services:
     App\Service\Stripe\StripePlanService:
         arguments:
             $stripeSecretKey: "%app.stripe.secret_key%"
-    App\Service\Stripe\StripeTopupService:
+    App\Service\Stripe\StripeRefillService:
         arguments:
             $stripeSecretKey: "%app.stripe.secret_key%"
     App\Service\Encryption\TokenEncryptionService:

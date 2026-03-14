@@ -8,7 +8,7 @@ use Stripe\Price;
 use Stripe\Product;
 use Stripe\Stripe;
 
-class StripeTopupService
+class StripeRefillService
 {
     private const CACHE_TTL_SECONDS = 3600;
 
@@ -19,9 +19,9 @@ class StripeTopupService
         Stripe::setApiKey($this->stripeSecretKey);
     }
 
-    public function getTopupPriceId(): ?string
+    public function getRefillPriceId(): ?string
     {
-        $cached = $this->redisStoreService->get(RedisStoreService::getStripeTopupKey());
+        $cached = $this->redisStoreService->get(RedisStoreService::getStripeRefillKey());
 
         if ($cached !== null) {
             return $cached;
@@ -32,11 +32,11 @@ class StripeTopupService
 
     public function refreshCache(): ?string
     {
-        $priceId = $this->fetchTopupPriceIdFromStripe();
+        $priceId = $this->fetchRefillPriceIdFromStripe();
 
         if ($priceId !== null) {
             $this->redisStoreService->set(
-                RedisStoreService::getStripeTopupKey(),
+                RedisStoreService::getStripeRefillKey(),
                 $priceId,
                 time() + self::CACHE_TTL_SECONDS,
             );
@@ -45,7 +45,7 @@ class StripeTopupService
         return $priceId;
     }
 
-    private function fetchTopupPriceIdFromStripe(): ?string
+    private function fetchRefillPriceIdFromStripe(): ?string
     {
         $products = Product::all(['active' => true]);
 

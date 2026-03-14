@@ -11,7 +11,7 @@ class GenerateScriptMessage
         private int $scriptGenerationId,
         private int $retryCount = 0,
         private int $debitedFromSubscription = 0,
-        private int $debitedFromTopup = 0,
+        private int $debitedFromRefill = 0,
     ) {}
 
     public function getScriptGenerationId(): int
@@ -29,8 +29,8 @@ class GenerateScriptMessage
         return $this->debitedFromSubscription;
     }
 
-    public function getDebitedFromTopup(): int
+    public function getDebitedFromRefill(): int
     {
-        return $this->debitedFromTopup;
+        return $this->debitedFromRefill;
     }
 }

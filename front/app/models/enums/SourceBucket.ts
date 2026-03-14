@@ -1,11 +1,11 @@
 export enum SourceBucket {
     SubscriptionCredits = 'subscription_credits',
-    TopupCredits = 'topup_credits',
+    RefillCredits = 'refill_credits',
 }
 
 export const sourceBucketOptions = Object.values(SourceBucket);
 
 export const sourceBucketToFrenchTranslation: Record<SourceBucket, string> = {
     [SourceBucket.SubscriptionCredits]: "Abonnement",
-    [SourceBucket.TopupCredits]: "Recharge",
+    [SourceBucket.RefillCredits]: "Recharge",
 };

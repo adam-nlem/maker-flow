@@ -18,7 +18,7 @@ class StripeCheckoutService
         private readonly string $frontendUrl,
         private readonly UserRepository $userRepository,
         private readonly StripePlanService $stripePlanService,
-        private readonly StripeTopupService $stripeTopupService,
+        private readonly StripeRefillService $stripeRefillService,
     ) {
         Stripe::setApiKey($this->stripeSecretKey);
     }
@@ -85,12 +85,12 @@ class StripeCheckoutService
     /**
      * @throws CheckoutSessionCreationException
      */
-    public function createTopupCheckoutSession(User $user): string
+    public function createRefillCheckoutSession(User $user): string
     {
-        $priceId = $this->stripeTopupService->getTopupPriceId();
+        $priceId = $this->stripeRefillService->getRefillPriceId();
 
         if ($priceId === null) {
-            throw new CheckoutSessionCreationException('No topup price found in Stripe');
+            throw new CheckoutSessionCreationException('No refill price found in Stripe');
         }
 
         $customerId = $this->getOrCreateStripeCustomer($user);

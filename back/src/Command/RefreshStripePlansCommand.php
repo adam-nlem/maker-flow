@@ -3,7 +3,7 @@
 namespace App\Command;
 
 use App\Service\Stripe\StripePlanService;
-use App\Service\Stripe\StripeTopupService;
+use App\Service\Stripe\StripeRefillService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -12,13 +12,13 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
     name: 'app:stripe:refresh-plans',
-    description: 'Refresh Stripe plans and topup cache from Stripe product/price metadata',
+    description: 'Refresh Stripe plans and refill cache from Stripe product/price metadata',
 )]
 class RefreshStripePlansCommand extends Command
 {
     public function __construct(
         private readonly StripePlanService $stripePlanService,
-        private readonly StripeTopupService $stripeTopupService,
+        private readonly StripeRefillService $stripeRefillService,
     ) {
         parent::__construct();
     }
@@ -42,12 +42,12 @@ class RefreshStripePlansCommand extends Command
             ));
         }
 
-        $topupPriceId = $this->stripeTopupService->refreshCache();
+        $refillPriceId = $this->stripeRefillService->refreshCache();
 
-        if ($topupPriceId !== null) {
-            $io->success(sprintf('Successfully cached topup price: %s', $topupPriceId));
+        if ($refillPriceId !== null) {
+            $io->success(sprintf('Successfully cached refill price: %s', $refillPriceId));
         } else {
-            $io->warning('No topup product found in Stripe (missing metadata type=topup).');
+            $io->warning('No refill product found in Stripe (missing metadata type=refill).');
         }
 
         return Command::SUCCESS;

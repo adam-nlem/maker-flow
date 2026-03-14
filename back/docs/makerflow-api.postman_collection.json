@@ -2703,20 +2703,20 @@
       "name": "Credits",
       "item": [
         {
-          "name": "Create Topup Checkout",
-          "id": "credit-topup-0001-0000-000000000001",
+          "name": "Create Refill Checkout",
+          "id": "credit-refill-0001-0000-000000000001",
           "request": {
             "method": "POST",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/credits/topup/checkout",
+              "raw": "{{baseUrl}}/api/credits/refill/checkout",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "credits",
-                "topup",
+                "refill",
                 "checkout"
               ]
             }

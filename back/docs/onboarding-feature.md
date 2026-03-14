@@ -37,7 +37,7 @@ To add a new step: add a case here and update the frontend `OnboardingStep` enum
 
 ## Welcome Credits
 
-New users receive **3 free credits** at registration via `CreditService::addWelcomeCredits()`, called from `UserController::register()`. This uses `CreditTransactionType::WelcomeBonus` and `SourceBucket::TopupCredits`.
+New users receive **3 free credits** at registration via `CreditService::addWelcomeCredits()`, called from `UserController::register()`. This uses `CreditTransactionType::WelcomeBonus` and `SourceBucket::RefillCredits`.
 
 ## API Endpoints
 

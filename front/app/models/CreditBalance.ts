@@ -1,7 +1,7 @@
 export interface CreditBalanceJSON {
     uuid: string;
     subscriptionCredits: number;
-    topupCredits: number;
+    refillCredits: number;
     createdAt: string;
     updatedAt: string | null;
 }
@@ -10,7 +10,7 @@ export class CreditBalance {
     constructor(
         public readonly uuid: string,
         public readonly subscriptionCredits: number,
-        public readonly topupCredits: number,
+        public readonly refillCredits: number,
         public readonly createdAt: Date,
         public readonly updatedAt: Date | null,
     ) {}
@@ -19,13 +19,13 @@ export class CreditBalance {
         return new CreditBalance(
             json.uuid,
             json.subscriptionCredits,
-            json.topupCredits,
+            json.refillCredits,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : null,
         );
     }
 
     get totalCredits(): number {
-        return this.subscriptionCredits + this.topupCredits;
+        return this.subscriptionCredits + this.refillCredits;
     }
 }

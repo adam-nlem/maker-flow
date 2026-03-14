@@ -2,11 +2,11 @@ import { CreditCardIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
 import Shimmer from "~/components/ui/Shimmer";
 import { useShowCreditBalance } from "~/hooks/api/credits/useShowCreditBalance";
-import { useCreateTopupCheckout } from "~/hooks/api/credits/useCreateTopupCheckout";
+import { useCreateRefillCheckout } from "~/hooks/api/credits/useCreateRefillCheckout";
 
 export default function CreditBalanceCard() {
     const { creditBalance, isLoading } = useShowCreditBalance();
-    const { createTopupCheckout, isPending: isTopupPending } = useCreateTopupCheckout();
+    const { createRefillCheckout, isPending: isRefillPending } = useCreateRefillCheckout();
     if (isLoading) {
         return (
             <div className="border border-light-gray rounded-xl p-5">
@@ -33,8 +33,8 @@ export default function CreditBalanceCard() {
                     style="secondary"
                     width="w-auto"
                     height="h-8"
-                    isLoading={isTopupPending}
-                    onClick={() => createTopupCheckout()}
+                    isLoading={isRefillPending}
+                    onClick={() => createRefillCheckout()}
                 >
                     Recharger
                 </Button>
@@ -49,7 +49,7 @@ export default function CreditBalanceCard() {
                 </div>
                 <div className="flex flex-col">
                     <p className="text-body-xs text-gray">Crédits supplémentaires</p>
-                    <p className="text-heading-sm">{creditBalance.topupCredits}</p>
+                    <p className="text-heading-sm">{creditBalance.refillCredits}</p>
                 </div>
             </div>
         </div>

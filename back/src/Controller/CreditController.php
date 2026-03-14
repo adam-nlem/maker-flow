@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\Credit\ListCreditTransactionsQueryParamDTO;
-use App\DTO\Response\Credit\CreateTopupCheckoutResponseDTO;
+use App\DTO\Response\Credit\CreateRefillCheckoutResponseDTO;
 use App\Entity\User;
 use App\Repository\CreditTransactionRepository;
 use App\Service\Credit\CreditService;
@@ -17,19 +17,19 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/credits')]
 final class CreditController extends AbstractController
 {
-    #[Route('/topup/checkout', name: 'api_credits_topup_checkout', methods: ['POST'])]
-    public function topupCheckout(StripeCheckoutService $stripeCheckoutService): JsonResponse
+    #[Route('/refill/checkout', name: 'api_credits_refill_checkout', methods: ['POST'])]
+    public function refillCheckout(StripeCheckoutService $stripeCheckoutService): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
         try {
-            $checkoutUrl = $stripeCheckoutService->createTopupCheckoutSession($user);
+            $checkoutUrl = $stripeCheckoutService->createRefillCheckoutSession($user);
         } catch (CheckoutSessionCreationException $e) {
             return $this->json(data: ["message" => $e->getMessage()], status: Response::HTTP_BAD_REQUEST);
         }
 
-        $responseDto = new CreateTopupCheckoutResponseDTO($checkoutUrl);
+        $responseDto = new CreateRefillCheckoutResponseDTO($checkoutUrl);
 
         return $this->json(data: $responseDto->getData(), status: Response::HTTP_OK);
     }

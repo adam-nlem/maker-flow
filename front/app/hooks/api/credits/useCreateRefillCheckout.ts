@@ -1,14 +1,14 @@
 import { useMutation } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 
-interface CreateTopupCheckoutResponse {
+interface CreateRefillCheckoutResponse {
     checkout_url: string;
 }
 
-export function useCreateTopupCheckout() {
+export function useCreateRefillCheckout() {
     const mutation = useMutation({
         mutationFn: async () => {
-            const res = await httpClient.post<CreateTopupCheckoutResponse>('/credits/topup/checkout');
+            const res = await httpClient.post<CreateRefillCheckoutResponse>('/credits/refill/checkout');
             return res.data;
         },
         onSuccess: (data) => {
@@ -17,7 +17,7 @@ export function useCreateTopupCheckout() {
     });
 
     return {
-        createTopupCheckout: mutation.mutateAsync,
+        createRefillCheckout: mutation.mutateAsync,
         isPending: mutation.isPending,
         error: mutation.error,
     };

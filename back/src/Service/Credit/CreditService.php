@@ -35,7 +35,7 @@ class CreditService
         return $balance;
     }
 
-    public function addTopupCredits(
+    public function addRefillCredits(
         User $user,
         int $amount,
         ?string $stripePaymentIntentId = null,
@@ -46,14 +46,14 @@ class CreditService
         try {
             $balance = $this->getOrCreateBalance($user);
 
-            $balance->setTopupCredits($balance->getTopupCredits() + $amount);
+            $balance->setRefillCredits($balance->getRefillCredits() + $amount);
 
             $transaction = $this->createTransaction(
                 user: $user,
                 balance: $balance,
                 amount: $amount,
-                type: CreditTransactionType::TopupPurchase,
-                bucket: SourceBucket::TopupCredits,
+                type: CreditTransactionType::RefillPurchase,
+                bucket: SourceBucket::RefillCredits,
                 stripePaymentIntentId: $stripePaymentIntentId,
                 stripeInvoiceId: $stripeInvoiceId,
             );
@@ -115,7 +115,7 @@ class CreditService
             if ($bucket === SourceBucket::SubscriptionCredits) {
                 $balance->setSubscriptionCredits($balance->getSubscriptionCredits() + $amount);
             } else {
-                $balance->setTopupCredits($balance->getTopupCredits() + $amount);
+                $balance->setRefillCredits($balance->getRefillCredits() + $amount);
             }
 
             $transaction = $this->createTransaction(
@@ -160,7 +160,7 @@ class CreditService
             }
 
             $fromSubscription = min($balance->getSubscriptionCredits(), $amount);
-            $fromTopup = $amount - $fromSubscription;
+            $fromRefill = $amount - $fromSubscription;
 
             $transactions = [];
 
@@ -176,15 +176,15 @@ class CreditService
                 );
             }
 
-            if ($fromTopup > 0) {
-                $balance->setTopupCredits($balance->getTopupCredits() - $fromTopup);
+            if ($fromRefill > 0) {
+                $balance->setRefillCredits($balance->getRefillCredits() - $fromRefill);
 
                 $transactions[] = $this->createTransaction(
                     user: $user,
                     balance: $balance,
-                    amount: -$fromTopup,
+                    amount: -$fromRefill,
                     type: $type,
-                    bucket: SourceBucket::TopupCredits,
+                    bucket: SourceBucket::RefillCredits,
                 );
             }
 
@@ -207,14 +207,14 @@ class CreditService
         try {
             $balance = $this->getOrCreateBalance($user);
 
-            $balance->setTopupCredits($balance->getTopupCredits() + $amount);
+            $balance->setRefillCredits($balance->getRefillCredits() + $amount);
 
             $transaction = $this->createTransaction(
                 user: $user,
                 balance: $balance,
                 amount: $amount,
                 type: CreditTransactionType::WelcomeBonus,
-                bucket: SourceBucket::TopupCredits,
+                bucket: SourceBucket::RefillCredits,
             );
 
             $this->entityManager->flush();

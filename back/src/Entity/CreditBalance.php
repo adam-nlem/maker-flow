@@ -30,7 +30,7 @@ class CreditBalance
 
     #[ORM\Column(type: Types::INTEGER)]
     #[Groups(['api_credit_balance_show'])]
-    private int $topupCredits = 0;
+    private int $refillCredits = 0;
 
     #[ORM\Column]
     #[Groups(['api_credit_balance_show'])]
@@ -102,21 +102,21 @@ class CreditBalance
         return $this;
     }
 
-    public function getTopupCredits(): int
+    public function getRefillCredits(): int
     {
-        return $this->topupCredits;
+        return $this->refillCredits;
     }
 
-    public function setTopupCredits(int $topupCredits): static
+    public function setRefillCredits(int $refillCredits): static
     {
-        $this->topupCredits = $topupCredits;
+        $this->refillCredits = $refillCredits;
 
         return $this;
     }
 
     public function getTotalCredits(): int
     {
-        return $this->subscriptionCredits + $this->topupCredits;
+        return $this->subscriptionCredits + $this->refillCredits;
     }
 
     public function getCreatedAt(): ?\DateTimeImmutable

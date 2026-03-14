@@ -62,8 +62,8 @@ class RedisStoreService
         return 'STRIPE/PLANS';
     }
 
-    public static function getStripeTopupKey(): string
+    public static function getStripeRefillKey(): string
     {
-        return 'STRIPE/TOPUP';
+        return 'STRIPE/REFILL';
     }
 }

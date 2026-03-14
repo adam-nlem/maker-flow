@@ -59,7 +59,7 @@ class GenerateScriptHandler
         // On the first attempt (retryCount=0) we debit here; on retries the amounts are carried
         // from the original message so we never double-charge.
         $debitedFromSubscription = $message->getDebitedFromSubscription();
-        $debitedFromTopup = $message->getDebitedFromTopup();
+        $debitedFromRefill = $message->getDebitedFromRefill();
 
         if ($message->getRetryCount() === 0) {
             try {
@@ -68,7 +68,7 @@ class GenerateScriptHandler
                     if ($tx->getSourceBucket() === SourceBucket::SubscriptionCredits) {
                         $debitedFromSubscription = abs($tx->getAmount());
                     } else {
-                        $debitedFromTopup = abs($tx->getAmount());
+                        $debitedFromRefill = abs($tx->getAmount());
                     }
                 }
             } catch (InsufficientCreditsException $e) {
@@ -109,7 +109,7 @@ class GenerateScriptHandler
                         $generation->getId(),
                         $message->getRetryCount() + 1,
                         $debitedFromSubscription,
-                        $debitedFromTopup,
+                        $debitedFromRefill,
                     ),
                     [new DelayStamp($delay)],
                 );
@@ -144,13 +144,13 @@ class GenerateScriptHandler
                     captureException($e);
                 }
             }
-            if ($debitedFromTopup > 0) {
+            if ($debitedFromRefill > 0) {
                 try {
                     $this->creditService->refundCredit(
                         $user,
-                        $debitedFromTopup,
+                        $debitedFromRefill,
                         CreditTransactionType::ScriptGenerationRefund,
-                        SourceBucket::TopupCredits,
+                        SourceBucket::RefillCredits,
                     );
                 } catch (\Throwable $e) {
                     captureException($e);

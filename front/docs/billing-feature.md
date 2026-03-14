@@ -70,7 +70,7 @@ Exports: `subscriptionStatusOptions`, `subscriptionStatusToFrenchTranslation`
 | Case | Value |
 |------|-------|
 | SubscriptionRenewal | `subscription_renewal` |
-| TopupPurchase | `topup_purchase` |
+| RefillPurchase | `refill_purchase` |
 | ScriptGeneration | `script_generation` |
 | Refund | `refund` |
 | ManualAdjustment | `manual_adjustment` |
@@ -82,7 +82,7 @@ Exports: `creditTransactionTypeOptions`, `creditTransactionTypeToFrenchTranslati
 | Case | Value |
 |------|-------|
 | SubscriptionCredits | `subscription_credits` |
-| TopupCredits | `topup_credits` |
+| RefillCredits | `refill_credits` |
 
 Exports: `sourceBucketOptions`, `sourceBucketToFrenchTranslation`
 
@@ -96,11 +96,11 @@ Exports: `sourceBucketOptions`, `sourceBucketToFrenchTranslation`
 |----------|------|-------------|
 | `uuid` | string | Public identifier |
 | `subscriptionCredits` | number | Credits from subscription renewals |
-| `topupCredits` | number | Credits from topup purchases |
+| `refillCredits` | number | Credits from refill purchases |
 | `createdAt` | Date | Creation timestamp |
 | `updatedAt` | Date \| null | Last update timestamp |
 
-Computed getter: `totalCredits` returns `subscriptionCredits + topupCredits`.
+Computed getter: `totalCredits` returns `subscriptionCredits + refillCredits`.
 
 ### Subscription (`models/Subscription.ts`)
 
@@ -202,7 +202,7 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 | `useCreateSubscriptionCheckout` | `POST /api/subscriptions/checkout` | `{ createCheckout, isPending, error }` (redirects to Stripe on success). `createCheckout({ plan, checkoutRedirectPath? })` — optional base path for Stripe redirect (backend appends `?checkout=success` / `?checkout=cancel`). |
 | `useCancelSubscription` | `POST /api/subscriptions/cancel` | `{ cancelSubscription, isPending, error }` (invalidates subscription query) |
 | `useResumeSubscription` | `POST /api/subscriptions/resume` | `{ resumeSubscription, isPending, error }` (invalidates subscription query) |
-| `useCreateTopupCheckout` | `POST /api/credits/topup/checkout` | `{ createTopupCheckout, isPending, error }` (redirects to Stripe on success) |
+| `useCreateRefillCheckout` | `POST /api/credits/refill/checkout` | `{ createRefillCheckout, isPending, error }` (redirects to Stripe on success) |
 | `useListCreditTransactions` | `GET /api/credits/transactions` | `{ transactions, isLoading, error }` (paginated) |
 
 ---
@@ -212,7 +212,7 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 ### SubscriptionSettings (`components/settings/SubscriptionSettings.tsx`)
 
 Layout component for the subscription settings page. Displays:
-1. Credit balance card with topup button (always)
+1. Credit balance card with refill button (always)
 2. `SubscriptionOverview` — handles subscription status and plan selection
 3. Credit transaction history (always, hidden if no transactions)
 
@@ -230,7 +230,7 @@ Props:
 
 ### CreditBalanceCard (`components/settings/subscription/CreditBalanceCard.tsx`)
 
-Displays total credits with subscription/topup breakdown and a "Recharger" topup button. Shows shimmer loading state.
+Displays total credits with subscription/refill breakdown and a "Recharger" refill button. Shows shimmer loading state.
 
 ### CurrentSubscriptionCard (`components/settings/subscription/CurrentSubscriptionCard.tsx`)
 

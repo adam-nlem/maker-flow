@@ -5,10 +5,10 @@ namespace App\DTO\Response\Credit;
 use App\DTO\Response\ResponseDTOInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-class CreateTopupCheckoutResponseDTO implements ResponseDTOInterface
+class CreateRefillCheckoutResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
-        #[Groups(['api_credits_topup_checkout'])]
+        #[Groups(['api_credits_refill_checkout'])]
         private string $checkoutUrl,
     ) {}
 

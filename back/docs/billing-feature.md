@@ -2,7 +2,7 @@
 
 ## Overview
 
-The credit system manages user credits with two separate buckets: **subscription credits** (granted by plan renewals) and **topup credits** (purchased separately). A `CreditBalance` entity is the single source of truth, and every mutation is recorded as an immutable `CreditTransaction` for full auditability.
+The credit system manages user credits with two separate buckets: **subscription credits** (granted by plan renewals) and **refill credits** (purchased separately). A `CreditBalance` entity is the single source of truth, and every mutation is recorded as an immutable `CreditTransaction` for full auditability.
 
 Stripe Checkout handles the payment flow: the backend creates Checkout Sessions and returns URLs for the frontend to redirect users to Stripe-hosted payment pages. Plan identification is driven by **Stripe Product metadata** (`product.metadata.plan`), making the system fully metadata-driven — adding or modifying plans only requires changes in the Stripe dashboard.
 
@@ -19,12 +19,12 @@ Single source of truth for a user's available credits. OneToOne with User.
 | `id` | int | Auto-increment PK |
 | `uuid` | GUID | Public identifier |
 | `subscriptionCredits` | int | Credits from subscription renewals |
-| `topupCredits` | int | Credits from topup purchases |
+| `refillCredits` | int | Credits from refill purchases |
 | `user` | OneToOne(User) | Owner (owning side, CASCADE delete) |
 | `createdAt` | DateTimeImmutable | UTC timestamp |
 | `updatedAt` | DateTimeImmutable | UTC timestamp, auto-updated |
 
-Key method: `getTotalCredits(): int` returns `subscriptionCredits + topupCredits`.
+Key method: `getTotalCredits(): int` returns `subscriptionCredits + refillCredits`.
 
 Serialization groups: `api_credit_balance_show`
 
@@ -97,7 +97,7 @@ No UUID (stripeEventId serves as public identifier). No serialization groups (no
 | Case | Value |
 |------|-------|
 | SubscriptionRenewal | `subscription_renewal` |
-| TopupPurchase | `topup_purchase` |
+| RefillPurchase | `refill_purchase` |
 | ScriptGeneration | `script_generation` |
 | Refund | `refund` |
 | ManualAdjustment | `manual_adjustment` |
@@ -107,7 +107,7 @@ No UUID (stripeEventId serves as public identifier). No serialization groups (no
 | Case | Value |
 |------|-------|
 | SubscriptionCredits | `subscription_credits` |
-| TopupCredits | `topup_credits` |
+| RefillCredits | `refill_credits` |
 
 ### SubscriptionPlan (`Entity/Enum/SubscriptionPlan.php`)
 
@@ -158,8 +158,8 @@ Core business logic for credit operations. Uses pessimistic locking and DB trans
 #### `getOrCreateBalance(User $user): CreditBalance`
 Lazily creates a zero-balance if the user doesn't have one yet.
 
-#### `addTopupCredits(User $user, int $amount, ?string $stripePaymentIntentId, ?string $stripeInvoiceId): CreditTransaction`
-Adds credits to the topup bucket. Wrapped in a DB transaction for atomicity (balance update + transaction insert).
+#### `addRefillCredits(User $user, int $amount, ?string $stripePaymentIntentId, ?string $stripeInvoiceId): CreditTransaction`
+Adds credits to the refill bucket. Wrapped in a DB transaction for atomicity (balance update + transaction insert).
 
 #### `renewSubscriptionCredits(User $user, int $planCredits, ?string $stripeInvoiceId): CreditTransaction`
 Resets `subscriptionCredits` to the plan amount (not additive). Calculates the delta (`planCredits - currentSubscriptionCredits`) and records a CreditTransaction with `type = SubscriptionRenewal`. Called at each subscription renewal.
@@ -168,12 +168,12 @@ Resets `subscriptionCredits` to the plan amount (not additive). Calculates the d
 Debits credits following the **subscription-first** rule:
 1. Acquires a `PESSIMISTIC_WRITE` lock on the CreditBalance row
 2. Validates sufficient credits, throws `InsufficientCreditsException` if not
-3. Deducts from `subscriptionCredits` first, then `topupCredits`
+3. Deducts from `subscriptionCredits` first, then `refillCredits`
 4. Creates 1-2 CreditTransaction records (one per bucket used)
 5. Each transaction's `balanceAfter` reflects the running total after that specific debit
 
 #### `getTotalCredits(User $user): int`
-Returns the sum of subscription + topup credits.
+Returns the sum of subscription + refill credits.
 
 ### Debit Transaction Flow
 
@@ -182,7 +182,7 @@ Returns the sum of subscription + topup credits.
 2. SELECT ... FROM credit_balance WHERE user_id = ? FOR UPDATE
 3. Validate: totalCredits >= amount (else ROLLBACK + throw)
 4. fromSubscription = min(subscriptionCredits, amount)
-   fromTopup = amount - fromSubscription
+   fromRefill = amount - fromSubscription
 5. Update balance buckets
 6. INSERT CreditTransaction(s) per non-zero bucket
 7. FLUSH + COMMIT (releases lock)
@@ -221,7 +221,7 @@ Force-fetches plans from Stripe, updates the Redis cache, and returns the plans 
 
 All Stripe Products are identified by their `product.metadata.type` field, using the `StripeProductType` enum (`Entity/Enum/StripeProductType.php`):
 - `subscription` — subscription plan products (handled by `StripePlanService`)
-- `topup` — topup product (handled by `StripeTopupService`)
+- `refill` — refill product (handled by `StripeRefillService`)
 
 `StripePlanService` fetches all active Stripe Products, filters by `type=subscription`, then validates the `plan` metadata against the `SubscriptionPlan` enum. The associated default price is retrieved for pricing and credit data.
 
@@ -244,13 +244,13 @@ Each subscription product must have these metadata fields:
 
 Feature labels are configured via Stripe's built-in **Marketing features** on each Product (not metadata).
 
-### Stripe Product Metadata (Topup)
+### Stripe Product Metadata (Refill)
 
-The topup product must have:
+The refill product must have:
 
 | Key | Type | Description |
 |-----|------|-------------|
-| `type` | string | Must be `"topup"` |
+| `type` | string | Must be `"refill"` |
 
 ### Stripe Price Metadata
 
@@ -266,7 +266,7 @@ Each Stripe price (default price of the product) must have:
 dce back php bin/console app:stripe:refresh-plans
 ```
 
-Manually refreshes both the plans and topup Redis caches from Stripe. Use after updating product metadata in the Stripe dashboard.
+Manually refreshes both the plans and refill Redis caches from Stripe. Use after updating product metadata in the Stripe dashboard.
 
 ### Response DTOs
 
@@ -275,28 +275,28 @@ Manually refreshes both the plans and topup Redis caches from Stripe. Use after 
 
 ---
 
-## StripeTopupService (`Service/Stripe/StripeTopupService.php`)
+## StripeRefillService (`Service/Stripe/StripeRefillService.php`)
 
-Fetches the topup product from Stripe by `product.metadata.type=topup` and caches the price ID in Redis.
+Fetches the refill product from Stripe by `product.metadata.type=refill` and caches the price ID in Redis.
 
 ### Dependencies
 
 - `string $stripeSecretKey` -- Stripe API key
-- `RedisStoreService` -- Redis cache (key: `STRIPE/TOPUP`, TTL: 1 hour)
+- `RedisStoreService` -- Redis cache (key: `STRIPE/REFILL`, TTL: 1 hour)
 
 ### Public Methods
 
-#### `getTopupPriceId(): ?string`
-Returns the cached topup price ID. If cache miss, fetches from Stripe.
+#### `getRefillPriceId(): ?string`
+Returns the cached refill price ID. If cache miss, fetches from Stripe.
 
 #### `refreshCache(): ?string`
-Force-fetches the topup price ID from Stripe and updates the Redis cache.
+Force-fetches the refill price ID from Stripe and updates the Redis cache.
 
 ---
 
 ## StripeCheckoutService (`Service/Stripe/StripeCheckoutService.php`)
 
-Handles Stripe Checkout Session creation for subscriptions and topup purchases.
+Handles Stripe Checkout Session creation for subscriptions and refill purchases.
 
 ### Dependencies
 
@@ -304,7 +304,7 @@ Handles Stripe Checkout Session creation for subscriptions and topup purchases.
 - `string $frontendUrl` -- for building success/cancel redirect URLs
 - `UserRepository`
 - `StripePlanService` -- for resolving plan price IDs
-- `StripeTopupService` -- for resolving topup price ID
+- `StripeRefillService` -- for resolving refill price ID
 
 ### Public Methods
 
@@ -314,8 +314,8 @@ Returns the user's Stripe customer ID. If none exists, creates a Stripe customer
 #### `createSubscriptionCheckoutSession(User $user, SubscriptionPlan $plan, string $checkoutRedirectPath = '/settings/subscription'): string`
 Creates a Stripe Checkout Session in `subscription` mode. Resolves the price ID via `StripePlanService::getPriceIdForPlan()`. Returns the checkout URL. `$checkoutRedirectPath` is the base path for both success and cancel redirects — the backend appends `?checkout=success` or `?checkout=cancel` automatically. Defaults to `/settings/subscription`.
 
-#### `createTopupCheckoutSession(User $user): string`
-Creates a Stripe Checkout Session in `payment` mode using the single topup price. Returns the checkout URL.
+#### `createRefillCheckoutSession(User $user): string`
+Creates a Stripe Checkout Session in `payment` mode using the single refill price. Returns the checkout URL.
 
 ### Checkout Flow
 
@@ -426,12 +426,12 @@ Thrown when a subscription management action fails (cancel, resume, or plan chan
 
 | Method | Path | Name | Description |
 |--------|------|------|-------------|
-| POST | `/api/credits/topup/checkout` | `api_credits_topup_checkout` | Create Checkout Session for topup |
+| POST | `/api/credits/refill/checkout` | `api_credits_refill_checkout` | Create Checkout Session for refill |
 | GET | `/api/credits/balance` | `api_credits_balance` | Get credit balance |
 | GET | `/api/credits/transactions` | `api_credits_transactions` | Get paginated transaction history |
 
-**POST /api/credits/topup/checkout**
-- No request body (single topup price)
+**POST /api/credits/refill/checkout**
+- No request body (single refill price)
 - Response: `{"checkoutUrl": "https://checkout.stripe.com/..."}`
 
 **GET /api/credits/balance**
@@ -517,7 +517,7 @@ Stripe field:
 | `STRIPE_SECRET_KEY` | Stripe API secret key | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 
-> **Note:** All `STRIPE_PRICE_*` env vars have been removed. Product identification is fully metadata-driven via `StripePlanService` and `StripeTopupService`, using the `StripeProductType` enum and `product.metadata.type`.
+> **Note:** All `STRIPE_PRICE_*` env vars have been removed. Product identification is fully metadata-driven via `StripePlanService` and `StripeRefillService`, using the `StripeProductType` enum and `product.metadata.type`.
 
 ---
 
@@ -588,7 +588,7 @@ Services that receive an `isSubscribed` parameter skip premium computations for 
 
 1. **Single source of truth**: `CreditBalance` is the only place to check available credits
 2. **Audit trail**: Every balance mutation creates a `CreditTransaction` -- no exceptions
-3. **Debit order**: Subscription credits consumed first, then topup credits
+3. **Debit order**: Subscription credits consumed first, then refill credits
 4. **Hard block**: Debits are rejected if insufficient credits (no negative balances)
 5. **Race condition safety**: Pessimistic locking prevents concurrent debits from over-spending
 6. **Webhook idempotency**: `StripeWebhookEvent.stripeEventId` unique constraint prevents duplicate processing
@@ -629,7 +629,7 @@ Processes the event based on its type:
 
 | Event Type | Action |
 |------------|--------|
-| `checkout.session.completed` (payment mode) | Fetch session line items via Stripe API, read `credit_amount` from price metadata, call `CreditService::addTopupCredits()` |
+| `checkout.session.completed` (payment mode) | Fetch session line items via Stripe API, read `credit_amount` from price metadata, call `CreditService::addRefillCredits()` |
 | `customer.subscription.created` | Resolve plan via `StripePlanService::resolvePlanFromPriceId()`, create local `Subscription` entity |
 | `customer.subscription.updated` | Update subscription status, period dates, cancelAtPeriodEnd, plan |
 | `customer.subscription.deleted` | Set subscription status to `Canceled` |
@@ -651,7 +651,7 @@ Each Stripe price must have a `credit_amount` metadata field set in the Stripe d
 - Starter price → `credit_amount: 50`
 - Creator price → `credit_amount: 150`
 - Agency price → `credit_amount: 500`
-- Topup price → `credit_amount: <desired amount>`
+- Refill price → `credit_amount: <desired amount>`
 
 ### Configuration
 

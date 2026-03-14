@@ -1,6 +1,6 @@
 export enum CreditTransactionType {
     SubscriptionRenewal = 'subscription_renewal',
-    TopupPurchase = 'topup_purchase',
+    RefillPurchase = 'refill_purchase',
     ScriptGeneration = 'script_generation',
     ScriptGenerationRefund = 'script_generation_refund',
     Refund = 'refund',
@@ -11,7 +11,7 @@ export const creditTransactionTypeOptions = Object.values(CreditTransactionType)
 
 export const creditTransactionTypeToFrenchTranslation: Record<CreditTransactionType, string> = {
     [CreditTransactionType.SubscriptionRenewal]: "Renouvellement",
-    [CreditTransactionType.TopupPurchase]: "Recharge",
+    [CreditTransactionType.RefillPurchase]: "Recharge",
     [CreditTransactionType.ScriptGeneration]: "Génération de script",
     [CreditTransactionType.ScriptGenerationRefund]: "Remboursement suite a une génération de script echouée",
     [CreditTransactionType.Refund]: "Remboursement",
