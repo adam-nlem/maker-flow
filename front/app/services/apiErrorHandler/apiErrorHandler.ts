@@ -12,6 +12,7 @@ import {
 } from '~/services/httpClient/customHttpExceptions'
 import { ToastType } from '~/models/enums/ToastType'
 import { useToastStore } from '~/stores/toast/toastStore'
+import { loginPath } from '~/routes/routePaths'
 import { clearSessionData } from '~/services/session/clearSessionData'
 
 function extractBackendMessage(data: unknown): string | null {
@@ -26,8 +27,8 @@ function extractBackendMessage(data: unknown): string | null {
 export function handleMutationError(error: CustomHttpException): void {
   if (error instanceof UnauthorizedException) {
     clearSessionData()
-    if (window.location.pathname !== '/login') {
-      window.location.href = '/login'
+    if (window.location.pathname !== loginPath) {
+      window.location.href = loginPath
     }
     return
   }

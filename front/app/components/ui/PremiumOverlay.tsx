@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router";
+import { settingsSubscriptionPath } from "~/routes/routePaths";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
 
@@ -29,7 +30,7 @@ export default function PremiumOverlay({
                 <LockClosedIcon className="size-6 text-gray mb-2" />
                 <h2 className="text-heading-md mb-1">{title}</h2>
                 <p className="text-body-sm text-gray mb-3 text-center max-w-xs">{description}</p>
-                <Button style="primary" width="w-fit" onClick={() => navigate("/settings/subscription")}>
+                <Button style="primary" width="w-fit" onClick={() => navigate(settingsSubscriptionPath)}>
                     Passer à un abonnement superieur
                 </Button>
             </div>

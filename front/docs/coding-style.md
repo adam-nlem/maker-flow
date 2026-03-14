@@ -752,6 +752,23 @@ export default function ProtectedLayout() {
 4. **Show loading** while checking auth state
 5. **Feature routes** are top-level paths under the protected layout (e.g., `/tasks`, `/insights`)
 
+### Route Path Constants
+
+All route paths are defined as camelCase constants in `app/constants/routePaths.ts`. Never hardcode route paths as strings — always import and use the constant.
+
+```tsx
+// app/constants/routePaths.ts
+export const loginPath = '/login'
+export const settingsSubscriptionPath = '/settings/subscription'
+export function insightsPostDetailPath(postUuid: string): string {
+    return `/insights/posts/${postUuid}`
+}
+
+// Usage
+import { loginPath } from "~/constants/routePaths"
+navigate(loginPath, { replace: true })
+```
+
 ---
 
 ## Utility Functions

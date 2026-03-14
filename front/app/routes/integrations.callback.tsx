@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import { homePath } from "~/routes/routePaths";
 import { WindowMessageType } from "~/models/enums/WindowMessageType";
 import { OAuthCallbackReponseDTO } from "~/models/dtos/OAuthCallbackReponseDTO";
 
@@ -25,7 +26,7 @@ export default function IntegrationsCallback() {
             return;
         }
 
-        navigate("/");
+        navigate(homePath);
     }, [searchParams, navigate]);
 
     return (

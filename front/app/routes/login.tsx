@@ -3,6 +3,7 @@ import { useNavigate } from "react-router"
 
 import AuthStepLayout from "~/components/auth/AuthStepLayout"
 import LoginForm from "~/components/auth/LoginForm"
+import { homePath, onboardingPath, registerPath, verifyOtpPath } from "~/routes/routePaths"
 import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore"
 
 export default function LoginPage() {
@@ -15,16 +16,16 @@ export default function LoginPage() {
                 icon={ArrowLeftEndOnRectangleIcon}
                 title="Connexion"
                 subtitle="Connectez-vous pour retrouver vos contenus."
-                onBack={() => navigate("/onboarding")}
-                onNext={() => navigate("/register")}
+                onBack={() => navigate(onboardingPath)}
+                onNext={() => navigate(registerPath)}
                 nextLabel="Créer un compte"
             >
                 <div className="min-w-sm">
                     <LoginForm
                         initialEmail={prefillEmail ?? ""}
-                        onLoginSuccess={() => navigate("/")}
+                        onLoginSuccess={() => navigate(homePath)}
                         onOtpRequired={({ pendingOtpToken, otpType, email }) => {
-                            navigate("/verify-otp", {
+                            navigate(verifyOtpPath, {
                                 state: { pendingOtpToken, purpose: otpType, email },
                             })
                         }}

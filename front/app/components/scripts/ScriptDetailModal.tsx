@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import { scriptsPath } from "~/routes/routePaths";
 import type { Script } from "~/models/Script";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore";
@@ -23,7 +24,7 @@ export default function ScriptDetailModal({ script, projectUuid, onClose }: Scri
         const generationUuid = focusedGenerationUuid;
         setFocusedScriptUuid(script.uuid); // clears focusedGenerationUuid internally
         setFocusedGenerationUuid(generationUuid); // restore the selected generation
-        navigate("/scripts");
+        navigate(scriptsPath);
         onClose();
     };
 

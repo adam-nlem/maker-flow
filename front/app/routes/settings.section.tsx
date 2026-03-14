@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Navigate, useParams } from "react-router";
+import { settingsGeneralPath } from "~/routes/routePaths";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import GeneralSettings from "~/components/settings/GeneralSettings";
@@ -14,7 +15,7 @@ export default function SettingsSectionRoute() {
     const { focusedProjectUuid } = useSelectFocusedProject({ projects });
     const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null;
 
-    if (!section) return <Navigate to="/settings/general" replace />;
+    if (!section) return <Navigate to={settingsGeneralPath} replace />;
     if (!focusedProject) return null;
 
     const sectionNodes: Record<string, ReactNode> = {
@@ -26,6 +27,6 @@ export default function SettingsSectionRoute() {
     };
 
     const node = sectionNodes[section];
-    if (!node) return <Navigate to="/settings/general" replace />;
+    if (!node) return <Navigate to={settingsGeneralPath} replace />;
     return node;
 }

@@ -3,6 +3,7 @@ import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useShowOnboarding } from "~/hooks/api/onboarding/useShowOnboarding";
 import { useRef, useEffect } from "react";
 import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore";
+import { loginPath, onboardingPath } from "~/routes/routePaths";
 
 export default function ProtectedLayout() {
     const { user, isLoading } = useCurrentUser()
@@ -17,7 +18,7 @@ export default function ProtectedLayout() {
             if (!hasRedirected.current) {
                 hasRedirected.current = true
                 const hasEmail = useAuthPrefillStore.getState().email !== null
-                navigate(hasEmail ? '/login' : '/onboarding', { replace: true })
+                navigate(hasEmail ? loginPath : onboardingPath, { replace: true })
             }
             return
         }
@@ -25,7 +26,7 @@ export default function ProtectedLayout() {
         hasRedirected.current = false
 
         if (!onboardingLoading && onboarding && !onboarding.isDismissed) {
-            navigate('/onboarding', { replace: true })
+            navigate(onboardingPath, { replace: true })
         }
     }, [user, isLoading, onboarding, onboardingLoading, navigate])
 

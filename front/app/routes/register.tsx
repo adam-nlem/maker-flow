@@ -3,6 +3,7 @@ import { useNavigate } from "react-router"
 
 import AuthStepLayout from "~/components/auth/AuthStepLayout"
 import RegisterForm from "~/components/auth/RegisterForm"
+import { loginPath, onboardingPath, verifyOtpPath } from "~/routes/routePaths"
 import { OtpType } from "~/models/enums/OtpType"
 import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore"
 
@@ -16,15 +17,15 @@ export default function RegisterPage() {
                 icon={UserPlusIcon}
                 title="Créez votre compte"
                 subtitle="Commencez gratuitement et gérez vos contenus dès maintenant."
-                onBack={() => navigate("/onboarding")}
-                onNext={() => navigate("/login")}
+                onBack={() => navigate(onboardingPath)}
+                onNext={() => navigate(loginPath)}
                 nextLabel="J'ai déjà un compte"
             >
                 <div className="min-w-sm">
                     <RegisterForm
                         initialEmail={prefillEmail ?? ""}
                         onRegistered={({ pendingOtpToken, email }) => {
-                            navigate("/verify-otp", {
+                            navigate(verifyOtpPath, {
                                 state: {
                                     pendingOtpToken,
                                     purpose: OtpType.EmailVerification,

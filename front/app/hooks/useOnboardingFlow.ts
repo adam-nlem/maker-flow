@@ -1,6 +1,7 @@
 import { useEffect } from "react"
 import { useNavigate } from "react-router"
 
+import { homePath } from "~/routes/routePaths"
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser"
 import { useShowOnboarding } from "~/hooks/api/onboarding/useShowOnboarding"
 import { ONBOARDING_STEP_ORDER } from "~/models/enums/OnboardingStep"
@@ -16,7 +17,7 @@ export function useOnboardingFlow() {
 
     useEffect(() => {
         if (!isAuthLoading && user && !isOnboardingLoading && onboarding?.isDismissed) {
-            navigate('/', { replace: true })
+            navigate(homePath, { replace: true })
         }
     }, [user, isAuthLoading, onboarding, isOnboardingLoading, navigate])
 

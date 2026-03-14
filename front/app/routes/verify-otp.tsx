@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router"
 
 import AuthStepLayout from "~/components/auth/AuthStepLayout"
 import VerifyOtpForm from "~/components/auth/VerifyOtpForm"
+import { homePath, loginPath } from "~/routes/routePaths"
 import type { OtpType } from "~/models/enums/OtpType"
 import { otpTypeToFrenchTranslation } from "~/models/enums/OtpType"
 
@@ -20,7 +21,7 @@ export default function VerifyOtpPage() {
 
     useEffect(() => {
         if (!state) {
-            navigate("/login", { replace: true })
+            navigate(loginPath, { replace: true })
         }
     }, [state, navigate])
 
@@ -32,12 +33,12 @@ export default function VerifyOtpPage() {
                 icon={EnvelopeIcon}
                 title={otpTypeToFrenchTranslation[state.purpose]}
                 subtitle={<>Un code a été envoyé à <span className="text-dark font-medium">{state.email}</span></>}
-                onBack={() => navigate("/login")}
+                onBack={() => navigate(loginPath)}
             >
                 <VerifyOtpForm
                     pendingOtpToken={state.pendingOtpToken}
                     purpose={state.purpose}
-                    onVerified={() => navigate("/")}
+                    onVerified={() => navigate(homePath)}
                 />
             </AuthStepLayout>
         </div>

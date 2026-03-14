@@ -10,6 +10,7 @@ import FilterTile from "../FilterTile";
 import { CalendarDaysIcon, ChartBarSquareIcon, ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import PostInsightSummaryCard from "./PostInsightSummaryCard";
+import { insightsPath } from "~/routes/routePaths";
 import { BreadCrumbNavbar } from "~/components/ui/BreadCrumbNavBar";
 import { PercentageProgressBar } from "~/components/ui/PercentageProgressBar";
 import PostsRankingCard from "./PostsRankingCard";
@@ -49,7 +50,7 @@ export default function PostDetailPageView({ postUuid }: PostDetailPageViewProps
     return (
       <div className="h-screen overflow-auto p-6 flex flex-col gap-5">
         <BreadCrumbNavbar pages={[
-          { route: "/insights", name: "Plateformes" },
+          { route: insightsPath, name: "Plateformes" },
           { route: "#", name: "Detail de contenu" },
         ]} />
         <PremiumOverlay isRestricted>
@@ -95,7 +96,7 @@ export default function PostDetailPageView({ postUuid }: PostDetailPageViewProps
     <div className="h-screen overflow-auto p-6 flex flex-col gap-5">
       <BreadCrumbNavbar pages={
         [{
-          route: "/insights",
+          route: insightsPath,
           name: "Plateformes"
         },
         { route: "#", name: "Detail de contenu" }]

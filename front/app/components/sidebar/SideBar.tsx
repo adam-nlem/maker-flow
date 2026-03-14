@@ -11,6 +11,7 @@ import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
 import IconWithTextTile from "../ui/IconWithTextTile";
 import { useLocation, useNavigate } from "react-router";
+import { calendarPath, homePath, insightsPath, scriptsPath, settingsPath, settingsSubscriptionPath } from "~/routes/routePaths";
 import Shimmer from "../ui/Shimmer";
 
 import SelectDropdown from "../ui/SelectDropdown"
@@ -132,32 +133,32 @@ export default function SideBar() {
           {/* NAVIGATION SECTION */}
           <div className={`mt-10 flex flex-col gap-1 ${isExpanded ? '' : 'items-center'}`}>
             <IconWithTextTile
-              icon={location.pathname === '/' ? HomeIconSolid : HomeIcon}
+              icon={location.pathname === homePath ? HomeIconSolid : HomeIcon}
               label="Accueil"
               isExpanded={isExpanded}
-              isSelected={location.pathname === '/'}
-              onClick={() => navigate('/')}
+              isSelected={location.pathname === homePath}
+              onClick={() => navigate(homePath)}
             />
             <IconWithTextTile
-              icon={location.pathname.startsWith('/scripts') ? ClipboardDocumentCheckIconSolid : ClipboardDocumentCheckIcon}
+              icon={location.pathname.startsWith(scriptsPath) ? ClipboardDocumentCheckIconSolid : ClipboardDocumentCheckIcon}
               label="Script"
               isExpanded={isExpanded}
-              isSelected={location.pathname.startsWith('/scripts')}
-              onClick={() => navigate('/scripts')}
+              isSelected={location.pathname.startsWith(scriptsPath)}
+              onClick={() => navigate(scriptsPath)}
             />
             <IconWithTextTile
-              icon={location.pathname === '/calendar' ? CalendarDaysIconSolid : CalendarDaysIcon}
+              icon={location.pathname === calendarPath ? CalendarDaysIconSolid : CalendarDaysIcon}
               label="Calendrier"
               isExpanded={isExpanded}
-              isSelected={location.pathname === '/calendar'}
-              onClick={() => navigate('/calendar')}
+              isSelected={location.pathname === calendarPath}
+              onClick={() => navigate(calendarPath)}
             />
             <IconWithTextTile
-              icon={location.pathname.startsWith('/insights') ? ChartBarIconSolid : ChartBarIcon}
+              icon={location.pathname.startsWith(insightsPath) ? ChartBarIconSolid : ChartBarIcon}
               label="Statistiques"
               isExpanded={isExpanded}
-              isSelected={location.pathname.startsWith('/insights')}
-              onClick={() => navigate('/insights')}
+              isSelected={location.pathname.startsWith(insightsPath)}
+              onClick={() => navigate(insightsPath)}
             />
           </div>
         </div>
@@ -174,12 +175,12 @@ export default function SideBar() {
               onClick={toggleTheme}
             />
             <IconWithTextTile
-              icon={location.pathname.startsWith('/settings') ? Cog6ToothIconSolid : Cog6ToothIcon}
+              icon={location.pathname.startsWith(settingsPath) ? Cog6ToothIconSolid : Cog6ToothIcon}
               label="Paramètres"
               isExpanded={isExpanded}
               isBold={false}
-              isSelected={location.pathname.startsWith('/settings')}
-              onClick={() => navigate('/settings')}
+              isSelected={location.pathname.startsWith(settingsPath)}
+              onClick={() => navigate(settingsPath)}
             />
           </div>
 
@@ -189,7 +190,7 @@ export default function SideBar() {
             <Button
               type="button"
               style="primary"
-              onClick={() => navigate('/settings/subscription')}
+              onClick={() => navigate(settingsSubscriptionPath)}
             >
               <div className="flex flex-row justify-center items-center gap-3">
                 <SparklesIcon className="size-4" strokeWidth={2} />

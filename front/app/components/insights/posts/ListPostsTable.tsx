@@ -1,5 +1,6 @@
 import { useEffect, useRef, useMemo } from "react";
 import { useNavigate } from "react-router";
+import { insightsPostDetailPath } from "~/routes/routePaths";
 import DataTable, { type DataTableColumn } from "~/components/ui/DataTable";
 import { PostInsightType, postInsightTypeToFrenchTranslation } from "~/models/enums/PostInsightType";
 import { useListPaginatedPosts } from "~/hooks/api/posts/useListPaginatedPosts";
@@ -104,7 +105,7 @@ export default function ListPostsTable({ integrationUuid }: ListPostsTableProps)
         columns={columns}
         data={filteredPosts}
         getRowKey={(postWithInsights) => postWithInsights.post.uuid}
-        onRowClick={(postWithInsights) => navigate(`/insights/posts/${postWithInsights.post.uuid}`)}
+        onRowClick={(postWithInsights) => navigate(insightsPostDetailPath(postWithInsights.post.uuid))}
         afterTable={<div ref={sentinelRef} className="h-1" />}
         className="flex-1 min-h-0"
       />

@@ -1,5 +1,6 @@
 import { CheckCircleIcon } from "@heroicons/react/24/outline"
 
+import { onboardingPath } from "~/routes/routePaths"
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import SubscriptionOverview from "~/components/settings/subscription/SubscriptionOverview"
 import Shimmer from "~/components/ui/Shimmer"
@@ -9,7 +10,7 @@ export default function OnboardingSubscriptionStep() {
     return (
         <OnboardingStepLayout maxWidth="max-w-3xl">
             <SubscriptionOverview
-                checkoutRedirectPath="/onboarding"
+                checkoutRedirectPath={onboardingPath}
                 subscribedView={(subscription) => (
                     <div className="flex flex-col items-center text-center">
                         <div className="mb-4 size-16 rounded-full bg-primary/10 flex items-center justify-center">
