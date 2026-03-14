@@ -3,6 +3,7 @@
 namespace App\Service\Stripe;
 
 use App\DTO\Response\Subscription\PlanConfigResponseDTO;
+use App\Entity\Enum\StripeProductType;
 use App\Entity\Enum\SubscriptionPlan;
 use App\Service\RedisStore\RedisStoreService;
 use Stripe\Price;
@@ -118,13 +119,17 @@ class StripePlanService
         $plans = [];
 
         foreach ($products->data as $product) {
+            $metadata = $product->metadata->toArray();
 
-            
-            if (!isset($product->metadata['plan'])) {
+            if (($metadata['type'] ?? null) !== StripeProductType::Subscription->value) {
                 continue;
             }
 
-            $planValue = $product->metadata['plan'];
+            if (!isset($metadata['plan'])) {
+                continue;
+            }
+
+            $planValue = $metadata['plan'];
 
             if (SubscriptionPlan::tryFrom($planValue) === null) {
                 continue;
@@ -135,7 +140,6 @@ class StripePlanService
             }
 
             $price = Price::retrieve($product->default_price);
-            $metadata = $product->metadata->toArray();
             $priceMetadata = $price->metadata->toArray();
 
             $plans[] = [

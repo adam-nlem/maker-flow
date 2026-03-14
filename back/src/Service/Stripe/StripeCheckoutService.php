@@ -15,10 +15,10 @@ class StripeCheckoutService
 {
     public function __construct(
         private readonly string $stripeSecretKey,
-        private readonly string $stripePriceTopup,
         private readonly string $frontendUrl,
         private readonly UserRepository $userRepository,
         private readonly StripePlanService $stripePlanService,
+        private readonly StripeTopupService $stripeTopupService,
     ) {
         Stripe::setApiKey($this->stripeSecretKey);
     }
@@ -87,6 +87,12 @@ class StripeCheckoutService
      */
     public function createTopupCheckoutSession(User $user): string
     {
+        $priceId = $this->stripeTopupService->getTopupPriceId();
+
+        if ($priceId === null) {
+            throw new CheckoutSessionCreationException('No topup price found in Stripe');
+        }
+
         $customerId = $this->getOrCreateStripeCustomer($user);
 
         try {
@@ -95,7 +101,7 @@ class StripeCheckoutService
                 'customer' => $customerId,
                 'line_items' => [
                     [
-                        'price' => $this->stripePriceTopup,
+                        'price' => $priceId,
                         'quantity' => 1,
                     ],
                 ],

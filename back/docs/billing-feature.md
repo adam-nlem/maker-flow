@@ -219,19 +219,23 @@ Force-fetches plans from Stripe, updates the Redis cache, and returns the plans 
 
 ### How Plan Identification Works
 
-`StripePlanService` fetches all active Stripe Products and filters by `product.metadata.plan`. Each product with a valid `plan` metadata value (matching a `SubscriptionPlan` enum case) is treated as a subscription plan. The associated default price is retrieved for pricing and credit data.
+All Stripe Products are identified by their `product.metadata.type` field, using the `StripeProductType` enum (`Entity/Enum/StripeProductType.php`):
+- `subscription` — subscription plan products (handled by `StripePlanService`)
+- `topup` — topup product (handled by `StripeTopupService`)
+
+`StripePlanService` fetches all active Stripe Products, filters by `type=subscription`, then validates the `plan` metadata against the `SubscriptionPlan` enum. The associated default price is retrieved for pricing and credit data.
 
 This metadata-driven approach means:
-- **No hardcoded price IDs** for plan identification — `StripeCheckoutService` and `StripeWebhookService` resolve plans via `StripePlanService`
+- **No hardcoded price IDs** anywhere — all products are identified via metadata
 - **Adding a new plan** only requires creating a Stripe Product with the right metadata — no code or env var changes needed
-- **The topup price** (`STRIPE_PRICE_TOPUP`) remains as an env var since it's not a plan product
 
-### Stripe Product Metadata
+### Stripe Product Metadata (Subscription)
 
-Each Stripe product representing a subscription plan must have these metadata fields:
+Each subscription product must have these metadata fields:
 
 | Key | Type | Description |
 |-----|------|-------------|
+| `type` | string | Must be `"subscription"` |
 | `plan` | string | Plan identifier (`starter`, `creator`, `agency`) — must match a `SubscriptionPlan` enum case |
 | `is_highlighted` | string | `"true"` or `"false"` -- marks the recommended plan |
 | `max_projects` | string | Number or `"null"` for unlimited |
@@ -239,6 +243,14 @@ Each Stripe product representing a subscription plan must have these metadata fi
 | `sort_order` | string | Display ordering number |
 
 Feature labels are configured via Stripe's built-in **Marketing features** on each Product (not metadata).
+
+### Stripe Product Metadata (Topup)
+
+The topup product must have:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `type` | string | Must be `"topup"` |
 
 ### Stripe Price Metadata
 
@@ -254,12 +266,31 @@ Each Stripe price (default price of the product) must have:
 dce back php bin/console app:stripe:refresh-plans
 ```
 
-Manually refreshes the Redis cache from Stripe. Use after updating product metadata in the Stripe dashboard.
+Manually refreshes both the plans and topup Redis caches from Stripe. Use after updating product metadata in the Stripe dashboard.
 
 ### Response DTOs
 
 - `PlanConfigResponseDTO` -- Single plan's display data (implements `ResponseDTOInterface`)
 - `ListPlansResponseDTO` -- Wraps array of `PlanConfigResponseDTO`
+
+---
+
+## StripeTopupService (`Service/Stripe/StripeTopupService.php`)
+
+Fetches the topup product from Stripe by `product.metadata.type=topup` and caches the price ID in Redis.
+
+### Dependencies
+
+- `string $stripeSecretKey` -- Stripe API key
+- `RedisStoreService` -- Redis cache (key: `STRIPE/TOPUP`, TTL: 1 hour)
+
+### Public Methods
+
+#### `getTopupPriceId(): ?string`
+Returns the cached topup price ID. If cache miss, fetches from Stripe.
+
+#### `refreshCache(): ?string`
+Force-fetches the topup price ID from Stripe and updates the Redis cache.
 
 ---
 
@@ -270,10 +301,10 @@ Handles Stripe Checkout Session creation for subscriptions and topup purchases.
 ### Dependencies
 
 - `string $stripeSecretKey` -- Stripe API key (injected via `services.yaml`)
-- `string $stripePriceTopup` -- topup price ID
 - `string $frontendUrl` -- for building success/cancel redirect URLs
 - `UserRepository`
 - `StripePlanService` -- for resolving plan price IDs
+- `StripeTopupService` -- for resolving topup price ID
 
 ### Public Methods
 
@@ -484,10 +515,9 @@ Stripe field:
 | Variable | Description | Location |
 |----------|-------------|----------|
 | `STRIPE_SECRET_KEY` | Stripe API secret key | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
-| `STRIPE_PRICE_TOPUP` | Stripe price ID for topup pack | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 
-> **Note:** `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_CREATOR`, and `STRIPE_PRICE_AGENCY` are no longer needed. Plan identification is now fully metadata-driven via `StripePlanService`.
+> **Note:** All `STRIPE_PRICE_*` env vars have been removed. Product identification is fully metadata-driven via `StripePlanService` and `StripeTopupService`, using the `StripeProductType` enum and `product.metadata.type`.
 
 ---
 
