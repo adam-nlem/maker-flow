@@ -335,25 +335,43 @@ See detailed Pill documentation below in the **Script Feature Components** secti
 
 ---
 
-### PremiumOverlay
+### PremiumPlaceholder
 
-**Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/PremiumOverlay.tsx`
+**Location:** `front/app/components/ui/PremiumPlaceholder.tsx`
 
-Overlay for premium-only content. Blurs children and shows an upgrade CTA when restricted.
+Placeholder for premium-only content. Blurs children and shows an upgrade CTA when restricted.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `isRestricted` | `boolean` | - | Whether to show the overlay |
-| `title` | `string` | `"Fonctionnalite Premium"` | Overlay heading |
-| `description` | `string` | `"Passez a un abonnement..."` | Overlay description |
+| `isRestricted` | `boolean` | - | Whether to show the placeholder |
+| `title` | `string` | `"Fonctionnalite Premium"` | Placeholder heading |
+| `description` | `string` | `"Passez a un abonnement..."` | Placeholder description |
 | `children` | `ReactNode` | - | Content to blur/show |
 
 **When restricted:**
 - Children: `blur-sm pointer-events-none select-none`
-- Overlay: `absolute inset-0 bg-clear/60 z-10 rounded-xl`
+- Placeholder: `absolute inset-0 bg-clear/60 z-10 rounded-xl`
 - Content: `LockClosedIcon` (size-6, text-gray) + heading (`text-heading-md`) + description (`text-body-sm text-gray`) + primary Button to `/settings/subscription`
 
 **When not restricted:** Renders children as-is.
+
+---
+
+### ConnectIntegrationPlaceholder
+
+**Location:** `front/app/components/ui/ConnectIntegrationPlaceholder.tsx`
+
+Placeholder shown when no integration is connected. Displays a message and a CTA button to navigate to the integrations settings page.
+
+**Content:**
+- `LinkIcon` (outline, size-6, text-gray)
+- Heading: `"Aucune intégration connectée"` (`text-heading-md`)
+- Description: `"Connectez un compte Instagram ou YouTube pour accéder à vos statistiques."` (`text-body-sm text-gray`)
+- Primary Button: `"Connecter un compte"` → navigates to `/settings/integrations`
+
+**Layout:** `flex flex-col items-center justify-center py-20`
+
+**Used in:** `InsightsPageView` and `home.tsx` when `integrations.length === 0`.
 
 ---
 

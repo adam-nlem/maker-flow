@@ -8,7 +8,8 @@ import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegration
 import RankedPostsList from "~/components/home/RankedPostsList";
 import RankedPostGroupsList from "~/components/home/RankedPostGroupsList";
 import HomeScriptsSection from "~/components/home/HomeScriptsSection";
-import PremiumOverlay from "~/components/ui/PremiumOverlay";
+import PremiumPlaceholder from "~/components/ui/PremiumPlaceholder";
+import ConnectIntegrationPlaceholder from "~/components/integrations/ConnectIntegrationPlaceholder";
 import IntegrationPillRow from "~/components/integrations/IntegrationPillRow";
 import { useIsSubscribed } from "~/hooks/useIsSubscribed";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
@@ -74,12 +75,14 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
                   <HomeScriptsSection projectUuid={focusedProject.uuid} />
                 </div>
                 <div className="w-1/3 flex flex-col gap-5 min-h-0">
-                  {focusedIntegrationUuid === null && !isSubscribed ? (
+                  {integrations.length === 0 ? (
+                    <ConnectIntegrationPlaceholder />
+                  ) : focusedIntegrationUuid === null && !isSubscribed ? (
                     <>
                       <IntegrationPillRow integrations={integrations} />
-                      <PremiumOverlay isRestricted>
+                      <PremiumPlaceholder isRestricted>
                         <div className="h-96" />
-                      </PremiumOverlay>
+                      </PremiumPlaceholder>
                     </>
                   ) : (
                     <>

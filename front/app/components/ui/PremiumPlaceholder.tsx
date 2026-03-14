@@ -4,19 +4,19 @@ import { settingsSubscriptionPath } from "~/routes/routePaths";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
 
-interface PremiumOverlayProps {
+interface PremiumPlaceholderProps {
     isRestricted: boolean;
     title?: string;
     description?: string;
     children: ReactNode;
 }
 
-export default function PremiumOverlay({
+export default function PremiumPlaceholder({
     isRestricted,
     title = "Fonctionnalite Premium",
     description = "Passez à un abonnement payant pour acceder à cette fonctionnalite.",
     children,
-}: PremiumOverlayProps) {
+}: PremiumPlaceholderProps) {
     const navigate = useNavigate();
 
     if (!isRestricted) return <>{children}</>;

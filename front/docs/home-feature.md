@@ -11,6 +11,10 @@ Two-column layout (`w-2/3` + `w-1/3`). The content wrapper uses `h-screen overfl
 - **Left column** (`overflow-y-auto scrollbar-none`): `HomeScriptsList` (filtered scripts list with status pills) + `ScriptCalendar`. Scrolls independently.
 - **Right column** (`min-h-0`): `HomeInsightsOverview` + ranked posts or ranked post groups. The `min-h-0` allows `flex-1 min-h-0` in child ranked list components to work, enabling their internal `overflow-y-auto` scrollable containers.
 
+## Empty State
+
+When `integrations.length === 0`, the right column renders `ConnectIntegrationPlaceholder` instead of `HomeInsightsOverview` and ranked lists. This prevents unnecessary API calls and shows the user a CTA to connect an account via `/settings/integrations`.
+
 ## Components
 
 ### HomeInsightsOverview

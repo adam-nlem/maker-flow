@@ -79,6 +79,10 @@ InsightsPageView                 h-screen overflow-hidden, flex flex-col
 - **`flex-1 min-h-0`** on intermediate flex children allows them to shrink below their content size, which is required for overflow to work in nested flex layouts.
 - **Sticky `<thead>`** keeps column headers visible while the table body scrolls.
 
+## Empty State
+
+When `integrations.length === 0`, `InsightsPageView` renders `ConnectIntegrationPlaceholder` instead of `IntegrationPageView`. This prevents broken API calls (e.g., `useShowIntegrationDetail` with an undefined UUID) and shows the user a CTA to connect an account via `/settings/integrations`.
+
 ## Components
 
 | Component | File | Role |

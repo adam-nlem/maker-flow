@@ -14,7 +14,7 @@ import { insightsPath } from "~/routes/routePaths";
 import { BreadCrumbNavbar } from "~/components/ui/BreadCrumbNavBar";
 import { PercentageProgressBar } from "~/components/ui/PercentageProgressBar";
 import PostsRankingCard from "./PostsRankingCard";
-import PremiumOverlay from "~/components/ui/PremiumOverlay";
+import PremiumPlaceholder from "~/components/ui/PremiumPlaceholder";
 import { useIsSubscribed } from "~/hooks/useIsSubscribed";
 
 interface PostDetailPageViewProps {
@@ -53,9 +53,9 @@ export default function PostDetailPageView({ postUuid }: PostDetailPageViewProps
           { route: insightsPath, name: "Plateformes" },
           { route: "#", name: "Detail de contenu" },
         ]} />
-        <PremiumOverlay isRestricted>
+        <PremiumPlaceholder isRestricted>
           <div className="h-96" />
-        </PremiumOverlay>
+        </PremiumPlaceholder>
       </div>
     );
   }
