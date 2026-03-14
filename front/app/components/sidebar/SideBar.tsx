@@ -3,7 +3,7 @@ import { CalendarDaysIcon as CalendarDaysIconSolid, HomeIcon as HomeIconSolid, G
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
-import { getMaxProjectsForPlan } from "~/models/PlanConfig";
+import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { Button } from "../ui/Button";
 import { useEffect } from "react";
@@ -29,7 +29,9 @@ export default function SideBar() {
 
   const { projects, isLoading: isLoadingProjects } = useListPaginatedProjects()
   const { subscription } = useShowCurrentSubscription()
-  const maxProjects = getMaxProjectsForPlan(subscription?.plan)
+  const { plans } = useListPlans()
+  const currentPlanConfig = plans.find((p) => p.plan === subscription?.plan)
+  const maxProjects = subscription ? (currentPlanConfig?.maxProjects ?? null) : 1
   const isAtProjectLimit = maxProjects !== null && projects.length >= maxProjects
 
   const { focusedProjectUuid, setFocusedProjectUuid } = useSelectFocusedProject({ projects })

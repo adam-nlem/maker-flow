@@ -20,6 +20,7 @@ use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptRepository;
 use App\Repository\ScriptShotRepository;
 use App\Repository\SubscriptionRepository;
+use App\Service\Stripe\StripePlanService;
 use App\Repository\ScriptTagRepository;
 use App\Repository\ScriptTextRepository;
 use App\Repository\ScriptVoiceOverRepository;
@@ -105,6 +106,7 @@ final class ScriptController extends AbstractController
         PostGroupRepository $postGroupRepository,
         ScriptTagRepository $scriptTagRepository,
         SubscriptionRepository $subscriptionRepository,
+        StripePlanService $stripePlanService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -116,7 +118,7 @@ final class ScriptController extends AbstractController
         }
 
         $plan = $subscriptionRepository->getActiveByUser($user)?->getPlan();
-        $maxScripts = $plan?->getMaxScriptsPerProject() ?? 1;
+        $maxScripts = $plan !== null ? $stripePlanService->getPlanConfigFromSubscription($plan)?->getMaxScriptsPerProject() : 1;
 
         if ($maxScripts !== null && $scriptRepository->countByProjectAndUser($project, $user) >= $maxScripts) {
             return $this->json(

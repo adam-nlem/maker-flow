@@ -56,4 +56,9 @@ class RedisStoreService
     {
         return sprintf('INTEGRATION/STATE/%s', $state);
     }
+
+    public static function getStripePlansKey(): string
+    {
+        return 'STRIPE/PLANS';
+    }
 }

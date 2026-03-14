@@ -6,7 +6,6 @@ use App\Entity\Enum\SubscriptionPlan;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Stripe\Exception\CheckoutSessionCreationException;
-use Doctrine\ORM\EntityManagerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Customer;
 use Stripe\Exception\ApiErrorException;
@@ -16,12 +15,10 @@ class StripeCheckoutService
 {
     public function __construct(
         private readonly string $stripeSecretKey,
-        private readonly string $stripePriceStarter,
-        private readonly string $stripePriceCreator,
-        private readonly string $stripePriceAgency,
         private readonly string $stripePriceTopup,
         private readonly string $frontendUrl,
         private readonly UserRepository $userRepository,
+        private readonly StripePlanService $stripePlanService,
     ) {
         Stripe::setApiKey($this->stripeSecretKey);
     }
@@ -55,7 +52,11 @@ class StripeCheckoutService
      */
     public function createSubscriptionCheckoutSession(User $user, SubscriptionPlan $plan, string $checkoutRedirectPath = '/settings/subscription'): string
     {
-        $priceId = $this->resolvePriceId($plan);
+        $priceId = $this->stripePlanService->getPriceIdForPlan($plan);
+
+        if ($priceId === null) {
+            throw new CheckoutSessionCreationException('No price found for plan: ' . $plan->value);
+        }
         $customerId = $this->getOrCreateStripeCustomer($user);
 
         try {
@@ -111,15 +112,4 @@ class StripeCheckoutService
         return $session->url;
     }
 
-    /**
-     * @throws CheckoutSessionCreationException
-     */
-    private function resolvePriceId(SubscriptionPlan $plan): string
-    {
-        return match ($plan) {
-            SubscriptionPlan::Starter => $this->stripePriceStarter,
-            SubscriptionPlan::Creator => $this->stripePriceCreator,
-            SubscriptionPlan::Agency => $this->stripePriceAgency,
-        };
-    }
 }

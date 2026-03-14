@@ -5,11 +5,13 @@ namespace App\Controller;
 use App\DTO\Request\Subscription\ChangePlanRequestDTO;
 use App\DTO\Request\Subscription\CreateSubscriptionCheckoutRequestDTO;
 use App\DTO\Response\Subscription\CreateSubscriptionCheckoutResponseDTO;
+use App\DTO\Response\Subscription\ListPlansResponseDTO;
 use App\Entity\User;
 use App\Repository\SubscriptionRepository;
 use App\Service\Stripe\Exception\CheckoutSessionCreationException;
 use App\Service\Stripe\Exception\SubscriptionManagementException;
 use App\Service\Stripe\StripeCheckoutService;
+use App\Service\Stripe\StripePlanService;
 use App\Service\Stripe\StripeSubscriptionService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,6 +21,27 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/api/subscriptions')]
 final class SubscriptionController extends AbstractController
 {
+    #[Route('/plans', name: 'api_subscriptions_plans_list', methods: ['GET'])]
+    public function plans(StripePlanService $stripePlanService): JsonResponse
+    {
+        try {
+            $plans = $stripePlanService->getPlanConfigs();
+        } catch (\Exception $e) {
+            return $this->json(
+                data: ["message" => "Unable to load plans"],
+                status: Response::HTTP_INTERNAL_SERVER_ERROR,
+            );
+        }
+
+        $responseDto = new ListPlansResponseDTO($plans);
+
+        return $this->json(
+            data: $responseDto->getData(),
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_subscriptions_plans_list']],
+        );
+    }
+
     #[Route('/checkout', name: 'api_subscriptions_checkout', methods: ['POST'])]
     public function checkout(CreateSubscriptionCheckoutRequestDTO $dto, StripeCheckoutService $stripeCheckoutService): JsonResponse
     {

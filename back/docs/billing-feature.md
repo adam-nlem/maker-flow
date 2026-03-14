@@ -4,7 +4,7 @@
 
 The credit system manages user credits with two separate buckets: **subscription credits** (granted by plan renewals) and **topup credits** (purchased separately). A `CreditBalance` entity is the single source of truth, and every mutation is recorded as an immutable `CreditTransaction` for full auditability.
 
-Stripe Checkout handles the payment flow: the backend creates Checkout Sessions and returns URLs for the frontend to redirect users to Stripe-hosted payment pages. Price configuration lives entirely in Stripe product metadata (`plan` and `credit_amount`), with price IDs stored as environment variables.
+Stripe Checkout handles the payment flow: the backend creates Checkout Sessions and returns URLs for the frontend to redirect users to Stripe-hosted payment pages. Plan identification is driven by **Stripe Product metadata** (`product.metadata.plan`), making the system fully metadata-driven — adding or modifying plans only requires changes in the Stripe dashboard.
 
 ---
 
@@ -190,6 +190,79 @@ Returns the sum of subscription + topup credits.
 
 ---
 
+## StripePlanService (`Service/Stripe/StripePlanService.php`)
+
+Central service for plan configuration. Fetches plan data from Stripe product/price metadata, caches it in Redis, and provides lookup methods used by all other Stripe services.
+
+### Dependencies
+
+- `string $stripeSecretKey` -- Stripe API key
+- `RedisStoreService` -- Redis cache
+- `LoggerInterface` -- for logging warnings on missing metadata
+
+### Public Methods
+
+#### `getPlanConfigs(): PlanConfigResponseDTO[]`
+Returns all plan configurations as DTOs. Checks Redis cache first (key: `STRIPE/PLANS`, TTL: 1 hour). If cache miss, fetches from Stripe and caches.
+
+#### `getPlanConfigFromSubscription(SubscriptionPlan $plan): ?PlanConfigResponseDTO`
+Returns a single plan's configuration DTO from the cached plans.
+
+#### `getPriceIdForPlan(SubscriptionPlan $plan): ?string`
+Returns the Stripe price ID for a given plan. Used by `StripeCheckoutService` to create checkout sessions.
+
+#### `resolvePlanFromPriceId(string $priceId): ?SubscriptionPlan`
+Returns the `SubscriptionPlan` enum for a given Stripe price ID. Used by `StripeWebhookService` to identify plans from webhooks.
+
+#### `refreshCache(): PlanConfigResponseDTO[]`
+Force-fetches plans from Stripe, updates the Redis cache, and returns the plans as DTOs.
+
+### How Plan Identification Works
+
+`StripePlanService` fetches all active Stripe Products and filters by `product.metadata.plan`. Each product with a valid `plan` metadata value (matching a `SubscriptionPlan` enum case) is treated as a subscription plan. The associated default price is retrieved for pricing and credit data.
+
+This metadata-driven approach means:
+- **No hardcoded price IDs** for plan identification — `StripeCheckoutService` and `StripeWebhookService` resolve plans via `StripePlanService`
+- **Adding a new plan** only requires creating a Stripe Product with the right metadata — no code or env var changes needed
+- **The topup price** (`STRIPE_PRICE_TOPUP`) remains as an env var since it's not a plan product
+
+### Stripe Product Metadata
+
+Each Stripe product representing a subscription plan must have these metadata fields:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `plan` | string | Plan identifier (`starter`, `creator`, `agency`) — must match a `SubscriptionPlan` enum case |
+| `is_highlighted` | string | `"true"` or `"false"` -- marks the recommended plan |
+| `max_projects` | string | Number or `"null"` for unlimited |
+| `max_scripts_per_project` | string | Number or `"null"` for unlimited |
+| `sort_order` | string | Display ordering number |
+
+Feature labels are configured via Stripe's built-in **Marketing features** on each Product (not metadata).
+
+### Stripe Price Metadata
+
+Each Stripe price (default price of the product) must have:
+
+| Key | Type | Description |
+|-----|------|-------------|
+| `credit_amount` | string | Number of credits granted per billing cycle |
+
+### CLI Command
+
+```bash
+dce back php bin/console app:stripe:refresh-plans
+```
+
+Manually refreshes the Redis cache from Stripe. Use after updating product metadata in the Stripe dashboard.
+
+### Response DTOs
+
+- `PlanConfigResponseDTO` -- Single plan's display data (implements `ResponseDTOInterface`)
+- `ListPlansResponseDTO` -- Wraps array of `PlanConfigResponseDTO`
+
+---
+
 ## StripeCheckoutService (`Service/Stripe/StripeCheckoutService.php`)
 
 Handles Stripe Checkout Session creation for subscriptions and topup purchases.
@@ -197,11 +270,10 @@ Handles Stripe Checkout Session creation for subscriptions and topup purchases.
 ### Dependencies
 
 - `string $stripeSecretKey` -- Stripe API key (injected via `services.yaml`)
-- `string $stripePriceStarter`, `$stripePriceCreator`, `$stripePriceAgency` -- subscription price IDs
 - `string $stripePriceTopup` -- topup price ID
 - `string $frontendUrl` -- for building success/cancel redirect URLs
-- `EntityManagerInterface`
 - `UserRepository`
+- `StripePlanService` -- for resolving plan price IDs
 
 ### Public Methods
 
@@ -209,7 +281,7 @@ Handles Stripe Checkout Session creation for subscriptions and topup purchases.
 Returns the user's Stripe customer ID. If none exists, creates a Stripe customer and persists the ID to the User entity.
 
 #### `createSubscriptionCheckoutSession(User $user, SubscriptionPlan $plan, string $checkoutRedirectPath = '/settings/subscription'): string`
-Creates a Stripe Checkout Session in `subscription` mode. Resolves the price ID from env vars based on the plan. Returns the checkout URL. `$checkoutRedirectPath` is the base path for both success and cancel redirects — the backend appends `?checkout=success` or `?checkout=cancel` automatically. Defaults to `/settings/subscription`.
+Creates a Stripe Checkout Session in `subscription` mode. Resolves the price ID via `StripePlanService::getPriceIdForPlan()`. Returns the checkout URL. `$checkoutRedirectPath` is the base path for both success and cancel redirects — the backend appends `?checkout=success` or `?checkout=cancel` automatically. Defaults to `/settings/subscription`.
 
 #### `createTopupCheckoutSession(User $user): string`
 Creates a Stripe Checkout Session in `payment` mode using the single topup price. Returns the checkout URL.
@@ -222,7 +294,8 @@ Frontend                    Backend                         Stripe
    |-- POST /subscriptions    |                               |
    |   /checkout              |                               |
    |   {"plan":"starter"} --->|                               |
-   |                          |-- resolve price from env var   |
+   |                          |-- StripePlanService            |
+   |                          |   ->getPriceIdForPlan()        |
    |                          |-- getOrCreateCustomer -------->|
    |                          |<-- customer_id ---------------|
    |                          |-- Session::create ----------->|
@@ -239,12 +312,11 @@ Frontend                    Backend                         Stripe
 
 ## StripeSubscriptionService (`Service/Stripe/StripeSubscriptionService.php`)
 
-Handles subscription lifecycle management via the Stripe API: cancel, resume, and plan changes.
+Handles subscription lifecycle management via the Stripe API: cancel and resume.
 
 ### Dependencies
 
 - `string $stripeSecretKey` -- Stripe API key
-- `string $stripePriceStarter`, `$stripePriceCreator`, `$stripePriceAgency` -- subscription price IDs
 - `SubscriptionRepository`
 - `LoggerInterface`
 
@@ -286,10 +358,17 @@ Thrown when a subscription management action fails (cancel, resume, or plan chan
 
 | Method | Path | Name | Description |
 |--------|------|------|-------------|
+| GET | `/api/subscriptions/plans` | `api_subscriptions_plans` | Get all plan configurations from Stripe |
 | POST | `/api/subscriptions/checkout` | `api_subscriptions_checkout` | Create Checkout Session for subscription |
 | GET | `/api/subscriptions/current` | `api_subscriptions_current` | Get current subscription |
 | POST | `/api/subscriptions/cancel` | `api_subscriptions_cancel` | Cancel subscription at period end |
 | POST | `/api/subscriptions/resume` | `api_subscriptions_resume` | Resume a canceled subscription |
+
+**GET /api/subscriptions/plans**
+- No request body
+- Response: Array of plan config objects (plan, name, monthlyPrice, currency, creditsPerMonth, maxProjects, maxScriptsPerProject, features, isHighlighted, sortOrder)
+- Data fetched from Stripe product/price metadata, cached in Redis (1 hour TTL)
+- DTO: `ListPlansResponseDTO` containing `PlanConfigResponseDTO[]`
 
 **POST /api/subscriptions/checkout**
 - Request body: `{"plan": "starter"}` (valid values: `starter`, `creator`, `agency`)
@@ -405,40 +484,34 @@ Stripe field:
 | Variable | Description | Location |
 |----------|-------------|----------|
 | `STRIPE_SECRET_KEY` | Stripe API secret key | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
-| `STRIPE_PRICE_STARTER` | Stripe price ID for Starter plan | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
-| `STRIPE_PRICE_CREATOR` | Stripe price ID for Creator plan | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
-| `STRIPE_PRICE_AGENCY` | Stripe price ID for Agency plan | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 | `STRIPE_PRICE_TOPUP` | Stripe price ID for topup pack | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | `.env`, `docker-compose.yaml`, `back/.env`, `services.yaml` |
 
-Price IDs are resolved at runtime via `services.yaml` parameters injected into `StripeCheckoutService` and `StripeWebhookService`.
+> **Note:** `STRIPE_PRICE_STARTER`, `STRIPE_PRICE_CREATOR`, and `STRIPE_PRICE_AGENCY` are no longer needed. Plan identification is now fully metadata-driven via `StripePlanService`.
 
 ---
 
 ## Plan-Based Feature Limits
 
-The `SubscriptionPlan` enum defines per-plan limits. When no active subscription exists, the user is treated as a free user with default limits.
+Plan limits (maxProjects, maxScriptsPerProject) are stored in Stripe product metadata and cached by `StripePlanService`. When no active subscription exists, the user is treated as a free user with default limits.
 
 ### Subscription Resolution
 
 Controllers use `SubscriptionRepository::getActiveByUser($user)` to get the subscription. This method validates both status (`Active`) and expiry (`currentPeriodEnd >= now`). If it returns `null`, the user is treated as free.
 
-### SubscriptionPlan Methods
+### Plan Limits (from Stripe metadata)
 
-| Method | Starter | Creator | Agency |
-|--------|---------|---------|--------|
-| `getMaxProjects()` | 1 | 1 | null (unlimited) |
-| `getMaxScriptsPerProject()` | null (unlimited) | null (unlimited) | null (unlimited) |
+Limits are configured in Stripe product metadata and read via `StripePlanService`. The `SubscriptionPlan` enum is a type-safe identifier only — it no longer contains limit methods.
 
 **Free user defaults** (no active subscription): max 1 project, max 1 script per project.
 
 ### Limit Enforcement Pattern
 
-Limits are checked in controllers before calling services:
+Limits are checked in controllers before calling services using `StripePlanService`:
 
 ```php
 $plan = $subscriptionRepository->getActiveByUser($user)?->getPlan();
-$maxX = $plan?->getMaxX() ?? 1; // defaults to 1 for free users
+$maxX = $plan !== null ? $stripePlanService->getPlanConfig($plan)?->getMaxX() : 1;
 
 if ($maxX !== null && $repository->countBy...($user) >= $maxX) {
     return $this->json(
@@ -489,7 +562,7 @@ Services that receive an `isSubscribed` parameter skip premium computations for 
 4. **Hard block**: Debits are rejected if insufficient credits (no negative balances)
 5. **Race condition safety**: Pessimistic locking prevents concurrent debits from over-spending
 6. **Webhook idempotency**: `StripeWebhookEvent.stripeEventId` unique constraint prevents duplicate processing
-7. **Metadata-driven pricing**: Plan name and credit amounts live in Stripe product metadata, not in app config
+7. **Metadata-driven plans**: Plan identity, features, and limits live in Stripe product metadata — no hardcoded price IDs for plan resolution
 8. **Stripe customer linkage**: `stripeCustomerId` on User entity (not Subscription) -- one customer per user across all Stripe interactions
 
 ---
@@ -516,7 +589,7 @@ Worker  ◀─consume──  ProcessStripeWebhookHandler (async)
 
 ### StripeWebhookService (`Service/Stripe/StripeWebhookService.php`)
 
-Handles signature verification and event processing. Injected with Stripe secret key, webhook secret, and price IDs for plan resolution.
+Handles signature verification and event processing. Uses `StripePlanService` for plan resolution from price IDs.
 
 #### `constructEvent(string $payload, string $signature): \Stripe\Event`
 Verifies the webhook signature and constructs the Stripe event. Throws `WebhookSignatureVerificationException` on failure.
@@ -527,7 +600,7 @@ Processes the event based on its type:
 | Event Type | Action |
 |------------|--------|
 | `checkout.session.completed` (payment mode) | Fetch session line items via Stripe API, read `credit_amount` from price metadata, call `CreditService::addTopupCredits()` |
-| `customer.subscription.created` | Resolve plan from price ID, create local `Subscription` entity |
+| `customer.subscription.created` | Resolve plan via `StripePlanService::resolvePlanFromPriceId()`, create local `Subscription` entity |
 | `customer.subscription.updated` | Update subscription status, period dates, cancelAtPeriodEnd, plan |
 | `customer.subscription.deleted` | Set subscription status to `Canceled` |
 | `invoice.paid` | Read `credit_amount` from invoice line item price metadata, call `CreditService::renewSubscriptionCredits()` |
@@ -563,9 +636,6 @@ App\Service\Stripe\StripeWebhookService:
     arguments:
         $stripeSecretKey: "%app.stripe.secret_key%"
         $stripeWebhookSecret: "%app.stripe.webhook_secret%"
-        $stripePriceStarter: "%app.stripe.price_starter%"
-        $stripePriceCreator: "%app.stripe.price_creator%"
-        $stripePriceAgency: "%app.stripe.price_agency%"
 ```
 
 ### Local Testing

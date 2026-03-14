@@ -2,7 +2,6 @@
 
 namespace App\Service\Stripe;
 
-use App\Entity\Enum\CreditTransactionType;
 use App\Entity\Enum\StripeEventType;
 use App\Entity\Enum\SubscriptionPlan;
 use App\Entity\Enum\SubscriptionStatus;
@@ -12,7 +11,6 @@ use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
 use App\Service\Credit\CreditService;
 use App\Service\Stripe\Exception\WebhookSignatureVerificationException;
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
@@ -25,12 +23,10 @@ class StripeWebhookService
     public function __construct(
         private readonly string $stripeSecretKey,
         private readonly string $stripeWebhookSecret,
-        private readonly string $stripePriceStarter,
-        private readonly string $stripePriceCreator,
-        private readonly string $stripePriceAgency,
         private readonly UserRepository $userRepository,
         private readonly SubscriptionRepository $subscriptionRepository,
         private readonly CreditService $creditService,
+        private readonly StripePlanService $stripePlanService,
         private readonly LoggerInterface $log,
     ) {
         Stripe::setApiKey($this->stripeSecretKey);
@@ -128,7 +124,7 @@ class StripeWebhookService
 
         $item = $subscriptionData['items']['data'][0] ?? [];
         $priceId = $item['price']['id'] ?? null;
-        $plan = $priceId !== null ? $this->resolvePlanFromPriceId($priceId) : null;
+        $plan = $priceId !== null ? $this->stripePlanService->resolvePlanFromPriceId($priceId) : null;
 
         if ($plan === null) {
             $this->log->warning('Could not resolve plan from price ID', ['priceId' => $priceId]);
@@ -177,7 +173,7 @@ class StripeWebhookService
         $priceId = $item['price']['id'] ?? null;
 
         if ($priceId !== null) {
-            $plan = $this->resolvePlanFromPriceId($priceId);
+            $plan = $this->stripePlanService->resolvePlanFromPriceId($priceId);
 
             if ($plan !== null) {
                 $subscription->setPlan($plan);
@@ -268,13 +264,5 @@ class StripeWebhookService
         $this->subscriptionRepository->save($subscription, true);
     }
 
-    private function resolvePlanFromPriceId(string $priceId): ?SubscriptionPlan
-    {
-        return match ($priceId) {
-            $this->stripePriceStarter => SubscriptionPlan::Starter,
-            $this->stripePriceCreator => SubscriptionPlan::Creator,
-            $this->stripePriceAgency => SubscriptionPlan::Agency,
-            default => null,
-        };
-    }
+    
 }

@@ -1,10 +1,10 @@
 import { CheckIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
-import type { PlanConfig } from "~/models/PlanConfig";
+import type { PlanConfigDTO } from "~/dtos/subscriptions/PlanConfigDTO";
 import { formatPriceEur } from "~/utils/priceFormatters";
 
 interface PlanCardProps {
-    config: PlanConfig;
+    config: PlanConfigDTO;
     isPending: boolean;
     disabled?: boolean;
     onSelect: () => void;

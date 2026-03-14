@@ -2,7 +2,6 @@
 
 namespace App\Service\Stripe;
 
-use App\Entity\Enum\SubscriptionPlan;
 use App\Entity\Subscription;
 use App\Repository\SubscriptionRepository;
 use App\Service\Stripe\Exception\SubscriptionManagementException;
@@ -15,9 +14,6 @@ class StripeSubscriptionService
 {
     public function __construct(
         private readonly string $stripeSecretKey,
-        private readonly string $stripePriceStarter,
-        private readonly string $stripePriceCreator,
-        private readonly string $stripePriceAgency,
         private readonly SubscriptionRepository $subscriptionRepository,
         private readonly LoggerInterface $log,
     ) {
@@ -70,17 +66,5 @@ class StripeSubscriptionService
 
         $subscription->setCancelAtPeriodEnd(false);
         $this->subscriptionRepository->save($subscription, true);
-    }
-
-    /**
-     * @throws SubscriptionManagementException
-     */
-    private function resolvePriceId(SubscriptionPlan $plan): string
-    {
-        return match ($plan) {
-            SubscriptionPlan::Starter => $this->stripePriceStarter,
-            SubscriptionPlan::Creator => $this->stripePriceCreator,
-            SubscriptionPlan::Agency => $this->stripePriceAgency,
-        };
     }
 }

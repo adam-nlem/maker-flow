@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Repository\ProjectRepository;
 use App\Repository\SubscriptionRepository;
+use App\Service\Stripe\StripePlanService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
@@ -23,13 +24,13 @@ use Symfony\Component\Routing\Requirement\Requirement;
 final class ProjectController extends AbstractController
 {
     #[Route('', name: 'api_projects_create', methods: ['POST'])]
-    public function create(CreateProjectRequestDTO $dto, ProjectRepository $projectRepository, SubscriptionRepository $subscriptionRepository): JsonResponse
+    public function create(CreateProjectRequestDTO $dto, ProjectRepository $projectRepository, SubscriptionRepository $subscriptionRepository, StripePlanService $stripePlanService): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
         $plan = $subscriptionRepository->getActiveByUser($user)?->getPlan();
-        $maxProjects = $plan?->getMaxProjects() ?? 1;
+        $maxProjects = $plan !== null ? $stripePlanService->getPlanConfigFromSubscription($plan)?->getMaxProjects() : 1;
 
         if ($maxProjects !== null && $projectRepository->countByUser($user) >= $maxProjects) {
             return $this->json(

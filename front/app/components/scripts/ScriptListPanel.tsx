@@ -5,8 +5,8 @@ import ScriptCard from "./ScriptCard";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { SidePanel } from "~/components/ui/SidePanel";
-import { getMaxScriptsPerProjectForPlan } from "~/models/PlanConfig";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
+import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import { PaymentRequiredException } from "~/services/httpClient/customHttpExceptions";
 
 interface ScriptListPanelProps {
@@ -23,7 +23,9 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
     const sentinelRef = useRef<HTMLDivElement>(null);
     const { subscription } = useShowCurrentSubscription();
-    const maxScripts = getMaxScriptsPerProjectForPlan(subscription?.plan);
+    const { plans } = useListPlans();
+    const currentPlanConfig = plans.find((p) => p.plan === subscription?.plan);
+    const maxScripts = subscription ? (currentPlanConfig?.maxScriptsPerProject ?? null) : 1;
     const isLimitReached = maxScripts !== null && scripts.length >= maxScripts;
 
     const handleNewScript = async () => {

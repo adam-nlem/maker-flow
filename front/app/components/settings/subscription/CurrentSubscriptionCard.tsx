@@ -4,12 +4,9 @@ import { Button } from "~/components/ui/Button";
 import { useCancelSubscription } from "~/hooks/api/subscriptions/useCancelSubscription";
 import { useResumeSubscription } from "~/hooks/api/subscriptions/useResumeSubscription";
 import type { Subscription } from "~/models/Subscription";
-import type { SubscriptionPlan } from "~/models/enums/SubscriptionPlan";
 import { subscriptionPlanToFrenchTranslation } from "~/models/enums/SubscriptionPlan";
 import { subscriptionStatusToFrenchTranslation } from "~/models/enums/SubscriptionStatus";
 import { formatToFrenchDateLong } from "~/utils/dateFormatters";
-import { planConfigs } from "~/models/PlanConfig";
-import PlanCard from "./PlanCard";
 
 interface CurrentSubscriptionCardProps {
     subscription: Subscription;

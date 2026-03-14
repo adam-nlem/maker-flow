@@ -120,28 +120,33 @@ Computed getter: `isActive` returns `status === Active`.
 
 ---
 
-## Plan Config (`models/PlanConfig.ts`)
+## Plan Config DTO (`dtos/subscriptions/PlanConfigDTO.ts`)
 
-Interface + constant array for plan display data. All prices and features are configured here for easy updates.
+Plan display data is fetched from Stripe via the `GET /api/subscriptions/plans` endpoint. Stripe is the single source of truth — there is no hardcoded config file.
 
 ```ts
-export interface PlanConfig {
+export class PlanConfigDTO {
     plan: SubscriptionPlan;
     name: string;
-    monthlyPrice: number;       // in euros
+    monthlyPrice: number;
+    currency: string;
     creditsPerMonth: number;
     maxProjects: number | null;
     maxScriptsPerProject: number | null;
     features: string[];
     isHighlighted: boolean;
-}
+    sortOrder: number;
 
-export const planConfigs: PlanConfig[];
+    static fromJSON(json: PlanConfigDTOJSON): PlanConfigDTO;
+}
 ```
 
-Helper functions:
-- `getMaxProjectsForPlan(plan)` -- returns max projects for a plan (defaults to 1 for null/no subscription)
-- `getMaxScriptsPerProjectForPlan(plan)` -- returns max scripts per project (defaults to 1 for null/no subscription)
+Plan limits are accessed by looking up the current plan in the `useListPlans()` hook result:
+```ts
+const { plans } = useListPlans();
+const currentPlanConfig = plans.find((p) => p.plan === subscription?.plan);
+const maxProjects = subscription ? (currentPlanConfig?.maxProjects ?? null) : 1;
+```
 
 ---
 
@@ -169,7 +174,7 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 
 | Feature | Component | Behavior |
 |---------|-----------|----------|
-| Script creation | `ScriptListPanel` | "+" button disabled when `scripts.length >= maxScriptsPerProject`. Catches 402 from backend. |
+| Script creation | `ScriptListPanel` | "+" button disabled when `scripts.length >= maxScriptsPerProject` (limit from `useListPlans()`). Catches 402 from backend. |
 | Post detail page | `PostDetailPageView` | API call skipped via `enabled: isSubscribed`. Full `PremiumOverlay` shown instead of page content. Breadcrumb remains visible. |
 | Integration detail page | `IntegrationPageView` | API call skipped via `enabled: isSubscribed`. Full `PremiumOverlay` shown instead of detail content. |
 | Home aggregated view | `home.tsx` (parent) | Full `PremiumOverlay` replaces both `HomeInsightsOverview` and `RankedPostGroupsList` when "Toutes les plateformes" is selected and user is not subscribed. No API calls made. Pill row stays visible. Per-integration views remain accessible. |
@@ -185,13 +190,14 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 | File | Keys |
 |------|------|
 | `hooks/api/credits/creditQueryKeys.ts` | `all`, `balance()`, `transactions(page, limit)` |
-| `hooks/api/subscriptions/subscriptionQueryKeys.ts` | `all`, `current()` |
+| `hooks/api/subscriptions/subscriptionQueryKeys.ts` | `all`, `current()`, `plans()` |
 
 ### Hooks
 
 | Hook | Endpoint | Returns |
 |------|----------|---------|
 | `useShowCreditBalance` | `GET /api/credits/balance` | `{ creditBalance, isLoading, error }` |
+| `useListPlans` | `GET /api/subscriptions/plans` | `{ plans, isLoading, error }`. Plans fetched from Stripe via backend, cached with 30min staleTime. |
 | `useShowCurrentSubscription` | `GET /api/subscriptions/current` | `{ subscription, isLoading, error }` (null if no subscription). Accepts optional `{ refetchInterval }` for polling. |
 | `useCreateSubscriptionCheckout` | `POST /api/subscriptions/checkout` | `{ createCheckout, isPending, error }` (redirects to Stripe on success). `createCheckout({ plan, checkoutRedirectPath? })` — optional base path for Stripe redirect (backend appends `?checkout=success` / `?checkout=cancel`). |
 | `useCancelSubscription` | `POST /api/subscriptions/cancel` | `{ cancelSubscription, isPending, error }` (invalidates subscription query) |
@@ -235,11 +241,11 @@ Shows current subscription: plan name, status pill, billing period dates, cancel
 
 ### PlanSelector (`components/settings/subscription/PlanSelector.tsx`)
 
-Grid of plan cards for initial subscription. Uses `planConfigs` for data and `useCreateSubscriptionCheckout` for the checkout flow. Accepts optional `checkoutRedirectPath` prop to override the base redirect path (used by `OnboardingSubscriptionStep` to redirect back to `/onboarding`).
+Grid of plan cards for initial subscription. Uses `useListPlans()` to fetch plan data from the API and `useCreateSubscriptionCheckout` for the checkout flow. Shows shimmer loading state while plans load. Accepts optional `checkoutRedirectPath` prop to override the base redirect path (used by `OnboardingSubscriptionStep` to redirect back to `/onboarding`) and `disabledPlan` to disable the current plan in the change-plan flow.
 
 ### PlanCard (`components/settings/subscription/PlanCard.tsx`)
 
-Individual plan card with name, price, credits, feature checklist, and action button. Supports `disabled` and custom `actionLabel` props for reuse in the change-plan flow.
+Individual plan card with name, price, credits, feature checklist, and action button. Accepts `config: PlanConfigDTO` prop. Supports `disabled` and custom `actionLabel` props for reuse in the change-plan flow.
 
 ### CreditTransactionHistory (`components/settings/subscription/CreditTransactionHistory.tsx`)
 
