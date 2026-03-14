@@ -2,8 +2,6 @@ import type { ReactNode } from "react"
 
 import WelcomeFeatureStep from "~/components/welcome/WelcomeFeatureStep"
 import WelcomeHowItWorksStep from "~/components/welcome/WelcomeHowItWorksStep"
-import WelcomeRegisterStep from "~/components/welcome/WelcomeRegisterStep"
-import WelcomeVerifyOtpStep from "~/components/welcome/WelcomeVerifyOtpStep"
 import OnboardingCreateProjectStep from "~/components/onboarding/OnboardingCreateProjectStep"
 import OnboardingConnectIntegrationStep from "~/components/onboarding/OnboardingConnectIntegrationStep"
 import OnboardingCreatorProfileStep from "~/components/onboarding/OnboardingCreatorProfileStep"
@@ -17,8 +15,6 @@ import { WelcomeStep } from "~/models/enums/WelcomeStep"
 const welcomeNodes: Record<WelcomeStep, ReactNode> = {
     [WelcomeStep.Features]: <WelcomeFeatureStep />,
     [WelcomeStep.HowItWorks]: <WelcomeHowItWorksStep />,
-    [WelcomeStep.Register]: <WelcomeRegisterStep />,
-    [WelcomeStep.VerifyOtp]: <WelcomeVerifyOtpStep />,
 }
 
 const onboardingNodes: Record<OnboardingStep, ReactNode> = {
@@ -34,8 +30,6 @@ export default function OnboardingPage() {
     const {
         isAuthLoading,
         isAuthenticated,
-        currentStep,
-        totalSteps,
         currentOnboardingStep,
         currentWelcomeStep,
     } = useOnboardingFlow()

@@ -3,7 +3,7 @@ import { Button } from "~/components/ui/Button"
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>
 
-interface WelcomeStepLayoutProps {
+interface AuthStepLayoutProps {
     icon?: HeroIcon
     title: string
     subtitle: ReactNode
@@ -13,7 +13,7 @@ interface WelcomeStepLayoutProps {
     children?: ReactNode
 }
 
-export default function WelcomeStepLayout({
+export default function AuthStepLayout({
     icon: Icon,
     title,
     subtitle,
@@ -21,7 +21,7 @@ export default function WelcomeStepLayout({
     onNext,
     nextLabel = "Suivant",
     children,
-}: WelcomeStepLayoutProps) {
+}: AuthStepLayoutProps) {
     return (
         <div className="min-h-screen flex flex-col items-center justify-between px-6 py-12">
             <div className="flex flex-col items-center">

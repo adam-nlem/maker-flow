@@ -1,7 +1,7 @@
 import { RocketLaunchIcon, ClipboardDocumentCheckIcon, ChartBarIcon, CalendarDaysIcon, SparklesIcon } from "@heroicons/react/24/outline"
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
 import { WelcomeStep } from "~/models/enums/WelcomeStep"
-import WelcomeStepLayout from "~/components/welcome/WelcomeStepLayout"
+import AuthStepLayout from "~/components/auth/AuthStepLayout"
 
 const features = [
     {
@@ -30,7 +30,7 @@ export default function WelcomeFeatureStep() {
     const setWelcomeStep = useOnboardingStore((s) => s.setWelcomeStep)
 
     return (
-        <WelcomeStepLayout
+        <AuthStepLayout
             icon={RocketLaunchIcon}
             title="Gérez vos contenus comme un pro"
             subtitle="MakerFlow vous aide à planifier, rédiger et analyser vos contenus vidéo sur Instagram et YouTube."
@@ -51,6 +51,6 @@ export default function WelcomeFeatureStep() {
                     </div>
                 ))}
             </div>
-        </WelcomeStepLayout>
+        </AuthStepLayout>
     )
 }

@@ -2,11 +2,11 @@
 
 ## Overview
 
-The onboarding system is a **unified full-page step flow** at `/onboarding` that covers the entire user journey: welcome presentation → registration → OTP verification → in-app setup (project, integrations, creator profile, AI script generation, subscriptions). The existing standalone login/register pages remain as fallbacks for returning users.
+The onboarding system is a **full-page step flow** at `/onboarding` covering two phases: welcome presentation (Features → HowItWorks) then post-auth setup (project, integrations, creator profile, AI script generation, subscriptions). After the welcome steps, users are redirected to the standalone `/register` route. The auth routes (`/login`, `/register`, `/verify-otp`) use `AuthStepLayout` for a consistent visual style.
 
 ## Architecture
 
-All onboarding step components are **self-contained** (zero props). They read state from Zustand stores and hooks internally, and the route file uses `Record<Enum, ReactNode>` mappings instead of switch statements.
+All onboarding step components are **self-contained** (zero props). Auth pages (`/login`, `/register`, `/verify-otp`) are standalone routes using `AuthStepLayout`. The onboarding route file uses `Record<Enum, ReactNode>` mappings instead of switch statements.
 
 ### Component Mapping Pattern
 
@@ -28,7 +28,7 @@ This follows the same pattern as `settings.section.tsx`.
 
 ### State Management
 
-- **`useOnboardingStore`** (`app/stores/onboarding/onboardingStore.ts`): Ephemeral Zustand store (no persist) for pre-auth navigation (`welcomeStep`) and OTP credentials (`pendingOtpToken`, `otpEmail`). Pre-auth components read/write this store for navigation.
+- **`useOnboardingStore`** (`app/stores/onboarding/onboardingStore.ts`): Ephemeral Zustand store (no persist) for welcome step navigation (`welcomeStep`, `setWelcomeStep`). Only used by the welcome step components (Features, HowItWorks).
 - **`useFocusProjectStore`**: Post-auth components read `focusedProjectUuid` from this store.
 - **`useFocusScriptStore`**: `OnboardingGenerateScriptStep` reads `focusedScriptUuid` from this store.
 - **`useAdvanceOnboardingStep`** (`app/hooks/api/onboarding/useAdvanceOnboardingStep.ts`): Hook that encapsulates step completion logic. Post-auth components call `advanceStep()` internally.
@@ -38,10 +38,9 @@ This follows the same pattern as `settings.section.tsx`.
 
 **File:** `app/stores/auth/authPrefillStore.ts`
 
-Persistent Zustand store (`app:auth:prefill`): `{ email: string | null, setEmail }`.
+Persistent Zustand store (`app:auth:prefill`): `{ email: string | null, setEmail }`. Resettable (cleared on logout).
 
 - Set on login/register form submit (both standalone pages and onboarding flow)
-- Used by `protected.tsx` to decide redirect: no email → `/onboarding` (first-time), has email → `/login` (returning user)
 - Used by login/register pages to prefill the email input
 
 ## Routing & Auth Guard
@@ -52,8 +51,8 @@ Persistent Zustand store (`app:auth:prefill`): `{ email: string | null, setEmail
 
 ### Protected Layout (`routes/protected.tsx`)
 
-Two redirect layers:
-1. **Unauthenticated**: checks `authPrefillStore.email` → redirects to `/onboarding` (no email) or `/login` (has email)
+Single effect with two redirect layers:
+1. **Unauthenticated**: redirects to `/onboarding` (first-time, no stored email) or `/login` (returning user, has stored email via `authPrefillStore`).
 2. **Onboarding guard**: fetches onboarding via `useShowOnboarding({ enabled: !!user })` → if not dismissed, redirects to `/onboarding`
 
 ## Enums
@@ -62,7 +61,7 @@ Two redirect layers:
 
 **File:** `app/models/enums/WelcomeStep.ts`
 
-Values: `features`, `how_it_works`, `register`, `verify_otp`. Exports `WELCOME_STEP_ORDER` array and metadata maps: `welcomeStepToTitle`, `welcomeStepToDescription` (partial, only for steps using `OnboardingStepHeader`).
+Values: `features`, `how_it_works`. Exports `WELCOME_STEP_ORDER` array and metadata maps (`welcomeStepToIcon`, `welcomeStepToShortLabel`). Auth steps (login, register, verify OTP) are handled by standalone routes, not welcome steps.
 
 ### `OnboardingStep`
 
@@ -77,13 +76,9 @@ Step metadata defined as const maps: `onboardingStepToFrenchTranslation`, `onboa
 | Step | Enum | Component | Description |
 |------|------|-----------|-------------|
 | 0 | `WelcomeStep.Features` | `WelcomeFeatureStep` | Feature cards grid |
-| 1 | `WelcomeStep.HowItWorks` | `WelcomeHowItWorksStep` | 3-step visual guide |
-| 2 | `WelcomeStep.Register` | `WelcomeRegisterStep` | Register form with icon/title/description, Back + "J'ai déjà un compte" buttons |
-| 3 | `WelcomeStep.VerifyOtp` | `WelcomeVerifyOtpStep` | OTP verification with icon/title/dynamic email description, Back button |
+| 1 | `WelcomeStep.HowItWorks` | `WelcomeHowItWorksStep` | 3-step visual guide, "Next" navigates to `/register` |
 
-All pre-auth components navigate via `useOnboardingStore.setWelcomeStep()`. Register step also calls `setOtpCredentials()` before navigating to OTP.
-
-After OTP verification, `useVerifyOtp` sets user in React Query cache → component detects auth → switches to post-auth steps.
+After HowItWorks, the user is redirected to `/register` (standalone route). After registration → `/verify-otp` → `/` → `protected.tsx` redirects to `/onboarding` for post-auth steps.
 
 ## Post-Auth Steps
 
@@ -127,7 +122,7 @@ Props: `maxWidth?` (string, defaults to `"max-w-lg"`), `disableNextButton?` (boo
 
 **File:** `app/components/onboarding/OnboardingStepHeader.tsx`
 
-Self-contained header used by `OnboardingStepLayout`. Reads the current step from `useOnboardingFlow` and looks up title/description from enum metadata (`onboardingStepToFrenchTranslation`, `onboardingStepToDescription`, `welcomeStepToTitle`, `welcomeStepToDescription`). Handles the VerifyOtp dynamic description (includes email from `useOnboardingStore`) internally. Also renders the progress bar and "Continuer" button.
+Self-contained header used by `OnboardingStepLayout`. Reads the current step from `useOnboardingFlow` and looks up title/description from enum metadata (`onboardingStepToFrenchTranslation`, `onboardingStepToDescription`). Also renders the progress bar and "Continuer" button.
 
 Props: `disableNextButton?` (optional, used by `OnboardingCreateScriptStep`).
 
@@ -179,23 +174,26 @@ Shared OTP verification form. Contains code input, cooldown timer, verify/resend
 
 Props: `pendingOtpToken`, `purpose`, `onVerified?`, `formSpacing?`.
 
-### WelcomeStepLayout
+### AuthStepLayout
 
-**File:** `app/components/welcome/WelcomeStepLayout.tsx`
+**File:** `app/components/auth/AuthStepLayout.tsx`
 
-Shared layout component used by all welcome step components. Provides consistent structure: full-screen centered layout, optional icon badge, title, subtitle, content wrapper (`max-w-sm`), and standardized button footer.
+Shared layout component used by all auth step components and welcome steps. Provides consistent structure: full-screen centered layout, optional icon badge, title, subtitle, content wrapper, and standardized button footer.
 
 Props: `icon?` (HeroIcon), `title` (string), `subtitle` (ReactNode), `onBack?` (() => void), `onNext?` (() => void), `nextLabel?` (string, defaults to "Suivant"), `children?` (ReactNode).
+
+### Auth Form Components
+
+**Directory:** `app/components/auth/`
+- `LoginForm` — Login form (email + password). Props: `onLoginSuccess()`, `onOtpRequired(data)`, `initialEmail?`
+
+Auth pages (`/login`, `/register`, `/verify-otp`) are standalone route pages that compose `AuthStepLayout` with the appropriate form component (`LoginForm`, `RegisterForm`, `VerifyOtpForm`).
 
 ### Welcome Components
 
 **Directory:** `app/components/welcome/`
-- `WelcomeFeatureStep` — Feature cards
-- `WelcomeHowItWorksStep` — How it works guide
-- `WelcomeRegisterStep` — Register form
-- `WelcomeVerifyOtpStep` — OTP verification
-
-All welcome components use `WelcomeStepLayout` for consistent layout and navigation.
+- `WelcomeFeatureStep` — Feature cards (uses `AuthStepLayout`)
+- `WelcomeHowItWorksStep` — How it works guide (uses `AuthStepLayout`)
 
 ## OnboardingGenerateScriptStep Detail
 
@@ -232,9 +230,8 @@ Returns: `{ phase, script, isPending, isFailed, messageIndex, handleBriefSubmit 
 - `app/hooks/api/onboarding/useShowOnboarding.ts`
 - `app/hooks/api/onboarding/useDismissOnboarding.ts`
 - `app/components/onboarding/OnboardingStepHeader.tsx`
-- `app/components/welcome/WelcomeStepLayout.tsx`
-- `app/components/welcome/WelcomeRegisterStep.tsx`
-- `app/components/welcome/WelcomeVerifyOtpStep.tsx`
+- `app/components/auth/AuthStepLayout.tsx`
+- `app/components/auth/LoginForm.tsx`
 - `app/components/onboarding/OnboardingCreateProjectStep.tsx`
 - `app/components/onboarding/OnboardingConnectIntegrationStep.tsx`
 - `app/components/onboarding/OnboardingCreatorProfileStep.tsx`

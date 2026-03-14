@@ -1,8 +1,9 @@
 import { Fragment } from "react"
 import { FolderPlusIcon, LinkIcon, ChartBarIcon } from "@heroicons/react/24/outline"
+import { useNavigate } from "react-router"
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
 import { WelcomeStep } from "~/models/enums/WelcomeStep"
-import WelcomeStepLayout from "~/components/welcome/WelcomeStepLayout"
+import AuthStepLayout from "~/components/auth/AuthStepLayout"
 
 const steps = [
     {
@@ -26,14 +27,15 @@ const steps = [
 ]
 
 export default function WelcomeHowItWorksStep() {
+    const navigate = useNavigate()
     const setWelcomeStep = useOnboardingStore((s) => s.setWelcomeStep)
 
     return (
-        <WelcomeStepLayout
+        <AuthStepLayout
             title="Comment ça marche ?"
             subtitle="Trois étapes pour commencer."
             onBack={() => setWelcomeStep(WelcomeStep.Features)}
-            onNext={() => setWelcomeStep(WelcomeStep.Register)}
+            onNext={() => navigate("/register")}
         >
             <div className="flex flex-col sm:flex-row gap-8 max-w-3xl w-full">
                 {steps.map((step) => (
@@ -51,6 +53,6 @@ export default function WelcomeHowItWorksStep() {
                     </Fragment>
                 ))}
             </div>
-        </WelcomeStepLayout>
+        </AuthStepLayout>
     )
 }
