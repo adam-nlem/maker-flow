@@ -5,7 +5,7 @@ import { httpClient } from "~/services/httpClient/httpClient";
 import { postQueryKeys } from "./postQueryKeys";
 
 interface UseListPaginatedRankedPostsProps {
-    integrationUuid: string;
+    integrationUuid: string | null;
     limit?: number;
 }
 
@@ -16,7 +16,7 @@ export function useListPaginatedRankedPosts({ integrationUuid, limit = 10 }: Use
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const query = useQuery({
-        queryKey: postQueryKeys.rank(integrationUuid),
+        queryKey: postQueryKeys.rank(integrationUuid ?? ''),
         queryFn: async () => {
             const res = await httpClient.get<PostWithAggregatedInsightsDTOJSON[]>(`/posts/rank`, {
                 params: {
@@ -31,6 +31,7 @@ export function useListPaginatedRankedPosts({ integrationUuid, limit = 10 }: Use
             setPage(1);
             return postsData;
         },
+        enabled: !!integrationUuid,
     });
 
     const posts = useMemo(() => {

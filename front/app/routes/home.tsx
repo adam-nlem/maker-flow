@@ -31,7 +31,7 @@ export default function HomePage({ loaderData }: Route.ComponentProps) {
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
   const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
   const { isSubscribed } = useIsSubscribed()
-  const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid ?? "" })
+  const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid })
 
   return (
     <div className="w-full">

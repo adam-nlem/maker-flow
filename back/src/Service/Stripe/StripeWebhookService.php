@@ -210,7 +210,14 @@ class StripeWebhookService
             return;
         }
 
-        $creditAmount = (int) ($lineItems[0]['price']['metadata']['credit_amount'] ?? 0);
+        $priceId = $lineItems[0]['pricing']['price_details']['price'] ?? null;
+
+        if ($priceId === null) {
+            return;
+        }
+
+        $price = Price::retrieve($priceId);
+        $creditAmount = (int) ($price->metadata->credit_amount ?? 0);
 
         if ($creditAmount <= 0) {
             return;

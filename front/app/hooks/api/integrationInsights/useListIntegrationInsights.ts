@@ -6,9 +6,9 @@ import {
   type IntegrationInsightsOverviewDTOJSON,
 } from "~/dtos/integrationInsights/IntegrationInsightsOverviewDTO";
 
-export function useListIntegrationInsights({ projectUuid }: { projectUuid: string }) {
+export function useListIntegrationInsights({ projectUuid }: { projectUuid: string | null }) {
   const query = useQuery({
-    queryKey: integrationInsightQueryKeys.list(projectUuid),
+    queryKey: integrationInsightQueryKeys.list(projectUuid ?? ''),
     queryFn: async () => {
       const res = await httpClient.get<IntegrationInsightsOverviewDTOJSON>('/integration-insights', {
         params: {
@@ -17,6 +17,7 @@ export function useListIntegrationInsights({ projectUuid }: { projectUuid: strin
       })
       return IntegrationInsightsOverviewDTO.fromJSON(res.data)
     },
+    enabled: !!projectUuid,
   })
 
   return {

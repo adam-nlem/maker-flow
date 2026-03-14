@@ -7,7 +7,7 @@ import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 
 export default function OnboardingConnectIntegrationStep() {
     const projectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
-    const { integrations, isLoading } = useListIntegrations({ projectUuid: projectUuid! })
+    const { integrations, isLoading } = useListIntegrations({ projectUuid })
 
     if (!projectUuid) return null
 

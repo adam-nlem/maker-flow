@@ -6,7 +6,7 @@ import { postQueryKeys } from "./postQueryKeys";
 
 interface UseListPaginatedPostsProps {
     limit?: number;
-    integrationUuid: string;
+    integrationUuid: string | null;
 }
 
 export function useListPaginatedPosts({ limit = 10, integrationUuid }: UseListPaginatedPostsProps) {
@@ -16,7 +16,7 @@ export function useListPaginatedPosts({ limit = 10, integrationUuid }: UseListPa
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const query = useQuery({
-        queryKey: postQueryKeys.list(integrationUuid),
+        queryKey: postQueryKeys.list(integrationUuid ?? ''),
         queryFn: async () => {
             const res = await httpClient.get<PostWithInsightsDTOJSON[]>(`/posts`, {
                 params: {
@@ -31,6 +31,7 @@ export function useListPaginatedPosts({ limit = 10, integrationUuid }: UseListPa
             setPage(1);
             return postsData;
         },
+        enabled: !!integrationUuid,
     });
 
     const posts = useMemo(() => {

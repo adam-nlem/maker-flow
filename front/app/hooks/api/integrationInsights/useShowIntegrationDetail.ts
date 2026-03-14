@@ -4,14 +4,14 @@ import { integrationInsightQueryKeys } from "./integrationInsightQueryKeys";
 import { IntegrationDetailDTO, type IntegrationDetailDTOJSON } from "~/dtos/integrationInsights/IntegrationDetailDTO";
 
 interface UseShowIntegrationDetailProps {
-    integrationUuid: string;
+    integrationUuid: string | null;
 }
 
 export function useShowIntegrationDetail({
     integrationUuid,
 }: UseShowIntegrationDetailProps) {
     const query = useQuery({
-        queryKey: integrationInsightQueryKeys.detail(integrationUuid),
+        queryKey: integrationInsightQueryKeys.detail(integrationUuid ?? ''),
         queryFn: async () => {
             const res = await httpClient.get<IntegrationDetailDTOJSON>('/integration-insights/detail', {
                 params: {
@@ -21,6 +21,7 @@ export function useShowIntegrationDetail({
 
             return IntegrationDetailDTO.fromJSON(res.data);
         },
+        enabled: !!integrationUuid,
     });
 
     return {

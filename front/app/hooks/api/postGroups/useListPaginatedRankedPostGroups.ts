@@ -5,7 +5,7 @@ import { httpClient } from "~/services/httpClient/httpClient";
 import { postGroupQueryKeys } from "./postGroupQueryKeys";
 
 interface UseListPaginatedRankedPostGroupsProps {
-    projectUuid: string;
+    projectUuid: string | null;
     limit?: number;
 }
 
@@ -16,7 +16,7 @@ export function useListPaginatedRankedPostGroups({ projectUuid, limit = 10 }: Us
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const query = useQuery({
-        queryKey: postGroupQueryKeys.rank(projectUuid),
+        queryKey: postGroupQueryKeys.rank(projectUuid ?? ''),
         queryFn: async () => {
             const res = await httpClient.get<PostGroupWithAggregatedInsightsDTOJSON[]>(`/post-groups/rank`, {
                 params: {
@@ -31,6 +31,7 @@ export function useListPaginatedRankedPostGroups({ projectUuid, limit = 10 }: Us
             setPage(1);
             return postGroupsData;
         },
+        enabled: !!projectUuid,
     });
 
     const postGroups = useMemo(() => {

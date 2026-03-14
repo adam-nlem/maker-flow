@@ -6,7 +6,7 @@ import type { ScriptStatus } from "~/models/enums/ScriptStatus";
 import { scriptQueryKeys } from "./scriptQueryKeys";
 
 interface UseListPaginatedScriptsProps {
-    projectUuid: string;
+    projectUuid: string | null;
     limit?: number;
     status?: ScriptStatus;
 }
@@ -18,7 +18,7 @@ export function useListPaginatedScripts({ projectUuid, limit = 20, status }: Use
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const query = useQuery({
-        queryKey: scriptQueryKeys.list(projectUuid, status),
+        queryKey: scriptQueryKeys.list(projectUuid ?? '', status),
         queryFn: async () => {
             const res = await httpClient.get<ScriptJSON[]>('/scripts', {
                 params: {
@@ -34,6 +34,7 @@ export function useListPaginatedScripts({ projectUuid, limit = 20, status }: Use
             setPage(1);
             return scriptsData;
         },
+        enabled: !!projectUuid,
     });
 
     const scripts = useMemo(() => {

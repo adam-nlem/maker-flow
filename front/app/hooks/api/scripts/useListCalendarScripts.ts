@@ -4,20 +4,21 @@ import { ListScriptsGroupedByDayDTO, type ListScriptsGroupedByDayDTOJSON } from 
 import { scriptQueryKeys } from "./scriptQueryKeys";
 
 interface UseListCalendarScriptsProps {
-    projectUuid: string;
+    projectUuid: string | null;
     year: number;
     month: number;
 }
 
 export function useListCalendarScripts({ projectUuid, year, month }: UseListCalendarScriptsProps) {
     const query = useQuery({
-        queryKey: scriptQueryKeys.calendar(projectUuid, year, month),
+        queryKey: scriptQueryKeys.calendar(projectUuid ?? '', year, month),
         queryFn: async () => {
             const res = await httpClient.get<ListScriptsGroupedByDayDTOJSON[]>('/scripts/calendar', {
                 params: { projectUuid, year, month },
             });
             return res.data.map((json) => ListScriptsGroupedByDayDTO.fromJSON(json));
         },
+        enabled: !!projectUuid,
     });
 
     return {

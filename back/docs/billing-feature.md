@@ -635,7 +635,7 @@ Processes the event based on its type:
 | `customer.subscription.created` | Resolve plan via `StripePlanService::resolvePlanFromPriceId()`, create local `Subscription` entity |
 | `customer.subscription.updated` | Update subscription status, period dates, cancelAtPeriodEnd, plan |
 | `customer.subscription.deleted` | Set subscription status to `Canceled` |
-| `invoice.paid` | Read `credit_amount` from invoice line item price metadata, call `CreditService::renewSubscriptionCredits()`. If local subscription doesn't exist yet (race condition with `customer.subscription.created`), falls back to resolving user from invoice `customer` field |
+| `invoice.paid` | Extract price ID from invoice line item (`pricing.price_details.price`), retrieve full Price object from Stripe API, read `credit_amount` from price metadata, call `CreditService::renewSubscriptionCredits()`. If local subscription doesn't exist yet (race condition with `customer.subscription.created`), falls back to resolving user from invoice `customer` field |
 | `invoice.payment_failed` | Set subscription status to `PastDue` |
 
 ### Async Processing

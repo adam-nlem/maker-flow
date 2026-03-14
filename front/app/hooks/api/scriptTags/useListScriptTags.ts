@@ -4,13 +4,14 @@ import { ScriptTag, type ScriptTagJSON } from "~/models/ScriptTag";
 import { scriptTagQueryKeys } from "./scriptTagQueryKeys";
 import { NotFoundException } from "~/services/httpClient/customHttpExceptions";
 
-export function useListScriptTags({ projectUuid }: { projectUuid: string }) {
+export function useListScriptTags({ projectUuid }: { projectUuid: string | null }) {
     const query = useQuery({
-        queryKey: scriptTagQueryKeys.list(projectUuid),
+        queryKey: scriptTagQueryKeys.list(projectUuid ?? ''),
         queryFn: async () => {
             const res = await httpClient.get('/scripts/tags', { params: { projectUuid } })
             return res.data.map((json: ScriptTagJSON) => ScriptTag.fromJSON(json)) as ScriptTag[]
         },
+        enabled: !!projectUuid,
     })
 
     return {

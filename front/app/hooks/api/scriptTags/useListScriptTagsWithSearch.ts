@@ -4,7 +4,7 @@ import { httpClient } from "~/services/httpClient/httpClient";
 import { ScriptTag, type ScriptTagJSON } from "~/models/ScriptTag";
 import { scriptTagQueryKeys } from "./scriptTagQueryKeys";
 
-export function useListScriptTagsWithSearch({ projectUuid }: { projectUuid: string }) {
+export function useListScriptTagsWithSearch({ projectUuid }: { projectUuid: string | null }) {
     const [searchTerm, setSearchTerm] = useState("")
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
 
@@ -18,7 +18,7 @@ export function useListScriptTagsWithSearch({ projectUuid }: { projectUuid: stri
     }, [searchTerm])
 
     const query = useQuery({
-        queryKey: scriptTagQueryKeys.list(projectUuid, debouncedSearchTerm),
+        queryKey: scriptTagQueryKeys.list(projectUuid ?? '', debouncedSearchTerm),
         queryFn: async () => {
             const res = await httpClient.get('/scripts/tags', {
                 params: {
@@ -28,6 +28,7 @@ export function useListScriptTagsWithSearch({ projectUuid }: { projectUuid: stri
             })
             return res.data.map((json: ScriptTagJSON) => ScriptTag.fromJSON(json)) as ScriptTag[]
         },
+        enabled: !!projectUuid,
     })
 
     return {

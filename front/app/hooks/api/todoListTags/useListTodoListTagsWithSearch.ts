@@ -5,7 +5,7 @@ import { TodoListTag, type TodoListTagJSON } from "~/models/TodoListTag";
 import { todoListTagQueryKeys } from "./todoListTagQueryKeys";
 
 
-export function useListTodoListTagsWithSearch({ todoListUuid }: { todoListUuid: string }) {
+export function useListTodoListTagsWithSearch({ todoListUuid }: { todoListUuid: string | null }) {
     const [searchTerm, setSearchTerm] = useState("")
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("")
 
@@ -19,7 +19,7 @@ export function useListTodoListTagsWithSearch({ todoListUuid }: { todoListUuid: 
     }, [searchTerm])
 
     const query = useQuery({
-        queryKey: todoListTagQueryKeys.list(todoListUuid, debouncedSearchTerm),
+        queryKey: todoListTagQueryKeys.list(todoListUuid ?? '', debouncedSearchTerm),
         queryFn: async () => {
             const res = await httpClient.get('/todo-lists/tags', {
                 params: {
@@ -29,6 +29,7 @@ export function useListTodoListTagsWithSearch({ todoListUuid }: { todoListUuid: 
             })
             return res.data.map((json: TodoListTagJSON) => TodoListTag.fromJSON(json)) as TodoListTag[]
         },
+        enabled: !!todoListUuid,
     })
 
     return {
