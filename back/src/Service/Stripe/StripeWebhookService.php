@@ -3,7 +3,6 @@
 namespace App\Service\Stripe;
 
 use App\Entity\Enum\StripeEventType;
-use App\Entity\Enum\SubscriptionPlan;
 use App\Entity\Enum\SubscriptionStatus;
 use App\Entity\Subscription;
 use App\Entity\StripeWebhookEvent;
@@ -27,7 +26,6 @@ class StripeWebhookService
         private readonly SubscriptionRepository $subscriptionRepository,
         private readonly CreditService $creditService,
         private readonly StripePlanService $stripePlanService,
-        private readonly LoggerInterface $log,
     ) {
         Stripe::setApiKey($this->stripeSecretKey);
     }
@@ -60,22 +58,17 @@ class StripeWebhookService
 
     private function handleCheckoutSessionCompleted(array $payload): void
     {
-        $this->log->info('Processing Checkout');
         $session = $payload['data']['object'];
-        $this->log->info('Extracted session');
 
         // Subscriptions will be processed by the handleCustomerSubscriptionCreated method
         if ($session['mode'] !== 'payment') {
             return;
         }
 
-        $this->log->info('Is payment');
-
         $customerId = $session['customer'];
         $user = $this->userRepository->getByStripeCustomerId($customerId);
 
         if ($user === null) {
-            $this->log->warning('Checkout session completed but user not found', ['customerId' => $customerId]);
             return;
         }
 
@@ -85,7 +78,6 @@ class StripeWebhookService
         $lineItems = Session::allLineItems($sessionId);
 
         if (empty($lineItems)) {
-            $this->log->warning('Checkout session has no line items', ['sessionId' => $sessionId]);
             return;
         }
 
@@ -94,10 +86,6 @@ class StripeWebhookService
         $creditAmount = (int) ($price->metadata->credit_amount ?? 0);
 
         if ($creditAmount <= 0) {
-            $this->log->warning('No credit_amount metadata on price', [
-                'sessionId' => $sessionId,
-                'priceId' => $lineItems[0]->price->id,
-            ]);
             return;
         }
 
@@ -112,7 +100,6 @@ class StripeWebhookService
         $user = $this->userRepository->getByStripeCustomerId($customerId);
 
         if ($user === null) {
-            $this->log->warning('Subscription created but user not found', ['customerId' => $customerId]);
             return;
         }
 
@@ -127,7 +114,6 @@ class StripeWebhookService
         $plan = $priceId !== null ? $this->stripePlanService->resolvePlanFromPriceId($priceId) : null;
 
         if ($plan === null) {
-            $this->log->warning('Could not resolve plan from price ID', ['priceId' => $priceId]);
             return;
         }
 
@@ -152,9 +138,6 @@ class StripeWebhookService
         $subscription = $this->subscriptionRepository->getByStripeSubscriptionId($subscriptionData['id']);
 
         if ($subscription === null) {
-            $this->log->warning('Subscription updated but not found locally', [
-                'stripeSubscriptionId' => $subscriptionData['id'],
-            ]);
             return;
         }
 
@@ -190,9 +173,6 @@ class StripeWebhookService
         $subscription = $this->subscriptionRepository->getByStripeSubscriptionId($subscriptionData['id']);
 
         if ($subscription === null) {
-            $this->log->warning('Subscription deleted but not found locally', [
-                'stripeSubscriptionId' => $subscriptionData['id'],
-            ]);
             return;
         }
 
@@ -212,32 +192,30 @@ class StripeWebhookService
 
         $subscription = $this->subscriptionRepository->getByStripeSubscriptionId($stripeSubscriptionId);
 
-        if ($subscription === null) {
-            $this->log->warning('Invoice paid but subscription not found locally', [
-                'stripeSubscriptionId' => $stripeSubscriptionId,
-            ]);
-            return;
+        if ($subscription !== null) {
+            $user = $subscription->getUser();
+        } else {
+            $customerId = $invoiceData['customer'] ?? null;
+            $user = $customerId !== null ? $this->userRepository->getByStripeCustomerId($customerId) : null;
+
+            if ($user === null) {
+                return;
+            }
         }
 
         $invoiceId = $invoiceData['id'];
         $lineItems = $invoiceData['lines']['data'] ?? [];
 
         if (empty($lineItems)) {
-            $this->log->warning('Invoice has no line items', ['invoiceId' => $invoiceId]);
             return;
         }
 
         $creditAmount = (int) ($lineItems[0]['price']['metadata']['credit_amount'] ?? 0);
 
         if ($creditAmount <= 0) {
-            $this->log->warning('No credit_amount metadata on invoice line item price', [
-                'invoiceId' => $invoiceId,
-                'priceId' => $lineItems[0]['price']['id'] ?? null,
-            ]);
             return;
         }
 
-        $user = $subscription->getUser();
         $this->creditService->renewSubscriptionCredits($user, $creditAmount, $invoiceId);
     }
 
@@ -254,9 +232,6 @@ class StripeWebhookService
         $subscription = $this->subscriptionRepository->getByStripeSubscriptionId($stripeSubscriptionId);
 
         if ($subscription === null) {
-            $this->log->warning('Invoice payment failed but subscription not found locally', [
-                'stripeSubscriptionId' => $stripeSubscriptionId,
-            ]);
             return;
         }
 

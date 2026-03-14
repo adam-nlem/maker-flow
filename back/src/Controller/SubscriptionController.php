@@ -67,7 +67,7 @@ final class SubscriptionController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $subscription = $subscriptionRepository->getActiveByUser($user);
+        $subscription = $subscriptionRepository->getLatestActiveByUser($user);
 
         return $this->json(data: $subscription, status: Response::HTTP_OK, context: ['groups' => ['api_subscription_show']]);
     }
@@ -78,7 +78,7 @@ final class SubscriptionController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $subscription = $subscriptionRepository->getByUser($user);
+        $subscription = $subscriptionRepository->getLatestByUser($user);
 
         if ($subscription === null) {
             return $this->json(data: ["message" => "No active subscription found"], status: Response::HTTP_NOT_FOUND);
@@ -99,7 +99,7 @@ final class SubscriptionController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $subscription = $subscriptionRepository->getByUser($user);
+        $subscription = $subscriptionRepository->getLatestByUser($user);
 
         if ($subscription === null) {
             return $this->json(data: ["message" => "No active subscription found"], status: Response::HTTP_NOT_FOUND);

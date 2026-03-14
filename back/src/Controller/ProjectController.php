@@ -29,7 +29,7 @@ final class ProjectController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $plan = $subscriptionRepository->getActiveByUser($user)?->getPlan();
+        $plan = $subscriptionRepository->getLatestActiveByUser($user)?->getPlan();
         $maxProjects = $plan !== null ? $stripePlanService->getPlanConfigFromSubscription($plan)?->getMaxProjects() : 1;
 
         if ($maxProjects !== null && $projectRepository->countByUser($user) >= $maxProjects) {

@@ -36,7 +36,7 @@ final class IntegrationInsightController extends AbstractController
             );
         }
 
-        $isSubscribed = $subscriptionRepository->getActiveByUser($user) !== null;
+        $isSubscribed = $subscriptionRepository->getLatestActiveByUser($user) !== null;
 
         $result = $insightService->list($user, $project, $isSubscribed);
 

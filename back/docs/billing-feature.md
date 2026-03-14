@@ -53,7 +53,7 @@ Serialization groups: `api_credit_transactions_list`
 
 ### Subscription
 
-Local mirror of Stripe subscription state. OneToOne with User.
+Local mirror of Stripe subscription state. ManyToOne with User (a user can have multiple subscriptions over time for history). Use `SubscriptionRepository::getLatestActiveByUser()` to get the current active subscription, or `getLatestByUser()` for the most recent regardless of status.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -487,8 +487,8 @@ Thrown when a subscription management action fails (cancel, resume, or plan chan
 - `getByUserPaginated(User $user, int $page, int $limit): array` -- paginated transaction history
 
 ### SubscriptionRepository
-- `getActiveByUser(User $user): ?Subscription` -- returns only if status is `Active` AND `currentPeriodEnd >= now`
-- `getByUser(User $user): ?Subscription`
+- `getLatestActiveByUser(User $user): ?Subscription` -- returns the latest subscription with status `Active` AND `currentPeriodEnd >= now`
+- `getLatestByUser(User $user): ?Subscription` -- returns the most recent subscription regardless of status
 - `getByStripeSubscriptionId(string $stripeSubscriptionId): ?Subscription`
 
 ### StripeWebhookEventRepository
@@ -503,7 +503,9 @@ Thrown when a subscription management action fails (cancel, resume, or plan chan
 
 OneToOne relationships (inverse side, mapped by User, cascade remove):
 - `creditBalance` -- `?CreditBalance`
-- `subscription` -- `?Subscription`
+
+OneToMany relationships (inverse side, mapped by User, cascade remove):
+- `subscriptions` -- `Collection<Subscription>` (history of all subscriptions)
 
 Stripe field:
 - `stripeCustomerId` -- `?string`, nullable, serialized in `api_user_me` group
@@ -527,7 +529,7 @@ Plan limits (maxProjects, maxScriptsPerProject) are stored in Stripe product met
 
 ### Subscription Resolution
 
-Controllers use `SubscriptionRepository::getActiveByUser($user)` to get the subscription. This method validates both status (`Active`) and expiry (`currentPeriodEnd >= now`). If it returns `null`, the user is treated as free.
+Controllers use `SubscriptionRepository::getLatestActiveByUser($user)` to get the subscription. This method validates both status (`Active`) and expiry (`currentPeriodEnd >= now`). If it returns `null`, the user is treated as free.
 
 ### Plan Limits (from Stripe metadata)
 
@@ -557,8 +559,8 @@ Premium detail endpoints return **402 Payment Required** directly from controlle
 
 | Endpoint | Controller | Behavior |
 |----------|-----------|----------|
-| `GET /api/post-insights/detail` | `PostInsightController::detail()` | Returns 402 if `getActiveByUser()` is null |
-| `GET /api/integration-insights/detail` | `IntegrationInsightController::detail()` | Returns 402 if `getActiveByUser()` is null |
+| `GET /api/post-insights/detail` | `PostInsightController::detail()` | Returns 402 if `getLatestActiveByUser()` is null |
+| `GET /api/integration-insights/detail` | `IntegrationInsightController::detail()` | Returns 402 if `getLatestActiveByUser()` is null |
 
 Services that receive an `isSubscribed` parameter skip premium computations for free users:
 
@@ -633,7 +635,7 @@ Processes the event based on its type:
 | `customer.subscription.created` | Resolve plan via `StripePlanService::resolvePlanFromPriceId()`, create local `Subscription` entity |
 | `customer.subscription.updated` | Update subscription status, period dates, cancelAtPeriodEnd, plan |
 | `customer.subscription.deleted` | Set subscription status to `Canceled` |
-| `invoice.paid` | Read `credit_amount` from invoice line item price metadata, call `CreditService::renewSubscriptionCredits()` |
+| `invoice.paid` | Read `credit_amount` from invoice line item price metadata, call `CreditService::renewSubscriptionCredits()`. If local subscription doesn't exist yet (race condition with `customer.subscription.created`), falls back to resolving user from invoice `customer` field |
 | `invoice.payment_failed` | Set subscription status to `PastDue` |
 
 ### Async Processing

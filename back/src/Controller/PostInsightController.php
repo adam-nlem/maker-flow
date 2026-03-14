@@ -35,7 +35,7 @@ final class PostInsightController extends AbstractController
             );
         }
 
-        if ($subscriptionRepository->getActiveByUser($user) === null) {
+        if ($subscriptionRepository->getLatestActiveByUser($user) === null) {
             return $this->json(
                 data: ["message" => "Active subscription required."],
                 status: Response::HTTP_PAYMENT_REQUIRED,

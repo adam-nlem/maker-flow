@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { CheckBadgeIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
+import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { useCancelSubscription } from "~/hooks/api/subscriptions/useCancelSubscription";
 import { useResumeSubscription } from "~/hooks/api/subscriptions/useResumeSubscription";
 import type { Subscription } from "~/models/Subscription";
@@ -13,20 +14,10 @@ interface CurrentSubscriptionCardProps {
 }
 
 export default function CurrentSubscriptionCard({ subscription }: CurrentSubscriptionCardProps) {
-    const [confirmCancel, setConfirmCancel] = useState(false);
+    const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
 
     const { cancelSubscription, isPending: isCanceling } = useCancelSubscription();
     const { resumeSubscription, isPending: isResuming } = useResumeSubscription();
-
-    const handleCancel = async () => {
-        if (!confirmCancel) {
-            setConfirmCancel(true);
-            return;
-        }
-
-        await cancelSubscription();
-        setConfirmCancel(false);
-    };
 
     const handleResume = async () => {
         await resumeSubscription();
@@ -71,11 +62,20 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
                                 style="danger"
                                 width="w-auto"
                                 height="h-9"
-                                isLoading={isCanceling}
-                                onClick={handleCancel}
+                                onClick={() => setShowCancelConfirmation(true)}
                             >
-                                {confirmCancel ? "Confirmer l'annulation" : "Annuler l'abonnement"}
+                                Annuler l'abonnement
                             </Button>
+                            <ConfirmDeleteDialog
+                                isOpen={showCancelConfirmation}
+                                onClose={() => setShowCancelConfirmation(false)}
+                                onConfirm={async () => {
+                                    await cancelSubscription();
+                                    setShowCancelConfirmation(false);
+                                }}
+                                isPending={isCanceling}
+                                message="Êtes-vous sûr de vouloir annuler votre abonnement ? Celui-ci restera actif jusqu'à la fin de la période en cours."
+                            />
                         </>
                     )}
 

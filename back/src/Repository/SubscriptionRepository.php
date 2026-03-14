@@ -38,7 +38,7 @@ class SubscriptionRepository extends ServiceEntityRepository
         }
     }
 
-    public function getActiveByUser(User $user): ?Subscription
+    public function getLatestActiveByUser(User $user): ?Subscription
     {
         return $this->createQueryBuilder('s')
             ->where('s.user = :user')
@@ -47,16 +47,20 @@ class SubscriptionRepository extends ServiceEntityRepository
             ->setParameter('user', $user)
             ->setParameter('status', SubscriptionStatus::Active)
             ->setParameter('now', DateHelper::createUtcDateTimeImmutable())
+            ->orderBy('s.createdAt', 'DESC')
+            ->setMaxResults(1)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUser(User $user): ?Subscription
+    public function getLatestByUser(User $user): ?Subscription
     {
         return $this->createQueryBuilder('s')
             ->where('s.user = :user')
             ->setParameter('user', $user)
+            ->orderBy('s.createdAt', 'DESC')
+            ->setMaxResults(1)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);

@@ -41,7 +41,7 @@ final class PostController extends AbstractController
             );
         }
 
-        $isSubscribed = $subscriptionRepository->getActiveByUser($user) !== null;
+        $isSubscribed = $subscriptionRepository->getLatestActiveByUser($user) !== null;
 
         $posts = $this->service->getPostsWithInsights(
             user: $user,

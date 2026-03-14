@@ -83,8 +83,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToOne(targetEntity: CreditBalance::class, mappedBy: 'user', cascade: ['remove'])]
     private ?CreditBalance $creditBalance = null;
 
-    #[ORM\OneToOne(targetEntity: Subscription::class, mappedBy: 'user', cascade: ['remove'])]
-    private ?Subscription $subscription = null;
+    /**
+     * @var Collection<int, Subscription>
+     */
+    #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'user', cascade: ['remove'])]
+    private Collection $subscriptions;
 
     #[ORM\OneToOne(targetEntity: Onboarding::class, mappedBy: 'user', cascade: ['remove'])]
     private ?Onboarding $onboarding = null;
@@ -110,6 +113,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->tokens = new ArrayCollection();
         $this->integrations = new ArrayCollection();
         $this->projects = new ArrayCollection();
+        $this->subscriptions = new ArrayCollection();
         $this->otps = new ArrayCollection();
     }
 
@@ -351,16 +355,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getSubscription(): ?Subscription
+    /**
+     * @return Collection<int, Subscription>
+     */
+    public function getSubscriptions(): Collection
     {
-        return $this->subscription;
-    }
-
-    public function setSubscription(?Subscription $subscription): static
-    {
-        $this->subscription = $subscription;
-
-        return $this;
+        return $this->subscriptions;
     }
 
     /**
