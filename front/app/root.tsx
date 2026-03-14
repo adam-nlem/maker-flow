@@ -7,26 +7,13 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
-import { MutationCache, QueryCache, QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { handleMutationError } from "~/services/apiErrorHandler/apiErrorHandler";
+import { QueryClientProvider } from "@tanstack/react-query";
+import { queryClient } from "~/services/queryClient/queryClient";
 import ToastContainer from "~/components/ui/ToastContainer";
 import { Settings } from 'luxon';
 
 import type { Route } from "./+types/root";
 import "./app.css";
-
-const queryClient = new QueryClient({
-  queryCache: new QueryCache({
-    onError: (error: Error) => {
-      handleMutationError(error)
-    }
-  }),
-  mutationCache: new MutationCache({
-    onError: (error) => {
-      handleMutationError(error)
-    }
-  }),
-});
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (

@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createResettableStore } from '~/stores/createResettableStore'
 import { useScriptGenerationStore } from './scriptGenerationStore'
 
 type FocusScriptState = {
@@ -10,7 +10,7 @@ type FocusScriptAction = {
     setFocusedScriptUuid: (uuid: string | null) => void
 }
 
-export const useFocusScriptStore = create<FocusScriptState & FocusScriptAction>()(
+export const useFocusScriptStore = createResettableStore<FocusScriptState & FocusScriptAction>()(
     persist(
         (set) => ({
             focusedScriptUuid: null,

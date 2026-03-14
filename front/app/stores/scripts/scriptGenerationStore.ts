@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createResettableStore } from '~/stores/createResettableStore'
 
 type ScriptGenerationState = {
     activeGenerationUuid: string | null
@@ -11,7 +11,7 @@ type ScriptGenerationAction = {
     setFocusedGenerationUuid: (uuid: string | undefined) => void
 }
 
-export const useScriptGenerationStore = create<ScriptGenerationState & ScriptGenerationAction>()(
+export const useScriptGenerationStore = createResettableStore<ScriptGenerationState & ScriptGenerationAction>()(
     (set) => ({
         activeGenerationUuid: null,
         focusedGenerationUuid: undefined,

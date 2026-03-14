@@ -1,16 +1,15 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { useMutation } from "@tanstack/react-query"
 import { httpClient } from "~/services/httpClient/httpClient"
-import { userQueryKeys } from "./userQueryKeys"
+import { clearSessionData } from "~/services/session/clearSessionData"
 
 export function useLogout() {
-    const queryClient = useQueryClient()
-
     const mutation = useMutation({
         mutationFn: async () => {
             await httpClient.get('/users/logout')
         },
         onSuccess: () => {
-            queryClient.setQueryData(userQueryKeys.me, null)
+            clearSessionData()
+            window.location.href = '/login'
         },
     })
 

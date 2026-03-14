@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createResettableStore } from '~/stores/createResettableStore'
 
 type FocusTodoListState = {
     focusedTodoListUuid: string | null
@@ -9,7 +9,7 @@ type FocusTodoListAction = {
     setFocusedTodoListUuid: (uuid: string | null) => void
 }
 
-export const useFocusTodoListStore = create<FocusTodoListState & FocusTodoListAction>()(
+export const useFocusTodoListStore = createResettableStore<FocusTodoListState & FocusTodoListAction>()(
     persist(
         (set) => ({
             focusedTodoListUuid: null,

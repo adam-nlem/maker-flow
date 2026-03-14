@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createResettableStore } from '~/stores/createResettableStore'
 import type { Platform } from '~/models/enums/Platform'
 import type { ScriptStatus } from '~/models/enums/ScriptStatus'
 
@@ -21,7 +21,7 @@ type CalendarAction = {
 
 const today = new Date()
 
-export const useCalendarStore = create<CalendarState & CalendarAction>()(
+export const useCalendarStore = createResettableStore<CalendarState & CalendarAction>()(
     persist(
         (set) => ({
             currentMonth: today.getMonth(),

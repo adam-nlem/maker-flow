@@ -592,13 +592,59 @@ export const useFocusProjectStore = create<FocusProjectState & FocusProjectActio
 );
 ```
 
+### Resettable Store (User-Specific Data)
+
+Use `createResettableStore` (from `~/stores/createResettableStore`) instead of `create` for stores that hold user-specific data. On logout or 401, all resettable stores are automatically reset to their initial state via `resetAllStores()`.
+
+This follows [Zustand's official reset pattern](https://zustand.docs.pmnd.rs/guides/how-to-reset-state): a custom `create` wrapper that registers stores in a global registry and uses the built-in `store.getInitialState()` method for resets.
+
+```tsx
+import { persist } from 'zustand/middleware';
+import { createResettableStore } from '~/stores/createResettableStore';
+
+export const useFocusProjectStore = createResettableStore<FocusProjectState & FocusProjectAction>()(
+    persist(
+        (set) => ({
+            focusedProjectUuid: null,
+            setFocusedProjectUuid: (uuid) => set({ focusedProjectUuid: uuid }),
+        }),
+        {
+            name: 'app:project:focused',
+        }
+    )
+);
+```
+
+For non-persisted stores:
+
+```tsx
+import { createResettableStore } from '~/stores/createResettableStore';
+
+export const useOnboardingStore = createResettableStore<OnboardingState & OnboardingAction>()(
+    (set) => ({
+        welcomeStep: WelcomeStep.Features,
+        pendingOtpToken: null,
+        otpEmail: null,
+    })
+);
+```
+
+**Do NOT use `createResettableStore`** for UI preference stores (theme, sidebar, filters) — these should survive logout.
+
+### Session Cleanup
+
+On logout or 401, `clearSessionData()` (from `~/services/session/clearSessionData`) is called automatically. It:
+1. Calls `resetAllStores()` — resets all resettable Zustand stores to initial state (including localStorage for persisted stores)
+2. Calls `queryClient.cancelQueries()` + `queryClient.clear()` — cancels in-flight queries then wipes all React Query cached data
+
 ### Conventions
 
 1. **Separate State and Action types**
 2. **Combine types** with `&` in `create<State & Action>`
 3. **Use `persist` middleware** for persistence
-4. **Namespace storage keys** with `app:{domain}`
-5. **Simple setters** for state updates
+4. **Use `createResettableStore`** instead of `create` for user-specific stores
+5. **Namespace storage keys** with `app:{domain}`
+6. **Simple setters** for state updates
 
 ---
 

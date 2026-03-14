@@ -12,6 +12,7 @@ import {
 } from '~/services/httpClient/customHttpExceptions'
 import { ToastType } from '~/models/enums/ToastType'
 import { useToastStore } from '~/stores/toast/toastStore'
+import { clearSessionData } from '~/services/session/clearSessionData'
 
 function extractBackendMessage(data: unknown): string | null {
   if (data && typeof data === 'object') {
@@ -23,9 +24,8 @@ function extractBackendMessage(data: unknown): string | null {
 }
 
 export function handleMutationError(error: CustomHttpException): void {
-  console.log(error);
-
   if (error instanceof UnauthorizedException) {
+    clearSessionData()
     if (window.location.pathname !== '/login') {
       window.location.href = '/login'
     }

@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createResettableStore } from '~/stores/createResettableStore'
 
 type AuthPrefillState = {
     email: string | null
@@ -9,7 +9,7 @@ type AuthPrefillAction = {
     setEmail: (email: string | null) => void
 }
 
-export const useAuthPrefillStore = create<AuthPrefillState & AuthPrefillAction>()(
+export const useAuthPrefillStore = createResettableStore<AuthPrefillState & AuthPrefillAction>()(
     persist(
         (set) => ({
             email: null,

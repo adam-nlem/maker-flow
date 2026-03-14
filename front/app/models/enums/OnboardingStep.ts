@@ -26,7 +26,7 @@ export const onboardingStepToFrenchTranslation: Record<OnboardingStep, string> =
     [OnboardingStep.ConnectIntegration]: "Connectez vos réseaux sociaux",
     [OnboardingStep.CreateCreatorProfile]: "Personnalisez votre compte créateur",
     [OnboardingStep.CreateFirstScript]: "Créez votre premier script",
-    [OnboardingStep.GenerateFirstScript]: "Générez votre premier script",
+    [OnboardingStep.GenerateFirstScript]: "Améliorez votre script avec l'IA",
     [OnboardingStep.ShowSubscriptions]: "Découvrez nos offres",
 }
 

@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createResettableStore } from '~/stores/createResettableStore'
 import type { HookTemplate } from '~/models/HookTemplate'
 
 type HookTemplateState = {
@@ -11,7 +11,7 @@ type HookTemplateAction = {
     setFocusedHookTemplateUuid: (uuid: string | null) => void
 }
 
-export const useHookTemplateStore = create<HookTemplateState & HookTemplateAction>()(
+export const useHookTemplateStore = createResettableStore<HookTemplateState & HookTemplateAction>()(
     (set) => ({
         selectedTemplate: null,
         focusedHookTemplateUuid: null,
