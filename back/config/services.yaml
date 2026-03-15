@@ -37,8 +37,11 @@ parameters:
 
     app.encryption.token_key: "%env(string:APP_ENCRYPTION_KEY)%"
 
+    app.resend.api_key: "%env(string:RESEND_API_KEY)%"
     app.mailing.from_address: "%env(string:MAILING_FROM_ADDRESS)%"
     app.mailing.from_name: "%env(string:MAILING_FROM_NAME)%"
+
+    app.prelaunch.enabled: "%env(bool:PRELAUNCH_ENABLED)%"
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -120,6 +123,10 @@ services:
     App\Service\Encryption\TokenEncryptionService:
         arguments:
             $encryptionKey: "%app.encryption.token_key%"
+    Resend\Client:
+        factory: ['Resend', 'client']
+        arguments: ['%app.resend.api_key%']
+
     App\Service\Mailing\MailingService:
         arguments:
             $fromAddress: "%app.mailing.from_address%"
@@ -127,6 +134,13 @@ services:
     App\EventSubscriber\IntegrationTokenExpiredSubscriber:
         arguments:
             $frontendUrl: "%app.frontend_url%"
+
+    App\Service\Prelaunch\PrelaunchService:
+        arguments:
+            $prelaunchEnabled: "%app.prelaunch.enabled%"
+    App\Controller\PrelaunchController:
+        arguments:
+            $prelaunchEnabled: "%app.prelaunch.enabled%"
 
     App\EventListener\IntegrationTokenEncryptionListener:
         tags:

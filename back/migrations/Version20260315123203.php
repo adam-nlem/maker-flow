@@ -7,11 +7,11 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version20260311000004 extends AbstractMigration
+final class Version20260315123203 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create Tasks tables (todo_list, todo_list_tag, todo_list_task)';
+        return 'Create todo list tables';
     }
 
     public function up(Schema $schema): void
@@ -32,14 +32,14 @@ final class Version20260311000004 extends AbstractMigration
 
     public function down(Schema $schema): void
     {
-        $this->addSql('ALTER TABLE todo_list_task_todo_list_tag DROP FOREIGN KEY FK_C9CCC2897F251143');
-        $this->addSql('ALTER TABLE todo_list_task_todo_list_tag DROP FOREIGN KEY FK_C9CCC2894BC2E842');
-        $this->addSql('ALTER TABLE todo_list_task DROP FOREIGN KEY FK_5A25B2DCA76ED395');
-        $this->addSql('ALTER TABLE todo_list_task DROP FOREIGN KEY FK_5A25B2DCE8A7DCFA');
-        $this->addSql('ALTER TABLE todo_list_tag DROP FOREIGN KEY FK_35DD63CEA76ED395');
-        $this->addSql('ALTER TABLE todo_list_tag DROP FOREIGN KEY FK_35DD63CEE8A7DCFA');
         $this->addSql('ALTER TABLE todo_list DROP FOREIGN KEY FK_1B199E07A76ED395');
         $this->addSql('ALTER TABLE todo_list DROP FOREIGN KEY FK_1B199E07166D1F9C');
+        $this->addSql('ALTER TABLE todo_list_tag DROP FOREIGN KEY FK_35DD63CEA76ED395');
+        $this->addSql('ALTER TABLE todo_list_tag DROP FOREIGN KEY FK_35DD63CEE8A7DCFA');
+        $this->addSql('ALTER TABLE todo_list_task DROP FOREIGN KEY FK_5A25B2DCA76ED395');
+        $this->addSql('ALTER TABLE todo_list_task DROP FOREIGN KEY FK_5A25B2DCE8A7DCFA');
+        $this->addSql('ALTER TABLE todo_list_task_todo_list_tag DROP FOREIGN KEY FK_C9CCC2897F251143');
+        $this->addSql('ALTER TABLE todo_list_task_todo_list_tag DROP FOREIGN KEY FK_C9CCC2894BC2E842');
         $this->addSql('DROP TABLE todo_list_task_todo_list_tag');
         $this->addSql('DROP TABLE todo_list_task');
         $this->addSql('DROP TABLE todo_list_tag');

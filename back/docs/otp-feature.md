@@ -21,6 +21,7 @@ OTP (One-Time Password) system providing two security layers:
 **`OtpType` enum** (`Entity/Enum/OtpType.php`)
 - `Login` — for 2FA on login
 - `EmailVerification` — for email verification on registration
+- `PrelaunchVerification` — for prelaunch email authentication
 
 **`Otp` entity** (`Entity/Otp.php`)
 - `uuid` — public identifier
@@ -37,7 +38,7 @@ OTP (One-Time Password) system providing two security layers:
 - Added `verifiedAt` (nullable DateTimeImmutable) — set when email is verified
 - Added `isVerified(): bool` convenience method
 - Added `otps` OneToMany relation
-- Serialization groups: `api_otp_verify_login`, `api_otp_verify_email` on user fields (uuid, firstName, lastName, email, createdAt, verifiedAt)
+- Serialization groups: `api_otp_verify_login`, `api_otp_verify_email`, `api_otp_verify_prelaunch` on user fields (uuid, firstName, lastName, email, createdAt, verifiedAt). `api_otp_verify_prelaunch` also includes `referralCode`.
 
 ### Service
 
@@ -81,11 +82,12 @@ OTP (One-Time Password) system providing two security layers:
 |----------|--------|------------|------|-------------|
 | `/api/otp/verify-login` | POST | `api_otp_verify_login` | Public | Verify OTP for login 2FA, returns User + sets cookie |
 | `/api/otp/verify-email` | POST | `api_otp_verify_email` | Public | Verify OTP for email verification, sets verifiedAt + cookie |
+| `/api/otp/verify-prelaunch` | POST | `api_otp_verify_prelaunch` | Public | Verify OTP for prelaunch authentication, sets verifiedAt + cookie |
 | `/api/otp/resend` | POST | `api_otp_resend` | Public | Resend OTP, invalidates old one, returns new pendingOtpToken |
 
 ### Request/Response Examples
 
-**Verify OTP** (`POST /api/otp/verify-login` or `/api/otp/verify-email`)
+**Verify OTP** (`POST /api/otp/verify-login`, `/api/otp/verify-email`, or `/api/otp/verify-prelaunch`)
 ```json
 // Request
 { "pendingOtpToken": "abc123...", "code": "123456" }
@@ -121,7 +123,7 @@ OTP (One-Time Password) system providing two security layers:
 4. User enters OTP → `POST /api/otp/verify-email` → verifiedAt set + cookie set
 
 ### TokenAuthenticator Changes
-- `EXCLUDED_ROUTES` constant lists all public route names (api_login, api_user_register, api_integrations_callback, api_stripe_webhook, api_otp_verify_login, api_otp_verify_email, api_otp_resend)
+- `EXCLUDED_ROUTES` constant lists all public route names (api_login, api_user_register, api_integrations_callback, api_stripe_webhook, api_otp_verify_login, api_otp_verify_email, api_otp_verify_prelaunch, api_otp_resend, prelaunch routes)
 - `supports()` uses `in_array()` against `EXCLUDED_ROUTES` for clean, consistent route exclusion
 - Defensive check: rejects users with `isVerified() === false`
 

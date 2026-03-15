@@ -25,14 +25,14 @@ export default function GeneralSettings() {
 
     useEffect(() => {
         if (user) {
-            setFirstName(user.firstName);
-            setLastName(user.lastName);
+            setFirstName(user.firstName ?? '');
+            setLastName(user.lastName ?? '');
         }
     }, [user]);
 
     if (!user) return null;
 
-    const hasProfileChanges = firstName !== user.firstName || lastName !== user.lastName;
+    const hasProfileChanges = firstName !== (user.firstName ?? '') || lastName !== (user.lastName ?? '');
     const hasPasswordChanges = currentPassword.length > 0 || newPassword.length > 0 || confirmNewPassword.length > 0;
     const hasChanges = hasProfileChanges || hasPasswordChanges;
 

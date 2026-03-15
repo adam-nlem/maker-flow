@@ -54,4 +54,46 @@ class UserRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    public function getByEmail(string $email): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.email = :email')
+            ->setParameter('email', $email)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByReferralCode(string $referralCode): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.referralCode = :referralCode')
+            ->setParameter('referralCode', $referralCode)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function countByIpAddress(string $ipAddress): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.ipAddress = :ipAddress')
+            ->andWhere('u.referralCode IS NOT NULL')
+            ->setParameter('ipAddress', $ipAddress)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function countVerifiedReferrals(User $referrer): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.referredBy = :referrer')
+            ->andWhere('u.verifiedAt IS NOT NULL')
+            ->setParameter('referrer', $referrer)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

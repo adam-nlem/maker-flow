@@ -7,11 +7,11 @@ namespace DoctrineMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-final class Version20260311000002 extends AbstractMigration
+final class Version20260315123200 extends AbstractMigration
 {
     public function getDescription(): string
     {
-        return 'Create Projects table';
+        return 'Create project table';
     }
 
     public function up(Schema $schema): void

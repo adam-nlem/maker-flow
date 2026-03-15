@@ -15,6 +15,7 @@ use App\Service\Otp\Exception\InvalidOtpException;
 use App\Service\Otp\Exception\InvalidPendingTokenException;
 use App\Service\Otp\Exception\MaxAttemptsOtpException;
 use App\Service\Otp\OtpService;
+use App\Service\Prelaunch\PrelaunchService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -129,6 +130,70 @@ final class OtpController extends AbstractController
         );
 
         $cookieService->addCookieToHeaders($token, $request, $res);
+
+        return $res;
+    }
+
+    #[Route('/verify-prelaunch', name: 'api_otp_verify_prelaunch', methods: ['POST'])]
+    public function verifyPrelaunch(
+        VerifyOtpRequestDTO $dto,
+        OtpService $otpService,
+        TokenRepository $tokenRepository,
+        EntityManagerInterface $em,
+        CookieService $cookieService,
+        PrelaunchService $prelaunchService,
+        Request $request,
+    ): JsonResponse {
+        try {
+            $otp = $otpService->verify($dto->getPendingOtpToken(), $dto->getCode());
+        } catch (InvalidOtpException $e) {
+            return $this->json(
+                data: ['message' => 'Code incorrect.', 'remainingAttempts' => $e->getRemainingAttempts()],
+                status: Response::HTTP_UNPROCESSABLE_ENTITY,
+            );
+        } catch (ExpiredOtpException) {
+            return $this->json(
+                data: ['message' => 'Code expiré. Veuillez en demander un nouveau.'],
+                status: Response::HTTP_UNPROCESSABLE_ENTITY,
+            );
+        } catch (MaxAttemptsOtpException) {
+            return $this->json(
+                data: ['message' => 'Nombre maximum de tentatives atteint. Veuillez renvoyer un nouveau code.'],
+                status: Response::HTTP_TOO_MANY_REQUESTS,
+            );
+        } catch (InvalidPendingTokenException) {
+            return $this->json(
+                data: ['message' => 'Session invalide ou expirée.'],
+                status: Response::HTTP_UNPROCESSABLE_ENTITY,
+            );
+        }
+
+        $user = $otp->getUser();
+        $user->setVerifiedAt(DateHelper::createUtcDateTimeImmutable());
+
+        $token = $tokenRepository->getByUser($user);
+
+        if ($token === null) {
+            $token = new Token();
+            $user->addToken($token);
+        } else {
+            $token->resetToken();
+        }
+
+        $tokenRepository->save($token, true);
+
+        $res = $this->json(
+            data: $user,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_otp_verify_prelaunch']],
+        );
+
+        $cookieService->addCookieToHeaders($token, $request, $res);
+
+        $referrer = $user->getReferredBy();
+        if ($referrer !== null) {
+            $prelaunchService->syncReferrerSegments($referrer);
+        }
 
         return $res;
     }

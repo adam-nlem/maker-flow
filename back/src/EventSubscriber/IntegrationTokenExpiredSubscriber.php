@@ -3,14 +3,15 @@
 namespace App\EventSubscriber;
 
 use App\Event\IntegrationTokenExpiredEvent;
-use App\Service\Mailing\MailingService;
+use App\Message\SendEmailMessage;
 use App\Service\Mailing\Template\IntegrationTokenExpiredEmailTemplate;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 class IntegrationTokenExpiredSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly MailingService $mailingService,
+        private readonly MessageBusInterface $messageBus,
         private readonly string $frontendUrl,
     ) {}
 
@@ -34,6 +35,6 @@ class IntegrationTokenExpiredSubscriber implements EventSubscriberInterface
             $this->frontendUrl . '/settings/integrations',
         );
 
-        $this->mailingService->send($template->toEmail());
+        $this->messageBus->dispatch(new SendEmailMessage($template));
     }
 }

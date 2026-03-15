@@ -28,39 +28,56 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
     private ?string $uuid = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
     private ?string $firstName = null;
 
-    #[ORM\Column(length: 255)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
+    #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\Email]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
     private ?string $email = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_login', 'api_otp_verify_login', 'api_otp_verify_email'])]
+    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_login', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
     private ?\DateTimeImmutable $verifiedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups(['api_user_me', 'api_user_update'])]
     private ?string $stripeCustomerId = null;
+
+    #[ORM\Column(length: 8, unique: true, nullable: true)]
+    #[Groups(['api_user_me', 'api_otp_verify_prelaunch'])]
+    private ?string $referralCode = null;
+
+    #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'referrals')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?self $referredBy = null;
+
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'referredBy')]
+    private Collection $referrals;
+
+    #[ORM\Column(length: 45, nullable: true)]
+    private ?string $ipAddress = null;
 
     /**
      * @var Collection<int, Token>
@@ -115,6 +132,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->projects = new ArrayCollection();
         $this->subscriptions = new ArrayCollection();
         $this->otps = new ArrayCollection();
+        $this->referrals = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -139,7 +157,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->firstName;
     }
 
-    public function setFirstName(string $firstName): static
+    public function setFirstName(?string $firstName): static
     {
         $this->firstName = $firstName;
 
@@ -151,7 +169,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->lastName;
     }
 
-    public function setLastName(string $lastName): static
+    public function setLastName(?string $lastName): static
     {
         $this->lastName = $lastName;
 
@@ -175,7 +193,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): static
+    public function setPassword(?string $password): static
     {
         $this->password = $password;
 
@@ -241,6 +259,55 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->stripeCustomerId = $stripeCustomerId;
 
         return $this;
+    }
+
+    public function getReferralCode(): ?string
+    {
+        return $this->referralCode;
+    }
+
+    public function setReferralCode(?string $referralCode): static
+    {
+        $this->referralCode = $referralCode;
+
+        return $this;
+    }
+
+    public function getReferredBy(): ?self
+    {
+        return $this->referredBy;
+    }
+
+    public function setReferredBy(?self $referredBy): static
+    {
+        $this->referredBy = $referredBy;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getReferrals(): Collection
+    {
+        return $this->referrals;
+    }
+
+    public function getIpAddress(): ?string
+    {
+        return $this->ipAddress;
+    }
+
+    public function setIpAddress(?string $ipAddress): static
+    {
+        $this->ipAddress = $ipAddress;
+
+        return $this;
+    }
+
+    public function isPrelaunchSubscriber(): bool
+    {
+        return $this->referralCode !== null && $this->password === null;
     }
 
     /**

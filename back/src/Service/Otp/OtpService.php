@@ -6,15 +6,16 @@ use App\Entity\Enum\OtpType;
 use App\Entity\Otp;
 use App\Entity\User;
 use App\Helper\DateHelper;
+use App\Message\SendEmailMessage;
 use App\Repository\OtpRepository;
-use App\Service\Mailing\MailingService;
 use App\Service\Mailing\Template\EmailVerificationOtpEmailTemplate;
 use App\Service\Mailing\Template\LoginOtpEmailTemplate;
+use App\Service\Mailing\Template\PrelaunchVerificationEmailTemplate;
 use App\Service\Otp\Exception\ExpiredOtpException;
 use App\Service\Otp\Exception\InvalidOtpException;
 use App\Service\Otp\Exception\InvalidPendingTokenException;
 use App\Service\Otp\Exception\MaxAttemptsOtpException;
-use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final class OtpService
 {
@@ -23,8 +24,7 @@ final class OtpService
 
     public function __construct(
         private readonly OtpRepository $otpRepository,
-        private readonly MailingService $mailingService,
-        private readonly EntityManagerInterface $em,
+        private readonly MessageBusInterface $messageBus,
     ) {}
 
     public function createAndSend(User $user, OtpType $type): Otp
@@ -54,9 +54,13 @@ final class OtpService
                 $user->getFirstName(),
                 $code,
             ),
+            OtpType::PrelaunchVerification => new PrelaunchVerificationEmailTemplate(
+                $user->getEmail(),
+                $code,
+            ),
         };
 
-        $this->mailingService->send($template->toEmail());
+        $this->messageBus->dispatch(new SendEmailMessage($template));
 
         return $otp;
     }
