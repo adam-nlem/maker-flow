@@ -4,6 +4,7 @@ import PrelaunchRewardTierCard from "~/components/prelaunch/PrelaunchRewardTierC
 import { usePrelaunchStatus } from "~/hooks/api/prelaunch/usePrelaunchStatus"
 import { prelaunchRewardTierOptions } from "~/models/enums/PrelaunchRewardTier"
 import { ClipboardDocumentIcon, CheckIcon } from "@heroicons/react/24/outline"
+import Shimmer from "~/components/ui/Shimmer"
 
 interface PrelaunchDashboardProps {
     referralCode: string
@@ -35,8 +36,32 @@ export default function PrelaunchDashboard({ referralCode }: PrelaunchDashboardP
 
     if (isLoading || !status) {
         return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+            <div className="flex flex-col items-center justify-center min-h-screen px-4 py-12">
+                <div className="max-w-lg w-full text-center space-y-6">
+                    <Shimmer width="w-3/4" height="h-8" radius="rounded-lg" />
+                    <Shimmer width="w-full" height="h-5" />
+
+                    <div className="rounded-xl border border-light-gray p-4 space-y-3">
+                        <Shimmer width="w-1/3" height="h-4" />
+                        <Shimmer width="w-full" height="h-10" radius="rounded-lg" />
+                        <div className="flex gap-3">
+                            <Shimmer width="w-full" height="h-10" radius="rounded-lg" />
+                            <Shimmer width="w-full" height="h-10" radius="rounded-lg" />
+                        </div>
+                    </div>
+
+                    <div className="rounded-xl border border-light-gray p-4 space-y-2">
+                        <Shimmer width="w-1/3" height="h-4" />
+                        <Shimmer width="w-1/4" height="h-8" />
+                    </div>
+
+                    <div className="space-y-3">
+                        <Shimmer width="w-1/4" height="h-5" />
+                        <Shimmer width="w-full" height="h-16" radius="rounded-xl" />
+                        <Shimmer width="w-full" height="h-16" radius="rounded-xl" />
+                        <Shimmer width="w-full" height="h-16" radius="rounded-xl" />
+                    </div>
+                </div>
             </div>
         )
     }
