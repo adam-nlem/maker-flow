@@ -24,15 +24,15 @@ body {
   --font-family-sans: Roboto, ui-sans-serif, system-ui, sans-serif;
   --font-family-display: Outfit, ui-sans-serif, system-ui, sans-serif;
 
-  --color-gray-900: #111827;
-  --color-light-gray: #D9D9D9;
-  --color-gray: #6b7280;
-  --color-gray-400: #9ca3af;
+  --color-gray-900: #F0F0F0;
+  --color-light-gray: #2d2d44;
+  --color-gray: #9ca3af;
+  --color-gray-400: #6b7280;
   --color-purple: #715AFF;
 
   --color-primary: #43CEA9;
-  --color-dark: #141115;
-  --color-clear: #FFFFFF;
+  --color-dark: #F0F0F0;
+  --color-clear: #141115;
   --color-danger: #D33F49;
 
   --color-red: #E4572E;
@@ -42,7 +42,7 @@ body {
   --color-purple: #5346B6;
 
   --color-pastel-green: #BCD5AA;
-  --color-surface-hover: rgba(67, 206, 169, 0.10);
+  --color-surface-hover: rgba(67, 206, 169, 0.05);
 
   /* Custom text sizes with appropriate fonts */
   --font-size-xs: 0.75rem;
@@ -57,17 +57,6 @@ body {
 }
 
 :root {
-  --shimmer-highlight: rgba(255, 255, 255, 0.6);
-}
-
-:root.dark {
-  --color-clear: #141115;
-  --color-dark: #F0F0F0;
-  --color-light-gray: #2d2d44;
-  --color-gray: #9ca3af;
-  --color-gray-400: #6b7280;
-  --color-gray-900: #F0F0F0;
-  --color-surface-hover: rgba(67, 206, 169, 0.05);
   --shimmer-highlight: rgba(255, 255, 255, 0.1);
 }
 

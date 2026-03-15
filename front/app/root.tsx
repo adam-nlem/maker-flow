@@ -17,13 +17,12 @@ import "./app.css";
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <Meta />
         <Links />
-        <script dangerouslySetInnerHTML={{ __html: `(function(){try{var d=JSON.parse(localStorage.getItem('app:theme'));if(d&&d.state&&d.state.isDark===false)return}catch(e){}document.documentElement.classList.add('dark')})()` }} />
       </head>
       <body className="h-full overflow-hidden bg-clear text-dark">
         {children}

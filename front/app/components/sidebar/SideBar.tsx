@@ -1,4 +1,4 @@
-import { CalendarDaysIcon, ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, MoonIcon, PencilSquareIcon, PlusIcon, SparklesIcon, SunIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, PencilSquareIcon, PlusIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import { CalendarDaysIcon as CalendarDaysIconSolid, HomeIcon as HomeIconSolid, GlobeEuropeAfricaIcon as GlobeEuropeAfricaIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
@@ -17,8 +17,6 @@ import Shimmer from "../ui/Shimmer";
 import SelectDropdown from "../ui/SelectDropdown"
 import type { Project } from "~/models/Project"
 import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
-import { useThemeStore } from "~/stores/theme/themeStore";
-
 import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
 import UpdateProjectModal from "../projects/UpdateProjectModal";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
@@ -45,9 +43,6 @@ export default function SideBar() {
 
   const updatingProjectUuid = useUpdateProjectStore((state) => state.updatingProjectUuid)
   const setUpdatingProjectUuid = useUpdateProjectStore((state) => state.setUpdatingProjectUuid)
-
-  const isDark = useThemeStore((state) => state.isDark)
-  const toggleTheme = useThemeStore((state) => state.toggleTheme)
 
   // Close modals when sidebar collapses
   useEffect(() => {
@@ -169,13 +164,6 @@ export default function SideBar() {
         <div className={isExpanded ? '' : 'flex flex-col items-center'}>
           {/* BOTTOM NAVIGATION */}
           <div className={`mb-5 flex flex-col p-3 ${isExpanded ? '' : 'items-center'}`}>
-            <IconWithTextTile
-              icon={isDark ? SunIcon : MoonIcon}
-              label={isDark ? 'Mode clair' : 'Mode sombre'}
-              isExpanded={isExpanded}
-              isBold={false}
-              onClick={toggleTheme}
-            />
             <IconWithTextTile
               icon={location.pathname.startsWith(settingsPath) ? Cog6ToothIconSolid : Cog6ToothIcon}
               label="Paramètres"

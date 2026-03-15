@@ -82,26 +82,10 @@ Use these classes for body text. All use the **Outfit** font family with gray co
 
 | Name | Variable | Hex | Usage |
 |------|----------|-----|-------|
-| **Gray 900** | `--color-gray-900` | `#111827` | Darkest text |
-| **Gray** | `--color-gray` | `#6b7280` | Secondary text, icons |
-| **Gray 400** | `--color-gray-400` | `#9ca3af` | Placeholder text |
-| **Light Gray** | `--color-light-gray` | `#D9D9D9` | Borders, dividers, hover states |
-
-### Dark Mode Palette
-
-In dark mode (`:root.dark`), the following tokens are overridden:
-
-| Token | Light Value | Dark Value |
-|-------|-------------|------------|
-| `--color-clear` | `#FFFFFF` | `#1a1a2e` |
-| `--color-dark` | `#141115` | `#F0F0F0` |
-| `--color-light-gray` | `#D9D9D9` | `#2d2d44` |
-| `--color-gray` | `#6b7280` | `#9ca3af` |
-| `--color-gray-400` | `#9ca3af` | `#6b7280` |
-| `--color-gray-900` | `#111827` | `#F0F0F0` |
-| `--color-surface-hover` | `rgba(67, 206, 169, 0.05)` | `rgba(67, 206, 169, 0.05)` |
-
-See [dark-mode-feature.md](dark-mode-feature.md) for full details.
+| **Gray 900** | `--color-gray-900` | `#F0F0F0` | Darkest text |
+| **Gray** | `--color-gray` | `#9ca3af` | Secondary text, icons |
+| **Gray 400** | `--color-gray-400` | `#6b7280` | Placeholder text |
+| **Light Gray** | `--color-light-gray` | `#2d2d44` | Borders, dividers, hover states |
 
 ### Accent Colors
 
@@ -716,7 +700,7 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 ## Best Practices
 
 1. **Use typography classes** (`text-heading-*`, `text-body-*`) instead of raw Tailwind text classes
-2. **Always use design tokens** (`bg-clear`, `text-dark`, `border-light-gray`, `hover:bg-surface-hover`) — never use raw Tailwind colors (`bg-white`, `text-gray-900`, `border-gray-200`, `hover:bg-gray-50`) as they do not respond to dark mode
+2. **Always use design tokens** (`bg-clear`, `text-dark`, `border-light-gray`, `hover:bg-surface-hover`) — never use raw Tailwind colors (`bg-white`, `text-gray-900`, `border-gray-200`, `hover:bg-gray-50`)
 3. **Use `rounded-xl`** for buttons and inputs, `rounded-full` for pills/chips
 4. **Always include focus states** on interactive elements
 5. **Use Heroicons** for all icons, prefer outline style for navigation
