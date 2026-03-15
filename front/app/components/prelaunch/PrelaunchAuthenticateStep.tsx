@@ -89,17 +89,19 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
 
             <div className="mt-30 flex flex-col max-w-2xl w-full text-center items-center">
                 {referralCodeFromUrl && (
-                    <Pill label="Vous avez été invité par un ami !" bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" textColorClassName="text-primary" isSelected />
+                    <div className="animate-fade-in-up">
+                        <Pill label="Vous avez été invité par un ami !" bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" textColorClassName="text-primary" isSelected />
+                    </div>
                 )}
-                <h2 className="text-heading-3xl my-3">
+                <h2 className="text-heading-3xl my-3 animate-fade-in-up">
                     Arrêtez de jongler <br /> entre 7 onglets pour  <br /> publier <span className="text-primary">un seul contenu.</span>
                 </h2>
 
-                <p className="text-body-md mb-10">
+                <p className="text-body-md mb-10 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
                     <span className="text-primary">MakerFlow</span> centralise tout votre workflow créatif en un seul endroit <br /> pour que vous passiez moins de temps à gérer des outils, et plus <br /> de temps à créer ce qui compte vraiment.
                 </p>
 
-                <form className="flex flex-row gap-1 justify-center mb-1 w-lg" onSubmit={handleSubmit}>
+                <form className="flex flex-row gap-1 justify-center mb-1 w-lg animate-fade-in-up" style={{ animationDelay: "0.2s" }} onSubmit={handleSubmit}>
                     <Input
                         id="prelaunch-email"
                         name="email"
@@ -135,10 +137,11 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                 </p>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {features.map((feature) => (
+                    {features.map((feature, index) => (
                         <div
                             key={feature.title}
-                            className="flex flex-col items-start p-5 rounded-xl border border-light-gray text-left bg-clear"
+                            className="flex flex-col items-start p-5 rounded-xl border border-light-gray text-left bg-clear animate-fade-in-up"
+                            style={{ animationDelay: `${0.3 + index * 0.1}s` }}
                         >
                             <feature.icon className="h-6 w-6 text-primary mb-3" />
                             <h3 className="text-heading-sm mb-1">{feature.title}</h3>
@@ -149,21 +152,22 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
 
                 <div className="border-t border-light-gray rounded w-full my-10"></div>
 
-                <h3 className="text-heading-xl mb-3">
+                <h3 className="text-heading-xl mb-3 animate-fade-in-up" style={{ animationDelay: "0.7s" }}>
                     Invitez des amis. <br /> Débloquez des <span className="text-primary">récompenses.</span>
                 </h3>
 
-                <p className="text-body-md mb-10">
+                <p className="text-body-md mb-10 animate-fade-in-up" style={{ animationDelay: "0.8s" }}>
                     Plus vous invitez de créateurs dans l'aventure, plus vos avantages augmentent.
                 </p>
 
                 <div className="space-y-3 mb-10">
-                    {prelaunchRewardTierOptions.map((tier) => (
-                        <PrelaunchRewardTierCard
-                            key={tier}
-                            tier={tier}
-                            isUnlocked={false}
-                        />
+                    {prelaunchRewardTierOptions.map((tier, index) => (
+                        <div key={tier} className="animate-fade-in-up" style={{ animationDelay: `${0.9 + index * 0.1}s` }}>
+                            <PrelaunchRewardTierCard
+                                tier={tier}
+                                isUnlocked={false}
+                            />
+                        </div>
                     ))}
                 </div>
 
