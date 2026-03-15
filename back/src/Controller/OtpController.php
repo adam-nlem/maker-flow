@@ -15,8 +15,9 @@ use App\Service\Otp\Exception\InvalidOtpException;
 use App\Service\Otp\Exception\InvalidPendingTokenException;
 use App\Service\Otp\Exception\MaxAttemptsOtpException;
 use App\Service\Otp\OtpService;
-use App\Service\Prelaunch\PrelaunchService;
+use App\Message\SyncReferrerSegmentsMessage;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -141,7 +142,7 @@ final class OtpController extends AbstractController
         TokenRepository $tokenRepository,
         EntityManagerInterface $em,
         CookieService $cookieService,
-        PrelaunchService $prelaunchService,
+        MessageBusInterface $messageBus,
         Request $request,
     ): JsonResponse {
         try {
@@ -192,7 +193,7 @@ final class OtpController extends AbstractController
 
         $referrer = $user->getReferredBy();
         if ($referrer !== null) {
-            $prelaunchService->syncReferrerSegments($referrer);
+            $messageBus->dispatch(new SyncReferrerSegmentsMessage($referrer->getId()));
         }
 
         return $res;

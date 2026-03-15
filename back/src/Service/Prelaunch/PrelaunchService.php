@@ -7,19 +7,18 @@ use App\Entity\Enum\OtpType;
 use App\Entity\Enum\PrelaunchRewardTier;
 use App\Entity\Otp;
 use App\Entity\User;
-use App\Message\AddContactToSegmentMessage;
 use App\Repository\UserRepository;
+use App\Service\Mailing\MailingService;
 use App\Service\Otp\OtpService;
 use App\Service\Prelaunch\Exception\RateLimitExceededException;
 use App\Service\Prelaunch\Exception\SubscriberNotFoundException;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 final class PrelaunchService
 {
     public function __construct(
         private readonly UserRepository $userRepository,
         private readonly OtpService $otpService,
-        private readonly MessageBusInterface $messageBus,
+        private readonly MailingService $mailingService,
         private readonly bool $prelaunchEnabled,
     ) {}
 
@@ -35,10 +34,10 @@ final class PrelaunchService
             return $this->otpService->createAndSend($existing, OtpType::PrelaunchVerification);
         }
 
-        // Rate-limit new registrations only
-        if ($this->userRepository->countByIpAddress($ipAddress) >= 2) {
-            throw new RateLimitExceededException();
-        }
+        // // Rate-limit new registrations only
+        // if ($this->userRepository->countByIpAddress($ipAddress) >= 2) {
+        //     throw new RateLimitExceededException();
+        // }
 
         // Existing unverified prelaunch subscriber → delete and recreate
         if ($existing !== null) {
@@ -108,11 +107,8 @@ final class PrelaunchService
                 continue;
             }
 
-            $this->messageBus->dispatch(new AddContactToSegmentMessage(
-                $tier->getSegmentName(),
-                $referrer->getEmail(),
-                $referrer->getFirstName(),
-            ));
+            $segmentId = $this->mailingService->findOrCreateSegment($tier->getSegmentName());
+            $this->mailingService->addContactToSegment($segmentId, $referrer->getEmail(), $referrer->getFirstName());
         }
     }
 

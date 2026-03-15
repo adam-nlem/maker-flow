@@ -123,9 +123,7 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                 </form>
 
                 {error && (
-                    <div className="mb-4 rounded-md bg-danger/10 p-4 w-full">
-                        <div className="text-body-sm text-danger">{error}</div>
-                    </div>
+                    <p className="text-heading-sm text-danger">{error}</p>
                 )}
 
                 <div className="border-t border-light-gray rounded w-full my-8 sm:my-10"></div>
