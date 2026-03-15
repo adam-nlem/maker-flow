@@ -10,12 +10,12 @@ import { CustomHttpException } from "~/services/httpClient/customHttpExceptions"
 
 interface VerifyOtpFormProps {
     pendingOtpToken: string
-    purpose: OtpType
+    type: OtpType
     onVerified?: () => void
     formSpacing?: string
 }
 
-export default function VerifyOtpForm({ pendingOtpToken: initialToken, purpose, onVerified, formSpacing = "space-y-4" }: VerifyOtpFormProps) {
+export default function VerifyOtpForm({ pendingOtpToken: initialToken, type, onVerified, formSpacing = "space-y-4" }: VerifyOtpFormProps) {
     const [code, setCode] = useState("")
     const [pendingOtpToken, setPendingOtpToken] = useState(initialToken)
     const [error, setError] = useState<string | null>(null)
@@ -49,7 +49,7 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, purpose, 
         }
 
         try {
-            await verifyOtp({ pendingOtpToken, code, purpose })
+            await verifyOtp({ pendingOtpToken, code, purpose: type })
             onVerified?.()
         } catch (err) {
             if (err instanceof CustomHttpException) {
@@ -105,7 +105,6 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, purpose, 
                     maxLength={6}
                     value={code}
                     onChange={handleCodeChange}
-                    fullWidth
                 />
 
                 <Button

@@ -215,7 +215,7 @@ Minimal text-only button for inline actions.
 |------|------|---------|-------------|
 | `label` | `string` | - | Label text |
 | `error` | `string` | - | Error message |
-| `fullWidth` | `boolean` | `false` | Full width mode |
+| `width` | `string` | `'w-full'` | Width class |
 | `simple` | `boolean` | `false` | Borderless mode |
 | `icon` | `ReactNode` | - | Left icon |
 | `autoComplete` | `string` | `'off'` | Autocomplete attribute |
@@ -230,7 +230,6 @@ Minimal text-only button for inline actions.
 <Input
   label="Nom"
   placeholder="Entrez le nom"
-  fullWidth
   value={name}
   onChange={(e) => setName(e.target.value)}
 />
@@ -248,7 +247,7 @@ Auto-resizing textarea with same styling as Input.
 |------|------|---------|-------------|
 | `label` | `string` | - | Label text |
 | `error` | `string` | - | Error message |
-| `fullWidth` | `boolean` | `false` | Full width mode |
+| `width` | `string` | `'w-full'` | Width class |
 | `simple` | `boolean` | `false` | Borderless mode |
 | `textStyle` | `string` | `'text-sm'` | Text size class |
 

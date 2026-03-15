@@ -46,7 +46,6 @@ export default function DialogueSubjectRow({ subject, scriptUuid, isReadOnly }: 
                     readOnly={isReadOnly}
                     placeholder="Intervenant"
                     textStyle="text-heading-sm"
-                    fullWidth
                 />
                 <TextArea
                     simple
@@ -56,7 +55,6 @@ export default function DialogueSubjectRow({ subject, scriptUuid, isReadOnly }: 
                     readOnly={isReadOnly}
                     placeholder="Contenu..."
                     textStyle="text-sm"
-                    fullWidth
                 />
             </div>
             {!isReadOnly && (

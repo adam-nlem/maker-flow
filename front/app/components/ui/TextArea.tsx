@@ -5,13 +5,13 @@ interface TextAreaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement
   label?: string;
   placeholder?: string;
   error?: string;
-  fullWidth?: boolean;
+  width?: string;
   simple?: boolean;
   textStyle?: string;
 }
 
 export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
-  ({ label, error, fullWidth = false, simple = false, textStyle = 'text-sm', className = '', ...props }, ref) => {
+  ({ label, error, width = 'w-full', simple = false, textStyle = 'text-sm', className = '', ...props }, ref) => {
     const internalRef = useRef<HTMLTextAreaElement>(null);
     
     // Use the auto-resize hook
@@ -21,7 +21,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
     useImperativeHandle(ref, () => internalRef.current as HTMLTextAreaElement);
     
     return (
-      <div className={`${fullWidth ? 'w-full' : ''}`}>
+      <div className={`${width}`}>
         {label && (
           <label
             htmlFor={props.id}
@@ -37,7 +37,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
               block bg-transparent placeholder-gray-400 ${textStyle} resize-none scrollbar-none
               ${!simple ? 'rounded-xl border border-light-gray px-3 py-1.5 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary' : 'border-0 shadow-none outline-none focus:outline-none focus:ring-0 p-0'}
               ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
-              ${fullWidth ? 'w-full' : ''}
+              ${width}
               ${className}
               `}
               {...props}

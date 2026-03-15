@@ -3,7 +3,7 @@ import React, { forwardRef } from 'react';
 interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string;
   error?: string;
-  fullWidth?: boolean;
+  width?: string;
   simple?: boolean;
   icon?: React.ReactNode;
   autoComplete?: string;
@@ -14,7 +14,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
   ({
     label,
     error,
-    fullWidth = false,
+    width = 'w-full',
     simple = false,
     className = '',
     icon,
@@ -35,12 +35,12 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
       block bg-transparent placeholder-gray-400 ${textStyle}
       ${!simple ? `rounded-xl border border-light-gray shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary ${spacingClasses}` : `border-0 shadow-none outline-none focus:outline-none focus:ring-0 ${spacingClasses}`}
       ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
-      ${fullWidth ? 'w-full' : ''}
+      w-full
       ${className}
     `} {...props} />;
 
     return (
-      <div className={`${fullWidth ? 'w-full' : ''}`}>
+      <div className={`${width}`}>
         {label && (
           <label
             htmlFor={props.id}
@@ -50,7 +50,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           </label>
         )}
         {icon ? (
-          <div className={`relative ${fullWidth ? 'w-full' : ''}`}>
+          <div className={`relative`}>
             <div className="absolute inset-y-0 left-3 flex items-center">
                 {icon}
             </div>

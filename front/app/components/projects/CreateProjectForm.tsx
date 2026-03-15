@@ -48,7 +48,6 @@ export default function CreateProjectForm({ onProjectCreated, formSpacing = "spa
                 name="name"
                 type="text"
                 required
-                fullWidth
                 value={name}
                 onChange={(e) => setName(e.target.value)}
             />
@@ -58,7 +57,6 @@ export default function CreateProjectForm({ onProjectCreated, formSpacing = "spa
                 placeholder="Écrivez une description (optionel)"
                 id="project-description"
                 name="description"
-                fullWidth
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
             />

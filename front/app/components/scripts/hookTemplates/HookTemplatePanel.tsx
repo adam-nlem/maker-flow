@@ -91,7 +91,6 @@ export default function HookTemplatePanel() {
                                 placeholder="Rechercher..."
                                 textStyle="text-body-sm"
                                 icon={<MagnifyingGlassIcon className="size-4 text-gray" strokeWidth={2} />}
-                                fullWidth
                             />
                         </div>
                         <div className="flex flex-row flex-wrap gap-2 px-4 py-3 border-b border-light-gray">

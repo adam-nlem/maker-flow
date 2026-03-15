@@ -86,7 +86,6 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                             name="title"
 
                             required
-                            fullWidth
                             simple
                             textStyle="text-heading-xl"
                             value={title}
@@ -236,7 +235,6 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                         placeholder="Contenu de la tâche"
                         id="content"
                         name="content"
-                        fullWidth
                         simple
                         value={content}
                         onChange={(e) => setContent(e.target.value)}

@@ -46,7 +46,6 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                 name="title"
                 type="text"
                 required
-                fullWidth
                 simple
 
                 value={title}

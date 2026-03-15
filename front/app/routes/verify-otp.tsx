@@ -4,9 +4,8 @@ import { useLocation, useNavigate } from "react-router"
 
 import AuthStepLayout from "~/components/auth/AuthStepLayout"
 import VerifyOtpForm from "~/components/auth/VerifyOtpForm"
-import { homePath, loginPath } from "~/routes/routePaths"
-import type { OtpType } from "~/models/enums/OtpType"
-import { otpTypeToFrenchTranslation } from "~/models/enums/OtpType"
+import { homePath, loginPath, prelaunchPath } from "~/routes/routePaths"
+import { OtpType, otpTypeToFrenchTranslation } from "~/models/enums/OtpType"
 
 interface VerifyOtpState {
     pendingOtpToken: string
@@ -27,18 +26,22 @@ export default function VerifyOtpPage() {
 
     if (!state) return null
 
+    const isPrelaunch = state.purpose === OtpType.PrelaunchVerification
+    const backPath = isPrelaunch ? prelaunchPath : loginPath
+    const successPath = isPrelaunch ? prelaunchPath : homePath
+
     return (
         <div className="bg-clear bg-dot-pattern min-h-screen relative">
             <AuthStepLayout
                 icon={EnvelopeIcon}
                 title={otpTypeToFrenchTranslation[state.purpose]}
                 subtitle={<>Un code a été envoyé à <span className="text-dark font-medium">{state.email}</span></>}
-                onBack={() => navigate(loginPath)}
+                onBack={() => navigate(backPath)}
             >
                 <VerifyOtpForm
                     pendingOtpToken={state.pendingOtpToken}
-                    purpose={state.purpose}
-                    onVerified={() => navigate(homePath)}
+                    type={state.purpose}
+                    onVerified={() => navigate(successPath)}
                 />
             </AuthStepLayout>
         </div>

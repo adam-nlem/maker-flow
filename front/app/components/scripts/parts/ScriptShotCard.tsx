@@ -88,7 +88,6 @@ export default function ScriptShotCard({ shot, scriptUuid, dragHandleProps, isRe
                 readOnly={isReadOnly}
                 placeholder="Description du plan..."
                 textStyle="text-sm"
-                fullWidth
             />
         </ScriptPartCard>
     );

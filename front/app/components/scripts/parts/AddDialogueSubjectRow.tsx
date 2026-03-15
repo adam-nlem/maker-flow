@@ -40,14 +40,12 @@ export default function AddDialogueSubjectRow({ dialogueUuid, scriptUuid }: Prop
                     onChange={(e) => setSpeaker(e.target.value)}
                     placeholder="Intervenant"
                     textStyle="text-heading-sm"
-                    fullWidth
                 />
                 <TextArea
                     simple
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     placeholder="Contenu..."
-                    fullWidth
                 />
                 <div className="flex flex-row gap-3">
                     <SimpleTextButton onClick={handleAdd} color="text-primary" hoverColor="hover:text-primary">

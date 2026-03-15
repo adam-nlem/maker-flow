@@ -113,7 +113,6 @@ export default function ListScriptTagsDropdown({ projectUuid, selectedTags, onCl
                     name="title"
                     type="text"
                     required
-                    fullWidth
                     simple
 
                     className="mb-3"

@@ -58,7 +58,6 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                     readOnly={isReadOnly}
                     placeholder="Titre du script"
                     textStyle="text-heading-xl"
-                    fullWidth
                 />
                 {isReadOnly && onOpenEditor ? (
                      <Pill

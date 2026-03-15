@@ -68,7 +68,6 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                         name="title"
                         type="text"
                         required
-                        fullWidth
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
@@ -81,7 +80,6 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                             id="content"
                             name="content"
                             required
-                            fullWidth
                             value={content}
                             onChange={(e) => setContent(e.target.value)}
                         />

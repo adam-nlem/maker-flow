@@ -52,7 +52,6 @@ export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandlePro
                 readOnly={isReadOnly}
                 placeholder="Titre du dialogue"
                 textStyle="text-heading-sm"
-                fullWidth
             />
             <TextArea
                 simple
@@ -62,7 +61,6 @@ export default function ScriptDialogueCard({ dialogue, scriptUuid, dragHandlePro
                 readOnly={isReadOnly}
                 placeholder="Description (optionnel)"
                 textStyle="text-sm"
-                fullWidth
             />
 
             {/* Subjects section */}

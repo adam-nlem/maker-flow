@@ -49,7 +49,6 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose }: Up
                         name="name"
                         type="text"
                         required
-                        fullWidth
 
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}

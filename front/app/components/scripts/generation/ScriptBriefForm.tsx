@@ -99,7 +99,6 @@ export default function ScriptBriefForm({
                 placeholder="De quoi parle cette vidéo ?"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                fullWidth
                 required
             />
 
@@ -124,7 +123,6 @@ export default function ScriptBriefForm({
                 placeholder="Les points importants à aborder (optionnel)"
                 value={keyPoints}
                 onChange={(e) => setKeyPoints(e.target.value)}
-                fullWidth
             />
 
             <div>
@@ -165,7 +163,6 @@ export default function ScriptBriefForm({
                     placeholder="Informations additionnelles pour l'IA (optionnel)"
                     value={extraContext}
                     onChange={(e) => setExtraContext(e.target.value)}
-                    fullWidth
                 />
             )}
 

@@ -60,7 +60,6 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                         name="name"
                         type="text"
                         required
-                        fullWidth
 
                         value={name}
                         onChange={(e) => setName(e.target.value)}
@@ -71,7 +70,6 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                         placeholder="Écrivez une description (optionel)"
                         id="description"
                         name="description"
-                        fullWidth
 
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}

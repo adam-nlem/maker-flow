@@ -83,21 +83,18 @@ export default function GeneralSettings() {
                             label="Prénom"
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
-                            fullWidth
                             required
                         />
                         <Input
                             label="Nom"
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
-                            fullWidth
                             required
                         />
                         <Input
                             label="Email"
                             value={user.email}
                             readOnly
-                            fullWidth
                             className="text-gray cursor-not-allowed"
                         />
 
@@ -108,7 +105,6 @@ export default function GeneralSettings() {
                             value={currentPassword}
                             onChange={(e) => { setCurrentPassword(e.target.value); setValidationError(null); reset(); }}
                             autoComplete="current-password"
-                            fullWidth
                         />
                         <Input
                             label="Nouveau mot de passe"
@@ -116,7 +112,6 @@ export default function GeneralSettings() {
                             value={newPassword}
                             onChange={(e) => { setNewPassword(e.target.value); setValidationError(null); reset(); }}
                             autoComplete="new-password"
-                            fullWidth
                         />
                         {newPassword.length > 0 && (
                             <PasswordRules rules={getPasswordRules(newPassword)} />
@@ -127,7 +122,6 @@ export default function GeneralSettings() {
                             value={confirmNewPassword}
                             onChange={(e) => { setConfirmNewPassword(e.target.value); setValidationError(null); reset(); }}
                             autoComplete="new-password"
-                            fullWidth
                         />
                         {(validationError ?? errorMessage) && (
                             <p className="text-body-sm text-danger">{validationError ?? errorMessage}</p>

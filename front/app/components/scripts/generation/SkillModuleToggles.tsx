@@ -79,7 +79,6 @@ export default function SkillModuleToggles({
                                             placeholder="Racontez votre histoire personnelle..."
                                             value={skillInputs[skill] ?? ''}
                                             onChange={(e) => updateSkillInput(skill, e.target.value)}
-                                            fullWidth
                                         />
                                     )}
                                     {extraType === 'text' && skill === SkillModule.SeoOptimization && (
@@ -87,7 +86,6 @@ export default function SkillModuleToggles({
                                             placeholder="Mot-clé cible"
                                             value={skillInputs[skill] ?? ''}
                                             onChange={(e) => updateSkillInput(skill, e.target.value)}
-                                            fullWidth
                                         />
                                     )}
                                     {extraType === 'select' && skill === SkillModule.ScriptFormat && (
@@ -123,7 +121,6 @@ export default function SkillModuleToggles({
                                                     placeholder="Décrivez votre call to action..."
                                                     value={callToAction}
                                                     onChange={(e) => onCallToActionChange(e.target.value)}
-                                                    fullWidth
                                                 />
                                             )}
                                         </div>

@@ -42,7 +42,6 @@ export default function CreateTodoListModal({ projectUuid, showModal, onClose, o
                         name="name"
                         type="text"
                         required
-                        fullWidth
 
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}

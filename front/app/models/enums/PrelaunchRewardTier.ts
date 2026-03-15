@@ -23,3 +23,21 @@ export const prelaunchRewardTierToThreshold: Record<PrelaunchRewardTier, number>
     [PrelaunchRewardTier.DevDiscordAccess]: 10,
     [PrelaunchRewardTier.LifetimeDiscount]: 25,
 }
+
+export const prelaunchRewardTierToBgClass: Record<PrelaunchRewardTier, string> = {
+    [PrelaunchRewardTier.EarlyBetaAccess]: "bg-primary/10",
+    [PrelaunchRewardTier.DevDiscordAccess]: "bg-yellow/10",
+    [PrelaunchRewardTier.LifetimeDiscount]: "bg-red/10",
+}
+
+export const prelaunchRewardTierToTextClass: Record<PrelaunchRewardTier, string> = {
+    [PrelaunchRewardTier.EarlyBetaAccess]: "text-primary",
+    [PrelaunchRewardTier.DevDiscordAccess]: "text-yellow",
+    [PrelaunchRewardTier.LifetimeDiscount]: "text-red",
+}
+
+export const prelaunchRewardTierToBorderClass: Record<PrelaunchRewardTier, string> = {
+    [PrelaunchRewardTier.EarlyBetaAccess]: "border-primary/30",
+    [PrelaunchRewardTier.DevDiscordAccess]: "border-yellow/30",
+    [PrelaunchRewardTier.LifetimeDiscount]: "border-red/30",
+}

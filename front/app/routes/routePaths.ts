@@ -1,5 +1,6 @@
 // Public routes
 export const homePath = '/'
+export const prelaunchPath = '/prelaunch'
 export const onboardingPath = '/onboarding'
 export const loginPath = '/login'
 export const registerPath = '/register'

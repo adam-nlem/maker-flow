@@ -43,7 +43,6 @@ export default function UpdateScriptTagDropdown({ tag, onClose, onTagDeleted }: 
                 name="title"
                 type="text"
                 required
-                fullWidth
                 simple
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}

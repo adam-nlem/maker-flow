@@ -61,7 +61,6 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                     required
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
-                    fullWidth
                 />
 
                 <Input
@@ -73,7 +72,6 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                     required
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
-                    fullWidth
                 />
 
                 <Input
@@ -85,7 +83,6 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    fullWidth
                 />
 
                 <Input
@@ -97,7 +94,6 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    fullWidth
                 />
                 {password.length > 0 && (
                     <PasswordRules rules={getPasswordRules(password)} />
@@ -112,7 +108,6 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    fullWidth
                 />
 
                 <Button

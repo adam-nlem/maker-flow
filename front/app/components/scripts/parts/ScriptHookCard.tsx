@@ -102,7 +102,6 @@ export default function ScriptHookCard({ hook, scriptUuid, isReadOnly, hidePanel
                         readOnly={isReadOnly}
                         placeholder="Hook..."
                         textStyle="text-sm"
-                        fullWidth
                     />
                 )}
             </ScriptPartCard>

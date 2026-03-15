@@ -85,7 +85,6 @@ export default function ScriptVoiceOverCard({ voiceOver, scriptUuid, dragHandleP
                 readOnly={isReadOnly}
                 placeholder="Contenu de la voix off..."
                 textStyle="text-sm"
-                fullWidth
             />
         </ScriptPartCard>
     );

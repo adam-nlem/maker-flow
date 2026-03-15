@@ -88,7 +88,6 @@ export default function ScriptRetentionCueCard({ retentionCue, scriptUuid, dragH
                 readOnly={isReadOnly}
                 placeholder="Contenu du signal de rétention..."
                 textStyle="text-sm"
-                fullWidth
             />
         </ScriptPartCard>
     );

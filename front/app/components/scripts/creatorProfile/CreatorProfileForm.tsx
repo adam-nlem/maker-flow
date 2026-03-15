@@ -136,7 +136,6 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                 placeholder="Ex: Fitness, Cuisine, Tech..."
                 value={niche}
                 onChange={(e) => setNiche(e.target.value)}
-                fullWidth
             />
 
             <Input
@@ -144,7 +143,6 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                 placeholder="Ex: Hommes 25-35 intéressés par la musculation"
                 value={targetAudience}
                 onChange={(e) => setTargetAudience(e.target.value)}
-                fullWidth
             />
 
             <div>
@@ -188,7 +186,6 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                                 handleAddPhrase();
                             }
                         }}
-                        fullWidth
                     />
                     <button
                         type="button"
@@ -220,7 +217,6 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                                 handleAddNeverItem();
                             }
                         }}
-                        fullWidth
                     />
                     <button
                         type="button"
@@ -238,7 +234,6 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                 placeholder="Collez un extrait de votre contenu existant pour que l'IA s'inspire de votre style..."
                 value={styleSample}
                 onChange={(e) => setStyleSample(e.target.value)}
-                fullWidth
             />
                 </div>
             </div>

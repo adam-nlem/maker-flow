@@ -88,7 +88,6 @@ export default function ScriptCallToActionCard({ callToAction, scriptUuid, dragH
                 readOnly={isReadOnly}
                 placeholder="Contenu de l'appel à l'action..."
                 textStyle="text-sm"
-                fullWidth
             />
         </ScriptPartCard>
     );

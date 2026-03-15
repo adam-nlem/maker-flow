@@ -73,7 +73,6 @@ export default function HookContentRenderer({ content, onReplacePlaceholder }: H
                                         onKeyDown={handleKeyDown}
                                         placeholder={part.label}
                                         textStyle="text-body-sm"
-                                        fullWidth
                                     />
                                 </div>
                             </>

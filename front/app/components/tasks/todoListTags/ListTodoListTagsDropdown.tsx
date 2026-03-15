@@ -111,7 +111,6 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
                     name="title"
                     type="text"
                     required
-                    fullWidth
                     simple
 
                     className="mb-3"

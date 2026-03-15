@@ -51,7 +51,6 @@ export default function ScriptTextCard({ text, scriptUuid, dragHandleProps, isRe
                 readOnly={isReadOnly}
                 placeholder="Ecrivez ici..."
                 textStyle="text-sm"
-                fullWidth
             />
         </ScriptPartCard>
     );

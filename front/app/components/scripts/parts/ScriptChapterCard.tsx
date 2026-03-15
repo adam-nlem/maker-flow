@@ -97,7 +97,6 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                 readOnly={isReadOnly}
                 placeholder="Titre du chapitre"
                 textStyle="text-heading-md"
-                fullWidth
             />
             <TextArea
                 simple
@@ -107,7 +106,6 @@ export default function ScriptChapterCard({ chapter, scriptUuid, dragHandleProps
                 readOnly={isReadOnly}
                 placeholder="Description (optionnel)"
                 textStyle="text-sm"
-                fullWidth
             />
         </ScriptPartCard>
     );

@@ -62,7 +62,6 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail 
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    fullWidth
                 />
 
                 <Input
@@ -74,7 +73,6 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail 
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    fullWidth
                 />
 
                 <Button

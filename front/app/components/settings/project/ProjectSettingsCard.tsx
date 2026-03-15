@@ -66,7 +66,6 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                                 onChange={(e) => setName(e.target.value)}
                                 textStyle="text-heading-sm"
                                 required
-                                fullWidth
                             />
                             <p className="text-body-xs text-gray">Créé le {formatToNumericDate(project.createdAt)}</p>
                         </div>
@@ -83,7 +82,6 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                         placeholder="Écrivez une description (optionnel)"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        fullWidth
                     />
 
                     <h3 className="text-heading-sm">Types</h3>
