@@ -79,29 +79,27 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
     ]
 
     return (
-        <div className="flex flex-col items-center  min-h-screen w-full pb-20">
+        <div className="flex flex-col items-center min-h-screen w-full pb-20">
             <div className="flex flex-row items-center justify-between w-full border-b border-light-gray py-2 px-4">
                 <h1 className="text-heading-xl">MakerFlow</h1>
                 <Pill label="ACCÈS ANTICIPÉ OUVERT" bgColorClassName="bg-yellow/10" borderColorClassName="border border-yellow/30" textColorClassName="text-yellow" isSelected />
             </div>
 
-
-
-            <div className="mt-30 flex flex-col max-w-2xl w-full text-center items-center">
+            <div className="mt-12 sm:mt-20 md:mt-30 flex flex-col max-w-2xl w-full text-center items-center px-4 sm:px-6">
                 {referralCodeFromUrl && (
                     <div className="animate-fade-in-up">
                         <Pill label="Vous avez été invité par un ami !" bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" textColorClassName="text-primary" isSelected />
                     </div>
                 )}
-                <h2 className="text-heading-3xl my-3 animate-fade-in-up">
-                    Arrêtez de jongler <br /> entre 7 onglets pour  <br /> publier <span className="text-primary">un seul contenu.</span>
+                <h2 className="text-heading-2xl sm:text-heading-3xl my-3 animate-fade-in-up">
+                    Arrêtez de jongler entre 7 onglets pour publier <span className="text-primary">un seul contenu.</span>
                 </h2>
 
-                <p className="text-body-md mb-10 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
-                    <span className="text-primary">MakerFlow</span> centralise tout votre workflow créatif en un seul endroit <br /> pour que vous passiez moins de temps à gérer des outils, et plus <br /> de temps à créer ce qui compte vraiment.
+                <p className="text-body-sm sm:text-body-md mb-8 sm:mb-10 animate-fade-in-up" style={{ animationDelay: "0.1s" }}>
+                    <span className="text-primary">MakerFlow</span> centralise tout votre workflow créatif en un seul endroit pour que vous passiez moins de temps à gérer des outils, et plus de temps à créer ce qui compte vraiment.
                 </p>
 
-                <form className="flex flex-row gap-1 justify-center mb-1 w-lg animate-fade-in-up" style={{ animationDelay: "0.2s" }} onSubmit={handleSubmit}>
+                <form className="flex flex-col sm:flex-row gap-2 sm:gap-1 justify-center mb-1 w-full sm:w-lg animate-fade-in-up" style={{ animationDelay: "0.2s" }} onSubmit={handleSubmit}>
                     <Input
                         id="prelaunch-email"
                         name="email"
@@ -110,7 +108,7 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                         required
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        width="w-2/3"
+                        width="w-full sm:w-2/3"
                     />
 
                     <Button
@@ -118,29 +116,29 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                         style="primary"
                         isLoading={isPending}
                         disabled={isPending}
-                        width="w-1/3"
+                        width="w-full sm:w-1/3"
                     >
                         Réserver ma place
                     </Button>
                 </form>
 
                 {error && (
-                    <div className="mb-4 rounded-md bg-danger/10 p-4">
-                        <div className="text-body-md text-danger">{error}</div>
+                    <div className="mb-4 rounded-md bg-danger/10 p-4 w-full">
+                        <div className="text-body-sm text-danger">{error}</div>
                     </div>
                 )}
 
-                <div className="border-t border-light-gray rounded w-full my-10"></div>
+                <div className="border-t border-light-gray rounded w-full my-8 sm:my-10"></div>
 
                 <p className="text-body-xs mb-3">
                     CE QUE ÇA CHANGE CONCRÈTEMENT
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 w-full">
                     {features.map((feature, index) => (
                         <div
                             key={feature.title}
-                            className="flex flex-col items-start p-5 rounded-xl border border-light-gray text-left bg-clear animate-fade-in-up"
+                            className="flex flex-col items-start p-4 sm:p-5 rounded-xl border border-light-gray text-left bg-clear animate-fade-in-up"
                             style={{ animationDelay: `${0.3 + index * 0.1}s` }}
                         >
                             <feature.icon className="h-6 w-6 text-primary mb-3" />
@@ -150,17 +148,17 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                     ))}
                 </div>
 
-                <div className="border-t border-light-gray rounded w-full my-10"></div>
+                <div className="border-t border-light-gray rounded w-full my-8 sm:my-10"></div>
 
-                <h3 className="text-heading-xl mb-3 animate-fade-in-up" style={{ animationDelay: "0.7s" }}>
-                    Invitez des amis. <br /> Débloquez des <span className="text-primary">récompenses.</span>
+                <h3 className="text-heading-lg sm:text-heading-xl mb-3 animate-fade-in-up" style={{ animationDelay: "0.7s" }}>
+                    Invitez des amis. Débloquez des <span className="text-primary">récompenses.</span>
                 </h3>
 
-                <p className="text-body-md mb-10 animate-fade-in-up" style={{ animationDelay: "0.8s" }}>
+                <p className="text-body-sm sm:text-body-md mb-8 sm:mb-10 animate-fade-in-up" style={{ animationDelay: "0.8s" }}>
                     Plus vous invitez de créateurs dans l'aventure, plus vos avantages augmentent.
                 </p>
 
-                <div className="space-y-3 mb-10">
+                <div className="space-y-3 mb-8 sm:mb-10 w-full">
                     {prelaunchRewardTierOptions.map((tier, index) => (
                         <div key={tier} className="animate-fade-in-up" style={{ animationDelay: `${0.9 + index * 0.1}s` }}>
                             <PrelaunchRewardTierCard
@@ -171,7 +169,7 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                     ))}
                 </div>
 
-                <Pill label="Inscris-toi d'abord, puis reçois ton lien de parrainage unique." bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" textColorClassName="text-primary" isSelected />
+                <Pill label="Inscrivez-vous d'abord, puis recevez votre lien de parrainage unique." bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" textColorClassName="text-primary" isSelected />
             </div>
         </div>
     )
