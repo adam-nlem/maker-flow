@@ -11,7 +11,7 @@ export default defineConfig(() => ({
   base: '/maker-flow/', 
   resolve: {
     alias: {
-      '~': fileURLToPath(new URL('.', import.meta.url)),
+      '~': fileURLToPath(new URL('./', import.meta.url)),
     },
   },
 }));
