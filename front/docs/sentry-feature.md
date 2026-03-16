@@ -7,7 +7,6 @@ Sentry is integrated on the frontend via `@sentry/react` to capture and report c
 ## Packages
 
 - `@sentry/react` — Core SDK for error monitoring, tracing, and session replay
-- `@sentry/vite-plugin` — Uploads source maps to Sentry during production builds
 
 ## Configuration
 
@@ -16,9 +15,6 @@ Sentry is integrated on the frontend via `@sentry/react` to capture and report c
 | Variable | Where | Purpose |
 |----------|-------|---------|
 | `VITE_SENTRY_DSN` | `front/.env`, `docker-compose.yaml` | Sentry DSN for the frontend project (exposed to client via Vite) |
-| `SENTRY_AUTH_TOKEN` | `front/.env`, `docker-compose.yaml` | Auth token for source map uploads |
-| `SENTRY_ORG` | `front/.env`, `docker-compose.yaml` | Sentry organization slug |
-| `SENTRY_PROJECT` | `front/.env`, `docker-compose.yaml` | Sentry project slug |
 
 Setting `VITE_SENTRY_DSN` to empty disables the SDK entirely.
 
@@ -67,14 +63,6 @@ The root `ErrorBoundary` calls `Sentry.captureException(error)` for non-route-er
 ### 3. API Error Handler (`apiErrorHandler.ts`)
 The centralized error handler calls `Sentry.captureException(error)` specifically for `InternalServerException` (500 errors), providing frontend context for server errors.
 
-## Source Maps
-
-Source maps are uploaded to Sentry via `@sentry/vite-plugin` during production builds (`npm run build`). The Vite config uses `sourcemap: "hidden"` to generate source maps without exposing them to end users.
-
-Configuration in `vite.config.ts`:
-- `build.sourcemap: "hidden"`
-- `sentryVitePlugin({ org, project, authToken })` — reads from environment variables
-
 ## Key Files
 
 | File | Role |
@@ -83,7 +71,6 @@ Configuration in `vite.config.ts`:
 | `app/root.tsx` | ErrorBoundary with `Sentry.captureException` |
 | `app/services/apiErrorHandler/apiErrorHandler.ts` | 5xx error reporting to Sentry |
 | `app/services/httpClient/customHttpExceptions.ts` | Exception classes used in `beforeSend` filter |
-| `vite.config.ts` | Source map upload plugin |
 
 ## Testing
 
@@ -91,4 +78,3 @@ Configuration in `vite.config.ts`:
 2. Trigger a JavaScript error — should appear in Sentry Issues
 3. Trigger a 404 navigation — should NOT appear in Sentry
 4. Trigger a 500 API error — should appear in Sentry
-5. Run `npm run build` with valid `SENTRY_AUTH_TOKEN` — source maps should upload

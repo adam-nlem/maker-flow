@@ -36,9 +36,6 @@ jobs:
             VITE_API_URL=${{ secrets.VITE_API_URL }}
             VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}
             VITE_PRELAUNCH_ENABLED=${{ secrets.VITE_PRELAUNCH_ENABLED }}
-            SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
-            SENTRY_ORG=${{ secrets.SENTRY_ORG }}
-            SENTRY_PROJECT=${{ secrets.SENTRY_PROJECT_FRONT }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

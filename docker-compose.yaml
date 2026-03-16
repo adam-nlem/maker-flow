@@ -17,9 +17,6 @@ services:
       - VITE_SENTRY_DSN=${SENTRY_DSN_FRONT}
       - VITE_PRELAUNCH_ENABLED=${PRELAUNCH_ENABLED}
       - SENTRY_DSN=${SENTRY_DSN_FRONT}
-      - SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN}
-      - SENTRY_ORG=${SENTRY_ORG}
-      - SENTRY_PROJECT=${SENTRY_PROJECT_FRONT}
     networks:
       - maker_flow
     depends_on:
