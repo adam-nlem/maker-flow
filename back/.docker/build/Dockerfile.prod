@@ -1,6 +1,10 @@
 FROM composer:2 AS composer-deps
 
 WORKDIR /app
+
+# Install ext-amqp (required by symfony/amqp-messenger)
+RUN apk add --no-cache rabbitmq-c-dev && pecl install amqp && docker-php-ext-enable amqp
+
 COPY composer.json composer.lock ./
 RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interaction
 
