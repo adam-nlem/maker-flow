@@ -1,17 +1,16 @@
-import { existsSync } from "node:fs";
-import path from "node:path";
-import { reactRouter } from "@react-router/dev/vite";
+import path from "path";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
-import { fileURLToPath } from "node:url";
 
-
-export default defineConfig(() => ({
-  plugins: [tailwindcss(), reactRouter()],
-  base: '/maker-flow/', 
+export default defineConfig({
+  plugins: [tailwindcss(), react()],
   resolve: {
     alias: {
-      '~': fileURLToPath(new URL('./', import.meta.url)),
+      "~": path.resolve(__dirname, "src"),
     },
   },
-}));
+  server: {
+    host: true,
+  },
+});

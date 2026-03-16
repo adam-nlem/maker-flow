@@ -705,22 +705,30 @@ export class NotFoundException extends CustomHttpException {
 
 ### Route Configuration
 
+Routes are defined in `app/router.tsx` using `createBrowserRouter` from `react-router-dom`:
+
 ```tsx
-import { type RouteConfig, index, layout, route } from "@react-router/dev/routes";
+import { createBrowserRouter } from "react-router-dom";
 
-export default [
-    // Public routes
-    route("login", "routes/login.tsx"),
-    route("register", "routes/register.tsx"),
-
-    // Protected routes
-    layout("routes/protected.tsx", [
-        index("routes/home.tsx"),
-        route("tasks", "routes/tasks.tsx"),
-        route("insights", "routes/insights.tsx"),
-        route("insights/posts/:postUuid", "routes/insights.postDetail.tsx"),
-    ]),
-] satisfies RouteConfig;
+export const router = createBrowserRouter([
+    { path: prelaunchPath, element: <PrelaunchPage /> },
+    {
+        element: <PrelaunchGuardLayout />,
+        children: [
+            { path: loginPath, element: <LoginPage /> },
+            { path: registerPath, element: <RegisterPage /> },
+            {
+                element: <ProtectedLayout />,
+                errorElement: <ErrorBoundary />,
+                children: [
+                    { index: true, element: <HomePage /> },
+                    { path: tasksPath, element: <TasksPage /> },
+                    { path: insightsPath, element: <InsightsPage /> },
+                ],
+            },
+        ],
+    },
+], { basename: "/maker-flow" });
 ```
 
 ### Protected Layout
@@ -754,10 +762,10 @@ export default function ProtectedLayout() {
 
 ### Route Path Constants
 
-All route paths are defined as camelCase constants in `app/constants/routePaths.ts`. Never hardcode route paths as strings — always import and use the constant.
+All route paths are defined as camelCase constants in `app/routes/routePaths.ts`. Never hardcode route paths as strings — always import and use the constant.
 
 ```tsx
-// app/constants/routePaths.ts
+// app/routes/routePaths.ts
 export const loginPath = '/login'
 export const settingsSubscriptionPath = '/settings/subscription'
 export function insightsPostDetailPath(postUuid: string): string {
@@ -765,7 +773,7 @@ export function insightsPostDetailPath(postUuid: string): string {
 }
 
 // Usage
-import { loginPath } from "~/constants/routePaths"
+import { loginPath } from "~/routes/routePaths"
 navigate(loginPath, { replace: true })
 ```
 
@@ -884,10 +892,10 @@ return (
 
 ### Architecture
 
-All mutation errors are caught globally by `MutationCache.onError` in `root.tsx` and routed through a centralized handler. No per-hook or per-component error display is needed for mutations.
+All mutation errors are caught globally by `MutationCache.onError` in `queryClient.ts` and routed through a centralized handler. No per-hook or per-component error display is needed for mutations.
 
 ```
-MutationCache.onError (root.tsx)
+MutationCache.onError (queryClient.ts)
   -> handleMutationError (apiErrorHandler.ts)
     -> 401? redirect to /login
     -> Other? useToastStore.getState().addToast(...)

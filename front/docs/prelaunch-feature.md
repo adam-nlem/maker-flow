@@ -23,7 +23,7 @@ Configured in `front/.env` and `docker-compose.yaml`.
 
 ## Route Gating
 
-All routes are gated in `root.tsx`:
+All routes are gated via `PrelaunchGuardLayout` in `router.tsx`:
 - When `VITE_PRELAUNCH_ENABLED=true` and `location.pathname !== prelaunchPath`, redirects to `/prelaunch`
 - This covers both authenticated and public routes (login, register, etc.)
 

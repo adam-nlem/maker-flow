@@ -1,22 +1,18 @@
 services:
 
   front:
-    # We don't use the Dockerfile in the React project because it is for Prod env
     image: node:20-alpine
     container_name: ${COMPOSE_PROJECT_NAME}_front
     restart: unless-stopped
     working_dir: /app
     ports:
-      - "3000:3000"
+      - "3000:5173"
     volumes:
       - ./front:/app
     environment:
-      - NODE_ENV=development
-      - PORT=3000
       - VITE_API_URL=${API_URL}
       - VITE_SENTRY_DSN=${SENTRY_DSN_FRONT}
       - VITE_PRELAUNCH_ENABLED=${PRELAUNCH_ENABLED}
-      - SENTRY_DSN=${SENTRY_DSN_FRONT}
     networks:
       - maker_flow
     depends_on:

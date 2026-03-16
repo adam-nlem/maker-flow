@@ -8,7 +8,7 @@ MakerFlow is a full-stack web application for social media analytics (Instagram,
 
 ## Tech Stack
 
-- **Frontend**: React 19, React Router 7 (SSR), TypeScript, Tailwind CSS 4, Zustand, React Query, Recharts, Vite 7
+- **Frontend**: React 19, React Router DOM 7, TypeScript, Tailwind CSS 4, Zustand, React Query, Recharts, Vite 7
 - **Backend**: Symfony 7.3, PHP 8.2, Doctrine ORM, MySQL 8.0, Redis, RabbitMQ (Symfony Messenger)
 - **Infrastructure**: Docker Compose (front, back, db, redis-store, rabbitmq, pma)
 
@@ -73,7 +73,7 @@ Features are organized in a flat structure across both frontend and backend. Cur
 
 - **React Query hooks**: Each resource has a query keys file and custom hooks (e.g., `useShowIntegrationDetail`)
 - **Zustand stores**: Client state for UI concerns (focused project, sidebar, modals, filters)
-- **Server-side rendering**: Enabled via React Router + Express server
+- **Client-side SPA**: Plain Vite + React with `react-router-dom` for routing, no SSR
 - **Axios HTTP client**: Centralized in `front/app/services/httpClient/`
 
 ### API Routes

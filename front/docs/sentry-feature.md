@@ -47,18 +47,18 @@ The `beforeSend` callback in `entry.client.tsx` filters exceptions to avoid nois
 | `CustomHttpException` with `statusCode < 500` (4xx) | No | Expected/handled errors (bad request, unauthorized, not found, etc.) |
 | `InternalServerException` (500) | Yes | Server errors — explicitly captured in `apiErrorHandler.ts` |
 | Unhandled JavaScript errors | Yes | Frontend bugs caught by React 19 error handlers |
-| React rendering errors | Yes | Caught by `ErrorBoundary` in `root.tsx` |
+| React rendering errors | Yes | Caught by `ErrorBoundary` in `components/ErrorBoundary.tsx` |
 
 ## Error Capture Points
 
-### 1. React 19 Error Handlers (`entry.client.tsx`)
-`hydrateRoot` is configured with `Sentry.reactErrorHandler()` for:
+### 1. React 19 Error Handlers (`main.tsx`)
+`createRoot` is configured with `Sentry.reactErrorHandler()` for:
 - `onUncaughtError` — Unhandled errors that bubble up
 - `onCaughtError` — Errors caught by error boundaries
-- `onRecoverableError` — Hydration mismatches and recoverable errors
+- `onRecoverableError` — Recoverable errors
 
-### 2. ErrorBoundary (`root.tsx`)
-The root `ErrorBoundary` calls `Sentry.captureException(error)` for non-route-error-response errors (actual exceptions, not 404s).
+### 2. ErrorBoundary (`components/ErrorBoundary.tsx`)
+The route `ErrorBoundary` calls `Sentry.captureException(error)` for non-route-error-response errors (actual exceptions, not 404s).
 
 ### 3. API Error Handler (`apiErrorHandler.ts`)
 The centralized error handler calls `Sentry.captureException(error)` specifically for `InternalServerException` (500 errors), providing frontend context for server errors.
@@ -67,8 +67,8 @@ The centralized error handler calls `Sentry.captureException(error)` specificall
 
 | File | Role |
 |------|------|
-| `app/entry.client.tsx` | Sentry initialization + React 19 error handlers |
-| `app/root.tsx` | ErrorBoundary with `Sentry.captureException` |
+| `app/main.tsx` | Sentry initialization + React 19 error handlers |
+| `app/components/ErrorBoundary.tsx` | ErrorBoundary with `Sentry.captureException` |
 | `app/services/apiErrorHandler/apiErrorHandler.ts` | 5xx error reporting to Sentry |
 | `app/services/httpClient/customHttpExceptions.ts` | Exception classes used in `beforeSend` filter |
 
