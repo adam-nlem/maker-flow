@@ -20,7 +20,7 @@ interface GenerateScriptPanelProps {
     projectUuid: string
 }
 
-export default function GenerateScriptPanel({ scriptUuid, projectUuid }: GenerateScriptPanelProps) {
+export default function GenerateScriptPanel({ scriptUuid }: GenerateScriptPanelProps) {
     const navigate = useNavigate()
     const focusedGenerationUuid = useScriptGenerationStore((s) => s.focusedGenerationUuid)
     const { generation: focusedGeneration } = useShowScriptGeneration({ generationUuid: focusedGenerationUuid ?? null, scriptUuid })

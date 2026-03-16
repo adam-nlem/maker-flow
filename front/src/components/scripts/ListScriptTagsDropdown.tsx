@@ -19,7 +19,7 @@ interface ListScriptTagsDropdownProps {
 }
 
 export default function ListScriptTagsDropdown({ projectUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListScriptTagsDropdownProps) {
-    const { searchTerm, setSearchTerm, scriptTags, isLoading } = useListScriptTagsWithSearch({ projectUuid: projectUuid });
+    const { setSearchTerm, scriptTags, isLoading } = useListScriptTagsWithSearch({ projectUuid: projectUuid });
     const [title, setTitle] = useState("");
     const [color, setColor] = useState(Color.Purple);
     const { createScriptTag } = useCreateScriptTag({ projectUuid: projectUuid })

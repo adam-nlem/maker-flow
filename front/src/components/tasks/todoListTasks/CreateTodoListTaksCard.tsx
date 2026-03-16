@@ -98,7 +98,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                         </SimpleTextButton>
                     )
                 )}
-                renderItem={({ item, isSelected, onSelect }) => (
+                renderItem={({ item, onSelect }) => (
                     <Badge
                         icon={ExclamationTriangleIcon}
                         label={todoListPriorityToFrenchTranslation[item]}

@@ -6,7 +6,7 @@ import { useDeleteScriptGeneration } from "~/hooks/api/scriptGenerations/useDele
 import { ScriptGenerationStatus, scriptGenerationStatusToBgClass, scriptGenerationStatusToBorderClass, scriptGenerationStatusToIcon } from "~/models/enums/ScriptGenerationStatus";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { aiModelToFrenchTranslation } from "~/models/enums/AiModel";
-import { formatToFrenchRelative, formatToNumericDate } from "~/utils/dateFormatters";
+import { formatToFrenchRelative } from "~/utils/dateFormatters";
 
 interface GenerationHistoryBarProps {
     scriptUuid: string;

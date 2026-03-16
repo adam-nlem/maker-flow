@@ -1,8 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import { PlusIcon } from "@heroicons/react/24/outline";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import { SettingsSection, settingsSectionToFrenchTranslation } from "~/models/enums/SettingsSection";
-import { Button } from "~/components/ui/Button";
 import Shimmer from "~/components/ui/Shimmer";
 import CreateProjectModal from "~/components/projects/CreateProjectModal";
 import ProjectSettingsCard from "./project/ProjectSettingsCard";

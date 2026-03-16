@@ -12,7 +12,7 @@ interface TodoListTaskCardProps {
     isDragDisabled?: boolean;
 }
 
-export default function TodoListTaskCard({ todoListUuid, task, onClick, isDragDisabled = false }: TodoListTaskCardProps) {
+export default function TodoListTaskCard({ task, onClick, isDragDisabled = false }: TodoListTaskCardProps) {
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: task.uuid,
         disabled: isDragDisabled,

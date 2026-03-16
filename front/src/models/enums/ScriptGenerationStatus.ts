@@ -1,4 +1,4 @@
-import { ArrowPathIcon, CheckCircleIcon, CheckIcon, ClockIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import { ArrowPathIcon, CheckCircleIcon, ClockIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
 
 export enum ScriptGenerationStatus {

@@ -11,7 +11,6 @@ import ScriptPlatformsRow from "./ScriptPlatformsRow";
 import ScriptSimpleMetaColumn from "./ScriptSimpleMetaCol";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useScriptEditorStore } from "~/stores/scripts/scriptEditorStore";
-import { TextArea } from "../ui/TextArea";
 
 interface ScriptMetaHeaderProps {
     script: Script;

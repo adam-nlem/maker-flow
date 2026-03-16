@@ -1,5 +1,3 @@
-import { ExclamationTriangleIcon } from "@heroicons/react/16/solid";
-
 export enum TodoListPriority {
     Low = 'low',
     Medium = 'medium',

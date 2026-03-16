@@ -21,7 +21,7 @@ interface TodoListStatusColumnProps {
 export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskClick }: TodoListStatusColumnProps) {
     const [showCreateTaskCard, setShowCreateTaskCard] = useState(false)
 
-    const { isOver, setNodeRef } = useDroppable({ id: status });
+    const { setNodeRef } = useDroppable({ id: status });
 
     return (
         <div className="flex flex-col w-1/3 gap-3 min-h-0" ref={setNodeRef}>

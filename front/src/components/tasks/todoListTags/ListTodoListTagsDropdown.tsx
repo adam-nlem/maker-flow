@@ -19,7 +19,7 @@ interface ListTodoListTagsDropdownProps {
 }
 
 export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListTodoListTagsDropdownProps) {
-    const { searchTerm, setSearchTerm, todoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
+    const { setSearchTerm, todoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
     const [title, setTitle] = useState("");
     const [color, setColor] = useState(Color.Purple);
     const { createTodoListTag } = useCreateTodoListTag({ todoListUuid: todoListUuid })

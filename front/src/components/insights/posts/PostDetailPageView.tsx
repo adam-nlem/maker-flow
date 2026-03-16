@@ -28,9 +28,6 @@ function findTimeline(
   return timelines.find((timeline) => timeline.type === type);
 }
 
-type WatchTimeType = PostInsightType.AverageWatchTime | PostInsightType.TotalWatchTime;
-type EngagementType = PostInsightType.Likes | PostInsightType.Comments | PostInsightType.Shares;
-
 export default function PostDetailPageView({ postUuid }: PostDetailPageViewProps) {
 
   const { isSubscribed, isLoading: isSubscriptionLoading } = useIsSubscribed();

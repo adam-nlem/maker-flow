@@ -3,7 +3,6 @@ import { Button } from "~/components/ui/Button"
 import PrelaunchRewardTierCard from "~/components/prelaunch/PrelaunchRewardTierCard"
 import { usePrelaunchStatus } from "~/hooks/api/prelaunch/usePrelaunchStatus"
 import { prelaunchRewardTierOptions } from "~/models/enums/PrelaunchRewardTier"
-import { ClipboardDocumentIcon, CheckIcon } from "@heroicons/react/24/outline"
 import Shimmer from "~/components/ui/Shimmer"
 
 interface PrelaunchDashboardProps {

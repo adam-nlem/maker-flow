@@ -1,5 +1,5 @@
 import { XMarkIcon } from "@heroicons/react/16/solid";
-import { AdjustmentsHorizontalIcon, EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
+import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;

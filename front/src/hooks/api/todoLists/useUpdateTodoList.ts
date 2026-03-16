@@ -1,6 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { TodoList } from "~/models/TodoList";
 import { todoListQueryKeys } from "./todoListQueryKeys";
 
 interface UpdateTodoListData {

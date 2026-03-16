@@ -11,7 +11,7 @@ interface IntegrationProfileInfoProps {
 export default function IntegrationProfileInfo({ integration }: IntegrationProfileInfoProps) {
     const focusedProjectUuid = useFocusProjectStore((state) => state.focusedProjectUuid)
 
-    const { createIntegration, isPending: isConnecting, oauthError } = useCreateIntegration({ projectUuid: focusedProjectUuid!, platform: integration.platform });
+    const { createIntegration } = useCreateIntegration({ projectUuid: focusedProjectUuid!, platform: integration.platform });
     return (
         <div className="flex flex-row gap-5 items-center">
             <div className="flex flex-row gap-1 items-center">

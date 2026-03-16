@@ -1,4 +1,4 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { insightsPostDetailPath } from "~/routes/routePaths";
 import DataTable, { type DataTableColumn } from "~/components/ui/DataTable";

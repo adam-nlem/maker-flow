@@ -15,7 +15,7 @@ interface CreateTodoListModalProps {
 export default function CreateTodoListModal({ projectUuid, showModal, onClose, onTodoListCreated }: CreateTodoListModalProps) {
     const [title, setTitle] = useState("");
 
-    const { createTodoList, isPending, error, reset } = useCreateTodoList({ projectUuid });
+    const { createTodoList, isPending, reset } = useCreateTodoList({ projectUuid });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()

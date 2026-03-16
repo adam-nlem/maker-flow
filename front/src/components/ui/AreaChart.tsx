@@ -1,5 +1,5 @@
 import { Area, AreaChart as RechartsAreaChart, ResponsiveContainer, Tooltip } from "recharts";
-import { formatToFrenchDateLong, formatToFrenchRelative } from "~/utils/dateFormatters";
+import { formatToFrenchDateLong } from "~/utils/dateFormatters";
 
 interface AreaChartDataPoint {
     value: number;

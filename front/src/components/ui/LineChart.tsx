@@ -1,4 +1,4 @@
-import { Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend, CartesianGrid } from "recharts";
+import { Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
 import { formatDurationToFrench } from "~/utils/durationFormatters";
 
 function formatHoursToFrench(hours: number): string {

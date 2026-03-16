@@ -1,6 +1,5 @@
 import ModalOverlay from "~/components/ui/ModalOverlay";
 import type { TodoListTask } from "~/models/TodoListTask";
-import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { Badge } from "~/components/ui/Badge";
 import { useState } from "react";
@@ -157,7 +156,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                         </SimpleTextButton>
                                     )
                                 )}
-                                renderItem={({ item, isSelected, onSelect }) => (
+                                renderItem={({ item, onSelect }) => (
                                     <Badge
                                         icon={ExclamationTriangleIcon}
                                         label={todoListPriorityToFrenchTranslation[item]}
@@ -187,7 +186,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                         onClick={onClick}
                                     />
                                 )}
-                                renderItem={({ item, isSelected, onSelect }) => (
+                                renderItem={({ item, onSelect }) => (
                                     <Badge
                                         icon={CheckBadgeIcon}
                                         label={todoListStatusToFrenchTranslation[item]}

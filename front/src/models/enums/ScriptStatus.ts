@@ -1,4 +1,4 @@
-import { ArrowPathIcon, CalendarDaysIcon, CheckBadgeIcon, CheckCircleIcon, ClockIcon, LightBulbIcon, PencilSquareIcon, ScissorsIcon, VideoCameraIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, CheckBadgeIcon, LightBulbIcon, PencilSquareIcon, ScissorsIcon, VideoCameraIcon } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
 
 export enum ScriptStatus {

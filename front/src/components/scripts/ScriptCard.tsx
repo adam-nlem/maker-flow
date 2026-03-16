@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TrashIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import { useDeleteScript } from "~/hooks/api/scripts/useDeleteScript";
 import ScriptSimpleMetaColumn from "./ScriptSimpleMetaCol";

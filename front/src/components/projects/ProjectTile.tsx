@@ -3,7 +3,7 @@ import { useMemo, useState, type ReactNode } from "react";
 import { formatToFrenchDateShort } from "~/utils/dateFormatters";
 import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 import { createAvatar } from '@dicebear/core';
-import { glass, lorelei, shapes } from '@dicebear/collection';
+import { shapes } from '@dicebear/collection';
 
 interface ProjectTileProps {
   project: Project;

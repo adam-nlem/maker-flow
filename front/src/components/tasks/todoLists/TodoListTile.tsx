@@ -1,4 +1,3 @@
-import type { Project } from "~/models/Project";
 import { useState, type ReactNode } from "react";
 import { formatToFrenchDateShort } from "~/utils/dateFormatters";
 import type { TodoList } from "~/models/TodoList";

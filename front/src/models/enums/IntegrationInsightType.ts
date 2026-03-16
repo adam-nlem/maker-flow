@@ -1,5 +1,5 @@
 
-import { BookmarkIcon, ArrowUpOnSquareIcon, ChatBubbleLeftIcon, EyeIcon, FilmIcon, HandThumbDownIcon, HandThumbUpIcon, LinkIcon, ShareIcon, SparklesIcon, UserPlusIcon, UsersIcon, HeartIcon } from "@heroicons/react/24/outline";
+import { BookmarkIcon, ArrowUpOnSquareIcon, ChatBubbleLeftIcon, EyeIcon, FilmIcon, HandThumbDownIcon, LinkIcon, SparklesIcon, UserPlusIcon, UsersIcon, HeartIcon } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
 
 export enum IntegrationInsightType {

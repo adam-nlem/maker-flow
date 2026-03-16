@@ -1,6 +1,5 @@
-import { CalendarDaysIcon, ChartBarIcon, ChevronDownIcon, ChevronUpDownIcon, ChevronUpIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, GlobeEuropeAfricaIcon, HomeIcon, LifebuoyIcon, PencilSquareIcon, PlusIcon, SparklesIcon } from "@heroicons/react/24/outline";
-import { CalendarDaysIcon as CalendarDaysIconSolid, HomeIcon as HomeIconSolid, GlobeEuropeAfricaIcon as GlobeEuropeAfricaIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, LifebuoyIcon as LifebuoyIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid } from "@heroicons/react/24/solid";
-import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
+import { CalendarDaysIcon, ChartBarIcon, ChevronUpDownIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, HomeIcon, PencilSquareIcon, PlusIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon as CalendarDaysIconSolid, HomeIcon as HomeIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid } from "@heroicons/react/24/solid";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";

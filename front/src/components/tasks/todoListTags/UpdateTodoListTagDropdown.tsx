@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
-import { Color, colorOptions, colorToBgClass } from "~/models/enums/Color";
+import { colorOptions, colorToBgClass } from "~/models/enums/Color";
 import { useUpdateTodoListTag } from "~/hooks/api/todoListTags/useUpdateTodoListTag";
 import type { TodoListTag } from "~/models/TodoListTag";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";

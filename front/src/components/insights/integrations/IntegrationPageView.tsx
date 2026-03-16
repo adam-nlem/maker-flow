@@ -6,7 +6,6 @@ import { useInsightsFilterStore } from "~/stores/insights/insightsFilterStore";
 import { useShowIntegrationDetail } from "~/hooks/api/integrationInsights/useShowIntegrationDetail";
 import { ArrowPathIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { Platform } from "~/models/enums/Platform";
-import { CalendarHeatMap } from "~/components/ui/CalendarHeatMap";
 import AreaChart from "~/components/ui/AreaChart";
 import { timePeriodToDays } from "~/models/enums/TimePeriod";
 import { computeTotalValue, getChartDataForInsightType, getFilteredPointsForType } from "~/helpers/insightChartDataHelper";

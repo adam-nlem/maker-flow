@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import type { Color } from "~/models/enums/Color";
-import { TodoListTag } from "~/models/TodoListTag";
 import { todoListTagQueryKeys } from "./todoListTagQueryKeys";
 
 interface UpdateTodoListTagData {

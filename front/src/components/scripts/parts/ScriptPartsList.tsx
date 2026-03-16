@@ -19,7 +19,6 @@ import ScriptCallToActionCard from "./ScriptCallToActionCard";
 import ScriptRetentionCueCard from "./ScriptRetentionCueCard";
 import ScriptHookCard from "./ScriptHookCard";
 import AddScriptPartMenu from "./AddScriptPartMenu";
-import ScriptPartTypeMenu from "./ScriptPartTypeMenu";
 import { useReorderScriptParts } from "~/hooks/api/scripts/useReorderScriptParts";
 import { ScriptPartType } from "~/models/enums/ScriptPartType";
 
