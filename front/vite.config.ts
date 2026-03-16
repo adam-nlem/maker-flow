@@ -1,9 +1,13 @@
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
-import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig(({ isSsrBuild }) => ({
+  resolve: {
+    alias: {
+      "~": `${import.meta.dirname}/app`,
+    },
+  },
   build: {
     rollupOptions: isSsrBuild
       ? {
@@ -11,5 +15,5 @@ export default defineConfig(({ isSsrBuild }) => ({
         }
       : undefined,
   },
-  plugins: [tailwindcss(), reactRouter(), tsconfigPaths({ projects: ["./tsconfig.vite.json"] })],
+  plugins: [tailwindcss(), reactRouter()],
 }));
