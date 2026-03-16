@@ -11,5 +11,5 @@ export default defineConfig(({ isSsrBuild }) => ({
         }
       : undefined,
   },
-  plugins: [tailwindcss(), reactRouter(), tsconfigPaths()],
+  plugins: [tailwindcss(), reactRouter(), tsconfigPaths({ projects: ["./tsconfig.vite.json"] })],
 }));
