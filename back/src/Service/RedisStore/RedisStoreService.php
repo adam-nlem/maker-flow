@@ -66,4 +66,14 @@ class RedisStoreService
     {
         return 'STRIPE/REFILL';
     }
+
+    public static function getResendSegmentKey(string $name): string
+    {
+        return sprintf('RESEND/SEGMENT/%s', $name);
+    }
+
+    public static function getResendSyncedTierKey(string $userUuid, string $tierValue): string
+    {
+        return sprintf('RESEND/SYNCED_TIER/%s/%s', $userUuid, $tierValue);
+    }
 }

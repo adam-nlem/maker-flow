@@ -65,7 +65,7 @@ OTP verification uses `/api/otp/verify-prelaunch` (in `OtpController`, same patt
 
 - **authenticate**: Handles both new and returning users. For existing verified users, sends OTP (acts as login). For new users, checks IP rate limit (max 2 per IP), creates partial User (email only + referralCode), calls `OtpService::createAndSend()` to send verification email
 - **getStatus**: Computes referral count via `UserRepository::countVerifiedReferrals()`, determines unlocked tiers, returns `PrelaunchStatusResponseDTO`
-- **syncReferrerSegments**: Counts verified referrals, dispatches `AddContactToSegmentMessage` for each qualifying tier
+- **syncReferrerSegments**: Counts verified referrals, calls `MailingService` to add the referrer to each qualifying tier's Resend segment
 
 ## Authentication Flow
 
@@ -105,15 +105,50 @@ When a referred user verifies their OTP via `/api/otp/verify-prelaunch`, if the 
 
 ```
 OtpController::verifyPrelaunch
-    → PrelaunchService::syncReferrerSegments(referrer)
-        1. Counts verified referrals (UserRepository::countVerifiedReferrals)
-        2. For each tier where count >= threshold:
-           → dispatches AddContactToSegmentMessage to RabbitMQ
-               → Worker consumes message
-                   → AddContactToSegmentHandler:
-                       → MailingService::findOrCreateSegment(segment name)
-                       → MailingService::addContactToSegment(segmentId, email, firstName)
+    → dispatches SyncReferrerSegmentsMessage to RabbitMQ
+        → Worker consumes message
+            → SyncReferrerSegmentsHandler:
+                → PrelaunchService::syncReferrerSegments(referrer)
+                    1. Counts verified referrals
+                    2. Filters out already-synced tiers (via Redis: RESEND/SYNCED_TIER/{uuid}/{tier})
+                    3. If new tiers to sync:
+                        → MailingService::ensureContactExists(email, firstName) — once
+                        → For each new tier:
+                            → MailingService::findOrCreateSegment(name) — cached in Redis
+                            → MailingService::addContactToSegment(segmentId, email)
+                            → Marks tier as synced in Redis
 ```
+
+### Optimization
+
+API calls are minimized via two Redis caches:
+- **Synced tiers** (`RESEND/SYNCED_TIER/{userUuid}/{tierValue}`): skips already-synced tiers entirely — no API calls for tiers processed in prior syncs
+- **Segment IDs** (`RESEND/SEGMENT/{name}`): caches segment name→ID mapping — avoids `segments->list()` on subsequent syncs
+- **Contact creation**: called once per sync (before the tier loop), not per tier
+
+| Scenario | API calls |
+|----------|-----------|
+| Re-sync, no new tiers | 0 |
+| Tier 2 just unlocked (warm cache) | 2 (`ensureContact` + `segments->add`) |
+| First sync, 3 tiers (cold cache) | 5 (`list` + `ensureContact` + 3× `add`) |
+
+If Redis is flushed, worst case is redundant but idempotent Resend calls.
+
+### Rate Limiting & Retry with Backoff
+
+All Resend API calls in `MailingService` are throttled to 2 req/sec via Symfony RateLimiter (token bucket, Redis-backed). This prevents 429 errors proactively across all worker processes.
+
+As a safety net, when Resend returns a retryable error (429, 500, 502, 503, 504), `MailingService` throws a `MailingRetryableException`. The handler re-dispatches the message with exponential backoff:
+
+| Attempt | Delay |
+|---------|-------|
+| 1st retry | 2s |
+| 2nd retry | 4s |
+| 3rd retry | 8s |
+
+After 3 retries, the exception is captured via Sentry. The retry count is carried in the `SyncReferrerSegmentsMessage` — the worker is freed between retries (non-blocking).
+
+Same pattern as `GenerateScriptHandler` (see `script-generation-feature.md`).
 
 ### Tier → Segment Mapping
 
@@ -127,9 +162,10 @@ Defined in `PrelaunchRewardTier::getSegmentName()`:
 
 ### Key Details
 
-- **Async**: Each qualifying tier dispatches an `AddContactToSegmentMessage` (generic, reusable) — Resend API calls do not block the OTP verification response
+- **Async**: The controller dispatches a `SyncReferrerSegmentsMessage` — Resend API calls do not block the OTP verification response
+- **Retryable**: 429 and 5xx errors from Resend trigger automatic retry with exponential backoff (max 3 retries)
 - **Idempotent**: Resend global contacts are identified by email — creating an existing contact is a no-op, adding to a segment they're already in is safe
-- **Error handling**: Failures are sent to Sentry per message, without affecting other tiers
+- **Error handling**: Permanent failures and retries exhausted are sent to Sentry
 - **Trigger**: Only dispatched when the verified user has a `referredBy` referrer
 
 See `mailing-feature.md` for Resend SDK and segment management details.

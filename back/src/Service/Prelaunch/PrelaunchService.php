@@ -12,6 +12,7 @@ use App\Service\Mailing\MailingService;
 use App\Service\Otp\OtpService;
 use App\Service\Prelaunch\Exception\RateLimitExceededException;
 use App\Service\Prelaunch\Exception\SubscriberNotFoundException;
+use App\Service\RedisStore\RedisStoreService;
 
 final class PrelaunchService
 {
@@ -19,6 +20,7 @@ final class PrelaunchService
         private readonly UserRepository $userRepository,
         private readonly OtpService $otpService,
         private readonly MailingService $mailingService,
+        private readonly RedisStoreService $redisStore,
         private readonly bool $prelaunchEnabled,
     ) {}
 
@@ -34,10 +36,10 @@ final class PrelaunchService
             return $this->otpService->createAndSend($existing, OtpType::PrelaunchVerification);
         }
 
-        // // Rate-limit new registrations only
-        // if ($this->userRepository->countByIpAddress($ipAddress) >= 2) {
-        //     throw new RateLimitExceededException();
-        // }
+        // Rate-limit new registrations only
+        if ($this->userRepository->countByIpAddress($ipAddress) >= 2) {
+            throw new RateLimitExceededException();
+        }
 
         // Existing unverified prelaunch subscriber → delete and recreate
         if ($existing !== null) {
@@ -102,13 +104,34 @@ final class PrelaunchService
     {
         $referralCount = $this->userRepository->countVerifiedReferrals($referrer);
 
+        $tiersToSync = [];
+
         foreach (PrelaunchRewardTier::cases() as $tier) {
             if ($referralCount < $tier->getThreshold()) {
                 continue;
             }
 
+            $syncKey = RedisStoreService::getResendSyncedTierKey($referrer->getUuid(), $tier->value);
+
+            if ($this->redisStore->exists($syncKey)) {
+                continue;
+            }
+
+            $tiersToSync[] = $tier;
+        }
+
+        if (empty($tiersToSync)) {
+            return;
+        }
+
+        $this->mailingService->ensureContactExists($referrer->getEmail(), $referrer->getFirstName());
+
+        foreach ($tiersToSync as $tier) {
             $segmentId = $this->mailingService->findOrCreateSegment($tier->getSegmentName());
-            $this->mailingService->addContactToSegment($segmentId, $referrer->getEmail(), $referrer->getFirstName());
+            $this->mailingService->addContactToSegment($segmentId, $referrer->getEmail());
+
+            $syncKey = RedisStoreService::getResendSyncedTierKey($referrer->getUuid(), $tier->value);
+            $this->redisStore->set($syncKey, '1');
         }
     }
 

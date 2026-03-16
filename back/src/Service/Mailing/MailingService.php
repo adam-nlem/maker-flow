@@ -2,10 +2,14 @@
 
 namespace App\Service\Mailing;
 
+use App\Service\Mailing\Exception\MailingRetryableException;
+use App\Service\RedisStore\RedisStoreService;
 use Resend\Client;
+use Resend\Exceptions\ErrorException;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
+use Symfony\Component\RateLimiter\RateLimiterFactory;
 
 final class MailingService
 {
@@ -14,6 +18,8 @@ final class MailingService
         private readonly Client $resend,
         private readonly string $fromAddress,
         private readonly string $fromName,
+        private readonly RateLimiterFactory $resendApiLimiter,
+        private readonly RedisStoreService $redisStore,
     ) {}
 
     public function send(Email $email): void
@@ -22,37 +28,102 @@ final class MailingService
             $email->from(new Address($this->fromAddress, $this->fromName));
         }
 
+        $this->throttle();
         $this->mailer->send($email);
     }
 
+    /**
+     * @throws MailingRetryableException
+     */
     public function findOrCreateSegment(string $name): string
     {
-        $segments = $this->resend->segments->list();
+        $cacheKey = RedisStoreService::getResendSegmentKey($name);
+        $cached = $this->redisStore->get($cacheKey);
 
-        foreach ($segments['data'] as $segment) {
-            if ($segment['name'] === $name) {
-                return $segment['id'];
-            }
+        if ($cached !== null) {
+            return $cached;
         }
 
-        $created = $this->resend->segments->create(['name' => $name]);
+        try {
+            $this->throttle();
+            $segments = $this->resend->segments->list();
 
-        return $created['id'];
+            foreach ($segments['data'] as $segment) {
+                $this->redisStore->set(RedisStoreService::getResendSegmentKey($segment['name']), $segment['id']);
+            }
+
+            $cached = $this->redisStore->get($cacheKey);
+
+            if ($cached !== null) {
+                return $cached;
+            }
+
+            $this->throttle();
+            $created = $this->resend->segments->create(['name' => $name]);
+
+            $this->redisStore->set($cacheKey, $created['id']);
+
+            return $created['id'];
+        } catch (ErrorException $e) {
+            $this->throwIfRetryable($e);
+
+            throw $e;
+        }
     }
 
-    public function addContactToSegment(string $segmentId, string $email, ?string $firstName = null): void
+    /**
+     * @throws MailingRetryableException
+     */
+    public function ensureContactExists(string $email, ?string $firstName = null): void
     {
-        $params = ['email' => $email];
+        try {
+            $params = ['email' => $email];
 
-        if ($firstName !== null) {
-            $params['first_name'] = $firstName;
+            if ($firstName !== null) {
+                $params['first_name'] = $firstName;
+            }
+
+            $this->throttle();
+            $this->resend->contacts->create($params);
+        } catch (ErrorException $e) {
+            $this->throwIfRetryable($e);
+
+            throw $e;
         }
+    }
 
-        $this->resend->contacts->create($params);
+    /**
+     * @throws MailingRetryableException
+     */
+    public function addContactToSegment(string $segmentId, string $email): void
+    {
+        try {
+            $this->throttle();
+            $this->resend->contacts->segments->add(
+                contact: $email,
+                segmentId: $segmentId,
+            );
+        } catch (ErrorException $e) {
+            $this->throwIfRetryable($e);
 
-        $this->resend->contacts->segments->add(
-            contact: $email,
-            segmentId: $segmentId,
-        );
+            throw $e;
+        }
+    }
+
+    /**
+     * @throws MailingRetryableException
+     */
+    private function throwIfRetryable(ErrorException $e): void
+    {
+        $retryableStatusCodes = [429, 500, 502, 503, 504];
+
+        if (in_array($e->getErrorCode(), $retryableStatusCodes, true)) {
+            throw new MailingRetryableException($e->getMessage(), $e->getErrorCode(), $e);
+        }
+    }
+
+    private function throttle(): void
+    {
+        $this->resendApiLimiter->create('resend_api')->reserve()->wait();
     }
 }

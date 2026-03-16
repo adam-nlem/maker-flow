@@ -23,13 +23,16 @@ Callers create a template and dispatch `SendEmailMessage` with it to the message
 ### Segment Management
 
 ```
-MailingService::findOrCreateSegment(name) → Resend Segments API
-MailingService::addContactToSegment(segmentId, email) → Resend Contacts API + Segments API
+MailingService::findOrCreateSegment(name) → Redis cache or Resend Segments API
+MailingService::ensureContactExists(email, firstName) → Resend Contacts API
+MailingService::addContactToSegment(segmentId, email) → Resend Segments API
 ```
 
-Segment methods call the Resend API directly (no async layer). They are called from within `AddContactToSegmentHandler`, which is already running asynchronously via RabbitMQ.
+Segment methods call the Resend API directly (no async layer). They are called from within `SyncReferrerSegmentsHandler`, which runs asynchronously via RabbitMQ.
 
-Contacts are global in Resend (identified by email, not tied to a single segment). `addContactToSegment` creates the contact first, then adds it to the segment.
+Contacts are global in Resend (identified by email, not tied to a single segment). Segment IDs are cached in Redis (`RESEND/SEGMENT/{name}`) to avoid repeated `segments->list()` calls.
+
+All Resend API calls (email sending + segment SDK) are throttled via Symfony RateLimiter (`token_bucket`, 2 req/sec, Redis-backed) to respect Resend's rate limit. The `throttle()` method calls `$limiter->reserve()->wait()` before each API call — it blocks until a token is available. This works across all worker processes sharing the same Redis instance.
 
 ## Configuration
 
@@ -51,6 +54,8 @@ Contacts are global in Resend (identified by email, not tied to a single segment
 | `config/packages/messenger.yaml` | Transport config (RabbitMQ) |
 | `config/packages/mailer.yaml` | Symfony Mailer DSN config |
 | `config/services.yaml` | `Resend\Client` factory, `app.mailing.*` parameters, `MailingService` wiring |
+| `config/packages/rate_limiter.yaml` | Resend API rate limiter config (token_bucket, 2 req/sec) |
+| `config/packages/cache.yaml` | Redis-backed cache pool for rate limiter |
 
 ### Service Configuration
 
@@ -73,14 +78,15 @@ src/Service/Mailing/
 │   ├── PrelaunchVerificationEmailTemplate.php
 │   └── IntegrationTokenExpiredEmailTemplate.php
 └── Exception/
-    └── MailingServiceException.php       # Abstract base exception (code 140200)
+    ├── MailingServiceException.php       # Abstract base exception (code 140200)
+    └── MailingRetryableException.php     # Thrown on retryable Resend errors (429, 5xx)
 
 src/Message/
 ├── SendEmailMessage.php                 # Async email dispatch message (carries AbstractEmailTemplate)
-├── AddContactToSegmentMessage.php       # Async segment contact addition
+├── SyncReferrerSegmentsMessage.php      # Async referrer segment sync (with retryCount)
 └── Handler/
     ├── SendEmailHandler.php             # Delegates to MailingService::send()
-    └── AddContactToSegmentHandler.php   # Adds contact to Resend segment
+    └── SyncReferrerSegmentsHandler.php  # Syncs referrer segments with retry/backoff
 ```
 
 ## Usage
@@ -111,7 +117,8 @@ $this->mailingService->addContactToSegment($segmentId, 'user@example.com', 'John
 - **Async emails**: Callers dispatch `SendEmailMessage(template)` to RabbitMQ, `SendEmailHandler` converts template to `Email` and calls `MailingService::send()`
 - **SendEmailMessage**: Carries an `AbstractEmailTemplate` — callers just pass the template, no raw strings or from-address config needed
 - **MailingService::send()**: Applies from-address defaulting, then sends via `MailerInterface` — used by `SendEmailHandler`
-- **Retry**: Uses the existing Messenger retry strategy (3 retries, 1s delay, 2x multiplier)
+- **Rate limiting**: Resend SDK calls are throttled to 2 req/sec via Symfony RateLimiter (token bucket, Redis-backed). Configured in `config/packages/rate_limiter.yaml`
+- **Retry**: `SyncReferrerSegmentsHandler` retries on `MailingRetryableException` (429, 5xx) with exponential backoff (2s, 4s, 8s). Email sending uses the Messenger retry strategy (3 retries, 1s delay, 2x multiplier)
 - **From address**: Configurable via env vars, applied only by `MailingService::send()` — callers don't handle from-address
 - **Segments**: Managed via Resend Segments API (replaces deprecated Audiences API), used for prelaunch referral tier rewards
 - **Global contacts**: Resend contacts are identified by email and exist independently of segments

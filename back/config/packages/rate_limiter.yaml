@@ -1,0 +1,7 @@
+framework:
+    rate_limiter:
+        resend_api:
+            policy: 'token_bucket'
+            limit: 1
+            rate: { interval: '1 second', amount: 2 }
+            cache_pool: 'cache.rate_limiter'

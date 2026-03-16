@@ -131,6 +131,7 @@ services:
         arguments:
             $fromAddress: "%app.mailing.from_address%"
             $fromName: "%app.mailing.from_name%"
+            $resendApiLimiter: '@limiter.resend_api'
     App\EventSubscriber\IntegrationTokenExpiredSubscriber:
         arguments:
             $frontendUrl: "%app.frontend_url%"
