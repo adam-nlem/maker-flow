@@ -12,12 +12,19 @@ class RedisStoreService
         private string $scheme,
         private string $host,
         private string $port,
+        private string $password = '',
     ) {
-        $this->client = new PredisClient([
+        $config = [
             'scheme' => $this->scheme,
             'host' => $this->host,
             'port' => $this->port,
-        ]);
+        ];
+
+        if ($this->password !== '') {
+            $config['password'] = $this->password;
+        }
+
+        $this->client = new PredisClient($config);
     }
 
     public function getClient(): PredisClient

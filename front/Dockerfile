@@ -12,6 +12,12 @@ FROM node:20-alpine AS build-env
 COPY . /app/
 COPY --from=development-dependencies-env /app/node_modules /app/node_modules
 WORKDIR /app
+ARG VITE_API_URL
+ARG VITE_SENTRY_DSN
+ARG VITE_PRELAUNCH_ENABLED
+ARG SENTRY_AUTH_TOKEN
+ARG SENTRY_ORG
+ARG SENTRY_PROJECT
 RUN npm run build
 
 FROM node:20-alpine

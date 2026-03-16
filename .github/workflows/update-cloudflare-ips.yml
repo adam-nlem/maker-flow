@@ -1,0 +1,58 @@
+name: Update Cloudflare IPs
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Every Monday at 9:00 UTC
+  workflow_dispatch: # Allow manual trigger
+
+jobs:
+  check-cloudflare-ips:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Fetch current Cloudflare IPs
+        id: fetch
+        run: |
+          # https://www.cloudflare.com/ips-v4 returns plain text, one CIDR per line
+          NEW_IPS=$(curl -sf https://www.cloudflare.com/ips-v4 | tr '\n' ',' | sed 's/,$//')
+
+          # Extract current IPs from .env.prod.example
+          CURRENT_IPS=$(grep '^CLOUDFLARE_IPS=' .env.prod.example | cut -d'=' -f2)
+
+          echo "new_ips=$NEW_IPS" >> "$GITHUB_OUTPUT"
+          echo "current_ips=$CURRENT_IPS" >> "$GITHUB_OUTPUT"
+
+          if [ "$NEW_IPS" != "$CURRENT_IPS" ]; then
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Update .env.prod.example
+        if: steps.fetch.outputs.changed == 'true'
+        run: |
+          DATE=$(date +%Y-%m)
+          sed -i "s|^# Last updated:.*|# Last updated: $DATE — https://www.cloudflare.com/ips-v4/#|" .env.prod.example
+          sed -i "s|^CLOUDFLARE_IPS=.*|CLOUDFLARE_IPS=${{ steps.fetch.outputs.new_ips }}|" .env.prod.example
+
+      - name: Create Pull Request
+        if: steps.fetch.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          branch: chore/update-cloudflare-ips
+          commit-message: "chore: update Cloudflare trusted IPs"
+          title: "chore: update Cloudflare trusted IPs"
+          body: |
+            Cloudflare IPv4 ranges have changed.
+
+            **Before:** `${{ steps.fetch.outputs.current_ips }}`
+            **After:** `${{ steps.fetch.outputs.new_ips }}`
+
+            Update `CLOUDFLARE_IPS` in your production `.env.prod` after merging.
+
+            Source: https://www.cloudflare.com/ips-v4/#
+          labels: infrastructure

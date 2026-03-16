@@ -25,6 +25,7 @@ parameters:
     app.redis_store.scheme: "%env(string:REDIS_STORE_SCHEME)%"
     app.redis_store.host: "%env(string:REDIS_STORE_HOST)%"
     app.redis_store.port: "%env(string:REDIS_STORE_PORT)%"
+    app.redis_store.password: "%env(string:REDIS_STORE_PASSWORD)%"
 
     app.youtube.client_id: "%env(string:YOUTUBE_CLIENT_ID)%"
     app.youtube.project_id: "%env(string:YOUTUBE_PROJECT_ID)%"
@@ -67,6 +68,7 @@ services:
             $scheme: "%app.redis_store.scheme%"
             $host: "%app.redis_store.host%"
             $port: "%app.redis_store.port%"
+            $password: "%app.redis_store.password%"
 
     App\Service\Integration\InstagramOAuthService:
         arguments:
