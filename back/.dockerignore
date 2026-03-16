@@ -1,5 +1,7 @@
 .git
-.docker
+.docker/build/Dockerfile
+.docker/build/Dockerfile.prod
+.docker/build/docker-entrypoint.sh
 vendor
 var
 tests
