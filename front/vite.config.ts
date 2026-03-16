@@ -1,13 +1,23 @@
 import { reactRouter } from "@react-router/dev/vite";
 import tailwindcss from "@tailwindcss/vite";
-import { defineConfig } from "vite";
+import { defineConfig, type Plugin } from "vite";
+
+function tildeAlias(): Plugin {
+  return {
+    name: "tilde-alias",
+    resolveId(source, importer) {
+      if (source.startsWith("~/")) {
+        return this.resolve(
+          source.replace("~/", `${import.meta.dirname}/app/`),
+          importer,
+          { skipSelf: true },
+        );
+      }
+    },
+  };
+}
 
 export default defineConfig(({ isSsrBuild }) => ({
-  resolve: {
-    alias: {
-      "~": `${import.meta.dirname}/app`,
-    },
-  },
   build: {
     rollupOptions: isSsrBuild
       ? {
@@ -15,5 +25,5 @@ export default defineConfig(({ isSsrBuild }) => ({
         }
       : undefined,
   },
-  plugins: [tailwindcss(), reactRouter()],
+  plugins: [tildeAlias(), tailwindcss(), reactRouter()],
 }));
