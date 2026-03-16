@@ -4,7 +4,6 @@
 vendor
 var
 tests
-.env
 .env.local
 .env.*.local
 docs

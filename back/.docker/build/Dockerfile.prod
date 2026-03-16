@@ -50,9 +50,6 @@ COPY . /var/www/html
 # Remove files not needed in production
 RUN rm -rf /var/www/html/tests /var/www/html/.git /var/www/html/.env.local
 
-# Symfony requires a .env file to exist even when env vars are injected via Docker
-RUN echo "APP_ENV=prod\nAPP_DEBUG=0" > /var/www/html/.env
-
 # Create var directory for Symfony cache/logs
 RUN mkdir -p /var/www/html/var \
     && chown -R www-data:www-data /var/www/html
