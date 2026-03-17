@@ -62,6 +62,7 @@ services:
     command:
       - "--providers.docker"
       - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=maker_flow"
       - "--entryPoints.websecure.address=:443"
       - "--certificatesresolvers.makerflow.acme.dnschallenge=true"
       - "--certificatesresolvers.makerflow.acme.dnschallenge.provider=cloudflare"
@@ -83,6 +84,8 @@ services:
     volumes:
       - letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - maker_flow
 
   front:
     image: ghcr.io/adam-nlem/maker-flow-front:latest
@@ -110,6 +113,7 @@ services:
       - "traefik.http.routers.makerflow-front.rule=Host(`${FRONTEND_DOMAIN}`)"
       - "traefik.http.routers.makerflow-front.entrypoints=websecure"
       - "traefik.http.routers.makerflow-front.tls.certresolver=makerflow"
+      - "traefik.http.services.makerflow-front.loadbalancer.server.port=80"
       - "com.centurylinklabs.watchtower.enable=true"
 
   back:
@@ -143,6 +147,7 @@ services:
       - "traefik.http.routers.makerflow-api.rule=Host(`${API_DOMAIN}`)"
       - "traefik.http.routers.makerflow-api.entrypoints=websecure"
       - "traefik.http.routers.makerflow-api.tls.certresolver=makerflow"
+      - "traefik.http.services.makerflow-api.loadbalancer.server.port=80"
       - "com.centurylinklabs.watchtower.enable=true"
 
   worker:
