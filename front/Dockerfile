@@ -14,6 +14,8 @@ RUN npm run build
 # Stage 2: Production image
 FROM nginx:1.25-alpine AS production
 
+RUN apk add --no-cache curl
+
 # Remove default nginx config
 RUN rm /etc/nginx/conf.d/default.conf
 
@@ -30,6 +32,6 @@ RUN chown -R nginx:nginx /usr/share/nginx/html \
 EXPOSE 80
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget -qO- http://localhost/health || exit 1
+  CMD curl -sf http://localhost/health || exit 1
 
 CMD ["nginx", "-g", "daemon off;"]

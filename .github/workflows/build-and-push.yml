@@ -65,3 +65,80 @@ jobs:
             ${{ env.REGISTRY }}/${{ github.repository_owner }}/maker-flow-back:${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  deploy:
+    runs-on: self-hosted
+    needs: [build-front, build-back]
+    environment: production
+    concurrency:
+      group: production-deploy
+      cancel-in-progress: false
+    steps:
+      - name: Login to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
+
+      - name: Pull new images
+        run: |
+          docker pull ghcr.io/${{ github.repository_owner }}/maker-flow-back:${{ github.sha }}
+          docker pull ghcr.io/${{ github.repository_owner }}/maker-flow-front:${{ github.sha }}
+
+      - name: Run database migrations
+        working-directory: /var/www/maker-flow
+        run: |
+          DEPLOY_TAG=${{ github.sha }} docker compose -f docker-compose.prod.yaml run \
+            --rm --no-deps back \
+            php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
+
+      - name: Record previous tag and update .env
+        id: tag
+        working-directory: /var/www/maker-flow
+        run: |
+          PREV_TAG=$(grep -oP '^DEPLOY_TAG=\K.*' .env || echo "latest")
+          echo "prev=$PREV_TAG" >> "$GITHUB_OUTPUT"
+          if grep -q '^DEPLOY_TAG=' .env; then
+            sed -i "s/^DEPLOY_TAG=.*/DEPLOY_TAG=${{ github.sha }}/" .env
+          else
+            echo "DEPLOY_TAG=${{ github.sha }}" >> .env
+          fi
+
+      - name: Stop workers gracefully
+        working-directory: /var/www/maker-flow
+        run: docker compose -f docker-compose.prod.yaml stop -t 60 worker
+
+      - name: Recreate backend and frontend
+        working-directory: /var/www/maker-flow
+        run: |
+          docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate back
+          docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate front
+
+      - name: Wait for backend health
+        working-directory: /var/www/maker-flow
+        run: |
+          echo "Waiting for backend health..."
+          for i in $(seq 1 30); do
+            if docker compose -f docker-compose.prod.yaml exec -T back \
+               curl -sf http://localhost:80/health > /dev/null 2>&1; then
+              echo "Backend healthy after ${i}s"
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "ERROR: Health check failed after 30s"
+          exit 1
+
+      - name: Restart workers
+        working-directory: /var/www/maker-flow
+        run: docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate worker
+
+      - name: Rollback on failure
+        if: failure()
+        working-directory: /var/www/maker-flow
+        run: |
+          echo "Rolling back to ${{ steps.tag.outputs.prev }}..."
+          sed -i "s/^DEPLOY_TAG=.*/DEPLOY_TAG=${{ steps.tag.outputs.prev }}/" .env
+          docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate back front
+          docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate worker
+
+      - name: Prune old images
+        if: success()
+        run: docker image prune -f --filter "until=168h"

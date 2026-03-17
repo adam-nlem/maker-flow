@@ -1,5 +1,5 @@
 x-back-common: &back-common
-  image: ghcr.io/adam-nlem/maker-flow-back:latest
+  image: ghcr.io/adam-nlem/maker-flow-back:${DEPLOY_TAG:-latest}
   restart: unless-stopped
   environment: &back-env
     APP_ENV: prod
@@ -79,7 +79,7 @@ services:
       - maker_flow
 
   front:
-    image: ghcr.io/adam-nlem/maker-flow-front:latest
+    image: ghcr.io/adam-nlem/maker-flow-front:${DEPLOY_TAG:-latest}
     restart: unless-stopped
     networks:
       - maker_flow
