@@ -27,20 +27,8 @@ export class Onboarding {
         )
     }
 
-    get isCompleted(): boolean {
-        return onboardingStepOptions.every((step) => this.completedSteps.includes(step))
-    }
-
     get isDismissed(): boolean {
         return this.dismissedAt !== null
-    }
-
-    get completionCount(): number {
-        return onboardingStepOptions.filter((step) => this.completedSteps.includes(step)).length
-    }
-
-    get totalSteps(): number {
-        return onboardingStepOptions.length
     }
 
     isStepCompleted(step: OnboardingStep): boolean {
