@@ -85,7 +85,7 @@ jobs:
       - name: Run database migrations
         working-directory: /var/www/maker-flow
         run: |
-          DEPLOY_TAG=${{ github.sha }} docker compose -f docker-compose.prod.yaml run \
+          DEPLOY_TAG=${{ github.sha }} docker compose -f docker-compose.yaml run \
             --rm --no-deps back \
             php bin/console doctrine:migrations:migrate --no-interaction --allow-no-migration
 
@@ -103,20 +103,20 @@ jobs:
 
       - name: Stop workers gracefully
         working-directory: /var/www/maker-flow
-        run: docker compose -f docker-compose.prod.yaml stop -t 60 worker
+        run: docker compose -f docker-compose.yaml stop -t 60 worker
 
       - name: Recreate backend and frontend
         working-directory: /var/www/maker-flow
         run: |
-          docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate back
-          docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate front
+          docker compose -f docker-compose.yaml up -d --no-deps --force-recreate back
+          docker compose -f docker-compose.yaml up -d --no-deps --force-recreate front
 
       - name: Wait for backend health
         working-directory: /var/www/maker-flow
         run: |
           echo "Waiting for backend health..."
           for i in $(seq 1 30); do
-            if docker compose -f docker-compose.prod.yaml exec -T back \
+            if docker compose -f docker-compose.yaml exec -T back \
                curl -sf http://localhost:80/health > /dev/null 2>&1; then
               echo "Backend healthy after ${i}s"
               exit 0
@@ -128,7 +128,7 @@ jobs:
 
       - name: Restart workers
         working-directory: /var/www/maker-flow
-        run: docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate worker
+        run: docker compose -f docker-compose.yaml up -d --no-deps --force-recreate worker
 
       - name: Rollback on failure
         if: failure()
@@ -136,8 +136,8 @@ jobs:
         run: |
           echo "Rolling back to ${{ steps.tag.outputs.prev }}..."
           sed -i "s/^DEPLOY_TAG=.*/DEPLOY_TAG=${{ steps.tag.outputs.prev }}/" .env
-          docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate back front
-          docker compose -f docker-compose.prod.yaml up -d --no-deps --force-recreate worker
+          docker compose -f docker-compose.yaml up -d --no-deps --force-recreate back front
+          docker compose -f docker-compose.yaml up -d --no-deps --force-recreate worker
 
       - name: Prune old images
         if: success()
