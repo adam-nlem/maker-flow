@@ -1,4 +1,4 @@
-import { OnboardingStep, onboardingStepOptions } from "./enums/OnboardingStep"
+import { OnboardingStep } from "./enums/OnboardingStep"
 
 interface OnboardingJSON {
     uuid: string;
