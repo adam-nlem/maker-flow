@@ -12,6 +12,7 @@ interface HomeScriptsListProps {
     projectUuid: string
 }
 
+
 export default function HomeScriptsList({ projectUuid }: HomeScriptsListProps) {
     const focusedScriptStatus = useScriptFilterStore((state) => state.focusedScriptStatus)
     const setFocusedScriptStatus = useScriptFilterStore((state) => state.setFocusedScriptStatus)
