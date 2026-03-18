@@ -11,6 +11,7 @@ export function usePrelaunchStatus() {
       return PrelaunchStatusResponseDTO.fromJSON(res.data)
     },
     refetchOnWindowFocus: true,
+    retry: false,
   })
 
   return {

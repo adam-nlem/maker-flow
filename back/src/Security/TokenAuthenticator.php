@@ -28,7 +28,6 @@ class TokenAuthenticator extends AbstractAuthenticator
         'api_otp_resend',
         'api_prelaunch_authenticate',
         'api_otp_verify_prelaunch',
-        'api_prelaunch_status',
     ];
 
     public function __construct(

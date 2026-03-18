@@ -49,13 +49,15 @@ Defined in `PrelaunchRewardTier` enum (`back/src/Entity/Enum/PrelaunchRewardTier
 
 ## API Endpoints
 
-Base: `/api/prelaunch` — All public (added to `TokenAuthenticator::EXCLUDED_ROUTES`). All endpoints return 404 when `PRELAUNCH_ENABLED=false`.
+Base: `/api/prelaunch` — All endpoints return 404 when `PRELAUNCH_ENABLED=false`.
 
 | Endpoint | Method | Description |
 |----------|--------|-------------|
-| `/api/prelaunch/authenticate` | POST | Email authentication — register or login (body: `{ email, referralCode? }`) |
-| `/api/prelaunch/status/{referralCode}` | GET | Get referral status + unlocked tiers |
-| `/api/prelaunch/check` | GET | Check if prelaunch is enabled |
+| `/api/prelaunch/authenticate` | POST | Email authentication — register or login (body: `{ email, referralCode? }`) | Public |
+| `/api/prelaunch/status/{referralCode}` | GET | Get referral status + unlocked tiers | Authenticated |
+| `/api/prelaunch/check` | GET | Check if prelaunch is enabled | Public |
+
+Public endpoints are listed in `TokenAuthenticator::EXCLUDED_ROUTES`. The `/status` endpoint requires authentication (uses `$this->getUser()`) and goes through `TokenAuthenticator`.
 
 OTP verification uses `/api/otp/verify-prelaunch` (in `OtpController`, same pattern as `verify-login` and `verify-email`). OTP resend uses `/api/otp/resend`. Both are documented in `otp-feature.md`.
 
