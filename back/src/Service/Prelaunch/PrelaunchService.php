@@ -67,11 +67,10 @@ final class PrelaunchService
     /**
      * @throws SubscriberNotFoundException
      */
-    public function getStatus(string $referralCode): PrelaunchStatusResponseDTO
+    public function getStatus(User $user): PrelaunchStatusResponseDTO
     {
-        $user = $this->userRepository->getByReferralCode($referralCode);
 
-        if ($user === null || !$user->isVerified()) {
+        if (!$user->isVerified()) {
             throw new SubscriberNotFoundException();
         }
 

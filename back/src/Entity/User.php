@@ -28,42 +28,91 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
+    #[Groups([
+        'api_user_register',
+        'api_user_me',
+        'api_user_update',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+        'api_otp_verify_prelaunch'
+    ])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
+    #[Groups([
+        'api_user_register',
+        'api_user_me',
+        'api_user_update',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+        'api_otp_verify_prelaunch'
+    ])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
+    #[Groups([
+        'api_user_register',
+        'api_user_me',
+        'api_user_update',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+        'api_otp_verify_prelaunch'
+    ])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255)]
     #[Assert\Email]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
+    #[Groups([
+        'api_user_register',
+        'api_user_me',
+        'api_user_update',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+        'api_otp_verify_prelaunch'
+    ])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $password = null;
 
     #[ORM\Column]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
+    #[Groups([
+        'api_user_register',
+        'api_user_me',
+        'api_user_update',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+        'api_otp_verify_prelaunch'
+    ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::JSON)]
     private array $roles = [];
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['api_user_register', 'api_user_me', 'api_user_update', 'api_login', 'api_otp_verify_login', 'api_otp_verify_email', 'api_otp_verify_prelaunch'])]
+    #[Groups([
+        'api_user_register',
+        'api_user_me',
+        'api_user_update',
+        'api_login',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+        'api_otp_verify_prelaunch'
+    ])]
     private ?\DateTimeImmutable $verifiedAt = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_user_me', 'api_user_update'])]
+    #[Groups([
+        'api_user_me',
+        'api_user_update'
+    ])]
     private ?string $stripeCustomerId = null;
 
     #[ORM\Column(length: 8, unique: true, nullable: true)]
-    #[Groups(['api_user_me', 'api_otp_verify_prelaunch'])]
+    #[Groups([
+        'api_user_me',
+        'api_otp_verify_prelaunch'
+    ])]
     private ?string $referralCode = null;
 
     #[ORM\ManyToOne(targetEntity: self::class, inversedBy: 'referrals')]

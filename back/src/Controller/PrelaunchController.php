@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\Request\Prelaunch\AuthenticatePrelaunchRequestDTO;
 use App\DTO\Response\Prelaunch\AuthenticatePrelaunchResponseDTO;
+use App\Entity\User;
 use App\Service\Prelaunch\Exception\RateLimitExceededException;
 use App\Service\Prelaunch\Exception\SubscriberNotFoundException;
 use App\Service\Prelaunch\PrelaunchService;
@@ -55,17 +56,19 @@ final class PrelaunchController extends AbstractController
         );
     }
 
-    #[Route('/status/{referralCode}', name: 'api_prelaunch_status', methods: ['GET'])]
+    #[Route('/status', name: 'api_prelaunch_status', methods: ['GET'])]
     public function status(
-        string $referralCode,
         PrelaunchService $prelaunchService,
     ): JsonResponse {
         if (!$this->prelaunchEnabled) {
             return $this->json(data: ['message' => 'Prelaunch is not enabled.'], status: Response::HTTP_NOT_FOUND);
         }
 
+        /** @var User $user */
+        $user = $this->getUser();
+
         try {
-            $responseDto = $prelaunchService->getStatus($referralCode);
+            $responseDto = $prelaunchService->getStatus($user);
         } catch (SubscriberNotFoundException $e) {
             return $this->json(
                 data: ['message' => $e->getMessage()],

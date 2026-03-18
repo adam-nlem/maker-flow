@@ -1,6 +1,3 @@
-twig:
-    file_name_pattern: "*.twig"
-
-when@test:
+when@dev:
     twig:
-        strict_variables: true
+        file_name_pattern: "*.twig"
