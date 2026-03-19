@@ -5,6 +5,7 @@ export enum CreditTransactionType {
     ScriptGenerationRefund = 'script_generation_refund',
     Refund = 'refund',
     ManualAdjustment = 'manual_adjustment',
+    WelcomeBonus = 'welcome_bonus',
 }
 
 export const creditTransactionTypeOptions = Object.values(CreditTransactionType);
@@ -16,4 +17,5 @@ export const creditTransactionTypeToFrenchTranslation: Record<CreditTransactionT
     [CreditTransactionType.ScriptGenerationRefund]: "Remboursement suite a une génération de script echouée",
     [CreditTransactionType.Refund]: "Remboursement",
     [CreditTransactionType.ManualAdjustment]: "Ajustement",
+    [CreditTransactionType.WelcomeBonus]: "Crédits de bienvenue",
 };
