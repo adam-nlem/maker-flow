@@ -7,6 +7,10 @@ use App\DTO\Request\User\UpdateUserRequestDTO;
 use App\DTO\Response\User\RegisterResponseDTO;
 use App\Entity\Enum\OtpType;
 use App\Entity\User;
+use App\Exception\User\IncorrectCurrentPasswordException;
+use App\Exception\User\InvalidPasswordException;
+use App\Exception\User\MissingPasswordFieldsException;
+use App\Exception\User\PasswordMismatchException;
 use App\Helper\PasswordHelper;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
@@ -48,9 +52,8 @@ final class UserController extends AbstractController
         OtpService $otpService,
         CreditService $creditService,
     ): Response {
-        $passwordErrors = PasswordHelper::validate($dto->getPlainPassword());
-        if (!empty($passwordErrors)) {
-            return $this->json(data: ["message" => $passwordErrors[0]], status: Response::HTTP_UNPROCESSABLE_ENTITY);
+        if (!PasswordHelper::isValid($dto->getPlainPassword())) {
+            throw new InvalidPasswordException();
         }
 
         /** @var User $user */
@@ -98,20 +101,19 @@ final class UserController extends AbstractController
 
         if ($dto->getNewPassword() !== null) {
             if ($dto->getCurrentPassword() === null || $dto->getConfirmNewPassword() === null) {
-                return $this->json(data: ["message" => "All three password fields are required."], status: Response::HTTP_UNPROCESSABLE_ENTITY);
+                throw new MissingPasswordFieldsException();
             }
 
             if (!$passwordHasher->isPasswordValid($user, $dto->getCurrentPassword())) {
-                return $this->json(data: ["message" => "Current password is incorrect."], status: Response::HTTP_UNPROCESSABLE_ENTITY);
+                throw new IncorrectCurrentPasswordException();
             }
 
             if ($dto->getNewPassword() !== $dto->getConfirmNewPassword()) {
-                return $this->json(data: ["message" => "Passwords do not match."], status: Response::HTTP_UNPROCESSABLE_ENTITY);
+                throw new PasswordMismatchException();
             }
 
-            $passwordErrors = PasswordHelper::validate($dto->getNewPassword());
-            if (!empty($passwordErrors)) {
-                return $this->json(data: ["message" => $passwordErrors[0]], status: Response::HTTP_UNPROCESSABLE_ENTITY);
+            if (!PasswordHelper::isValid($dto->getNewPassword())) {
+                throw new InvalidPasswordException();
             }
 
             $user->setPassword($passwordHasher->hashPassword($user, $dto->getNewPassword()));

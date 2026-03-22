@@ -49,6 +49,12 @@ export const errorCodeMessages: Record<number, string> = {
   19003: 'Tag introuvable.',
   19004: 'Ce titre de tag est déjà utilisé.',
 
+  // User (21xxx)
+  21001: 'Le mot de passe ne respecte pas les critères de sécurité.',
+  21002: 'Le mot de passe actuel est incorrect.',
+  21003: 'Les mots de passe ne correspondent pas.',
+  21004: 'Tous les champs de mot de passe sont requis.',
+
   // Validation (22xxx)
   22001: 'Cette valeur est déjà utilisée.',
 

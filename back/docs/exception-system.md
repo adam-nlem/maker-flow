@@ -104,6 +104,11 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 19002 | `TodoListTaskNotFoundException` | 404 | — | `src/Exception/TodoList/` |
 | 19003 | `TodoListTagNotFoundException` | 404 | — | `src/Exception/TodoList/` |
 | 19004 | `TodoListTagTitleConflictException` | 409 | — | `src/Exception/TodoList/` |
+| **User (21xxx)** |
+| 21001 | `InvalidPasswordException` | 422 | — | `src/Exception/User/` |
+| 21002 | `IncorrectCurrentPasswordException` | 422 | — | `src/Exception/User/` |
+| 21003 | `PasswordMismatchException` | 422 | — | `src/Exception/User/` |
+| 21004 | `MissingPasswordFieldsException` | 422 | — | `src/Exception/User/` |
 | **Validation (22xxx)** |
 | 22001 | `AlreadyUsedValueException` | 409 | `propertyName` | `src/Exception/Validation/` |
 
