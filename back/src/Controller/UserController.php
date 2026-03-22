@@ -56,6 +56,11 @@ final class UserController extends AbstractController
             throw new InvalidPasswordException();
         }
 
+        if ($userRepository->getByEmail($dto->getEmail())) {
+            $responseDto = new RegisterResponseDTO(true, bin2hex(random_bytes(32)), $dto->getEmail());
+            return $this->json(data: $responseDto->getData(), status: Response::HTTP_OK);
+        }
+
         /** @var User $user */
         $user = $dto->build();
 
