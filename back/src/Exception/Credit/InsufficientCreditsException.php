@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Service\Credit\Exception;
+namespace App\Exception\Credit;
 
-class InsufficientCreditsException extends CreditServiceException
+use Symfony\Component\HttpFoundation\Response;
+
+final class InsufficientCreditsException extends CreditException
 {
     public const CODE = 1;
 
@@ -12,7 +14,9 @@ class InsufficientCreditsException extends CreditServiceException
     ) {
         parent::__construct(
             sprintf('Insufficient credits: requested %d, available %d', $requested, $available),
-            self::CODE
+            self::CODE,
+            Response::HTTP_PAYMENT_REQUIRED,
+            ['requested' => $requested, 'available' => $available],
         );
     }
 

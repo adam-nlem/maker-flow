@@ -7,7 +7,7 @@ use App\Entity\Enum\IntegrationStatus;
 use App\Event\IntegrationTokenExpiredEvent;
 use App\Message\FetchIntegrationInsightsMessage;
 use App\Service\IntegrationInsight\IntegrationInsightService;
-use App\Service\Integration\Exception\OAuthTokenRevokedException;
+use App\Exception\Integration\OAuthTokenRevokedException;
 use App\Repository\IntegrationRepository;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;

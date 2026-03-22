@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { UnprocessableEntityException } from "~/services/httpClient/customHttpExceptions";
+import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages";
 import { SettingsSection, settingsSectionToFrenchTranslation } from "~/models/enums/SettingsSection";
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
@@ -36,10 +36,7 @@ export default function GeneralSettings() {
     const hasPasswordChanges = currentPassword.length > 0 || newPassword.length > 0 || confirmNewPassword.length > 0;
     const hasChanges = hasProfileChanges || hasPasswordChanges;
 
-    const errorMessage = error instanceof UnprocessableEntityException
-        ? (error.data?.message ?? 'An error occurred.')
-        : error ? 'An error occurred.'
-        : null;
+    const errorMessage = error ? resolveErrorMessage(error) : null;
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();

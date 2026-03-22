@@ -13,7 +13,7 @@ use App\Event\IntegrationCreatedEvent;
 use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
-use App\Service\Integration\Exception\OAuthTokenRevokedException;
+use App\Exception\Integration\OAuthTokenRevokedException;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
 
@@ -161,7 +161,7 @@ class InstagramOAuthService
             $integration->setStatus(IntegrationStatus::Revoked);
             $this->integrationRepository->save($integration, true);
 
-            throw new OAuthTokenRevokedException($integration->getId());
+            throw new OAuthTokenRevokedException($integration->getUuid());
         }
 
         return $this->updateIntegrationToken($integration, $newToken);

@@ -7,7 +7,6 @@ use App\DTO\Response\Credit\CreateRefillCheckoutResponseDTO;
 use App\Entity\User;
 use App\Repository\CreditTransactionRepository;
 use App\Service\Credit\CreditService;
-use App\Service\Stripe\Exception\CheckoutSessionCreationException;
 use App\Service\Stripe\StripeCheckoutService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,11 +22,7 @@ final class CreditController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        try {
-            $checkoutUrl = $stripeCheckoutService->createRefillCheckoutSession($user);
-        } catch (CheckoutSessionCreationException $e) {
-            return $this->json(data: ["message" => $e->getMessage()], status: Response::HTTP_BAD_REQUEST);
-        }
+        $checkoutUrl = $stripeCheckoutService->createRefillCheckoutSession($user);
 
         $responseDto = new CreateRefillCheckoutResponseDTO($checkoutUrl);
 

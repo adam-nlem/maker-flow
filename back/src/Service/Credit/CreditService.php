@@ -9,7 +9,7 @@ use App\Entity\Enum\SourceBucket;
 use App\Entity\User;
 use App\Repository\CreditBalanceRepository;
 use App\Repository\CreditTransactionRepository;
-use App\Service\Credit\Exception\InsufficientCreditsException;
+use App\Exception\Credit\InsufficientCreditsException;
 use Doctrine\ORM\EntityManagerInterface;
 
 class CreditService

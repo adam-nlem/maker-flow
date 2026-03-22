@@ -2,7 +2,7 @@
 
 namespace App\Service\Mailing;
 
-use App\Service\Mailing\Exception\MailingRetryableException;
+use App\Exception\Mailing\MailingRetryableException;
 use App\Service\RedisStore\RedisStoreService;
 use Resend\Client;
 use Resend\Exceptions\ErrorException;
