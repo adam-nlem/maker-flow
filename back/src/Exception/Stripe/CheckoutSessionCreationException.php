@@ -9,11 +9,11 @@ final class CheckoutSessionCreationException extends StripeException
     public const CODE = 1;
 
     public function __construct(
-        string $reason,
+        string $message,
         ?\Throwable $previous = null
     ) {
         parent::__construct(
-            $reason,
+            $message,
             self::CODE,
             Response::HTTP_BAD_REQUEST,
             [],

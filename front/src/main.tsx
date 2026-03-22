@@ -1,5 +1,5 @@
 import * as Sentry from "@sentry/react";
-import { CustomHttpException } from "~/services/httpClient/customHttpExceptions";
+import { HttpException } from "~/services/httpClient/HttpException";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { RouterProvider } from "react-router-dom";
@@ -28,7 +28,7 @@ Sentry.init({
   beforeSend(event, hint) {
     const error = hint.originalException;
 
-    if (error instanceof CustomHttpException && error.statusCode < 500) {
+    if (error instanceof HttpException && error.response.httpStatus < 500) {
       return null;
     }
 

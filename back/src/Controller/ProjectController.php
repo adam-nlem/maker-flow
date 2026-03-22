@@ -3,11 +3,15 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\Project\ListProjectsQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\Project\CreateProjectRequestDTO;
 use App\DTO\Request\Project\UpdateProjectRequestDTO;
 use App\Entity\Project;
 use App\Entity\User;
+use App\Exception\Project\ProjectAlreadyFinishedException;
+use App\Exception\Project\ProjectAlreadyOpenException;
+use App\Exception\Project\ProjectLimitReachedException;
+use App\Exception\Project\ProjectNameConflictException;
+use App\Exception\Project\ProjectNotFoundException;
 use App\Helper\DateHelper;
 use App\Repository\ProjectRepository;
 use App\Repository\SubscriptionRepository;
@@ -33,18 +37,11 @@ final class ProjectController extends AbstractController
         $maxProjects = $plan !== null ? $stripePlanService->getPlanConfigFromSubscription($plan)?->getMaxProjects() : 1;
 
         if ($maxProjects !== null && $projectRepository->countByUser($user) >= $maxProjects) {
-            return $this->json(
-                data: ["message" => "You have reached the project limit for your plan."],
-                status: Response::HTTP_PAYMENT_REQUIRED
-            );
+            throw new ProjectLimitReachedException();
         }
 
-        try {
-            /** @var Project $project */
-            $project = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var Project $project */
+        $project = $dto->build();
 
         $project->setUser($user);
 
@@ -62,13 +59,13 @@ final class ProjectController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         if ($dto->getName() !== null && $dto->getName() != $project->getName()) {
             $projectWithSameName = $projectRepository->getByNameAndUser($dto->getName(), $user);
             if ($projectWithSameName !== null) {
-                return $this->json(data: ["Message" => "You already use this name for another project"], status: Response::HTTP_CONFLICT);
+                throw new ProjectNameConflictException();
             }
             $project->setName($dto->getName());
         }
@@ -95,7 +92,7 @@ final class ProjectController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_get_by_uuid']]);
@@ -110,11 +107,11 @@ final class ProjectController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         if ($project->getFinishedAt() !== null) {
-            return $this->json(data: ["message" => "This project has already been finished"], status: Response::HTTP_NOT_MODIFIED);
+            throw new ProjectAlreadyFinishedException();
         }
 
         $project->setFinishedAt(DateHelper::createUtcDateTimeImmutable());
@@ -133,11 +130,11 @@ final class ProjectController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         if ($project->getFinishedAt() === null) {
-            return $this->json(data: ["message" => "This project is already open"], status: Response::HTTP_NOT_MODIFIED);
+            throw new ProjectAlreadyOpenException();
         }
 
         $project->setFinishedAt(null);
@@ -169,7 +166,7 @@ final class ProjectController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         $projectRepository->remove($project, true);

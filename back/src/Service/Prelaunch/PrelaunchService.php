@@ -10,8 +10,8 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\Mailing\MailingService;
 use App\Service\Otp\OtpService;
-use App\Service\Prelaunch\Exception\RateLimitExceededException;
-use App\Service\Prelaunch\Exception\SubscriberNotFoundException;
+use App\Exception\Prelaunch\RateLimitExceededException;
+use App\Exception\Prelaunch\SubscriberNotFoundException;
 use App\Service\RedisStore\RedisStoreService;
 
 final class PrelaunchService

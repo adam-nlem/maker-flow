@@ -2,8 +2,7 @@
 
 namespace App\DTO\QueryParam;
 
-use App\DTO\Request\Exception\CustomValidationException;
-use App\Entity\Enum\ValidationExceptionType;
+use App\Exception\Validation\AlreadyUsedValueException;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints as ORMAssert;
@@ -27,10 +26,7 @@ abstract class AbstractQueryParamDTO
             foreach ($errors as $error) {
                 switch ($error->getCode()) {
                     case ORMAssert\UniqueEntity::NOT_UNIQUE_ERROR:
-                        throw new CustomValidationException(
-                            ValidationExceptionType::AlreadyUsedValue,
-                            $error->getPropertyPath()
-                        );
+                        throw new AlreadyUsedValueException($error->getPropertyPath());
                         break;
                 }
             }

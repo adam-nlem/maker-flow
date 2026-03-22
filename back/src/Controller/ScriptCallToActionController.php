@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptCallToAction\ListScriptCallToActionsQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptCallToAction\CreateScriptCallToActionRequestDTO;
 use App\DTO\Request\ScriptCallToAction\UpdateScriptCallToActionRequestDTO;
 use App\Entity\ScriptCallToAction;
@@ -74,12 +73,8 @@ final class ScriptCallToActionController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        try {
-            /** @var ScriptCallToAction $callToAction */
-            $callToAction = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptCallToAction $callToAction */
+        $callToAction = $dto->build();
 
         $callToAction
             ->setUser($user)

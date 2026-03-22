@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\DTO\QueryParam\Script\ListCalendarScriptsQueryParamDTO;
 use App\DTO\QueryParam\Script\ListScriptPartsQueryParamDTO;
 use App\DTO\QueryParam\Script\ListScriptsQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Response\Script\ListScriptsGroupedByDayResponseDTO;
 use App\DTO\Request\Script\CreateScriptRequestDTO;
 use App\DTO\Request\Script\ReorderScriptPartsRequestDTO;
@@ -13,6 +12,10 @@ use App\DTO\Request\Script\UpdateScriptRequestDTO;
 use App\Entity\Enum\ScriptPartType;
 use App\Entity\Script;
 use App\Entity\User;
+use App\Exception\Project\ProjectNotFoundException;
+use App\Exception\Script\ScriptNotFoundException;
+use App\Exception\Script\ScriptLimitReachedException;
+use App\Exception\Script\ScriptGenerationNotFoundException;
 use App\Repository\PostGroupRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\ScriptChapterRepository;
@@ -50,7 +53,7 @@ final class ScriptController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         $scripts = $scriptRepository->getByProjectAndUserPaginated($project, $user, $queryParamDto->getPage(), $queryParamDto->getLimit(), $queryParamDto->getStatus());
@@ -74,7 +77,7 @@ final class ScriptController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         $scripts = $scriptRepository->getByProjectAndUserAndMonth($project, $user, $queryParamDto->getYear(), $queryParamDto->getMonth());
@@ -114,25 +117,18 @@ final class ScriptController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         $plan = $subscriptionRepository->getLatestActiveByUser($user)?->getPlan();
         $maxScripts = $plan !== null ? $stripePlanService->getPlanConfigFromSubscription($plan)?->getMaxScriptsPerProject() : 1;
 
         if ($maxScripts !== null && $scriptRepository->countByProjectAndUser($project, $user) >= $maxScripts) {
-            return $this->json(
-                data: ["message" => "You have reached the script limit for your plan."],
-                status: Response::HTTP_PAYMENT_REQUIRED
-            );
+            throw new ScriptLimitReachedException();
         }
 
-        try {
-            /** @var Script $script */
-            $script = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var Script $script */
+        $script = $dto->build();
 
         $script
             ->setUser($user)
@@ -172,7 +168,7 @@ final class ScriptController extends AbstractController
         $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
-            return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptNotFoundException();
         }
 
         return $this->json(
@@ -196,7 +192,7 @@ final class ScriptController extends AbstractController
         $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
-            return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptNotFoundException();
         }
 
         if ($dto->getTitle() !== null && $dto->getTitle() !== $script->getTitle()) {
@@ -259,7 +255,7 @@ final class ScriptController extends AbstractController
         $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
-            return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptNotFoundException();
         }
 
         $scriptRepository->remove($script, true);
@@ -288,7 +284,7 @@ final class ScriptController extends AbstractController
         $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
-            return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptNotFoundException();
         }
 
         $generationUuid = $queryParamDto->getGenerationUuid();
@@ -298,7 +294,7 @@ final class ScriptController extends AbstractController
             $generation = $generationRepository->getByUuidAndUser($generationUuid, $user);
 
             if ($generation === null) {
-                return $this->json(data: ["message" => "You don't have any generation with this uuid"], status: Response::HTTP_NOT_FOUND);
+                throw new ScriptGenerationNotFoundException();
             }
         }
 
@@ -343,7 +339,7 @@ final class ScriptController extends AbstractController
         $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
 
         if ($script === null) {
-            return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptNotFoundException();
         }
 
         foreach ($dto->getOrderedParts() as $index => $part) {

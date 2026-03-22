@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\HookTemplate\ListHookTemplatesQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\HookTemplate\CreateHookTemplateRequestDTO;
 use App\DTO\Request\HookTemplate\UpdateHookTemplateRequestDTO;
 use App\Entity\Enum\HookTemplatePlaceholder;
@@ -62,12 +61,8 @@ final class HookTemplateController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        try {
-            /** @var HookTemplate $hookTemplate */
-            $hookTemplate = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var HookTemplate $hookTemplate */
+        $hookTemplate = $dto->build();
 
         $hookTemplate->setUser($user);
 

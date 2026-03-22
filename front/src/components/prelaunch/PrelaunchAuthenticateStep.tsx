@@ -5,7 +5,8 @@ import { Input } from "~/components/ui/Input"
 import { useAuthenticatePrelaunch } from "~/hooks/api/prelaunch/useAuthenticatePrelaunch"
 import { OtpType } from "~/models/enums/OtpType"
 import { verifyOtpPath } from "~/routes/routePaths"
-import { CustomHttpException } from "~/services/httpClient/customHttpExceptions"
+import { HttpException } from "~/services/httpClient/HttpException"
+import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages"
 import {
     ChartBarIcon,
     CalendarDaysIcon,
@@ -48,9 +49,8 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                 },
             })
         } catch (err) {
-            if (err instanceof CustomHttpException) {
-                const message = err.data?.message ?? err.errorMessage
-                setError(message)
+            if (err instanceof HttpException) {
+                setError(resolveErrorMessage(err))
             }
         }
     }

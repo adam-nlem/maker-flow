@@ -7,6 +7,7 @@ use App\DTO\Request\Otp\VerifyOtpRequestDTO;
 use App\DTO\Response\Otp\ResendOtpResponseDTO;
 use App\Entity\Token;
 use App\Helper\DateHelper;
+use App\Exception\Otp\ExpiredOtpSessionException;
 use App\Repository\OtpRepository;
 use App\Repository\TokenRepository;
 use App\Service\Cookie\CookieService;
@@ -138,10 +139,7 @@ final class OtpController extends AbstractController
         $otp = $otpRepository->getByPendingOtpToken($dto->getPendingOtpToken());
 
         if ($otp === null || $otp->isUsed()) {
-            return $this->json(
-                data: ['message' => 'Session invalide ou expirée.'],
-                status: Response::HTTP_UNAUTHORIZED,
-            );
+            throw new ExpiredOtpSessionException();
         }
 
         $user = $otp->getUser();

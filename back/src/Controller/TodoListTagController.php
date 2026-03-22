@@ -2,13 +2,15 @@
 
 namespace App\Controller;
 
-use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
 use App\DTO\QueryParam\TodoListTag\ListTodoListTagsQueryParamDTO;
 use App\DTO\Request\TodoListTag\CreateTodoListTagRequestDTO;
 use App\DTO\Request\TodoListTag\UpdateTodoListTagRequestDTO;
 use App\Entity\TodoListTag;
 use App\Entity\TodoListTask;
+use App\Exception\TodoList\TodoListNotFoundException;
+use App\Exception\TodoList\TodoListTagNotFoundException;
+use App\Exception\TodoList\TodoListTagTitleConflictException;
 use App\Repository\TodoListRepository;
 use App\Repository\TodoListTagRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,7 +36,7 @@ class TodoListTagController extends AbstractController
         $todoList = $todoListRepository->getByUuidAndUser($queryParamDto->getTodoListUuid(), $user);
 
         if ($todoList === null) {
-            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListNotFoundException();
         }
 
         if ($queryParamDto->getSearchTerm() !== null) {
@@ -63,15 +65,11 @@ class TodoListTagController extends AbstractController
         $todoList = $todoListRepository->getByUuidAndUser($dto->getTodoListUuid(), $user);
 
         if ($todoList === null) {
-            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListNotFoundException();
         }
 
-        try {
-            /** @var TodoListTag $tag */
-            $tag = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var TodoListTag $tag */
+        $tag = $dto->build();
 
         $tag
             ->setUser($user)
@@ -86,9 +84,6 @@ class TodoListTagController extends AbstractController
         );
     }
 
-    #[Route('/{tagUuid}', name: 'api_todo_lists_tags_show', methods: ['GET'])]
-    public function show(string $tagUuid) {}
-
     #[Route('/{tagUuid}', name: 'api_todo_lists_tags_update', methods: ['PATCH'])]
     public function update(
         string $tagUuid,
@@ -101,14 +96,14 @@ class TodoListTagController extends AbstractController
         $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
 
         if ($tag === null) {
-            return $this->json(data: ["message" => "You don't have any tag with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListTagNotFoundException();
         }
 
         if ($dto->getTitle() !== null && $dto->getTitle() != $tag->getTitle()) {
             // We check if there is another tag with the same title in the same todo list (we don't want that to happen)
             $tagWithSameTitle = $tagRepository->getByTitleAndTodoListAndUser($dto->getTitle(), $tag->getTodoList(), $user);
             if ($tagWithSameTitle !== null) {
-                return $this->json(data: ["Message" => "You already use this title for another tag in this todo list"], status: Response::HTTP_CONFLICT);
+                throw new TodoListTagTitleConflictException();
             }
             $tag->setTitle($dto->getTitle());
         }
@@ -131,7 +126,7 @@ class TodoListTagController extends AbstractController
         $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
 
         if ($tag === null) {
-            return $this->json(data: ["message" => "You don't have any tag with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListTagNotFoundException();
         }
 
         $tagRepository->remove($tag, true);

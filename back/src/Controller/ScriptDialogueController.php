@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptDialogue\ListScriptDialoguesQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptDialogue\CreateScriptDialogueRequestDTO;
 use App\DTO\Request\ScriptDialogue\UpdateScriptDialogueRequestDTO;
 use App\Entity\ScriptDialogue;
@@ -70,12 +69,8 @@ final class ScriptDialogueController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        try {
-            /** @var ScriptDialogue $dialogue */
-            $dialogue = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptDialogue $dialogue */
+        $dialogue = $dto->build();
 
         $dialogue
             ->setUser($user)

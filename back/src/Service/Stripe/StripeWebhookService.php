@@ -9,7 +9,7 @@ use App\Entity\StripeWebhookEvent;
 use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
 use App\Service\Credit\CreditService;
-use App\Service\Stripe\Exception\WebhookSignatureVerificationException;
+use App\Exception\Stripe\WebhookSignatureVerificationException;
 use Psr\Log\LoggerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;

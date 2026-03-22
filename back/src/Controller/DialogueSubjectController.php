@@ -6,7 +6,6 @@ use App\DTO\QueryParam\DialogueSubject\ListDialogueSubjectsQueryParamDTO;
 use App\DTO\Request\DialogueSubject\CreateDialogueSubjectRequestDTO;
 use App\DTO\Request\DialogueSubject\ReorderDialogueSubjectsRequestDTO;
 use App\DTO\Request\DialogueSubject\UpdateDialogueSubjectRequestDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\DialogueSubject;
 use App\Entity\User;
 use App\Repository\DialogueSubjectRepository;
@@ -60,12 +59,8 @@ final class DialogueSubjectController extends AbstractController
             return $this->json(data: ["message" => "You don't have any dialogue with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        try {
-            /** @var DialogueSubject $subject */
-            $subject = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var DialogueSubject $subject */
+        $subject = $dto->build();
 
         $subject
             ->setUser($user)

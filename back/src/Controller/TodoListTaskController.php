@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
 use App\DTO\QueryParam\TodoListTask\ListTodoListTasksQueryParamDTO;
 use App\DTO\Request\TodoListTask\CreateTodoListTaskRequestDTO;
@@ -10,6 +9,8 @@ use App\DTO\Request\TodoListTask\UpdateTodoListTaskRequestDTO;
 use App\DTO\Response\TodoListTask\ListTodoListTasksGroupedByStatusResponseDTO;
 use App\Entity\Enum\TodoListStatus;
 use App\Entity\TodoListTask;
+use App\Exception\TodoList\TodoListNotFoundException;
+use App\Exception\TodoList\TodoListTaskNotFoundException;
 use App\Repository\TodoListRepository;
 use App\Repository\TodoListTagRepository;
 use App\Repository\TodoListTaskRepository;
@@ -35,7 +36,7 @@ class TodoListTaskController extends AbstractController
         $todoList = $todoListRepository->getByUuidAndUser($queryParamDto->getTodoListUuid(), $user);
 
         if ($todoList === null) {
-            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListNotFoundException();
         }
 
         $statuses = $queryParamDto->getStatus() !== null
@@ -72,15 +73,11 @@ class TodoListTaskController extends AbstractController
         $todoList = $todoListRepository->getByUuidAndUser($dto->getTodoListUuid(), $user);
 
         if ($todoList === null) {
-            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListNotFoundException();
         }
 
-        try {
-            /** @var TodoListTask $task */
-            $task = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var TodoListTask $task */
+        $task = $dto->build();
 
         $tagUuids = $dto->getTagUuids();
 
@@ -119,7 +116,7 @@ class TodoListTaskController extends AbstractController
         $task = $taskRepository->getByUuidAndUser($taskUuid, $user);
 
         if ($task === null) {
-            return $this->json(data: ["message" => "You don't have any task with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListTaskNotFoundException();
         }
 
         if ($dto->getTitle() !== null && $dto->getTitle() !== $task->getTitle()) {
@@ -176,7 +173,7 @@ class TodoListTaskController extends AbstractController
         $task = $taskRepository->getByUuidAndUser($taskUuid, $user);
 
         if ($task === null) {
-            return $this->json(data: ["message" => "You don't have any task with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListTaskNotFoundException();
         }
 
         $taskRepository->remove($task, true);

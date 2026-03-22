@@ -2,14 +2,8 @@
 
 namespace App\DTO\Request;
 
-use App\DTO\Request\Exception\CustomValidationException;
-use App\DTO\Request\Exception\CustomValidationExceptionBodyItem;
-use App\DTO\Request\Exception\CustomValidationExceptionDataItem;
-use App\Entity\Enum\ValidationExceptionType;
-use Exception;
+use App\Exception\Validation\AlreadyUsedValueException;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints as ORMAssert;
 
@@ -45,10 +39,7 @@ abstract class AbstractRequestDTO
             foreach ($errors as $error) {
                 switch ($error->getCode()) {
                     case ORMAssert\UniqueEntity::NOT_UNIQUE_ERROR:
-                        throw new CustomValidationException(
-                            ValidationExceptionType::AlreadyUsedValue,
-                            $error->getPropertyPath()
-                        );
+                        throw new AlreadyUsedValueException($error->getPropertyPath());
                         break;
                 }
             }
@@ -62,10 +53,7 @@ abstract class AbstractRequestDTO
                 foreach ($errors as $error) {
                     switch ($error->getCode()) {
                         case ORMAssert\UniqueEntity::NOT_UNIQUE_ERROR:
-                            throw new CustomValidationException(
-                                ValidationExceptionType::AlreadyUsedValue,
-                                $error->getPropertyPath()
-                            );
+                            throw new AlreadyUsedValueException($error->getPropertyPath());
                             break;
                     }
                 }

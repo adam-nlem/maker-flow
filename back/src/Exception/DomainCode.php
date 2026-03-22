@@ -13,6 +13,8 @@ enum DomainCode: int
     case Prelaunch = 16;
     case Project = 17;
     case Script = 18;
-    case Post = 19;
-    case User = 20;
+    case TodoList = 19;
+    case Post = 20;
+    case User = 21;
+    case Validation = 22;
 }

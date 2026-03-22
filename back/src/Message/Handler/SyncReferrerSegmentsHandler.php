@@ -4,7 +4,7 @@ namespace App\Message\Handler;
 
 use App\Message\SyncReferrerSegmentsMessage;
 use App\Repository\UserRepository;
-use App\Service\Mailing\Exception\MailingRetryableException;
+use App\Exception\Mailing\MailingRetryableException;
 use App\Service\Prelaunch\PrelaunchService;
 use Symfony\Component\Messenger\Attribute\AsMessageHandler;
 use Symfony\Component\Messenger\MessageBusInterface;

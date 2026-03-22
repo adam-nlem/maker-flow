@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\User\RegisterUserRequestDTO;
 use App\DTO\Request\User\UpdateUserRequestDTO;
 use App\DTO\Response\User\RegisterResponseDTO;
@@ -54,12 +53,8 @@ final class UserController extends AbstractController
             return $this->json(data: ["message" => $passwordErrors[0]], status: Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        try {
-            /** @var User $user */
-            $user = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var User $user */
+        $user = $dto->build();
 
         $userRepository->save($user, true);
 

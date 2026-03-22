@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptHook\CreateScriptHookRequestDTO;
 use App\DTO\Request\ScriptHook\UpdateScriptHookRequestDTO;
 use App\Entity\ScriptHook;
@@ -37,12 +36,8 @@ final class ScriptHookController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        try {
-            /** @var ScriptHook $hook */
-            $hook = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptHook $hook */
+        $hook = $dto->build();
 
         $hook
             ->setUser($user)

@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptRetentionCue\ListScriptRetentionCuesQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptRetentionCue\CreateScriptRetentionCueRequestDTO;
 use App\DTO\Request\ScriptRetentionCue\UpdateScriptRetentionCueRequestDTO;
 use App\Entity\ScriptRetentionCue;
@@ -74,12 +73,8 @@ final class ScriptRetentionCueController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        try {
-            /** @var ScriptRetentionCue $retentionCue */
-            $retentionCue = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptRetentionCue $retentionCue */
+        $retentionCue = $dto->build();
 
         $retentionCue
             ->setUser($user)

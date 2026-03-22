@@ -5,8 +5,7 @@ namespace App\Controller;
 use App\DTO\Request\Prelaunch\AuthenticatePrelaunchRequestDTO;
 use App\DTO\Response\Prelaunch\AuthenticatePrelaunchResponseDTO;
 use App\Entity\User;
-use App\Service\Prelaunch\Exception\RateLimitExceededException;
-use App\Service\Prelaunch\Exception\SubscriberNotFoundException;
+use App\Exception\Prelaunch\PrelaunchNotEnabledException;
 use App\Service\Prelaunch\PrelaunchService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -28,21 +27,14 @@ final class PrelaunchController extends AbstractController
         Request $request,
     ): JsonResponse {
         if (!$this->prelaunchEnabled) {
-            return $this->json(data: ['message' => 'Prelaunch is not enabled.'], status: Response::HTTP_NOT_FOUND);
+            throw new PrelaunchNotEnabledException();
         }
 
-        try {
-            $otp = $prelaunchService->authenticate(
-                $dto->getEmail(),
-                $request->getClientIp(),
-                $dto->getReferralCode(),
-            );
-        } catch (RateLimitExceededException $e) {
-            return $this->json(
-                data: ['message' => $e->getMessage()],
-                status: Response::HTTP_TOO_MANY_REQUESTS,
-            );
-        }
+        $otp = $prelaunchService->authenticate(
+            $dto->getEmail(),
+            $request->getClientIp(),
+            $dto->getReferralCode(),
+        );
 
         $responseDto = new AuthenticatePrelaunchResponseDTO(
             $otp->getPendingOtpToken(),
@@ -61,20 +53,13 @@ final class PrelaunchController extends AbstractController
         PrelaunchService $prelaunchService,
     ): JsonResponse {
         if (!$this->prelaunchEnabled) {
-            return $this->json(data: ['message' => 'Prelaunch is not enabled.'], status: Response::HTTP_NOT_FOUND);
+            throw new PrelaunchNotEnabledException();
         }
 
         /** @var User $user */
         $user = $this->getUser();
 
-        try {
-            $responseDto = $prelaunchService->getStatus($user);
-        } catch (SubscriberNotFoundException $e) {
-            return $this->json(
-                data: ['message' => $e->getMessage()],
-                status: Response::HTTP_NOT_FOUND,
-            );
-        }
+        $responseDto = $prelaunchService->getStatus($user);
 
         return $this->json(
             data: $responseDto->getData(),

@@ -2,12 +2,13 @@
 
 namespace App\Controller;
 
-use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\User;
 use App\DTO\QueryParam\TodoList\ListTodoListsQueryParamDTO;
 use App\DTO\Request\TodoList\CreateTodoListRequestDTO;
 use App\DTO\Request\TodoList\UpdateTodoListRequestDTO;
 use App\Entity\TodoList;
+use App\Exception\Project\ProjectNotFoundException;
+use App\Exception\TodoList\TodoListNotFoundException;
 use App\Repository\ProjectRepository;
 use App\Repository\TodoListRepository;
 use App\Repository\TodoListTagRepository;
@@ -34,7 +35,7 @@ class TodoListController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         $todoLists = $todoListRepository->getByProjectAndUser($project, $user);
@@ -58,15 +59,11 @@ class TodoListController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
-        try {
-            /** @var TodoList $todoList */
-            $todoList = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var TodoList $todoList */
+        $todoList = $dto->build();
 
         $todoList
             ->setUser($user)
@@ -93,7 +90,7 @@ class TodoListController extends AbstractController
         $todoList = $todoListRepository->getByUuidAndUser($todoListUuid, $user);
 
         if ($todoList === null) {
-            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListNotFoundException();
         }
 
         if ($dto->getTitle() !== null && $dto->getTitle() != $todoList->getTitle()) {
@@ -120,7 +117,7 @@ class TodoListController extends AbstractController
         $todoList = $todoListRepository->getByUuidAndUser($todoListUuid, $user);
 
         if ($todoList === null) {
-            return $this->json(data: ["message" => "You don't have any todo list with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new TodoListNotFoundException();
         }
 
         $todoListRepository->remove($todoList, true);

@@ -2,7 +2,7 @@
 
 namespace App\Sentry;
 
-use App\DTO\Request\Exception\CustomValidationException;
+use App\Exception\AppException;
 use Sentry\Event;
 use Sentry\EventHint;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
@@ -17,8 +17,10 @@ final class SentryBeforeSendCallback
             return $event;
         }
 
-        if ($exception instanceof CustomValidationException) {
-            return null;
+        if ($exception instanceof AppException) {
+            if ($exception->getHttpStatus() >= 400 && $exception->getHttpStatus() < 500) {
+                return null;
+            }
         }
 
         if ($exception instanceof HttpExceptionInterface) {
