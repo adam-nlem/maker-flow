@@ -48,41 +48,12 @@ x-back-common: &back-common
 
 services:
 
-  reverse-proxy:
-    image: traefik:v3
-    command:
-      - "--providers.docker"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=maker_flow"
-      - "--entryPoints.websecure.address=:443"
-      - "--certificatesresolvers.makerflow.acme.dnschallenge=true"
-      - "--certificatesresolvers.makerflow.acme.dnschallenge.provider=cloudflare"
-      - "--certificatesresolvers.makerflow.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
-      - "--certificatesresolvers.makerflow.acme.email=adam@maker-flow.com"
-      - "--certificatesresolvers.makerflow.acme.storage=/letsencrypt/acme.json"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-      # Cloudflare IPs — allows Traefik to restore real visitor IPs from CF-Connecting-IP header
-      # CLOUDFLARE_IPS defined in .env.prod — update from https://www.cloudflare.com/ips-v4/#
-      - "--entryPoints.websecure.forwardedHeaders.trustedIPs=${CLOUDFLARE_IPS}"
-      - "--entryPoints.web.forwardedHeaders.trustedIPs=${CLOUDFLARE_IPS}"
-    environment:
-      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
-    ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - letsencrypt:/letsencrypt
-      - /var/run/docker.sock:/var/run/docker.sock
-    networks:
-      - maker_flow
-
   front:
     image: ghcr.io/adam-nlem/maker-flow-front:${DEPLOY_TAG:-latest}
     restart: unless-stopped
     networks:
       - maker_flow
+      - traefik_public
     depends_on:
       back:
         condition: service_healthy
@@ -101,8 +72,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.makerflow-front.rule=Host(`${FRONTEND_DOMAIN}`)"
       - "traefik.http.routers.makerflow-front.entrypoints=websecure"
-      - "traefik.http.routers.makerflow-front.tls.certresolver=makerflow"
+      - "traefik.http.routers.makerflow-front.tls.certresolver=letsencrypt"
       - "traefik.http.services.makerflow-front.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik_public"
 
   back:
     <<: *back-common
@@ -110,6 +82,7 @@ services:
       <<: *back-env
     networks:
       - maker_flow
+      - traefik_public
     depends_on:
       db:
         condition: service_healthy
@@ -132,8 +105,9 @@ services:
       - "traefik.enable=true"
       - "traefik.http.routers.makerflow-api.rule=Host(`${API_DOMAIN}`)"
       - "traefik.http.routers.makerflow-api.entrypoints=websecure"
-      - "traefik.http.routers.makerflow-api.tls.certresolver=makerflow"
+      - "traefik.http.routers.makerflow-api.tls.certresolver=letsencrypt"
       - "traefik.http.services.makerflow-api.loadbalancer.server.port=80"
+      - "traefik.docker.network=traefik_public"
 
   worker:
     <<: *back-common
@@ -245,8 +219,9 @@ volumes:
   maker_flow_db_data:
   maker_flow_rabbitmq_data:
   maker_flow_redis_data:
-  letsencrypt:
 
 networks:
   maker_flow:
     driver: bridge
+  traefik_public:
+    external: true
