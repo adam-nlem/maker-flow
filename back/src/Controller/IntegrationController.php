@@ -13,6 +13,9 @@ use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Enum\OAuthCallbackStatus;
 use App\Entity\Enum\OAuthErrorCode;
 use App\Entity\User;
+use App\Exception\Integration\IntegrationAlreadyExistsException;
+use App\Exception\Integration\IntegrationNotFoundException;
+use App\Exception\Project\ProjectNotFoundException;
 use App\Repository\IntegrationRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
@@ -45,10 +48,7 @@ final class IntegrationController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(
-                data: ["message" => "You don't have any project with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new ProjectNotFoundException();
         }
 
         $integrations = $integrationRepository->getByProjectAndUser($project, $user);
@@ -75,19 +75,13 @@ final class IntegrationController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(
-                data: ["message" => "You don't have any project with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new ProjectNotFoundException();
         }
 
         $existingIntegration = $integrationRepository->getOneByProjectAndPlatformAndStatus($project, $dto->getPlatform(), IntegrationStatus::Active);
 
         if ($existingIntegration !== null) {
-            return $this->json(
-                data: ["message" => "This project already has an integration for this platform"],
-                status: Response::HTTP_CONFLICT
-            );
+            throw new IntegrationAlreadyExistsException();
         }
 
         $state = bin2hex(random_bytes(16));
@@ -203,10 +197,7 @@ final class IntegrationController extends AbstractController
         $integration = $integrationRepository->getByUuidAndUser($integrationUuid, $user);
 
         if ($integration === null) {
-            return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new IntegrationNotFoundException();
         }
 
         return $this->json(
@@ -225,10 +216,7 @@ final class IntegrationController extends AbstractController
         $integration = $integrationRepository->getByUuidAndUser($integrationUuid, $user);
 
         if ($integration === null) {
-            return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new IntegrationNotFoundException();
         }
 
         $integrationRepository->remove($integration, true);
@@ -248,10 +236,7 @@ final class IntegrationController extends AbstractController
         $integration = $integrationRepository->getByUuidAndUser($integrationUuid, $user);
 
         if ($integration === null) {
-            return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new IntegrationNotFoundException();
         }
 
         $integration

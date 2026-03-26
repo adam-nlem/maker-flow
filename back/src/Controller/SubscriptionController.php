@@ -8,8 +8,7 @@ use App\DTO\Response\Subscription\CreateSubscriptionCheckoutResponseDTO;
 use App\DTO\Response\Subscription\ListPlansResponseDTO;
 use App\Entity\User;
 use App\Repository\SubscriptionRepository;
-use App\Service\Stripe\Exception\CheckoutSessionCreationException;
-use App\Service\Stripe\Exception\SubscriptionManagementException;
+use App\Exception\Stripe\SubscriptionNotFoundException;
 use App\Service\Stripe\StripeCheckoutService;
 use App\Service\Stripe\StripePlanService;
 use App\Service\Stripe\StripeSubscriptionService;
@@ -24,14 +23,7 @@ final class SubscriptionController extends AbstractController
     #[Route('/plans', name: 'api_subscriptions_plans_list', methods: ['GET'])]
     public function plans(StripePlanService $stripePlanService): JsonResponse
     {
-        try {
-            $plans = $stripePlanService->getPlanConfigs();
-        } catch (\Exception $e) {
-            return $this->json(
-                data: ["message" => "Unable to load plans"],
-                status: Response::HTTP_INTERNAL_SERVER_ERROR,
-            );
-        }
+        $plans = $stripePlanService->getPlanConfigs();
 
         $responseDto = new ListPlansResponseDTO($plans);
 
@@ -50,11 +42,7 @@ final class SubscriptionController extends AbstractController
 
         $dto->build();
 
-        try {
-            $checkoutUrl = $stripeCheckoutService->createSubscriptionCheckoutSession($user, $dto->getPlan(), $dto->getCheckoutRedirectPath());
-        } catch (CheckoutSessionCreationException $e) {
-            return $this->json(data: ["message" => $e->getMessage()], status: Response::HTTP_BAD_REQUEST);
-        }
+        $checkoutUrl = $stripeCheckoutService->createSubscriptionCheckoutSession($user, $dto->getPlan(), $dto->getCheckoutRedirectPath());
 
         $responseDto = new CreateSubscriptionCheckoutResponseDTO($checkoutUrl);
 
@@ -81,14 +69,10 @@ final class SubscriptionController extends AbstractController
         $subscription = $subscriptionRepository->getLatestByUser($user);
 
         if ($subscription === null) {
-            return $this->json(data: ["message" => "No active subscription found"], status: Response::HTTP_NOT_FOUND);
+            throw new SubscriptionNotFoundException();
         }
 
-        try {
-            $stripeSubscriptionService->cancelSubscription($subscription);
-        } catch (SubscriptionManagementException $e) {
-            return $this->json(data: ["message" => $e->getMessage()], status: Response::HTTP_BAD_REQUEST);
-        }
+        $stripeSubscriptionService->cancelSubscription($subscription);
 
         return $this->json(data: $subscription, status: Response::HTTP_OK, context: ['groups' => ['api_subscription_show']]);
     }
@@ -102,14 +86,10 @@ final class SubscriptionController extends AbstractController
         $subscription = $subscriptionRepository->getLatestByUser($user);
 
         if ($subscription === null) {
-            return $this->json(data: ["message" => "No active subscription found"], status: Response::HTTP_NOT_FOUND);
+            throw new SubscriptionNotFoundException();
         }
 
-        try {
-            $stripeSubscriptionService->resumeSubscription($subscription);
-        } catch (SubscriptionManagementException $e) {
-            return $this->json(data: ["message" => $e->getMessage()], status: Response::HTTP_BAD_REQUEST);
-        }
+        $stripeSubscriptionService->resumeSubscription($subscription);
 
         return $this->json(data: $subscription, status: Response::HTTP_OK, context: ['groups' => ['api_subscription_show']]);
     }

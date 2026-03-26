@@ -12,7 +12,7 @@ use App\Entity\User;
 use App\Event\IntegrationCreatedEvent;
 use App\Helper\DateHelper;
 use App\Repository\IntegrationRepository;
-use App\Service\Integration\Exception\OAuthTokenRevokedException;
+use App\Exception\Integration\OAuthTokenRevokedException;
 use Google\Client;
 use Google\Service\YouTube;
 use Google\Service\YouTubeAnalytics;
@@ -174,7 +174,7 @@ class YoutubeOAuthService
             $integration->setStatus(IntegrationStatus::Revoked);
             $this->integrationRepository->save($integration, true);
 
-            throw new OAuthTokenRevokedException($integration->getId());
+            throw new OAuthTokenRevokedException($integration->getUuid());
         }
         $tokenDTO = YoutubeTokenDTO::fromArray($tokenArray);
 

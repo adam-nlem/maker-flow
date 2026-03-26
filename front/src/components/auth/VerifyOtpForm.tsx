@@ -6,7 +6,8 @@ import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { useVerifyOtp } from "~/hooks/api/users/useVerifyOtp"
 import { useResendOtp } from "~/hooks/api/users/useResendOtp"
 import type { OtpType } from "~/models/enums/OtpType"
-import { CustomHttpException } from "~/services/httpClient/customHttpExceptions"
+import { HttpException } from "~/services/httpClient/HttpException"
+import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages"
 
 interface VerifyOtpFormProps {
   pendingOtpToken: string
@@ -52,9 +53,8 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, type, onV
       await verifyOtp({ pendingOtpToken, code, purpose: type })
       onVerified?.()
     } catch (err) {
-      if (err instanceof CustomHttpException) {
-        const message = err.data?.message ?? err.errorMessage
-        setError(message)
+      if (err instanceof HttpException) {
+        setError(resolveErrorMessage(err))
       }
       setCode("")
     }
@@ -70,9 +70,8 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, type, onV
       setResendCooldown(60)
       setCode("")
     } catch (err) {
-      if (err instanceof CustomHttpException) {
-        const message = err.data?.message ?? err.errorMessage
-        setError(message)
+      if (err instanceof HttpException) {
+        setError(resolveErrorMessage(err))
       }
     }
   }

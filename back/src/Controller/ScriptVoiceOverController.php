@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptVoiceOver\ListScriptVoiceOversQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptVoiceOver\CreateScriptVoiceOverRequestDTO;
 use App\DTO\Request\ScriptVoiceOver\UpdateScriptVoiceOverRequestDTO;
 use App\Entity\ScriptVoiceOver;
@@ -70,12 +69,8 @@ final class ScriptVoiceOverController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        try {
-            /** @var ScriptVoiceOver $voiceOver */
-            $voiceOver = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptVoiceOver $voiceOver */
+        $voiceOver = $dto->build();
 
         $voiceOver
             ->setUser($user)

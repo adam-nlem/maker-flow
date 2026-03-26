@@ -1,0 +1,40 @@
+services:
+
+  reverse-proxy:
+    image: traefik:v3
+    restart: unless-stopped
+    command:
+      - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik_public"
+      - "--entryPoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge=true"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.provider=cloudflare"
+      - "--certificatesresolvers.letsencrypt.acme.dnschallenge.resolvers=1.1.1.1:53,8.8.8.8:53"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      # Cloudflare IPs — allows Traefik to restore real visitor IPs from CF-Connecting-IP header
+      # CLOUDFLARE_IPS defined in .env.traefik — update from https://www.cloudflare.com/ips-v4/#
+      - "--entryPoints.websecure.forwardedHeaders.trustedIPs=${CLOUDFLARE_IPS}"
+      - "--entryPoints.web.forwardedHeaders.trustedIPs=${CLOUDFLARE_IPS}"
+    environment:
+      CF_DNS_API_TOKEN: ${CF_DNS_API_TOKEN}
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - letsencrypt:/letsencrypt
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik_public
+
+volumes:
+  letsencrypt:
+
+networks:
+  traefik_public:
+    name: traefik_public
+    driver: bridge

@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptShot\ListScriptShotsQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptShot\CreateScriptShotRequestDTO;
 use App\DTO\Request\ScriptShot\UpdateScriptShotRequestDTO;
 use App\Entity\ScriptShot;
 use App\Entity\User;
+use App\Exception\Script\ScriptNotFoundException;
+use App\Exception\Script\ScriptGenerationNotFoundException;
+use App\Exception\Script\ScriptShotNotFoundException;
 use App\Repository\ScriptChapterRepository;
 use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptGenerationRepository;
@@ -37,7 +39,7 @@ final class ScriptShotController extends AbstractController
         $script = $scriptRepository->getByUuidAndUser($queryParamDto->getScriptUuid(), $user);
 
         if ($script === null) {
-            return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptNotFoundException();
         }
 
         $shots = $shotRepository->getByScriptAndUserOrderedByPosition($script, $user);
@@ -67,15 +69,11 @@ final class ScriptShotController extends AbstractController
         $script = $scriptRepository->getByUuidAndUser($dto->getScriptUuid(), $user);
 
         if ($script === null) {
-            return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptNotFoundException();
         }
 
-        try {
-            /** @var ScriptShot $shot */
-            $shot = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptShot $shot */
+        $shot = $dto->build();
 
         $shot
             ->setUser($user)
@@ -85,7 +83,7 @@ final class ScriptShotController extends AbstractController
         if ($dto->getGenerationUuid() !== null) {
             $generation = $generationRepository->getByUuidAndUser($dto->getGenerationUuid(), $user);
             if ($generation === null) {
-                return $this->json(data: ["message" => "You don't have any generation with this uuid"], status: Response::HTTP_NOT_FOUND);
+                throw new ScriptGenerationNotFoundException();
             }
             $shot->setScriptGeneration($generation);
         }
@@ -125,7 +123,7 @@ final class ScriptShotController extends AbstractController
         $shot = $shotRepository->getByUuidAndUser($shotUuid, $user);
 
         if ($shot === null) {
-            return $this->json(data: ["message" => "You don't have any shot with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptShotNotFoundException();
         }
 
         if ($dto->getContent() !== null && $dto->getContent() !== $shot->getContent()) {
@@ -154,7 +152,7 @@ final class ScriptShotController extends AbstractController
         $shot = $shotRepository->getByUuidAndUser($shotUuid, $user);
 
         if ($shot === null) {
-            return $this->json(data: ["message" => "You don't have any shot with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptShotNotFoundException();
         }
 
         $shotRepository->remove($shot, true);

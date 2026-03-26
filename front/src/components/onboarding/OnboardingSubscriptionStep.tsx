@@ -8,7 +8,7 @@ import { subscriptionPlanToFrenchTranslation } from "~/models/enums/Subscription
 
 export default function OnboardingSubscriptionStep() {
     return (
-        <OnboardingStepLayout maxWidth="max-w-3xl">
+        <OnboardingStepLayout maxWidth="max-w-4xl">
             <SubscriptionOverview
                 checkoutRedirectPath={onboardingPath}
                 subscribedView={(subscription) => (

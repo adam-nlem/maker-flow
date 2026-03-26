@@ -21,6 +21,8 @@ back/src/
 ├── Entity/              # Doctrine entities
 │   └── Enum/            # PHP enums
 ├── Event/               # Domain events
+├── Exception/           # Business exceptions (AppException hierarchy)
+│   └── {Domain}/        # Domain-specific exceptions
 ├── EventSubscriber/     # Event subscribers
 ├── Helper/              # Static helper classes
 ├── Message/             # Async messages
@@ -147,6 +149,8 @@ final class ResourceController extends AbstractController
 7. **Use named parameters** for `$this->json()` calls
 
 ### Error Handling
+
+Business exceptions extending `AppException` are automatically caught by `ApiExceptionSubscriber` and returned as structured JSON (see [exception-system.md](exception-system.md)). Controllers do NOT need try-catch for these. For simple inline checks that don't warrant a full exception class, return JSON directly:
 
 ```php
 if ($project === null) {

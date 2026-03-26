@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptText\ListScriptTextsQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptText\CreateScriptTextRequestDTO;
 use App\DTO\Request\ScriptText\UpdateScriptTextRequestDTO;
 use App\Entity\ScriptText;
@@ -70,12 +69,8 @@ final class ScriptTextController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        try {
-            /** @var ScriptText $text */
-            $text = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptText $text */
+        $text = $dto->build();
 
         $text
             ->setUser($user)

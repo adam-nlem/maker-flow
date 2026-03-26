@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\DTO\QueryParam\CreatorProfile\ShowCreatorProfileQueryParamDTO;
 use App\DTO\Request\CreatorProfile\CreateOrUpdateCreatorProfileRequestDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\Entity\CreatorProfile;
 use App\Entity\User;
 use App\Repository\CreatorProfileRepository;
@@ -64,12 +63,8 @@ final class CreatorProfileController extends AbstractController
         $isNew = $existingProfile === null;
 
         if ($isNew) {
-            try {
-                /** @var CreatorProfile $creatorProfile */
-                $creatorProfile = $dto->build();
-            } catch (CustomValidationException $e) {
-                return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-            }
+            /** @var CreatorProfile $creatorProfile */
+            $creatorProfile = $dto->build();
 
             $creatorProfile
                 ->setUser($user)

@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\DTO\QueryParam\PostGroup\ListPostGroupsQueryParamDTO;
 use App\DTO\QueryParam\PostGroup\RankPostGroupsQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\PostGroup\CreatePostGroupRequestDTO;
 use App\DTO\Request\PostGroup\UpdatePostGroupRequestDTO;
 use App\Entity\PostGroup;
@@ -96,12 +95,8 @@ final class PostGroupController extends AbstractController
             return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        try {
-            /** @var PostGroup $postGroup */
-            $postGroup = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var PostGroup $postGroup */
+        $postGroup = $dto->build();
 
         $postGroup
             ->setUser($user)

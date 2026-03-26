@@ -5,7 +5,7 @@ namespace App\Service\Stripe;
 use App\Entity\Enum\SubscriptionPlan;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\Stripe\Exception\CheckoutSessionCreationException;
+use App\Exception\Stripe\CheckoutSessionCreationException;
 use Stripe\Checkout\Session;
 use Stripe\Customer;
 use Stripe\Exception\ApiErrorException;

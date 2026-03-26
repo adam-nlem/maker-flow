@@ -9,7 +9,7 @@ use App\Entity\StripeWebhookEvent;
 use App\Repository\SubscriptionRepository;
 use App\Repository\UserRepository;
 use App\Service\Credit\CreditService;
-use App\Service\Stripe\Exception\WebhookSignatureVerificationException;
+use App\Exception\Stripe\WebhookSignatureVerificationException;
 use Psr\Log\LoggerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
@@ -182,15 +182,17 @@ class StripeWebhookService
 
     private function handleInvoicePaid(array $payload): void
     {
+
         $invoiceData = $payload['data']['object'];
 
-        $stripeSubscriptionId = $invoiceData['subscription'] ?? null;
+        $stripeSubscriptionId = $invoiceData['parent']['subscription_details']['subscription'] ?? null;
 
         if ($stripeSubscriptionId === null) {
             return;
         }
 
         $subscription = $this->subscriptionRepository->getByStripeSubscriptionId($stripeSubscriptionId);
+
 
         if ($subscription !== null) {
             $user = $subscription->getUser();
@@ -205,24 +207,20 @@ class StripeWebhookService
 
         $invoiceId = $invoiceData['id'];
         $lineItems = $invoiceData['lines']['data'] ?? [];
-
         if (empty($lineItems)) {
             return;
         }
 
         $priceId = $lineItems[0]['pricing']['price_details']['price'] ?? null;
-
         if ($priceId === null) {
             return;
         }
 
         $price = Price::retrieve($priceId);
         $creditAmount = (int) ($price->metadata->credit_amount ?? 0);
-
         if ($creditAmount <= 0) {
             return;
         }
-
         $this->creditService->renewSubscriptionCredits($user, $creditAmount, $invoiceId);
     }
 
@@ -230,7 +228,7 @@ class StripeWebhookService
     {
         $invoiceData = $payload['data']['object'];
 
-        $stripeSubscriptionId = $invoiceData['subscription'] ?? null;
+        $stripeSubscriptionId = $invoiceData['parent']['subscription_details']['subscription'] ?? null;
 
         if ($stripeSubscriptionId === null) {
             return;
@@ -245,6 +243,4 @@ class StripeWebhookService
         $subscription->setStatus(SubscriptionStatus::PastDue);
         $this->subscriptionRepository->save($subscription, true);
     }
-
-    
 }

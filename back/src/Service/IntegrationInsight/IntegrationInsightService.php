@@ -28,7 +28,7 @@ use App\Repository\IntegrationInsightRepository;
 use App\Repository\PostRepository;
 use App\Repository\YoutubeReportingJobRepository;
 use App\Repository\IntegrationRepository;
-use App\Service\Integration\Exception\OAuthTokenRevokedException;
+use App\Exception\Integration\OAuthTokenRevokedException;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
 use Google\Client;
@@ -408,7 +408,7 @@ class IntegrationInsightService
             $integration->setStatus(IntegrationStatus::Revoked);
             $this->integrationRepository->save($integration, true);
 
-            throw new OAuthTokenRevokedException($integration->getId());
+            throw new OAuthTokenRevokedException($integration->getUuid());
         }
     }
 }

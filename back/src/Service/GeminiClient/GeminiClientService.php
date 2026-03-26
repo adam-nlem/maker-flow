@@ -3,8 +3,8 @@
 namespace App\Service\GeminiClient;
 
 use App\Service\AiClient\AiClientInterface;
-use App\Service\AiClient\Exception\AiClientPermanentException;
-use App\Service\AiClient\Exception\AiClientRetryableException;
+use App\Exception\AiClient\AiClientPermanentException;
+use App\Exception\AiClient\AiClientRetryableException;
 use Psr\Log\LoggerInterface;
 use Symfony\Contracts\HttpClient\Exception\TransportExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;

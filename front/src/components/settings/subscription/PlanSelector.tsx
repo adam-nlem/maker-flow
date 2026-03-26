@@ -22,7 +22,7 @@ export default function PlanSelector({ checkoutRedirectPath, disabledPlan }: Pla
 
     if (error) {
         return (
-            <div>
+            <div className="w-full">
                 <h3 className="text-heading-md mb-4">Choisir un abonnement</h3>
                 <p className="text-body-sm text-gray">Impossible de charger les abonnements. Veuillez réessayer plus tard.</p>
             </div>
@@ -31,7 +31,7 @@ export default function PlanSelector({ checkoutRedirectPath, disabledPlan }: Pla
 
     if (isLoading) {
         return (
-            <div>
+            <div className="w-full">
                 <h3 className="text-heading-md mb-4">Choisir un abonnement</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[1, 2, 3].map((i) => (
@@ -43,7 +43,7 @@ export default function PlanSelector({ checkoutRedirectPath, disabledPlan }: Pla
     }
 
     return (
-        <div>
+        <div className="w-full">
             <h3 className="text-heading-md mb-4">Choisir un abonnement</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {plans.map((config) => (

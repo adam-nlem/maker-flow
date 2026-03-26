@@ -6,7 +6,7 @@ use App\Entity\Enum\StripeEventType;
 use App\Entity\StripeWebhookEvent;
 use App\Message\ProcessStripeWebhookMessage;
 use App\Repository\StripeWebhookEventRepository;
-use App\Service\Stripe\Exception\WebhookSignatureVerificationException;
+use App\Exception\Stripe\MissingWebhookSignatureException;
 use App\Service\Stripe\StripeWebhookService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -29,14 +29,10 @@ final class StripeWebhookController extends AbstractController
         $signature = $request->headers->get('stripe-signature');
 
         if ($signature === null) {
-            return $this->json(data: ['message' => 'Missing Stripe-Signature header'], status: Response::HTTP_BAD_REQUEST);
+            throw new MissingWebhookSignatureException();
         }
 
-        try {
-            $event = $stripeWebhookService->constructEvent($payload, $signature);
-        } catch (WebhookSignatureVerificationException $e) {
-            return $this->json(data: ['message' => 'Invalid signature'], status: Response::HTTP_BAD_REQUEST);
-        }
+        $event = $stripeWebhookService->constructEvent($payload, $signature);
 
         $eventType = StripeEventType::tryFrom($event->type);
 

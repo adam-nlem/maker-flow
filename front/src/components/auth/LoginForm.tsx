@@ -1,5 +1,4 @@
 import { useState } from "react"
-
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
 import { useLogin } from "~/hooks/api/users/useLogin"
@@ -18,11 +17,9 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail 
     const [email, setEmail] = useState(initialEmail)
     const [password, setPassword] = useState("")
 
-    const { login, isPending, error } = useLogin()
+    const { login, isPending } = useLogin()
 
-    const errorMessage = error?.message ?? null
-
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault()
         setStoredEmail(email)
         const response = await login({ email, password })
@@ -46,12 +43,6 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail 
 
     return (
         <>
-            {errorMessage && (
-                <div className="mb-4 rounded-md bg-danger/10 p-4">
-                    <div className="text-body-sm text-danger">{errorMessage}</div>
-                </div>
-            )}
-
             <form className="space-y-4" onSubmit={handleSubmit}>
                 <Input
                     label="Adresse email"

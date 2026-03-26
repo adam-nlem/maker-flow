@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptGeneration\ListScriptGenerationQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptGeneration\GenerateScriptRequestDTO;
 use App\DTO\Request\ScriptGeneration\UpdateScriptGenerationRequestDTO;
 use App\Entity\Enum\ScriptGenerationStatus;
@@ -49,12 +48,8 @@ final class ScriptGenerationController extends AbstractController
             return $this->json(data: ["message" => "You don't have enough credits to generate a script."], status: Response::HTTP_PAYMENT_REQUIRED);
         }
 
-        try {
-            /** @var ScriptGeneration $generation */
-            $generation = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptGeneration $generation */
+        $generation = $dto->build();
 
         $generation
             ->setUser($user)

@@ -11,10 +11,10 @@ use App\Repository\OtpRepository;
 use App\Service\Mailing\Template\EmailVerificationOtpEmailTemplate;
 use App\Service\Mailing\Template\LoginOtpEmailTemplate;
 use App\Service\Mailing\Template\PrelaunchVerificationEmailTemplate;
-use App\Service\Otp\Exception\ExpiredOtpException;
-use App\Service\Otp\Exception\InvalidOtpException;
-use App\Service\Otp\Exception\InvalidPendingTokenException;
-use App\Service\Otp\Exception\MaxAttemptsOtpException;
+use App\Exception\Otp\ExpiredOtpException;
+use App\Exception\Otp\InvalidOtpException;
+use App\Exception\Otp\InvalidPendingTokenException;
+use App\Exception\Otp\MaxAttemptsOtpException;
 use Symfony\Component\Messenger\MessageBusInterface;
 
 final class OtpService

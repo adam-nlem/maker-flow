@@ -3,11 +3,13 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptTag\ListScriptTagsQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptTag\CreateScriptTagRequestDTO;
 use App\DTO\Request\ScriptTag\UpdateScriptTagRequestDTO;
 use App\Entity\ScriptTag;
 use App\Entity\User;
+use App\Exception\Project\ProjectNotFoundException;
+use App\Exception\Script\ScriptTagNotFoundException;
+use App\Exception\Script\ScriptTagTitleConflictException;
 use App\Repository\ProjectRepository;
 use App\Repository\ScriptTagRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,7 +33,7 @@ final class ScriptTagController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         if ($queryParamDto->getSearchTerm() !== null) {
@@ -59,15 +61,11 @@ final class ScriptTagController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
-        try {
-            /** @var ScriptTag $tag */
-            $tag = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptTag $tag */
+        $tag = $dto->build();
 
         $tag
             ->setUser($user)
@@ -94,13 +92,13 @@ final class ScriptTagController extends AbstractController
         $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
 
         if ($tag === null) {
-            return $this->json(data: ["message" => "You don't have any tag with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptTagNotFoundException();
         }
 
         if ($dto->getTitle() !== null && $dto->getTitle() != $tag->getTitle()) {
             $tagWithSameTitle = $tagRepository->getByTitleAndProjectAndUser($dto->getTitle(), $tag->getProject(), $user);
             if ($tagWithSameTitle !== null) {
-                return $this->json(data: ["message" => "You already use this title for another tag in this project"], status: Response::HTTP_CONFLICT);
+                throw new ScriptTagTitleConflictException();
             }
             $tag->setTitle($dto->getTitle());
         }
@@ -123,7 +121,7 @@ final class ScriptTagController extends AbstractController
         $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
 
         if ($tag === null) {
-            return $this->json(data: ["message" => "You don't have any tag with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptTagNotFoundException();
         }
 
         $tagRepository->remove($tag, true);

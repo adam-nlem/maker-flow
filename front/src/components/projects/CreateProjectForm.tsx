@@ -7,7 +7,7 @@ import { TextArea } from "~/components/ui/TextArea"
 import Pill from "~/components/ui/Pill"
 import { ProjectType, projectTypeOptions, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType"
 import { useCreateProject } from "~/hooks/api/projects/useCreateProject"
-import { PaymentRequiredException } from "~/services/httpClient/customHttpExceptions"
+import { HttpException } from "~/services/httpClient/HttpException"
 
 interface CreateProjectFormProps {
     onProjectCreated: (projectUuid: string) => void
@@ -33,7 +33,7 @@ export default function CreateProjectForm({ onProjectCreated, formSpacing = "spa
             setLimitError(false)
             onProjectCreated(project.uuid)
         } catch (error) {
-            if (error instanceof PaymentRequiredException) {
+            if (error instanceof HttpException && error.response.httpStatus === 402) {
                 setLimitError(true)
             }
         }

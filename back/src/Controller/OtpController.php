@@ -7,13 +7,10 @@ use App\DTO\Request\Otp\VerifyOtpRequestDTO;
 use App\DTO\Response\Otp\ResendOtpResponseDTO;
 use App\Entity\Token;
 use App\Helper\DateHelper;
+use App\Exception\Otp\ExpiredOtpSessionException;
 use App\Repository\OtpRepository;
 use App\Repository\TokenRepository;
 use App\Service\Cookie\CookieService;
-use App\Service\Otp\Exception\ExpiredOtpException;
-use App\Service\Otp\Exception\InvalidOtpException;
-use App\Service\Otp\Exception\InvalidPendingTokenException;
-use App\Service\Otp\Exception\MaxAttemptsOtpException;
 use App\Service\Otp\OtpService;
 use App\Message\SyncReferrerSegmentsMessage;
 use Doctrine\ORM\EntityManagerInterface;
@@ -36,29 +33,7 @@ final class OtpController extends AbstractController
         CookieService $cookieService,
         Request $request,
     ): JsonResponse {
-        try {
-            $otp = $otpService->verify($dto->getPendingOtpToken(), $dto->getCode());
-        } catch (InvalidOtpException $e) {
-            return $this->json(
-                data: ['message' => 'Code incorrect.', 'remainingAttempts' => $e->getRemainingAttempts()],
-                status: Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        } catch (ExpiredOtpException) {
-            return $this->json(
-                data: ['message' => 'Code expiré. Veuillez en demander un nouveau.'],
-                status: Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        } catch (MaxAttemptsOtpException) {
-            return $this->json(
-                data: ['message' => 'Nombre maximum de tentatives atteint. Veuillez renvoyer un nouveau code.'],
-                status: Response::HTTP_TOO_MANY_REQUESTS,
-            );
-        } catch (InvalidPendingTokenException) {
-            return $this->json(
-                data: ['message' => 'Session invalide ou expirée.'],
-                status: Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        }
+        $otp = $otpService->verify($dto->getPendingOtpToken(), $dto->getCode());
 
         $user = $otp->getUser();
 
@@ -93,29 +68,7 @@ final class OtpController extends AbstractController
         CookieService $cookieService,
         Request $request,
     ): JsonResponse {
-        try {
-            $otp = $otpService->verify($dto->getPendingOtpToken(), $dto->getCode());
-        } catch (InvalidOtpException $e) {
-            return $this->json(
-                data: ['message' => 'Code incorrect.', 'remainingAttempts' => $e->getRemainingAttempts()],
-                status: Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        } catch (ExpiredOtpException) {
-            return $this->json(
-                data: ['message' => 'Code expiré. Veuillez en demander un nouveau.'],
-                status: Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        } catch (MaxAttemptsOtpException) {
-            return $this->json(
-                data: ['message' => 'Nombre maximum de tentatives atteint. Veuillez renvoyer un nouveau code.'],
-                status: Response::HTTP_TOO_MANY_REQUESTS,
-            );
-        } catch (InvalidPendingTokenException) {
-            return $this->json(
-                data: ['message' => 'Session invalide ou expirée.'],
-                status: Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        }
+        $otp = $otpService->verify($dto->getPendingOtpToken(), $dto->getCode());
 
         $user = $otp->getUser();
         $user->setVerifiedAt(DateHelper::createUtcDateTimeImmutable());
@@ -145,29 +98,7 @@ final class OtpController extends AbstractController
         MessageBusInterface $messageBus,
         Request $request,
     ): JsonResponse {
-        try {
-            $otp = $otpService->verify($dto->getPendingOtpToken(), $dto->getCode());
-        } catch (InvalidOtpException $e) {
-            return $this->json(
-                data: ['message' => 'Code incorrect.', 'remainingAttempts' => $e->getRemainingAttempts()],
-                status: Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        } catch (ExpiredOtpException) {
-            return $this->json(
-                data: ['message' => 'Code expiré. Veuillez en demander un nouveau.'],
-                status: Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        } catch (MaxAttemptsOtpException) {
-            return $this->json(
-                data: ['message' => 'Nombre maximum de tentatives atteint. Veuillez renvoyer un nouveau code.'],
-                status: Response::HTTP_TOO_MANY_REQUESTS,
-            );
-        } catch (InvalidPendingTokenException) {
-            return $this->json(
-                data: ['message' => 'Session invalide ou expirée.'],
-                status: Response::HTTP_UNPROCESSABLE_ENTITY,
-            );
-        }
+        $otp = $otpService->verify($dto->getPendingOtpToken(), $dto->getCode());
 
         $user = $otp->getUser();
         $user->setVerifiedAt(DateHelper::createUtcDateTimeImmutable());
@@ -208,10 +139,7 @@ final class OtpController extends AbstractController
         $otp = $otpRepository->getByPendingOtpToken($dto->getPendingOtpToken());
 
         if ($otp === null || $otp->isUsed()) {
-            return $this->json(
-                data: ['message' => 'Session invalide ou expirée.'],
-                status: Response::HTTP_UNAUTHORIZED,
-            );
+            throw new ExpiredOtpSessionException();
         }
 
         $user = $otp->getUser();

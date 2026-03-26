@@ -7,7 +7,7 @@ import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { SidePanel } from "~/components/ui/SidePanel";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
-import { PaymentRequiredException } from "~/services/httpClient/customHttpExceptions";
+import { HttpException } from "~/services/httpClient/HttpException";
 
 interface ScriptListPanelProps {
     scripts: Script[];
@@ -33,7 +33,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
             const newScript = await createScript({ projectUuid, title: "Nouveau script" });
             setFocusedScriptUuid(newScript.uuid);
         } catch (error) {
-            if (error instanceof PaymentRequiredException) {
+            if (error instanceof HttpException && error.response.httpStatus === 402) {
                 return;
             }
             throw error;

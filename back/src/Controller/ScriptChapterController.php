@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptChapter\ListScriptChaptersQueryParamDTO;
-use App\DTO\Request\Exception\CustomValidationException;
 use App\DTO\Request\ScriptChapter\CreateScriptChapterRequestDTO;
 use App\DTO\Request\ScriptChapter\UpdateScriptChapterRequestDTO;
 use App\Entity\ScriptChapter;
@@ -70,12 +69,8 @@ final class ScriptChapterController extends AbstractController
             return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        try {
-            /** @var ScriptChapter $chapter */
-            $chapter = $dto->build();
-        } catch (CustomValidationException $e) {
-            return $this->json(data: $e->getData(), status: Response::HTTP_CONFLICT);
-        }
+        /** @var ScriptChapter $chapter */
+        $chapter = $dto->build();
 
         $chapter
             ->setUser($user)

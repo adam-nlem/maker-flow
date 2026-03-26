@@ -4,7 +4,7 @@ namespace App\Service\Stripe;
 
 use App\Entity\Subscription;
 use App\Repository\SubscriptionRepository;
-use App\Service\Stripe\Exception\SubscriptionManagementException;
+use App\Exception\Stripe\SubscriptionManagementException;
 use Psr\Log\LoggerInterface;
 use Stripe\Exception\ApiErrorException;
 use Stripe\Stripe;

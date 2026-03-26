@@ -25,7 +25,7 @@ use App\Repository\PostRepository;
 use App\Repository\IntegrationRepository;
 use App\Entity\Enum\YoutubeReportType;
 use App\Service\InstagramPostInsight\InstagramPostInsightService;
-use App\Service\Integration\Exception\OAuthTokenRevokedException;
+use App\Exception\Integration\OAuthTokenRevokedException;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
 use App\Service\YoutubePostInsight\YoutubePostInsightService;
@@ -487,7 +487,7 @@ class PostInsightService
             $integration->setStatus(IntegrationStatus::Revoked);
             $this->integrationRepository->save($integration, true);
 
-            throw new OAuthTokenRevokedException($integration->getId());
+            throw new OAuthTokenRevokedException($integration->getUuid());
         }
     }
 }
