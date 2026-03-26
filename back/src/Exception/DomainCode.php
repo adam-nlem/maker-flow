@@ -17,4 +17,5 @@ enum DomainCode: int
     case Post = 20;
     case User = 21;
     case Validation = 22;
+    case Auth = 23;
 }

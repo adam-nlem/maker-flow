@@ -58,6 +58,14 @@ export const errorCodeMessages: Record<number, string> = {
   // Validation (22xxx)
   22001: 'Cette valeur est déjà utilisée.',
 
+  // Auth (23xxx)
+  23001: 'Veuillez fournir un email et un mot de passe.',
+  23002: 'Email ou mot de passe incorrect.',
+  23003: 'Session expirée. Veuillez vous reconnecter.',
+  23004: 'Session expirée. Veuillez vous reconnecter.',
+  23005: 'Session invalide. Veuillez vous reconnecter.',
+  23006: "Votre email n'est pas vérifié.",
+
   // Fallback
   99999: 'Une erreur est survenue',
 }

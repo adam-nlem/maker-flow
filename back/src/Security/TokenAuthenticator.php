@@ -2,13 +2,17 @@
 
 namespace App\Security;
 
+use App\DTO\Response\Error\ErrorResponseDTO;
+use App\Exception\Auth\EmailNotVerifiedException;
+use App\Exception\Auth\InvalidTokenException;
+use App\Exception\Auth\MissingTokenException;
+use App\Exception\Auth\TokenExpiredException;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Service\Cookie\CookieService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
@@ -50,11 +54,11 @@ class TokenAuthenticator extends AbstractAuthenticator
         $token = $this->cookieService->getApiToken($request);
 
         if (null == $token) {
-            throw new HttpException(Response::HTTP_UNAUTHORIZED, "No token found with this value");
+            throw new MissingTokenException();
         }
 
         if ($token->isExpired()) {
-            throw new HttpException(Response::HTTP_UNAUTHORIZED, "Token expired, use email and password instead");
+            throw new TokenExpiredException();
         }
 
         return new SelfValidatingPassport(new UserBadge($token->getValue(), function ($tokenValue) {
@@ -63,11 +67,11 @@ class TokenAuthenticator extends AbstractAuthenticator
             $user = $this->tokenRepository->getByValue($tokenValue)->getUser();
 
             if (null === $user) {
-                throw new HttpException(Response::HTTP_UNAUTHORIZED, "No user for this token");
+                throw new InvalidTokenException();
             }
 
             if (!$user->isVerified()) {
-                throw new HttpException(Response::HTTP_FORBIDDEN, "Email not verified");
+                throw new EmailNotVerifiedException();
             }
 
             return $user;
@@ -86,15 +90,14 @@ class TokenAuthenticator extends AbstractAuthenticator
             }
         }
 
-        // $res = new JsonResponse();
-        // $this->cookieService->addCookieToHeaders($token, $request, $res);
-        // return $res;
-
         return null;
     }
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        return new JsonResponse(strtr($exception->getMessageKey(), $exception->getMessageData()), Response::HTTP_UNAUTHORIZED);
+        $appException = new InvalidTokenException();
+        $responseDto = ErrorResponseDTO::fromAppException($appException);
+
+        return new JsonResponse($responseDto->getData(), $appException->getHttpStatus());
     }
 }

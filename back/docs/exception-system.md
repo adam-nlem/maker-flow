@@ -111,6 +111,13 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 21004 | `MissingPasswordFieldsException` | 422 | — | `src/Exception/User/` |
 | **Validation (22xxx)** |
 | 22001 | `AlreadyUsedValueException` | 409 | `propertyName` | `src/Exception/Validation/` |
+| **Auth (23xxx)** |
+| 23001 | `MissingCredentialsException` | 400 | — | `src/Exception/Auth/` |
+| 23002 | `InvalidCredentialsException` | 401 | — | `src/Exception/Auth/` |
+| 23003 | `MissingTokenException` | 401 | — | `src/Exception/Auth/` |
+| 23004 | `TokenExpiredException` | 401 | — | `src/Exception/Auth/` |
+| 23005 | `InvalidTokenException` | 401 | — | `src/Exception/Auth/` |
+| 23006 | `EmailNotVerifiedException` | 403 | — | `src/Exception/Auth/` |
 
 ## Controller Pattern
 

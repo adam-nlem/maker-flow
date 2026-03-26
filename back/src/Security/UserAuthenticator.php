@@ -2,14 +2,16 @@
 
 namespace App\Security;
 
+use App\DTO\Response\Error\ErrorResponseDTO;
 use App\DTO\Response\User\LoginResponseDTO;
 use App\Entity\Enum\OtpType;
 use App\Entity\User;
+use App\Exception\Auth\InvalidCredentialsException;
+use App\Exception\Auth\MissingCredentialsException;
 use App\Service\Otp\OtpService;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
@@ -33,7 +35,7 @@ class UserAuthenticator extends AbstractAuthenticator
         $body = json_decode($request->getContent(), true);
 
         if (null === $body) {
-            throw new HttpException(Response::HTTP_BAD_REQUEST, "You have to provide an email and a password");
+            throw new MissingCredentialsException();
         }
 
         $email = $body['email'];
@@ -69,6 +71,9 @@ class UserAuthenticator extends AbstractAuthenticator
 
     public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
     {
-        return new JsonResponse("Wrong email or password", Response::HTTP_UNAUTHORIZED);
+        $appException = new InvalidCredentialsException();
+        $responseDto = ErrorResponseDTO::fromAppException($appException);
+
+        return new JsonResponse($responseDto->getData(), $appException->getHttpStatus());
     }
 }
