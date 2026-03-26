@@ -37,9 +37,9 @@ final class PrelaunchService
         }
 
         // Rate-limit new registrations only
-        if ($this->userRepository->countByIpAddress($ipAddress) >= 2) {
-            throw new RateLimitExceededException();
-        }
+        // if ($this->userRepository->countByIpAddress($ipAddress) >= 2) {
+        //     throw new RateLimitExceededException();
+        // }
 
         // Existing unverified prelaunch subscriber → delete and recreate
         if ($existing !== null) {
