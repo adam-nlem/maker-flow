@@ -21,22 +21,6 @@ export default function CreatorProfileSettings({ projectUuid }: CreatorProfileSe
 
             {isLoading ? (
                 <div className="flex flex-col gap-5 px-6 py-5">
-                    <div>
-                        <Shimmer width="w-24" height="h-4" />
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {Array.from({ length: 4 }).map((_, i) => (
-                                <Shimmer key={i} width="w-24" height="h-8" radius="rounded-full" />
-                            ))}
-                        </div>
-                    </div>
-                    <div>
-                        <Shimmer width="w-32" height="h-4" />
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {Array.from({ length: 3 }).map((_, i) => (
-                                <Shimmer key={i} width="w-28" height="h-8" radius="rounded-full" />
-                            ))}
-                        </div>
-                    </div>
                     <Shimmer height="h-10" />
                     <Shimmer height="h-10" />
                     <div>

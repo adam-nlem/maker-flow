@@ -36,15 +36,6 @@ class PromptAssemblerService
     {
         $lines = [];
 
-        if ($profile->getPlatforms() !== null && count($profile->getPlatforms()) > 0) {
-            $platformsList = implode(', ', $profile->getPlatforms());
-            $lines[] = "Le créateur publie sur {$platformsList}.";
-        }
-
-        if ($profile->getContentType() !== null) {
-            $lines[] = "Type de contenu : {$profile->getContentType()->value}.";
-        }
-
         if ($profile->getNiche() !== null && $profile->getNiche() !== '') {
             $lines[] = "Sa niche est {$profile->getNiche()}.";
         }

@@ -20,8 +20,6 @@ Per-project persistent profile that captures the creator's style and preferences
 |-------|------|-------------|
 | `id` | `int` | Auto-generated primary key |
 | `uuid` | `string (GUID)` | Unique identifier exposed via API |
-| `platforms` | `JSON`, nullable | Array of platform strings (instagram, youtube, tiktok) |
-| `contentType` | `ContentType` enum, nullable | short_form or long_form |
 | `niche` | `text`, nullable | Free text describing the creator's niche |
 | `targetAudience` | `text`, nullable | Free text describing the target audience |
 | `tones` | `JSON`, nullable | Array of `Tone` enum values |
@@ -235,8 +233,6 @@ Used in `skillInputs['format']` to control script output format.
 | Property | Type | Required |
 |----------|------|----------|
 | `projectUuid` | `string` | Yes |
-| `platforms` | `string[]` | No |
-| `contentType` | `ContentType` | No |
 | `niche` | `string` | No |
 | `targetAudience` | `string` | No |
 | `tones` | `Tone[]` | No |
@@ -271,7 +267,7 @@ Used in `skillInputs['format']` to control script output format.
 
 Builds the full prompt by concatenating structured blocks:
 
-1. Creator profile block — platform, content type, niche, audience, tones, signature phrases, never list
+1. Creator profile block — niche, audience, tones, signature phrases, never list
 2. Style sample block — creator's style sample (if provided)
 3. Script brief block — topic, goal, key points, opening style, duration, extra context
 4. Skill modules block — active skill instructions (strong hook, retention boosters, storytelling, SEO, format, B-Roll, call to action) + negative instructions for disabled skills. When a specific CTA type or retention cue type is selected via `skillInputs`, the instruction targets that specific type; otherwise, generic instructions are used. When CTA type is "custom" and `callToAction` text is provided, the custom text is included in the CTA instruction

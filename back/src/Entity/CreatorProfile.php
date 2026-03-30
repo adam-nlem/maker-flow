@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Enum\ContentType;
 use App\Entity\Enum\Tone;
 use App\Helper\DateHelper;
 use App\Repository\CreatorProfileRepository;
@@ -29,22 +28,6 @@ class CreatorProfile
         'api_creator_profiles_update',
     ])]
     private ?string $uuid = null;
-
-    #[ORM\Column(type: Types::JSON, nullable: true)]
-    #[Groups([
-        'api_creator_profiles_show',
-        'api_creator_profiles_create',
-        'api_creator_profiles_update',
-    ])]
-    private ?array $platforms = null;
-
-    #[ORM\Column(enumType: ContentType::class, nullable: true)]
-    #[Groups([
-        'api_creator_profiles_show',
-        'api_creator_profiles_create',
-        'api_creator_profiles_update',
-    ])]
-    private ?ContentType $contentType = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
@@ -152,30 +135,6 @@ class CreatorProfile
     public function setUuid(string $uuid): static
     {
         $this->uuid = $uuid;
-
-        return $this;
-    }
-
-    public function getPlatforms(): ?array
-    {
-        return $this->platforms;
-    }
-
-    public function setPlatforms(?array $platforms): static
-    {
-        $this->platforms = $platforms;
-
-        return $this;
-    }
-
-    public function getContentType(): ?ContentType
-    {
-        return $this->contentType;
-    }
-
-    public function setContentType(?ContentType $contentType): static
-    {
-        $this->contentType = $contentType;
 
         return $this;
     }

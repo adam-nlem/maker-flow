@@ -1,14 +1,10 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { creatorProfileQueryKeys } from "./creatorProfileQueryKeys";
-import type { Platform } from "~/models/enums/Platform";
-import type { ContentType } from "~/models/enums/ContentType";
 import type { Tone } from "~/models/enums/Tone";
 
 interface CreateOrUpdateCreatorProfileData {
     projectUuid: string;
-    platforms?: Platform[];
-    contentType?: ContentType;
     niche?: string;
     targetAudience?: string;
     tones?: Tone[];

@@ -72,8 +72,6 @@ final class CreatorProfileController extends AbstractController
         } else {
             $creatorProfile = $existingProfile;
             $creatorProfile
-                ->setPlatforms($dto->getPlatforms())
-                ->setContentType($dto->getContentType())
                 ->setNiche($dto->getNiche())
                 ->setTargetAudience($dto->getTargetAudience())
                 ->setTones($dto->getTones())

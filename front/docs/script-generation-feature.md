@@ -49,7 +49,7 @@ Settings Page (/settings)
 ```
 front/app/
 ├── models/
-│   ├── CreatorProfile.ts              ← platforms[], contentType, tones[], signaturePhrases[], neverList[]
+│   ├── CreatorProfile.ts              ← niche, targetAudience, tones[], signaturePhrases[], neverList[], styleSample
 │   ├── ScriptGeneration.ts            ← uuid, status, topic, goal, errorMessage, etc.
 │   └── enums/
 │       ├── ContentType.ts             ← short_form, long_form (toFrenchTranslation map)
@@ -156,7 +156,7 @@ Persistence key: `"app:scripts:right-panel"`
 - `CreatorProfileForm` uses upsert pattern — same form for create and update
 - Form layout follows the ScriptPartsList pattern: scrollable fields (`flex-1 overflow-y-auto px-6 py-5`) + fixed footer (`px-6 py-4 border-t`) for save button
 - Dynamic array inputs for `signaturePhrases` and `neverList` (add with Enter or +, remove with ×)
-- Multi-select `ToggleChip` for `platforms` and `tones`
+- Multi-select `ToggleChip` for `tones`
 
 ### Skill Modules
 
@@ -184,8 +184,6 @@ Each module renders as a card with a radio-style toggle indicator. Active module
 ```ts
 class CreatorProfile {
     uuid: string
-    platforms: Platform[]
-    contentType: ContentType | undefined
     niche: string | undefined
     targetAudience: string | undefined
     tones: Tone[]
