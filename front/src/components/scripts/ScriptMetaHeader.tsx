@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import { type ScriptStatus, scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToBorderClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
@@ -140,7 +140,12 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                                 )
                                 : "Pas de date"}
                             isSelected={!!script.publishedAt}
-                            borderColorClassName="border-light-gray" />
+                            borderColorClassName="border-light-gray"
+                            suffixIcon={!isReadOnly && script.publishedAt ? XMarkIcon : undefined}
+                            onSuffixClick={() => {
+                                updateScript({ scriptUuid: script.uuid, data: { publishedAt: null } });
+                                setIsDatePickerOpen(false);
+                            }} />
 
                         {!isReadOnly && isDatePickerOpen && (
                             <>

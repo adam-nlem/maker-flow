@@ -17,6 +17,7 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     private ?array $tagUuids;
     private ?array $platforms;
     private ?ScriptStatus $status;
+    private bool $hasPublishedAt = false;
     private bool $hasPostGroupUuid = false;
     private bool $hasPlatforms = false;
     private bool $hasStatus = false;
@@ -32,6 +33,7 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     {
         $this->title = $payload["title"] ?? null;
         $this->publishedAt = isset($payload["publishedAt"]) ? new \DateTimeImmutable($payload["publishedAt"]) : null;
+        $this->hasPublishedAt = array_key_exists("publishedAt", $payload);
         $this->postGroupUuid = $payload["postGroupUuid"] ?? null;
         $this->hasPostGroupUuid = array_key_exists("postGroupUuid", $payload);
         $this->tagUuids = $payload["tagUuids"] ?? null;
@@ -61,6 +63,11 @@ class UpdateScriptRequestDTO extends AbstractRequestDTO
     public function getPublishedAt(): ?DateTimeImmutable
     {
         return $this->publishedAt;
+    }
+
+    public function hasPublishedAt(): bool
+    {
+        return $this->hasPublishedAt;
     }
 
     public function getPostGroupUuid(): ?string

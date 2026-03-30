@@ -199,7 +199,7 @@ final class ScriptController extends AbstractController
             $script->setTitle($dto->getTitle());
         }
 
-        if ($dto->getPublishedAt() !== null) {
+        if ($dto->hasPublishedAt()) {
             $script->setPublishedAt($dto->getPublishedAt());
         }
 
