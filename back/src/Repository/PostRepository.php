@@ -249,7 +249,8 @@ class PostRepository extends ServiceEntityRepository
             ->setParameter('to', $to)
             ->orderBy('p.publishedAt', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     /**
@@ -280,7 +281,8 @@ class PostRepository extends ServiceEntityRepository
             ->setParameter('uuids', $uuids)
             ->setParameter('user', $user)
             ->getQuery()
-            ->getResult();
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     /**
@@ -329,6 +331,20 @@ class PostRepository extends ServiceEntityRepository
             ->where('p.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->getQuery()
-            ->getResult();
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return Post[]
+     */
+    public function getUngroupedPosts(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.postGroup IS NULL')
+            ->orderBy('p.publishedAt', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 }

@@ -7,6 +7,7 @@ use App\DTO\QueryParam\Post\ListPostsQueryParamDTO;
 use App\DTO\QueryParam\Post\RankPostsQueryParamDTO;
 use App\Repository\PostRepository;
 use App\Service\Post\PostService;
+use App\Service\Post\PostThumbnailService;
 use App\Entity\Enum\TimePeriod;
 use App\Repository\IntegrationRepository;
 use App\Repository\SubscriptionRepository;
@@ -21,7 +22,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 #[Route('/api/posts', requirements: ['postUuid' => Requirement::UUID])]
 final class PostController extends AbstractController
 {
-    public function __construct(private PostService $service) {}
+    public function __construct(private PostService $postService) {}
 
     #[Route('', name: 'api_posts_list', methods: ['GET'])]
     public function list(
@@ -43,7 +44,7 @@ final class PostController extends AbstractController
 
         $isSubscribed = $subscriptionRepository->getLatestActiveByUser($user) !== null;
 
-        $posts = $this->service->getPostsWithInsights(
+        $posts = $this->postService->getPostsWithInsights(
             user: $user,
             integration: $integration,
             page: $queryParamDto->getPage(),
@@ -76,7 +77,7 @@ final class PostController extends AbstractController
             );
         }
 
-        $posts = $this->service->getRankedPosts(
+        $posts = $this->postService->getRankedPosts(
             user: $user,
             integration: $integration,
             page: $queryParamDto->getPage(),
@@ -94,6 +95,7 @@ final class PostController extends AbstractController
     public function getThumbnail(
         string $postUuid,
         PostRepository $postRepository,
+        PostThumbnailService $postThumbnailService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -107,7 +109,7 @@ final class PostController extends AbstractController
             );
         }
 
-        $thumbnailFile = $this->service->getPostThumbnail($post);
+        $thumbnailFile = $postThumbnailService->getFile($post);
 
         if ($thumbnailFile === null) {
             return $this->json(

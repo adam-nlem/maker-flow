@@ -20,23 +20,14 @@ use App\Repository\IntegrationInsightRepository;
 use App\Repository\PostInsightRepository;
 use App\Repository\PostRepository;
 use App\Service\PostGroup\PostGroupService;
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\Filesystem\Filesystem;
-use Symfony\Component\HttpFoundation\File\File;
-use Symfony\Contracts\HttpClient\HttpClientInterface;
-
 class PostService
 {
-    private const THUMBNAIL_BASE_PATH = '/private/uploads/social-analytics/%s/post/thumbnail';
-
     public function __construct(
         private readonly PostRepository $repository,
         private readonly PostInsightRepository $insightRepository,
         private readonly IntegrationInsightRepository $integrationInsightRepository,
         private readonly PostGroupService $postGroupService,
-        private readonly HttpClientInterface $httpClient,
-        private readonly Filesystem $filesystem,
-        private readonly ParameterBagInterface $parameterBag,
+        private readonly PostThumbnailService $postThumbnailService,
     ) {}
 
     public function createOrGetPost(
@@ -66,7 +57,7 @@ class PostService
             ->setUser($integration->getUser());
 
         if ($postDTO->getThumbnailUrl() !== null) {
-            $this->downloadAndStoreThumbnail($post, $postDTO->getThumbnailUrl());
+            $this->postThumbnailService->downloadAndStore($post, $postDTO->getThumbnailUrl());
         }
 
         $this->repository->save($post);
@@ -102,70 +93,13 @@ class PostService
             ->setUser($integration->getUser());
 
         if ($postDTO->getThumbnailUrl() !== null) {
-            $this->downloadAndStoreThumbnail($post, $postDTO->getThumbnailUrl());
+            $this->postThumbnailService->downloadAndStore($post, $postDTO->getThumbnailUrl());
         }
 
         $this->repository->save($post);
         $this->postGroupService->tryAutoGroup($post);
 
         return $post;
-    }
-
-    public function downloadAndStoreThumbnail(Post $post, string $thumbnailUrl): ?string
-    {
-        $platform = strtolower($post->getIntegration()->getPlatform()->value);
-        $thumbnailDirectory = $this->getThumbnailDirectory($platform);
-
-        if (!$this->filesystem->exists($thumbnailDirectory)) {
-            $this->filesystem->mkdir($thumbnailDirectory);
-        }
-
-        $extension = $this->getExtensionFromUrl($thumbnailUrl);
-        $filename = sprintf('%s.%s', $post->getUuid(), $extension);
-        $filePath = sprintf('%s/%s', $thumbnailDirectory, $filename);
-
-        $response = $this->httpClient->request('GET', $thumbnailUrl);
-
-        if ($response->getStatusCode() !== 200) {
-            return null;
-        }
-
-        $this->filesystem->dumpFile($filePath, $response->getContent());
-
-        return $filePath;
-    }
-
-    private function getThumbnailDirectory(string $platform): string
-    {
-        $projectDir = $this->parameterBag->get('kernel.project_dir');
-
-        return sprintf('%s%s', $projectDir, sprintf(self::THUMBNAIL_BASE_PATH, $platform));
-    }
-
-    private function getExtensionFromUrl(string $url): string
-    {
-        $path = parse_url($url, PHP_URL_PATH);
-        $extension = pathinfo($path, PATHINFO_EXTENSION);
-
-        return $extension ?: 'jpg';
-    }
-
-    //TODO: Add a placeholder
-    public function getPostThumbnail(Post $post): ?\Symfony\Component\HttpFoundation\File\File
-    {
-        $platform = strtolower($post->getIntegration()->getPlatform()->value);
-        $thumbnailDirectory = $this->getThumbnailDirectory($platform);
-
-        $possibleExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
-
-        foreach ($possibleExtensions as $extension) {
-            $filePath = sprintf('%s/%s.%s', $thumbnailDirectory, $post->getUuid(), $extension);
-            if (file_exists($filePath)) {
-                return new File($filePath, false);
-            }
-        }
-
-        return null;
     }
 
     private const EXCLUDED_INSIGHT_TYPES = [
@@ -309,5 +243,4 @@ class PostService
         $publishedAt = $post->getPublishedAt();
         return $publishedAt->diff($now);
     }
-
 }
