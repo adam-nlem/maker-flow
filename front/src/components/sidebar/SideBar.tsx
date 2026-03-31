@@ -5,7 +5,6 @@ import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCur
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { Button } from "../ui/Button";
-import { useEffect } from "react";
 import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
 import IconWithTextTile from "../ui/IconWithTextTile";
@@ -15,7 +14,6 @@ import Shimmer from "../ui/Shimmer";
 
 import SelectDropdown from "../ui/SelectDropdown"
 import type { Project } from "~/models/Project"
-import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
 import UpdateProjectModal from "../projects/UpdateProjectModal";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
@@ -34,34 +32,17 @@ export default function SideBar() {
   const { focusedProjectUuid, setFocusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
 
-  const isExpanded = useSidebarStore((state) => state.isExpanded)
-  const setIsExpanded = useSidebarStore((state) => state.setIsExpanded)
-
   const isCreateProjectModalOpen = useCreateProjectModalStore((state) => state.isCreateModalOpen)
   const setIsCreateProjectModalOpen = useCreateProjectModalStore((state) => state.setIsCreateModalOpen)
 
   const updatingProjectUuid = useUpdateProjectStore((state) => state.updatingProjectUuid)
   const setUpdatingProjectUuid = useUpdateProjectStore((state) => state.setUpdatingProjectUuid)
 
-  // Close modals when sidebar collapses
-  useEffect(() => {
-    if (!isExpanded) {
-      setIsCreateProjectModalOpen(false)
-    }
-  }, [isExpanded, setIsCreateProjectModalOpen])
-
   return (
-    <div className="fixed inset-0 z-10 flex flex-row pointer-events-none">
-      <div
-        onMouseEnter={() => setIsExpanded(true)}
-        onMouseLeave={() => {
-          if (!isCreateProjectModalOpen)
-            setIsExpanded(false)
-        }}
-        className={`h-full shrink-0 border-r border-light-gray bg-clear flex flex-col justify-between overflow-hidden transition-all duration-300 ease-in-out pointer-events-auto ${isExpanded ? 'w-72' : 'w-16'}`}
-      >
+    <>
+      <div className="w-50 shrink-0 h-screen border-r border-light-gray bg-clear flex flex-col justify-between overflow-hidden">
         {/* TOP SECTION */}
-        <div className={`p-3 ${isExpanded ? '' : 'flex flex-col items-center'}`}>
+        <div className="p-3">
           {/* PROJECT SELECTOR */}
 
           {isLoadingProjects ? <Shimmer width="w-10" height="h-10" /> : <div>
@@ -80,7 +61,7 @@ export default function SideBar() {
                   <ProjectTile
                     project={focusedProject}
                     rightIcon={
-                      isExpanded && <ChevronUpDownIcon className="size-5 text-gray -mb-0.5" strokeWidth={2} />
+                      <ChevronUpDownIcon className="size-5 text-gray -mb-0.5" strokeWidth={2} />
                     }
                     onClick={onClick}
                   />
@@ -103,11 +84,11 @@ export default function SideBar() {
                 <div className="flex flex-col items-center gap-1">
                   <Button type="button" disabled>
                     <div className="flex flex-row justify-center items-center gap-3 shrink-0">
-                      {isExpanded && <p className="text-sm">Créer un nouveau Projet</p>}
+                      <p className="text-sm">Créer un nouveau Projet</p>
                       <PlusIcon className="size-4" strokeWidth={2} />
                     </div>
                   </Button>
-                  {isExpanded && <p className="text-body-xs text-gray text-center">Limite de projets atteinte</p>}
+                  <p className="text-body-xs text-gray text-center">Limite de projets atteinte</p>
                 </div>
               ) : (
                 <Button
@@ -117,7 +98,7 @@ export default function SideBar() {
                   }}
                 >
                   <div className="flex flex-row justify-center items-center gap-3 shrink-0">
-                    {isExpanded && <p className="text-sm">Créer un nouveau Projet</p>}
+                    <p className="text-sm">Créer un nouveau Projet</p>
                     <PlusIcon className="size-4" strokeWidth={2} />
                   </div>
                 </Button>
@@ -127,32 +108,28 @@ export default function SideBar() {
           </div>}
 
           {/* NAVIGATION SECTION */}
-          <div className={`mt-10 flex flex-col gap-1 ${isExpanded ? '' : 'items-center'}`}>
+          <div className="mt-10 flex flex-col gap-1">
             <IconWithTextTile
               icon={location.pathname === homePath ? HomeIconSolid : HomeIcon}
               label="Accueil"
-              isExpanded={isExpanded}
               isSelected={location.pathname === homePath}
               onClick={() => navigate(homePath)}
             />
             <IconWithTextTile
               icon={location.pathname.startsWith(scriptsPath) ? ClipboardDocumentCheckIconSolid : ClipboardDocumentCheckIcon}
               label="Script"
-              isExpanded={isExpanded}
               isSelected={location.pathname.startsWith(scriptsPath)}
               onClick={() => navigate(scriptsPath)}
             />
             <IconWithTextTile
               icon={location.pathname === calendarPath ? CalendarDaysIconSolid : CalendarDaysIcon}
               label="Calendrier"
-              isExpanded={isExpanded}
               isSelected={location.pathname === calendarPath}
               onClick={() => navigate(calendarPath)}
             />
             <IconWithTextTile
               icon={location.pathname.startsWith(insightsPath) ? ChartBarIconSolid : ChartBarIcon}
               label="Statistiques"
-              isExpanded={isExpanded}
               isSelected={location.pathname.startsWith(insightsPath)}
               onClick={() => navigate(insightsPath)}
             />
@@ -160,13 +137,12 @@ export default function SideBar() {
         </div>
 
         {/* BOTTOM SECTION */}
-        <div className={isExpanded ? '' : 'flex flex-col items-center'}>
+        <div>
           {/* BOTTOM NAVIGATION */}
-          <div className={`mb-5 flex flex-col p-3 ${isExpanded ? '' : 'items-center'}`}>
+          <div className="mb-5 flex flex-col p-3">
             <IconWithTextTile
               icon={location.pathname.startsWith(settingsPath) ? Cog6ToothIconSolid : Cog6ToothIcon}
               label="Paramètres"
-              isExpanded={isExpanded}
               isBold={false}
               isSelected={location.pathname.startsWith(settingsPath)}
               onClick={() => navigate(settingsPath)}
@@ -183,22 +159,18 @@ export default function SideBar() {
             >
               <div className="flex flex-row justify-center items-center gap-3">
                 <SparklesIcon className="size-4" strokeWidth={2} />
-                {isExpanded ? <p className="text-sm">Passer Premium ?</p> : null}
+                <p className="text-sm">Passer Premium ?</p>
               </div>
             </Button>
           </div>
         </div>
       </div>
 
-
       {/* Modals */}
       <CreateProjectModal
         showModal={isCreateProjectModalOpen}
         onProjectCreated={() => setIsCreateProjectModalOpen(false)}
-        onClose={() => {
-          setIsCreateProjectModalOpen(false);
-          setIsExpanded(false);
-        }}
+        onClose={() => setIsCreateProjectModalOpen(false)}
       />
 
       {updatingProjectUuid && <UpdateProjectModal
@@ -206,7 +178,6 @@ export default function SideBar() {
         showModal
         onClose={() => setUpdatingProjectUuid(null)}
       />}
-
-    </div>
+    </>
   );
 }

@@ -20,7 +20,6 @@ export default function SettingsPageView() {
                             key={section}
                             icon={settingsSectionToIcon[section]}
                             label={settingsSectionToFrenchTranslation[section]}
-                            isExpanded
                             isSelected={activeSection === section}
                             onClick={() => navigate(`/settings/${settingsSectionToPath[section]}`)}
                         />

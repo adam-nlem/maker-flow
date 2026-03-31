@@ -142,7 +142,7 @@ hover:bg-gray        /* Button hover */
 
 ```css
 transition-colors    /* Color transitions */
-transition-all duration-300 ease-in-out  /* Sidebar animations */
+transition-all duration-300 ease-in-out  /* Panel animations */
 ```
 
 ---
@@ -398,7 +398,7 @@ Real-time password strength feedback. Displays a list of rules with pass/fail in
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/ModalOverlay.tsx`
 
-Modal backdrop with sidebar awareness.
+Modal backdrop with sidebar-aware positioning.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
@@ -410,7 +410,7 @@ Modal backdrop with sidebar awareness.
 **Features:**
 - Closes on Escape key
 - Closes on backdrop click
-- Adapts to sidebar expanded/collapsed state
+- Offsets content area to account for sidebar width (w-72)
 - Prevents body scroll when open
 - Uses React Portal
 

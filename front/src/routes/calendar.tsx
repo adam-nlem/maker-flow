@@ -42,9 +42,9 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="w-full">
+    <div className="flex w-full">
       <SideBar />
-      <div className="w-full pl-16">
+      <div className="flex-1 min-w-0">
         <div className="p-5 h-screen overflow-hidden flex flex-col gap-5">
 
           <h1 className="text-heading-xl">Calendrier</h1>

@@ -9,9 +9,9 @@ export default function InsightsPage() {
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
 
   return (
-    <div className="w-full">
+    <div className="flex w-full">
       <SideBar />
-      <div className="w-full pl-16">
+      <div className="flex-1 min-w-0">
         {focusedProject && (
           <InsightsPageView projectUuid={focusedProject.uuid} />
         )}

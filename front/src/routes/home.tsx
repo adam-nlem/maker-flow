@@ -22,9 +22,9 @@ export default function HomePage() {
   const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid })
 
   return (
-    <div className="w-full">
+    <div className="flex w-full">
       <SideBar />
-      <div className="w-full pl-16 h-screen overflow-hidden">
+      <div className="flex-1 min-w-0 h-screen overflow-hidden">
         <div className="p-5 flex flex-col h-full">
           <div className="flex flex-row gap-5 flex-1 min-h-0">
             {isLoading ? (

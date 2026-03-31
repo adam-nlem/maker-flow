@@ -340,8 +340,6 @@ The SideBar component integrates all project features:
 6. **Navigation Links**: "Taches" and "Insights" links for built-in features
 
 **Behavior:**
-- Modals close when sidebar collapses
-- Sidebar stays expanded while modals are open
 - Edit icon appears on hover in selection modal
 
 ---

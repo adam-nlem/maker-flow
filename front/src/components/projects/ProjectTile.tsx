@@ -1,7 +1,6 @@
 import type { Project } from "~/models/Project";
 import { useMemo, useState, type ReactNode } from "react";
 import { formatToFrenchDateShort } from "~/utils/dateFormatters";
-import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 import { createAvatar } from '@dicebear/core';
 import { shapes } from '@dicebear/collection';
 
@@ -22,7 +21,6 @@ export default function ProjectTile({
   onHoverRightIcon,
   onClick
 }: ProjectTileProps) {
-  const isExpanded = useSidebarStore((state) => state.isExpanded)
   const [isHovered, setIsHovered] = useState(false)
 
   const avatar = useMemo(() => {
@@ -42,14 +40,14 @@ export default function ProjectTile({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex flex-row gap-3 items-center">
-        {(isExpanded && isSelected) && <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>}
+        {isSelected && <div className="h-1.5 w-1.5 rounded-full bg-primary"></div>}
         <img src={avatar} alt="Project Avatar" className="rounded-md h-10 w-10 shrink-0" />
-        {isExpanded && <div className="flex flex-col">
+        <div className="flex flex-col">
           <h1 className="text-heading-sm whitespace-nowrap">{project.name}</h1>
           {showCreatedAt && (
             <p className="text-body-xs text-gray whitespace-nowrap">Créé le {formatToFrenchDateShort(project.createdAt)}</p>
           )}
-        </div>}
+        </div>
       </div>
       {isHovered && onHoverRightIcon}
       {rightIcon}
