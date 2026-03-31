@@ -34,11 +34,9 @@ export default function ModalOverlay({ isOpen, onClose, children, className = ""
             className="fixed inset-0 z-50 flex flex-row pointer-events-none"
             onClick={onClose}
         >
-            {/* Sidebar spacer */}
-            <div className="shrink-0 w-72" />
 
             {/* Modal content area */}
-            <div className={`flex-1 flex bg-black/5 pointer-events-auto p-3 ${className}`}>
+            <div className={`flex-1 min-w-0 flex bg-black/40 pointer-events-auto p-3 ${className}`}>
                 {children}
             </div>
         </div>,

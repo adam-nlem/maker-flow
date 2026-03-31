@@ -1,10 +1,10 @@
-import { useNavigate } from "react-router-dom";
 import { LinkIcon } from "@heroicons/react/24/outline";
-import { settingsIntegrationsPath } from "~/routes/routePaths";
 import { Button } from "~/components/ui/Button";
+import { Platform } from "~/models/enums/Platform";
+import { useIntegrationLoginModalStore } from "~/stores/integrations/integrationLoginModalStore";
 
 export default function ConnectIntegrationPlaceholder() {
-    const navigate = useNavigate();
+    const setSelectedPlatform = useIntegrationLoginModalStore((state) => state.setSelectedPlatform);
 
     return (
         <div className="flex flex-col items-center justify-center py-20">
@@ -13,7 +13,7 @@ export default function ConnectIntegrationPlaceholder() {
             <p className="text-body-sm text-gray mb-3 text-center max-w-xs">
                 Connectez un compte Instagram ou YouTube pour accéder à vos statistiques.
             </p>
-            <Button style="primary" width="w-fit" onClick={() => navigate(settingsIntegrationsPath)}>
+            <Button style="primary" width="w-fit" onClick={() => setSelectedPlatform(Platform.Instagram)}>
                 Connecter un compte
             </Button>
         </div>
