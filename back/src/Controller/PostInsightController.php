@@ -4,6 +4,8 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\DTO\QueryParam\PostInsight\ShowPostInsightDetailQueryParamDTO;
+use App\Exception\Post\PostNotFoundException;
+use App\Exception\Stripe\ActiveSubscriptionRequiredException;
 use App\Repository\PostRepository;
 use App\Repository\SubscriptionRepository;
 use App\Service\PostInsight\PostInsightService;
@@ -29,17 +31,11 @@ final class PostInsightController extends AbstractController
         $post = $postRepository->getByUuidAndUser($queryParamDto->getPostUuid(), $user);
 
         if ($post === null) {
-            return $this->json(
-                data: ["message" => "Post not found"],
-                status: Response::HTTP_NOT_FOUND,
-            );
+            throw new PostNotFoundException();
         }
 
         if ($subscriptionRepository->getLatestActiveByUser($user) === null) {
-            return $this->json(
-                data: ["message" => "Active subscription required."],
-                status: Response::HTTP_PAYMENT_REQUIRED,
-            );
+            throw new ActiveSubscriptionRequiredException();
         }
 
         $detail = $postInsightService->getDetail($user, $post);

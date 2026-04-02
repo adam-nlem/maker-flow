@@ -15,6 +15,7 @@ export const errorCodeMessages: Record<number, string> = {
   13003: "Impossible de gérer l'abonnement.",
   13004: 'Aucun abonnement actif trouvé.',
   13005: 'Signature Stripe manquante.',
+  13006: 'Un abonnement actif est requis.',
 
   // OTP (15xxx)
   15001: 'Code incorrect.',
@@ -42,12 +43,19 @@ export const errorCodeMessages: Record<number, string> = {
   18004: 'Plan introuvable.',
   18005: 'Tag introuvable.',
   18006: 'Ce titre de tag est déjà utilisé.',
+  18007: 'Une génération de script est déjà en cours.',
+  18008: 'Impossible de supprimer une génération en cours.',
 
   // TodoList (19xxx)
   19001: 'Liste introuvable.',
   19002: 'Tâche introuvable.',
   19003: 'Tag introuvable.',
   19004: 'Ce titre de tag est déjà utilisé.',
+
+  // Post (20xxx)
+  20001: 'Publication introuvable.',
+  20002: 'Miniature introuvable.',
+  20003: 'Groupe de publications introuvable.',
 
   // User (21xxx)
   21001: 'Le mot de passe ne respecte pas les critères de sécurité.',

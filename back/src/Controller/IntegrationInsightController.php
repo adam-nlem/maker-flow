@@ -6,6 +6,8 @@ use App\Entity\User;
 use App\DTO\QueryParam\IntegrationInsight\ListIntegrationInsightsQueryParamDTO;
 use App\DTO\QueryParam\IntegrationInsight\ShowIntegrationDetailQueryParamDTO;
 use App\Entity\Enum\TimePeriod;
+use App\Exception\Integration\IntegrationNotFoundException;
+use App\Exception\Project\ProjectNotFoundException;
 use App\Repository\ProjectRepository;
 use App\Service\IntegrationInsight\IntegrationInsightService;
 use App\Repository\IntegrationRepository;
@@ -30,10 +32,7 @@ final class IntegrationInsightController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(
-                data: ["message" => "You don't have any project with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new ProjectNotFoundException();
         }
 
         $isSubscribed = $subscriptionRepository->getLatestActiveByUser($user) !== null;
@@ -59,10 +58,7 @@ final class IntegrationInsightController extends AbstractController
         $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
 
         if ($integration === null) {
-            return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new IntegrationNotFoundException();
         }
 
         $detail = $insightService->getDetail(

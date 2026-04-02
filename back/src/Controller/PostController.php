@@ -6,6 +6,10 @@ use App\Entity\User;
 use App\DTO\QueryParam\Post\ListPostsQueryParamDTO;
 use App\DTO\QueryParam\Post\RankPostsQueryParamDTO;
 use App\DTO\QueryParam\Post\SearchPostsQueryParamDTO;
+use App\Exception\Integration\IntegrationNotFoundException;
+use App\Exception\Post\PostNotFoundException;
+use App\Exception\Post\PostThumbnailNotFoundException;
+use App\Exception\Project\ProjectNotFoundException;
 use App\Repository\PostRepository;
 use App\Repository\ProjectRepository;
 use App\Service\Post\PostService;
@@ -35,10 +39,7 @@ final class PostController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(
-                data: ["message" => "You don't have any project with this uuid"],
-                status: Response::HTTP_NOT_FOUND,
-            );
+            throw new ProjectNotFoundException();
         }
 
         $posts = $this->postService->getPostsWithAggregatedInsightsByProjectAndSearchTerm(
@@ -68,10 +69,7 @@ final class PostController extends AbstractController
         $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
 
         if ($integration === null) {
-            return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new IntegrationNotFoundException();
         }
 
         $posts = $this->postService->getRankedPosts(
@@ -100,10 +98,7 @@ final class PostController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(
-                data: ["message" => "You don't have any project with this uuid"],
-                status: Response::HTTP_NOT_FOUND,
-            );
+            throw new ProjectNotFoundException();
         }
 
         $posts = $postRepository->searchByProjectAndUserAndCaption(
@@ -139,19 +134,13 @@ final class PostController extends AbstractController
         $post = $postRepository->getByUuidAndUser($postUuid, $user);
 
         if ($post === null) {
-            return $this->json(
-                data: ["message" => "You don't have any post with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new PostNotFoundException();
         }
 
         $thumbnailFile = $postThumbnailService->getFile($post);
 
         if ($thumbnailFile === null) {
-            return $this->json(
-                data: ["message" => "Thumbnail not found for this post"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new PostThumbnailNotFoundException();
         }
 
         return new BinaryFileResponse(
