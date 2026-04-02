@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import ScriptCard from "./ScriptCard";
@@ -7,6 +6,7 @@ import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { SidePanel } from "~/components/ui/SidePanel";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { HttpException } from "~/services/httpClient/HttpException";
 
 interface ScriptListPanelProps {
@@ -21,7 +21,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     const { createScript, isPending } = useCreateScript();
     const focusedScriptUuid = useFocusScriptStore((state) => state.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
-    const sentinelRef = useRef<HTMLDivElement>(null);
+    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore);
     const { subscription } = useShowCurrentSubscription();
     const { plans } = useListPlans();
     const currentPlanConfig = plans.find((p) => p.plan === subscription?.plan);
@@ -39,26 +39,6 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
             throw error;
         }
     };
-
-    useEffect(() => {
-        const sentinel = sentinelRef.current;
-        if (!sentinel) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-                    listMore();
-                }
-            },
-            { rootMargin: "0px 0px 200px 0px" },
-        );
-
-        observer.observe(sentinel);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [hasMore, isLoadingMore, listMore]);
 
     return (
         <SidePanel

@@ -292,10 +292,11 @@ class PostRepository extends ServiceEntityRepository
     /**
      * @return Post[]
      */
-    public function getByProjectAndUserPaginated(
+    public function getByProjectAndUserPaginatedAndSearchTerm(
         Project $project,
         User $user,
         ?Platform $platform,
+        ?string $searchTerm,
         int $page,
         int $limit,
     ): array {
@@ -312,6 +313,11 @@ class PostRepository extends ServiceEntityRepository
         if ($platform !== null) {
             $qb->andWhere('i.platform = :platform')
                 ->setParameter('platform', $platform);
+        }
+
+        if ($searchTerm !== null) {
+            $qb->andWhere('LOWER(p.caption) LIKE LOWER(:searchTerm)')
+                ->setParameter('searchTerm', '%' . $searchTerm . '%');
         }
 
         return $qb->getQuery()

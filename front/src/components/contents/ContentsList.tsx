@@ -3,23 +3,23 @@ import { PostGroupWithInsightsAndScriptDTO } from "~/dtos/postGroups/PostGroupWi
 import { useListPaginatedPostGroups } from "~/hooks/api/postGroups/useListPaginatedPostGroups"
 import { useListPaginatedPosts } from "~/hooks/api/posts/useListPaginatedPosts"
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
-import { ContentTab } from "~/models/enums/ContentTab"
-import { useContentStore } from "~/stores/content/contentStore"
+import { ContentsTab } from "~/models/enums/ContentsTab"
+import { useContentsStore } from "~/stores/contents/contentsStore"
 import ContentCard from "./ContentCard"
 
-interface ContentListProps {
+interface ContentsListProps {
     projectUuid: string
 }
 
-export default function ContentList({ projectUuid }: ContentListProps) {
-    const activeTab = useContentStore((s) => s.activeTab)
-    const platformFilter = useContentStore((s) => s.platformFilter)
-    const selectedGroupUuid = useContentStore((s) => s.selectedGroupUuid)
-    const selectedPostUuid = useContentStore((s) => s.selectedPostUuid)
-    const selectGroup = useContentStore((s) => s.selectGroup)
-    const selectPost = useContentStore((s) => s.selectPost)
+export default function ContentsList({ projectUuid }: ContentsListProps) {
+    const activeTab = useContentsStore((s) => s.activeTab)
+    const platformFilter = useContentsStore((s) => s.platformFilter)
+    const selectedGroupUuid = useContentsStore((s) => s.selectedGroupUuid)
+    const selectedPostUuid = useContentsStore((s) => s.selectedPostUuid)
+    const selectGroup = useContentsStore((s) => s.selectGroup)
+    const selectPost = useContentsStore((s) => s.selectPost)
 
-    const isGroupTab = activeTab === ContentTab.Groups
+    const isGroupTab = activeTab === ContentsTab.Groups
 
     const {
         postGroups,

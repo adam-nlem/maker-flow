@@ -9,7 +9,7 @@ import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
 import IconWithTextTile from "../ui/IconWithTextTile";
 import { useLocation, useNavigate } from "react-router-dom";
-import { calendarPath, contentPath, homePath, scriptsPath, settingsPath, settingsSubscriptionPath } from "~/routes/routePaths";
+import { calendarPath, contentsPath, homePath, scriptsPath, settingsPath, settingsSubscriptionPath } from "~/routes/routePaths";
 import Shimmer from "../ui/Shimmer";
 
 import SelectDropdown from "../ui/SelectDropdown"
@@ -136,10 +136,10 @@ export default function SideBar() {
               onClick={() => navigate(calendarPath)}
             />
             <IconWithTextTile
-              icon={location.pathname.startsWith(contentPath) ? ChartBarIconSolid : ChartBarIcon}
+              icon={location.pathname.startsWith(contentsPath) ? ChartBarIconSolid : ChartBarIcon}
               label="Contenu"
-              isSelected={location.pathname.startsWith(contentPath)}
-              onClick={() => navigate(contentPath)}
+              isSelected={location.pathname.startsWith(contentsPath)}
+              onClick={() => navigate(contentsPath)}
             />
           </div>
 

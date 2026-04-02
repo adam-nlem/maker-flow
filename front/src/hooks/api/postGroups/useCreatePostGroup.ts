@@ -2,14 +2,19 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { postGroupQueryKeys } from "./postGroupQueryKeys";
 
+interface CreatePostGroupData {
+    title: string;
+    postUuids?: string[];
+}
+
 export function useCreatePostGroup({ projectUuid }: { projectUuid: string }) {
     const queryClient = useQueryClient()
 
     const mutation = useMutation({
-        mutationFn: async (title: string) => {
+        mutationFn: async (data: CreatePostGroupData) => {
             await httpClient.post('/post-groups', {
                 "projectUuid": projectUuid,
-                "title": title,
+                ...data,
             })
         },
         onSuccess: () => {

@@ -156,7 +156,7 @@ front/app/
 ## Key Patterns
 
 ### Infinite Scroll Pagination
-`ScriptListPanel` uses infinite scroll to load scripts page by page. `useListPaginatedScripts` manages page/additionalScripts/hasMore/isLoadingMore state (same pattern as `useListPaginatedPosts`). Accepts an optional `status?: ScriptStatus` prop to filter scripts by status — when provided, only scripts matching that status are returned. The query key includes the status so React Query refetches when the filter changes. A sentinel `<div>` at the bottom of the list triggers an `IntersectionObserver` (rootMargin `200px`) to call `listMore()` when the user scrolls near the end. The API sends `page`, `limit`, and optionally `status` query params; `hasMore` is determined by `count === limit`.
+`ScriptListPanel` uses infinite scroll to load scripts page by page. `useListPaginatedScripts` manages page/additionalScripts/hasMore/isLoadingMore state (same pattern as `useListPaginatedPosts`). Accepts an optional `status?: ScriptStatus` prop to filter scripts by status — when provided, only scripts matching that status are returned. The query key includes the status so React Query refetches when the filter changes. A sentinel `<div>` at the bottom of the list is observed via the `useInfiniteScroll` hook (rootMargin `200px`) to call `listMore()` when the user scrolls near the end. The API sends `page`, `limit`, and optionally `status` query params; `hasMore` is determined by `count === limit`.
 
 ### Script Creation (no modal)
 Clicking "+ New script" in `ScriptListPanel` calls `useCreateScript` directly with a default title `"Nouveau script"`. Since `useCreateScript.mutationFn` returns the full `Script` object, the new UUID is immediately available to set as focused, opening the editor instantly.

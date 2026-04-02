@@ -29,11 +29,8 @@ export default function ScriptDetailModal({ script, projectUuid, onClose }: Scri
     };
 
     return (
-        <ModalOverlay isOpen={!!script} onClose={onClose} className="justify-center items-center">
-            <div
-                className="border rounded-xl border-light-gray w-175 max-h-[85vh] flex flex-col shadow-lg bg-clear overflow-hidden"
-                onClick={(e) => e.stopPropagation()}
-            >
+        <ModalOverlay isOpen={!!script} onClose={onClose}>
+            <div className="flex-1 min-h-0 overflow-hidden">
                 <ScriptEditorPanel key={script.uuid} script={script} projectUuid={projectUuid} isReadOnly onOpenEditor={handleOpenEditor} />
             </div>
         </ModalOverlay>

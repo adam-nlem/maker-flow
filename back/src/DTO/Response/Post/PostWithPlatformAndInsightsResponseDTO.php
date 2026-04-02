@@ -2,6 +2,7 @@
 
 namespace App\DTO\Response\Post;
 
+use App\DTO\AggregatedInsightDTO;
 use App\DTO\Response\ResponseDTOInterface;
 use App\Entity\Post;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -13,7 +14,7 @@ class PostWithPlatformAndInsightsResponseDTO implements ResponseDTOInterface
         private readonly Post $post,
         #[Groups(['api_posts_list'])]
         private readonly string $platform,
-        /** @var array<array{type: string, value: float}> */
+        /** @var AggregatedInsightDTO[] */
         #[Groups(['api_posts_list'])]
         private readonly array $aggregatedInsights,
         #[Groups(['api_posts_list'])]

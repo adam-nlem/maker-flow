@@ -7,9 +7,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class AggregatedInsightDTO
 {
     public function __construct(
-        #[Groups(['api_post_groups_list'])]
+        #[Groups(['api_post_groups_list', 'api_posts_list'])]
         private readonly string $type,
-        #[Groups(['api_post_groups_list'])]
+        #[Groups(['api_post_groups_list', 'api_posts_list'])]
         private readonly float $value,
     ) {}
 

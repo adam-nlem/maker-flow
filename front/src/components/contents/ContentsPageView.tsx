@@ -1,27 +1,27 @@
 import { Button } from "~/components/ui/Button"
 import Pill from "~/components/ui/Pill"
-import { useContentStore } from "~/stores/content/contentStore"
-import { contentTabOptions, contentTabToFrenchTranslation } from "~/models/enums/ContentTab"
+import { useContentsStore } from "~/stores/contents/contentsStore"
+import { contentsTabOptions, contentsTabToFrenchTranslation } from "~/models/enums/ContentsTab"
 import { PlusIcon } from "@heroicons/react/24/outline"
-import ContentPlatformFilter from "./ContentPlatformFilter"
-import ContentList from "./ContentList"
+import ContentsPlatformFilter from "./ContentsPlatformFilter"
+import ContentsList from "./ContentsList"
 import ContentGroupDetailPanel from "./ContentGroupDetailPanel"
 import ContentPostDetailPanel from "./ContentPostDetailPanel"
 import CreateGroupModal from "./CreateGroupModal"
 
-interface ContentPageViewProps {
+interface ContentsPageViewProps {
     projectUuid: string
 }
 
-export default function ContentPageView({ projectUuid }: ContentPageViewProps) {
-    const activeTab = useContentStore((s) => s.activeTab)
-    const setActiveTab = useContentStore((s) => s.setActiveTab)
-    const platformFilter = useContentStore((s) => s.platformFilter)
-    const setPlatformFilter = useContentStore((s) => s.setPlatformFilter)
-    const selectedGroupUuid = useContentStore((s) => s.selectedGroupUuid)
-    const selectedPostUuid = useContentStore((s) => s.selectedPostUuid)
-    const isCreateGroupModalOpen = useContentStore((s) => s.isCreateGroupModalOpen)
-    const setIsCreateGroupModalOpen = useContentStore((s) => s.setIsCreateGroupModalOpen)
+export default function ContentsPageView({ projectUuid }: ContentsPageViewProps) {
+    const activeTab = useContentsStore((s) => s.activeTab)
+    const setActiveTab = useContentsStore((s) => s.setActiveTab)
+    const platformFilter = useContentsStore((s) => s.platformFilter)
+    const setPlatformFilter = useContentsStore((s) => s.setPlatformFilter)
+    const selectedGroupUuid = useContentsStore((s) => s.selectedGroupUuid)
+    const selectedPostUuid = useContentsStore((s) => s.selectedPostUuid)
+    const isCreateGroupModalOpen = useContentsStore((s) => s.isCreateGroupModalOpen)
+    const setIsCreateGroupModalOpen = useContentsStore((s) => s.setIsCreateGroupModalOpen)
 
     return (
         <div className="flex flex-col h-full overflow-hidden">
@@ -42,10 +42,10 @@ export default function ContentPageView({ projectUuid }: ContentPageViewProps) {
 
             {/* Tab bar */}
             <div className="flex flex-row items-center gap-2 px-6 py-3 border-b border-light-gray">
-                {contentTabOptions.map((tab) => (
+                {contentsTabOptions.map((tab) => (
                     <Pill
                         key={tab}
-                        label={contentTabToFrenchTranslation[tab]}
+                        label={contentsTabToFrenchTranslation[tab]}
                         isSelected={activeTab === tab}
                         onClick={() => setActiveTab(tab)}
                         bgColorClassName="bg-primary/10"
@@ -58,7 +58,7 @@ export default function ContentPageView({ projectUuid }: ContentPageViewProps) {
 
             {/* Platform filter */}
             <div className="px-6 py-3">
-                <ContentPlatformFilter
+                <ContentsPlatformFilter
                     projectUuid={projectUuid}
                     platformFilter={platformFilter}
                     onPlatformChange={setPlatformFilter}
@@ -69,7 +69,7 @@ export default function ContentPageView({ projectUuid }: ContentPageViewProps) {
             <div className="flex flex-row flex-1 min-h-0">
                 {/* Main content area */}
                 <div className="flex-1 min-h-0 overflow-hidden flex flex-col">
-                    <ContentList projectUuid={projectUuid} />
+                    <ContentsList projectUuid={projectUuid} />
                 </div>
 
                 {/* Side panels */}

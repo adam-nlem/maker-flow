@@ -1,37 +1,42 @@
 import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { PostWithInsightsDTO, type PostWithInsightsDTOJSON } from "~/dtos/posts/PostWithInsightsDTO";
+import { PostWithPlatformAndInsightsDTO, type PostWithPlatformAndInsightsDTOJSON } from "~/dtos/posts/PostWithPlatformAndInsightsDTO";
 import { postQueryKeys } from "./postQueryKeys";
+import type { Platform } from "~/models/enums/Platform";
 
 interface UseListPaginatedPostsProps {
+    projectUuid: string | null;
+    platform: Platform | null;
+    searchTerm?: string;
     limit?: number;
-    integrationUuid: string | null;
 }
 
-export function useListPaginatedPosts({ limit = 10, integrationUuid }: UseListPaginatedPostsProps) {
+export function useListPaginatedPosts({ projectUuid, platform, searchTerm, limit = 10 }: UseListPaginatedPostsProps) {
     const [page, setPage] = useState(1);
-    const [additionalPosts, setAdditionalPosts] = useState<PostWithInsightsDTO[]>([]);
+    const [additionalPosts, setAdditionalPosts] = useState<PostWithPlatformAndInsightsDTO[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const query = useQuery({
-        queryKey: postQueryKeys.list(integrationUuid ?? ''),
+        queryKey: postQueryKeys.list(projectUuid ?? '', platform, searchTerm),
         queryFn: async () => {
-            const res = await httpClient.get<PostWithInsightsDTOJSON[]>(`/posts`, {
-                params: {
-                    integrationUuid,
-                    page: 1,
-                    limit,
-                }
-            });
-            const postsData = res.data.map((json) => PostWithInsightsDTO.fromJSON(json));
+            const params: Record<string, string | number> = {
+                projectUuid: projectUuid!,
+                ...(searchTerm ? { searchTerm } : {}),
+                page: 1,
+                limit,
+            };
+            if (platform) params.platform = platform;
+
+            const res = await httpClient.get<PostWithPlatformAndInsightsDTOJSON[]>(`/posts`, { params });
+            const postsData = res.data.map((json) => PostWithPlatformAndInsightsDTO.fromJSON(json));
             setHasMore(postsData.length === limit);
             setAdditionalPosts([]);
             setPage(1);
             return postsData;
         },
-        enabled: !!integrationUuid,
+        enabled: !!projectUuid,
     });
 
     const posts = useMemo(() => {
@@ -45,21 +50,23 @@ export function useListPaginatedPosts({ limit = 10, integrationUuid }: UseListPa
         const nextPage = page + 1;
 
         try {
-            const res = await httpClient.get<PostWithInsightsDTOJSON[]>(`/posts`, {
-                params: {
-                    integrationUuid,
-                    page: nextPage,
-                    limit,
-                }
-            });
-            const postsData = res.data.map((json) => PostWithInsightsDTO.fromJSON(json));
+            const params: Record<string, string | number> = {
+                projectUuid: projectUuid!,
+                ...(searchTerm ? { searchTerm } : {}),
+                page: nextPage,
+                limit,
+            };
+            if (platform) params.platform = platform;
+
+            const res = await httpClient.get<PostWithPlatformAndInsightsDTOJSON[]>(`/posts`, { params });
+            const postsData = res.data.map((json) => PostWithPlatformAndInsightsDTO.fromJSON(json));
             setAdditionalPosts(prev => [...prev, ...postsData]);
             setHasMore(postsData.length === limit);
             setPage(nextPage);
         } finally {
             setIsLoadingMore(false);
         }
-    }, [page, isLoadingMore, hasMore, limit, integrationUuid]);
+    }, [page, isLoadingMore, hasMore, limit, projectUuid, platform, searchTerm]);
 
     return {
         posts,

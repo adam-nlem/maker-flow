@@ -46,12 +46,11 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
     if (!showModal) return null;
 
     return (
-        <ModalOverlay isOpen={showModal} onClose={onClose} className="justify-center items-center">
-            <div className="border rounded-xl border-light-gray w-125 h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
+        <ModalOverlay isOpen={showModal} onClose={onClose}>
+            <div className="flex flex-col gap-3 py-5 px-10 flex-1 min-h-0 overflow-y-auto">
                 <h1 className="text-heading-lg">
                     Modifier le Projet
                 </h1>
-                {/* <p className="text-body-xs w-100">Chaque Todo List est associée à un project. Cela permet de garder une organisation propre et simple. Vous pouvez créer autant de Todo List que vous souhaitez.</p> */}
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <Input
                         label="Titre"

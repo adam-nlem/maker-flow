@@ -6,6 +6,7 @@ interface UpdatePostGroupData {
     title?: string;
     addPostUuids?: string[];
     removePostUuids?: string[];
+    scriptUuid?: string | null;
 }
 
 interface UpdatePostGroupParams {

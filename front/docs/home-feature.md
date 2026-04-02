@@ -34,7 +34,7 @@ Props: `projectUuid`
 
 **File:** `app/components/home/RankedPostsList.tsx`
 
-Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `RankingItemTile` with infinite scroll (IntersectionObserver sentinel, vertical `rootMargin`). Outer container uses `flex-1 min-h-0`, inner scrollable div uses `overflow-y-auto scrollbar-none flex-1 min-h-0`. Displays Views, Likes, and Comments metrics for each post.
+Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `RankingItemTile` with infinite scroll via `useInfiniteScroll` hook. Outer container uses `flex-1 min-h-0`, inner scrollable div uses `overflow-y-auto scrollbar-none flex-1 min-h-0`. Displays Views, Likes, and Comments metrics for each post.
 
 Props: `integrationUuid`
 
@@ -42,7 +42,7 @@ Props: `integrationUuid`
 
 **File:** `app/components/home/RankedPostGroupsList.tsx`
 
-Calls `useListPaginatedRankedPostGroups({ projectUuid })`, renders post groups using `RankingItemTile` with infinite scroll (IntersectionObserver sentinel, vertical `rootMargin`). Outer container uses `flex-1 min-h-0`, inner scrollable div uses `overflow-y-auto scrollbar-none flex-1 min-h-0`. Displays group title, post count, and aggregated Views, Likes, and Comments metrics.
+Calls `useListPaginatedRankedPostGroups({ projectUuid })`, renders post groups using `RankingItemTile` with infinite scroll via `useInfiniteScroll` hook. Outer container uses `flex-1 min-h-0`, inner scrollable div uses `overflow-y-auto scrollbar-none flex-1 min-h-0`. Displays group title, post count, and aggregated Views, Likes, and Comments metrics.
 
 Props: `projectUuid`
 
@@ -50,7 +50,7 @@ Props: `projectUuid`
 
 **File:** `app/components/home/HomeScriptsList.tsx`
 
-Displays a filtered, paginated list of scripts. A row of `Pill` components lets the user select a `ScriptStatus` filter (persisted via `useScriptFilterStore.focusedScriptStatus`). Uses `useListPaginatedScripts({ projectUuid, status, limit: 10 })` to fetch filtered scripts. Renders `ScriptListItem` components in a horizontal list (`overflow-x-auto`) with infinite scroll (IntersectionObserver sentinel, horizontal `rootMargin`). Fixed height (`h-40`). Clicking a script opens a `ScriptDetailModal` (read-only preview with "open editor" button).
+Displays a filtered, paginated list of scripts. A row of `Pill` components lets the user select a `ScriptStatus` filter (persisted via `useScriptFilterStore.focusedScriptStatus`). Uses `useListPaginatedScripts({ projectUuid, status, limit: 10 })` to fetch filtered scripts. Renders `ScriptListItem` components in a horizontal list (`overflow-x-auto`) with infinite scroll via `useInfiniteScroll` hook (horizontal direction). Fixed height (`h-40`). Clicking a script opens a `ScriptDetailModal` (read-only preview with "open editor" button).
 
 Props: `projectUuid`
 

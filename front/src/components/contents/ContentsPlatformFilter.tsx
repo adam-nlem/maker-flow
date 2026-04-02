@@ -5,13 +5,13 @@ import { useListIntegrations } from "~/hooks/api/integrations/useListIntegration
 import { IntegrationStatus } from "~/models/enums/IntegrationStatus"
 import { Platform } from "~/models/enums/Platform"
 
-interface ContentPlatformFilterProps {
+interface ContentsPlatformFilterProps {
     projectUuid: string
     platformFilter: Platform | null
     onPlatformChange: (platform: Platform | null) => void
 }
 
-export default function ContentPlatformFilter({ projectUuid, platformFilter, onPlatformChange }: ContentPlatformFilterProps) {
+export default function ContentsPlatformFilter({ projectUuid, platformFilter, onPlatformChange }: ContentsPlatformFilterProps) {
     const { integrations } = useListIntegrations({ projectUuid })
 
     const activePlatforms = useMemo(() => {

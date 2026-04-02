@@ -2,6 +2,7 @@
 
 namespace App\Service\Post;
 
+use App\DTO\AggregatedInsightDTO;
 use App\Entity\Enum\Platform;
 use App\Entity\Integration;
 use App\Entity\Project;
@@ -138,14 +139,15 @@ class PostService
     /**
      * @return PostWithPlatformAndInsightsResponseDTO[]
      */
-    public function getPostsWithAggregatedInsightsByProject(
+    public function getPostsWithAggregatedInsightsByProjectAndSearchTerm(
         User $user,
         Project $project,
         ?Platform $platform,
+        ?string $searchTerm,
         int $page,
         int $limit,
     ): array {
-        $posts = $this->repository->getByProjectAndUserPaginated($project, $user, $platform, $page, $limit);
+        $posts = $this->repository->getByProjectAndUserPaginatedAndSearchTerm($project, $user, $platform, $searchTerm, $page, $limit);
 
         if (empty($posts)) {
             return [];
@@ -156,13 +158,11 @@ class PostService
         $insightsByPostId = [];
         foreach ($this->insightRepository->getAggregatedLatestByPostIds($postIds) as $row) {
             $type = $row['type'] instanceof PostInsightType ? $row['type']->value : $row['type'];
-            $insightsByPostId[$row['postId']][] = ['type' => $type, 'value' => (float) $row['value']];
+            $insightsByPostId[$row['postId']][] = new AggregatedInsightDTO($type, (float) $row['value']);
         }
 
         return array_map(function (Post $p) use ($insightsByPostId) {
             $insights = $insightsByPostId[$p->getId()] ?? [];
-            $views = $this->findAggregatedInsightValue($insights, PostInsightType::Views->value);
-            $totalInteractions = $this->findAggregatedInsightValue($insights, PostInsightType::TotalInteractions->value);
 
             return new PostWithPlatformAndInsightsResponseDTO(
                 post: $p,
@@ -170,22 +170,8 @@ class PostService
                 aggregatedInsights: $insights,
                 postGroupUuid: $p->getPostGroup()?->getUuid(),
                 postGroupTitle: $p->getPostGroup()?->getTitle(),
-                engagementByViews: InsightHelper::calculateEngagement($totalInteractions, $views),
+                engagementByViews: InsightHelper::calculateEngagementByViews($insights),
             );
         }, $posts);
-    }
-
-    /**
-     * @param array<array{type: string, value: float}> $insights
-     */
-    private function findAggregatedInsightValue(array $insights, string $type): ?float
-    {
-        foreach ($insights as $insight) {
-            if ($insight['type'] === $type) {
-                return $insight['value'];
-            }
-        }
-
-        return null;
     }
 }

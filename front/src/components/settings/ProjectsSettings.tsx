@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { SettingsSection, settingsSectionToFrenchTranslation } from "~/models/enums/SettingsSection";
 import Shimmer from "~/components/ui/Shimmer";
 import CreateProjectModal from "~/components/projects/CreateProjectModal";
@@ -8,27 +9,7 @@ import ProjectSettingsCard from "./project/ProjectSettingsCard";
 export default function ProjectsSettings() {
     const [showCreate, setShowCreate] = useState(false);
     const { projects, isLoading, hasMore, isLoadingMore, listMore } = useListPaginatedProjects();
-    const sentinelRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const sentinel = sentinelRef.current;
-        if (!sentinel) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-                    listMore();
-                }
-            },
-            { rootMargin: "0px 0px 200px 0px" },
-        );
-
-        observer.observe(sentinel);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [hasMore, isLoadingMore, listMore]);
+    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore);
 
     return (
         <div className="h-full flex flex-col overflow-hidden">

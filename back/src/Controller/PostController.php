@@ -41,10 +41,11 @@ final class PostController extends AbstractController
             );
         }
 
-        $posts = $this->postService->getPostsWithAggregatedInsightsByProject(
+        $posts = $this->postService->getPostsWithAggregatedInsightsByProjectAndSearchTerm(
             user: $user,
             project: $project,
             platform: $queryParamDto->getPlatform(),
+            searchTerm: $queryParamDto->getSearchTerm(),
             page: $queryParamDto->getPage(),
             limit: $queryParamDto->getLimit(),
         );

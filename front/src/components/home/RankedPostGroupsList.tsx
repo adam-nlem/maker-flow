@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react"
 import RankingItemTile from "~/components/ui/RankingItemTile"
 import Shimmer from "~/components/ui/Shimmer"
 import { useListPaginatedRankedPostGroups } from "~/hooks/api/postGroups/useListPaginatedRankedPostGroups"
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
 import { PostInsightType } from "~/models/enums/PostInsightType"
 
 const DISPLAYED_METRIC_TYPES = [PostInsightType.Views, PostInsightType.Likes, PostInsightType.Comments] as const
@@ -13,27 +13,7 @@ interface RankedPostGroupsListProps {
 export default function RankedPostGroupsList({ projectUuid }: RankedPostGroupsListProps) {
   const { postGroups, isLoading, isLoadingMore, hasMore, listMore } = useListPaginatedRankedPostGroups({ projectUuid })
 
-  const sentinelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current
-    if (!sentinel) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-          listMore()
-        }
-      },
-      { rootMargin: "0px 0px 200px 0px" },
-    )
-
-    observer.observe(sentinel)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [hasMore, isLoadingMore, listMore, isLoading])
+  const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore)
 
   if (isLoading) {
     return (

@@ -2,7 +2,7 @@ import { SidePanel } from "~/components/ui/SidePanel"
 import { useListPaginatedPostGroups } from "~/hooks/api/postGroups/useListPaginatedPostGroups"
 import { useUpdatePostGroup } from "~/hooks/api/postGroups/useUpdatePostGroup"
 import { useDeletePostGroup } from "~/hooks/api/postGroups/useDeletePostGroup"
-import { useContentStore } from "~/stores/content/contentStore"
+import { useContentsStore } from "~/stores/contents/contentsStore"
 import { postInsightTypeToFrenchTranslation, formatPostInsightValue } from "~/models/enums/PostInsightType"
 import { DocumentTextIcon, TrashIcon, PlusIcon } from "@heroicons/react/24/outline"
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog"
@@ -17,7 +17,7 @@ interface ContentGroupDetailPanelProps {
 }
 
 export default function ContentGroupDetailPanel({ groupUuid, projectUuid }: ContentGroupDetailPanelProps) {
-    const closePanel = useContentStore((s) => s.closePanel)
+    const closePanel = useContentsStore((s) => s.closePanel)
     const { postGroups } = useListPaginatedPostGroups({ projectUuid })
     const { deletePostGroup, isPending: isDeleting } = useDeletePostGroup()
     const { updatePostGroup, isPending: isUpdating } = useUpdatePostGroup()

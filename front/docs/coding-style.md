@@ -68,7 +68,7 @@ front/app/
 | API mutations | `use{Action}{Resource}` | `useCreateProject`, `useDeleteProject` |
 | API queries | `use{Action}{Resource}` or `use{Resource}` | `useListPaginatedProjects`, `useCurrentUser` |
 | Selection hooks | `useSelect{Resource}` | `useSelectFocusedProject` |
-| Utility hooks | `use{Description}` | `useAutoResizeTextarea` |
+| Utility hooks | `use{Description}` | `useAutoResizeTextarea`, `useInfiniteScroll` |
 
 ### Stores
 

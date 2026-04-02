@@ -7,7 +7,7 @@ import {
   registerPath,
   integrationCallbackPath,
   tasksPath,
-  insightsPath,
+  contentsPath,
   scriptsPath,
   calendarPath,
   settingsPath,
@@ -23,8 +23,7 @@ import IntegrationsCallback from "./routes/integrations.callback";
 import ProtectedLayout from "./routes/protected";
 import HomePage from "./routes/home";
 import TasksPage from "./routes/tasks";
-import InsightsPage from "./routes/insights";
-import InsightsPostDetailPage from "./routes/insights.post-detail";
+import ContentsPage from "./routes/contents";
 import ScriptsPage from "./routes/scripts";
 import CalendarPage from "./routes/calendar";
 import SettingsLayout from "./routes/settings";
@@ -54,8 +53,7 @@ export const router = createBrowserRouter(
           children: [
             { index: true, element: <HomePage /> },
             { path: tasksPath, element: <TasksPage /> },
-            { path: insightsPath, element: <InsightsPage /> },
-            { path: "insights/posts/:postUuid", element: <InsightsPostDetailPage /> },
+            { path: contentsPath, element: <ContentsPage /> },
             { path: scriptsPath, element: <ScriptsPage /> },
             { path: calendarPath, element: <CalendarPage /> },
             {

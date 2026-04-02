@@ -405,7 +405,8 @@ Modal backdrop with sidebar-aware positioning.
 | `isOpen` | `boolean` | - | Visibility state |
 | `onClose` | `() => void` | - | Close handler |
 | `children` | `ReactNode` | - | Modal content |
-| `className` | `string` | `''` | Additional classes |
+| `width` | `string` | `'w-200'` | Width class |
+| `height` | `string` | `'h-[80vh]'` | Height class |
 
 **Features:**
 - Closes on Escape key

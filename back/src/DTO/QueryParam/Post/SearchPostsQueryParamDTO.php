@@ -8,21 +8,17 @@ use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ListPostsQueryParamDTO extends AbstractQueryParamDTO
+class SearchPostsQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
+    #[Assert\Uuid]
     private string $projectUuid;
 
     private ?Platform $platform;
 
-    private ?string $searchTerm;
-
     #[Assert\NotBlank]
-    #[Assert\Positive]
-    private int $page;
+    private string $search;
 
-    #[Assert\NotBlank]
-    #[Assert\Positive]
     private int $limit;
 
     public function __construct(
@@ -34,11 +30,10 @@ class ListPostsQueryParamDTO extends AbstractQueryParamDTO
 
     protected function fromQueryParams(array $queryParams): void
     {
-        $this->projectUuid = $queryParams["projectUuid"];
+        $this->projectUuid = $queryParams["projectUuid"] ?? "";
         $this->platform = !empty($queryParams["platform"]) ? Platform::tryFrom($queryParams["platform"]) : null;
-        $this->searchTerm = $queryParams["searchTerm"] ?? null;
-        $this->page = (int) $queryParams["page"];
-        $this->limit = (int) $queryParams["limit"];
+        $this->search = $queryParams["search"] ?? "";
+        $this->limit = (int) ($queryParams["limit"] ?? 20);
     }
 
     public function getProjectUuid(): string
@@ -51,14 +46,9 @@ class ListPostsQueryParamDTO extends AbstractQueryParamDTO
         return $this->platform;
     }
 
-    public function getSearchTerm(): ?string
+    public function getSearch(): string
     {
-        return $this->searchTerm;
-    }
-
-    public function getPage(): int
-    {
-        return $this->page;
+        return $this->search;
     }
 
     public function getLimit(): int
