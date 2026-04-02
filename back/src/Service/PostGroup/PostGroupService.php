@@ -4,7 +4,9 @@ namespace App\Service\PostGroup;
 
 use App\DTO\AutoGroupSignal;
 use App\DTO\Response\PostGroup\PostGroupWithAggregatedInsightsResponseDTO;
+use App\DTO\Response\PostGroup\PostGroupWithInsightsAndScriptResponseDTO;
 use App\Entity\Enum\PostInsightType;
+use App\Helper\InsightHelper;
 use App\Entity\Post;
 use App\Entity\PostGroup;
 use App\Entity\Project;
@@ -66,6 +68,35 @@ class PostGroupService
             postGroup: $pg,
             aggregatedInsights: $insightsByGroupId[$pg->getId()] ?? [],
         ), $postGroups);
+    }
+
+    /**
+     * @return PostGroupWithInsightsAndScriptResponseDTO[]
+     */
+    public function getPostGroupsWithInsightsAndScript(User $user, Project $project, int $page, int $limit): array
+    {
+        $postGroups = $this->postGroupRepository->getByProjectAndUserPaginated($project, $user, $page, $limit);
+
+        if (empty($postGroups)) {
+            return [];
+        }
+
+        $postGroupIds = array_map(fn(PostGroup $pg) => $pg->getId(), $postGroups);
+
+        $insightsByGroupId = InsightHelper::buildAggregatedInsightsMapByGroupId(
+            $this->postInsightRepository->getAggregatedLatestByPostGroupIds($postGroupIds),
+        );
+
+        return array_map(function (PostGroup $pg) use ($insightsByGroupId) {
+            $insights = $insightsByGroupId[$pg->getId()] ?? [];
+
+            return new PostGroupWithInsightsAndScriptResponseDTO(
+                postGroup: $pg,
+                aggregatedInsights: $insights,
+                script: $pg->getScript(),
+                engagementByViews: InsightHelper::calculateEngagementByViews($insights),
+            );
+        }, $postGroups);
     }
 
     public function tryAutoGroup(Post $post): void

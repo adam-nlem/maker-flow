@@ -5,12 +5,12 @@ namespace App\Controller;
 use App\Entity\User;
 use App\DTO\QueryParam\Post\ListPostsQueryParamDTO;
 use App\DTO\QueryParam\Post\RankPostsQueryParamDTO;
+use App\DTO\QueryParam\Post\SearchPostsQueryParamDTO;
 use App\Repository\PostRepository;
+use App\Repository\ProjectRepository;
 use App\Service\Post\PostService;
 use App\Service\Post\PostThumbnailService;
-use App\Entity\Enum\TimePeriod;
 use App\Repository\IntegrationRepository;
-use App\Repository\SubscriptionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,30 +27,26 @@ final class PostController extends AbstractController
     #[Route('', name: 'api_posts_list', methods: ['GET'])]
     public function list(
         ListPostsQueryParamDTO $queryParamDto,
-        IntegrationRepository $integrationRepository,
-        SubscriptionRepository $subscriptionRepository,
+        ProjectRepository $projectRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
+        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
-        if ($integration === null) {
+        if ($project === null) {
             return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
+                data: ["message" => "You don't have any project with this uuid"],
+                status: Response::HTTP_NOT_FOUND,
             );
         }
 
-        $isSubscribed = $subscriptionRepository->getLatestActiveByUser($user) !== null;
-
-        $posts = $this->postService->getPostsWithInsights(
+        $posts = $this->postService->getPostsWithAggregatedInsightsByProject(
             user: $user,
-            integration: $integration,
+            project: $project,
+            platform: $queryParamDto->getPlatform(),
             page: $queryParamDto->getPage(),
             limit: $queryParamDto->getLimit(),
-            timePeriod: TimePeriod::LastYear,
-            isSubscribed: $isSubscribed,
         );
 
         return $this->json(
@@ -88,6 +84,45 @@ final class PostController extends AbstractController
             data: $posts,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_posts_rank']],
+        );
+    }
+
+    #[Route('/search', name: 'api_posts_search', methods: ['GET'])]
+    public function search(
+        SearchPostsQueryParamDTO $queryParamDto,
+        ProjectRepository $projectRepository,
+        PostRepository $postRepository,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+
+        if ($project === null) {
+            return $this->json(
+                data: ["message" => "You don't have any project with this uuid"],
+                status: Response::HTTP_NOT_FOUND,
+            );
+        }
+
+        $posts = $postRepository->searchByProjectAndUserAndCaption(
+            $project,
+            $user,
+            $queryParamDto->getPlatform(),
+            $queryParamDto->getSearch(),
+            $queryParamDto->getLimit(),
+        );
+
+        return $this->json(
+            data: array_map(fn($post) => [
+                'uuid' => $post->getUuid(),
+                'caption' => $post->getCaption(),
+                'publishedAt' => $post->getPublishedAt(),
+                'mediaType' => $post->getMediaType()->value,
+                'platform' => $post->getIntegration()->getPlatform()->value,
+                'postGroupUuid' => $post->getPostGroup()?->getUuid(),
+            ], $posts),
+            status: Response::HTTP_OK,
         );
     }
 

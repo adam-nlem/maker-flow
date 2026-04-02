@@ -28,8 +28,8 @@ export default function CreateTodoListModal({ projectUuid, showModal, onClose, o
     if (!showModal) return null;
 
     return (
-        <ModalOverlay isOpen={showModal} onClose={onClose} className="justify-center items-center">
-            <div className="border rounded-xl border-light-gray w-125 h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
+        <ModalOverlay isOpen={showModal} onClose={onClose}>
+            <div className="flex flex-col gap-3 py-5 px-10 flex-1 min-h-0 overflow-y-auto">
                 <h1 className="text-heading-lg">
                     Créez une nouvelle Todo List
                 </h1>

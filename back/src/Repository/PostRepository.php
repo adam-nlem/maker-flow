@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Enum\Platform;
 use App\Entity\Enum\PostInsightType;
 use App\Entity\Integration;
 use App\Entity\Post;
@@ -105,53 +106,6 @@ class PostRepository extends ServiceEntityRepository
         ])->fetchOne();
 
         return (int) ($result ?? 0);
-    }
-
-    /**
-     * @return Post[]
-     */
-    public function getByUserAndIntegrationPaginated(
-        User $user,
-        Integration $integration,
-        int $page,
-        int $limit,
-    ): array {
-        return $this->createQueryBuilder('p')
-            ->where('p.user = :user')
-            ->andWhere('p.integration = :integration')
-            ->setParameter('user', $user)
-            ->setParameter('integration', $integration)
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
-            ->orderBy('p.publishedAt', 'DESC')
-            ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
-    }
-
-    /**
-     * @return Post[]
-     */
-    public function getByUserAndIntegrationAndPublishedAfterPaginated(
-        User $user,
-        Integration $integration,
-        \DateTimeImmutable $publishedAfter,
-        int $page,
-        int $limit,
-    ): array {
-        return $this->createQueryBuilder('p')
-            ->where('p.user = :user')
-            ->andWhere('p.integration = :integration')
-            ->andWhere('p.publishedAt >= :publishedAfter')
-            ->setParameter('user', $user)
-            ->setParameter('integration', $integration)
-            ->setParameter('publishedAfter', $publishedAfter)
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
-            ->orderBy('p.publishedAt', 'DESC')
-            ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     public function getByUuidAndUser(string $uuid, User $user): ?Post
@@ -331,6 +285,67 @@ class PostRepository extends ServiceEntityRepository
             ->where('p.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return Post[]
+     */
+    public function getByProjectAndUserPaginated(
+        Project $project,
+        User $user,
+        ?Platform $platform,
+        int $page,
+        int $limit,
+    ): array {
+        $qb = $this->createQueryBuilder('p')
+            ->join('p.integration', 'i')
+            ->where('i.project = :project')
+            ->andWhere('p.user = :user')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->orderBy('p.publishedAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+
+        if ($platform !== null) {
+            $qb->andWhere('i.platform = :platform')
+                ->setParameter('platform', $platform);
+        }
+
+        return $qb->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return Post[]
+     */
+    public function searchByProjectAndUserAndCaption(
+        Project $project,
+        User $user,
+        ?Platform $platform,
+        string $search,
+        int $limit = 20,
+    ): array {
+        $qb = $this->createQueryBuilder('p')
+            ->join('p.integration', 'i')
+            ->where('i.project = :project')
+            ->andWhere('p.user = :user')
+            ->andWhere('p.caption LIKE :search')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->setParameter('search', '%' . $search . '%')
+            ->orderBy('p.publishedAt', 'DESC')
+            ->setMaxResults($limit);
+
+        if ($platform !== null) {
+            $qb->andWhere('i.platform = :platform')
+                ->setParameter('platform', $platform);
+        }
+
+        return $qb->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }

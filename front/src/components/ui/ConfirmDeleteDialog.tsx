@@ -11,8 +11,8 @@ interface ConfirmDeleteDialogProps {
 
 export default function ConfirmDeleteDialog({ isOpen, onClose, onConfirm, isPending = false, message }: ConfirmDeleteDialogProps) {
     return (
-        <ModalOverlay isOpen={isOpen} onClose={onClose} className="justify-center items-center">
-            <div className="border rounded-xl border-light-gray w-100 h-fit flex flex-col items-center gap-4 py-6 px-8 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
+        <ModalOverlay isOpen={isOpen} onClose={onClose} width="w-120" height="h-fit">
+            <div className="flex flex-col items-center gap-4 py-6 px-8 flex-1 min-h-0 overflow-y-auto">
                 <p className="text-body-xs text-center">{message}</p>
                 <div className="flex flex-row w-full justify-center items-center gap-3">
                     <Button

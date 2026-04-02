@@ -73,9 +73,8 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
 
     return (
         <>
-        <ModalOverlay isOpen={showModal} onClose={handleClose} className="justify-center items-center">
-            <div className="border rounded-xl border-light-gray w-1/2 h-3/4 flex flex-col min-h-0 min-w-0 gap-5 shadow-lg bg-clear"
-                onClick={(e) => e.stopPropagation()}
+        <ModalOverlay isOpen={showModal} onClose={handleClose}>
+            <div className="flex flex-col gap-5 flex-1 min-h-0"
                 onMouseDown={(e) => e.stopPropagation()}>
                 <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-y-auto scrollbar-none px-5 py-5 scroll-pb-5">
                     <div className="flex flex-row justify-around items-start">

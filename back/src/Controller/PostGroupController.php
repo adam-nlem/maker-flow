@@ -11,6 +11,7 @@ use App\Entity\User;
 use App\Repository\PostGroupRepository;
 use App\Repository\PostRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\ScriptRepository;
 use App\Repository\SubscriptionRepository;
 use App\Service\PostGroup\PostGroupService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,7 +28,6 @@ final class PostGroupController extends AbstractController
     #[Route('', name: 'api_post_groups_list', methods: ['GET'])]
     public function list(
         ListPostGroupsQueryParamDTO $queryParamDto,
-        PostGroupRepository $postGroupRepository,
         ProjectRepository $projectRepository,
     ): JsonResponse {
         /** @var User $user */
@@ -39,10 +39,10 @@ final class PostGroupController extends AbstractController
             return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
         }
 
-        $postGroups = $postGroupRepository->getByProjectAndUser($project, $user);
+        $result = $this->service->getPostGroupsWithInsightsAndScript($user, $project, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(
-            data: $postGroups,
+            data: $result,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_post_groups_list']]
         );
@@ -123,6 +123,7 @@ final class PostGroupController extends AbstractController
         UpdatePostGroupRequestDTO $dto,
         PostGroupRepository $postGroupRepository,
         PostRepository $postRepository,
+        ScriptRepository $scriptRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -150,6 +151,29 @@ final class PostGroupController extends AbstractController
 
             foreach ($postsToRemove as $post) {
                 $post->setPostGroup(null);
+            }
+        }
+
+        if ($dto->hasScriptUuid()) {
+            $currentScript = $postGroup->getScript();
+
+            if ($dto->getScriptUuid() === null) {
+                if ($currentScript !== null) {
+                    $currentScript->setPostGroup(null);
+                    $scriptRepository->save($currentScript);
+                }
+            } else {
+                $script = $scriptRepository->getByUuidAndUser($dto->getScriptUuid(), $user);
+
+                if ($script !== null) {
+                    if ($currentScript !== null && $currentScript !== $script) {
+                        $currentScript->setPostGroup(null);
+                        $scriptRepository->save($currentScript);
+                    }
+
+                    $script->setPostGroup($postGroup);
+                    $scriptRepository->save($script);
+                }
             }
         }
 

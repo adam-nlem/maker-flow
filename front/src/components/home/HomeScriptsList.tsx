@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react"
+import { useState } from "react"
 import Pill from "~/components/ui/Pill"
 import Shimmer from "~/components/ui/Shimmer"
 import ScriptTile from "~/components/scripts/ScriptTile"
 import ScriptDetailModal from "~/components/scripts/ScriptDetailModal"
 import type { Script } from "~/models/Script"
 import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts"
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
 import { scriptStatusOptions, scriptStatusToBgClass, scriptStatusToBorderClass, scriptStatusToFrenchTranslation, scriptStatusToIcon, scriptStatusToTextClass } from "~/models/enums/ScriptStatus"
 import { useScriptFilterStore } from "~/stores/scripts/scriptFilterStore"
 
@@ -24,27 +25,9 @@ export default function HomeScriptsList({ projectUuid }: HomeScriptsListProps) {
         limit: 10,
     })
 
-    const sentinelRef = useRef<HTMLDivElement>(null)
-
-    useEffect(() => {
-        const sentinel = sentinelRef.current
-        if (!sentinel) return
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-                    listMore()
-                }
-            },
-            { rootMargin: "0px 200px 0px 0px" },
-        )
-
-        observer.observe(sentinel)
-
-        return () => {
-            observer.disconnect()
-        }
-    }, [hasMore, isLoadingMore, listMore])
+    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore, {
+        direction: "horizontal",
+    })
 
     return (
         <div className="flex flex-col gap-3 h-35">

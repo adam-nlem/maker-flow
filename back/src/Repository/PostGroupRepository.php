@@ -51,18 +51,19 @@ class PostGroupRepository extends ServiceEntityRepository
     /**
      * @return PostGroup[]
      */
-    public function getByProjectAndUser(Project $project, User $user): array
+    public function getByProjectAndUserPaginated(Project $project, User $user, int $page, int $limit): array
     {
         return $this->createQueryBuilder('pg')
-            ->leftJoin('pg.posts', 'p')
-            ->addSelect('p')
             ->where('pg.project = :project')
             ->andWhere('pg.user = :user')
             ->setParameter('project', $project)
             ->setParameter('user', $user)
             ->orderBy('pg.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
             ->getQuery()
-            ->getResult();
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     /**
@@ -114,6 +115,7 @@ class PostGroupRepository extends ServiceEntityRepository
             ->where('pg.id IN (:ids)')
             ->setParameter('ids', $ids)
             ->getQuery()
-            ->getResult();
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 }

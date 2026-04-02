@@ -1,4 +1,5 @@
 import { Post, type PostJSON } from "~/models/Post";
+import { Script, type ScriptJSON } from "./Script";
 
 export interface PostGroupJSON {
     uuid: string;
@@ -6,6 +7,7 @@ export interface PostGroupJSON {
     createdAt: string;
     updatedAt: string | null;
     posts?: PostJSON[];
+    script?: ScriptJSON | null;
 }
 
 export class PostGroup {
@@ -15,6 +17,7 @@ export class PostGroup {
         public readonly createdAt: Date,
         public readonly updatedAt: Date | null,
         public readonly posts: Post[] = [],
+        public readonly script: Script | null = null,
     ) { }
 
     static fromJSON(json: PostGroupJSON): PostGroup {
@@ -24,6 +27,7 @@ export class PostGroup {
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : null,
             json.posts?.map(Post.fromJSON) ?? [],
+            json.script ? Script.fromJSON(json.script) : null,
         );
     }
 }

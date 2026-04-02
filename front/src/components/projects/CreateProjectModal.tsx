@@ -15,7 +15,7 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
 
     return (
         <ModalOverlay isOpen={showModal} onClose={onClose}>
-            <div className="border rounded-xl border-light-gray w-125 h-fit flex flex-col gap-3 py-5 px-10 shadow-lg bg-clear" onClick={(e) => e.stopPropagation()}>
+            <div className="flex flex-col gap-3 py-5 px-10 flex-1 min-h-0 overflow-y-auto">
                 {showStepHeader && (
                     <div className="flex flex-row items-center gap-3">
                         <StepBadge label="Introduction" completed={true} />
