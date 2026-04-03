@@ -8,6 +8,7 @@ import { queryClient } from "~/services/queryClient/queryClient";
 import ToastContainer from "~/components/ui/ToastContainer";
 import { Settings } from "luxon";
 import { router } from "./router";
+import { PostHogProvider } from '@posthog/react'
 import "./app.css";
 
 Sentry.init({
@@ -38,15 +39,22 @@ Sentry.init({
 
 Settings.defaultZone = "Europe/Paris";
 
+const postHogOptions = {
+  api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+  defaults: '2026-01-30',
+} as const
+
 createRoot(document.getElementById("root")!, {
   onUncaughtError: Sentry.reactErrorHandler(),
   onCaughtError: Sentry.reactErrorHandler(),
   onRecoverableError: Sentry.reactErrorHandler(),
 }).render(
   <StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <ToastContainer />
-    </QueryClientProvider>
+    <PostHogProvider apiKey={import.meta.env.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN} options={postHogOptions}>
+      <QueryClientProvider client={queryClient}>
+        <RouterProvider router={router} />
+        <ToastContainer />
+      </QueryClientProvider>
+    </PostHogProvider>
   </StrictMode>,
 );

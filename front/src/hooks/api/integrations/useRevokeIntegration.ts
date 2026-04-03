@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { integrationQueryKeys } from "./integrationQueryKeys";
 
 export function useRevokeIntegration({ projectUuid }: { projectUuid: string }) {
@@ -11,6 +13,7 @@ export function useRevokeIntegration({ projectUuid }: { projectUuid: string }) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
+            track(AnalyticsEvent.IntegrationRevoked)
         },
     });
 

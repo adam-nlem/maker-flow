@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { ToastType } from "~/models/enums/ToastType";
 import { useToastStore } from "~/stores/toast/toastStore";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import type { Subscription } from "~/models/Subscription";
 import Shimmer from "~/components/ui/Shimmer";
 import CurrentSubscriptionCard from "./CurrentSubscriptionCard";
@@ -24,6 +26,7 @@ export default function SubscriptionOverview({ checkoutRedirectPath, subscribedV
 
     useEffect(() => {
         if (isCheckoutSuccess && subscription) {
+            track(AnalyticsEvent.SubscriptionPurchased, { plan: subscription.plan })
             useToastStore.getState().addToast(ToastType.Success, "Paiement effectué avec succès");
             setSearchParams({}, { replace: true });
         }

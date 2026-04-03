@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { ScriptGeneration, type ScriptGenerationJSON } from "~/models/ScriptGeneration";
 import { scriptGenerationQueryKeys } from "./scriptGenerationQueryKeys";
 import type { ScriptGoal } from "~/models/enums/ScriptGoal";
@@ -31,6 +33,13 @@ export function useCreateScriptGeneration() {
         },
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: scriptGenerationQueryKeys.list(variables.scriptUuid) });
+            track(AnalyticsEvent.ScriptGenerationCreated, {
+                goal: variables.goal,
+                opening_style: variables.openingStyle,
+                duration: variables.duration,
+                ai_model: variables.aiModel,
+                skills_count: variables.activeSkills.length,
+            })
         },
     });
 

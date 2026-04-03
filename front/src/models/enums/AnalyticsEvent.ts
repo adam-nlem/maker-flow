@@ -1,0 +1,26 @@
+export enum AnalyticsEvent {
+    WelcomeStepViewed = 'welcome_step_viewed',
+    WelcomeCompleted = 'welcome_completed',
+    UserRegistered = 'user_registered',
+    UserLoggedIn = 'user_logged_in',
+    OnboardingStepCompleted = 'onboarding_step_completed',
+    OnboardingDismissed = 'onboarding_dismissed',
+    ProjectCreated = 'project_created',
+    ProjectDeleted = 'project_deleted',
+    ScriptCreated = 'script_created',
+    ScriptDeleted = 'script_deleted',
+    ScriptPartAdded = 'script_part_added',
+    ScriptGenerationCreated = 'script_generation_created',
+    ScriptGenerationRegenerated = 'script_generation_regenerated',
+    IntegrationConnected = 'integration_connected',
+    IntegrationRevoked = 'integration_revoked',
+    SubscriptionCheckoutStarted = 'subscription_checkout_started',
+    SubscriptionPurchased = 'subscription_purchased',
+    SubscriptionCancelled = 'subscription_cancelled',
+    SubscriptionResumed = 'subscription_resumed',
+    CreditRefillCheckoutStarted = 'credit_refill_checkout_started',
+    CreatorProfileSaved = 'creator_profile_saved',
+    HookTemplateCreated = 'hook_template_created',
+}
+
+export const analyticsEventOptions = Object.values(AnalyticsEvent);

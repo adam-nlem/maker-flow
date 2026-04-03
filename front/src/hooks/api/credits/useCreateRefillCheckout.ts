@@ -1,5 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 
 interface CreateRefillCheckoutResponse {
     checkout_url: string;
@@ -12,6 +14,7 @@ export function useCreateRefillCheckout() {
             return res.data;
         },
         onSuccess: (data) => {
+            track(AnalyticsEvent.CreditRefillCheckoutStarted)
             window.location.href = data.checkout_url;
         },
     });

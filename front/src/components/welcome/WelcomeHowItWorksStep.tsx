@@ -1,9 +1,11 @@
-import { Fragment } from "react"
+import { Fragment, useEffect } from "react"
 import { FolderPlusIcon, LinkIcon, ChartBarIcon } from "@heroicons/react/24/outline"
 import { useNavigate } from "react-router-dom"
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent"
+import { WelcomeStep } from "~/models/enums/WelcomeStep"
+import { track } from "~/services/analytics/analytics"
 import { registerPath } from "~/routes/routePaths"
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
-import { WelcomeStep } from "~/models/enums/WelcomeStep"
 import AuthStepLayout from "~/components/auth/AuthStepLayout"
 
 const steps = [
@@ -31,12 +33,21 @@ export default function WelcomeHowItWorksStep() {
     const navigate = useNavigate()
     const setWelcomeStep = useOnboardingStore((s) => s.setWelcomeStep)
 
+    useEffect(() => {
+        track(AnalyticsEvent.WelcomeStepViewed, { step: WelcomeStep.HowItWorks })
+    }, [])
+
+    const handleNext = () => {
+        track(AnalyticsEvent.WelcomeCompleted)
+        navigate(registerPath)
+    }
+
     return (
         <AuthStepLayout
             title="Comment ça marche ?"
             subtitle="Trois étapes pour commencer."
             onBack={() => setWelcomeStep(WelcomeStep.Features)}
-            onNext={() => navigate(registerPath)}
+            onNext={handleNext}
         >
             <div className="flex flex-col sm:flex-row gap-8 max-w-3xl w-full">
                 {steps.map((step) => (

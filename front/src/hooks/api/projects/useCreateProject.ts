@@ -2,6 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { ProjectType } from "~/models/enums/ProjectType";
 import { Project } from "~/models/Project";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { projectQueryKeys } from "./projectQueryKeys";
 
 interface CreateProjectData {
@@ -22,8 +24,9 @@ export function useCreateProject() {
       })
       return Project.fromJSON(res.data)
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: projectQueryKeys.all })
+      track(AnalyticsEvent.ProjectCreated, { project_types: variables.types })
     },
   })
 
