@@ -21,6 +21,7 @@ import LoginPage from "./routes/login";
 import RegisterPage from "./routes/register";
 import IntegrationsCallback from "./routes/integrations.callback";
 import ProtectedLayout from "./routes/protected";
+import SidebarLayout from "./components/sidebar/SidebarLayout";
 import HomePage from "./routes/home";
 import TasksPage from "./routes/tasks";
 import ContentsPage from "./routes/contents";
@@ -51,17 +52,22 @@ export const router = createBrowserRouter(
           element: <ProtectedLayout />,
           errorElement: <ErrorBoundary />,
           children: [
-            { index: true, element: <HomePage /> },
-            { path: tasksPath, element: <TasksPage /> },
-            { path: contentsPath, element: <ContentsPage /> },
-            { path: scriptsPath, element: <ScriptsPage /> },
-            { path: calendarPath, element: <CalendarPage /> },
             {
-              path: settingsPath,
-              element: <SettingsLayout />,
+              element: <SidebarLayout />,
               children: [
-                { index: true, element: <SettingsIndex /> },
-                { path: ":section", element: <SettingsSectionRoute /> },
+                { index: true, element: <HomePage /> },
+                { path: tasksPath, element: <TasksPage /> },
+                { path: contentsPath, element: <ContentsPage /> },
+                { path: scriptsPath, element: <ScriptsPage /> },
+                { path: calendarPath, element: <CalendarPage /> },
+                {
+                  path: settingsPath,
+                  element: <SettingsLayout />,
+                  children: [
+                    { index: true, element: <SettingsIndex /> },
+                    { path: ":section", element: <SettingsSectionRoute /> },
+                  ],
+                },
               ],
             },
           ],

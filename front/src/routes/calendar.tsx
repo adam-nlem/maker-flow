@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { DndContext, DragOverlay, PointerSensor, type DragEndEvent, type DragStartEvent, useSensor, useSensors } from "@dnd-kit/core";
-import SideBar from "~/components/sidebar/SideBar";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { ScriptCalendar } from "~/components/scripts/calendar";
@@ -42,28 +41,22 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="flex w-full">
-      <SideBar />
-      <div className="flex-1 min-w-0">
-        <div className="p-5 h-screen overflow-hidden flex flex-col gap-5">
+    <div className="p-5 h-screen overflow-hidden flex flex-col gap-5">
+      <h1 className="text-heading-xl">Calendrier</h1>
+      {focusedProject && (
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <CalendarFilterPanel projectUuid={focusedProject.uuid} />
+          <ScriptCalendar projectUuid={focusedProject.uuid} />
 
-          <h1 className="text-heading-xl">Calendrier</h1>
-          {focusedProject && (
-            <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-              <CalendarFilterPanel projectUuid={focusedProject.uuid} />
-              <ScriptCalendar projectUuid={focusedProject.uuid} />
-
-              <DragOverlay dropAnimation={null}>
-                {draggedScript && (
-                  <div className="opacity-90 rotate-1 shadow-lg">
-                    <ScriptTile script={draggedScript} onClick={() => { }} />
-                  </div>
-                )}
-              </DragOverlay>
-            </DndContext>
-          )}
-        </div>
-      </div>
+          <DragOverlay dropAnimation={null}>
+            {draggedScript && (
+              <div className="opacity-90 rotate-1 shadow-lg">
+                <ScriptTile script={draggedScript} onClick={() => { }} />
+              </div>
+            )}
+          </DragOverlay>
+        </DndContext>
+      )}
     </div>
   );
 }

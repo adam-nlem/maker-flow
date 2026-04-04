@@ -1,5 +1,4 @@
-import { CalendarDaysIcon, ChartBarIcon, ChevronUpDownIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, HomeIcon, PencilSquareIcon, PlusIcon, SparklesIcon } from "@heroicons/react/24/outline";
-import { CalendarDaysIcon as CalendarDaysIconSolid, HomeIcon as HomeIconSolid, ChartBarIcon as ChartBarIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid } from "@heroicons/react/24/solid";
+import { ChevronUpDownIcon, PencilSquareIcon, PlusIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
@@ -9,21 +8,22 @@ import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
 import IconWithTextTile from "../ui/IconWithTextTile";
 import { useLocation, useNavigate } from "react-router-dom";
-import { calendarPath, contentsPath, homePath, scriptsPath, settingsPath, settingsSubscriptionPath } from "~/routes/routePaths";
+import { settingsSubscriptionPath } from "~/routes/routePaths";
 import Shimmer from "../ui/Shimmer";
-
 import SelectDropdown from "../ui/SelectDropdown"
 import type { Project } from "~/models/Project"
 import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
 import UpdateProjectModal from "../projects/UpdateProjectModal";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
 import { platformOptions } from "~/models/enums/Platform";
+import { sidebarMainNavigationItems, sidebarBottomNavigationItems, navigationItemToFrenchTranslation, navigationItemToIcon, navigationItemToIconSolid, navigationItemToPath } from "~/models/enums/NavigationItem";
+import { isNavigationItemSelected } from "~/utils/navigationHelpers";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
 import IntegrationTile from "../integrations/IntegrationTile";
 import IntegrationLoginModal from "../integrations/IntegrationLoginModal";
 import { useIntegrationLoginModalStore } from "~/stores/integrations/integrationLoginModalStore";
 
-export default function SideBar() {
+export default function DesktopSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -117,30 +117,18 @@ export default function SideBar() {
 
           {/* NAVIGATION SECTION */}
           <div className="mt-10 flex flex-col gap-1">
-            <IconWithTextTile
-              icon={location.pathname === homePath ? HomeIconSolid : HomeIcon}
-              label="Accueil"
-              isSelected={location.pathname === homePath}
-              onClick={() => navigate(homePath)}
-            />
-            <IconWithTextTile
-              icon={location.pathname.startsWith(scriptsPath) ? ClipboardDocumentCheckIconSolid : ClipboardDocumentCheckIcon}
-              label="Script"
-              isSelected={location.pathname.startsWith(scriptsPath)}
-              onClick={() => navigate(scriptsPath)}
-            />
-            <IconWithTextTile
-              icon={location.pathname === calendarPath ? CalendarDaysIconSolid : CalendarDaysIcon}
-              label="Calendrier"
-              isSelected={location.pathname === calendarPath}
-              onClick={() => navigate(calendarPath)}
-            />
-            <IconWithTextTile
-              icon={location.pathname.startsWith(contentsPath) ? ChartBarIconSolid : ChartBarIcon}
-              label="Contenu"
-              isSelected={location.pathname.startsWith(contentsPath)}
-              onClick={() => navigate(contentsPath)}
-            />
+            {sidebarMainNavigationItems.map((item) => {
+              const selected = isNavigationItemSelected(item, location.pathname);
+              return (
+                <IconWithTextTile
+                  key={item}
+                  icon={selected ? navigationItemToIconSolid[item] : navigationItemToIcon[item]}
+                  label={navigationItemToFrenchTranslation[item]}
+                  isSelected={selected}
+                  onClick={() => navigate(navigationItemToPath[item])}
+                />
+              );
+            })}
           </div>
 
           {/* INTEGRATION SECTION */}
@@ -165,13 +153,19 @@ export default function SideBar() {
         <div>
           {/* BOTTOM NAVIGATION */}
           <div className="mb-5 flex flex-col p-3">
-            <IconWithTextTile
-              icon={location.pathname.startsWith(settingsPath) ? Cog6ToothIconSolid : Cog6ToothIcon}
-              label="Paramètres"
-              isBold={false}
-              isSelected={location.pathname.startsWith(settingsPath)}
-              onClick={() => navigate(settingsPath)}
-            />
+            {sidebarBottomNavigationItems.map((item) => {
+              const selected = isNavigationItemSelected(item, location.pathname);
+              return (
+                <IconWithTextTile
+                  key={item}
+                  icon={selected ? navigationItemToIconSolid[item] : navigationItemToIcon[item]}
+                  label={navigationItemToFrenchTranslation[item]}
+                  isBold={false}
+                  isSelected={selected}
+                  onClick={() => navigate(navigationItemToPath[item])}
+                />
+              );
+            })}
           </div>
 
           <div className="border-t border-light-gray rounded w-full"></div>

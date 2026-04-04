@@ -1,4 +1,3 @@
-import SideBar from "~/components/sidebar/SideBar";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import TodoListDashboardView from "~/components/tasks/TodoListDashboardView";
@@ -9,13 +8,10 @@ export default function TasksPage() {
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
 
   return (
-    <div className="flex w-full">
-      <SideBar />
-      <div className="flex-1 min-w-0">
-        {focusedProject && (
-          <TodoListDashboardView projectUuid={focusedProject.uuid} />
-        )}
-      </div>
-    </div>
+    <>
+      {focusedProject && (
+        <TodoListDashboardView projectUuid={focusedProject.uuid} />
+      )}
+    </>
   );
 }
