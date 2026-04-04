@@ -28,8 +28,8 @@ export default function OnboardingGenerateScriptStep() {
 
     return (
         <OnboardingStepLayout maxWidth="max-w-5xl">
-            <div className="flex gap-10 w-full max-w-5xl">
-                <div className="w-full flex-1 min-h-[75vh]  max-h-[75vh] rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden flex flex-col">
+            <div className="flex flex-col md:flex-row gap-10 w-full max-w-5xl">
+                <div className="hidden md:flex w-full flex-1 min-h-[75vh] max-h-[75vh] rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden flex-col">
                     {script ? (
                         <ScriptEditorPanel key={script.uuid} script={script} projectUuid={projectUuid} isReadOnly />
                     ) : (
