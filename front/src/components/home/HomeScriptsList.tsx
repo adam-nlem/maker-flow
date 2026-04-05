@@ -30,8 +30,8 @@ export default function HomeScriptsList({ projectUuid }: HomeScriptsListProps) {
     })
 
     return (
-        <div className="flex flex-col gap-3 h-35">
-            <div className="flex flex-row gap-2 flex-wrap">
+        <div className="flex flex-col gap-3 h-auto md:h-35">
+            <div className="flex flex-row gap-2 overflow-x-auto scrollbar-none md:overflow-x-visible md:flex-wrap">
                 {scriptStatusOptions.map((status) => (
                     <Pill
                         key={status}

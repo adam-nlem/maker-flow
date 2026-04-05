@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
 import { platformOptions } from "~/models/enums/Platform";
 import { scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon, scriptStatusToBorderClass } from "~/models/enums/ScriptStatus";
 import { colorToBgClass, colorToBorderClass, colorToTextClass } from "~/models/enums/Color";
@@ -13,13 +15,16 @@ interface CalendarFilterPanelProps {
 export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanelProps) {
     const { selectedPlatforms, selectedStatuses, selectedTagUuids, togglePlatform, toggleStatus, toggleTag } = useCalendarStore();
     const { scriptTags } = useListScriptTags({ projectUuid });
+    const [isExpanded, setIsExpanded] = useState(false);
 
     const selectedPlatformSet = new Set(selectedPlatforms);
     const selectedStatusSet = new Set(selectedStatuses);
     const selectedTagSet = new Set(selectedTagUuids);
 
-    return (
-        <div className="flex flex-row gap-5 w-full shrink-0">
+    const activeFilterCount = selectedPlatforms.length + selectedStatuses.length + selectedTagUuids.length;
+
+    const filterSections = (
+        <>
             {/* Platforms */}
             <div className="flex flex-col gap-2">
                 <span className="text-heading-xs text-gray">Plateformes</span>
@@ -73,6 +78,37 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
                     </div>
                 </div>
             )}
+        </>
+    );
+
+    return (
+        <div className="shrink-0">
+            {/* Mobile: collapsible filter bar */}
+            <div className="md:hidden">
+                <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="flex flex-row items-center gap-2 px-3 py-2 border border-light-gray rounded-xl hover:bg-surface-hover transition-colors cursor-pointer"
+                >
+                    <AdjustmentsHorizontalIcon className="size-4 text-gray" />
+                    <span className="text-heading-xs text-gray">Filtres</span>
+                    {activeFilterCount > 0 && (
+                        <span className="flex items-center justify-center size-5 rounded-full bg-primary/10 text-primary text-body-xs font-semibold">
+                            {activeFilterCount}
+                        </span>
+                    )}
+                </button>
+
+                {isExpanded && (
+                    <div className="flex flex-col gap-3 pt-3 animate-fade-in">
+                        {filterSections}
+                    </div>
+                )}
+            </div>
+
+            {/* Desktop: horizontal layout */}
+            <div className="hidden md:flex flex-row gap-5 w-full">
+                {filterSections}
+            </div>
         </div>
     );
 }

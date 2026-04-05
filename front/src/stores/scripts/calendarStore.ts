@@ -6,6 +6,7 @@ import type { ScriptStatus } from '~/models/enums/ScriptStatus'
 type CalendarState = {
     currentMonth: number,
     currentYear: number,
+    selectedDay: number | null,
     selectedPlatforms: Platform[],
     selectedStatuses: ScriptStatus[],
     selectedTagUuids: string[],
@@ -14,6 +15,10 @@ type CalendarState = {
 type CalendarAction = {
     setCurrentMonth: (month: number) => void
     setCurrentYear: (year: number) => void
+    setSelectedDay: (day: number | null) => void
+    goToPrevMonth: () => void
+    goToNextMonth: () => void
+    goToToday: () => void
     togglePlatform: (platform: Platform) => void
     toggleStatus: (status: ScriptStatus) => void
     toggleTag: (tagUuid: string) => void
@@ -26,12 +31,26 @@ export const useCalendarStore = createResettableStore<CalendarState & CalendarAc
         (set) => ({
             currentMonth: today.getMonth(),
             currentYear: today.getFullYear(),
+            selectedDay: null,
             selectedPlatforms: [],
             selectedStatuses: [],
             selectedTagUuids: [],
 
-            setCurrentMonth: (month) => set({ currentMonth: month }),
+            setCurrentMonth: (month) => set({ currentMonth: month, selectedDay: null }),
             setCurrentYear: (year) => set({ currentYear: year }),
+            setSelectedDay: (day) => set({ selectedDay: day }),
+            goToPrevMonth: () => set((state) => state.currentMonth === 0
+                ? { currentMonth: 11, currentYear: state.currentYear - 1, selectedDay: null }
+                : { currentMonth: state.currentMonth - 1, selectedDay: null }
+            ),
+            goToNextMonth: () => set((state) => state.currentMonth === 11
+                ? { currentMonth: 0, currentYear: state.currentYear + 1, selectedDay: null }
+                : { currentMonth: state.currentMonth + 1, selectedDay: null }
+            ),
+            goToToday: () => {
+                const now = new Date()
+                set({ currentMonth: now.getMonth(), currentYear: now.getFullYear(), selectedDay: null })
+            },
             togglePlatform: (platform) => set((state) => ({
                 selectedPlatforms: state.selectedPlatforms.includes(platform)
                     ? state.selectedPlatforms.filter((p) => p !== platform)

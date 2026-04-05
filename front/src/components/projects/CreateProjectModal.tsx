@@ -14,7 +14,7 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
     if (!showModal) return null;
 
     return (
-        <ModalOverlay isOpen={showModal} onClose={onClose}>
+        <ModalOverlay isOpen={showModal} onClose={onClose} height="max-h-fit" >
             <div className="flex flex-col gap-3 py-5 px-10 flex-1 min-h-0 overflow-y-auto">
                 {showStepHeader && (
                     <div className="flex flex-row items-center gap-3">
@@ -28,7 +28,7 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
                 <h1 className="text-heading-lg">
                     Créez un nouveau Projet
                 </h1>
-                <p className="text-body-xs w-100">Les projets vous permettront de regrouper tous les modules afin de vous y retrouver plus rapidement</p>
+                <p className="text-body-xs w-90">Les projets vous permettront de regrouper tous les modules afin de vous y retrouver plus rapidement</p>
                 <CreateProjectForm onProjectCreated={() => onProjectCreated()} formSpacing="space-y-6" />
             </div>
         </ModalOverlay>

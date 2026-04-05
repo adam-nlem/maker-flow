@@ -5,7 +5,8 @@ import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
 import ScriptTile from "~/components/scripts/ScriptTile";
 import HomeScriptsList from "./HomeScriptsList";
-import { ScriptCalendar } from "~/components/scripts/calendar";
+import ScriptCalendar from "../scripts/calendar/ScriptCalendar";
+
 
 interface HomeScriptsSectionProps {
     projectUuid: string;
@@ -41,7 +42,9 @@ export default function HomeScriptsSection({ projectUuid }: HomeScriptsSectionPr
     return (
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <HomeScriptsList projectUuid={projectUuid} />
-            <ScriptCalendar projectUuid={projectUuid} />
+            <div className="hidden md:flex md:flex-col flex-1 min-h-0">
+                <ScriptCalendar projectUuid={projectUuid} />
+            </div>
 
             <DragOverlay dropAnimation={null}>
                 {draggedScript && (

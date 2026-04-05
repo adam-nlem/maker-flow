@@ -14,7 +14,7 @@ export default function IntegrationLoginModal() {
     if (!selectedPlatform || !focusedProjectUuid) return null;
 
     return (
-        <ModalOverlay isOpen onClose={() => setSelectedPlatform(null)}>
+        <ModalOverlay isOpen onClose={() => setSelectedPlatform(null)} height="max-h-fit">
             <div className="flex-1 min-h-0 overflow-y-auto">
                 <IntegrationLoginCard
                     projectUuid={focusedProjectUuid}

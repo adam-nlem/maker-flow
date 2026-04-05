@@ -21,13 +21,13 @@ export default function HomePage() {
   const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid })
 
   return (
-    <div className="h-screen overflow-hidden">
-      <div className="p-5 flex flex-col h-full">
-        <div className="flex flex-row gap-5 flex-1 min-h-0">
+    <div className="h-screen overflow-y-auto md:overflow-hidden">
+      <div className="p-3 md:p-5 flex flex-col h-full">
+        <div className="flex flex-col md:flex-row gap-3 md:gap-5 flex-1 min-h-0">
           {isLoading ? (
             <>
-              <div className="w-2/3" />
-              <div className="w-1/3 flex flex-col gap-5">
+              <div className="hidden md:block md:w-2/3" />
+              <div className="w-full md:w-1/3 flex flex-col gap-3 md:gap-5">
                 <div className="flex flex-row flex-wrap gap-2">
                   {[...Array(4)].map((_, i) => (
                     <div key={i} className="flex flex-row gap-3 border border-light-gray rounded-lg p-2 w-fit items-center">
@@ -56,10 +56,10 @@ export default function HomePage() {
             </>
           ) : focusedProject && (
             <>
-              <div className="w-2/3 flex flex-col gap-5 overflow-y-auto scrollbar-none">
+              <div className="w-full md:w-2/3 flex flex-col gap-3 md:gap-5 overflow-y-auto scrollbar-none">
                 <HomeScriptsSection projectUuid={focusedProject.uuid} />
               </div>
-              <div className="w-1/3 flex flex-col gap-5 min-h-0">
+              <div className="w-full md:w-1/3 flex flex-col gap-3 md:gap-5 min-h-0">
                 {integrations.length === 0 ? (
                   <ConnectIntegrationPlaceholder />
                 ) : focusedIntegrationUuid === null && !isSubscribed ? (
