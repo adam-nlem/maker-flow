@@ -43,7 +43,7 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="p-3 md:p-5 h-screen overflow-y-auto md:overflow-hidden flex flex-col gap-3 md:gap-5">
+    <div className="p-3 md:p-5 h-full overflow-y-auto md:overflow-hidden flex flex-col gap-3 md:gap-5">
       <h1 className="text-heading-xl">Calendrier</h1>
       {focusedProject && (
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>

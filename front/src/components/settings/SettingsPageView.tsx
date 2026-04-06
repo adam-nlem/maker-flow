@@ -12,7 +12,7 @@ export default function SettingsPageView() {
     ) ?? SettingsSection.General;
 
     return (
-        <div className="flex flex-col md:flex-row h-screen md:overflow-hidden">
+        <div className="flex flex-col md:flex-row h-full md:overflow-hidden">
             <div className="md:hidden flex flex-row gap-2 overflow-x-auto scrollbar-none px-3 py-3 border-b border-light-gray shrink-0">
                 {settingsSectionOptions.map((section) => (
                     <IconWithTextTile

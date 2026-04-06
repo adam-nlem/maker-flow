@@ -21,7 +21,7 @@ export default function HomePage() {
   const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid })
 
   return (
-    <div className="h-screen overflow-y-auto md:overflow-hidden">
+    <div className="h-full overflow-y-auto md:overflow-hidden">
       <div className="p-3 md:p-5 flex flex-col h-full">
         <div className="flex flex-col md:flex-row gap-3 md:gap-5 flex-1 min-h-0">
           {isLoading ? (

@@ -8,7 +8,7 @@ export default function ContentsPage() {
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
 
   return (
-    <div className="h-screen">
+    <div className="h-full">
       {focusedProject && (
         <ContentsPageView projectUuid={focusedProject.uuid} />
       )}

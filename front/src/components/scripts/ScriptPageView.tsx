@@ -46,7 +46,7 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
     return (
         <>
             {/* Mobile layout */}
-            <div className="flex flex-col h-screen overflow-hidden md:hidden">
+            <div className="flex flex-col h-full overflow-hidden md:hidden">
                 {focusedScript ? (
                     <ScriptEditorPanel
                         key={focusedScript.uuid}
@@ -61,7 +61,7 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
             </div>
 
             {/* Desktop layout */}
-            <div className="hidden md:flex flex-row h-screen overflow-hidden">
+            <div className="hidden md:flex flex-row h-full overflow-hidden">
                 {listPanel}
                 <div className="flex-1 overflow-hidden">
                     {focusedScript ? (

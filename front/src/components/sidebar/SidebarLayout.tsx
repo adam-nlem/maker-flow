@@ -7,14 +7,14 @@ export default function SidebarLayout() {
     <>
       <MobileSidebar />
 
-      <div className="flex w-full">
+      <div className="flex w-full h-screen">
         {/* Desktop sidebar: hidden on mobile */}
         <div className="hidden md:block">
           <DesktopSidebar />
         </div>
 
         {/* Page content: top padding on mobile for the fixed header */}
-        <div className="flex-1 min-w-0 pt-12 md:pt-0">
+        <div className="flex-1 min-w-0 pt-12 md:pt-0 h-full">
           <Outlet />
         </div>
       </div>
