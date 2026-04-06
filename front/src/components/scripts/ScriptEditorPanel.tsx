@@ -9,8 +9,7 @@ import GenerationHistoryBar from "./generation/GenerationHistoryBar";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
 import { useScriptGenerationStore } from "~/stores/scripts/scriptGenerationStore";
-import { useListScriptGenerations } from "~/hooks/api/scriptGenerations/useListScriptGenerations";
-import { ScriptGenerationStatus } from "~/models/enums/ScriptGenerationStatus";
+import { useLatestScriptGeneration } from "~/hooks/api/scriptGenerations/useLatestScriptGeneration";
 
 interface ScriptEditorPanelProps {
     script: Script;
@@ -24,18 +23,15 @@ interface ScriptEditorPanelProps {
 export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, hidePanelTriggers, onOpenEditor, onBack }: ScriptEditorPanelProps) {
     const focusedGenerationUuid = useScriptGenerationStore((s) => s.focusedGenerationUuid);
     const setFocusedGenerationUuid = useScriptGenerationStore((s) => s.setFocusedGenerationUuid);
-    const { generations } = useListScriptGenerations({ scriptUuid: script.uuid });
+    const { latestCompletedGeneration } = useLatestScriptGeneration({ scriptUuid: script.uuid });
     const hasInitialized = useRef(false);
 
     useEffect(() => {
-        if (hasInitialized.current || generations.length === 0) return;
+        if (hasInitialized.current || !latestCompletedGeneration) return;
         hasInitialized.current = true;
         if (useScriptGenerationStore.getState().focusedGenerationUuid !== undefined) return;
-        const latestCompleted = generations.find((g) => g.status === ScriptGenerationStatus.Completed);
-        if (latestCompleted) {
-            setFocusedGenerationUuid(latestCompleted.uuid);
-        }
-    }, [generations, setFocusedGenerationUuid]);
+        setFocusedGenerationUuid(latestCompletedGeneration.uuid);
+    }, [latestCompletedGeneration, setFocusedGenerationUuid]);
 
     const { parts, isLoading } = useListScriptParts({ scriptUuid: script.uuid, generationUuid: focusedGenerationUuid });
     const togglePanel = useScriptRightPanelStore((s) => s.togglePanel);
