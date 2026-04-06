@@ -205,17 +205,6 @@ Persists the focused project UUID in localStorage.
 
 ---
 
-### `useSelectProjectModalStore`
-
-**Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/stores/project/selectProjectModalStore.ts`
-
-| State/Action | Type | Description |
-|--------------|------|-------------|
-| `isSelectModalOpen` | `boolean` | Modal visibility |
-| `setIsSelectModalOpen` | `(isOpen) => void` | Toggle modal |
-
----
-
 ### `useUpdateProjectStore`
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/stores/project/updateProjectStore.ts`
