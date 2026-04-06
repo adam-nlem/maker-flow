@@ -39,9 +39,9 @@ export default function OnboardingCreateScriptStep() {
 
     return (
         <OnboardingStepLayout maxWidth="max-w-2xl">
-            <div className="flex flex-col items-center gap-5 w-full">
+            <div className="flex flex-col items-center gap-5 w-full h-full">
                 {script ? (
-                    <div className="w-full flex-1 min-h-[60vh] max-h-[60vh] sm:min-h-[75vh]  sm:max-h-[75vh] rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden flex flex-col">
+                    <div className="w-full flex-1 min-h-[60vh] max-h-[60vh] md:min-h-[70vh]  md:max-h-[70vh] rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden flex flex-col">
                         <ScriptEditorPanel key={script.uuid} script={script} projectUuid={projectUuid} hidePanelTriggers />
                     </div>
                 ) : (

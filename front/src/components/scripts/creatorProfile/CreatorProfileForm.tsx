@@ -60,7 +60,7 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
         setNeverList(neverList.filter((_, i) => i !== index));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         await createOrUpdateCreatorProfile({
             projectUuid,

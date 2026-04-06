@@ -74,6 +74,9 @@ export const errorCodeMessages: Record<number, string> = {
   23005: 'Session invalide. Veuillez vous reconnecter.',
   23006: "Votre email n'est pas vérifié.",
 
+  // CreatorProfile (24xxx)
+  24001: 'Profil créateur introuvable.',
+
   // Fallback
   99999: 'Une erreur est survenue',
 }
