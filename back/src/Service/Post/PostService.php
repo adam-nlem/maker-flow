@@ -38,6 +38,8 @@ class PostService
                 $this->repository->save($existingPost);
             }
 
+            $this->downloadThumbnailIfMissing($existingPost, $postDTO->getThumbnailUrl());
+
             return $existingPost;
         }
 
@@ -73,6 +75,8 @@ class PostService
                 $existingPost->setCaption($postDTO->getCaption());
                 $this->repository->save($existingPost);
             }
+
+            $this->downloadThumbnailIfMissing($existingPost, $postDTO->getThumbnailUrl());
 
             return $existingPost;
         }
@@ -173,5 +177,18 @@ class PostService
                 engagementByViews: InsightHelper::calculateEngagementByViews($insights),
             );
         }, $posts);
+    }
+
+    private function downloadThumbnailIfMissing(Post $post, ?string $thumbnailUrl): void
+    {
+        if ($thumbnailUrl === null) {
+            return;
+        }
+
+        if ($this->postThumbnailService->getPath($post) !== null) {
+            return;
+        }
+
+        $this->postThumbnailService->downloadAndStore($post, $thumbnailUrl);
     }
 }

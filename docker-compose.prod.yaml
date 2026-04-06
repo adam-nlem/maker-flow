@@ -80,6 +80,8 @@ services:
     <<: *back-common
     environment:
       <<: *back-env
+    volumes:
+      - maker_flow_uploads:/var/www/html/private/uploads
     networks:
       - maker_flow
       - traefik_public
@@ -112,6 +114,8 @@ services:
   worker:
     <<: *back-common
     command: ["php", "bin/console", "messenger:consume", "messages", "--time-limit=3600", "--memory-limit=256M", "-vv"]
+    volumes:
+      - maker_flow_uploads:/var/www/html/private/uploads
     networks:
       - maker_flow
     depends_on:
@@ -132,6 +136,8 @@ services:
   scheduler:
     <<: *back-common
     command: ["php", "bin/console", "messenger:consume", "scheduler_default", "--time-limit=3600", "--memory-limit=256M", "-vv"]
+    volumes:
+      - maker_flow_uploads:/var/www/html/private/uploads
     networks:
       - maker_flow
     depends_on:
@@ -239,6 +245,7 @@ volumes:
   maker_flow_db_data:
   maker_flow_rabbitmq_data:
   maker_flow_redis_data:
+  maker_flow_uploads:
 
 networks:
   maker_flow:
