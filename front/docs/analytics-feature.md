@@ -6,9 +6,10 @@ MakerFlow uses [PostHog](https://posthog.com) for product analytics. Events are 
 
 ## Setup
 
-PostHog is initialized in `main.tsx` via `PostHogProvider` wrapping the app. Configuration uses two environment variables:
+PostHog is initialized in `main.tsx` via `PostHogProvider` wrapping the app. Configuration uses three environment variables:
 - `VITE_PUBLIC_POSTHOG_PROJECT_TOKEN` — PostHog project API key
-- `VITE_PUBLIC_POSTHOG_HOST` — PostHog API host (e.g., `https://eu.i.posthog.com`)
+- `VITE_PUBLIC_POSTHOG_API_HOST` — My managed reverse proxy domain (e.g., `https://t.maker-flow.com`)
+- `VITE_PUBLIC_POSTHOG_UI_HOST` — Necessary because you're using a proxy, this way links will point back to PostHog properly (e.g., `https://eu.posthog.com`)
 
 ## Architecture
 
