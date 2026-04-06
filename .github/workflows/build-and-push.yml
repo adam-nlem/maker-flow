@@ -107,7 +107,7 @@ jobs:
 
       - name: Stop workers gracefully
         working-directory: /var/www/maker-flow
-        run: docker compose -f docker-compose.yaml stop -t 60 worker
+        run: docker compose -f docker-compose.yaml stop -t 60 worker scheduler
 
       - name: Recreate backend and frontend
         working-directory: /var/www/maker-flow
@@ -132,7 +132,9 @@ jobs:
 
       - name: Restart workers
         working-directory: /var/www/maker-flow
-        run: docker compose -f docker-compose.yaml up -d --no-deps --force-recreate worker
+        run: |
+          docker compose -f docker-compose.yaml up -d --no-deps --force-recreate worker
+          docker compose -f docker-compose.yaml up -d --no-deps --force-recreate scheduler
 
       - name: Rollback on failure
         if: failure()
@@ -141,7 +143,7 @@ jobs:
           echo "Rolling back to ${{ steps.tag.outputs.prev }}..."
           sed -i "s/^DEPLOY_TAG=.*/DEPLOY_TAG=${{ steps.tag.outputs.prev }}/" .env
           docker compose -f docker-compose.yaml up -d --no-deps --force-recreate back front
-          docker compose -f docker-compose.yaml up -d --no-deps --force-recreate worker
+          docker compose -f docker-compose.yaml up -d --no-deps --force-recreate worker scheduler
 
       - name: Prune old images
         if: success()

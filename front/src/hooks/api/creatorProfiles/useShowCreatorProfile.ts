@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { HttpException } from "~/services/httpClient/HttpException";
 import { creatorProfileQueryKeys } from "./creatorProfileQueryKeys";
 import { CreatorProfile, type CreatorProfileJSON } from "~/models/CreatorProfile";
 
@@ -16,8 +17,8 @@ export function useShowCreatorProfile({ projectUuid }: UseShowCreatorProfilePara
                     params: { projectUuid },
                 });
                 return CreatorProfile.fromJSON(response.data);
-            } catch (error: any) {
-                if (error?.response?.status === 404) {
+            } catch (error) {
+                if (error instanceof HttpException && error.response.code === 24001) {
                     return null;
                 }
                 throw error;

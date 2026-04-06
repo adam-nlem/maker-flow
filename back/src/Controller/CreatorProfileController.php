@@ -6,6 +6,8 @@ use App\DTO\QueryParam\CreatorProfile\ShowCreatorProfileQueryParamDTO;
 use App\DTO\Request\CreatorProfile\CreateOrUpdateCreatorProfileRequestDTO;
 use App\Entity\CreatorProfile;
 use App\Entity\User;
+use App\Exception\CreatorProfile\CreatorProfileNotFoundException;
+use App\Exception\Project\ProjectNotFoundException;
 use App\Repository\CreatorProfileRepository;
 use App\Repository\ProjectRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,13 +30,13 @@ final class CreatorProfileController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         $creatorProfile = $creatorProfileRepository->getByProjectAndUser($project, $user);
 
         if ($creatorProfile === null) {
-            return $this->json(data: null, status: Response::HTTP_NOT_FOUND);
+            throw new CreatorProfileNotFoundException();
         }
 
         return $this->json(
@@ -56,7 +58,7 @@ final class CreatorProfileController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         $existingProfile = $creatorProfileRepository->getByProjectAndUser($project, $user);

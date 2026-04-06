@@ -89,7 +89,7 @@ class Project
     ])]
     private ?\DateTimeImmutable $finishedAt = null;
 
-    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ProjectType::class)]
+    #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ProjectType::class, nullable: true)]
     #[Groups([
         'api_project_create',
         'api_project_update',

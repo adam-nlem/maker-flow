@@ -41,14 +41,16 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     };
 
     const createButton = (
-        <button
-            onClick={handleNewScript}
-            disabled={isPending || isLimitReached}
-            className="text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
-            title={isLimitReached ? "Limite atteinte pour votre abonnement" : "Nouveau script"}
-        >
-            <PlusIcon className="size-4" strokeWidth={2} />
-        </button>
+        isLimitReached ?
+            <p className="text-body-xs text-center ">Votre abonnement ne vous permet plus de générer de script</p> :
+            <button
+                onClick={handleNewScript}
+                disabled={isPending || isLimitReached}
+                className="text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
+                title={"Nouveau script"}
+            >
+                <PlusIcon className="size-4" strokeWidth={2} />
+            </button>
     );
 
     const listContent = (

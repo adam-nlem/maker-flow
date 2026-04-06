@@ -25,8 +25,7 @@ class FetchIntegrationInsightsCommand extends Command
         Platform::Youtube,
     ];
 
-    //TODO: Change this back to 24 horus
-    private const SYNC_THRESHOLD_HOURS = 0;
+    private const SYNC_THRESHOLD_HOURS = 24;
 
     public function __construct(
         private readonly IntegrationRepository $integrationRepository,

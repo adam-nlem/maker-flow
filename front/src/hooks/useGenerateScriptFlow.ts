@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript"
 import { useCreateScriptGeneration } from "~/hooks/api/scriptGenerations/useCreateScriptGeneration"
 import { useShowScriptGeneration } from "~/hooks/api/scriptGenerations/useShowScriptGeneration"
+import { useLatestScriptGeneration } from "~/hooks/api/scriptGenerations/useLatestScriptGeneration"
 import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts"
 import { GenerateScriptPhase } from "~/models/enums/GenerateScriptPhase"
 import { ScriptGenerationStatus } from "~/models/enums/ScriptGenerationStatus"
@@ -32,6 +33,8 @@ export function useGenerateScriptFlow({ projectUuid, initialScriptUuid }: UseGen
     const { createScriptGeneration, isPending: isCreatingGeneration } = useCreateScriptGeneration()
     const { generation } = useShowScriptGeneration({ generationUuid, scriptUuid: scriptUuid ?? "" })
     const { scripts } = useListPaginatedScripts({ projectUuid, limit: 1 })
+    const { inProgressGeneration, latestCompletedGeneration } = useLatestScriptGeneration({ scriptUuid: scriptUuid ?? "" })
+    const hasInitialized = useRef(false)
 
     const isPending = isCreatingScript || isCreatingGeneration
     const script = scripts.find((s) => s.uuid === scriptUuid) ?? scripts[0] ?? null
@@ -43,6 +46,21 @@ export function useGenerateScriptFlow({ projectUuid, initialScriptUuid }: UseGen
             setScriptUuid(script.uuid)
         }
     }, [scriptUuid, script])
+
+    // Recover phase and generationUuid from existing generations on reload
+    useEffect(() => {
+        if (hasInitialized.current) return
+
+        if (inProgressGeneration) {
+            hasInitialized.current = true
+            setGenerationUuid(inProgressGeneration.uuid)
+            setPhase(GenerateScriptPhase.Generating)
+        } else if (latestCompletedGeneration) {
+            hasInitialized.current = true
+            setGenerationUuid(latestCompletedGeneration.uuid)
+            setPhase(GenerateScriptPhase.Preview)
+        }
+    }, [inProgressGeneration, latestCompletedGeneration])
 
     // Rotate generating messages
     useEffect(() => {

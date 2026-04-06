@@ -18,4 +18,5 @@ enum DomainCode: int
     case User = 21;
     case Validation = 22;
     case Auth = 23;
+    case CreatorProfile = 24;
 }

@@ -201,7 +201,7 @@ Auth pages (`/login`, `/register`, `/verify-otp`) are standalone route pages tha
 
 **File:** `app/hooks/useGenerateScriptFlow.ts`
 
-Encapsulates all generation flow state and logic: phase transitions (`brief` → `generating` → `preview`), script/generation UUID management, rotating messages interval, recovery on reload (falls back to most recent script via `useListPaginatedScripts`), and the `handleBriefSubmit` handler (creates script if needed, triggers generation).
+Encapsulates all generation flow state and logic: phase transitions (`brief` → `generating` → `preview`), script/generation UUID management, rotating messages interval, recovery on reload (falls back to most recent script via `useListPaginatedScripts`, and resumes from existing generations via `useLatestScriptGeneration` — in-progress → Generating phase, completed → Preview phase), and the `handleBriefSubmit` handler (creates script if needed, triggers generation).
 
 Returns: `{ phase, script, isPending, isFailed, messageIndex, handleBriefSubmit }`
 

@@ -74,7 +74,7 @@ front/app/
 │       ├── useUpdateScriptGeneration.ts  ← PATCH /{uuid}, resets + re-dispatches existing generation
 │       ├── useDeleteScriptGeneration.ts  ← DELETE /{uuid}, removes generation and its parts
 │       ├── useListScriptGenerations.ts   ← GET, returns ScriptGeneration[] (all generations for a script)
-│       ├── useLatestScriptGeneration.ts  ← derives from useListScriptGenerations (first item)
+│       ├── useLatestScriptGeneration.ts  ← derives inProgressGeneration + latestCompletedGeneration from useListScriptGenerations
 │       └── useShowScriptGeneration.ts    ← GET with polling (refetchInterval: 2s)
 ├── stores/scripts/
 │   ├── scriptGenerationStore.ts       ← activeGenerationUuid + focusedGenerationUuid state

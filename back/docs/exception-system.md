@@ -55,6 +55,7 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | User | 21 | `DomainCode::User` |
 | Validation | 22 | `DomainCode::Validation` |
 | Auth | 23 | `DomainCode::Auth` |
+| CreatorProfile | 24 | `DomainCode::CreatorProfile` |
 
 ## Exception Inventory
 
@@ -126,6 +127,8 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 23004 | `TokenExpiredException` | 401 | — | `src/Exception/Auth/` |
 | 23005 | `InvalidTokenException` | 401 | — | `src/Exception/Auth/` |
 | 23006 | `EmailNotVerifiedException` | 403 | — | `src/Exception/Auth/` |
+| **CreatorProfile (24xxx)** |
+| 24001 | `CreatorProfileNotFoundException` | 404 | — | `src/Exception/CreatorProfile/` |
 
 ## Controller Pattern
 
