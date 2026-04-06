@@ -22,3 +22,6 @@ framework:
             cache.rate_limiter:
                 adapter: cache.adapter.redis
                 provider: 'redis://:%env(default::string:REDIS_STORE_PASSWORD)%@%env(string:REDIS_STORE_HOST)%:%env(string:REDIS_STORE_PORT)%'
+            cache.scheduler:
+                adapter: cache.adapter.redis
+                provider: 'redis://:%env(default::string:REDIS_STORE_PASSWORD)%@%env(string:REDIS_STORE_HOST)%:%env(string:REDIS_STORE_PORT)%'

@@ -129,6 +129,26 @@ services:
           memory: 256M
           cpus: "0.5"
 
+  scheduler:
+    <<: *back-common
+    command: ["php", "bin/console", "messenger:consume", "scheduler_default", "--time-limit=3600", "--memory-limit=256M", "-vv"]
+    networks:
+      - maker_flow
+    depends_on:
+      back:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+      redis-store:
+        condition: service_healthy
+    deploy:
+      mode: replicated
+      replicas: 1
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.25"
+
   db:
     image: mysql:8.0
     container_name: ${COMPOSE_PROJECT_NAME}_db
