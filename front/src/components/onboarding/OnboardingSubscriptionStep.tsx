@@ -34,6 +34,12 @@ export default function OnboardingSubscriptionStep() {
                 )}
                 loadingView={<Shimmer height="h-64" width="w-full" />}
             />
+            <p
+                className="text-body-sm text-gray cursor-pointer hover:text-dark transition-colors text-center mt-4"
+                onClick={advanceStep}
+            >
+                Ignorer
+            </p>
         </OnboardingStepLayout>
     )
 }
