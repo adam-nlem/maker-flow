@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useFloating, offset, flip, shift, autoUpdate, useDismiss, useInteractions, FloatingPortal } from "@floating-ui/react"
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
 import { colorOptions, colorToBgClass } from "~/models/enums/Color";
@@ -10,12 +11,13 @@ import { useDeleteScriptTag } from "~/hooks/api/scriptTags/useDeleteScriptTag";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 
 interface UpdateScriptTagDropdownProps {
+    anchorRef: React.RefObject<HTMLElement | null>;
     tag: ScriptTag;
     onClose: () => void;
     onTagDeleted: (deletedTagUuid: string) => void;
 }
 
-export default function UpdateScriptTagDropdown({ tag, onClose, onTagDeleted }: UpdateScriptTagDropdownProps) {
+export default function UpdateScriptTagDropdown({ anchorRef, tag, onClose, onTagDeleted }: UpdateScriptTagDropdownProps) {
     const [title, setTitle] = useState(tag.title);
     const [color, setColor] = useState(tag.color);
 
@@ -24,6 +26,18 @@ export default function UpdateScriptTagDropdown({ tag, onClose, onTagDeleted }: 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
     const inputRef = useRef<HTMLInputElement>(null);
+
+    const { refs, floatingStyles, context } = useFloating({
+        open: true,
+        onOpenChange: (open) => { if (!open) onClose() },
+        placement: "right-start",
+        elements: { reference: anchorRef.current },
+        middleware: [offset(8), flip(), shift({ padding: 8 })],
+        whileElementsMounted: autoUpdate,
+    })
+
+    const dismiss = useDismiss(context)
+    const { getFloatingProps } = useInteractions([dismiss])
 
     useEffect(() => {
         inputRef.current?.focus();
@@ -35,43 +49,52 @@ export default function UpdateScriptTagDropdown({ tag, onClose, onTagDeleted }: 
     };
 
     return (
-        <div className="flex flex-col items-center gap-3 absolute left-full top-0 ml-2 z-20 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2">
-            <Input
-                ref={inputRef}
-                placeholder="Tag"
-                id="title"
-                name="title"
-                type="text"
-                required
-                simple
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-            />
-
-            <div className="flex flex-row gap-2">
-                {colorOptions.map((c) => (
-                    <div
-                        key={c}
-                        onClick={() => setColor(c)}
-                        className={`size-5 rounded cursor-pointer ${colorToBgClass[c]} ${color === c ? 'ring-2 ring-offset-1 ring-gray' : ''}`}
+        <>
+            <FloatingPortal>
+                <div
+                    ref={refs.setFloating}
+                    style={floatingStyles}
+                    {...getFloatingProps()}
+                    className="z-70 flex flex-col items-center gap-3 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2"
+                >
+                    <Input
+                        ref={inputRef}
+                        placeholder="Tag"
+                        id="title"
+                        name="title"
+                        type="text"
+                        required
+                        simple
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
                     />
-                ))}
-            </div>
 
-            <Button
-                onClick={handleSave}
-                disabled={isUpdating || title.trim() === ""}
-            >
-                Enregistrer
-            </Button>
+                    <div className="flex flex-row gap-2">
+                        {colorOptions.map((c) => (
+                            <div
+                                key={c}
+                                onClick={() => setColor(c)}
+                                className={`size-5 rounded cursor-pointer ${colorToBgClass[c]} ${color === c ? 'ring-2 ring-offset-1 ring-gray' : ''}`}
+                            />
+                        ))}
+                    </div>
 
-            <SimpleTextButton
-                onClick={() => setShowDeleteConfirm(true)}
-                hoverColor={"hover:text-danger"}
-            >
-                <TrashIcon className="size-3.5" strokeWidth={2} />
-                <p>Supprimer</p>
-            </SimpleTextButton>
+                    <Button
+                        onClick={handleSave}
+                        disabled={isUpdating || title.trim() === ""}
+                    >
+                        Enregistrer
+                    </Button>
+
+                    <SimpleTextButton
+                        onClick={() => setShowDeleteConfirm(true)}
+                        hoverColor={"hover:text-danger"}
+                    >
+                        <TrashIcon className="size-3.5" strokeWidth={2} />
+                        <p>Supprimer</p>
+                    </SimpleTextButton>
+                </div>
+            </FloatingPortal>
 
             <ConfirmDeleteDialog
                 isOpen={showDeleteConfirm}
@@ -84,6 +107,6 @@ export default function UpdateScriptTagDropdown({ tag, onClose, onTagDeleted }: 
                 isPending={isDeleting}
                 message="Êtes-vous sûr de vouloir supprimer ce tag ? Cette action est irréversible."
             />
-        </div>
+        </>
     );
 }

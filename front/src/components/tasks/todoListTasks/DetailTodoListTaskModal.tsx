@@ -2,7 +2,7 @@ import ModalOverlay from "~/components/ui/ModalOverlay";
 import type { TodoListTask } from "~/models/TodoListTask";
 import { TextArea } from "~/components/ui/TextArea";
 import { Badge } from "~/components/ui/Badge";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { TodoListStatus, todoListStatusOptions, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
 import { TodoListPriority, todoListPriorityOptions, todoListPriorityToFrenchTranslation } from "~/models/enums/TodoListPriority";
 import { useUpdateTodoListTask } from "~/hooks/api/todoListTasks/useUpdateTodoListTask";
@@ -37,6 +37,9 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
     const [showTagsDropdown, setShowTagsDropdown] = useState(false);
     const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+
+    const tagButtonRef = useRef<HTMLDivElement>(null);
+    const dueDateButtonRef = useRef<HTMLDivElement>(null);
 
     const { updateTodoListTask } = useUpdateTodoListTask()
     const { deleteTodoListTask } = useDeleteTodoListTask()
@@ -102,12 +105,15 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
 
                     <div>
                         <h2 className="text-heading-sm mb-1.5">Tags</h2>
-                        <div className="flex flex-col gap-1 relative min-w-fit">
-                            <SimpleTextButton onClick={() => setShowTagsDropdown(!showTagsDropdown)}>
-                                <TagIcon className="size-3.5" strokeWidth={2} />
-                                <p>Ajouter un tag</p>
-                            </SimpleTextButton>
+                        <div className="flex flex-col gap-1 min-w-fit">
+                            <div ref={tagButtonRef}>
+                                <SimpleTextButton onClick={() => setShowTagsDropdown(!showTagsDropdown)}>
+                                    <TagIcon className="size-3.5" strokeWidth={2} />
+                                    <p>Ajouter un tag</p>
+                                </SimpleTextButton>
+                            </div>
                             {showTagsDropdown && <ListTodoListTagsDropdown
+                                anchorRef={tagButtonRef}
                                 todoListUuid={todoListUuid}
                                 selectedTags={tags}
                                 onClose={() => setShowTagsDropdown(false)}
@@ -132,7 +138,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
 
                     <div>
                         <h2 className="text-heading-sm mb-1.5">Priorité</h2>
-                        <div className="relative flex flex-col gap-1">
+                        <div className="flex flex-col gap-1">
                             <SelectDropdown<TodoListPriority>
                                 items={todoListPriorityOptions}
                                 selectedItemId={priority}
@@ -170,7 +176,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
 
                     <div>
                         <h2 className="text-heading-sm mb-1.5">Statut</h2>
-                        <div className="relative flex flex-col gap-1">
+                        <div className="flex flex-col gap-1">
                             <SelectDropdown<TodoListStatus>
                                 items={todoListStatusOptions}
                                 selectedItemId={status}
@@ -200,25 +206,28 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
 
                     <div>
                         <h2 className="text-heading-sm mb-1.5">Date d'échéance</h2>
-                        <div className="relative flex flex-col gap-1">
+                        <div className="flex flex-col gap-1">
 
-                            {dueDate ? (
-                                <Badge
-                                    icon={CalendarDateRangeIcon}
-                                    label={dueDate.toLocaleDateString('fr-FR')}
-                                    textColor="text-gray"
-                                    onRemoveClick={() => setDueDate(undefined)}
-                                    onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}
-                                />
-                            ) : (
-                                <SimpleTextButton onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}>
-                                    <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
-                                    <p>Ajouter une date</p>
-                                </SimpleTextButton>
-                            )}
+                            <div ref={dueDateButtonRef}>
+                                {dueDate ? (
+                                    <Badge
+                                        icon={CalendarDateRangeIcon}
+                                        label={dueDate.toLocaleDateString('fr-FR')}
+                                        textColor="text-gray"
+                                        onRemoveClick={() => setDueDate(undefined)}
+                                        onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}
+                                    />
+                                ) : (
+                                    <SimpleTextButton onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}>
+                                        <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
+                                        <p>Ajouter une date</p>
+                                    </SimpleTextButton>
+                                )}
+                            </div>
 
                             {showDueDateDropdown && (
                                 <AddDueDateDropdown
+                                    anchorRef={dueDateButtonRef}
                                     selectedDueDate={dueDate}
                                     onClose={() => setShowDueDateDropdown(false)}
                                     onDueDateSelected={(selectedDate) => setDueDate(selectedDate)}

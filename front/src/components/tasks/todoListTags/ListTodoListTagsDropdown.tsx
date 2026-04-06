@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useFloating, offset, flip, shift, autoUpdate, useDismiss, useInteractions, FloatingPortal } from "@floating-ui/react"
 import { Badge } from "~/components/ui/Badge";
 import { useListTodoListTagsWithSearch } from "~/hooks/api/todoListTags/useListTodoListTagsWithSearch";
 import { TagIcon } from "@heroicons/react/16/solid";
@@ -11,6 +12,7 @@ import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import UpdateTodoListTagDropdown from "./UpdateTodoListTagDropdown";
 
 interface ListTodoListTagsDropdownProps {
+    anchorRef: React.RefObject<HTMLElement | null>;
     todoListUuid: string;
     selectedTags: TodoListTag[];
     onClose: () => void;
@@ -18,7 +20,7 @@ interface ListTodoListTagsDropdownProps {
     onTagDeleted?: (deletedTagUuid: string) => void;
 }
 
-export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListTodoListTagsDropdownProps) {
+export default function ListTodoListTagsDropdown({ anchorRef, todoListUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListTodoListTagsDropdownProps) {
     const { setSearchTerm, todoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
     const [title, setTitle] = useState("");
     const [color, setColor] = useState(Color.Purple);
@@ -26,6 +28,19 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
     const [updatingTag, setUpdatingTag] = useState<TodoListTag | null>(null);
 
     const inputRef = useRef<HTMLInputElement>(null);
+    const tagAnchorRefs = useRef<Map<string, HTMLElement>>(new Map())
+
+    const { refs, floatingStyles, context } = useFloating({
+        open: true,
+        onOpenChange: (open) => { if (!open) onClose() },
+        placement: "bottom-start",
+        elements: { reference: anchorRef.current },
+        middleware: [offset(4), flip(), shift({ padding: 8 })],
+        whileElementsMounted: autoUpdate,
+    })
+
+    const dismiss = useDismiss(context)
+    const { getFloatingProps } = useInteractions([dismiss])
 
     // Auto-focus the search input when the dropdown opens
     useEffect(() => {
@@ -47,7 +62,10 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
                     {todoListTags.map((tag) => {
                         if (!selectedTags.some(t => t.uuid === tag.uuid))
                             return (
-                                <div key={tag.uuid} className="relative">
+                                <div key={tag.uuid} ref={(el) => {
+                                    if (el) tagAnchorRefs.current.set(tag.uuid, el)
+                                    else tagAnchorRefs.current.delete(tag.uuid)
+                                }}>
                                     <Badge
                                         icon={TagIcon}
                                         label={tag.title}
@@ -56,8 +74,9 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
                                         onOptionClick={() => setUpdatingTag(tag)}
                                         onClick={() => onTagSelected(tag)}
                                     />
-                                    {updatingTag?.uuid === tag.uuid && (
+                                    {updatingTag?.uuid === tag.uuid && tagAnchorRefs.current.get(tag.uuid) && (
                                         <UpdateTodoListTagDropdown
+                                            anchorRef={{ current: tagAnchorRefs.current.get(tag.uuid) ?? null }}
                                             tag={tag}
                                             onClose={() => setUpdatingTag(null)}
                                             onTagDeleted={(deletedTagUuid) => {
@@ -100,10 +119,13 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
     }
 
     return (
-        <>
-            {/* Backdrop to close dropdown when clicking outside */}
-            <div className="fixed inset-0 z-0" onClick={onClose} />
-            <div className="absolute top-14 left-0 mt-1 z-10 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center">
+        <FloatingPortal>
+            <div
+                ref={refs.setFloating}
+                style={floatingStyles}
+                {...getFloatingProps()}
+                className="z-70 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center"
+            >
                 <Input
                     ref={inputRef}
                     placeholder="Tag"
@@ -124,6 +146,6 @@ export default function ListTodoListTagsDropdown({ todoListUuid, selectedTags, o
 
                 {renderContent()}
             </div>
-        </>
+        </FloatingPortal>
     );
-}   
+}

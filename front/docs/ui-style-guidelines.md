@@ -703,6 +703,17 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 
 ---
 
+## Z-Index Hierarchy
+
+| Layer | Z-index | Component |
+|-------|---------|-----------|
+| Premium overlay | `z-10` | PremiumPlaceholder |
+| Mobile sidebar | `z-40` | SidePanel / MobileSidebar |
+| Modals / Toasts | `z-50` | ModalOverlay, ToastContainer |
+| Dropdown portals | `z-70` | All dropdown panels via `FloatingPortal` (`@floating-ui/react`) |
+
+---
+
 ## Best Practices
 
 1. **Use typography classes** (`text-heading-*`, `text-body-*`) instead of raw Tailwind text classes
