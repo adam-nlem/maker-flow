@@ -40,8 +40,10 @@ Sentry.init({
 Settings.defaultZone = "Europe/Paris";
 
 const postHogOptions = {
-  api_host: import.meta.env.VITE_PUBLIC_POSTHOG_HOST,
+  api_host: import.meta.env.VITE_PUBLIC_POSTHOG_API_HOST,
+  ui_host: import.meta.env.VITE_PUBLIC_POSTHOG_UI_HOST,
   defaults: '2026-01-30',
+  person_profiles: 'always',
 } as const
 
 createRoot(document.getElementById("root")!, {

@@ -38,7 +38,8 @@ jobs:
             VITE_SENTRY_DSN=${{ secrets.VITE_SENTRY_DSN }}
             VITE_PRELAUNCH_ENABLED=${{ secrets.VITE_PRELAUNCH_ENABLED }}
             VITE_PUBLIC_POSTHOG_PROJECT_TOKEN=${{ secrets.VITE_PUBLIC_POSTHOG_PROJECT_TOKEN }}
-            VITE_PUBLIC_POSTHOG_HOST=${{ secrets.VITE_PUBLIC_POSTHOG_HOST }}
+            VITE_PUBLIC_POSTHOG_API_HOST=${{ secrets.VITE_PUBLIC_POSTHOG_API_HOST }}
+            VITE_PUBLIC_POSTHOG_UI_HOST=${{ secrets.VITE_PUBLIC_POSTHOG_UI_HOST }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
