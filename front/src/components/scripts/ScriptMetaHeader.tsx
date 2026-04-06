@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import { type ScriptStatus, scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToBorderClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
@@ -19,9 +19,10 @@ interface ScriptMetaHeaderProps {
     isReadOnly?: boolean;
     hidePanelTriggers?: boolean;
     onOpenEditor?: () => void;
+    onBack?: () => void;
 }
 
-export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal, isReadOnly, hidePanelTriggers, onOpenEditor }: ScriptMetaHeaderProps) {
+export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal, isReadOnly, hidePanelTriggers, onOpenEditor, onBack }: ScriptMetaHeaderProps) {
     const [title, setTitle] = useState(script.title);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [status, setStatus] = useState<ScriptStatus | undefined>(script.status);
@@ -49,6 +50,11 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
     return (
         <div className="px-6 py-5 border-b border-light-gray flex flex-col gap-4">
             <div className="flex flex-row items-center gap-2">
+                {onBack && (
+                    <button onClick={onBack} className="md:hidden shrink-0 text-gray hover:text-dark transition-colors cursor-pointer">
+                        <ArrowLeftIcon className="size-5" strokeWidth={2} />
+                    </button>
+                )}
                 <Input
                     simple
                     value={title}

@@ -421,7 +421,7 @@ Modal backdrop with sidebar-aware positioning.
 
 **Location:** `front/app/components/ui/SidePanel.tsx`
 
-Reusable side panel layout with header, optional toolbar, scrollable body, and optional sticky footer. Supports collapsible animation.
+Reusable side panel layout with header, optional toolbar, scrollable body, and optional sticky footer. Supports collapsible animation with responsive mobile behavior.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
@@ -455,6 +455,12 @@ Reusable side panel layout with header, optional toolbar, scrollable body, and o
     <div className="p-3 flex flex-col gap-2">{/* list */}</div>
 </SidePanel>
 ```
+
+**Responsive behavior (collapsible panels):**
+- **Desktop (md+):** Sidebar with width transition (`w-0` → `w-72`/`w-96`), same as before
+- **Mobile (<md):** Full-screen fixed overlay (`fixed top-12 left-0 right-0 bottom-0 z-40`) when open. `top-12` accounts for the mobile header bar. Panel content becomes full-width.
+
+Non-collapsible panels (no `isOpen` prop) are not affected by this responsive behavior — parent components handle their own mobile layout.
 
 ---
 

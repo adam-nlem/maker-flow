@@ -22,24 +22,29 @@ const panelMinWidth: Record<PanelWidth, string> = {
     "w-96": "min-w-96",
 };
 
-export function SidePanel({
+function PanelContent({
     title,
     icon: Icon,
-    width = "w-72",
-    side = "right",
-    isOpen,
+    borderClass,
     onClose,
     headerActions,
     toolbar,
     footer,
+    className,
     children,
-}: SidePanelProps) {
-    const borderClass = side === "left" ? "border-r" : "border-l";
-    const minWidthClass = panelMinWidth[width];
-    const isCollapsible = isOpen !== undefined;
-
-    const panel = (
-        <div className={`${width} ${minWidthClass} shrink-0 ${borderClass} border-light-gray h-full flex flex-col`}>
+}: {
+    title: string;
+    icon?: HeroIcon;
+    borderClass: string;
+    onClose?: () => void;
+    headerActions?: ReactNode;
+    toolbar?: ReactNode;
+    footer?: ReactNode;
+    className: string;
+    children: ReactNode;
+}) {
+    return (
+        <div className={`shrink-0 ${borderClass} border-light-gray h-full flex flex-col bg-clear ${className}`}>
             {/* Header */}
             <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
                 <div className="flex flex-row items-center gap-2">
@@ -76,14 +81,45 @@ export function SidePanel({
             )}
         </div>
     );
+}
+
+export function SidePanel({
+    title,
+    icon,
+    width = "w-72",
+    side = "right",
+    isOpen,
+    onClose,
+    headerActions,
+    toolbar,
+    footer,
+    children,
+}: SidePanelProps) {
+    const borderClass = side === "left" ? "border-r" : "border-l";
+    const minWidthClass = panelMinWidth[width];
+    const isCollapsible = isOpen !== undefined;
+
+    const panelProps = { title, icon, borderClass, onClose, headerActions, toolbar, footer, children };
 
     if (isCollapsible) {
         return (
-            <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? width : "w-0"}`}>
-                {panel}
-            </div>
+            <>
+                {/* Desktop: sidebar collapse */}
+                <div className={`hidden md:block transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? width : "w-0"}`}>
+                    <PanelContent {...panelProps} className={`${width} ${minWidthClass}`} />
+                </div>
+
+                {/* Mobile: full-screen overlay */}
+                {isOpen && (
+                    <div className="md:hidden fixed top-12 left-0 right-0 bottom-0 z-40">
+                        <PanelContent {...panelProps} className="w-full" />
+                    </div>
+                )}
+            </>
         );
     }
 
-    return panel;
+    return (
+        <PanelContent {...panelProps} className={`${width} ${minWidthClass}`} />
+    );
 }

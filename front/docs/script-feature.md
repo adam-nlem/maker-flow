@@ -12,6 +12,8 @@ The Script feature provides a split-view editor for managing scripts per project
 
 ### Split-View Layout
 
+**Desktop** (`hidden md:flex flex-row`):
+
 ```
 ScriptPageView (flex-row h-screen)
   ├── ScriptListPanel (w-72, left panel)
@@ -32,6 +34,14 @@ ScriptPageView (flex-row h-screen)
         ├── HookTemplateCard[] (infinite scroll)
         └── CreateHookTemplateModal (via + button)
 ```
+
+**Mobile** (`md:hidden flex flex-col`):
+
+Each panel becomes a separate full-screen view. The active view is derived from `focusScriptStore.focusedScriptUuid`:
+- `null` → **list view**: ScriptListPanel renders full-width (inline layout, no SidePanel wrapper)
+- non-null → **editor view**: ScriptEditorPanel renders full-width with a back arrow button (ArrowLeftIcon in ScriptMetaHeader, `md:hidden`)
+
+Right panels (GenerateScriptPanel, HookTemplatePanel) render as **fixed full-screen overlays** on mobile via SidePanel's responsive collapsible behavior (`fixed top-12 left-0 right-0 bottom-0 z-40`). They self-manage visibility through `useScriptRightPanelStore`.
 
 ### File Structure
 
