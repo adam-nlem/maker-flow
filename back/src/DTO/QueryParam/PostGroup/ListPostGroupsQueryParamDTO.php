@@ -12,6 +12,14 @@ class ListPostGroupsQueryParamDTO extends AbstractQueryParamDTO
     #[Assert\NotBlank]
     private string $projectUuid;
 
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private int $page;
+
+    #[Assert\NotBlank]
+    #[Assert\Positive]
+    private int $limit;
+
     public function __construct(
         protected RequestStack $requestStack,
         protected ValidatorInterface $validator,
@@ -22,10 +30,22 @@ class ListPostGroupsQueryParamDTO extends AbstractQueryParamDTO
     protected function fromQueryParams(array $queryParams): void
     {
         $this->projectUuid = $queryParams["projectUuid"];
+        $this->page = (int) $queryParams["page"];
+        $this->limit = (int) $queryParams["limit"];
     }
 
     public function getProjectUuid(): string
     {
         return $this->projectUuid;
+    }
+
+    public function getPage(): int
+    {
+        return $this->page;
+    }
+
+    public function getLimit(): int
+    {
+        return $this->limit;
     }
 }

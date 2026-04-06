@@ -707,50 +707,38 @@ const iconUrl = platformToIcon[platform] ?? PLATFORM_PLACEHOLDER_ICON;
 
 ---
 
-## Integration Settings Page
+## Sidebar Integration Tiles & Modal
 
-The `/settings/integration` route allows users to manage their social media connections from a dedicated settings section.
+Integration management is accessible from the sidebar's "PLATEFORMES" section. Each tile shows the platform icon, name, and a colored status dot. Clicking a tile opens the `IntegrationLoginModal`.
 
 ### Location
-- **Page component:** `front/app/components/settings/IntegrationSettings.tsx`
-- **Card component:** `front/app/components/settings/integration/IntegrationSettingCard.tsx`
-- **Delete hook:** `front/app/hooks/api/integrations/useDeleteIntegration.ts`
-- **Route wrapper:** `IntegrationSettingsWrapper` in `front/app/routes/settings.section.tsx`
+- **Tile component:** `front/app/components/integrations/IntegrationTile.tsx`
+- **Modal component:** `front/app/components/integrations/IntegrationLoginModal.tsx`
+- **Modal store:** `front/app/stores/integrations/integrationLoginModalStore.ts`
+- **Card component:** `front/app/components/integrations/IntegrationLoginCard.tsx`
 
 ### Architecture
 
-Integrations are per-project. `IntegrationSettingsWrapper` resolves the focused project UUID and passes it to `IntegrationSettings`, which then renders one `IntegrationSettingCard` per platform.
+The modal is controlled via a Zustand store (`useIntegrationLoginModalStore`) holding `selectedPlatform: Platform | null`. This allows any component to open the modal — the sidebar tiles and `ConnectIntegrationPlaceholder` both use this store.
 
 ```
-settings.section.tsx
-  └── IntegrationSettingsWrapper  (resolves projectUuid from focused project)
-        └── IntegrationSettings   (lists all platforms)
-              └── IntegrationSettingCard × 3  (one per platform)
+SideBar.tsx
+  └── IntegrationTile × 3  (one per platform, shows status dot)
+  └── IntegrationLoginModal  (reads from store, renders ModalOverlay + IntegrationLoginCard)
+
+ConnectIntegrationPlaceholder.tsx
+  └── Button onClick → setSelectedPlatform(Platform.Instagram)
 ```
 
-### IntegrationSettingCard
+### Status dot colors
+| Status | Bg Class | Border Class |
+|---|---|---|
+| `Active` | `bg-primary/10` | `border-primary/30` |
+| `Revoked` | `bg-yellow/10` | `border-yellow/30` |
+| `Error` | `bg-danger/10` | `border-danger/30` |
+| Not connected | `bg-mid-gray` | `border-transparent` |
 
-Each card shows:
-- Platform icon + name + status badge (Connecté / Expiré / Erreur / Non connecté)
-- Connected: profile picture, display name, `@username`, last sync date
-- Disconnected: "Aucun compte connecté."
-- Actions: `[Déconnecter]` (with confirm dialog) and/or `[Connecter / Reconnecter]`
-
-**Status badge classes:**
-| Status | Classes |
-|---|---|
-| `Active` | `bg-primary/10 text-primary` |
-| `Revoked` | `bg-yellow/10 text-yellow` |
-| `Error` | `bg-danger/10 text-danger` |
-| No integration | `bg-light-gray text-gray` |
-
-**Reconnect logic:** The reconnect button is shown when there is no integration OR when the integration status is not `Active` (i.e., `Revoked` or `Error`). Disconnect is available whenever an integration exists.
-
-### useDeleteIntegration
-
-```ts
-const { deleteIntegration, isPending } = useDeleteIntegration({ projectUuid });
-await deleteIntegration(integrationUuid);
-```
-
-Calls `DELETE /api/integrations/{integrationUuid}` and invalidates `integrationQueryKeys.list(projectUuid)` on success.
+### Behavior
+- **Click action:** Opens a centered modal (`ModalOverlay`) containing `IntegrationLoginCard` for the clicked platform, allowing the user to connect/disconnect/reconnect.
+- **Reactivity:** After connecting or disconnecting via the modal, the `useListIntegrations` query is invalidated by the mutation hooks, so the status dot updates automatically.
+- **ConnectIntegrationPlaceholder:** The "Connecter un compte" button on the home page opens the modal defaulting to Instagram.

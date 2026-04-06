@@ -18,9 +18,10 @@ interface ScriptEditorPanelProps {
     isReadOnly?: boolean;
     hidePanelTriggers?: boolean;
     onOpenEditor?: () => void;
+    onBack?: () => void;
 }
 
-export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, hidePanelTriggers, onOpenEditor }: ScriptEditorPanelProps) {
+export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, hidePanelTriggers, onOpenEditor, onBack }: ScriptEditorPanelProps) {
     const focusedGenerationUuid = useScriptGenerationStore((s) => s.focusedGenerationUuid);
     const setFocusedGenerationUuid = useScriptGenerationStore((s) => s.setFocusedGenerationUuid);
     const { generations } = useListScriptGenerations({ scriptUuid: script.uuid });
@@ -48,6 +49,7 @@ export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, hid
                 isReadOnly={isReadOnly}
                 hidePanelTriggers={hidePanelTriggers}
                 onOpenEditor={onOpenEditor}
+                onBack={onBack}
             />
 
             <GenerationHistoryBar

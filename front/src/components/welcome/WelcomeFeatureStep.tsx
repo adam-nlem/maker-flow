@@ -1,6 +1,9 @@
+import { useEffect } from "react"
 import { RocketLaunchIcon, ClipboardDocumentCheckIcon, ChartBarIcon, CalendarDaysIcon, SparklesIcon } from "@heroicons/react/24/outline"
-import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent"
 import { WelcomeStep } from "~/models/enums/WelcomeStep"
+import { track } from "~/services/analytics/analytics"
+import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
 import AuthStepLayout from "~/components/auth/AuthStepLayout"
 
 const features = [
@@ -28,6 +31,10 @@ const features = [
 
 export default function WelcomeFeatureStep() {
     const setWelcomeStep = useOnboardingStore((s) => s.setWelcomeStep)
+
+    useEffect(() => {
+        track(AnalyticsEvent.WelcomeStepViewed, { step: WelcomeStep.Features })
+    }, [])
 
     return (
         <AuthStepLayout

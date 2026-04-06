@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { useFloating, offset, flip, shift, autoUpdate, useDismiss, useInteractions, FloatingPortal } from "@floating-ui/react"
 import Pill from "~/components/ui/Pill";
 import { useListScriptTagsWithSearch } from "~/hooks/api/scriptTags/useListScriptTagsWithSearch";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
@@ -11,6 +12,7 @@ import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import UpdateScriptTagDropdown from "./UpdateScriptTagDropdown";
 
 interface ListScriptTagsDropdownProps {
+    anchorRef: React.RefObject<HTMLElement | null>;
     projectUuid: string;
     selectedTags: ScriptTag[];
     onClose: () => void;
@@ -18,7 +20,7 @@ interface ListScriptTagsDropdownProps {
     onTagDeleted?: (deletedTagUuid: string) => void;
 }
 
-export default function ListScriptTagsDropdown({ projectUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListScriptTagsDropdownProps) {
+export default function ListScriptTagsDropdown({ anchorRef, projectUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListScriptTagsDropdownProps) {
     const { setSearchTerm, scriptTags, isLoading } = useListScriptTagsWithSearch({ projectUuid: projectUuid });
     const [title, setTitle] = useState("");
     const [color, setColor] = useState(Color.Purple);
@@ -26,6 +28,19 @@ export default function ListScriptTagsDropdown({ projectUuid, selectedTags, onCl
     const [updatingTag, setUpdatingTag] = useState<ScriptTag | null>(null);
 
     const inputRef = useRef<HTMLInputElement>(null);
+    const tagAnchorRefs = useRef<Map<string, HTMLElement>>(new Map())
+
+    const { refs, floatingStyles, context } = useFloating({
+        open: true,
+        onOpenChange: (open) => { if (!open) onClose() },
+        placement: "bottom-start",
+        elements: { reference: anchorRef.current },
+        middleware: [offset(4), flip(), shift({ padding: 8 })],
+        whileElementsMounted: autoUpdate,
+    })
+
+    const dismiss = useDismiss(context)
+    const { getFloatingProps } = useInteractions([dismiss])
 
     // Auto-focus the search input when the dropdown opens
     useEffect(() => {
@@ -47,7 +62,10 @@ export default function ListScriptTagsDropdown({ projectUuid, selectedTags, onCl
                     {scriptTags.map((tag) => {
                         if (!selectedTags.some(t => t.uuid === tag.uuid))
                             return (
-                                <div key={tag.uuid} className="relative">
+                                <div key={tag.uuid} ref={(el) => {
+                                    if (el) tagAnchorRefs.current.set(tag.uuid, el)
+                                    else tagAnchorRefs.current.delete(tag.uuid)
+                                }}>
                                     <Pill
                                         isSelected
                                         label={tag.title}
@@ -58,8 +76,9 @@ export default function ListScriptTagsDropdown({ projectUuid, selectedTags, onCl
                                         onSuffixClick={() => setUpdatingTag(tag)}
                                         onClick={() => onTagSelected(tag)}
                                     />
-                                    {updatingTag?.uuid === tag.uuid && (
+                                    {updatingTag?.uuid === tag.uuid && tagAnchorRefs.current.get(tag.uuid) && (
                                         <UpdateScriptTagDropdown
+                                            anchorRef={{ current: tagAnchorRefs.current.get(tag.uuid) ?? null }}
                                             tag={tag}
                                             onClose={() => setUpdatingTag(null)}
                                             onTagDeleted={(deletedTagUuid) => {
@@ -102,10 +121,13 @@ export default function ListScriptTagsDropdown({ projectUuid, selectedTags, onCl
     }
 
     return (
-        <>
-            {/* Backdrop to close dropdown when clicking outside */}
-            <div className="fixed inset-0 z-0" onClick={onClose} />
-            <div className="absolute top-14 left-0 mt-1 z-10 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center">
+        <FloatingPortal>
+            <div
+                ref={refs.setFloating}
+                style={floatingStyles}
+                {...getFloatingProps()}
+                className="z-70 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center"
+            >
                 <Input
                     ref={inputRef}
                     placeholder="Tag"
@@ -126,6 +148,6 @@ export default function ListScriptTagsDropdown({ projectUuid, selectedTags, onCl
 
                 {renderContent()}
             </div>
-        </>
+        </FloatingPortal>
     );
 }

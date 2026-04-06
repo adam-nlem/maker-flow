@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { subscriptionQueryKeys } from "./subscriptionQueryKeys";
 
 export function useCancelSubscription() {
@@ -12,6 +14,7 @@ export function useCancelSubscription() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: subscriptionQueryKeys.current() });
+            track(AnalyticsEvent.SubscriptionCancelled)
         },
     });
 

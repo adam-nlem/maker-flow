@@ -1,14 +1,12 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { creatorProfileQueryKeys } from "./creatorProfileQueryKeys";
-import type { Platform } from "~/models/enums/Platform";
-import type { ContentType } from "~/models/enums/ContentType";
 import type { Tone } from "~/models/enums/Tone";
 
 interface CreateOrUpdateCreatorProfileData {
     projectUuid: string;
-    platforms?: Platform[];
-    contentType?: ContentType;
     niche?: string;
     targetAudience?: string;
     tones?: Tone[];
@@ -26,6 +24,7 @@ export function useCreateOrUpdateCreatorProfile() {
         },
         onSuccess: (_, { projectUuid }) => {
             queryClient.invalidateQueries({ queryKey: creatorProfileQueryKeys.show(projectUuid) });
+            track(AnalyticsEvent.CreatorProfileSaved)
         },
     });
 

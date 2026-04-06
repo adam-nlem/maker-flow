@@ -2,6 +2,8 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { OnboardingStep } from "~/models/enums/OnboardingStep";
 import { Onboarding } from "~/models/Onboarding";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { onboardingQueryKeys } from "./onboardingQueryKeys";
 
 export function useCompleteOnboardingStep() {
@@ -12,8 +14,9 @@ export function useCompleteOnboardingStep() {
             const res = await httpClient.post('/onboarding/complete-step', { step });
             return Onboarding.fromJSON(res.data);
         },
-        onSuccess: () => {
+        onSuccess: (_, step) => {
             queryClient.invalidateQueries({ queryKey: onboardingQueryKeys.all });
+            track(AnalyticsEvent.OnboardingStepCompleted, { step })
         },
     });
 

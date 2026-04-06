@@ -16,11 +16,8 @@ export default function ApplyHookTemplateModal({ isOpen, template, onConfirm, on
     const parts = parseHookPlaceholders(template.content);
 
     return (
-        <ModalOverlay isOpen={isOpen} onClose={onCancel} className="items-center justify-center">
-            <div
-                className="bg-clear rounded-xl shadow-lg p-6 w-full max-w-md flex flex-col gap-4 border border-light-gray"
-                onClick={(e) => e.stopPropagation()}
-            >
+        <ModalOverlay isOpen={isOpen} onClose={onCancel}>
+            <div className="flex flex-col gap-4 p-6 flex-1 min-h-0 overflow-y-auto">
                 <h3 className="text-heading-lg">Appliquer ce template ?</h3>
 
                 <div className="flex flex-col gap-1">

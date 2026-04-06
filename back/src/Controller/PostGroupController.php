@@ -8,9 +8,13 @@ use App\DTO\Request\PostGroup\CreatePostGroupRequestDTO;
 use App\DTO\Request\PostGroup\UpdatePostGroupRequestDTO;
 use App\Entity\PostGroup;
 use App\Entity\User;
+use App\Exception\Post\PostGroupNotFoundException;
+use App\Exception\Project\ProjectNotFoundException;
+use App\Exception\Stripe\ActiveSubscriptionRequiredException;
 use App\Repository\PostGroupRepository;
 use App\Repository\PostRepository;
 use App\Repository\ProjectRepository;
+use App\Repository\ScriptRepository;
 use App\Repository\SubscriptionRepository;
 use App\Service\PostGroup\PostGroupService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -27,7 +31,6 @@ final class PostGroupController extends AbstractController
     #[Route('', name: 'api_post_groups_list', methods: ['GET'])]
     public function list(
         ListPostGroupsQueryParamDTO $queryParamDto,
-        PostGroupRepository $postGroupRepository,
         ProjectRepository $projectRepository,
     ): JsonResponse {
         /** @var User $user */
@@ -36,13 +39,13 @@ final class PostGroupController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
-        $postGroups = $postGroupRepository->getByProjectAndUser($project, $user);
+        $result = $this->service->getPostGroupsWithInsightsAndScript($user, $project, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(
-            data: $postGroups,
+            data: $result,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_post_groups_list']]
         );
@@ -58,16 +61,13 @@ final class PostGroupController extends AbstractController
         $user = $this->getUser();
 
         if ($subscriptionRepository->getLatestActiveByUser($user) === null) {
-            return $this->json(
-                data: ["message" => "Active subscription required."],
-                status: Response::HTTP_PAYMENT_REQUIRED,
-            );
+            throw new ActiveSubscriptionRequiredException();
         }
 
         $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         $result = $this->service->getRankedPostGroups($user, $project, $queryParamDto->getPage(), $queryParamDto->getLimit());
@@ -92,7 +92,7 @@ final class PostGroupController extends AbstractController
         $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
-            return $this->json(data: ["message" => "You don't have any project with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ProjectNotFoundException();
         }
 
         /** @var PostGroup $postGroup */
@@ -123,6 +123,7 @@ final class PostGroupController extends AbstractController
         UpdatePostGroupRequestDTO $dto,
         PostGroupRepository $postGroupRepository,
         PostRepository $postRepository,
+        ScriptRepository $scriptRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -130,7 +131,7 @@ final class PostGroupController extends AbstractController
         $postGroup = $postGroupRepository->getByUuidAndUser($postGroupUuid, $user);
 
         if ($postGroup === null) {
-            return $this->json(data: ["message" => "You don't have any post group with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new PostGroupNotFoundException();
         }
 
         if ($dto->getTitle() !== null && $dto->getTitle() !== $postGroup->getTitle()) {
@@ -150,6 +151,29 @@ final class PostGroupController extends AbstractController
 
             foreach ($postsToRemove as $post) {
                 $post->setPostGroup(null);
+            }
+        }
+
+        if ($dto->hasScriptUuid()) {
+            $currentScript = $postGroup->getScript();
+
+            if ($dto->getScriptUuid() === null) {
+                if ($currentScript !== null) {
+                    $currentScript->setPostGroup(null);
+                    $scriptRepository->save($currentScript);
+                }
+            } else {
+                $script = $scriptRepository->getByUuidAndUser($dto->getScriptUuid(), $user);
+
+                if ($script !== null) {
+                    if ($currentScript !== null && $currentScript !== $script) {
+                        $currentScript->setPostGroup(null);
+                        $scriptRepository->save($currentScript);
+                    }
+
+                    $script->setPostGroup($postGroup);
+                    $scriptRepository->save($script);
+                }
             }
         }
 
@@ -174,7 +198,7 @@ final class PostGroupController extends AbstractController
         $postGroup = $postGroupRepository->getByUuidAndUser($postGroupUuid, $user);
 
         if ($postGroup === null) {
-            return $this->json(data: ["message" => "You don't have any post group with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new PostGroupNotFoundException();
         }
 
         $postRepository->unlinkPostsByPostGroup($postGroup);

@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import Pill from "~/components/ui/Pill";
 import { useListScriptGenerations } from "~/hooks/api/scriptGenerations/useListScriptGenerations";
 import { useDeleteScriptGeneration } from "~/hooks/api/scriptGenerations/useDeleteScriptGeneration";
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { ScriptGenerationStatus, scriptGenerationStatusToBgClass, scriptGenerationStatusToBorderClass, scriptGenerationStatusToIcon } from "~/models/enums/ScriptGenerationStatus";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { aiModelToFrenchTranslation } from "~/models/enums/AiModel";
@@ -20,28 +21,10 @@ export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUui
     const { deleteScriptGeneration } = useDeleteScriptGeneration();
     const [pendingDeleteUuid, setPendingDeleteUuid] = useState<string | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const sentinelRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const sentinel = sentinelRef.current;
-        const container = containerRef.current;
-        if (!sentinel || !container) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-                    listMore();
-                }
-            },
-            { root: container, rootMargin: "0px 200px 0px 0px" },
-        );
-
-        observer.observe(sentinel);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [hasMore, isLoadingMore, listMore]);
+    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore, {
+        direction: "horizontal",
+        root: containerRef,
+    });
 
     if (generations.length === 0) return null;
 

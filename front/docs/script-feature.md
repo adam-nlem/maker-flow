@@ -12,6 +12,8 @@ The Script feature provides a split-view editor for managing scripts per project
 
 ### Split-View Layout
 
+**Desktop** (`hidden md:flex flex-row`):
+
 ```
 ScriptPageView (flex-row h-screen)
   ├── ScriptListPanel (w-72, left panel)
@@ -32,6 +34,14 @@ ScriptPageView (flex-row h-screen)
         ├── HookTemplateCard[] (infinite scroll)
         └── CreateHookTemplateModal (via + button)
 ```
+
+**Mobile** (`md:hidden flex flex-col`):
+
+Each panel becomes a separate full-screen view. The active view is derived from `focusScriptStore.focusedScriptUuid`:
+- `null` → **list view**: ScriptListPanel renders full-width (inline layout, no SidePanel wrapper)
+- non-null → **editor view**: ScriptEditorPanel renders full-width with a back arrow button (ArrowLeftIcon in ScriptMetaHeader, `md:hidden`)
+
+Right panels (GenerateScriptPanel, HookTemplatePanel) render as **fixed full-screen overlays** on mobile via SidePanel's responsive collapsible behavior (`fixed top-12 left-0 right-0 bottom-0 z-40`). They self-manage visibility through `useScriptRightPanelStore`.
 
 ### File Structure
 
@@ -156,7 +166,7 @@ front/app/
 ## Key Patterns
 
 ### Infinite Scroll Pagination
-`ScriptListPanel` uses infinite scroll to load scripts page by page. `useListPaginatedScripts` manages page/additionalScripts/hasMore/isLoadingMore state (same pattern as `useListPaginatedPosts`). Accepts an optional `status?: ScriptStatus` prop to filter scripts by status — when provided, only scripts matching that status are returned. The query key includes the status so React Query refetches when the filter changes. A sentinel `<div>` at the bottom of the list triggers an `IntersectionObserver` (rootMargin `200px`) to call `listMore()` when the user scrolls near the end. The API sends `page`, `limit`, and optionally `status` query params; `hasMore` is determined by `count === limit`.
+`ScriptListPanel` uses infinite scroll to load scripts page by page. `useListPaginatedScripts` manages page/additionalScripts/hasMore/isLoadingMore state (same pattern as `useListPaginatedPosts`). Accepts an optional `status?: ScriptStatus` prop to filter scripts by status — when provided, only scripts matching that status are returned. The query key includes the status so React Query refetches when the filter changes. A sentinel `<div>` at the bottom of the list is observed via the `useInfiniteScroll` hook (rootMargin `200px`) to call `listMore()` when the user scrolls near the end. The API sends `page`, `limit`, and optionally `status` query params; `hasMore` is determined by `count === limit`.
 
 ### Script Creation (no modal)
 Clicking "+ New script" in `ScriptListPanel` calls `useCreateScript` directly with a default title `"Nouveau script"`. Since `useCreateScript.mutationFn` returns the full `Script` object, the new UUID is immediately available to set as focused, opening the editor instantly.

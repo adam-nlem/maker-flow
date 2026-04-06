@@ -5,6 +5,7 @@ import { ToggleChip } from "~/components/ui/ToggleChip";
 import { SidePanel } from "~/components/ui/SidePanel";
 import { HookTemplateCategory, hookTemplateCategoryOptions, hookTemplateCategoryToFrenchTranslation } from "~/models/enums/HookTemplateCategory";
 import { useListPaginatedHookTemplates } from "~/hooks/api/hookTemplates/useListPaginatedHookTemplates";
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
 import { useHookTemplateStore } from "~/stores/scripts/hookTemplateStore";
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
@@ -33,27 +34,7 @@ export default function HookTemplatePanel() {
     }, [searchInput]);
 
     const { hookTemplates, hasMore, isLoadingMore, listMore } = useListPaginatedHookTemplates({ searchTerm: debouncedSearchTerm || undefined });
-    const sentinelRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const sentinel = sentinelRef.current;
-        if (!sentinel) return;
-
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-                    listMore();
-                }
-            },
-            { rootMargin: "0px 0px 200px 0px" },
-        );
-
-        observer.observe(sentinel);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [hasMore, isLoadingMore, listMore]);
+    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore);
 
     const filteredTemplates = hookTemplates.filter((template) => {
         switch (activeCategory) {

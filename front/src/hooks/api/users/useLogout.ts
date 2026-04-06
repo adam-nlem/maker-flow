@@ -2,6 +2,7 @@ import { useMutation } from "@tanstack/react-query"
 import { useNavigate } from "react-router-dom"
 import { loginPath } from "~/routes/routePaths"
 import { httpClient } from "~/services/httpClient/httpClient"
+import { resetUser } from "~/services/analytics/analytics"
 import { clearSessionData } from "~/services/session/clearSessionData"
 
 export function useLogout() {
@@ -12,6 +13,7 @@ export function useLogout() {
             await httpClient.get('/users/logout')
         },
         onSuccess: () => {
+            resetUser()
             clearSessionData()
             navigate(loginPath, { replace: true })
         },

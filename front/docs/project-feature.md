@@ -205,17 +205,6 @@ Persists the focused project UUID in localStorage.
 
 ---
 
-### `useSelectProjectModalStore`
-
-**Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/stores/project/selectProjectModalStore.ts`
-
-| State/Action | Type | Description |
-|--------------|------|-------------|
-| `isSelectModalOpen` | `boolean` | Modal visibility |
-| `setIsSelectModalOpen` | `(isOpen) => void` | Toggle modal |
-
----
-
 ### `useUpdateProjectStore`
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/stores/project/updateProjectStore.ts`
@@ -340,8 +329,6 @@ The SideBar component integrates all project features:
 6. **Navigation Links**: "Taches" and "Insights" links for built-in features
 
 **Behavior:**
-- Modals close when sidebar collapses
-- Sidebar stays expanded while modals are open
 - Edit icon appears on hover in selection modal
 
 ---

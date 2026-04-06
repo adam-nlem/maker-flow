@@ -4,8 +4,6 @@ namespace App\DTO\Request\CreatorProfile;
 
 use App\DTO\Request\AbstractRequestDTO;
 use App\Entity\CreatorProfile;
-use App\Entity\Enum\ContentType;
-use App\Entity\Enum\Platform;
 use App\Entity\Enum\Tone;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -13,8 +11,6 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
 {
     private string $projectUuid;
-    private ?array $platforms;
-    private ?ContentType $contentType;
     private ?string $niche;
     private ?string $targetAudience;
     private ?array $tones;
@@ -32,10 +28,6 @@ class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
     protected function fromPayload(array $payload): void
     {
         $this->projectUuid = $payload["projectUuid"];
-        $this->platforms = isset($payload["platforms"])
-            ? array_filter(array_map(fn(string $platform) => Platform::tryFrom($platform), $payload["platforms"]))
-            : null;
-        $this->contentType = isset($payload["contentType"]) ? ContentType::tryFrom($payload["contentType"]) : null;
         $this->niche = $payload["niche"] ?? null;
         $this->targetAudience = $payload["targetAudience"] ?? null;
         $this->tones = $payload["tones"] ?? null;
@@ -49,8 +41,6 @@ class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
         $creatorProfile = new CreatorProfile();
 
         return $creatorProfile
-            ->setPlatforms($this->platforms)
-            ->setContentType($this->contentType)
             ->setNiche($this->niche)
             ->setTargetAudience($this->targetAudience)
             ->setTones($this->tones)
@@ -62,16 +52,6 @@ class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
     public function getProjectUuid(): string
     {
         return $this->projectUuid;
-    }
-
-    public function getPlatforms(): ?array
-    {
-        return $this->platforms;
-    }
-
-    public function getContentType(): ?ContentType
-    {
-        return $this->contentType;
     }
 
     public function getNiche(): ?string

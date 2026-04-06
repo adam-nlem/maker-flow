@@ -2,7 +2,7 @@
 
 ## Overview
 
-`SelectDropdown` is a self-contained dropdown component for selecting items from a list. It manages its own open/close state and positions the dropdown below the trigger element.
+`SelectDropdown` is a self-contained dropdown component for selecting items from a list. It manages its own open/close state and uses `@floating-ui/react` to position the dropdown panel via a portal, ensuring it is never clipped by parent overflow containers.
 
 ---
 
@@ -42,6 +42,19 @@
     onSelect: () => void // Callback to select this item
 }
 ```
+
+---
+
+## Positioning
+
+SelectDropdown uses `@floating-ui/react` for positioning:
+- **Portal rendering**: The dropdown panel renders via `FloatingPortal` to `document.body`, escaping any parent `overflow-hidden` or `overflow-y-auto` containers
+- **Auto-flip**: If there isn't enough space below the trigger, the dropdown flips above it
+- **Auto-shift**: The dropdown shifts horizontally to stay within the viewport
+- **Auto-update**: The position recalculates on scroll and resize
+- **Dismiss**: Clicking outside or pressing Escape closes the dropdown (handled by `useDismiss`)
+
+The dropdown panel uses `z-70` to float above modals (`z-50`).
 
 ---
 
@@ -122,11 +135,34 @@ const metricOptions = Object.values(InsightMetric)
 ## Key Points
 
 1. **Self-contained**: Manages open/close state internally - no external store needed
-2. **Trigger + Dropdown**: Use `renderTrigger` to define the clickable element, dropdown appears below it
-3. **Backdrop**: Clicking outside the dropdown closes it (uses `fixed inset-0 z-20` backdrop)
-4. **ChevronUpDownIcon**: Use as `rightIcon` on triggers to indicate selection capability
-5. **Selection Indicator**: Use a small primary dot (`h-1.5 w-1.5 rounded-full bg-primary`) in tile components
-6. **Optional Create Button**: Omit `onClickCreateButton` and `createButtonLabel` for enum selection
+2. **Portal-based**: Renders via `FloatingPortal` - safe inside overflow containers, sidebars, and modals
+3. **Smart positioning**: Auto-flips and auto-shifts at viewport edges via `@floating-ui/react`
+4. **Dismiss**: Clicking outside or pressing Escape closes the dropdown (no manual backdrop needed)
+5. **ChevronUpDownIcon**: Use as `rightIcon` on triggers to indicate selection capability
+6. **Selection Indicator**: Use a small primary dot (`h-1.5 w-1.5 rounded-full bg-primary`) in tile components
+7. **Optional Create Button**: Omit `onClickCreateButton` and `createButtonLabel` for enum selection
+
+---
+
+## Dropdown Portal Pattern (for other dropdowns)
+
+Other dropdown components (`AddDueDateDropdown`, `ListTodoListTagsDropdown`, `ListScriptTagsDropdown`, `UpdateTodoListTagDropdown`, `UpdateScriptTagDropdown`) follow the same floating-ui portal pattern but accept an `anchorRef` prop since they don't own their trigger:
+
+```tsx
+interface DropdownProps {
+    anchorRef: React.RefObject<HTMLElement | null>;
+    onClose: () => void;
+    // ... other props
+}
+
+// Parent passes a ref to the trigger element:
+const triggerRef = useRef<HTMLDivElement>(null)
+
+<div ref={triggerRef}>
+    <SimpleTextButton onClick={() => setShowDropdown(true)}>Trigger</SimpleTextButton>
+</div>
+{showDropdown && <SomeDropdown anchorRef={triggerRef} onClose={() => setShowDropdown(false)} />}
+```
 
 ---
 

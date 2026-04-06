@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query"
 import { RegisterResponseDTO } from "~/models/dtos/RegisterResponseDTO"
 import { httpClient } from "~/services/httpClient/httpClient"
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent"
+import { track } from "~/services/analytics/analytics"
 
 interface RegisterData {
     firstName: string
@@ -19,6 +21,9 @@ export function useRegister() {
                 password: data.password
             })
             return RegisterResponseDTO.fromJSON(res.data)
+        },
+        onSuccess: () => {
+            track(AnalyticsEvent.UserRegistered)
         },
     })
 

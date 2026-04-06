@@ -1,4 +1,3 @@
-import { useEffect, useRef } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import ScriptCard from "./ScriptCard";
@@ -7,6 +6,7 @@ import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { SidePanel } from "~/components/ui/SidePanel";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { HttpException } from "~/services/httpClient/HttpException";
 
 interface ScriptListPanelProps {
@@ -21,7 +21,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     const { createScript, isPending } = useCreateScript();
     const focusedScriptUuid = useFocusScriptStore((state) => state.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
-    const sentinelRef = useRef<HTMLDivElement>(null);
+    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore);
     const { subscription } = useShowCurrentSubscription();
     const { plans } = useListPlans();
     const currentPlanConfig = plans.find((p) => p.plan === subscription?.plan);
@@ -40,61 +40,59 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
         }
     };
 
-    useEffect(() => {
-        const sentinel = sentinelRef.current;
-        if (!sentinel) return;
+    const createButton = (
+        <button
+            onClick={handleNewScript}
+            disabled={isPending || isLimitReached}
+            className="text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
+            title={isLimitReached ? "Limite atteinte pour votre abonnement" : "Nouveau script"}
+        >
+            <PlusIcon className="size-4" strokeWidth={2} />
+        </button>
+    );
 
-        const observer = new IntersectionObserver(
-            (entries) => {
-                if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-                    listMore();
-                }
-            },
-            { rootMargin: "0px 0px 200px 0px" },
-        );
-
-        observer.observe(sentinel);
-
-        return () => {
-            observer.disconnect();
-        };
-    }, [hasMore, isLoadingMore, listMore]);
+    const listContent = (
+        <div className="p-3 flex flex-col gap-1">
+            {scripts.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 text-gray">
+                    <p className="text-body-sm text-center">Aucun script.</p>
+                    <p className="text-body-xs text-center mt-1">Cliquez sur + pour en créer un.</p>
+                </div>
+            ) : (
+                <>
+                    {scripts.map((script) => (
+                        <ScriptCard
+                            key={script.uuid}
+                            script={script}
+                            isSelected={script.uuid === focusedScriptUuid}
+                            onClick={() => setFocusedScriptUuid(script.uuid)}
+                        />
+                    ))}
+                    <div ref={sentinelRef} className="h-1" />
+                </>
+            )}
+        </div>
+    );
 
     return (
-        <SidePanel
-            title="Scripts"
-            side="left"
-            headerActions={
-                <button
-                    onClick={handleNewScript}
-                    disabled={isPending || isLimitReached}
-                    className="text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
-                    title={isLimitReached ? "Limite atteinte pour votre abonnement" : "Nouveau script"}
-                >
-                    <PlusIcon className="size-4" strokeWidth={2} />
-                </button>
-            }
-        >
-            <div className="p-3 flex flex-col gap-1">
-                {scripts.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-gray">
-                        <p className="text-body-sm text-center">Aucun script.</p>
-                        <p className="text-body-xs text-center mt-1">Cliquez sur + pour en créer un.</p>
-                    </div>
-                ) : (
-                    <>
-                        {scripts.map((script) => (
-                            <ScriptCard
-                                key={script.uuid}
-                                script={script}
-                                isSelected={script.uuid === focusedScriptUuid}
-                                onClick={() => setFocusedScriptUuid(script.uuid)}
-                            />
-                        ))}
-                        <div ref={sentinelRef} className="h-1" />
-                    </>
-                )}
+        <>
+            {/* Desktop */}
+            <div className="hidden md:block">
+                <SidePanel title="Scripts" side="left" headerActions={createButton}>
+                    {listContent}
+                </SidePanel>
             </div>
-        </SidePanel>
+
+            {/* Mobile */}
+            <div className="md:hidden flex flex-col h-full">
+                <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
+                    <h2 className="text-heading-md">Scripts</h2>
+                    {createButton}
+                </div>
+                <div className="flex-1 overflow-y-auto scrollbar-none">
+                    {listContent}
+                </div>
+            </div>
+        </>
     );
 }

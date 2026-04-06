@@ -1,5 +1,5 @@
 import { ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon } from "@heroicons/react/16/solid";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Badge } from "~/components/ui/Badge";
 import { Input } from "~/components/ui/Input";
 import ListTodoListTagsDropdown from "../todoListTags/ListTodoListTagsDropdown";
@@ -31,6 +31,9 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
     const [showTagsDropdown, setShowTagsDropdown] = useState(false);
     const [showDueDateDropdown, setShowDueDateDropdown] = useState(false);
 
+    const tagButtonRef = useRef<HTMLDivElement>(null);
+    const dueDateButtonRef = useRef<HTMLDivElement>(null);
+
     const resetForm = () => {
         setTitle("");
         setPriority(undefined);
@@ -51,11 +54,14 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
             />
-            <SimpleTextButton onClick={() => setShowTagsDropdown(!showTagsDropdown)}>
-                <TagIcon className="size-3.5" strokeWidth={2} />
-                <p>Ajouter un tag</p>
-            </SimpleTextButton>
+            <div ref={tagButtonRef}>
+                <SimpleTextButton onClick={() => setShowTagsDropdown(!showTagsDropdown)}>
+                    <TagIcon className="size-3.5" strokeWidth={2} />
+                    <p>Ajouter un tag</p>
+                </SimpleTextButton>
+            </div>
             {showTagsDropdown && <ListTodoListTagsDropdown
+                anchorRef={tagButtonRef}
                 todoListUuid={todoListUuid}
                 selectedTags={tags}
                 onClose={() => setShowTagsDropdown(false)}
@@ -110,23 +116,26 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                 )}
             />
 
-            {dueDate ? (
-                <Badge
-                    icon={CalendarDateRangeIcon}
-                    label={dueDate.toLocaleDateString('fr-FR')}
-                    textColor="text-gray"
-                    onRemoveClick={() => setDueDate(undefined)}
-                    onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}
-                />
-            ) : (
-                <SimpleTextButton onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}>
-                    <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
-                    <p>Ajouter une date</p>
-                </SimpleTextButton>
-            )}
+            <div ref={dueDateButtonRef}>
+                {dueDate ? (
+                    <Badge
+                        icon={CalendarDateRangeIcon}
+                        label={dueDate.toLocaleDateString('fr-FR')}
+                        textColor="text-gray"
+                        onRemoveClick={() => setDueDate(undefined)}
+                        onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}
+                    />
+                ) : (
+                    <SimpleTextButton onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}>
+                        <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
+                        <p>Ajouter une date</p>
+                    </SimpleTextButton>
+                )}
+            </div>
 
             {showDueDateDropdown && (
                 <AddDueDateDropdown
+                    anchorRef={dueDateButtonRef}
                     selectedDueDate={dueDate}
                     onClose={() => setShowDueDateDropdown(false)}
                     onDueDateSelected={(selectedDate) => setDueDate(selectedDate)}

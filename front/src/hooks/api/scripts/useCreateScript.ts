@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { Script, type ScriptJSON } from "~/models/Script";
 import { scriptQueryKeys } from "./scriptQueryKeys";
 
@@ -26,6 +28,7 @@ export function useCreateScript() {
                 (old: Script[] | undefined) => old ? [newScript, ...old] : [newScript]
             );
             queryClient.invalidateQueries({ queryKey: scriptQueryKeys.all });
+            track(AnalyticsEvent.ScriptCreated)
         },
     })
 

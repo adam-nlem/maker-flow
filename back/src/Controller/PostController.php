@@ -5,11 +5,16 @@ namespace App\Controller;
 use App\Entity\User;
 use App\DTO\QueryParam\Post\ListPostsQueryParamDTO;
 use App\DTO\QueryParam\Post\RankPostsQueryParamDTO;
+use App\DTO\QueryParam\Post\SearchPostsQueryParamDTO;
+use App\Exception\Integration\IntegrationNotFoundException;
+use App\Exception\Post\PostNotFoundException;
+use App\Exception\Post\PostThumbnailNotFoundException;
+use App\Exception\Project\ProjectNotFoundException;
 use App\Repository\PostRepository;
+use App\Repository\ProjectRepository;
 use App\Service\Post\PostService;
-use App\Entity\Enum\TimePeriod;
+use App\Service\Post\PostThumbnailService;
 use App\Repository\IntegrationRepository;
-use App\Repository\SubscriptionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -21,35 +26,29 @@ use Symfony\Component\Routing\Requirement\Requirement;
 #[Route('/api/posts', requirements: ['postUuid' => Requirement::UUID])]
 final class PostController extends AbstractController
 {
-    public function __construct(private PostService $service) {}
+    public function __construct(private PostService $postService) {}
 
     #[Route('', name: 'api_posts_list', methods: ['GET'])]
     public function list(
         ListPostsQueryParamDTO $queryParamDto,
-        IntegrationRepository $integrationRepository,
-        SubscriptionRepository $subscriptionRepository,
+        ProjectRepository $projectRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
+        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
 
-        if ($integration === null) {
-            return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+        if ($project === null) {
+            throw new ProjectNotFoundException();
         }
 
-        $isSubscribed = $subscriptionRepository->getLatestActiveByUser($user) !== null;
-
-        $posts = $this->service->getPostsWithInsights(
+        $posts = $this->postService->getPostsWithAggregatedInsightsByProjectAndSearchTerm(
             user: $user,
-            integration: $integration,
+            project: $project,
+            platform: $queryParamDto->getPlatform(),
+            searchTerm: $queryParamDto->getSearchTerm(),
             page: $queryParamDto->getPage(),
             limit: $queryParamDto->getLimit(),
-            timePeriod: TimePeriod::LastYear,
-            isSubscribed: $isSubscribed,
         );
 
         return $this->json(
@@ -70,13 +69,10 @@ final class PostController extends AbstractController
         $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
 
         if ($integration === null) {
-            return $this->json(
-                data: ["message" => "You don't have any integration with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new IntegrationNotFoundException();
         }
 
-        $posts = $this->service->getRankedPosts(
+        $posts = $this->postService->getRankedPosts(
             user: $user,
             integration: $integration,
             page: $queryParamDto->getPage(),
@@ -90,10 +86,47 @@ final class PostController extends AbstractController
         );
     }
 
+    #[Route('/search', name: 'api_posts_search', methods: ['GET'])]
+    public function search(
+        SearchPostsQueryParamDTO $queryParamDto,
+        ProjectRepository $projectRepository,
+        PostRepository $postRepository,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+
+        if ($project === null) {
+            throw new ProjectNotFoundException();
+        }
+
+        $posts = $postRepository->searchByProjectAndUserAndCaption(
+            $project,
+            $user,
+            $queryParamDto->getPlatform(),
+            $queryParamDto->getSearch(),
+            $queryParamDto->getLimit(),
+        );
+
+        return $this->json(
+            data: array_map(fn($post) => [
+                'uuid' => $post->getUuid(),
+                'caption' => $post->getCaption(),
+                'publishedAt' => $post->getPublishedAt(),
+                'mediaType' => $post->getMediaType()->value,
+                'platform' => $post->getIntegration()->getPlatform()->value,
+                'postGroupUuid' => $post->getPostGroup()?->getUuid(),
+            ], $posts),
+            status: Response::HTTP_OK,
+        );
+    }
+
     #[Route('/{postUuid}/thumbnail', name: 'api_posts_thumbnail', methods: ['GET'])]
     public function getThumbnail(
         string $postUuid,
         PostRepository $postRepository,
+        PostThumbnailService $postThumbnailService,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -101,19 +134,13 @@ final class PostController extends AbstractController
         $post = $postRepository->getByUuidAndUser($postUuid, $user);
 
         if ($post === null) {
-            return $this->json(
-                data: ["message" => "You don't have any post with this uuid"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new PostNotFoundException();
         }
 
-        $thumbnailFile = $this->service->getPostThumbnail($post);
+        $thumbnailFile = $postThumbnailService->getFile($post);
 
         if ($thumbnailFile === null) {
-            return $this->json(
-                data: ["message" => "Thumbnail not found for this post"],
-                status: Response::HTTP_NOT_FOUND
-            );
+            throw new PostThumbnailNotFoundException();
         }
 
         return new BinaryFileResponse(

@@ -7,7 +7,7 @@ import {
   registerPath,
   integrationCallbackPath,
   tasksPath,
-  insightsPath,
+  contentsPath,
   scriptsPath,
   calendarPath,
   settingsPath,
@@ -21,10 +21,10 @@ import LoginPage from "./routes/login";
 import RegisterPage from "./routes/register";
 import IntegrationsCallback from "./routes/integrations.callback";
 import ProtectedLayout from "./routes/protected";
+import SidebarLayout from "./components/sidebar/SidebarLayout";
 import HomePage from "./routes/home";
 import TasksPage from "./routes/tasks";
-import InsightsPage from "./routes/insights";
-import InsightsPostDetailPage from "./routes/insights.post-detail";
+import ContentsPage from "./routes/contents";
 import ScriptsPage from "./routes/scripts";
 import CalendarPage from "./routes/calendar";
 import SettingsLayout from "./routes/settings";
@@ -52,18 +52,22 @@ export const router = createBrowserRouter(
           element: <ProtectedLayout />,
           errorElement: <ErrorBoundary />,
           children: [
-            { index: true, element: <HomePage /> },
-            { path: tasksPath, element: <TasksPage /> },
-            { path: insightsPath, element: <InsightsPage /> },
-            { path: "insights/posts/:postUuid", element: <InsightsPostDetailPage /> },
-            { path: scriptsPath, element: <ScriptsPage /> },
-            { path: calendarPath, element: <CalendarPage /> },
             {
-              path: settingsPath,
-              element: <SettingsLayout />,
+              element: <SidebarLayout />,
               children: [
-                { index: true, element: <SettingsIndex /> },
-                { path: ":section", element: <SettingsSectionRoute /> },
+                { index: true, element: <HomePage /> },
+                { path: tasksPath, element: <TasksPage /> },
+                { path: contentsPath, element: <ContentsPage /> },
+                { path: scriptsPath, element: <ScriptsPage /> },
+                { path: calendarPath, element: <CalendarPage /> },
+                {
+                  path: settingsPath,
+                  element: <SettingsLayout />,
+                  children: [
+                    { index: true, element: <SettingsIndex /> },
+                    { path: ":section", element: <SettingsSectionRoute /> },
+                  ],
+                },
               ],
             },
           ],

@@ -54,6 +54,7 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | Post | 20 | `DomainCode::Post` |
 | User | 21 | `DomainCode::User` |
 | Validation | 22 | `DomainCode::Validation` |
+| Auth | 23 | `DomainCode::Auth` |
 
 ## Exception Inventory
 
@@ -80,6 +81,7 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 13003 | `SubscriptionManagementException` | 400 | — | `src/Exception/Stripe/` |
 | 13004 | `SubscriptionNotFoundException` | 404 | — | `src/Exception/Stripe/` |
 | 13005 | `MissingWebhookSignatureException` | 400 | — | `src/Exception/Stripe/` |
+| 13006 | `ActiveSubscriptionRequiredException` | 402 | — | `src/Exception/Stripe/` |
 | **Mailing (14xxx)** |
 | 14001 | `MailingRetryableException` | 503 | — | `src/Exception/Mailing/` |
 | **Prelaunch (16xxx)** |
@@ -99,11 +101,17 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 18004 | `ScriptShotNotFoundException` | 404 | — | `src/Exception/Script/` |
 | 18005 | `ScriptTagNotFoundException` | 404 | — | `src/Exception/Script/` |
 | 18006 | `ScriptTagTitleConflictException` | 409 | — | `src/Exception/Script/` |
+| 18007 | `ScriptGenerationAlreadyActiveException` | 409 | — | `src/Exception/Script/` |
+| 18008 | `ScriptGenerationDeletionNotAllowedException` | 409 | — | `src/Exception/Script/` |
 | **TodoList (19xxx)** |
 | 19001 | `TodoListNotFoundException` | 404 | — | `src/Exception/TodoList/` |
 | 19002 | `TodoListTaskNotFoundException` | 404 | — | `src/Exception/TodoList/` |
 | 19003 | `TodoListTagNotFoundException` | 404 | — | `src/Exception/TodoList/` |
 | 19004 | `TodoListTagTitleConflictException` | 409 | — | `src/Exception/TodoList/` |
+| **Post (20xxx)** |
+| 20001 | `PostNotFoundException` | 404 | — | `src/Exception/Post/` |
+| 20002 | `PostThumbnailNotFoundException` | 404 | — | `src/Exception/Post/` |
+| 20003 | `PostGroupNotFoundException` | 404 | — | `src/Exception/Post/` |
 | **User (21xxx)** |
 | 21001 | `InvalidPasswordException` | 422 | — | `src/Exception/User/` |
 | 21002 | `IncorrectCurrentPasswordException` | 422 | — | `src/Exception/User/` |

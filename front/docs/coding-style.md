@@ -46,7 +46,7 @@ front/app/
 |------|------------|---------|
 | Components | PascalCase | `CreateProjectModal.tsx`, `ProjectTile.tsx` |
 | Hooks | camelCase with `use` prefix | `useCreateProject.ts`, `useCurrentUser.ts` |
-| Stores | camelCase with `Store` suffix | `focusProjectStore.ts`, `sidebarStore.ts` |
+| Stores | camelCase with `Store` suffix | `focusProjectStore.ts`, `calendarStore.ts` |
 | Models | PascalCase | `Project.ts`, `User.ts` |
 | Enums | PascalCase | `ProjectType.ts`, `Color.ts` |
 | Utils | camelCase | `dateFormatters.ts` |
@@ -68,13 +68,13 @@ front/app/
 | API mutations | `use{Action}{Resource}` | `useCreateProject`, `useDeleteProject` |
 | API queries | `use{Action}{Resource}` or `use{Resource}` | `useListPaginatedProjects`, `useCurrentUser` |
 | Selection hooks | `useSelect{Resource}` | `useSelectFocusedProject` |
-| Utility hooks | `use{Description}` | `useAutoResizeTextarea` |
+| Utility hooks | `use{Description}` | `useAutoResizeTextarea`, `useInfiniteScroll` |
 
 ### Stores
 
 | Type | Convention | Example |
 |------|------------|---------|
-| Store hook | `use{Domain}Store` | `useFocusProjectStore`, `useSidebarStore` |
+| Store hook | `use{Domain}Store` | `useFocusProjectStore`, `useCalendarStore` |
 | Modal stores | `use{Action}{Resource}ModalStore` | `useCreateProjectModalStore` |
 
 ### Variables
@@ -549,17 +549,17 @@ export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegra
 ```tsx
 import { create } from 'zustand';
 
-type SidebarState = {
-    isExpanded: boolean;
+type CreateProjectModalState = {
+    isCreateModalOpen: boolean;
 };
 
-type SidebarAction = {
-    setIsExpanded: (isExpanded: boolean) => void;
+type CreateProjectModalAction = {
+    setIsCreateModalOpen: (isCreateModalOpen: boolean) => void;
 };
 
-export const useSidebarStore = create<SidebarState & SidebarAction>((set) => ({
-    isExpanded: false,
-    setIsExpanded: (isExpanded) => set({ isExpanded }),
+export const useCreateProjectModalStore = create<CreateProjectModalState & CreateProjectModalAction>((set) => ({
+    isCreateModalOpen: false,
+    setIsCreateModalOpen: (isCreateModalOpen) => set({ isCreateModalOpen }),
 }));
 ```
 

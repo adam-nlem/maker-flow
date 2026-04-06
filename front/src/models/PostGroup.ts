@@ -1,13 +1,13 @@
-export interface PostGroupPostJSON {
-    uuid: string;
-}
+import { Post, type PostJSON } from "~/models/Post";
+import { Script, type ScriptJSON } from "./Script";
 
 export interface PostGroupJSON {
     uuid: string;
     title: string;
     createdAt: string;
     updatedAt: string | null;
-    posts?: PostGroupPostJSON[];
+    posts?: PostJSON[];
+    script?: ScriptJSON | null;
 }
 
 export class PostGroup {
@@ -16,7 +16,8 @@ export class PostGroup {
         public readonly title: string,
         public readonly createdAt: Date,
         public readonly updatedAt: Date | null,
-        public readonly posts: PostGroupPostJSON[] = [],
+        public readonly posts: Post[] = [],
+        public readonly script: Script | null = null,
     ) { }
 
     static fromJSON(json: PostGroupJSON): PostGroup {
@@ -25,7 +26,8 @@ export class PostGroup {
             json.title,
             new Date(json.createdAt),
             json.updatedAt ? new Date(json.updatedAt) : null,
-            json.posts ?? [],
+            json.posts?.map(Post.fromJSON) ?? [],
+            json.script ? Script.fromJSON(json.script) : null,
         );
     }
 }

@@ -3,6 +3,7 @@
 namespace App\DTO\QueryParam\Post;
 
 use App\DTO\QueryParam\AbstractQueryParamDTO;
+use App\Entity\Enum\Platform;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -10,7 +11,11 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class ListPostsQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
-    private string $integrationUuid;
+    private string $projectUuid;
+
+    private ?Platform $platform;
+
+    private ?string $searchTerm;
 
     #[Assert\NotBlank]
     #[Assert\Positive]
@@ -29,14 +34,26 @@ class ListPostsQueryParamDTO extends AbstractQueryParamDTO
 
     protected function fromQueryParams(array $queryParams): void
     {
-        $this->integrationUuid = $queryParams["integrationUuid"] ?? "";
-        $this->page = $queryParams["page"];
-        $this->limit = $queryParams["limit"];
+        $this->projectUuid = $queryParams["projectUuid"];
+        $this->platform = !empty($queryParams["platform"]) ? Platform::tryFrom($queryParams["platform"]) : null;
+        $this->searchTerm = $queryParams["searchTerm"] ?? null;
+        $this->page = (int) $queryParams["page"];
+        $this->limit = (int) $queryParams["limit"];
     }
 
-    public function getIntegrationUuid(): string
+    public function getProjectUuid(): string
     {
-        return $this->integrationUuid;
+        return $this->projectUuid;
+    }
+
+    public function getPlatform(): ?Platform
+    {
+        return $this->platform;
+    }
+
+    public function getSearchTerm(): ?string
+    {
+        return $this->searchTerm;
     }
 
     public function getPage(): int

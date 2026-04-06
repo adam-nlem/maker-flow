@@ -27,3 +27,9 @@ export const integrationStatusToTextClass: Record<IntegrationStatus, string> = {
     [IntegrationStatus.Revoked]: "text-yellow",
     [IntegrationStatus.Error]: "text-danger",
 }
+
+export const integrationStatusToDotClass: Record<IntegrationStatus, string> = {
+    [IntegrationStatus.Active]: "bg-primary",
+    [IntegrationStatus.Revoked]: "bg-yellow",
+    [IntegrationStatus.Error]: "bg-danger",
+}

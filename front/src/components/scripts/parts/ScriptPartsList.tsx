@@ -140,7 +140,7 @@ export default function ScriptPartsList({ parts, script, generationUuid, isReadO
     };
 
     return (
-        <div className="flex-1 min-h-0 flex flex-col overflow-hidden bg-dot-pattern">
+        <div className="flex-1 min-h-0 flex flex-col  bg-dot-pattern">
             <div className="flex-1 overflow-y-auto px-6 py-4 h-full scrollbar-none">
                 {hookPart && (
                     <div className="mb-3">

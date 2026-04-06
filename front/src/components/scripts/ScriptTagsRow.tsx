@@ -17,6 +17,7 @@ export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props
     const [showDropdown, setShowDropdown] = useState(false);
     const [localTags, setLocalTags] = useState<ScriptTag[]>(script.tags);
     const pendingMutations = useRef(0);
+    const tagPillRef = useRef<HTMLDivElement>(null);
 
     const { updateScript } = useUpdateScript();
 
@@ -67,7 +68,7 @@ export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props
             ))}
 
             {!isReadOnly && (
-                <div className="relative">
+                <div ref={tagPillRef}>
                     <Pill
                         onClick={() => setShowDropdown(!showDropdown)}
                         icon={TagIcon}
@@ -75,6 +76,7 @@ export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props
                     />
                     {showDropdown && (
                         <ListScriptTagsDropdown
+                            anchorRef={tagPillRef}
                             projectUuid={projectUuid}
                             selectedTags={localTags}
                             onClose={() => setShowDropdown(false)}

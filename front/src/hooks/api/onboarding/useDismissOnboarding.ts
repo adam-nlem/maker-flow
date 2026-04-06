@@ -1,6 +1,8 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Onboarding } from "~/models/Onboarding";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { onboardingQueryKeys } from "./onboardingQueryKeys";
 
 export function useDismissOnboarding() {
@@ -13,6 +15,7 @@ export function useDismissOnboarding() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: onboardingQueryKeys.all });
+            track(AnalyticsEvent.OnboardingDismissed)
         },
     });
 

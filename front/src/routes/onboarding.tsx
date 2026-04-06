@@ -43,7 +43,7 @@ export default function OnboardingPage() {
     }
 
     return (
-        <div className="bg-clear bg-dot-pattern min-h-screen relative">
+        <div className="bg-clear bg-dot-pattern h-screen relative overflow-y-auto">
             {isAuthenticated
                 ? onboardingNodes[currentOnboardingStep]
                 : welcomeNodes[currentWelcomeStep]}

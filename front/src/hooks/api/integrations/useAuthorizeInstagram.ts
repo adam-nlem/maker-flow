@@ -1,6 +1,8 @@
 import { useCallback } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { useOAuthPopup } from "~/hooks/useOAuthPopup";
 import { OAuthErrorCode } from "~/models/enums/OAuthErrorCode";
 import { Platform } from "~/models/enums/Platform";
@@ -20,7 +22,8 @@ export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegra
 
     const handleOAuthSuccess = useCallback(() => {
         queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
-    }, [queryClient, projectUuid]);
+        track(AnalyticsEvent.IntegrationConnected, { platform })
+    }, [queryClient, projectUuid, platform]);
 
     const {
         openPopup,

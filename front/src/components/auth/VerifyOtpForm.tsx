@@ -50,7 +50,7 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, type, onV
     }
 
     try {
-      await verifyOtp({ pendingOtpToken, code, purpose: type })
+      await verifyOtp({ pendingOtpToken, code, type: type })
       onVerified?.()
     } catch (err) {
       if (err instanceof HttpException) {

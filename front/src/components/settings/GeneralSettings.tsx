@@ -68,12 +68,12 @@ export default function GeneralSettings() {
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
-            <div className="px-6 py-5 border-b border-light-gray">
+            <div className="px-4 md:px-6 py-4 md:py-5 border-b border-light-gray">
                 <h2 className="text-heading-xl">{settingsSectionToFrenchTranslation[SettingsSection.General]}</h2>
             </div>
 
             <form className="flex-1 flex flex-col min-h-0" onSubmit={handleSubmit}>
-                <div className="flex-1 overflow-y-auto scrollbar-none px-6 py-5">
+                <div className="flex-1 overflow-y-auto scrollbar-none px-4 md:px-6 py-4 md:py-5">
                     <div className="flex flex-col gap-5">
                         <h3 className="text-heading-sm">Mon compte</h3>
                         <Input
@@ -132,7 +132,7 @@ export default function GeneralSettings() {
                 </div>
 
                 {hasChanges && (
-                    <div className="px-6 py-4 border-t border-light-gray">
+                    <div className="px-4 md:px-6 py-3 md:py-4 border-t border-light-gray">
                         <Button type="submit" style="primary" isLoading={isPending} disabled={isPending}>
                             <p className="text-sm">Enregistrer</p>
                         </Button>

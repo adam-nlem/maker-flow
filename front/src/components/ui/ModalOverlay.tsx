@@ -1,17 +1,15 @@
 import { createPortal } from "react-dom";
 import { useEffect, useCallback } from "react";
-import { useSidebarStore } from "~/stores/sidebar/sidebarStore";
 
 interface ModalOverlayProps {
     isOpen: boolean;
     onClose: () => void;
     children: React.ReactNode;
-    className?: string;
+    width?: string;
+    height?: string;
 }
 
-export default function ModalOverlay({ isOpen, onClose, children, className = "" }: ModalOverlayProps) {
-    const isSidebarExpanded = useSidebarStore((state) => state.isExpanded);
-
+export default function ModalOverlay({ isOpen, onClose, children, width = "w-200", height = "h-[80vh]" }: ModalOverlayProps) {
     const handleEscape = useCallback((e: KeyboardEvent) => {
         if (e.key === 'Escape') onClose();
     }, [onClose]);
@@ -34,15 +32,18 @@ export default function ModalOverlay({ isOpen, onClose, children, className = ""
         <div
             role="dialog"
             aria-modal="true"
-            className="fixed inset-0 z-50 flex flex-row pointer-events-none"
+            className="fixed inset-0 z-50 pointer-events-none"
             onClick={onClose}
         >
-            {/* Sidebar spacer - adapts to sidebar state */}
-            <div className={`shrink-0 transition-all duration-300 ease-in-out ${isSidebarExpanded ? 'w-72' : 'w-16'}`} />
-
-            {/* Modal content area */}
-            <div className={`flex-1 flex bg-black/5 pointer-events-auto p-3 ${className}`}>
-                {children}
+            {/* Backdrop */}
+            <div className="w-full h-full flex bg-black/40 pointer-events-auto justify-center items-center">
+                {/* Modal container */}
+                <div
+                    className={`${width} ${height} border rounded-xl border-light-gray shadow-lg bg-clear flex flex-col overflow-y-auto`}
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    {children}
+                </div>
             </div>
         </div>,
         document.body

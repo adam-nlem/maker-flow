@@ -134,7 +134,6 @@ When `integrations.length === 0`, `InsightsPageView` renders `ConnectIntegration
 
 - `useListIntegrationInsights` -- Fetches all integration insights grouped by integration for a project (`projectUuid`). Returns `insightsOverview: IntegrationInsightsOverviewDTO | null`.
 - `useShowIntegrationDetail` -- Fetches integration detail (followers, daily points, post count, streak).
-- `useListPaginatedPosts` -- Paginated post list with `hasMore` / `listMore` for infinite scroll.
 - `useShowPostInsightDetail` -- Fetches post detail with insight tiles, evolution, engagement rates, timeline data for charts, and ranking data.
 
 ## Infinite Scroll

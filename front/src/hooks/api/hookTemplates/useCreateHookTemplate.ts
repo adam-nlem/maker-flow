@@ -1,5 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 import { HookTemplate, type HookTemplateJSON } from "~/models/HookTemplate";
 import { hookTemplateQueryKeys } from "./hookTemplateQueryKeys";
 
@@ -19,6 +21,7 @@ export function useCreateHookTemplate() {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: hookTemplateQueryKeys.all })
+            track(AnalyticsEvent.HookTemplateCreated)
         },
     })
 

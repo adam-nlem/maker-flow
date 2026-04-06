@@ -1,6 +1,8 @@
 import { useMutation } from "@tanstack/react-query";
 import type { SubscriptionPlan } from "~/models/enums/SubscriptionPlan";
 import { httpClient } from "~/services/httpClient/httpClient";
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
+import { track } from "~/services/analytics/analytics";
 
 interface CreateSubscriptionCheckoutResponse {
     checkout_url: string;
@@ -20,7 +22,8 @@ export function useCreateSubscriptionCheckout() {
             });
             return res.data;
         },
-        onSuccess: (data) => {
+        onSuccess: (data, variables) => {
+            track(AnalyticsEvent.SubscriptionCheckoutStarted, { plan: variables.plan })
             window.location.href = data.checkout_url;
         },
     });

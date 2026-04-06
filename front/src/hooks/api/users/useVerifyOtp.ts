@@ -2,12 +2,14 @@ import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { OtpType, otpTypeToEndpoint } from "~/models/enums/OtpType"
 import { User } from "~/models/User"
 import { httpClient } from "~/services/httpClient/httpClient"
+import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent"
+import { identifyUser, track } from "~/services/analytics/analytics"
 import { userQueryKeys } from "./userQueryKeys"
 
 interface VerifyOtpData {
     pendingOtpToken: string
     code: string
-    purpose: OtpType
+    type: OtpType
 }
 
 export function useVerifyOtp() {
@@ -15,15 +17,17 @@ export function useVerifyOtp() {
 
     const mutation = useMutation({
         mutationFn: async (data: VerifyOtpData) => {
-            const res = await httpClient.post(otpTypeToEndpoint[data.purpose], {
+            const res = await httpClient.post(otpTypeToEndpoint[data.type], {
                 pendingOtpToken: data.pendingOtpToken,
                 code: data.code,
             })
 
             return User.fromJSON(res.data)
         },
-        onSuccess: (user) => {
+        onSuccess: (user, data) => {
             queryClient.setQueryData(userQueryKeys.me, user)
+            identifyUser({ uuid: user.uuid, email: user.email })
+            track(AnalyticsEvent.UserLoggedIn, { method: data.type })
         },
     })
 

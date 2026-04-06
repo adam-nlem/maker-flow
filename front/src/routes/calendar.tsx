@@ -1,14 +1,14 @@
 import { useState } from "react";
-import { DndContext, DragOverlay, PointerSensor, type DragEndEvent, type DragStartEvent, useSensor, useSensors } from "@dnd-kit/core";
-import SideBar from "~/components/sidebar/SideBar";
+import { DndContext, DragOverlay, PointerSensor, TouchSensor, type DragEndEvent, type DragStartEvent, useSensor, useSensors } from "@dnd-kit/core";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import { ScriptCalendar } from "~/components/scripts/calendar";
+
 import CalendarFilterPanel from "~/components/scripts/calendar/CalendarFilterPanel";
 import ScriptTile from "~/components/scripts/ScriptTile";
 import type { Script } from "~/models/Script";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
+import ScriptCalendar from "~/components/scripts/calendar/ScriptCalendar";
 
 export default function CalendarPage() {
   const { projects } = useListPaginatedProjects()
@@ -20,7 +20,8 @@ export default function CalendarPage() {
   const [draggedScript, setDraggedScript] = useState<Script | null>(null);
 
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 8 } })
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 250, tolerance: 5 } })
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -42,28 +43,22 @@ export default function CalendarPage() {
   };
 
   return (
-    <div className="w-full">
-      <SideBar />
-      <div className="w-full pl-16">
-        <div className="p-5 h-screen overflow-hidden flex flex-col gap-5">
+    <div className="p-3 md:p-5 h-full overflow-y-auto md:overflow-hidden flex flex-col gap-3 md:gap-5">
+      <h1 className="text-heading-xl">Calendrier</h1>
+      {focusedProject && (
+        <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+          <CalendarFilterPanel projectUuid={focusedProject.uuid} />
+          <ScriptCalendar projectUuid={focusedProject.uuid} />
 
-          <h1 className="text-heading-xl">Calendrier</h1>
-          {focusedProject && (
-            <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
-              <CalendarFilterPanel projectUuid={focusedProject.uuid} />
-              <ScriptCalendar projectUuid={focusedProject.uuid} />
-
-              <DragOverlay dropAnimation={null}>
-                {draggedScript && (
-                  <div className="opacity-90 rotate-1 shadow-lg">
-                    <ScriptTile script={draggedScript} onClick={() => { }} />
-                  </div>
-                )}
-              </DragOverlay>
-            </DndContext>
-          )}
-        </div>
-      </div>
+          <DragOverlay dropAnimation={null}>
+            {draggedScript && (
+              <div className="opacity-90 rotate-1 shadow-lg">
+                <ScriptTile script={draggedScript} onClick={() => { }} />
+              </div>
+            )}
+          </DragOverlay>
+        </DndContext>
+      )}
     </div>
   );
 }

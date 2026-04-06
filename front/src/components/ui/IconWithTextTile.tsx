@@ -5,7 +5,6 @@ type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 interface IconWithTextTileProps {
     icon: HeroIcon;
     label: string;
-    isExpanded?: boolean;
     isBold?: boolean;
     isSelected?: boolean;
     activeBgClassName?: string;
@@ -17,7 +16,6 @@ interface IconWithTextTileProps {
 export default function IconWithTextTile({
     icon: Icon,
     label,
-    isExpanded = true,
     isBold = false,
     isSelected = false,
     activeBgClassName = "bg-primary/10",
@@ -34,11 +32,9 @@ export default function IconWithTextTile({
                 className={`size-5 shrink-0 ${isSelected ? 'text-dark' : 'text-gray'}`}
                 strokeWidth={isBold ? 2 : 1}
             />
-            {isExpanded && (
-                <h1 className={`${isBold ? 'text-heading-sm' : 'text-body-sm'} whitespace-nowrap ${isSelected ? 'text-dark' : 'text-gray'}`}>
-                    {label}
-                </h1>
-            )}
+            <h1 className={`${isBold ? 'text-heading-sm' : 'text-body-sm'} whitespace-nowrap ${isSelected ? 'text-dark' : 'text-gray'}`}>
+                {label}
+            </h1>
         </div>
     );
 }

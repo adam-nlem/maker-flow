@@ -8,6 +8,11 @@ use App\DTO\Request\ScriptGeneration\UpdateScriptGenerationRequestDTO;
 use App\Entity\Enum\ScriptGenerationStatus;
 use App\Entity\ScriptGeneration;
 use App\Entity\User;
+use App\Exception\Credit\InsufficientCreditsException;
+use App\Exception\Script\ScriptGenerationAlreadyActiveException;
+use App\Exception\Script\ScriptGenerationDeletionNotAllowedException;
+use App\Exception\Script\ScriptGenerationNotFoundException;
+use App\Exception\Script\ScriptNotFoundException;
 use App\Message\GenerateScriptMessage;
 use App\Repository\ScriptGenerationRepository;
 use App\Repository\ScriptRepository;
@@ -37,15 +42,17 @@ final class ScriptGenerationController extends AbstractController
         $script = $scriptRepository->getByUuidAndUser($dto->getScriptUuid(), $user);
 
         if ($script === null) {
-            return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptNotFoundException();
         }
 
         if ($generationRepository->hasActiveGeneration($user)) {
-            return $this->json(data: ["message" => "You already have a processing generation. Please wait until it is completed."], status: Response::HTTP_CONFLICT);
+            throw new ScriptGenerationAlreadyActiveException();
         }
 
-        if ($creditService->getTotalCredits($user) < 1) {
-            return $this->json(data: ["message" => "You don't have enough credits to generate a script."], status: Response::HTTP_PAYMENT_REQUIRED);
+        $availableCredits = $creditService->getTotalCredits($user);
+
+        if ($availableCredits < 1) {
+            throw new InsufficientCreditsException(1, $availableCredits);
         }
 
         /** @var ScriptGeneration $generation */
@@ -77,7 +84,7 @@ final class ScriptGenerationController extends AbstractController
         $generation = $generationRepository->getByUuidAndUser($generationUuid, $user);
 
         if ($generation === null) {
-            return $this->json(data: ["message" => "You don't have any generation with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptGenerationNotFoundException();
         }
 
         return $this->json(
@@ -99,7 +106,7 @@ final class ScriptGenerationController extends AbstractController
         $script = $scriptRepository->getByUuidAndUser($queryParamDto->getScriptUuid(), $user);
 
         if ($script === null) {
-            return $this->json(data: ["message" => "You don't have any script with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptNotFoundException();
         }
 
         $generations = $generationRepository->getByScriptAndUserPaginated($script, $user, $queryParamDto->getPage(), $queryParamDto->getLimit());
@@ -126,15 +133,17 @@ final class ScriptGenerationController extends AbstractController
         $generation = $generationRepository->getByUuidAndUser($generationUuid, $user);
 
         if ($generation === null) {
-            return $this->json(data: ["message" => "You don't have any generation with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptGenerationNotFoundException();
         }
 
         if ($generationRepository->hasActiveGenerationExcluding($user, $generation)) {
-            return $this->json(data: ["message" => "You already have a processing generation. Please wait until it is completed."], status: Response::HTTP_CONFLICT);
+            throw new ScriptGenerationAlreadyActiveException();
         }
 
-        if ($creditService->getTotalCredits($user) < 1) {
-            return $this->json(data: ["message" => "You don't have enough credits to generate a script."], status: Response::HTTP_PAYMENT_REQUIRED);
+        $availableCredits = $creditService->getTotalCredits($user);
+
+        if ($availableCredits < 1) {
+            throw new InsufficientCreditsException(1, $availableCredits);
         }
 
         $scriptGenerationService->deletePartsByGeneration($generation);
@@ -177,11 +186,11 @@ final class ScriptGenerationController extends AbstractController
         $generation = $generationRepository->getByUuidAndUser($generationUuid, $user);
 
         if ($generation === null) {
-            return $this->json(data: ["message" => "You don't have any generation with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new ScriptGenerationNotFoundException();
         }
 
         if (in_array($generation->getStatus(), [ScriptGenerationStatus::Pending, ScriptGenerationStatus::Processing])) {
-            return $this->json(data: ["message" => "You cannot delete an active generation."], status: Response::HTTP_CONFLICT);
+            throw new ScriptGenerationDeletionNotAllowedException();
         }
 
         $generationRepository->remove($generation, true);

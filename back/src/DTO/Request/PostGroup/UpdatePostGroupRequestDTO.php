@@ -13,6 +13,8 @@ class UpdatePostGroupRequestDTO extends AbstractRequestDTO
     private ?array $addPostUuids;
     /** @var string[]|null */
     private ?array $removePostUuids;
+    private ?string $scriptUuid;
+    private bool $hasScriptUuid = false;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -26,6 +28,13 @@ class UpdatePostGroupRequestDTO extends AbstractRequestDTO
         $this->title = $payload["title"] ?? null;
         $this->addPostUuids = $payload["addPostUuids"] ?? null;
         $this->removePostUuids = $payload["removePostUuids"] ?? null;
+
+        if (array_key_exists("scriptUuid", $payload)) {
+            $this->hasScriptUuid = true;
+            $this->scriptUuid = $payload["scriptUuid"];
+        } else {
+            $this->scriptUuid = null;
+        }
     }
 
     protected function buildObject(): array
@@ -56,5 +65,15 @@ class UpdatePostGroupRequestDTO extends AbstractRequestDTO
     public function getRemovePostUuids(): ?array
     {
         return $this->removePostUuids;
+    }
+
+    public function hasScriptUuid(): bool
+    {
+        return $this->hasScriptUuid;
+    }
+
+    public function getScriptUuid(): ?string
+    {
+        return $this->scriptUuid;
     }
 }

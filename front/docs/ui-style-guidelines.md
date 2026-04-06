@@ -142,7 +142,7 @@ hover:bg-gray        /* Button hover */
 
 ```css
 transition-colors    /* Color transitions */
-transition-all duration-300 ease-in-out  /* Sidebar animations */
+transition-all duration-300 ease-in-out  /* Panel animations */
 ```
 
 ---
@@ -398,19 +398,20 @@ Real-time password strength feedback. Displays a list of rules with pass/fail in
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/ModalOverlay.tsx`
 
-Modal backdrop with sidebar awareness.
+Modal backdrop with sidebar-aware positioning.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `isOpen` | `boolean` | - | Visibility state |
 | `onClose` | `() => void` | - | Close handler |
 | `children` | `ReactNode` | - | Modal content |
-| `className` | `string` | `''` | Additional classes |
+| `width` | `string` | `'w-200'` | Width class |
+| `height` | `string` | `'h-[80vh]'` | Height class |
 
 **Features:**
 - Closes on Escape key
 - Closes on backdrop click
-- Adapts to sidebar expanded/collapsed state
+- Offsets content area to account for sidebar width (w-72)
 - Prevents body scroll when open
 - Uses React Portal
 
@@ -420,7 +421,7 @@ Modal backdrop with sidebar awareness.
 
 **Location:** `front/app/components/ui/SidePanel.tsx`
 
-Reusable side panel layout with header, optional toolbar, scrollable body, and optional sticky footer. Supports collapsible animation.
+Reusable side panel layout with header, optional toolbar, scrollable body, and optional sticky footer. Supports collapsible animation with responsive mobile behavior.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
@@ -454,6 +455,12 @@ Reusable side panel layout with header, optional toolbar, scrollable body, and o
     <div className="p-3 flex flex-col gap-2">{/* list */}</div>
 </SidePanel>
 ```
+
+**Responsive behavior (collapsible panels):**
+- **Desktop (md+):** Sidebar with width transition (`w-0` → `w-72`/`w-96`), same as before
+- **Mobile (<md):** Full-screen fixed overlay (`fixed top-12 left-0 right-0 bottom-0 z-40`) when open. `top-12` accounts for the mobile header bar. Panel content becomes full-width.
+
+Non-collapsible panels (no `isOpen` prop) are not affected by this responsive behavior — parent components handle their own mobile layout.
 
 ---
 
@@ -693,6 +700,17 @@ import { XMarkIcon } from "@heroicons/react/20/solid";
 ```tsx
 <Icon className="size-4" strokeWidth={2} />
 ```
+
+---
+
+## Z-Index Hierarchy
+
+| Layer | Z-index | Component |
+|-------|---------|-----------|
+| Premium overlay | `z-10` | PremiumPlaceholder |
+| Mobile sidebar | `z-40` | SidePanel / MobileSidebar |
+| Modals / Toasts | `z-50` | ModalOverlay, ToastContainer |
+| Dropdown portals | `z-70` | All dropdown panels via `FloatingPortal` (`@floating-ui/react`) |
 
 ---
 

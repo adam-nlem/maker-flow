@@ -1,7 +1,7 @@
-import { useEffect, useRef } from "react"
 import RankingItemTile from "~/components/ui/RankingItemTile"
 import Shimmer from "~/components/ui/Shimmer"
 import { useListPaginatedRankedPosts } from "~/hooks/api/posts/useListPaginatedRankedPosts"
+import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
 import { PostInsightType } from "~/models/enums/PostInsightType"
 import { formatToFrenchRelative } from "~/utils/dateFormatters"
 
@@ -14,27 +14,7 @@ interface RankedPostsListProps {
 export default function RankedPostsList({ integrationUuid }: RankedPostsListProps) {
   const { posts, isLoading, isLoadingMore, hasMore, listMore } = useListPaginatedRankedPosts({ integrationUuid })
 
-  const sentinelRef = useRef<HTMLDivElement>(null)
-
-  useEffect(() => {
-    const sentinel = sentinelRef.current
-    if (!sentinel) return
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
-          listMore()
-        }
-      },
-      { rootMargin: "0px 0px 200px 0px" },
-    )
-
-    observer.observe(sentinel)
-
-    return () => {
-      observer.disconnect()
-    }
-  }, [hasMore, isLoadingMore, listMore, isLoading])
+  const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore)
 
   if (isLoading) {
     return (
