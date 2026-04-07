@@ -113,7 +113,7 @@ services:
 
   worker:
     <<: *back-common
-    command: ["php", "bin/console", "messenger:consume", "messages", "--time-limit=3600", "--memory-limit=256M", "-vv"]
+    command: ["php", "bin/console", "messenger:consume", "messages", "--time-limit=3600", "--memory-limit=192M", "-vv"]
     volumes:
       - maker_flow_uploads:/var/www/html/private/uploads
     networks:
@@ -135,7 +135,7 @@ services:
 
   scheduler:
     <<: *back-common
-    command: ["php", "bin/console", "messenger:consume", "scheduler_default", "--time-limit=3600", "--memory-limit=256M", "-vv"]
+    command: ["php", "bin/console", "messenger:consume", "scheduler_default", "--time-limit=3600", "--memory-limit=192M", "-vv"]
     volumes:
       - maker_flow_uploads:/var/www/html/private/uploads
     networks:

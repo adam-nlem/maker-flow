@@ -34,6 +34,7 @@ use Google\Client;
 use Google\Service\Exception;
 use Google\Service\YouTube;
 use Google\Service\YouTubeAnalytics;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -72,6 +73,7 @@ class PostInsightService
         private readonly Client $googleClient,
         private readonly HttpClientInterface $httpClient,
         private readonly ParameterBagInterface $parameterBag,
+        private readonly EntityManagerInterface $entityManager,
     ) {
         $this->instagramGraphUrl = $this->parameterBag->get('app.instagram.graph_url');
     }
@@ -94,6 +96,8 @@ class PostInsightService
             'access_token' => $integration->getAccessToken(),
         ];
 
+        $integrationId = $integration->getId();
+
         try {
             do {
                 $response = $this->httpClient->request('GET', $url, ['query' => $queryParams]);
@@ -102,6 +106,10 @@ class PostInsightService
                 foreach ($data['data'] as $postData) {
                     $this->instagramPostInsightService->processPostData($integration, $postData);
                 }
+
+                $this->entityManager->flush();
+                $this->entityManager->clear();
+                $integration = $this->integrationRepository->find($integrationId);
 
                 $url = $data['paging']['next'] ?? null;
                 $queryParams = [];
@@ -121,6 +129,8 @@ class PostInsightService
         if ($integration->getPlatform() !== Platform::Youtube) {
             throw new \InvalidArgumentException('Integration must be a YouTube integration');
         }
+
+        $integrationId = $integration->getId();
 
         $this->youtubeOAuthService->configureGoogleClient();
         $integration = $this->youtubeOAuthService->refreshTokenIfNeeded($integration);
@@ -152,6 +162,8 @@ class PostInsightService
             foreach ($postDTOs as $postDTO) {
                 $this->youtubePostInsightService->processPostData($integration, $postDTO);
             }
+
+            $this->entityManager->flush();
 
             // Step 5: Ensure Reporting API jobs exist
             $reportingJobs = $this->youtubeReportingService->ensureJobsExist($integration);
@@ -200,6 +212,10 @@ class PostInsightService
                     $this->youtubePostInsightService->processPostData($integration, $postDTO);
                 }
             }
+
+            $this->entityManager->flush();
+            $this->entityManager->clear();
+            $integration = $this->integrationRepository->find($integrationId);
         } catch (\Exception $e) {
             $this->throwIfOAuthAuthError($e, $integration);
 

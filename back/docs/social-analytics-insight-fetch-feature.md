@@ -466,7 +466,8 @@ dce back php bin/console app:social-analytics:fetch-post-insights
 Messages are processed asynchronously. Start the worker to consume messages:
 
 ```bash
-dce back php bin/console messenger:consume messages -vv
+# Use --no-debug to prevent Doctrine backtrace profiling from exhausting memory
+dce back php bin/console messenger:consume messages --no-debug -vv
 ```
 
 ---

@@ -55,7 +55,7 @@ The scheduler runs as a dedicated service in `docker-compose.prod.yaml`:
 ```yaml
 scheduler:
   <<: *back-common
-  command: ["php", "bin/console", "messenger:consume", "scheduler_default", "--time-limit=3600", "--memory-limit=256M", "-vv"]
+  command: ["php", "bin/console", "messenger:consume", "scheduler_default", "--time-limit=3600", "--memory-limit=192M", "-vv"]
   deploy:
     replicas: 1   # Must be exactly 1
 ```
@@ -83,7 +83,8 @@ The scheduler is stopped, recreated, and rolled back alongside the `worker` serv
 Run the scheduler locally to test:
 
 ```bash
-dce back php bin/console messenger:consume scheduler_default -vv
+# Use --no-debug to prevent Doctrine backtrace profiling from exhausting memory
+dce back php bin/console messenger:consume scheduler_default --no-debug -vv
 ```
 
 The scheduler will pick up the schedule and dispatch commands at the configured intervals.
