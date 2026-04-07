@@ -101,7 +101,7 @@ export default function ContentsListPanel({ projectUuid }: ContentsListPanelProp
             <div ref={scrollContainerRef} className="flex flex-row flex-wrap gap-3 p-4 overflow-y-auto scrollbar-none flex-1 min-h-0">
                 {items.map((item) => {
                     const isGroup = item instanceof PostGroupWithInsightsAndScriptDTO
-                    const uuid = isGroup ? item.postGroup.uuid : item.post.uuid
+                    const uuid = isGroup ? item.postGroup.uuid : item.uuid
 
                     return (
                         <ContentCard

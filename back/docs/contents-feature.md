@@ -21,9 +21,33 @@ Now accepts `projectUuid` + optional `platform` as an alternative to `integratio
 | `page` | int | No | Page number (default: 1) |
 | `limit` | int | No | Items per page (default: 20) |
 
-**Response:** `PostWithPlatformAndInsightsResponseDTO[]`
+**Response:** `PostListItemResponseDTO[]`
 
-Each post includes its platform identifier and aggregated latest insights.
+Each item is a flat DTO with only the fields needed for list cards: `uuid`, `caption`, `publishedAt`, `platform`, `views`, `totalInteractions`, `engagementByViews`.
+
+### Show Post
+
+```
+GET /api/posts/{postUuid}
+```
+
+Returns full post details with all aggregated insights, platform, post group info, and engagement rate.
+
+**Response:** `PostWithPlatformAndInsightsResponseDTO`
+
+```json
+{
+  "post": { "uuid": "...", "caption": "...", "publishedAt": "...", "externalUrl": "...", ... },
+  "platform": "instagram",
+  "aggregatedInsights": [
+    { "type": "views", "value": 25000 },
+    { "type": "likes", "value": 1200 }
+  ],
+  "postGroupUuid": "...",
+  "postGroupTitle": "...",
+  "engagementByViews": 4.8
+}
+```
 
 ### List Post Groups (enriched, paginated)
 
@@ -87,7 +111,8 @@ Searches posts by caption within a project. Used by the PostPicker component on 
 
 | File | Purpose |
 |------|---------|
-| `src/DTO/Response/Post/PostWithPlatformAndInsightsResponseDTO.php` | Post with platform and aggregated insights |
+| `src/DTO/Response/Post/PostListItemResponseDTO.php` | Flat summary DTO for the list (uuid, caption, publishedAt, platform, views, totalInteractions, engagementByViews) |
+| `src/DTO/Response/Post/PostWithPlatformAndInsightsResponseDTO.php` | Full post detail with platform and all aggregated insights (used by show endpoint) |
 | `src/DTO/Response/PostGroup/PostGroupWithInsightsAndScriptResponseDTO.php` | Post group with aggregated insights and linked script |
 | `src/DTO/QueryParam/Post/SearchPostsQueryParamDTO.php` | Query params for the search endpoint |
 
@@ -103,7 +128,8 @@ Searches posts by caption within a project. Used by the PostPicker component on 
 
 | Method | File | Description |
 |--------|------|-------------|
-| `getPostsWithAggregatedInsightsByProject()` | `src/Service/Post/PostService.php` | Fetches paginated posts with their platform and aggregated latest insights |
+| `getPostListItems()` | `src/Service/Post/PostService.php` | Fetches paginated flat post summaries for the list |
+| `getPostDetail()` | `src/Service/Post/PostService.php` | Fetches full post detail with all aggregated insights for a single post |
 | `getPostGroupsWithInsightsAndScript()` | `src/Service/PostGroup/PostGroupService.php` | Fetches post groups with aggregated insights and linked script info |
 
 ## Script Linking

@@ -1,5 +1,5 @@
 import { PostGroupWithInsightsAndScriptDTO } from "~/dtos/postGroups/PostGroupWithInsightsAndScriptDTO"
-import type { PostWithPlatformAndInsightsDTO } from "~/dtos/posts/PostWithPlatformAndInsightsDTO"
+import { PostListItemDTO } from "~/dtos/posts/PostListItemDTO"
 import { PostInsightType, postInsightTypeToFrenchTranslation } from "~/models/enums/PostInsightType"
 import { platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform"
 import { formatCompactNumber } from "~/utils/numberFormatters"
@@ -8,7 +8,7 @@ import { DocumentTextIcon } from "@heroicons/react/24/outline"
 import ContentMetricBox from "./ContentMetricBox"
 
 interface ContentCardProps {
-    data: PostGroupWithInsightsAndScriptDTO | PostWithPlatformAndInsightsDTO
+    data: PostGroupWithInsightsAndScriptDTO | PostListItemDTO
     isSelected: boolean
     onClick: () => void
 }
@@ -16,8 +16,12 @@ interface ContentCardProps {
 export default function ContentCard({ data, isSelected, onClick }: ContentCardProps) {
     const isGroup = data instanceof PostGroupWithInsightsAndScriptDTO
 
-    const views = data.aggregatedInsights.find((i) => i.type === PostInsightType.Views)?.value ?? null
-    const totalInteractions = data.aggregatedInsights.find((i) => i.type === PostInsightType.TotalInteractions)?.value ?? null
+    const views = isGroup
+        ? data.aggregatedInsights.find((i) => i.type === PostInsightType.Views)?.value ?? null
+        : data.views
+    const totalInteractions = isGroup
+        ? data.aggregatedInsights.find((i) => i.type === PostInsightType.TotalInteractions)?.value ?? null
+        : data.totalInteractions
 
     return (
         <div
@@ -47,16 +51,16 @@ export default function ContentCard({ data, isSelected, onClick }: ContentCardPr
 
                     <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                         <h3 className="text-heading-sm truncate">
-                            {data.post.caption
-                                ? data.post.caption.length > 80
-                                    ? data.post.caption.substring(0, 80) + "..."
-                                    : data.post.caption
+                            {data.caption
+                                ? data.caption.length > 80
+                                    ? data.caption.substring(0, 80) + "..."
+                                    : data.caption
                                 : "Sans description"}
                         </h3>
 
                     </div>
                     <span className="text-body-xs text-gray whitespace-nowrap">
-                        {formatToFrenchDateShort(data.post.publishedAt)}
+                        {formatToFrenchDateShort(data.publishedAt)}
                     </span>
                 </div>
             )}

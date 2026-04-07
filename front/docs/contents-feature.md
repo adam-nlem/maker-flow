@@ -47,7 +47,7 @@ Unified card component for both post groups and individual posts. Accepts a `dat
 
 **File:** `app/components/contents/ContentPostDetailPanel.tsx`
 
-`SidePanel` showing full details of a single post: thumbnail, caption, platform, published date, and per-post insights.
+`SidePanel` showing full details of a single post: thumbnail, caption, platform, published date, and per-post insights. Uses `useShowPost` to fetch full post data by UUID from `GET /api/posts/{postUuid}`, independent of the paginated list.
 
 ### CreateGroupPanel
 
@@ -90,7 +90,8 @@ Zustand store managing Contents page UI state.
 | Hook | File | API Endpoint | Returns |
 |------|------|-------------|---------|
 | `useListPaginatedPostGroups` | `app/hooks/api/postGroups/useListPaginatedPostGroups.ts` | `GET /api/post-groups` | Paginated `PostGroupWithInsightsAndScriptDTO[]` with infinite scroll (aggregated insights + linked script) |
-| `useListPaginatedPosts` | `app/hooks/api/posts/useListPaginatedPosts.ts` | `GET /api/posts` | Paginated `PostWithPlatformAndInsightsDTO[]` with platform info |
+| `useListPaginatedPosts` | `app/hooks/api/posts/useListPaginatedPosts.ts` | `GET /api/posts` | Paginated `PostListItemDTO[]` — flat summary items for the list |
+| `useShowPost` | `app/hooks/api/posts/useShowPost.ts` | `GET /api/posts/{postUuid}` | Single `PostWithPlatformAndInsightsDTO` — full post detail with all insights |
 | `useSearchPosts` | `app/hooks/api/posts/useSearchPosts.ts` | `GET /api/posts/search` | Posts matching a caption search query |
 
 ## DTOs
@@ -98,11 +99,13 @@ Zustand store managing Contents page UI state.
 | File | Description |
 |------|-------------|
 | `app/dtos/postGroups/PostGroupWithInsightsAndScriptDTO.ts` | Post group with aggregated insights and optional linked script info |
-| `app/dtos/posts/PostWithPlatformAndInsightsDTO.ts` | Post with platform identifier and aggregated insights |
+| `app/dtos/posts/PostListItemDTO.ts` | Flat summary DTO for the list (uuid, caption, publishedAt, platform, views, totalInteractions, engagementByViews) |
+| `app/dtos/posts/PostWithPlatformAndInsightsDTO.ts` | Full post detail with platform identifier and all aggregated insights (used by `useShowPost`) |
 
 ## Key Patterns
 
 - **SidePanel for detail views:** all detail and creation views use the shared `SidePanel` component sliding in from the right
 - **Platform pills filter:** `ContentsPlatformFilter` provides platform-scoped filtering shared across both tabs
 - **Mutual exclusion between panels:** only one side panel can be open at a time (group detail, post detail, or create group), enforced by the store actions
-- **Enriched DTOs:** the backend now returns pre-aggregated insights and script info in the list endpoints, avoiding N+1 queries on the frontend
+- **List/detail data split:** the list endpoint (`GET /api/posts`) returns a flat summary DTO (`PostListItemDTO`) with only the fields needed for cards, while the show endpoint (`GET /api/posts/{postUuid}`) returns the full `PostWithPlatformAndInsightsDTO` with all insights for the detail panel
+- **Enriched DTOs:** the backend returns pre-aggregated insights and script info in the list endpoints, avoiding N+1 queries on the frontend

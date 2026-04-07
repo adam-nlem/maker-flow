@@ -19,7 +19,6 @@ export default function ContentsPageView({ projectUuid }: ContentsPageViewProps)
             />
             <ContentPostDetailPanel
                 postUuid={selectedPostUuid}
-                projectUuid={projectUuid}
             />
         </>
     )

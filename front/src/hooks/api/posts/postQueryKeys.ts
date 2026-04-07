@@ -3,5 +3,6 @@ export const postQueryKeys = {
     list: (projectUuid: string, platform: string | null, searchTerm?: string) => [...postQueryKeys.all, "list", projectUuid, platform ?? "all", searchTerm ?? "all"] as const,
     search: (projectUuid: string) => [...postQueryKeys.all, "search", projectUuid] as const,
     rank: (integrationUuid: string) => [...postQueryKeys.all, "rank", integrationUuid] as const,
+    show: (postUuid: string) => [...postQueryKeys.all, "show", postUuid] as const,
     thumbnail: (postUuid: string) => [...postQueryKeys.all, "thumbnail", postUuid] as const,
 };

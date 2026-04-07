@@ -1,7 +1,7 @@
 import { SidePanel } from "~/components/ui/SidePanel"
 import PlatformPill from "~/components/ui/PlatformPill"
 import Shimmer from "~/components/ui/Shimmer"
-import { useListPaginatedPosts } from "~/hooks/api/posts/useListPaginatedPosts"
+import { useShowPost } from "~/hooks/api/posts/useShowPost"
 import { useShowPostThumbnail } from "~/hooks/api/posts/useShowPostThumbnail"
 import { useContentsStore } from "~/stores/contents/contentsStore"
 import { useContentsRightPanelStore, ContentsRightPanel } from "~/stores/contents/contentsRightPanelStore"
@@ -12,28 +12,21 @@ import ContentMetricBox from "./ContentMetricBox"
 
 interface ContentPostDetailPanelProps {
     postUuid: string | null
-    projectUuid: string
 }
 
-export default function ContentPostDetailPanel({ postUuid, projectUuid }: ContentPostDetailPanelProps) {
+export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPanelProps) {
     const closePanel = useContentsStore((s) => s.closePanel)
     const closeRightPanel = useContentsRightPanelStore((s) => s.closePanel)
     const isOpen = useContentsRightPanelStore((s) => s.activePanel === ContentsRightPanel.PostDetail)
     const selectGroup = useContentsStore((s) => s.selectGroup)
     const openRightPanel = useContentsRightPanelStore((s) => s.openPanel)
-    const platformFilter = useContentsStore((s) => s.platformFilter)
 
     const handleClose = () => {
         closeRightPanel()
         closePanel()
     }
 
-    const { posts } = useListPaginatedPosts({
-        projectUuid,
-        platform: platformFilter,
-    })
-
-    const postData = posts.find((p) => p.post.uuid === postUuid)
+    const { post: postData, isLoading } = useShowPost(postUuid ?? undefined)
     const { thumbnailUrl, isLoading: isLoadingThumbnail } = useShowPostThumbnail(postUuid ?? undefined)
 
     const caption = postData?.post.caption ?? "Sans description"
@@ -46,6 +39,21 @@ export default function ContentPostDetailPanel({ postUuid, projectUuid }: Conten
             isOpen={isOpen}
             onClose={handleClose}
         >
+            {isLoading && (
+                <div className="p-4 flex flex-col gap-4">
+                    <Shimmer width="w-full" height="h-48" radius="rounded-lg" />
+                    <div className="flex flex-row items-center justify-between">
+                        <Shimmer width="w-24" height="h-6" />
+                        <Shimmer width="w-20" height="h-4" />
+                    </div>
+                    <Shimmer width="w-full" height="h-16" />
+                    <div className="flex flex-row flex-wrap gap-1">
+                        <Shimmer width="w-24" height="h-14" />
+                        <Shimmer width="w-24" height="h-14" />
+                        <Shimmer width="w-24" height="h-14" />
+                    </div>
+                </div>
+            )}
             {postData && (
                 <div className="p-4 flex flex-col gap-4">
                     {/* Thumbnail */}

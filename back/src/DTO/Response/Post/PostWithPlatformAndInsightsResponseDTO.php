@@ -10,18 +10,18 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class PostWithPlatformAndInsightsResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
-        #[Groups(['api_posts_list'])]
+        #[Groups(['api_posts_list', 'api_posts_show'])]
         private readonly Post $post,
-        #[Groups(['api_posts_list'])]
+        #[Groups(['api_posts_list', 'api_posts_show'])]
         private readonly string $platform,
         /** @var AggregatedInsightDTO[] */
-        #[Groups(['api_posts_list'])]
+        #[Groups(['api_posts_list', 'api_posts_show'])]
         private readonly array $aggregatedInsights,
-        #[Groups(['api_posts_list'])]
+        #[Groups(['api_posts_list', 'api_posts_show'])]
         private readonly ?string $postGroupUuid,
-        #[Groups(['api_posts_list'])]
+        #[Groups(['api_posts_list', 'api_posts_show'])]
         private readonly ?string $postGroupTitle,
-        #[Groups(['api_posts_list'])]
+        #[Groups(['api_posts_list', 'api_posts_show'])]
         private readonly ?float $engagementByViews,
     ) {}
 
