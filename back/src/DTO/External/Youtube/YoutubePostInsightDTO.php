@@ -118,6 +118,30 @@ class YoutubePostInsightDTO
     }
 
     /**
+     * @param YoutubePostInsightDTO[] $postInsightDTOs
+     */
+    public static function buildTotalInteractions(array $postInsightDTOs): self
+    {
+        $values = [];
+
+        foreach ($postInsightDTOs as $dto) {
+            if ($dto->getType() !== null) {
+                $values[$dto->getType()->value] = $dto->getValue();
+            }
+        }
+
+        $totalInteractions = ($values[PostInsightType::Likes->value] ?? 0.0)
+            + ($values[PostInsightType::Dislikes->value] ?? 0.0)
+            + ($values[PostInsightType::Comments->value] ?? 0.0)
+            + ($values[PostInsightType::Shares->value] ?? 0.0);
+
+        return new self(
+            type: PostInsightType::TotalInteractions,
+            value: $totalInteractions,
+        );
+    }
+
+    /**
      * @return string[]
      */
     public static function getAnalyticsMetrics(): array

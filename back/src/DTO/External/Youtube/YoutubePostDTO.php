@@ -83,7 +83,10 @@ class YoutubePostDTO
      */
     public function getPostInsights(): array
     {
-        return $this->postInsights;
+        return [
+            ...$this->postInsights,
+            YoutubePostInsightDTO::buildTotalInteractions($this->postInsights),
+        ];
     }
 
     public function addPostInsight(YoutubePostInsightDTO $insight): void
