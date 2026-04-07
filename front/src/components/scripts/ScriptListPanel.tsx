@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import ScriptCard from "./ScriptCard";
@@ -21,7 +22,10 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     const { createScript, isPending } = useCreateScript();
     const focusedScriptUuid = useFocusScriptStore((state) => state.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
-    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore);
+    const desktopScrollRef = useRef<HTMLDivElement>(null);
+    const mobileScrollRef = useRef<HTMLDivElement>(null);
+    useInfiniteScroll(desktopScrollRef, hasMore, isLoadingMore, listMore);
+    useInfiniteScroll(mobileScrollRef, hasMore, isLoadingMore, listMore);
     const { subscription } = useShowCurrentSubscription();
     const { plans } = useListPlans();
     const currentPlanConfig = plans.find((p) => p.plan === subscription?.plan);
@@ -70,7 +74,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
                             onClick={() => setFocusedScriptUuid(script.uuid)}
                         />
                     ))}
-                    <div ref={sentinelRef} className="h-1" />
+
                 </>
             )}
         </div>
@@ -80,7 +84,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
         <>
             {/* Desktop */}
             <div className="hidden md:block">
-                <SidePanel title="Scripts" side="left" headerActions={createButton}>
+                <SidePanel title="Scripts" side="left" headerActions={createButton} bodyRef={desktopScrollRef}>
                     {listContent}
                 </SidePanel>
             </div>
@@ -91,7 +95,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
                     <h2 className="text-heading-md">Scripts</h2>
                     {createButton}
                 </div>
-                <div className="flex-1 overflow-y-auto scrollbar-none">
+                <div ref={mobileScrollRef} className="flex-1 overflow-y-auto scrollbar-none">
                     {listContent}
                 </div>
             </div>

@@ -1,3 +1,4 @@
+import { useRef } from "react"
 import RankingItemTile from "~/components/ui/RankingItemTile"
 import Shimmer from "~/components/ui/Shimmer"
 import { useListPaginatedRankedPostGroups } from "~/hooks/api/postGroups/useListPaginatedRankedPostGroups"
@@ -13,7 +14,8 @@ interface RankedPostGroupsListProps {
 export default function RankedPostGroupsList({ projectUuid }: RankedPostGroupsListProps) {
   const { postGroups, isLoading, isLoadingMore, hasMore, listMore } = useListPaginatedRankedPostGroups({ projectUuid })
 
-  const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore)
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  useInfiniteScroll(scrollContainerRef, hasMore, isLoadingMore, listMore)
 
   if (isLoading) {
     return (
@@ -41,7 +43,7 @@ export default function RankedPostGroupsList({ projectUuid }: RankedPostGroupsLi
   return (
     <div className="flex flex-col flex-1 min-h-0">
       <h2 className="text-heading-sm mb-2">Classement des groupes de posts</h2>
-      <div className="overflow-y-auto scrollbar-none flex-1 min-h-0">
+      <div ref={scrollContainerRef} className="overflow-y-auto scrollbar-none flex-1 min-h-0">
         {postGroups.map((group, index) => (
           <RankingItemTile
             key={group.postGroup.uuid}
@@ -56,7 +58,7 @@ export default function RankedPostGroupsList({ projectUuid }: RankedPostGroupsLi
             isLast={index === postGroups.length - 1 && !hasMore}
           />
         ))}
-        <div ref={sentinelRef} className="h-1" />
+
       </div>
     </div>
   )

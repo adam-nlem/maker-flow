@@ -1,3 +1,4 @@
+import { useRef } from "react"
 import Shimmer from "~/components/ui/Shimmer"
 import { PostGroupWithInsightsAndScriptDTO } from "~/dtos/postGroups/PostGroupWithInsightsAndScriptDTO"
 import { useListPaginatedPostGroups } from "~/hooks/api/postGroups/useListPaginatedPostGroups"
@@ -48,7 +49,8 @@ export default function ContentsList({ projectUuid }: ContentsListProps) {
     const listMore = isGroupTab ? listMoreGroups : listMorePosts
     const items = isGroupTab ? postGroups : posts
 
-    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore)
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    useInfiniteScroll(scrollContainerRef, hasMore, isLoadingMore, listMore)
 
     if (isLoading) {
         return (
@@ -83,7 +85,7 @@ export default function ContentsList({ projectUuid }: ContentsListProps) {
     }
 
     return (
-        <div className={"flex flex-row flex-wrap gap-3 p-4 overflow-y-auto scrollbar-none flex-1 min-h-0"}>
+        <div ref={scrollContainerRef} className={"flex flex-row flex-wrap gap-3 p-4 overflow-y-auto scrollbar-none flex-1 min-h-0"}>
             {items.map((item) => {
                 const isGroup = item instanceof PostGroupWithInsightsAndScriptDTO
                 const uuid = isGroup ? item.postGroup.uuid : item.post.uuid
@@ -97,7 +99,7 @@ export default function ContentsList({ projectUuid }: ContentsListProps) {
                     />
                 )
             })}
-            <div ref={sentinelRef} className="h-1" />
+
             {isLoadingMore && (
                 <div className="flex flex-row flex-wrap gap-3 p-4 flex-1">
                     {[...Array(3)].map((_, i) => (

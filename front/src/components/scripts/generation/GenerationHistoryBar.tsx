@@ -21,9 +21,8 @@ export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUui
     const { deleteScriptGeneration } = useDeleteScriptGeneration();
     const [pendingDeleteUuid, setPendingDeleteUuid] = useState<string | null>(null);
     const containerRef = useRef<HTMLDivElement>(null);
-    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore, {
+    useInfiniteScroll(containerRef, hasMore, isLoadingMore, listMore, {
         direction: "horizontal",
-        root: containerRef,
     });
 
     if (generations.length === 0) return null;
@@ -60,7 +59,7 @@ export default function GenerationHistoryBar({ scriptUuid, selectedGenerationUui
                         onSuffixClick={isReadOnly ? undefined : () => setPendingDeleteUuid(gen.uuid)}
                     />
                 ))}
-                <div ref={sentinelRef} className="w-1 shrink-0" />
+
             </div>
 
             <ConfirmDeleteDialog

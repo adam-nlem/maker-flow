@@ -39,9 +39,7 @@ export default function PostPicker({ projectUuid, selectedUuids, onSelectionChan
 
     const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore, {
-        root: scrollContainerRef,
-    })
+    useInfiniteScroll(scrollContainerRef, hasMore, isLoadingMore, listMore)
 
     const handleToggle = (uuid: string) => {
         if (selectedUuids.includes(uuid)) {
@@ -89,7 +87,7 @@ export default function PostPicker({ projectUuid, selectedUuids, onSelectionChan
                                 onSelect={() => handleToggle(item.post.uuid)}
                             />
                         ))}
-                        <div ref={sentinelRef} className="h-1" />
+
                         {isLoadingMore && <Shimmer width="w-full" height="h-10" radius="rounded-md" />}
                     </>
                 )}
