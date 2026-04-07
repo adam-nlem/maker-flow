@@ -3,6 +3,7 @@ import { useListPaginatedPostGroups } from "~/hooks/api/postGroups/useListPagina
 import { useUpdatePostGroup } from "~/hooks/api/postGroups/useUpdatePostGroup"
 import { useDeletePostGroup } from "~/hooks/api/postGroups/useDeletePostGroup"
 import { useContentsStore } from "~/stores/contents/contentsStore"
+import { useContentsRightPanelStore, ContentsRightPanel } from "~/stores/contents/contentsRightPanelStore"
 import { postInsightTypeToFrenchTranslation, formatPostInsightValue } from "~/models/enums/PostInsightType"
 import { DocumentTextIcon, TrashIcon, PlusIcon } from "@heroicons/react/24/outline"
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog"
@@ -12,12 +13,14 @@ import ContentMetricBox from "./ContentMetricBox"
 import PostTile from "./PostTile"
 
 interface ContentGroupDetailPanelProps {
-    groupUuid: string
+    groupUuid: string | null
     projectUuid: string
 }
 
 export default function ContentGroupDetailPanel({ groupUuid, projectUuid }: ContentGroupDetailPanelProps) {
     const closePanel = useContentsStore((s) => s.closePanel)
+    const isOpen = useContentsRightPanelStore((s) => s.activePanel === ContentsRightPanel.GroupDetail)
+    const closeRightPanel = useContentsRightPanelStore((s) => s.closePanel)
     const { postGroups } = useListPaginatedPostGroups({ projectUuid })
     const { deletePostGroup, isPending: isDeleting } = useDeletePostGroup()
     const { updatePostGroup, isPending: isUpdating } = useUpdatePostGroup()
@@ -26,7 +29,13 @@ export default function ContentGroupDetailPanel({ groupUuid, projectUuid }: Cont
 
     const group = postGroups.find((g) => g.postGroup.uuid === groupUuid)
 
+    const handleClose = () => {
+        closeRightPanel()
+        closePanel()
+    }
+
     const handleRemovePost = async (postUuid: string) => {
+        if (!groupUuid) return
         await updatePostGroup({
             postGroupUuid: groupUuid,
             data: { removePostUuids: [postUuid] },
@@ -34,6 +43,7 @@ export default function ContentGroupDetailPanel({ groupUuid, projectUuid }: Cont
     }
 
     const handleAddPosts = async (postUuids: string[]) => {
+        if (!groupUuid) return
         await updatePostGroup({
             postGroupUuid: groupUuid,
             data: { addPostUuids: postUuids },
@@ -42,24 +52,23 @@ export default function ContentGroupDetailPanel({ groupUuid, projectUuid }: Cont
     }
 
     const handleUnlinkScript = async () => {
+        if (!groupUuid) return
         await updatePostGroup({
             postGroupUuid: groupUuid,
             data: { scriptUuid: null },
         })
     }
 
-    if (!group) return null
-
-    const existingPostUuids = group.postGroup.posts.map((p) => p.uuid)
+    const existingPostUuids = group?.postGroup.posts.map((p) => p.uuid) ?? []
 
     return (
         <>
             <SidePanel
-                title={group.postGroup.title}
+                title={group?.postGroup.title ?? ""}
                 width="w-96"
                 side="right"
-                isOpen={true}
-                onClose={closePanel}
+                isOpen={isOpen}
+                onClose={handleClose}
                 headerActions={
                     <button
                         onClick={() => setShowDeleteConfirmation(true)}
@@ -70,84 +79,87 @@ export default function ContentGroupDetailPanel({ groupUuid, projectUuid }: Cont
                     </button>
                 }
             >
-                <div className="p-4 flex flex-col gap-4">
+                {group && (
+                    <div className="p-4 flex flex-col gap-4">
 
-                    {/* Metrics summary */}
-                    <div className="flex flex-col gap-2">
-                        <h3 className="text-heading-xs text-gray">Statistiques</h3>
-                        <div className="flex flex-row flex-wrap gap-1">
-                            {group.aggregatedInsights.map((insight) => (
+                        {/* Metrics summary */}
+                        <div className="flex flex-col gap-2">
+                            <h3 className="text-heading-xs text-gray">Statistiques</h3>
+                            <div className="flex flex-row flex-wrap gap-1">
+                                {group.aggregatedInsights.map((insight) => (
+                                    <ContentMetricBox
+                                        key={insight.type}
+                                        label={postInsightTypeToFrenchTranslation[insight.type]}
+                                        value={formatPostInsightValue(insight.type, insight.value)}
+                                    />
+                                ))}
+                                {group.aggregatedInsights.length === 0 && (
+                                    <p className="text-body-xs text-gray">Aucune statistique disponible.</p>
+                                )}
+                            </div>
+                        </div>
 
-                                <ContentMetricBox
-                                    label={postInsightTypeToFrenchTranslation[insight.type]}
-                                    value={formatPostInsightValue(insight.type, insight.value)}
-                                />
-                            ))}
-                            {group.aggregatedInsights.length === 0 && (
-                                <p className="text-body-xs text-gray">Aucune statistique disponible.</p>
+                        {/* Script section */}
+                        <div className="flex flex-col gap-2">
+                            <h3 className="text-heading-xs text-gray">Script</h3>
+                            {group.script ? (
+                                <div className="flex flex-row items-center justify-between gap-2 border border-light-gray rounded-md p-2">
+                                    <div className="flex flex-row items-center gap-1.5 min-w-0">
+                                        <DocumentTextIcon className="size-3.5 text-primary shrink-0" strokeWidth={2} />
+                                        <span className="text-body-xs text-primary truncate">{group.script.title}</span>
+                                    </div>
+                                    <button
+                                        onClick={handleUnlinkScript}
+                                        disabled={isUpdating}
+                                        className="text-gray hover:text-danger transition-colors cursor-pointer text-body-xs whitespace-nowrap disabled:opacity-50"
+                                    >
+                                        Délier
+                                    </button>
+                                </div>
+                            ) : (
+                                <p className="text-body-xs text-gray">Aucun script lié.</p>
                             )}
                         </div>
-                    </div>
 
-                    {/* Script section */}
-                    <div className="flex flex-col gap-2">
-                        <h3 className="text-heading-xs text-gray">Script</h3>
-                        {group.script ? (
-                            <div className="flex flex-row items-center justify-between gap-2 border border-light-gray rounded-md p-2">
-                                <div className="flex flex-row items-center gap-1.5 min-w-0">
-                                    <DocumentTextIcon className="size-3.5 text-primary shrink-0" strokeWidth={2} />
-                                    <span className="text-body-xs text-primary truncate">{group.script.title}</span>
-                                </div>
+                        {/* Posts list */}
+                        <div className="flex flex-col gap-2">
+                            <div className="flex flex-row items-center justify-between">
+                                <h3 className="text-heading-xs text-gray">
+                                    Posts ({group.postGroup.posts.length})
+                                </h3>
                                 <button
-                                    onClick={handleUnlinkScript}
-                                    disabled={isUpdating}
-                                    className="text-gray hover:text-danger transition-colors cursor-pointer text-body-xs whitespace-nowrap disabled:opacity-50"
+                                    onClick={() => setIsPostPickerOpen(true)}
+                                    className="text-primary hover:text-primary/80 transition-colors cursor-pointer"
                                 >
-                                    Délier
+                                    <PlusIcon className="size-4" strokeWidth={2} />
                                 </button>
                             </div>
-                        ) : (
-                            <p className="text-body-xs text-gray">Aucun script lié.</p>
-                        )}
-                    </div>
 
-                    {/* Posts list */}
-                    <div className="flex flex-col gap-2">
-                        <div className="flex flex-row items-center justify-between">
-                            <h3 className="text-heading-xs text-gray">
-                                Posts ({group.postGroup.posts.length})
-                            </h3>
-                            <button
-                                onClick={() => setIsPostPickerOpen(true)}
-                                className="text-primary hover:text-primary/80 transition-colors cursor-pointer"
-                            >
-                                <PlusIcon className="size-4" strokeWidth={2} />
-                            </button>
-                        </div>
-
-                        <div className="flex flex-col gap-1">
-                            {group.postGroup.posts.map((post) => (
-                                <PostTile
-                                    key={post.uuid}
-                                    post={post}
-                                    onRemove={() => handleRemovePost(post.uuid)}
-                                    isRemoving={isUpdating}
-                                />
-                            ))}
-                            {group.postGroup.posts.length === 0 && (
-                                <p className="text-body-xs text-gray">Aucun post dans ce groupe.</p>
-                            )}
+                            <div className="flex flex-col gap-1">
+                                {group.postGroup.posts.map((post) => (
+                                    <PostTile
+                                        key={post.uuid}
+                                        post={post}
+                                        onRemove={() => handleRemovePost(post.uuid)}
+                                        isRemoving={isUpdating}
+                                    />
+                                ))}
+                                {group.postGroup.posts.length === 0 && (
+                                    <p className="text-body-xs text-gray">Aucun post dans ce groupe.</p>
+                                )}
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
             </SidePanel>
 
             <ConfirmDeleteDialog
                 isOpen={showDeleteConfirmation}
                 onClose={() => setShowDeleteConfirmation(false)}
                 onConfirm={async () => {
+                    if (!groupUuid) return
                     await deletePostGroup(groupUuid)
-                    closePanel()
+                    handleClose()
                 }}
                 isPending={isDeleting}
                 message="Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action est irréversible."
