@@ -15,7 +15,6 @@ export default function ContentsPageView({ projectUuid }: ContentsPageViewProps)
         <>
             <ContentGroupDetailPanel
                 groupUuid={selectedGroupUuid}
-                projectUuid={projectUuid}
             />
             <ContentPostDetailPanel
                 postUuid={selectedPostUuid}

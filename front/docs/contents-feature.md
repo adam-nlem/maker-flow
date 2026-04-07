@@ -35,13 +35,13 @@ Unified list component for both groups and posts. Reads `activeTab` from the sto
 
 **File:** `app/components/contents/ContentCard.tsx`
 
-Unified card component for both post groups and individual posts. Accepts a `data` prop typed as `PostGroupWithInsightsAndScriptDTO | PostWithPlatformAndInsightsDTO` and uses `instanceof` to determine the rendering variant. Shared: metrics row (views, engagement, interactions), selection state, click handling. Group-specific: title, post count, script badge. Post-specific: platform dot, caption, optional group title.
+Unified card component for both post groups and individual posts. Accepts a `data` prop typed as `PostGroupListItemDTO | PostListItemDTO` and uses `instanceof` to determine the rendering variant. Both DTOs are flat with shared fields (`uuid`, `views`, `totalInteractions`, `engagementByViews`). Group-specific: title, post count, script badge. Post-specific: platform icon, caption.
 
 ### ContentGroupDetailPanel
 
 **File:** `app/components/contents/ContentGroupDetailPanel.tsx`
 
-`SidePanel` showing full details of a post group: title, linked posts, aggregated insights, and linked script. Supports editing and script linking.
+`SidePanel` showing full details of a post group: title, linked posts, aggregated insights, and linked script. Uses `useShowPostGroup` to fetch full group data by UUID from `GET /api/post-groups/{postGroupUuid}`, independent of the paginated list. Supports editing and script linking.
 
 ### ContentPostDetailPanel
 
@@ -89,7 +89,8 @@ Zustand store managing Contents page UI state.
 
 | Hook | File | API Endpoint | Returns |
 |------|------|-------------|---------|
-| `useListPaginatedPostGroups` | `app/hooks/api/postGroups/useListPaginatedPostGroups.ts` | `GET /api/post-groups` | Paginated `PostGroupWithInsightsAndScriptDTO[]` with infinite scroll (aggregated insights + linked script) |
+| `useListPaginatedPostGroups` | `app/hooks/api/postGroups/useListPaginatedPostGroups.ts` | `GET /api/post-groups` | Paginated `PostGroupListItemDTO[]` — flat summary items for the list |
+| `useShowPostGroup` | `app/hooks/api/postGroups/useShowPostGroup.ts` | `GET /api/post-groups/{postGroupUuid}` | Single `PostGroupWithInsightsAndScriptDTO` — full group detail with all insights, posts, and script |
 | `useListPaginatedPosts` | `app/hooks/api/posts/useListPaginatedPosts.ts` | `GET /api/posts` | Paginated `PostListItemDTO[]` — flat summary items for the list |
 | `useShowPost` | `app/hooks/api/posts/useShowPost.ts` | `GET /api/posts/{postUuid}` | Single `PostWithPlatformAndInsightsDTO` — full post detail with all insights |
 | `useSearchPosts` | `app/hooks/api/posts/useSearchPosts.ts` | `GET /api/posts/search` | Posts matching a caption search query |
@@ -98,8 +99,9 @@ Zustand store managing Contents page UI state.
 
 | File | Description |
 |------|-------------|
-| `app/dtos/postGroups/PostGroupWithInsightsAndScriptDTO.ts` | Post group with aggregated insights and optional linked script info |
-| `app/dtos/posts/PostListItemDTO.ts` | Flat summary DTO for the list (uuid, caption, publishedAt, platform, views, totalInteractions, engagementByViews) |
+| `app/dtos/postGroups/PostGroupListItemDTO.ts` | Flat summary DTO for the group list (uuid, title, createdAt, postCount, views, totalInteractions, engagementByViews, scriptTitle) |
+| `app/dtos/postGroups/PostGroupWithInsightsAndScriptDTO.ts` | Full group detail with all aggregated insights, posts, and linked script (used by `useShowPostGroup`) |
+| `app/dtos/posts/PostListItemDTO.ts` | Flat summary DTO for the post list (uuid, caption, publishedAt, platform, views, totalInteractions, engagementByViews) |
 | `app/dtos/posts/PostWithPlatformAndInsightsDTO.ts` | Full post detail with platform identifier and all aggregated insights (used by `useShowPost`) |
 
 ## Key Patterns
@@ -107,5 +109,4 @@ Zustand store managing Contents page UI state.
 - **SidePanel for detail views:** all detail and creation views use the shared `SidePanel` component sliding in from the right
 - **Platform pills filter:** `ContentsPlatformFilter` provides platform-scoped filtering shared across both tabs
 - **Mutual exclusion between panels:** only one side panel can be open at a time (group detail, post detail, or create group), enforced by the store actions
-- **List/detail data split:** the list endpoint (`GET /api/posts`) returns a flat summary DTO (`PostListItemDTO`) with only the fields needed for cards, while the show endpoint (`GET /api/posts/{postUuid}`) returns the full `PostWithPlatformAndInsightsDTO` with all insights for the detail panel
-- **Enriched DTOs:** the backend returns pre-aggregated insights and script info in the list endpoints, avoiding N+1 queries on the frontend
+- **List/detail data split:** list endpoints (`GET /api/posts`, `GET /api/post-groups`) return flat summary DTOs with only the fields needed for cards, while show endpoints (`GET /api/posts/{postUuid}`, `GET /api/post-groups/{postGroupUuid}`) return full detail DTOs with all insights for the detail panels

@@ -3,7 +3,6 @@ import { PlusIcon } from "@heroicons/react/24/outline"
 import { Button } from "~/components/ui/Button"
 import Pill from "~/components/ui/Pill"
 import Shimmer from "~/components/ui/Shimmer"
-import { PostGroupWithInsightsAndScriptDTO } from "~/dtos/postGroups/PostGroupWithInsightsAndScriptDTO"
 import { useListPaginatedPostGroups } from "~/hooks/api/postGroups/useListPaginatedPostGroups"
 import { useListPaginatedPosts } from "~/hooks/api/posts/useListPaginatedPosts"
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
@@ -100,8 +99,7 @@ export default function ContentsListPanel({ projectUuid }: ContentsListPanelProp
         return (
             <div ref={scrollContainerRef} className="flex flex-row flex-wrap gap-3 p-4 overflow-y-auto scrollbar-none flex-1 min-h-0">
                 {items.map((item) => {
-                    const isGroup = item instanceof PostGroupWithInsightsAndScriptDTO
-                    const uuid = isGroup ? item.postGroup.uuid : item.uuid
+                    const uuid = item.uuid
 
                     return (
                         <ContentCard

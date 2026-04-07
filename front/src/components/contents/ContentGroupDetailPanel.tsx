@@ -1,9 +1,11 @@
 import { SidePanel } from "~/components/ui/SidePanel"
-import { useListPaginatedPostGroups } from "~/hooks/api/postGroups/useListPaginatedPostGroups"
+import Shimmer from "~/components/ui/Shimmer"
+import { useShowPostGroup } from "~/hooks/api/postGroups/useShowPostGroup"
 import { useUpdatePostGroup } from "~/hooks/api/postGroups/useUpdatePostGroup"
 import { useDeletePostGroup } from "~/hooks/api/postGroups/useDeletePostGroup"
 import { useContentsStore } from "~/stores/contents/contentsStore"
 import { useContentsRightPanelStore, ContentsRightPanel } from "~/stores/contents/contentsRightPanelStore"
+import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 import { postInsightTypeToFrenchTranslation, formatPostInsightValue } from "~/models/enums/PostInsightType"
 import { DocumentTextIcon, TrashIcon, PlusIcon } from "@heroicons/react/24/outline"
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog"
@@ -14,20 +16,18 @@ import PostTile from "./PostTile"
 
 interface ContentGroupDetailPanelProps {
     groupUuid: string | null
-    projectUuid: string
 }
 
-export default function ContentGroupDetailPanel({ groupUuid, projectUuid }: ContentGroupDetailPanelProps) {
+export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetailPanelProps) {
     const closePanel = useContentsStore((s) => s.closePanel)
     const isOpen = useContentsRightPanelStore((s) => s.activePanel === ContentsRightPanel.GroupDetail)
     const closeRightPanel = useContentsRightPanelStore((s) => s.closePanel)
-    const { postGroups } = useListPaginatedPostGroups({ projectUuid })
+    const focusedProjectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
+    const { postGroup: group, isLoading } = useShowPostGroup(groupUuid ?? undefined)
     const { deletePostGroup, isPending: isDeleting } = useDeletePostGroup()
     const { updatePostGroup, isPending: isUpdating } = useUpdatePostGroup()
     const [isPostPickerOpen, setIsPostPickerOpen] = useState(false)
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
-
-    const group = postGroups.find((g) => g.postGroup.uuid === groupUuid)
 
     const handleClose = () => {
         closeRightPanel()
@@ -79,6 +79,17 @@ export default function ContentGroupDetailPanel({ groupUuid, projectUuid }: Cont
                     </button>
                 }
             >
+                {isLoading && (
+                    <div className="p-4 flex flex-col gap-4">
+                        <Shimmer width="w-full" height="h-16" />
+                        <Shimmer width="w-full" height="h-10" />
+                        <div className="flex flex-col gap-1">
+                            <Shimmer width="w-full" height="h-10" />
+                            <Shimmer width="w-full" height="h-10" />
+                            <Shimmer width="w-full" height="h-10" />
+                        </div>
+                    </div>
+                )}
                 {group && (
                     <div className="p-4 flex flex-col gap-4">
 
@@ -169,7 +180,7 @@ export default function ContentGroupDetailPanel({ groupUuid, projectUuid }: Cont
                 isOpen={isPostPickerOpen}
                 onClose={() => setIsPostPickerOpen(false)}
                 onConfirm={handleAddPosts}
-                projectUuid={projectUuid}
+                projectUuid={focusedProjectUuid!}
                 excludeUuids={existingPostUuids}
                 isConfirming={isUpdating}
             />

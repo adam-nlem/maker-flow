@@ -11,14 +11,14 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class PostGroupWithInsightsAndScriptResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
-        #[Groups(['api_post_groups_list'])]
+        #[Groups(['api_post_groups_list', 'api_post_groups_show'])]
         private readonly PostGroup $postGroup,
         /** @var AggregatedInsightDTO[] */
-        #[Groups(['api_post_groups_list'])]
+        #[Groups(['api_post_groups_list', 'api_post_groups_show'])]
         private readonly array $aggregatedInsights,
-        #[Groups(['api_post_groups_list'])]
+        #[Groups(['api_post_groups_list', 'api_post_groups_show'])]
         private readonly ?Script $script,
-        #[Groups(['api_post_groups_list'])]
+        #[Groups(['api_post_groups_list', 'api_post_groups_show'])]
         private readonly ?float $engagementByViews,
     ) {}
 

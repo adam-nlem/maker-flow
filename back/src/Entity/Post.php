@@ -24,7 +24,7 @@ class Post
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_rank', 'api_posts_search'])]
+    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_show', 'api_post_groups_rank', 'api_posts_search'])]
     private ?string $uuid = null;
 
     #[ORM\Column]
@@ -36,27 +36,27 @@ class Post
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_rank', 'api_posts_search'])]
+    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_show', 'api_post_groups_rank', 'api_posts_search'])]
     private ?string $externalId = null;
 
     #[ORM\Column(length: 255, enumType: MediaType::class)]
-    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_rank', 'api_posts_search'])]
+    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_show', 'api_post_groups_rank', 'api_posts_search'])]
     private ?MediaType $mediaType = null;
 
     #[ORM\Column]
-    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_rank'])]
+    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_show', 'api_post_groups_rank'])]
     private ?int $duration = null;
 
     #[ORM\Column]
-    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_rank', 'api_posts_search'])]
+    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_show', 'api_post_groups_rank', 'api_posts_search'])]
     private ?\DateTimeImmutable $publishedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_rank', 'api_posts_search'])]
+    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_show', 'api_post_groups_rank', 'api_posts_search'])]
     private ?string $caption = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_rank'])]
+    #[Groups(['api_posts_list', 'api_posts_show', 'api_posts_rank', 'api_post_insights_detail', 'api_post_groups_list', 'api_post_groups_show', 'api_post_groups_rank'])]
     private ?string $externalUrl = null;
 
     #[ORM\ManyToOne]

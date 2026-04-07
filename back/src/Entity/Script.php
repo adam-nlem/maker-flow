@@ -30,6 +30,7 @@ class Script
         'api_scripts_update',
         'api_scripts_show',
         'api_post_groups_list',
+        'api_post_groups_show',
     ])]
     private ?string $uuid = null;
 
@@ -41,6 +42,7 @@ class Script
         'api_scripts_update',
         'api_scripts_show',
         'api_post_groups_list',
+        'api_post_groups_show',
     ])]
     private ?string $title = null;
 
@@ -62,6 +64,7 @@ class Script
         'api_scripts_update',
         'api_scripts_show',
         'api_post_groups_list',
+        'api_post_groups_show',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
