@@ -12,7 +12,7 @@ interface UseListPaginatedPostsProps {
     limit?: number;
 }
 
-export function useListPaginatedPosts({ projectUuid, platform, searchTerm, limit = 10 }: UseListPaginatedPostsProps) {
+export function useListPaginatedPosts({ projectUuid, platform, searchTerm, limit = 20 }: UseListPaginatedPostsProps) {
     const [page, setPage] = useState(1);
     const [additionalPosts, setAdditionalPosts] = useState<PostWithPlatformAndInsightsDTO[]>([]);
     const [hasMore, setHasMore] = useState(true);

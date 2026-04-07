@@ -9,7 +9,7 @@ interface UseListPostGroupsProps {
     limit?: number;
 }
 
-export function useListPaginatedPostGroups({ projectUuid, limit = 12 }: UseListPostGroupsProps) {
+export function useListPaginatedPostGroups({ projectUuid, limit = 20 }: UseListPostGroupsProps) {
     const [page, setPage] = useState(1);
     const [additionalGroups, setAdditionalGroups] = useState<PostGroupWithInsightsAndScriptDTO[]>([]);
     const [hasMore, setHasMore] = useState(true);

@@ -22,7 +22,7 @@ export default function ContentCard({ data, isSelected, onClick }: ContentCardPr
     return (
         <div
             onClick={onClick}
-            className={`flex flex-col gap-2 border rounded-lg p-4 cursor-pointer transition-colors hover:border-gray w-100 max-h-fit ${isSelected ? "border-primary" : "border-light-gray"}`}
+            className={`flex flex-col gap-2 border rounded-lg p-2 cursor-pointer transition-colors hover:border-gray w-100 max-h-fit ${isSelected ? "border-primary" : "border-light-gray"}`}
         >
             {/* Header */}
             {isGroup ? (
