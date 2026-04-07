@@ -26,11 +26,8 @@ class InstagramPostDTO
     public static function fromArray(array $data): self
     {
 
-        $postInsightDTOs = [];
+        $postInsightDTOs = InstagramPostInsightDTO::fromInsightsData($data['insights']['data']);
 
-        foreach ($data['insights']['data'] as $postInsightData) {
-            $postInsightDTOs[] = InstagramPostInsightDTO::fromArray($postInsightData);
-        }
         return new self(
             externalId: $data['id'],
             mediaType: self::MEDIA_TYPE_MAPPING[$data['media_type']],

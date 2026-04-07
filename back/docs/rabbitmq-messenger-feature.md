@@ -173,10 +173,11 @@ class FetchIntegrationInsightsCommand extends Command
 
 ```bash
 # Start consuming messages (in back container)
-dce back php bin/console messenger:consume async -vv
+# Use --no-debug to disable Doctrine query backtrace logging and prevent memory exhaustion
+dce back php bin/console messenger:consume async --no-debug -vv
 
 # Start worker with limits (recommended for production)
-dce back php bin/console messenger:consume async --time-limit=3600 --memory-limit=256M -vv
+dce back php bin/console messenger:consume async --no-debug --time-limit=3600 --memory-limit=192M -vv
 
 # Stop workers gracefully
 dce back php bin/console messenger:stop-workers
@@ -228,15 +229,16 @@ Access the RabbitMQ management interface at: `http://localhost:15672`
 ### Performance
 
 1. **Time limit**: Worker restarts every hour (`--time-limit=3600`)
-2. **Memory limit**: Worker restarts at 256MB (`--memory-limit=256M`)
-3. **Multiple workers**: Scale by running multiple worker containers
+2. **Memory limit**: Worker restarts at 192MB (`--memory-limit=192M`), below the 256MB container limit to provide headroom
+3. **No debug mode**: Always use `--no-debug` to disable Doctrine's backtrace profiling which accumulates memory per query
+4. **Multiple workers**: Scale by running multiple worker containers
 
 ### Scaling Workers
 
 To run multiple worker processes, open multiple terminal sessions and run:
 
 ```bash
-dce back php bin/console messenger:consume async --time-limit=3600 --memory-limit=256M -vv
+dce back php bin/console messenger:consume async --no-debug --time-limit=3600 --memory-limit=192M -vv
 ```
 
 For production, consider using a process manager like Supervisor inside the container.

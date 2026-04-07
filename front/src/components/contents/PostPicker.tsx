@@ -39,9 +39,7 @@ export default function PostPicker({ projectUuid, selectedUuids, onSelectionChan
 
     const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore, {
-        root: scrollContainerRef,
-    })
+    useInfiniteScroll(scrollContainerRef, hasMore, isLoadingMore, listMore)
 
     const handleToggle = (uuid: string) => {
         if (selectedUuids.includes(uuid)) {
@@ -51,7 +49,7 @@ export default function PostPicker({ projectUuid, selectedUuids, onSelectionChan
         }
     }
 
-    const items = posts.filter((p) => !excludeUuids.includes(p.post.uuid))
+    const items = posts.filter((p) => !excludeUuids.includes(p.uuid))
 
     return (
         <div className="flex flex-col gap-3 flex-1 min-h-0">
@@ -83,13 +81,13 @@ export default function PostPicker({ projectUuid, selectedUuids, onSelectionChan
                     <>
                         {items.map((item) => (
                             <PostTile
-                                key={item.post.uuid}
-                                post={item.post}
-                                isSelected={selectedUuids.includes(item.post.uuid)}
-                                onSelect={() => handleToggle(item.post.uuid)}
+                                key={item.uuid}
+                                post={item}
+                                isSelected={selectedUuids.includes(item.uuid)}
+                                onSelect={() => handleToggle(item.uuid)}
                             />
                         ))}
-                        <div ref={sentinelRef} className="h-1" />
+
                         {isLoadingMore && <Shimmer width="w-full" height="h-10" radius="rounded-md" />}
                     </>
                 )}

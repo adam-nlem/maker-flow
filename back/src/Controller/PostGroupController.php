@@ -42,12 +42,31 @@ final class PostGroupController extends AbstractController
             throw new ProjectNotFoundException();
         }
 
-        $result = $this->service->getPostGroupsWithInsightsAndScript($user, $project, $queryParamDto->getPage(), $queryParamDto->getLimit());
+        $result = $this->service->getPostGroupListItems($user, $project, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(
             data: $result,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_post_groups_list']]
+        );
+    }
+
+    #[Route('/{postGroupUuid}', name: 'api_post_groups_show', methods: ['GET'])]
+    public function show(string $postGroupUuid, PostGroupRepository $postGroupRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $postGroup = $postGroupRepository->getByUuidAndUser($postGroupUuid, $user);
+
+        if ($postGroup === null) {
+            throw new PostGroupNotFoundException();
+        }
+
+        return $this->json(
+            data: $this->service->getPostGroupDetail($postGroup),
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_post_groups_show']],
         );
     }
 

@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { PostGroupWithInsightsAndScriptDTO, type PostGroupWithInsightsAndScriptDTOJSON } from "~/dtos/postGroups/PostGroupWithInsightsAndScriptDTO";
+import { PostGroupListItemDTO, type PostGroupListItemDTOJSON } from "~/dtos/postGroups/PostGroupListItemDTO";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { postGroupQueryKeys } from "./postGroupQueryKeys";
 
@@ -9,27 +9,26 @@ interface UseListPostGroupsProps {
     limit?: number;
 }
 
-export function useListPaginatedPostGroups({ projectUuid, limit = 12 }: UseListPostGroupsProps) {
+export function useListPaginatedPostGroups({ projectUuid, limit = 20 }: UseListPostGroupsProps) {
     const [page, setPage] = useState(1);
-    const [additionalGroups, setAdditionalGroups] = useState<PostGroupWithInsightsAndScriptDTO[]>([]);
+    const [additionalGroups, setAdditionalGroups] = useState<PostGroupListItemDTO[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
     const query = useQuery({
         queryKey: postGroupQueryKeys.list(projectUuid ?? ''),
         queryFn: async () => {
-            const res = await httpClient.get<PostGroupWithInsightsAndScriptDTOJSON[]>('/post-groups', {
+            const res = await httpClient.get<PostGroupListItemDTOJSON[]>('/post-groups', {
                 params: {
                     projectUuid: projectUuid!,
                     page: 1,
                     limit,
                 },
             });
-            const groupsData = res.data.map((json) => PostGroupWithInsightsAndScriptDTO.fromJSON(json));
+            const groupsData = res.data.map((json) => PostGroupListItemDTO.fromJSON(json));
             setHasMore(groupsData.length === limit);
             setAdditionalGroups([]);
             setPage(1);
-            console.log(groupsData)
             return groupsData;
         },
         enabled: !!projectUuid,
@@ -46,14 +45,14 @@ export function useListPaginatedPostGroups({ projectUuid, limit = 12 }: UseListP
         const nextPage = page + 1;
 
         try {
-            const res = await httpClient.get<PostGroupWithInsightsAndScriptDTOJSON[]>('/post-groups', {
+            const res = await httpClient.get<PostGroupListItemDTOJSON[]>('/post-groups', {
                 params: {
                     projectUuid: projectUuid!,
                     page: nextPage,
                     limit,
                 },
             });
-            const groupsData = res.data.map((json) => PostGroupWithInsightsAndScriptDTO.fromJSON(json));
+            const groupsData = res.data.map((json) => PostGroupListItemDTO.fromJSON(json));
             setAdditionalGroups(prev => [...prev, ...groupsData]);
             setHasMore(groupsData.length === limit);
             setPage(nextPage);

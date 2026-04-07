@@ -10,6 +10,7 @@ use App\Entity\User;
 use App\DTO\External\Instagram\InstagramPostDTO;
 use App\DTO\External\Youtube\YoutubePostDTO;
 use App\DTO\Response\Post\PostWithAggregatedInsightsResponseDTO;
+use App\DTO\Response\Post\PostListItemResponseDTO;
 use App\DTO\Response\Post\PostWithPlatformAndInsightsResponseDTO;
 use App\Entity\Enum\PostInsightType;
 use App\Entity\Post;
@@ -141,9 +142,9 @@ class PostService
     }
 
     /**
-     * @return PostWithPlatformAndInsightsResponseDTO[]
+     * @return PostListItemResponseDTO[]
      */
-    public function getPostsWithAggregatedInsightsByProjectAndSearchTerm(
+    public function getPostListItems(
         User $user,
         Project $project,
         ?Platform $platform,
@@ -168,15 +169,38 @@ class PostService
         return array_map(function (Post $p) use ($insightsByPostId) {
             $insights = $insightsByPostId[$p->getId()] ?? [];
 
-            return new PostWithPlatformAndInsightsResponseDTO(
-                post: $p,
+            return new PostListItemResponseDTO(
+                uuid: $p->getUuid(),
+                caption: $p->getCaption(),
+                publishedAt: $p->getPublishedAt(),
                 platform: $p->getIntegration()->getPlatform()->value,
-                aggregatedInsights: $insights,
-                postGroupUuid: $p->getPostGroup()?->getUuid(),
-                postGroupTitle: $p->getPostGroup()?->getTitle(),
+                views: InsightHelper::findAggregatedValue($insights, PostInsightType::Views),
+                totalInteractions: InsightHelper::findAggregatedValue($insights, PostInsightType::TotalInteractions),
                 engagementByViews: InsightHelper::calculateEngagementByViews($insights),
             );
         }, $posts);
+    }
+
+    public function getPostDetail(Post $post): PostWithPlatformAndInsightsResponseDTO
+    {
+        $insightRows = $this->insightRepository->getAggregatedLatestByPostIds([$post->getId()]);
+
+        $insights = array_map(
+            fn(array $row) => new AggregatedInsightDTO(
+                $row['type'] instanceof PostInsightType ? $row['type']->value : $row['type'],
+                (float) $row['value'],
+            ),
+            $insightRows,
+        );
+
+        return new PostWithPlatformAndInsightsResponseDTO(
+            post: $post,
+            platform: $post->getIntegration()->getPlatform()->value,
+            aggregatedInsights: $insights,
+            postGroupUuid: $post->getPostGroup()?->getUuid(),
+            postGroupTitle: $post->getPostGroup()?->getTitle(),
+            engagementByViews: InsightHelper::calculateEngagementByViews($insights),
+        );
     }
 
     private function downloadThumbnailIfMissing(Post $post, ?string $thumbnailUrl): void

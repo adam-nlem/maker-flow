@@ -8,7 +8,6 @@ class InstagramPostInsightDTO
 {
     private const METRIC_MAPPING = [
         'reach' => PostInsightType::Reach,
-        'total_interactions' => PostInsightType::TotalInteractions,
         'saved' => PostInsightType::Saved,
         'views' => PostInsightType::Views,
         'likes' => PostInsightType::Likes,
@@ -16,13 +15,28 @@ class InstagramPostInsightDTO
         'shares' => PostInsightType::Shares,
         'ig_reels_avg_watch_time' => PostInsightType::AverageWatchTime,
         'ig_reels_video_view_total_time' => PostInsightType::TotalWatchTime,
-
     ];
 
     public function __construct(
         private readonly ?PostInsightType $type,
         private readonly float $value,
     ) {}
+
+    /**
+     * @return InstagramPostInsightDTO[]
+     */
+    public static function fromInsightsData(array $insightsData): array
+    {
+        $dtos = [];
+
+        foreach ($insightsData as $insightData) {
+            $dtos[] = self::fromArray($insightData);
+        }
+
+        $dtos[] = self::buildTotalInteractions($dtos);
+
+        return $dtos;
+    }
 
     public static function fromArray(array $data): self
     {
@@ -44,6 +58,30 @@ class InstagramPostInsightDTO
     public function getValue(): float
     {
         return $this->value;
+    }
+
+    /**
+     * @param InstagramPostInsightDTO[] $postInsightDTOs
+     */
+    public static function buildTotalInteractions(array $postInsightDTOs): self
+    {
+        $values = [];
+
+        foreach ($postInsightDTOs as $dto) {
+            if ($dto->getType() !== null) {
+                $values[$dto->getType()->value] = $dto->getValue();
+            }
+        }
+
+        $totalInteractions = ($values[PostInsightType::Likes->value] ?? 0.0)
+            + ($values[PostInsightType::Comments->value] ?? 0.0)
+            + ($values[PostInsightType::Shares->value] ?? 0.0)
+            + ($values[PostInsightType::Saved->value] ?? 0.0);
+
+        return new self(
+            type: PostInsightType::TotalInteractions,
+            value: $totalInteractions,
+        );
     }
 
     public static function getMetricNames(): array

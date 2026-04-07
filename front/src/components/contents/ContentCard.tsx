@@ -1,5 +1,5 @@
-import { PostGroupWithInsightsAndScriptDTO } from "~/dtos/postGroups/PostGroupWithInsightsAndScriptDTO"
-import type { PostWithPlatformAndInsightsDTO } from "~/dtos/posts/PostWithPlatformAndInsightsDTO"
+import { PostGroupListItemDTO } from "~/dtos/postGroups/PostGroupListItemDTO"
+import { PostListItemDTO } from "~/dtos/posts/PostListItemDTO"
 import { PostInsightType, postInsightTypeToFrenchTranslation } from "~/models/enums/PostInsightType"
 import { platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform"
 import { formatCompactNumber } from "~/utils/numberFormatters"
@@ -8,33 +8,30 @@ import { DocumentTextIcon } from "@heroicons/react/24/outline"
 import ContentMetricBox from "./ContentMetricBox"
 
 interface ContentCardProps {
-    data: PostGroupWithInsightsAndScriptDTO | PostWithPlatformAndInsightsDTO
+    data: PostGroupListItemDTO | PostListItemDTO
     isSelected: boolean
     onClick: () => void
 }
 
 export default function ContentCard({ data, isSelected, onClick }: ContentCardProps) {
-    const isGroup = data instanceof PostGroupWithInsightsAndScriptDTO
-
-    const views = data.aggregatedInsights.find((i) => i.type === PostInsightType.Views)?.value ?? null
-    const totalInteractions = data.aggregatedInsights.find((i) => i.type === PostInsightType.TotalInteractions)?.value ?? null
+    const isGroup = data instanceof PostGroupListItemDTO
 
     return (
         <div
             onClick={onClick}
-            className={`flex flex-col gap-2 border rounded-lg p-4 cursor-pointer transition-colors hover:border-gray w-100 max-h-fit ${isSelected ? "border-primary" : "border-light-gray"}`}
+            className={`flex flex-col gap-2 border rounded-lg p-2 cursor-pointer transition-colors hover:border-gray w-100 max-h-fit ${isSelected ? "border-primary" : "border-light-gray"}`}
         >
             {/* Header */}
             {isGroup ? (
                 <>
                     <div className="flex flex-row items-center justify-between gap-2">
-                        <h3 className="text-heading-sm truncate">{data.postGroup.title}</h3>
+                        <h3 className="text-heading-sm truncate">{data.title}</h3>
                         <span className="text-body-xs text-gray whitespace-nowrap">
-                            {formatToFrenchDateShort(data.postGroup.createdAt)}
+                            {formatToFrenchDateShort(data.createdAt)}
                         </span>
                     </div>
                     <span className="text-body-xs text-gray">
-                        {data.postGroup.posts.length} post{data.postGroup.posts.length > 1 ? "s" : ""}
+                        {data.postCount} post{data.postCount > 1 ? "s" : ""}
                     </span>
                 </>
             ) : (
@@ -47,16 +44,16 @@ export default function ContentCard({ data, isSelected, onClick }: ContentCardPr
 
                     <div className="flex flex-col gap-0.5 flex-1 min-w-0">
                         <h3 className="text-heading-sm truncate">
-                            {data.post.caption
-                                ? data.post.caption.length > 80
-                                    ? data.post.caption.substring(0, 80) + "..."
-                                    : data.post.caption
+                            {data.caption
+                                ? data.caption.length > 80
+                                    ? data.caption.substring(0, 80) + "..."
+                                    : data.caption
                                 : "Sans description"}
                         </h3>
 
                     </div>
                     <span className="text-body-xs text-gray whitespace-nowrap">
-                        {formatToFrenchDateShort(data.post.publishedAt)}
+                        {formatToFrenchDateShort(data.publishedAt)}
                     </span>
                 </div>
             )}
@@ -65,7 +62,7 @@ export default function ContentCard({ data, isSelected, onClick }: ContentCardPr
             <div className="flex flex-row gap-2">
                 <ContentMetricBox
                     label={postInsightTypeToFrenchTranslation[PostInsightType.Views]}
-                    value={views !== null ? formatCompactNumber(views) : "-"}
+                    value={data.views !== null ? formatCompactNumber(data.views) : "-"}
                 />
                 <ContentMetricBox
                     label="Engagement"
@@ -73,17 +70,17 @@ export default function ContentCard({ data, isSelected, onClick }: ContentCardPr
                 />
                 <ContentMetricBox
                     label={postInsightTypeToFrenchTranslation[PostInsightType.TotalInteractions]}
-                    value={totalInteractions !== null ? formatCompactNumber(totalInteractions) : "-"}
+                    value={data.totalInteractions !== null ? formatCompactNumber(data.totalInteractions) : "-"}
                 />
             </div>
 
             {/* Script badge - group only */}
             {isGroup && (
                 <div className="border-t border-light-gray pt-2">
-                    {data.script ? (
+                    {data.scriptTitle ? (
                         <div className="flex flex-row items-center gap-1.5">
                             <DocumentTextIcon className="size-3.5 text-primary" strokeWidth={2} />
-                            <span className="text-body-xs text-primary truncate">{data.script.title}</span>
+                            <span className="text-body-xs text-primary truncate">{data.scriptTitle}</span>
                         </div>
                     ) : (
                         <span className="text-body-xs text-gray">Aucun script lié</span>

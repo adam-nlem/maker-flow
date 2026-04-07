@@ -2,10 +2,15 @@ import { useShowPostThumbnail } from "~/hooks/api/posts/useShowPostThumbnail"
 import { formatToFrenchDateShort } from "~/utils/dateFormatters"
 import { TrashIcon } from "@heroicons/react/24/outline"
 import Shimmer from "~/components/ui/Shimmer"
-import type { Post } from "~/models/Post"
+
+interface PostTilePost {
+    uuid: string
+    caption: string | null
+    publishedAt: Date
+}
 
 interface PostTileProps {
-    post: Post
+    post: PostTilePost
     onRemove?: () => void
     isRemoving?: boolean
     isSelected?: boolean

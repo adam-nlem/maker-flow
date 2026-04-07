@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { SettingsSection, settingsSectionToFrenchTranslation } from "~/models/enums/SettingsSection";
@@ -9,7 +9,8 @@ import ProjectSettingsCard from "./project/ProjectSettingsCard";
 export default function ProjectsSettings() {
     const [showCreate, setShowCreate] = useState(false);
     const { projects, isLoading, hasMore, isLoadingMore, listMore } = useListPaginatedProjects();
-    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    useInfiniteScroll(scrollContainerRef, hasMore, isLoadingMore, listMore);
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
@@ -18,7 +19,7 @@ export default function ProjectsSettings() {
                 <p className="text-body-sm text-gray">Gérez vos projets et leurs paramètres.</p>
             </div>
 
-            <div className="flex-1 overflow-y-auto px-4 md:px-6 py-4 md:py-5 flex flex-col gap-4">
+            <div ref={scrollContainerRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-4 md:py-5 flex flex-col gap-4">
                 {isLoading ? (
                     <>
                         <Shimmer width="w-full" height="h-28" radius="rounded-xl" />
@@ -29,7 +30,7 @@ export default function ProjectsSettings() {
                         {projects.map(project => (
                             <ProjectSettingsCard key={project.uuid} project={project} />
                         ))}
-                        <div ref={sentinelRef} className="h-1" />
+
                     </>
                 )}
             </div>

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Pill from "~/components/ui/Pill"
 import Shimmer from "~/components/ui/Shimmer"
 import ScriptTile from "~/components/scripts/ScriptTile"
@@ -25,7 +25,8 @@ export default function HomeScriptsList({ projectUuid }: HomeScriptsListProps) {
         limit: 10,
     })
 
-    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore, {
+    const scrollContainerRef = useRef<HTMLDivElement>(null)
+    useInfiniteScroll(scrollContainerRef, hasMore, isLoadingMore, listMore, {
         direction: "horizontal",
     })
 
@@ -60,7 +61,7 @@ export default function HomeScriptsList({ projectUuid }: HomeScriptsListProps) {
                 scripts.length === 0 ? (
                     <p className="text-body-sm text-gray">Aucun script trouvé pour ce statut.</p>
                 ) : (
-                    <div className="flex flex-row flex-wrap gap-2 overflow-x-auto scrollbar-none flex-1 min-h-0">
+                    <div ref={scrollContainerRef} className="flex flex-row flex-wrap gap-2 overflow-x-auto scrollbar-none flex-1 min-h-0">
                         {scripts.map((script) => (
                             <ScriptTile
                                 key={script.uuid}
@@ -69,7 +70,6 @@ export default function HomeScriptsList({ projectUuid }: HomeScriptsListProps) {
                                 onClick={() => setSelectedScript(script)}
                             />
                         ))}
-                        <div ref={sentinelRef} className="w-1 shrink-0" />
                     </div>
                 )
             }

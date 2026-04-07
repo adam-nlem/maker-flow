@@ -42,7 +42,7 @@ final class PostController extends AbstractController
             throw new ProjectNotFoundException();
         }
 
-        $posts = $this->postService->getPostsWithAggregatedInsightsByProjectAndSearchTerm(
+        $posts = $this->postService->getPostListItems(
             user: $user,
             project: $project,
             platform: $queryParamDto->getPlatform(),
@@ -55,6 +55,25 @@ final class PostController extends AbstractController
             data: $posts,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_posts_list']],
+        );
+    }
+
+    #[Route('/{postUuid}', name: 'api_posts_show', methods: ['GET'])]
+    public function show(string $postUuid, PostRepository $postRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $post = $postRepository->getByUuidAndUser($postUuid, $user);
+
+        if ($post === null) {
+            throw new PostNotFoundException();
+        }
+
+        return $this->json(
+            data: $this->postService->getPostDetail($post),
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_posts_show']],
         );
     }
 

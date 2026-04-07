@@ -5,8 +5,8 @@ export function track(event: AnalyticsEvent, properties?: Record<string, unknown
     posthog.capture(event, properties)
 }
 
-export function identifyUser(user: { uuid: string; email: string }): void {
-    posthog.identify(user.uuid, { email: user.email })
+export function identifyUser(user: { uuid: string}): void {
+    posthog.identify(user.uuid)
 }
 
 export function resetUser(): void {

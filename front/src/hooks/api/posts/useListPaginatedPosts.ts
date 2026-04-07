@@ -1,7 +1,7 @@
 import { useState, useCallback, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
-import { PostWithPlatformAndInsightsDTO, type PostWithPlatformAndInsightsDTOJSON } from "~/dtos/posts/PostWithPlatformAndInsightsDTO";
+import { PostListItemDTO, type PostListItemDTOJSON } from "~/dtos/posts/PostListItemDTO";
 import { postQueryKeys } from "./postQueryKeys";
 import type { Platform } from "~/models/enums/Platform";
 
@@ -12,9 +12,9 @@ interface UseListPaginatedPostsProps {
     limit?: number;
 }
 
-export function useListPaginatedPosts({ projectUuid, platform, searchTerm, limit = 10 }: UseListPaginatedPostsProps) {
+export function useListPaginatedPosts({ projectUuid, platform, searchTerm, limit = 20 }: UseListPaginatedPostsProps) {
     const [page, setPage] = useState(1);
-    const [additionalPosts, setAdditionalPosts] = useState<PostWithPlatformAndInsightsDTO[]>([]);
+    const [additionalPosts, setAdditionalPosts] = useState<PostListItemDTO[]>([]);
     const [hasMore, setHasMore] = useState(true);
     const [isLoadingMore, setIsLoadingMore] = useState(false);
 
@@ -29,8 +29,8 @@ export function useListPaginatedPosts({ projectUuid, platform, searchTerm, limit
             };
             if (platform) params.platform = platform;
 
-            const res = await httpClient.get<PostWithPlatformAndInsightsDTOJSON[]>(`/posts`, { params });
-            const postsData = res.data.map((json) => PostWithPlatformAndInsightsDTO.fromJSON(json));
+            const res = await httpClient.get<PostListItemDTOJSON[]>(`/posts`, { params });
+            const postsData = res.data.map((json) => PostListItemDTO.fromJSON(json));
             setHasMore(postsData.length === limit);
             setAdditionalPosts([]);
             setPage(1);
@@ -58,8 +58,8 @@ export function useListPaginatedPosts({ projectUuid, platform, searchTerm, limit
             };
             if (platform) params.platform = platform;
 
-            const res = await httpClient.get<PostWithPlatformAndInsightsDTOJSON[]>(`/posts`, { params });
-            const postsData = res.data.map((json) => PostWithPlatformAndInsightsDTO.fromJSON(json));
+            const res = await httpClient.get<PostListItemDTOJSON[]>(`/posts`, { params });
+            const postsData = res.data.map((json) => PostListItemDTO.fromJSON(json));
             setAdditionalPosts(prev => [...prev, ...postsData]);
             setHasMore(postsData.length === limit);
             setPage(nextPage);

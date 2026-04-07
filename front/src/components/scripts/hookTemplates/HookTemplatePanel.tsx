@@ -34,7 +34,8 @@ export default function HookTemplatePanel() {
     }, [searchInput]);
 
     const { hookTemplates, hasMore, isLoadingMore, listMore } = useListPaginatedHookTemplates({ searchTerm: debouncedSearchTerm || undefined });
-    const sentinelRef = useInfiniteScroll(hasMore, isLoadingMore, listMore);
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    useInfiniteScroll(scrollContainerRef, hasMore, isLoadingMore, listMore);
 
     const filteredTemplates = hookTemplates.filter((template) => {
         switch (activeCategory) {
@@ -54,6 +55,7 @@ export default function HookTemplatePanel() {
                 title="Hooks"
                 isOpen={isOpen}
                 onClose={closePanel}
+                bodyRef={scrollContainerRef}
                 headerActions={
                     <button
                         onClick={() => setShowCreateModal(true)}
@@ -102,7 +104,6 @@ export default function HookTemplatePanel() {
                                     onClick={() => setSelectedTemplate(template)}
                                 />
                             ))}
-                            <div ref={sentinelRef} className="h-1" />
                         </>
                     )}
                 </div>

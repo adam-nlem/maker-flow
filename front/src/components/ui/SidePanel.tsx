@@ -1,4 +1,4 @@
-import type { ComponentType, ReactNode, SVGProps } from "react";
+import type { ComponentType, ReactNode, RefObject, SVGProps } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
@@ -14,6 +14,7 @@ interface SidePanelProps {
     headerActions?: ReactNode;
     toolbar?: ReactNode;
     footer?: ReactNode;
+    bodyRef?: RefObject<HTMLDivElement | null>;
     children: ReactNode;
 }
 
@@ -30,6 +31,7 @@ function PanelContent({
     headerActions,
     toolbar,
     footer,
+    bodyRef,
     className,
     children,
 }: {
@@ -40,6 +42,7 @@ function PanelContent({
     headerActions?: ReactNode;
     toolbar?: ReactNode;
     footer?: ReactNode;
+    bodyRef?: RefObject<HTMLDivElement | null>;
     className: string;
     children: ReactNode;
 }) {
@@ -69,7 +72,7 @@ function PanelContent({
             {toolbar}
 
             {/* Scrollable body */}
-            <div className="flex-1 overflow-y-auto scrollbar-none">
+            <div ref={bodyRef} className="flex-1 overflow-y-auto scrollbar-none">
                 {children}
             </div>
 
@@ -93,13 +96,14 @@ export function SidePanel({
     headerActions,
     toolbar,
     footer,
+    bodyRef,
     children,
 }: SidePanelProps) {
     const borderClass = side === "left" ? "border-r" : "border-l";
     const minWidthClass = panelMinWidth[width];
     const isCollapsible = isOpen !== undefined;
 
-    const panelProps = { title, icon, borderClass, onClose, headerActions, toolbar, footer, children };
+    const panelProps = { title, icon, borderClass, onClose, headerActions, toolbar, footer, bodyRef, children };
 
     if (isCollapsible) {
         return (
