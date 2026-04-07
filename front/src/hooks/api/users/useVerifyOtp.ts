@@ -26,7 +26,7 @@ export function useVerifyOtp() {
         },
         onSuccess: (user, data) => {
             queryClient.setQueryData(userQueryKeys.me, user)
-            identifyUser({ uuid: user.uuid, email: user.email })
+            identifyUser({ uuid: user.uuid })
             track(AnalyticsEvent.UserLoggedIn, { method: data.type })
         },
     })
