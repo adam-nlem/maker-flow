@@ -1,4 +1,5 @@
 import { SparklesIcon } from "@heroicons/react/24/outline"
+import { useIsDesktop } from "~/hooks/useIsDesktop"
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import GenerateScriptPreviewPhase from "~/components/onboarding/GenerateScriptPreviewPhase"
 import GenerateScriptGeneratingPhase from "~/components/onboarding/GenerateScriptGeneratingPhase"
@@ -20,6 +21,8 @@ export default function OnboardingGenerateScriptStep() {
         initialScriptUuid,
     })
 
+    const isDesktop = useIsDesktop()
+
     if (!projectUuid) return null
 
     if (phase === GenerateScriptPhase.Preview) {
@@ -28,16 +31,18 @@ export default function OnboardingGenerateScriptStep() {
 
     return (
         <OnboardingStepLayout maxWidth="max-w-5xl">
-            <div className="flex flex-col md:flex-row gap-10 w-full max-w-5xl">
-                <div className="hidden md:flex w-full flex-1 min-h-[75vh] max-h-[75vh] rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden flex-col">
-                    {script ? (
-                        <ScriptEditorPanel key={script.uuid} script={script} projectUuid={projectUuid} isReadOnly />
-                    ) : (
-                        <div className="flex items-center justify-center h-64 text-body-sm text-gray">
-                            Le script apparaîtra ici...
-                        </div>
-                    )}
-                </div>
+            <div className={`flex gap-10 w-full max-w-5xl ${isDesktop ? 'flex-row' : 'flex-col'}`}>
+                {isDesktop && (
+                    <div className="flex w-full flex-1 min-h-[75vh] max-h-[75vh] rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden flex-col">
+                        {script ? (
+                            <ScriptEditorPanel key={script.uuid} script={script} projectUuid={projectUuid} isReadOnly />
+                        ) : (
+                            <div className="flex items-center justify-center h-64 text-body-sm text-gray">
+                                Le script apparaîtra ici...
+                            </div>
+                        )}
+                    </div>
+                )}
 
                 <div className="flex-1 flex flex-col overflow-y-auto max-h-150 scrollbar-none">
                     {phase === GenerateScriptPhase.Generating ? (

@@ -1,5 +1,6 @@
 import HomeInsightsOverview from "~/components/home/HomeInsightsOverview";
 import Shimmer from "~/components/ui/Shimmer";
+import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegrationStore";
@@ -19,6 +20,7 @@ export default function HomePage() {
   const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
   const { isSubscribed } = useIsSubscribed()
   const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid })
+  const isDesktop = useIsDesktop()
 
   return (
     <div className="h-full overflow-y-auto md:overflow-hidden">
@@ -26,8 +28,8 @@ export default function HomePage() {
         <div className="flex flex-col md:flex-row gap-3 md:gap-5 flex-1 min-h-0">
           {isLoading ? (
             <>
-              <div className="hidden md:block md:w-2/3" />
-              <div className="w-full md:w-1/3 flex flex-col gap-3 md:gap-5">
+              {isDesktop && <div className="w-2/3" />}
+              <div className={`${isDesktop ? 'w-1/3' : 'w-full'} flex flex-col gap-3 md:gap-5`}>
                 <div className="flex flex-row flex-wrap gap-2">
                   {[...Array(4)].map((_, i) => (
                     <div key={i} className="flex flex-row gap-3 border border-light-gray rounded-lg p-2 w-fit items-center">

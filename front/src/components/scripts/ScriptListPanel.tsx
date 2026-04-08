@@ -4,6 +4,7 @@ import type { Script } from "~/models/Script";
 import ScriptCard from "./ScriptCard";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
+import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { SidePanel } from "~/components/ui/SidePanel";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
@@ -22,10 +23,9 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     const { createScript, isPending } = useCreateScript();
     const focusedScriptUuid = useFocusScriptStore((state) => state.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
-    const desktopScrollRef = useRef<HTMLDivElement>(null);
-    const mobileScrollRef = useRef<HTMLDivElement>(null);
-    useInfiniteScroll(desktopScrollRef, hasMore, isLoadingMore, listMore);
-    useInfiniteScroll(mobileScrollRef, hasMore, isLoadingMore, listMore);
+    const isDesktop = useIsDesktop();
+    const scrollRef = useRef<HTMLDivElement>(null);
+    useInfiniteScroll(scrollRef, hasMore, isLoadingMore, listMore);
     const { subscription } = useShowCurrentSubscription();
     const { plans } = useListPlans();
     const currentPlanConfig = plans.find((p) => p.plan === subscription?.plan);
@@ -80,25 +80,23 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
         </div>
     );
 
-    return (
-        <>
-            {/* Desktop */}
-            <div className="hidden md:block">
-                <SidePanel title="Scripts" side="left" headerActions={createButton} bodyRef={desktopScrollRef}>
-                    {listContent}
-                </SidePanel>
-            </div>
+    if (isDesktop) {
+        return (
+            <SidePanel title="Scripts" side="left" headerActions={createButton} bodyRef={scrollRef}>
+                {listContent}
+            </SidePanel>
+        );
+    }
 
-            {/* Mobile */}
-            <div className="md:hidden flex flex-col h-full">
-                <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
-                    <h2 className="text-heading-md">Scripts</h2>
-                    {createButton}
-                </div>
-                <div ref={mobileScrollRef} className="flex-1 overflow-y-auto scrollbar-none">
-                    {listContent}
-                </div>
+    return (
+        <div className="flex flex-col h-full">
+            <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
+                <h2 className="text-heading-md">Scripts</h2>
+                {createButton}
             </div>
-        </>
+            <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-none">
+                {listContent}
+            </div>
+        </div>
     );
 }

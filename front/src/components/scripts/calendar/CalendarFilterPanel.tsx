@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
+import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { platformOptions } from "~/models/enums/Platform";
 import { scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon, scriptStatusToBorderClass } from "~/models/enums/ScriptStatus";
 import { colorToBgClass, colorToBorderClass, colorToTextClass } from "~/models/enums/Color";
@@ -15,6 +16,7 @@ interface CalendarFilterPanelProps {
 export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanelProps) {
     const { selectedPlatforms, selectedStatuses, selectedTagUuids, togglePlatform, toggleStatus, toggleTag } = useCalendarStore();
     const { scriptTags } = useListScriptTags({ projectUuid });
+    const isDesktop = useIsDesktop();
     const [isExpanded, setIsExpanded] = useState(false);
 
     const selectedPlatformSet = new Set(selectedPlatforms);
@@ -81,10 +83,9 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
         </>
     );
 
-    return (
-        <div className="shrink-0">
-            {/* Mobile: collapsible filter bar */}
-            <div className="md:hidden">
+    if (!isDesktop) {
+        return (
+            <div className="shrink-0">
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
                     className="flex flex-row items-center gap-2 px-3 py-2 border border-light-gray rounded-xl hover:bg-surface-hover transition-colors cursor-pointer"
@@ -104,11 +105,12 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
                     </div>
                 )}
             </div>
+        );
+    }
 
-            {/* Desktop: horizontal layout */}
-            <div className="hidden md:flex flex-row gap-5 w-full">
-                {filterSections}
-            </div>
+    return (
+        <div className="shrink-0 flex flex-row gap-5 w-full">
+            {filterSections}
         </div>
     );
 }

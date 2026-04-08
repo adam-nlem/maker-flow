@@ -28,8 +28,9 @@ ProtectedLayout (auth guard)
 ## Responsive Behavior
 
 - **Breakpoint**: `md` (768px) — standard Tailwind breakpoint
-- **Desktop** (≥768px): `DesktopSidebar` visible inline, `MobileSidebar` header bar hidden via `md:hidden`
-- **Mobile** (<768px): `DesktopSidebar` hidden via `hidden md:block`, `MobileSidebar` header bar visible with burger icon
+- **Desktop** (≥768px): `DesktopSidebar` visible inline, `MobileSidebar` not rendered
+- **Mobile** (<768px): `DesktopSidebar` not rendered, `MobileSidebar` header bar visible with burger icon
+- **Detection**: Uses `useIsDesktop()` hook for JS-based conditional rendering (see coding-style.md § Responsive Patterns)
 
 ## Mobile Drawer
 
@@ -54,7 +55,7 @@ Pages do **not** import or render the sidebar. The `SidebarLayout` provides it v
 ]}
 ```
 
-Pages only render their own content. The layout handles `flex-1 min-w-0` and mobile top padding (`pt-12 md:pt-0`) for the fixed mobile header.
+Pages only render their own content. The layout handles `flex-1 min-w-0` and mobile top padding (`pt-12`) for the fixed mobile header.
 
 **Important:** Pages must use `h-full` (not `h-screen`) for their root container height. `SidebarLayout` constrains the content area to `h-screen` at the layout level. On mobile, `pt-12` reduces the available space by 48px. Using `h-screen` inside a page would cause a 48px overflow.
 

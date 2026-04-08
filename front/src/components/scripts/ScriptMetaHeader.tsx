@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowLeftIcon, CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useIsDesktop } from "~/hooks/useIsDesktop";
 import type { Script } from "~/models/Script";
 import { type ScriptStatus, scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToBorderClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
@@ -29,6 +30,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
 
     const { updateScript } = useUpdateScript();
     const { isExpanded, toggle } = useScriptEditorStore();
+    const isDesktop = useIsDesktop();
 
     const handleTitleBlur = () => {
         if (isReadOnly) return;
@@ -50,8 +52,8 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
     return (
         <div className="px-6 py-5 border-b border-light-gray flex flex-col gap-4">
             <div className="flex flex-row items-center gap-2">
-                {onBack && (
-                    <button onClick={onBack} className="md:hidden shrink-0 text-gray hover:text-dark transition-colors cursor-pointer">
+                {onBack && !isDesktop && (
+                    <button onClick={onBack} className="shrink-0 text-gray hover:text-dark transition-colors cursor-pointer">
                         <ArrowLeftIcon className="size-5" strokeWidth={2} />
                     </button>
                 )}

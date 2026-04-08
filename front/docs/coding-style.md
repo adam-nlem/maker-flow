@@ -938,6 +938,47 @@ onSuccess: () => {
 
 ---
 
+## Responsive Patterns
+
+### `useIsDesktop` Hook
+
+The `useIsDesktop()` hook (from `~/hooks/useIsDesktop`) uses `window.matchMedia('(min-width: 768px)')` to detect the viewport breakpoint in JavaScript. It returns a boolean and updates reactively on resize.
+
+### When to Use `useIsDesktop` vs CSS Breakpoints
+
+| Scenario | Approach | Example |
+|----------|----------|---------|
+| **Different component trees** for mobile/desktop | `useIsDesktop()` + conditional rendering | Mobile shows a list OR an editor; desktop shows both side-by-side |
+| **Show/hide an entire component** | `useIsDesktop()` + conditional rendering | Calendar only on desktop, back button only on mobile |
+| **Style adjustments** (spacing, font size, grid) | CSS breakpoint classes (`md:p-5`, `md:grid-cols-3`) | Padding, gaps, font sizes, widths |
+
+### Why Not CSS `hidden md:block`?
+
+CSS-based show/hide (`hidden md:block` / `md:hidden`) keeps **both** component trees mounted in the DOM simultaneously. This causes issues when components have:
+- Form validation (`required` fields in a hidden form trigger browser errors)
+- Duplicate element IDs
+- Duplicate state or side effects (e.g., two `useInfiniteScroll` refs)
+
+Using `useIsDesktop()` ensures only one version is mounted at a time.
+
+### Example
+
+```tsx
+import { useIsDesktop } from "~/hooks/useIsDesktop";
+
+export default function MyPageView() {
+    const isDesktop = useIsDesktop();
+
+    if (!isDesktop) {
+        return <MobileLayout />;
+    }
+
+    return <DesktopLayout />;
+}
+```
+
+---
+
 ## Best Practices
 
 1. **Use TypeScript strictly** - avoid `any` when possible
