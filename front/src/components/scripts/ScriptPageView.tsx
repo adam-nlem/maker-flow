@@ -1,5 +1,6 @@
 import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
+import { useIsDesktop } from "~/hooks/useIsDesktop";
 import ScriptListPanel from "./ScriptListPanel";
 import ScriptEditorPanel from "./ScriptEditorPanel";
 import GenerateScriptPanel from "./generation/GenerateScriptPanel";
@@ -13,6 +14,7 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
     const { scripts, hasMore, isLoadingMore, listMore } = useListPaginatedScripts({ projectUuid });
     const focusedScriptUuid = useFocusScriptStore((s) => s.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid);
+    const isDesktop = useIsDesktop();
 
     const focusedScript = scripts.find((s) => s.uuid === focusedScriptUuid) ?? null;
 
@@ -26,12 +28,6 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
         />
     );
 
-    const emptyState = (
-        <div className="flex flex-col items-center justify-center h-full text-gray">
-            <p className="text-body-md">Sélectionnez ou créez un script.</p>
-        </div>
-    );
-
     const rightPanels = focusedScript && (
         <>
             <GenerateScriptPanel
@@ -43,10 +39,9 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
         </>
     );
 
-    return (
-        <>
-            {/* Mobile layout */}
-            <div className="flex flex-col h-full overflow-hidden md:hidden">
+    if (!isDesktop) {
+        return (
+            <div className="flex flex-col h-full overflow-hidden">
                 {focusedScript ? (
                     <ScriptEditorPanel
                         key={focusedScript.uuid}
@@ -59,19 +54,22 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
                 )}
                 {rightPanels}
             </div>
+        );
+    }
 
-            {/* Desktop layout */}
-            <div className="hidden md:flex flex-row h-full overflow-hidden">
-                {listPanel}
-                <div className="flex-1 overflow-hidden">
-                    {focusedScript ? (
-                        <ScriptEditorPanel key={focusedScript.uuid} script={focusedScript} projectUuid={projectUuid} />
-                    ) : (
-                        emptyState
-                    )}
-                </div>
-                {rightPanels}
+    return (
+        <div className="flex flex-row h-full overflow-hidden">
+            {listPanel}
+            <div className="flex-1 overflow-hidden">
+                {focusedScript ? (
+                    <ScriptEditorPanel key={focusedScript.uuid} script={focusedScript} projectUuid={projectUuid} />
+                ) : (
+                    <div className="flex flex-col items-center justify-center h-full text-gray">
+                        <p className="text-body-md">Sélectionnez ou créez un script.</p>
+                    </div>
+                )}
             </div>
-        </>
+            {rightPanels}
+        </div>
     );
 }

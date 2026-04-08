@@ -1,6 +1,6 @@
 import { useState } from "react";
-
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
+import { useIsDesktop } from "~/hooks/useIsDesktop";
 import type { Script } from "~/models/Script";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
 import { useFilteredCalendarScripts } from "~/hooks/useFilteredCalendarScripts";
@@ -25,6 +25,7 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
 
     const { scriptsByDay } = useFilteredCalendarScripts({ projectUuid });
     const { createScript } = useCreateScript();
+    const isDesktop = useIsDesktop();
 
     const handleCreateScript = (date: Date) => {
         createScript({ projectUuid, title: "Nouveau script", publishedAt: date.toLocaleDateString("sv-SE") });
@@ -64,61 +65,61 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
                 </div>
             </div>
 
-            {/* Mobile layout */}
-            <div className="flex flex-col gap-3 flex-1 min-h-0 md:hidden">
-                <MobileCalendarGrid
-                    currentYear={currentYear}
-                    currentMonth={currentMonth}
-                    selectedDay={effectiveSelectedDay}
-                    onDaySelect={setSelectedDay}
-                    scriptsByDay={scriptsByDay}
-                />
-                <MobileDayDetail
-                    day={effectiveSelectedDay}
-                    date={selectedDate}
-                    isToday={isSameDay(selectedDate, today)}
-                    scripts={selectedDayScripts}
-                    onScriptClick={setSelectedScript}
-                    onCreateScript={() => handleCreateScript(selectedDate)}
-                />
-            </div>
-
-            {/* Desktop layout */}
-            <div className="hidden md:flex md:flex-col flex-1 min-h-0">
-                {/* Day headers */}
-                <div className="grid grid-cols-7 border-t border-l border-light-gray">
-                    {DAYS_FR.map((dayName) => (
-                        <div key={dayName} className="text-center text-heading-xs text-gray py-2 border-b border-r border-light-gray">
-                            {dayName}
-                        </div>
-                    ))}
+            {!isDesktop ? (
+                <div className="flex flex-col gap-3 flex-1 min-h-0">
+                    <MobileCalendarGrid
+                        currentYear={currentYear}
+                        currentMonth={currentMonth}
+                        selectedDay={effectiveSelectedDay}
+                        onDaySelect={setSelectedDay}
+                        scriptsByDay={scriptsByDay}
+                    />
+                    <MobileDayDetail
+                        day={effectiveSelectedDay}
+                        date={selectedDate}
+                        isToday={isSameDay(selectedDate, today)}
+                        scripts={selectedDayScripts}
+                        onScriptClick={setSelectedScript}
+                        onCreateScript={() => handleCreateScript(selectedDate)}
+                    />
                 </div>
+            ) : (
+                <div className="flex flex-col flex-1 min-h-0">
+                    {/* Day headers */}
+                    <div className="grid grid-cols-7 border-t border-l border-light-gray">
+                        {DAYS_FR.map((dayName) => (
+                            <div key={dayName} className="text-center text-heading-xs text-gray py-2 border-b border-r border-light-gray">
+                                {dayName}
+                            </div>
+                        ))}
+                    </div>
 
-                {/* Day grid */}
-                <div className="grid grid-cols-7 auto-rows-fr flex-1 min-h-0 border-l border-light-gray">
-                    {days.map((day, index) => {
-                        if (day === null) {
-                            return <div key={`empty-${index}`} className="border-b border-r border-light-gray" />;
-                        }
+                    {/* Day grid */}
+                    <div className="grid grid-cols-7 auto-rows-fr flex-1 min-h-0 border-l border-light-gray">
+                        {days.map((day, index) => {
+                            if (day === null) {
+                                return <div key={`empty-${index}`} className="border-b border-r border-light-gray" />;
+                            }
 
-                        const date = new Date(currentYear, currentMonth, day);
-                        const dateKey = toDateKey(date);
-                        const dayScripts = scriptsByDay.get(dateKey) ?? [];
+                            const date = new Date(currentYear, currentMonth, day);
+                            const dateKey = toDateKey(date);
+                            const dayScripts = scriptsByDay.get(dateKey) ?? [];
 
-                        return (
-                            <ScriptCalendarDayCell
-                                key={day}
-                                droppableId={`day-${day}`}
-                                day={day}
-                                isToday={isSameDay(date, today)}
-                                scripts={dayScripts}
-                                onScriptClick={setSelectedScript}
-                                onCreateScript={() => handleCreateScript(date)}
-                            />
-                        );
-                    })}
+                            return (
+                                <ScriptCalendarDayCell
+                                    key={day}
+                                    droppableId={`day-${day}`}
+                                    day={day}
+                                    isToday={isSameDay(date, today)}
+                                    scripts={dayScripts}
+                                    onScriptClick={setSelectedScript}
+                                    onCreateScript={() => handleCreateScript(date)}
+                                />
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            )}
 
             <ScriptDetailModal
                 script={selectedScript}

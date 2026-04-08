@@ -57,7 +57,7 @@ export default function ScriptBriefForm({
 
     const canSubmit = topic.trim() !== "" && goal !== undefined && openingStyle !== undefined && duration !== undefined
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = (e: React.SubmitEvent) => {
         e.preventDefault()
         if (!canSubmit || !goal || !openingStyle || !duration) return
 

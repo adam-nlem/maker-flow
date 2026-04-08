@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DndContext, DragOverlay, PointerSensor, type DragEndEvent, type DragStartEvent, useSensor, useSensors } from "@dnd-kit/core";
+import { useIsDesktop } from "~/hooks/useIsDesktop";
 import type { Script } from "~/models/Script";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
@@ -39,12 +40,16 @@ export default function HomeScriptsSection({ projectUuid }: HomeScriptsSectionPr
         await updateScript({ scriptUuid: active.id as string, data: { publishedAt: newDate } });
     };
 
+    const isDesktop = useIsDesktop();
+
     return (
         <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <HomeScriptsList projectUuid={projectUuid} />
-            <div className="hidden md:flex md:flex-col flex-1 min-h-0">
-                <ScriptCalendar projectUuid={projectUuid} />
-            </div>
+            {isDesktop && (
+                <div className="flex flex-col flex-1 min-h-0">
+                    <ScriptCalendar projectUuid={projectUuid} />
+                </div>
+            )}
 
             <DragOverlay dropAnimation={null}>
                 {draggedScript && (

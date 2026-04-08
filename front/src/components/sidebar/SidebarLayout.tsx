@@ -1,20 +1,19 @@
 import { Outlet } from "react-router-dom";
+import { useIsDesktop } from "~/hooks/useIsDesktop";
 import DesktopSidebar from "./DesktopSidebar";
 import MobileSidebar from "./MobileSidebar";
 
 export default function SidebarLayout() {
+  const isDesktop = useIsDesktop();
+
   return (
     <>
-      <MobileSidebar />
+      {!isDesktop && <MobileSidebar />}
 
       <div className="flex w-full h-screen">
-        {/* Desktop sidebar: hidden on mobile */}
-        <div className="hidden md:block">
-          <DesktopSidebar />
-        </div>
+        {isDesktop && <DesktopSidebar />}
 
-        {/* Page content: top padding on mobile for the fixed header */}
-        <div className="flex-1 min-w-0 pt-12 md:pt-0 h-full">
+        <div className={`flex-1 min-w-0 h-full ${isDesktop ? '' : 'pt-12'}`}>
           <Outlet />
         </div>
       </div>

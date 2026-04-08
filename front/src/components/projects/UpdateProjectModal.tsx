@@ -30,7 +30,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
 
     if (!project) return null;
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault()
         await updateProject({
             projectUuid: project.uuid,
@@ -46,7 +46,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
     if (!showModal) return null;
 
     return (
-        <ModalOverlay isOpen={showModal} onClose={onClose}>
+        <ModalOverlay isOpen={showModal} onClose={onClose} height="h-fit">
             <div className="flex flex-col gap-3 py-5 px-10 flex-1 min-h-0 overflow-y-auto">
                 <h1 className="text-heading-lg">
                     Modifier le Projet

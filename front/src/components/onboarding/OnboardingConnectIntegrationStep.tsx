@@ -2,6 +2,7 @@ import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import IntegrationLoginCard from "~/components/integrations/IntegrationLoginCard"
 import Shimmer from "~/components/ui/Shimmer"
 import { Button } from "~/components/ui/Button"
+import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { platformOptions } from "~/models/enums/Platform"
 import { IntegrationStatus } from "~/models/enums/IntegrationStatus"
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations"
@@ -42,6 +43,10 @@ export default function OnboardingConnectIntegrationStep() {
                 >
                     Continuer
                 </Button>
+
+                <SimpleTextButton onClick={advanceStep}>
+                    Ignorer
+                </SimpleTextButton>
             </div>
         </OnboardingStepLayout>
     )

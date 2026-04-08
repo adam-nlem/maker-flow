@@ -5,6 +5,7 @@ import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import SubscriptionOverview from "~/components/settings/subscription/SubscriptionOverview"
 import Shimmer from "~/components/ui/Shimmer"
 import { Button } from "~/components/ui/Button"
+import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { subscriptionPlanToFrenchTranslation } from "~/models/enums/SubscriptionPlan"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 
@@ -34,12 +35,9 @@ export default function OnboardingSubscriptionStep() {
                 )}
                 loadingView={<Shimmer height="h-64" width="w-full" />}
             />
-            <p
-                className="text-body-sm text-gray cursor-pointer hover:text-dark transition-colors text-center mt-4"
-                onClick={advanceStep}
-            >
+            <SimpleTextButton onClick={advanceStep}>
                 Ignorer
-            </p>
+            </SimpleTextButton>
         </OnboardingStepLayout>
     )
 }

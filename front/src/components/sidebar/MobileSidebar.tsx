@@ -42,7 +42,7 @@ export default function MobileSidebar() {
   return (
     <>
       {/* Mobile header bar */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 h-12 bg-clear border-b border-light-gray flex items-center px-3 gap-2">
+      <div className="fixed top-0 left-0 right-0 z-40 h-12 bg-clear border-b border-light-gray flex items-center px-3 gap-2">
         <button type="button" onClick={toggle} className="p-1">
           {isOpen
             ? <XMarkIcon className="size-6 text-dark" strokeWidth={2} />
@@ -63,7 +63,7 @@ export default function MobileSidebar() {
         <div
           role="dialog"
           aria-modal="true"
-          className="md:hidden fixed inset-0 z-50"
+          className="fixed inset-0 z-50"
           onClick={() => setIsOpen(false)}
         >
           {/* Backdrop */}

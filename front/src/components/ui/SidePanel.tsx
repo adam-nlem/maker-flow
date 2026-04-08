@@ -1,5 +1,6 @@
 import type { ComponentType, ReactNode, RefObject, SVGProps } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { useIsDesktop } from "~/hooks/useIsDesktop";
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 type PanelWidth = "w-72" | "w-96";
@@ -105,22 +106,26 @@ export function SidePanel({
 
     const panelProps = { title, icon, borderClass, onClose, headerActions, toolbar, footer, bodyRef, children };
 
+    const isDesktop = useIsDesktop();
+
     if (isCollapsible) {
-        return (
-            <>
-                {/* Desktop: sidebar collapse */}
-                <div className={`hidden md:block transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? width : "w-0"}`}>
+        if (isDesktop) {
+            return (
+                <div className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? width : "w-0"}`}>
                     <PanelContent {...panelProps} className={`${width} ${minWidthClass}`} />
                 </div>
+            );
+        }
 
-                {/* Mobile: full-screen overlay */}
-                {isOpen && (
-                    <div className="md:hidden fixed top-12 left-0 right-0 bottom-0 z-40">
-                        <PanelContent {...panelProps} className="w-full" />
-                    </div>
-                )}
-            </>
-        );
+        if (isOpen) {
+            return (
+                <div className="fixed top-12 left-0 right-0 bottom-0 z-40">
+                    <PanelContent {...panelProps} className="w-full" />
+                </div>
+            );
+        }
+
+        return null;
     }
 
     return (

@@ -117,7 +117,7 @@ class InstagramOAuthService
             ->setExpiresAt($expiresAt)
             ->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable())
             ->setStatus(IntegrationStatus::Active)
-            ->setScope(['instagram_business_basic', 'instagram_business_manage_messages', 'instagram_business_manage_comments', 'instagram_business_content_publish']);
+            ->setScope(['instagram_business_basic', 'instagram_business_manage_insights']);
 
         $this->integrationRepository->save($integration);
 
