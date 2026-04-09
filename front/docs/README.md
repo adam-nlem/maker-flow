@@ -28,3 +28,4 @@ Index of all available documentation for the frontend codebase (React, TypeScrip
 | [analytics-feature.md](analytics-feature.md) | PostHog analytics | Analytics service (`track`, `identifyUser`, `resetUser`), typed event catalog (19 events), event placement in mutation hooks, adding new events |
 | [sidebar-layout.md](sidebar-layout.md) | Sidebar layout & mobile burger menu | `SidebarLayout` route wrapper, `DesktopSidebar` / `MobileSidebar` split, `mobileSidebarStore`, responsive breakpoint (`md`), drawer overlay with portal, auto-close on navigation |
 | [privacy-policy-page.md](privacy-policy-page.md) | Privacy policy page | Public route (`/privacy-policy`), Meta/Instagram API compliance, data collection disclosure, user rights |
+| [terms-of-service-page.md](terms-of-service-page.md) | Terms of service page | Public route (`/terms-of-service`), CGU in French, user obligations, liability, link to privacy policy |
