@@ -2,7 +2,7 @@
 
 ## Overview
 
-This document describes the backend OAuth integration system used in MakerFlow for connecting external services (Instagram, etc.). It covers the flow, error handling, and guidelines for adding new integrations.
+This document describes the backend OAuth integration system used in MakerFlow for connecting external services (Instagram, YouTube, TikTok). It covers the flow, error handling, and guidelines for adding new integrations.
 
 ---
 
@@ -303,6 +303,62 @@ class YoutubeChannelDTO
 
 ---
 
+## Platform-Specific Details
+
+### Instagram
+
+- **Auth URL:** `https://www.instagram.com/oauth/authorize`
+- **Token URL:** `https://api.instagram.com/oauth/access_token`
+- **Graph API:** `https://graph.instagram.com`
+- **Scopes:** `instagram_business_basic,instagram_business_manage_insights`
+- **Token flow:** Short-lived token (2h) -> exchange for long-lived token (60 days)
+- **Refresh threshold:** 7 days before expiry
+- **Refresh method:** `GET /refresh_access_token` with `grant_type=ig_refresh_token`
+- **No refresh token** -- uses long-lived access token directly
+
+### YouTube
+
+- **Auth URL:** Google OAuth2 (`https://accounts.google.com/o/oauth2/auth`)
+- **Token URL:** `https://oauth2.googleapis.com/token`
+- **Scopes:** `YT_ANALYTICS_READONLY`, `YOUTUBE_READONLY`
+- **Token flow:** Standard OAuth2 code exchange via Google PHP Client
+- **Access type:** `offline` (to get refresh token)
+- **Refresh threshold:** 20 minutes before expiry
+- **Refresh method:** Google Client `fetchAccessTokenWithRefreshToken()`
+
+### TikTok
+
+- **Auth URL:** `https://www.tiktok.com/v2/auth/authorize/`
+- **Token URL:** `https://open.tiktokapis.com/v2/oauth/token/`
+- **API URL:** `https://open.tiktokapis.com`
+- **Scopes:** `user.info.basic,user.info.profile,user.info.stats,video.list`
+- **Token flow:** Standard OAuth2 code exchange (no PKCE for web). Uses `client_key`/`client_secret` (not `client_id`)
+- **Access token lifetime:** 24 hours
+- **Refresh token lifetime:** 365 days
+- **Refresh threshold:** 1 hour before expiry
+- **Refresh method:** POST to token URL with `grant_type=refresh_token`
+- **Refresh token rotation:** TikTok may return a new refresh token on each refresh -- must always store the updated value
+- **User profile:** `GET /v2/user/info/?fields=open_id,display_name,avatar_url,username` with `Authorization: Bearer` header
+- **Content-Type:** Token exchange uses `application/x-www-form-urlencoded` with `Cache-Control: no-cache` header
+
+#### TikTok External DTOs
+
+```
+DTO/External/Tiktok/
+├── TiktokTokenDTO.php      # accessToken, expiresIn, openId, refreshToken, refreshExpiresIn, scope
+└── TiktokUserProfileDTO.php # openId, displayName, avatarUrl, username
+```
+
+#### TikTok Environment Variables
+
+```env
+TIKTOK_CLIENT_KEY=${TIKTOK_CLIENT_KEY}
+TIKTOK_CLIENT_SECRET=${TIKTOK_CLIENT_SECRET}
+TIKTOK_REDIRECT_URI=${TIKTOK_REDIRECT_URI}
+```
+
+---
+
 ## Security Considerations
 
 ### CSRF Protection (State Parameter)
@@ -494,7 +550,7 @@ When an OAuth token is revoked (user revokes access in platform settings, token 
 
 ### How It Works
 
-1. **Token refresh fails** — The OAuth service (`InstagramOAuthService` or `YoutubeOAuthService`) catches the error during `refreshTokenIfNeeded()`, sets the integration status to `Revoked`, persists, and throws `OAuthTokenRevokedException`
+1. **Token refresh fails** — The OAuth service (`InstagramOAuthService`, `YoutubeOAuthService`, or `TiktokOAuthService`) catches the error during `refreshTokenIfNeeded()`, sets the integration status to `Revoked`, persists, and throws `OAuthTokenRevokedException`
 2. **Handler catches + logs** — The message handler catches the exception, logs it, and the worker continues processing other integrations
 3. **Commands skip revoked** — On next cron run, commands use status-filtered repository queries (`getByPlatformAndStatus`, `getByPlatformsNotSyncedSinceAndStatus`) with `IntegrationStatus::Active`, so revoked integrations are not dispatched
 4. **Frontend shows revoked state** — The list endpoint (`GET /api/integrations`) returns integrations of all statuses. The frontend card shows a "Déconnecté" pill and "Reconnecter" button for revoked integrations

@@ -2,10 +2,11 @@
 
 namespace App\DTO\External\Youtube;
 
+use App\DTO\External\AbstractPostInsightDTO;
 use App\Entity\Enum\InsightValueFormat;
 use App\Entity\Enum\PostInsightType;
 
-class YoutubePostInsightDTO
+class YoutubePostInsightDTO extends AbstractPostInsightDTO
 {
     /**
      * Maps Reporting API CSV column names to insight types.
@@ -47,20 +48,12 @@ class YoutubePostInsightDTO
         'subscribersLost' => PostInsightType::FollowersLost,
     ];
 
-    public function __construct(
-        private readonly ?PostInsightType $type,
-        private readonly float $value,
-    ) {}
-
-    public function getType(): ?PostInsightType
-    {
-        return $this->type;
-    }
-
-    public function getValue(): float
-    {
-        return $this->value;
-    }
+    private const INTERACTION_TYPES = [
+        PostInsightType::Likes,
+        PostInsightType::Dislikes,
+        PostInsightType::Comments,
+        PostInsightType::Shares,
+    ];
 
     public function getValueFormat(): InsightValueFormat
     {
@@ -118,34 +111,15 @@ class YoutubePostInsightDTO
     }
 
     /**
-     * @param YoutubePostInsightDTO[] $postInsightDTOs
-     */
-    public static function buildTotalInteractions(array $postInsightDTOs): self
-    {
-        $values = [];
-
-        foreach ($postInsightDTOs as $dto) {
-            if ($dto->getType() !== null) {
-                $values[$dto->getType()->value] = $dto->getValue();
-            }
-        }
-
-        $totalInteractions = ($values[PostInsightType::Likes->value] ?? 0.0)
-            + ($values[PostInsightType::Dislikes->value] ?? 0.0)
-            + ($values[PostInsightType::Comments->value] ?? 0.0)
-            + ($values[PostInsightType::Shares->value] ?? 0.0);
-
-        return new self(
-            type: PostInsightType::TotalInteractions,
-            value: $totalInteractions,
-        );
-    }
-
-    /**
      * @return string[]
      */
     public static function getAnalyticsMetrics(): array
     {
         return array_keys(self::ANALYTICS_API_METRIC_MAPPING);
+    }
+
+    protected static function getInteractionTypes(): array
+    {
+        return self::INTERACTION_TYPES;
     }
 }

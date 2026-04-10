@@ -2,9 +2,10 @@
 
 namespace App\DTO\External\Instagram;
 
+use App\DTO\External\AbstractPostInsightDTO;
 use App\Entity\Enum\PostInsightType;
 
-class InstagramPostInsightDTO
+class InstagramPostInsightDTO extends AbstractPostInsightDTO
 {
     private const METRIC_MAPPING = [
         'reach' => PostInsightType::Reach,
@@ -17,10 +18,12 @@ class InstagramPostInsightDTO
         'ig_reels_video_view_total_time' => PostInsightType::TotalWatchTime,
     ];
 
-    public function __construct(
-        private readonly ?PostInsightType $type,
-        private readonly float $value,
-    ) {}
+    private const INTERACTION_TYPES = [
+        PostInsightType::Likes,
+        PostInsightType::Comments,
+        PostInsightType::Shares,
+        PostInsightType::Saved,
+    ];
 
     /**
      * @return InstagramPostInsightDTO[]
@@ -50,42 +53,13 @@ class InstagramPostInsightDTO
         );
     }
 
-    public function getType(): ?PostInsightType
-    {
-        return $this->type;
-    }
-
-    public function getValue(): float
-    {
-        return $this->value;
-    }
-
-    /**
-     * @param InstagramPostInsightDTO[] $postInsightDTOs
-     */
-    public static function buildTotalInteractions(array $postInsightDTOs): self
-    {
-        $values = [];
-
-        foreach ($postInsightDTOs as $dto) {
-            if ($dto->getType() !== null) {
-                $values[$dto->getType()->value] = $dto->getValue();
-            }
-        }
-
-        $totalInteractions = ($values[PostInsightType::Likes->value] ?? 0.0)
-            + ($values[PostInsightType::Comments->value] ?? 0.0)
-            + ($values[PostInsightType::Shares->value] ?? 0.0)
-            + ($values[PostInsightType::Saved->value] ?? 0.0);
-
-        return new self(
-            type: PostInsightType::TotalInteractions,
-            value: $totalInteractions,
-        );
-    }
-
     public static function getMetricNames(): array
     {
         return array_keys(self::METRIC_MAPPING);
+    }
+
+    protected static function getInteractionTypes(): array
+    {
+        return self::INTERACTION_TYPES;
     }
 }

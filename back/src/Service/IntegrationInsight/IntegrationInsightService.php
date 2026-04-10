@@ -8,6 +8,7 @@ use App\Entity\Project;
 use App\Entity\User;
 use App\Helper\DateHelper;
 use App\DTO\External\Instagram\InstagramIntegrationInsightDTO;
+use App\DTO\External\Tiktok\TiktokIntegrationInsightDTO;
 use App\DTO\External\Youtube\YoutubeIntegrationInsightDTO;
 use Google\Service\YouTube;
 use Google\Service\YouTubeAnalytics;
@@ -30,6 +31,7 @@ use App\Repository\YoutubeReportingJobRepository;
 use App\Repository\IntegrationRepository;
 use App\Exception\Integration\OAuthTokenRevokedException;
 use App\Service\Integration\InstagramOAuthService;
+use App\Service\Integration\TiktokOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
 use Google\Client;
 use Google\Service\Exception;
@@ -57,6 +59,7 @@ class IntegrationInsightService
         private readonly PostRepository $postRepository,
         private readonly IntegrationRepository $integrationRepository,
         private readonly InstagramOAuthService $instagramOAuthService,
+        private readonly TiktokOAuthService $tiktokOAuthService,
         private readonly HttpClientInterface $httpClient,
         private readonly ParameterBagInterface $parameterBag,
         private readonly Client $googleClient,
@@ -199,6 +202,53 @@ class IntegrationInsightService
         }
 
         $this->createInsightEntitiesFromDTOs($integration, $insightDTOs, YoutubeIntegrationInsightDTO::getMetricMapping());
+
+        $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
+        $this->integrationRepository->save($integration, true);
+    }
+
+    public function fetchTiktokProfileInsights(Integration $integration): void
+    {
+        if ($integration->getPlatform() !== Platform::Tiktok) {
+            throw new \InvalidArgumentException('Integration must be a TikTok integration');
+        }
+
+        $integration = $this->tiktokOAuthService->refreshTokenIfNeeded($integration);
+
+        $fields = implode(',', [...TiktokIntegrationInsightDTO::getMetricNames(), 'avatar_url']);
+
+        try {
+            $response = $this->httpClient->request('GET', sprintf('%s/v2/user/info/', $this->parameterBag->get('app.tiktok.api_url')), [
+                'headers' => [
+                    'Authorization' => sprintf('Bearer %s', $integration->getAccessToken()),
+                ],
+                'query' => [
+                    'fields' => $fields,
+                ],
+            ]);
+
+            $data = $response->toArray();
+        } catch (\Exception $e) {
+            $this->throwIfOAuthAuthError($e, $integration);
+
+            throw $e;
+        }
+
+        $user = $data['data']['user'] ?? [];
+
+        // Update profile picture URL on the integration to prevent expiration issues
+        if (isset($user['avatar_url'])) {
+            $integration->setProfilePictureUrl($user['avatar_url']);
+        }
+
+        $insightDTOs = [];
+        foreach (TiktokIntegrationInsightDTO::getMetricNames() as $fieldName) {
+            if (isset($user[$fieldName])) {
+                $insightDTOs[] = new TiktokIntegrationInsightDTO($fieldName, (float) $user[$fieldName]);
+            }
+        }
+
+        $this->createInsightEntitiesFromDTOs($integration, $insightDTOs, TiktokIntegrationInsightDTO::getMetricMapping());
 
         $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
         $this->integrationRepository->save($integration, true);

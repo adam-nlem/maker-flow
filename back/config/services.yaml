@@ -36,6 +36,13 @@ parameters:
     app.youtube.redirect_uri: "%env(string:YOUTUBE_REDIRECT_URI)%"
     app.youtube.javascript_origin: "%env(string:YOUTUBE_JAVASCRIPT_ORIGIN)%"
 
+    app.tiktok.authorization_url: "https://www.tiktok.com/v2/auth/authorize/"
+    app.tiktok.token_url: "https://open.tiktokapis.com/v2/oauth/token/"
+    app.tiktok.api_url: "https://open.tiktokapis.com"
+    app.tiktok.client_key: "%env(string:TIKTOK_CLIENT_KEY)%"
+    app.tiktok.client_secret: "%env(string:TIKTOK_CLIENT_SECRET)%"
+    app.tiktok.redirect_uri: "%env(string:TIKTOK_REDIRECT_URI)%"
+
     app.encryption.token_key: "%env(string:APP_ENCRYPTION_KEY)%"
 
     app.resend.api_key: "%env(string:RESEND_API_KEY)%"
@@ -92,6 +99,15 @@ services:
             $youtubeClientSecret: "%app.youtube.client_secret%"
             $youtubeRedirectUri: "%app.youtube.redirect_uri%"
             $youtubeJavascriptOrigin: "%app.youtube.javascript_origin%"
+
+    App\Service\Integration\TiktokOAuthService:
+        arguments:
+            $tiktokAuthorizationUrl: "%app.tiktok.authorization_url%"
+            $tiktokTokenUrl: "%app.tiktok.token_url%"
+            $tiktokApiUrl: "%app.tiktok.api_url%"
+            $tiktokClientKey: "%app.tiktok.client_key%"
+            $tiktokClientSecret: "%app.tiktok.client_secret%"
+            $tiktokRedirectUri: "%app.tiktok.redirect_uri%"
 
     App\Controller\IntegrationController:
         arguments:

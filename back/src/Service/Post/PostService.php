@@ -8,6 +8,7 @@ use App\Entity\Integration;
 use App\Entity\Project;
 use App\Entity\User;
 use App\DTO\External\Instagram\InstagramPostDTO;
+use App\DTO\External\Tiktok\TiktokPostDTO;
 use App\DTO\External\Youtube\YoutubePostDTO;
 use App\DTO\Response\Post\PostWithAggregatedInsightsResponseDTO;
 use App\DTO\Response\Post\PostListItemResponseDTO;
@@ -68,6 +69,44 @@ class PostService
     public function createOrGetYoutubePost(
         Integration $integration,
         YoutubePostDTO $postDTO
+    ): Post {
+        $existingPost = $this->repository->getByExternalIdAndIntegration($postDTO->getExternalId(), $integration);
+
+        if ($existingPost !== null) {
+            if ($existingPost->getCaption() !== $postDTO->getCaption()) {
+                $existingPost->setCaption($postDTO->getCaption());
+                $this->repository->save($existingPost);
+            }
+
+            $this->downloadThumbnailIfMissing($existingPost, $postDTO->getThumbnailUrl());
+
+            return $existingPost;
+        }
+
+        $post = new Post();
+        $post
+            ->setExternalId($postDTO->getExternalId())
+            ->setMediaType($postDTO->getMediaType())
+            ->setPublishedAt($postDTO->getPublishedAt())
+            ->setDuration($postDTO->getDuration())
+            ->setCaption($postDTO->getCaption())
+            ->setExternalUrl($postDTO->getExternalUrl())
+            ->setIntegration($integration)
+            ->setUser($integration->getUser());
+
+        if ($postDTO->getThumbnailUrl() !== null) {
+            $this->postThumbnailService->downloadAndStore($post, $postDTO->getThumbnailUrl());
+        }
+
+        $this->repository->save($post);
+        $this->postGroupService->tryAutoGroup($post);
+
+        return $post;
+    }
+
+    public function createOrGetTiktokPost(
+        Integration $integration,
+        TiktokPostDTO $postDTO
     ): Post {
         $existingPost = $this->repository->getByExternalIdAndIntegration($postDTO->getExternalId(), $integration);
 
