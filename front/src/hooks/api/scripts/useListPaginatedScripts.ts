@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { Script, type ScriptJSON } from "~/models/Script";
 import type { ScriptStatus } from "~/models/enums/ScriptStatus";
@@ -12,65 +12,33 @@ interface UseListPaginatedScriptsProps {
 }
 
 export function useListPaginatedScripts({ projectUuid, limit = 20, status }: UseListPaginatedScriptsProps) {
-    const [page, setPage] = useState(1);
-    const [additionalScripts, setAdditionalScripts] = useState<Script[]>([]);
-    const [hasMore, setHasMore] = useState(true);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-    const query = useQuery({
+    const query = useInfiniteQuery({
         queryKey: scriptQueryKeys.list(projectUuid ?? '', status),
-        queryFn: async () => {
+        queryFn: async ({ pageParam }) => {
             const res = await httpClient.get<ScriptJSON[]>('/scripts', {
                 params: {
                     projectUuid,
-                    page: 1,
+                    page: pageParam,
                     limit,
                     ...(status && { status }),
                 },
             });
-            const scriptsData = res.data.map((json) => Script.fromJSON(json));
-            setHasMore(scriptsData.length === limit);
-            setAdditionalScripts([]);
-            setPage(1);
-            return scriptsData;
+            return res.data.map((json) => Script.fromJSON(json));
         },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, _, lastPageParam) =>
+            lastPage.length === limit ? lastPageParam + 1 : undefined,
         enabled: !!projectUuid,
     });
 
-    const scripts = useMemo(() => {
-        return [...(query.data ?? []), ...additionalScripts];
-    }, [query.data, additionalScripts]);
-
-    const listMore = useCallback(async () => {
-        if (isLoadingMore || !hasMore) return;
-
-        setIsLoadingMore(true);
-        const nextPage = page + 1;
-
-        try {
-            const res = await httpClient.get<ScriptJSON[]>('/scripts', {
-                params: {
-                    projectUuid,
-                    page: nextPage,
-                    limit,
-                    ...(status && { status }),
-                },
-            });
-            const scriptsData = res.data.map((json) => Script.fromJSON(json));
-            setAdditionalScripts((prev) => [...prev, ...scriptsData]);
-            setHasMore(scriptsData.length === limit);
-            setPage(nextPage);
-        } finally {
-            setIsLoadingMore(false);
-        }
-    }, [page, isLoadingMore, hasMore, limit, projectUuid, status]);
+    const scripts = useMemo(() => query.data?.pages.flat() ?? [], [query.data]);
 
     return {
         scripts,
         isLoading: query.isLoading,
-        isLoadingMore,
-        hasMore,
+        isLoadingMore: query.isFetchingNextPage,
+        hasMore: query.hasNextPage,
         error: query.error,
-        listMore,
+        listMore: query.fetchNextPage,
     };
 }

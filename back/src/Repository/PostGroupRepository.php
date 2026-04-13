@@ -51,17 +51,28 @@ class PostGroupRepository extends ServiceEntityRepository
     /**
      * @return PostGroup[]
      */
-    public function getByProjectAndUserPaginated(Project $project, User $user, int $page, int $limit): array
-    {
-        return $this->createQueryBuilder('pg')
+    public function getByProjectAndUserPaginatedAndSearchTerm(
+        Project $project,
+        User $user,
+        ?string $searchTerm,
+        int $page,
+        int $limit
+    ): array {
+        $qb = $this->createQueryBuilder('pg')
             ->where('pg.project = :project')
             ->andWhere('pg.user = :user')
             ->setParameter('project', $project)
             ->setParameter('user', $user)
             ->orderBy('pg.createdAt', 'DESC')
             ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
-            ->getQuery()
+            ->setMaxResults($limit);
+
+        if ($searchTerm !== null) {
+            $qb->andWhere('LOWER(pg.title) LIKE LOWER(:searchTerm)')
+                ->setParameter('searchTerm', '%' . $searchTerm . '%');
+        }
+
+        return $qb->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }

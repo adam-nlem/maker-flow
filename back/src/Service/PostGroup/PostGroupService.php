@@ -74,9 +74,14 @@ class PostGroupService
     /**
      * @return PostGroupListItemResponseDTO[]
      */
-    public function getPostGroupListItems(User $user, Project $project, int $page, int $limit): array
-    {
-        $postGroups = $this->postGroupRepository->getByProjectAndUserPaginated($project, $user, $page, $limit);
+    public function getPostGroupListItems(
+        User $user,
+        Project $project,
+        ?string $searchTerm,
+        int $page,
+        int $limit
+    ): array {
+        $postGroups = $this->postGroupRepository->getByProjectAndUserPaginatedAndSearchTerm($project, $user, $searchTerm, $page, $limit);
 
         if (empty($postGroups)) {
             return [];

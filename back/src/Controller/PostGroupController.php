@@ -42,7 +42,13 @@ final class PostGroupController extends AbstractController
             throw new ProjectNotFoundException();
         }
 
-        $result = $this->service->getPostGroupListItems($user, $project, $queryParamDto->getPage(), $queryParamDto->getLimit());
+        $result = $this->service->getPostGroupListItems(
+            user: $user,
+            project: $project,
+            searchTerm: $queryParamDto->getSearchTerm(),
+            page: $queryParamDto->getPage(),
+            limit: $queryParamDto->getLimit()
+        );
 
         return $this->json(
             data: $result,
