@@ -235,7 +235,7 @@ class PostService
         return new PostWithPlatformAndInsightsResponseDTO(
             post: $post,
             platform: $post->getIntegration()->getPlatform()->value,
-            aggregatedInsights: $insights,
+            aggregatedInsights: InsightHelper::sortAggregatedInsights($insights),
             postGroupUuid: $post->getPostGroup()?->getUuid(),
             postGroupTitle: $post->getPostGroup()?->getTitle(),
             engagementByViews: InsightHelper::calculateEngagementByViews($insights),

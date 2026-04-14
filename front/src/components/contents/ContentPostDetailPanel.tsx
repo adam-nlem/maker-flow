@@ -1,14 +1,40 @@
 import { SidePanel } from "~/components/ui/SidePanel"
 import PlatformPill from "~/components/ui/PlatformPill"
 import Shimmer from "~/components/ui/Shimmer"
+import DonutChart from "~/components/ui/DonutChart"
 import { useShowPost } from "~/hooks/api/posts/useShowPost"
 import { useShowPostThumbnail } from "~/hooks/api/posts/useShowPostThumbnail"
 import { useContentsStore } from "~/stores/contents/contentsStore"
 import { useContentsRightPanelStore, ContentsRightPanel } from "~/stores/contents/contentsRightPanelStore"
-import { postInsightTypeToFrenchTranslation, formatPostInsightValue } from "~/models/enums/PostInsightType"
+import { PostInsightType, postInsightTypeToFrenchTranslation, postInsightTypeToEngagementColor, postInsightTypeToEngagementBgClass, formatPostInsightValue } from "~/models/enums/PostInsightType"
+import { formatCompactNumber } from "~/utils/numberFormatters"
 import { formatToFrenchDateShort } from "~/utils/dateFormatters"
 import { ArrowTopRightOnSquareIcon, FolderIcon } from "@heroicons/react/24/outline"
 import ContentMetricBox from "./ContentMetricBox"
+
+const OVERVIEW_TYPES = new Set<PostInsightType>([
+    PostInsightType.Views,
+    PostInsightType.TotalInteractions,
+    PostInsightType.AverageWatchTime,
+    PostInsightType.TotalWatchTime,
+    PostInsightType.Reach,
+    PostInsightType.ThumbnailImpressions,
+    PostInsightType.ThumbnailImpressionsClickRate,
+    PostInsightType.AudienceWatchRatio,
+    PostInsightType.Saved,
+])
+
+const ENGAGEMENT_TYPES = new Set<PostInsightType>([
+    PostInsightType.Likes,
+    PostInsightType.Comments,
+    PostInsightType.Shares,
+    PostInsightType.Dislikes,
+])
+
+const FOLLOWER_TYPES = new Set<PostInsightType>([
+    PostInsightType.FollowersGained,
+    PostInsightType.FollowersLost,
+])
 
 interface ContentPostDetailPanelProps {
     postUuid: string | null
@@ -31,6 +57,23 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
 
     const caption = postData?.post.caption ?? "Sans description"
 
+    const overviewMetrics = postData?.aggregatedInsights.filter((i) => OVERVIEW_TYPES.has(i.type)) ?? []
+    const engagementMetrics = postData?.aggregatedInsights.filter((i) => ENGAGEMENT_TYPES.has(i.type)) ?? []
+    const followerMetrics = postData?.aggregatedInsights.filter((i) => FOLLOWER_TYPES.has(i.type)) ?? []
+
+    const totalEngagement = postData?.aggregatedInsights.find((i) => i.type === PostInsightType.TotalInteractions)?.value ?? 0
+
+    const likesInsight = engagementMetrics.find((m) => m.type === PostInsightType.Likes)
+    const dislikesInsight = engagementMetrics.find((m) => m.type === PostInsightType.Dislikes)
+    const likesValue = likesInsight?.value ?? null
+    const dislikesValue = dislikesInsight?.value ?? null
+    const likeRatioTotal = (likesValue ?? 0) + (dislikesValue ?? 0)
+    const likePercentage = likeRatioTotal > 0 ? ((likesValue ?? 0) / likeRatioTotal) * 100 : 0
+
+    const gainedInsight = followerMetrics.find((m) => m.type === PostInsightType.FollowersGained)
+    const lostInsight = followerMetrics.find((m) => m.type === PostInsightType.FollowersLost)
+    const netFollowers = (gainedInsight?.value ?? 0) - (lostInsight?.value ?? 0)
+
     return (
         <SidePanel
             title="Détail du post"
@@ -46,11 +89,21 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                         <Shimmer width="w-24" height="h-6" />
                         <Shimmer width="w-20" height="h-4" />
                     </div>
-                    <Shimmer width="w-full" height="h-16" />
-                    <div className="flex flex-row flex-wrap gap-1">
-                        <Shimmer width="w-24" height="h-14" />
-                        <Shimmer width="w-24" height="h-14" />
-                        <Shimmer width="w-24" height="h-14" />
+                    <Shimmer width="w-full" height="h-12" />
+                    <div className="grid grid-cols-3 gap-1">
+                        <Shimmer width="w-full" height="h-14" />
+                        <Shimmer width="w-full" height="h-14" />
+                        <Shimmer width="w-full" height="h-14" />
+                        <Shimmer width="w-full" height="h-14" />
+                        <Shimmer width="w-full" height="h-14" />
+                    </div>
+                    <div className="flex flex-row items-center gap-4">
+                        <Shimmer width="w-30" height="h-30" radius="rounded-full" />
+                        <div className="flex flex-col gap-2 flex-1">
+                            <Shimmer width="w-full" height="h-4" />
+                            <Shimmer width="w-full" height="h-4" />
+                            <Shimmer width="w-full" height="h-4" />
+                        </div>
                     </div>
                 </div>
             )}
@@ -78,32 +131,118 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                     </div>
 
                     {/* Caption */}
-                    <div className="flex flex-col gap-1">
-                        <h3 className="text-heading-xs text-gray">Description</h3>
-                        <p className="text-body-xs select-text">{caption}</p>
-                    </div>
+                    <p className="text-body-xs select-text">{caption}</p>
 
-                    {/* Metrics */}
-                    <div className="flex flex-col gap-2">
-                        <h3 className="text-heading-xs text-gray">Statistiques</h3>
-                        <div className="flex flex-row flex-wrap gap-1">
-                            {postData.aggregatedInsights.map((insight) => (
-                                <ContentMetricBox
-                                    key={insight.type}
-                                    label={postInsightTypeToFrenchTranslation[insight.type]}
-                                    value={formatPostInsightValue(insight.type, insight.value)}
-                                />
-                            ))}
-                            {postData.aggregatedInsights.length === 0 && (
-                                <p className="text-body-xs text-gray">Aucune statistique disponible.</p>
-                            )}
+                    {/* Vue d'ensemble */}
+                    {(overviewMetrics.length > 0 || postData.engagementByViews !== null) && (
+                        <div className="flex flex-col gap-2">
+                            <h3 className="text-heading-xs text-gray uppercase">Vue d'ensemble</h3>
+                            <div className="grid grid-cols-3 gap-1">
+                                {overviewMetrics.map((insight) => (
+                                    <ContentMetricBox
+                                        key={insight.type}
+                                        label={postInsightTypeToFrenchTranslation[insight.type]}
+                                        value={formatPostInsightValue(insight.type, insight.value)}
+                                    />
+                                ))}
+                                {postData.engagementByViews !== null && (
+                                    <ContentMetricBox
+                                        label="Engagement"
+                                        value={`${postData.engagementByViews.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}%`}
+                                    />
+                                )}
+                            </div>
                         </div>
-                    </div>
+                    )}
+
+                    {/* Répartition de l'engagement */}
+                    {engagementMetrics.length > 0 && (
+                        <div className="flex flex-col gap-2">
+                            <h3 className="text-heading-xs text-gray uppercase">Répartition de l'engagement</h3>
+                            <div className="flex flex-row items-center gap-4">
+                                <DonutChart
+                                    data={engagementMetrics.map((m) => ({
+                                        label: postInsightTypeToFrenchTranslation[m.type],
+                                        value: m.value,
+                                        color: postInsightTypeToEngagementColor[m.type] ?? "var(--color-gray)",
+                                    }))}
+                                    size={120}
+                                    centerLabel={formatCompactNumber(totalEngagement)}
+                                    centerSubLabel="actions"
+                                />
+                                <div className="flex flex-col gap-1.5 flex-1">
+                                    {engagementMetrics.map((metric) => {
+                                        const pct = totalEngagement > 0
+                                            ? Math.round((metric.value / totalEngagement) * 100)
+                                            : 0
+                                        return (
+                                            <div key={metric.type} className="flex flex-row items-center justify-between">
+                                                <div className="flex flex-row items-center gap-2">
+                                                    <div className={`size-2.5 rounded-sm ${postInsightTypeToEngagementBgClass[metric.type] ?? "bg-gray"}`} />
+                                                    <span className="text-body-xs">{postInsightTypeToFrenchTranslation[metric.type]}</span>
+                                                </div>
+                                                <div className="flex flex-row items-center gap-2">
+                                                    <span className="text-heading-xs">{formatCompactNumber(metric.value)}</span>
+                                                    <span className="text-body-xs text-gray">{pct}%</span>
+                                                </div>
+                                            </div>
+                                        )
+                                    })}
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Ratio like / dislike */}
+                    {likesValue !== null && dislikesValue !== null && (
+                        <div className="flex flex-col gap-1.5">
+                            <div className="flex flex-row items-center justify-between">
+                                <span className="text-body-xs text-gray">Ratio like / dislike</span>
+                                <span className="text-heading-xs">{likePercentage.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}%</span>
+                            </div>
+                            <div className="w-full h-2 bg-light-gray rounded-full">
+                                <div
+                                    className="h-full bg-primary rounded-full"
+                                    style={{ width: `${likePercentage}%` }}
+                                />
+                            </div>
+                            <div className="flex flex-row justify-between">
+                                <span className="text-body-xs text-gray">{formatCompactNumber(likesValue)} positifs</span>
+                                <span className="text-body-xs text-gray">{formatCompactNumber(dislikesValue)} négatifs</span>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Abonnés */}
+                    {followerMetrics.length > 0 && (
+                        <div className="flex flex-col gap-2">
+                            <h3 className="text-heading-xs text-gray uppercase">Abonnés</h3>
+                            <div className="grid grid-cols-3 gap-1">
+                                {gainedInsight && (
+                                    <ContentMetricBox
+                                        label="Gagnés"
+                                        value={`+${formatCompactNumber(gainedInsight.value)}`}
+                                    />
+                                )}
+                                {lostInsight && (
+                                    <ContentMetricBox
+                                        label="Perdus"
+                                        value={formatCompactNumber(lostInsight.value)}
+                                    />
+                                )}
+                                {gainedInsight && lostInsight && (
+                                    <ContentMetricBox
+                                        label="Net"
+                                        value={`${netFollowers >= 0 ? "+" : ""}${formatCompactNumber(netFollowers)}`}
+                                    />
+                                )}
+                            </div>
+                        </div>
+                    )}
 
                     {/* Group link */}
                     {postData.postGroupTitle && postData.postGroupUuid && (
                         <div className="flex flex-col gap-1">
-                            <h3 className="text-heading-xs text-gray">Groupe</h3>
                             <button
                                 onClick={() => {
                                     selectGroup(postData.postGroupUuid)
@@ -112,7 +251,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                                 className="flex flex-row items-center gap-1.5 text-primary hover:text-primary/80 transition-colors cursor-pointer"
                             >
                                 <FolderIcon className="size-3.5" strokeWidth={2} />
-                                <span className="text-body-xs">{postData.postGroupTitle}</span>
+                                <span className="text-body-xs">Groupe <strong>{postData.postGroupTitle}</strong></span>
                             </button>
                         </div>
                     )}

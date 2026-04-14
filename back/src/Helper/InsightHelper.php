@@ -37,6 +37,41 @@ class InsightHelper
         return $map;
     }
 
+    private const AGGREGATED_INSIGHT_ORDER = [
+        PostInsightType::Views,
+        PostInsightType::TotalInteractions,
+        PostInsightType::AverageWatchTime,
+        PostInsightType::TotalWatchTime,
+        PostInsightType::Reach,
+        PostInsightType::Likes,
+        PostInsightType::Comments,
+        PostInsightType::Shares,
+        PostInsightType::Dislikes,
+        PostInsightType::Saved,
+        PostInsightType::ThumbnailImpressions,
+        PostInsightType::ThumbnailImpressionsClickRate,
+        PostInsightType::AudienceWatchRatio,
+        PostInsightType::FollowersGained,
+        PostInsightType::FollowersLost,
+    ];
+
+    /**
+     * @param AggregatedInsightDTO[] $insights
+     * @return AggregatedInsightDTO[]
+     */
+    public static function sortAggregatedInsights(array $insights): array
+    {
+        $typeOrder = array_map(fn(PostInsightType $t) => $t->value, self::AGGREGATED_INSIGHT_ORDER);
+
+        usort($insights, function (AggregatedInsightDTO $a, AggregatedInsightDTO $b) use ($typeOrder) {
+            $posA = array_search($a->getType(), $typeOrder);
+            $posB = array_search($b->getType(), $typeOrder);
+            return $posA - $posB;
+        });
+
+        return $insights;
+    }
+
     /**
      * @param AggregatedInsightDTO[] $insights
      */

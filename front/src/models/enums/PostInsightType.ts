@@ -41,20 +41,34 @@ export const postInsightTypeToIcon: Record<PostInsightType, ComponentType<SVGPro
 
 export const postInsightTypeToFrenchTranslation: Record<PostInsightType, string> = {
     [PostInsightType.Reach]: "Portée",
-    [PostInsightType.TotalInteractions]: "Interactions",
+    [PostInsightType.TotalInteractions]: "Interactions totales",
     [PostInsightType.Saved]: "Enregistrements",
     [PostInsightType.Shares]: "Partages",
     [PostInsightType.Views]: "Vues",
     [PostInsightType.Likes]: "Likes",
     [PostInsightType.Comments]: "Commentaires",
-    [PostInsightType.AverageWatchTime]: "Temps de visionnage moyen",
-    [PostInsightType.TotalWatchTime]: "Temps de visionnage total",
-    [PostInsightType.Dislikes]: "Je n'aime pas",
+    [PostInsightType.AverageWatchTime]: "Moy. visionnage",
+    [PostInsightType.TotalWatchTime]: "Temps de visionnage",
+    [PostInsightType.Dislikes]: "Dislikes",
     [PostInsightType.ThumbnailImpressions]: "Impressions miniature",
     [PostInsightType.ThumbnailImpressionsClickRate]: "Taux de clics miniature",
     [PostInsightType.FollowersGained]: "Abonnés gagnés",
     [PostInsightType.FollowersLost]: "Abonnés perdus",
     [PostInsightType.AudienceWatchRatio]: "Ratio de visionnage",
+};
+
+export const postInsightTypeToEngagementColor: Partial<Record<PostInsightType, string>> = {
+    [PostInsightType.Likes]: "var(--color-primary)",
+    [PostInsightType.Comments]: "var(--color-purple)",
+    [PostInsightType.Shares]: "var(--color-green)",
+    [PostInsightType.Dislikes]: "var(--color-danger)",
+};
+
+export const postInsightTypeToEngagementBgClass: Partial<Record<PostInsightType, string>> = {
+    [PostInsightType.Likes]: "bg-primary",
+    [PostInsightType.Comments]: "bg-purple",
+    [PostInsightType.Shares]: "bg-green",
+    [PostInsightType.Dislikes]: "bg-danger",
 };
 
 export const postInsightTypeOptions = Object.values(PostInsightType);

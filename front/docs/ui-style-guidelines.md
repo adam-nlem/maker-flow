@@ -533,6 +533,21 @@ SVG circular progress indicator.
 
 ---
 
+### DonutChart
+
+**Location:** `front/app/components/ui/DonutChart.tsx`
+
+Donut chart component using Recharts `PieChart` + `Pie` + `Cell`. Supports a center label overlay.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `data` | `DonutChartItem[]` | — | Array of `{ label, value, color }` segments |
+| `size` | `number` | `120` | Chart size in pixels |
+| `centerLabel` | `string` | — | Main text in the donut hole |
+| `centerSubLabel` | `string` | — | Secondary text below the center label |
+
+---
+
 ### Pill
 
 **Location:** `front/app/components/ui/Pill.tsx`
