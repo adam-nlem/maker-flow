@@ -396,24 +396,67 @@ import { Project } from "~/models/Project";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { projectQueryKeys } from "./projectQueryKeys";
 
-export function useListPaginatedProjects(limit: number = 10) {
+export function useShowProject(projectUuid: string) {
     const query = useQuery({
-        queryKey: projectQueryKeys.list(1, limit),
+        queryKey: projectQueryKeys.show(projectUuid),
         queryFn: async () => {
-            const res = await httpClient.get(`/projects`, {
-                params: { page: 1, limit }
-            });
-            return res.data.map((json: any) => Project.fromJSON(json));
+            const res = await httpClient.get(`/projects/${projectUuid}`);
+            return Project.fromJSON(res.data);
         },
     });
 
     return {
-        projects: query.data ?? [],
+        project: query.data ?? null,
         isLoading: query.isLoading,
         error: query.error,
     };
 }
 ```
+
+### Paginated Query Hook (useInfiniteQuery)
+
+For paginated lists with infinite scroll, use `useInfiniteQuery` instead of manual pagination state:
+
+```tsx
+import { useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
+import { Project } from "~/models/Project";
+import { httpClient } from "~/services/httpClient/httpClient";
+import { projectQueryKeys } from "./projectQueryKeys";
+
+export function useListPaginatedProjects(limit: number = 10) {
+    const query = useInfiniteQuery({
+        queryKey: projectQueryKeys.list(limit),
+        queryFn: async ({ pageParam }) => {
+            const res = await httpClient.get(`/projects`, {
+                params: { page: pageParam, limit }
+            });
+            return res.data.map((json: any) => Project.fromJSON(json));
+        },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, _, lastPageParam) =>
+            lastPage.length === limit ? lastPageParam + 1 : undefined,
+    });
+
+    const projects = useMemo(() => query.data?.pages.flat() ?? [], [query.data]);
+
+    return {
+        projects,
+        isLoading: query.isLoading,
+        isLoadingMore: query.isFetchingNextPage,
+        hasMore: query.hasNextPage,
+        error: query.error,
+        listMore: query.fetchNextPage,
+    };
+}
+```
+
+Key patterns:
+- `initialPageParam: 1` — pages start at 1
+- `getNextPageParam` — returns next page number if `lastPage.length === limit`, otherwise `undefined` (no more pages)
+- Flatten pages with `query.data?.pages.flat()` via `useMemo`
+- Map TanStack properties to a consistent return interface: `isLoadingMore`, `hasMore`, `listMore`
+- Compatible with `useInfiniteScroll` hook: `useInfiniteScroll(ref, hasMore, isLoadingMore, listMore)`
 
 ### Mutation Hook
 
