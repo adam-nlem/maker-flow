@@ -116,7 +116,7 @@ class PostGroupService
 
         return new PostGroupWithInsightsAndScriptResponseDTO(
             postGroup: $postGroup,
-            aggregatedInsights: $insights,
+            aggregatedInsights: InsightHelper::sortAggregatedInsights($insights),
             script: $postGroup->getScript(),
             engagementByViews: InsightHelper::calculateEngagementByViews($insights),
         );

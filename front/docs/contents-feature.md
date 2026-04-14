@@ -41,7 +41,15 @@ Unified card component for both post groups and individual posts. Accepts a `dat
 
 **File:** `app/components/contents/ContentGroupDetailPanel.tsx`
 
-`SidePanel` showing full details of a post group: title, linked posts, aggregated insights, and linked script. Uses `useShowPostGroup` to fetch full group data by UUID from `GET /api/post-groups/{postGroupUuid}`, independent of the paginated list. Supports editing and script linking.
+`SidePanel` showing full details of a post group. Uses `useShowPostGroup` to fetch full group data by UUID from `GET /api/post-groups/{postGroupUuid}`, independent of the paginated list. Supports editing, script linking, and post management.
+
+**Sections (same metric layout as ContentPostDetailPanel, only rendered when data exists):**
+1. **Vue d'ensemble** — overview metrics grid (`grid-cols-3`) with `ContentMetricBox`
+2. **Répartition de l'engagement** — donut chart (`DonutChart`) with legend
+3. **Ratio like / dislike** — progress bar (only when both Likes and Dislikes exist)
+4. **Abonnés** — followers section with Gagnés, Perdus, Net
+5. **Script** — linked script display with unlink button
+6. **Posts** — post list with add/remove functionality
 
 ### ContentPostDetailPanel
 

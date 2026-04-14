@@ -71,6 +71,30 @@ export const postInsightTypeToEngagementBgClass: Partial<Record<PostInsightType,
     [PostInsightType.Dislikes]: "bg-danger",
 };
 
+export const postInsightOverviewTypes = new Set<PostInsightType>([
+    PostInsightType.Views,
+    PostInsightType.TotalInteractions,
+    PostInsightType.AverageWatchTime,
+    PostInsightType.TotalWatchTime,
+    PostInsightType.Reach,
+    PostInsightType.ThumbnailImpressions,
+    PostInsightType.ThumbnailImpressionsClickRate,
+    PostInsightType.AudienceWatchRatio,
+    PostInsightType.Saved,
+]);
+
+export const postInsightEngagementTypes = new Set<PostInsightType>([
+    PostInsightType.Likes,
+    PostInsightType.Comments,
+    PostInsightType.Shares,
+    PostInsightType.Dislikes,
+]);
+
+export const postInsightFollowerTypes = new Set<PostInsightType>([
+    PostInsightType.FollowersGained,
+    PostInsightType.FollowersLost,
+]);
+
 export const postInsightTypeOptions = Object.values(PostInsightType);
 
 /**

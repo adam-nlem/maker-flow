@@ -6,35 +6,11 @@ import { useShowPost } from "~/hooks/api/posts/useShowPost"
 import { useShowPostThumbnail } from "~/hooks/api/posts/useShowPostThumbnail"
 import { useContentsStore } from "~/stores/contents/contentsStore"
 import { useContentsRightPanelStore, ContentsRightPanel } from "~/stores/contents/contentsRightPanelStore"
-import { PostInsightType, postInsightTypeToFrenchTranslation, postInsightTypeToEngagementColor, postInsightTypeToEngagementBgClass, formatPostInsightValue } from "~/models/enums/PostInsightType"
+import { PostInsightType, postInsightTypeToFrenchTranslation, postInsightTypeToEngagementColor, postInsightTypeToEngagementBgClass, postInsightOverviewTypes, postInsightEngagementTypes, postInsightFollowerTypes, formatPostInsightValue } from "~/models/enums/PostInsightType"
 import { formatCompactNumber } from "~/utils/numberFormatters"
 import { formatToFrenchDateShort } from "~/utils/dateFormatters"
 import { ArrowTopRightOnSquareIcon, FolderIcon } from "@heroicons/react/24/outline"
 import ContentMetricBox from "./ContentMetricBox"
-
-const OVERVIEW_TYPES = new Set<PostInsightType>([
-    PostInsightType.Views,
-    PostInsightType.TotalInteractions,
-    PostInsightType.AverageWatchTime,
-    PostInsightType.TotalWatchTime,
-    PostInsightType.Reach,
-    PostInsightType.ThumbnailImpressions,
-    PostInsightType.ThumbnailImpressionsClickRate,
-    PostInsightType.AudienceWatchRatio,
-    PostInsightType.Saved,
-])
-
-const ENGAGEMENT_TYPES = new Set<PostInsightType>([
-    PostInsightType.Likes,
-    PostInsightType.Comments,
-    PostInsightType.Shares,
-    PostInsightType.Dislikes,
-])
-
-const FOLLOWER_TYPES = new Set<PostInsightType>([
-    PostInsightType.FollowersGained,
-    PostInsightType.FollowersLost,
-])
 
 interface ContentPostDetailPanelProps {
     postUuid: string | null
@@ -57,9 +33,9 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
 
     const caption = postData?.post.caption ?? "Sans description"
 
-    const overviewMetrics = postData?.aggregatedInsights.filter((i) => OVERVIEW_TYPES.has(i.type)) ?? []
-    const engagementMetrics = postData?.aggregatedInsights.filter((i) => ENGAGEMENT_TYPES.has(i.type)) ?? []
-    const followerMetrics = postData?.aggregatedInsights.filter((i) => FOLLOWER_TYPES.has(i.type)) ?? []
+    const overviewMetrics = postData?.aggregatedInsights.filter((i) => postInsightOverviewTypes.has(i.type)) ?? []
+    const engagementMetrics = postData?.aggregatedInsights.filter((i) => postInsightEngagementTypes.has(i.type)) ?? []
+    const followerMetrics = postData?.aggregatedInsights.filter((i) => postInsightFollowerTypes.has(i.type)) ?? []
 
     const totalEngagement = postData?.aggregatedInsights.find((i) => i.type === PostInsightType.TotalInteractions)?.value ?? 0
 
