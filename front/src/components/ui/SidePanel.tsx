@@ -3,7 +3,7 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
-type PanelWidth = "w-72" | "w-96";
+type PanelWidth = "w-72" | "w-120";
 
 interface SidePanelProps {
     title: string;
@@ -21,7 +21,7 @@ interface SidePanelProps {
 
 const panelMinWidth: Record<PanelWidth, string> = {
     "w-72": "min-w-72",
-    "w-96": "min-w-96",
+    "w-120": "min-w-120",
 };
 
 function PanelContent({

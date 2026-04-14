@@ -15,13 +15,13 @@ class PostGroupListItemResponseDTO implements ResponseDTOInterface
         #[Groups(['api_post_groups_list'])]
         private readonly \DateTimeImmutable $createdAt,
         #[Groups(['api_post_groups_list'])]
-        private readonly int $postCount,
+        private readonly array $postUuids,
         #[Groups(['api_post_groups_list'])]
         private readonly ?float $views,
         #[Groups(['api_post_groups_list'])]
-        private readonly ?float $totalInteractions,
+        private readonly ?float $likes,
         #[Groups(['api_post_groups_list'])]
-        private readonly ?float $engagementByViews,
+        private readonly ?float $comments,
         #[Groups(['api_post_groups_list'])]
         private readonly ?string $scriptTitle,
     ) {}
@@ -32,10 +32,10 @@ class PostGroupListItemResponseDTO implements ResponseDTOInterface
             'uuid' => $this->uuid,
             'title' => $this->title,
             'createdAt' => $this->createdAt,
-            'postCount' => $this->postCount,
+            'postUuids' => $this->postUuids,
             'views' => $this->views,
-            'totalInteractions' => $this->totalInteractions,
-            'engagementByViews' => $this->engagementByViews,
+            'likes' => $this->likes,
+            'comments' => $this->comments,
             'scriptTitle' => $this->scriptTitle,
         ];
     }
@@ -55,9 +55,9 @@ class PostGroupListItemResponseDTO implements ResponseDTOInterface
         return $this->createdAt;
     }
 
-    public function getPostCount(): int
+    public function getPostUuids(): array
     {
-        return $this->postCount;
+        return $this->postUuids;
     }
 
     public function getViews(): ?float
@@ -65,14 +65,14 @@ class PostGroupListItemResponseDTO implements ResponseDTOInterface
         return $this->views;
     }
 
-    public function getTotalInteractions(): ?float
+    public function getLikes(): ?float
     {
-        return $this->totalInteractions;
+        return $this->likes;
     }
 
-    public function getEngagementByViews(): ?float
+    public function getComments(): ?float
     {
-        return $this->engagementByViews;
+        return $this->comments;
     }
 
     public function getScriptTitle(): ?string

@@ -4,7 +4,7 @@ import { useListPaginatedPostGroups } from "~/hooks/api/postGroups/useListPagina
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
 import { useContentsStore } from "~/stores/contents/contentsStore"
 import { useContentsRightPanelStore, ContentsRightPanel } from "~/stores/contents/contentsRightPanelStore"
-import ContentCard from "./ContentCard"
+import ContentGroupCard from "./ContentGroupCard"
 
 interface ContentGroupListProps {
     projectUuid: string;
@@ -12,7 +12,6 @@ interface ContentGroupListProps {
 
 export default function ContentGroupList({ projectUuid }: ContentGroupListProps) {
 
-    const selectedGroupUuid = useContentsStore((s) => s.selectedGroupUuid)
     const searchTerm = useContentsStore((s) => s.searchTerm)
     const selectGroup = useContentsStore((s) => s.selectGroup)
     const openRightPanel = useContentsRightPanelStore((s) => s.openPanel)
@@ -65,15 +64,14 @@ export default function ContentGroupList({ projectUuid }: ContentGroupListProps)
     }
 
     return (
-        <div ref={scrollContainerRef} className="flex flex-row flex-wrap gap-3 p-4 overflow-y-auto scrollbar-none flex-1 min-h-0">
+        <div ref={scrollContainerRef} className="flex flex-row flex-wrap gap-2 p-4 overflow-y-auto scrollbar-none ">
             {postGroups.map((postGroup) => {
                 const uuid = postGroup.uuid
 
                 return (
-                    <ContentCard
+                    <ContentGroupCard
                         key={uuid}
-                        data={postGroup}
-                        isSelected={selectedGroupUuid === uuid}
+                        postGroupDTO={postGroup}
                         onClick={() => {
                             selectGroup(uuid)
                             openRightPanel(ContentsRightPanel.GroupDetail)

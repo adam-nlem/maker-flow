@@ -214,8 +214,8 @@ class PostService
                 publishedAt: $p->getPublishedAt(),
                 platform: $p->getIntegration()->getPlatform()->value,
                 views: InsightHelper::findAggregatedValue($insights, PostInsightType::Views),
-                totalInteractions: InsightHelper::findAggregatedValue($insights, PostInsightType::TotalInteractions),
-                engagementByViews: InsightHelper::calculateEngagementByViews($insights),
+                likes: InsightHelper::findAggregatedValue($insights, PostInsightType::Likes),
+                comments: InsightHelper::findAggregatedValue($insights, PostInsightType::Comments),
             );
         }, $posts);
     }

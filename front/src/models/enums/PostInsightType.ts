@@ -1,4 +1,4 @@
-import { ArrowUpOnSquareIcon, BookmarkIcon, ChartBarIcon, ChatBubbleLeftIcon, ClockIcon, EyeIcon, HandThumbDownIcon, HeartIcon, SparklesIcon, UserPlusIcon, UsersIcon } from "@heroicons/react/24/solid";
+import { ArrowUpOnSquareIcon, BookmarkIcon, ChartBarIcon, ChatBubbleLeftIcon, ClockIcon, EyeIcon, HandThumbDownIcon, HeartIcon, SparklesIcon, UserPlusIcon, UsersIcon } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
 import { formatDurationToFrench } from "~/utils/durationFormatters";
 import { formatCompactNumber } from "~/utils/numberFormatters";

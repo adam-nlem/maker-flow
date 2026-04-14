@@ -4,8 +4,8 @@ import { platformToFrenchTranslation, platformToIcon } from "~/models/enums/Plat
 
 interface PlatformPillProps {
     platform: Platform
-    isSelected: boolean
-    onToggle: () => void
+    isSelected?: boolean
+    onToggle?: () => void
 }
 
 export default function PlatformPill({ platform, isSelected, onToggle }: PlatformPillProps) {
@@ -13,9 +13,10 @@ export default function PlatformPill({ platform, isSelected, onToggle }: Platfor
         <Pill
             imageUrl={platformToIcon[platform]}
             label={platformToFrenchTranslation[platform]}
-            isSelected={isSelected}
+            isSelected={onToggle ? isSelected : true}
             onClick={onToggle}
             borderColorClassName="border-light-gray"
+            bgColorClassName="bg-clear"
         />
     )
 }

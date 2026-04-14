@@ -1,7 +1,6 @@
-import { useShowPostThumbnail } from "~/hooks/api/posts/useShowPostThumbnail"
 import { formatToFrenchDateShort } from "~/utils/dateFormatters"
 import { TrashIcon } from "@heroicons/react/24/outline"
-import Shimmer from "~/components/ui/Shimmer"
+import PostThumbnail from "~/components/ui/PostThumbnail"
 
 interface PostTilePost {
     uuid: string
@@ -18,7 +17,6 @@ interface PostTileProps {
 }
 
 export default function PostTile({ post, onRemove, isRemoving = false, isSelected = false, onSelect }: PostTileProps) {
-    const { thumbnailUrl, isLoading } = useShowPostThumbnail(post.uuid)
 
     const caption = post.caption
         ? post.caption.length > 50
@@ -35,13 +33,7 @@ export default function PostTile({ post, onRemove, isRemoving = false, isSelecte
                 isSelected ? "bg-primary/10 border border-primary/30" : "hover:bg-light-gray/30"
             }`}
         >
-            {isLoading ? (
-                <Shimmer width="w-10" height="h-10" radius="rounded-md" />
-            ) : thumbnailUrl ? (
-                <img src={thumbnailUrl} alt="" className="size-10 rounded-md object-cover shrink-0" />
-            ) : (
-                <div className="size-10 rounded-md bg-dark-bg-secondary shrink-0" />
-            )}
+            <PostThumbnail postUuid={post.uuid} className="size-10 rounded-md shrink-0" />
             <div className="flex flex-col flex-1 min-w-0">
                 <span className="text-body-xs truncate">{caption}</span>
                 <span className="text-body-xs text-gray">{formatToFrenchDateShort(post.publishedAt)}</span>

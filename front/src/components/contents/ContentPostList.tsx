@@ -4,7 +4,7 @@ import { useListPaginatedPosts } from "~/hooks/api/posts/useListPaginatedPosts"
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
 import { useContentsStore } from "~/stores/contents/contentsStore"
 import { useContentsRightPanelStore, ContentsRightPanel } from "~/stores/contents/contentsRightPanelStore"
-import ContentCard from "./ContentCard"
+import ContentPostCard from "./ContentPostCard"
 
 interface ContentPostListProps {
     projectUuid: string;
@@ -12,7 +12,6 @@ interface ContentPostListProps {
 
 export default function ContentPostList({ projectUuid }: ContentPostListProps) {
     const platformFilter = useContentsStore((s) => s.platformFilter)
-    const selectedPostUuid = useContentsStore((s) => s.selectedPostUuid)
     const selectPost = useContentsStore((s) => s.selectPost)
     const searchTerm = useContentsStore((s) => s.searchTerm)
     const openRightPanel = useContentsRightPanelStore((s) => s.openPanel)
@@ -72,10 +71,9 @@ export default function ContentPostList({ projectUuid }: ContentPostListProps) {
                 const uuid = post.uuid
 
                 return (
-                    <ContentCard
+                    <ContentPostCard
                         key={uuid}
-                        data={post}
-                        isSelected={selectedPostUuid === uuid}
+                        postDTO={post}
                         onClick={() => {
                             selectPost(uuid)
                             openRightPanel(ContentsRightPanel.PostDetail)

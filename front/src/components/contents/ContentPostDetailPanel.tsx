@@ -34,7 +34,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
     return (
         <SidePanel
             title="Détail du post"
-            width="w-96"
+            width="w-120"
             side="right"
             isOpen={isOpen}
             onClose={handleClose}
@@ -71,11 +71,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
 
                     {/* Platform + date */}
                     <div className="flex flex-row items-center justify-between">
-                        <PlatformPill
-                            platform={postData.platform}
-                            isSelected={true}
-                            onToggle={() => { }}
-                        />
+                        <PlatformPill platform={postData.platform} />
                         <span className="text-body-xs text-gray">
                             {formatToFrenchDateShort(postData.post.publishedAt)}
                         </span>

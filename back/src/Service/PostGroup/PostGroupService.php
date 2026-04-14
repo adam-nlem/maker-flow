@@ -100,10 +100,10 @@ class PostGroupService
                 uuid: $pg->getUuid(),
                 title: $pg->getTitle(),
                 createdAt: $pg->getCreatedAt(),
-                postCount: $pg->getPosts()->count(),
+                postUuids: $pg->getPosts()->map(fn(Post $p) => $p->getUuid())->toArray(),
                 views: InsightHelper::findAggregatedValue($insights, PostInsightType::Views),
-                totalInteractions: InsightHelper::findAggregatedValue($insights, PostInsightType::TotalInteractions),
-                engagementByViews: InsightHelper::calculateEngagementByViews($insights),
+                likes: InsightHelper::findAggregatedValue($insights, PostInsightType::Likes),
+                comments: InsightHelper::findAggregatedValue($insights, PostInsightType::Comments),
                 scriptTitle: $pg->getScript()?->getTitle(),
             );
         }, $postGroups);

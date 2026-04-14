@@ -586,6 +586,33 @@ Unified pill component supporting multiple modes: toggle pill with HeroIcon, tog
 
 ---
 
+### CompactMetricRow
+
+**Location:** `front/src/components/ui/CompactMetricRow.tsx`
+
+Compact inline row of PostInsightType-based metrics. Each metric renders as an icon + formatted value pair.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `metrics` | `{ type: PostInsightType; value: number }[]` | - | Metrics to display |
+
+**Features:**
+- Resolves icons automatically via `postInsightTypeToIcon`
+- Formats values via `formatPostInsightValue` (handles duration types like AverageWatchTime)
+- Returns `null` if metrics array is empty
+
+**Example:**
+```tsx
+<CompactMetricRow metrics={[
+    { type: PostInsightType.Views, value: 12400 },
+    { type: PostInsightType.Likes, value: 530 },
+]} />
+```
+
+**Used in:** `RankingItemTile`
+
+---
+
 ### Shimmer
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/Shimmer.tsx`

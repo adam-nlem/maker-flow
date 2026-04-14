@@ -65,7 +65,7 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
         <>
             <SidePanel
                 title={group?.postGroup.title ?? ""}
-                width="w-96"
+                width="w-120"
                 side="right"
                 isOpen={isOpen}
                 onClose={handleClose}
