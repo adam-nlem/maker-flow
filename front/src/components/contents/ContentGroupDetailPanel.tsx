@@ -22,8 +22,10 @@ interface ContentGroupDetailPanelProps {
 
 export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetailPanelProps) {
     const closePanel = useContentsStore((s) => s.closePanel)
+    const selectPost = useContentsStore((s) => s.selectPost)
     const isOpen = useContentsRightPanelStore((s) => s.activePanel === ContentsRightPanel.GroupDetail)
     const closeRightPanel = useContentsRightPanelStore((s) => s.closePanel)
+    const openRightPanel = useContentsRightPanelStore((s) => s.openPanel)
     const focusedProjectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
     const { postGroup: group, isLoading } = useShowPostGroup(groupUuid ?? undefined)
     const { deletePostGroup, isPending: isDeleting } = useDeletePostGroup()
@@ -276,6 +278,10 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                                         post={post}
                                         onRemove={() => handleRemovePost(post.uuid)}
                                         isRemoving={isUpdating}
+                                        onSelect={() => {
+                                            selectPost(post.uuid)
+                                            openRightPanel(ContentsRightPanel.PostDetail)
+                                        }}
                                     />
                                 ))}
                                 {group.postGroup.posts.length === 0 && (
