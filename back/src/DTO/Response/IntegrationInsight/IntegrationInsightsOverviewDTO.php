@@ -1,8 +1,8 @@
 <?php
 
-namespace App\DTO\Response\Dashboard;
+namespace App\DTO\Response\IntegrationInsight;
 
-class DashboardOverviewDTO
+class IntegrationInsightsOverviewDTO
 {
     public function __construct(
         private readonly float $totalFollowers,

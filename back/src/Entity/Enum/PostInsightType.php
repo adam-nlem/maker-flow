@@ -6,7 +6,7 @@ enum PostInsightType: string
 {
     case Reach = 'reach';
     case TotalInteractions = 'total_interactions';
-    case Saved = 'saved';
+    case Saves = 'saves';
     case Shares = 'shares';
     case Views = 'views';
     case Likes = 'likes';

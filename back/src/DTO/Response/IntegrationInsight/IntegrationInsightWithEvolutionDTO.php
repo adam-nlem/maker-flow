@@ -8,11 +8,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
 class IntegrationInsightWithEvolutionDTO
 {
     public function __construct(
-        #[Groups(['api_integration_insights_detail'])]
+        #[Groups(['api_integration_insights_detail', 'api_integration_insights_list'])]
         private readonly IntegrationInsightType $type,
-        #[Groups(['api_integration_insights_detail'])]
+        #[Groups(['api_integration_insights_detail', 'api_integration_insights_list'])]
         private readonly float $value,
-        #[Groups(['api_integration_insights_detail'])]
+        #[Groups(['api_integration_insights_detail', 'api_integration_insights_list'])]
         private readonly ?string $evolutionPercentage,
     ) {}
 

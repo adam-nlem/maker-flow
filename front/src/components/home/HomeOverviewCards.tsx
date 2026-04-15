@@ -1,9 +1,9 @@
 import { EyeIcon, FireIcon, SignalIcon, UsersIcon } from "@heroicons/react/24/solid";
 import InsightTile from "~/components/insights/InsightTile";
-import type { DashboardOverviewDTO } from "~/dtos/dashboard/DashboardOverviewDTO";
+import type { IntegrationInsightsOverviewDTO } from "~/dtos/integrationInsights/IntegrationInsightsOverviewDTO";
 
 interface HomeOverviewCardsProps {
-    overview: DashboardOverviewDTO | null;
+    overview: IntegrationInsightsOverviewDTO | null;
 }
 
 export default function HomeOverviewCards({ overview }: HomeOverviewCardsProps) {
@@ -30,12 +30,6 @@ export default function HomeOverviewCards({ overview }: HomeOverviewCardsProps) 
                     value={overview.engagementRate ?? 0}
                     Icon={FireIcon}
                     evolutionPercentage={overview.engagementRateEvolution}
-                />
-                <InsightTile
-                    label="Portée totale"
-                    value={overview.totalReach}
-                    Icon={SignalIcon}
-                    evolutionPercentage={overview.totalReachEvolution}
                 />
             </div>
         </div>

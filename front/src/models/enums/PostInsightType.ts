@@ -6,7 +6,7 @@ import { formatCompactNumber } from "~/utils/numberFormatters";
 export enum PostInsightType {
     Reach = 'reach',
     TotalInteractions = 'total_interactions',
-    Saved = 'saved',
+    Saves = 'saves',
     Shares = 'shares',
     Views = 'views',
     Likes = 'likes',
@@ -24,7 +24,7 @@ export enum PostInsightType {
 export const postInsightTypeToIcon: Record<PostInsightType, ComponentType<SVGProps<SVGSVGElement>>> = {
     [PostInsightType.Reach]: UsersIcon,
     [PostInsightType.TotalInteractions]: SparklesIcon,
-    [PostInsightType.Saved]: BookmarkIcon,
+    [PostInsightType.Saves]: BookmarkIcon,
     [PostInsightType.Shares]: ArrowUpOnSquareIcon,
     [PostInsightType.Views]: EyeIcon,
     [PostInsightType.Likes]: HeartIcon,
@@ -42,7 +42,7 @@ export const postInsightTypeToIcon: Record<PostInsightType, ComponentType<SVGPro
 export const postInsightTypeToFrenchTranslation: Record<PostInsightType, string> = {
     [PostInsightType.Reach]: "Portée",
     [PostInsightType.TotalInteractions]: "Interactions totales",
-    [PostInsightType.Saved]: "Enregistrements",
+    [PostInsightType.Saves]: "Enregistrements",
     [PostInsightType.Shares]: "Partages",
     [PostInsightType.Views]: "Vues",
     [PostInsightType.Likes]: "Likes",
@@ -80,7 +80,7 @@ export const postInsightOverviewTypes = new Set<PostInsightType>([
     PostInsightType.ThumbnailImpressions,
     PostInsightType.ThumbnailImpressionsClickRate,
     PostInsightType.AudienceWatchRatio,
-    PostInsightType.Saved,
+    PostInsightType.Saves,
 ]);
 
 export const postInsightEngagementTypes = new Set<PostInsightType>([

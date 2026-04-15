@@ -9,7 +9,7 @@ class InstagramPostInsightDTO extends AbstractPostInsightDTO
 {
     private const METRIC_MAPPING = [
         'reach' => PostInsightType::Reach,
-        'saved' => PostInsightType::Saved,
+        'saved' => PostInsightType::Saves,
         'views' => PostInsightType::Views,
         'likes' => PostInsightType::Likes,
         'comments' => PostInsightType::Comments,
@@ -22,7 +22,7 @@ class InstagramPostInsightDTO extends AbstractPostInsightDTO
         PostInsightType::Likes,
         PostInsightType::Comments,
         PostInsightType::Shares,
-        PostInsightType::Saved,
+        PostInsightType::Saves,
     ];
 
     /**

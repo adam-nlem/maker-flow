@@ -4,6 +4,7 @@ namespace App\DTO\Response\Post;
 
 use App\DTO\AggregatedInsightDTO;
 use App\DTO\Response\ResponseDTOInterface;
+use App\Entity\Enum\Platform;
 use App\Entity\Post;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -13,7 +14,7 @@ class PostWithPlatformAndInsightsResponseDTO implements ResponseDTOInterface
         #[Groups(['api_posts_list', 'api_posts_show'])]
         private readonly Post $post,
         #[Groups(['api_posts_list', 'api_posts_show'])]
-        private readonly string $platform,
+        private readonly Platform $platform,
         /** @var AggregatedInsightDTO[] */
         #[Groups(['api_posts_list', 'api_posts_show'])]
         private readonly array $aggregatedInsights,
@@ -29,7 +30,7 @@ class PostWithPlatformAndInsightsResponseDTO implements ResponseDTOInterface
     {
         return [
             'post' => $this->post,
-            'platform' => $this->platform,
+            'platform' => $this->platform->value,
             'aggregatedInsights' => $this->aggregatedInsights,
             'postGroupUuid' => $this->postGroupUuid,
             'postGroupTitle' => $this->postGroupTitle,
@@ -42,7 +43,7 @@ class PostWithPlatformAndInsightsResponseDTO implements ResponseDTOInterface
         return $this->post;
     }
 
-    public function getPlatform(): string
+    public function getPlatform(): Platform
     {
         return $this->platform;
     }

@@ -47,7 +47,7 @@ class InsightHelper
         PostInsightType::Comments,
         PostInsightType::Shares,
         PostInsightType::Dislikes,
-        PostInsightType::Saved,
+        PostInsightType::Saves,
         PostInsightType::ThumbnailImpressions,
         PostInsightType::ThumbnailImpressionsClickRate,
         PostInsightType::AudienceWatchRatio,
