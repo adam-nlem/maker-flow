@@ -26,7 +26,7 @@ export default function DonutChart({
     const chartData = data.map((item) => ({ ...item, fill: item.color }))
 
     return (
-        <div className="relative" style={{ width: size, height: size }}>
+        <div className="relative **:outline-none" style={{ width: size, height: size }}>
             <PieChart width={size} height={size}>
                 <Pie
                     data={chartData}

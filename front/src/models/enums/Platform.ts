@@ -30,4 +30,10 @@ export const platformToIcon: Record<Platform, string> = {
     [Platform.Tiktok]: "/icons/platforms/tiktok.svg",
 }
 
+export const platformToChartColor: Record<Platform, string> = {
+    [Platform.Instagram]: "var(--color-purple)",
+    [Platform.Youtube]: "var(--color-red)",
+    [Platform.Tiktok]: "var(--color-primary)",
+}
+
 export const PLATFORM_PLACEHOLDER_ICON = "/icons/platforms/placeholder.svg";

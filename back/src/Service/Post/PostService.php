@@ -212,7 +212,7 @@ class PostService
                 uuid: $p->getUuid(),
                 caption: $p->getCaption(),
                 publishedAt: $p->getPublishedAt(),
-                platform: $p->getIntegration()->getPlatform()->value,
+                platform: $p->getIntegration()->getPlatform(),
                 views: InsightHelper::findAggregatedValue($insights, PostInsightType::Views),
                 likes: InsightHelper::findAggregatedValue($insights, PostInsightType::Likes),
                 comments: InsightHelper::findAggregatedValue($insights, PostInsightType::Comments),
@@ -234,7 +234,7 @@ class PostService
 
         return new PostWithPlatformAndInsightsResponseDTO(
             post: $post,
-            platform: $post->getIntegration()->getPlatform()->value,
+            platform: $post->getIntegration()->getPlatform(),
             aggregatedInsights: InsightHelper::sortAggregatedInsights($insights),
             postGroupUuid: $post->getPostGroup()?->getUuid(),
             postGroupTitle: $post->getPostGroup()?->getTitle(),

@@ -320,7 +320,7 @@ class PostInsightService
                 PostInsightType::Likes->value,
                 PostInsightType::Comments->value,
                 PostInsightType::Shares->value,
-                PostInsightType::Saved->value,
+                PostInsightType::Saves->value,
                 PostInsightType::TotalInteractions->value,
                 PostInsightType::AverageWatchTime->value,
                 PostInsightType::TotalWatchTime->value,
