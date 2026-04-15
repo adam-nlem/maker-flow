@@ -2,26 +2,32 @@ import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { integrationInsightQueryKeys } from "./integrationInsightQueryKeys";
 import {
-  IntegrationInsightsOverviewDTO,
-  type IntegrationInsightsOverviewDTOJSON,
-} from "~/dtos/integrationInsights/IntegrationInsightsOverviewDTO";
+  IntegrationInsightsResponseDTO,
+  type IntegrationInsightsResponseDTOJSON,
+} from "~/dtos/integrationInsights/IntegrationInsightsResponseDTO";
 
-export function useListIntegrationInsights({ projectUuid }: { projectUuid: string | null }) {
+interface UseListIntegrationInsightsProps {
+  projectUuid: string | null;
+  timePeriod: string;
+}
+
+export function useListIntegrationInsights({ projectUuid, timePeriod }: UseListIntegrationInsightsProps) {
   const query = useQuery({
-    queryKey: integrationInsightQueryKeys.list(projectUuid ?? ''),
+    queryKey: integrationInsightQueryKeys.list(projectUuid ?? '', timePeriod),
     queryFn: async () => {
-      const res = await httpClient.get<IntegrationInsightsOverviewDTOJSON>('/integration-insights', {
+      const res = await httpClient.get<IntegrationInsightsResponseDTOJSON>('/integration-insights', {
         params: {
-          "projectUuid": projectUuid
-        }
+          projectUuid,
+          timePeriod,
+        },
       })
-      return IntegrationInsightsOverviewDTO.fromJSON(res.data)
+      return IntegrationInsightsResponseDTO.fromJSON(res.data)
     },
     enabled: !!projectUuid,
   })
 
   return {
-    insightsOverview: query.data ?? null,
+    integrationInsights: query.data ?? null,
     isLoading: query.isLoading,
     error: query.error,
   }

@@ -6,13 +6,14 @@ import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegration
 
 interface IntegrationPillRowProps {
     integrations: Integration[]
+    showAllOption?: boolean
 }
 
-export default function IntegrationPillRow({ integrations }: IntegrationPillRowProps) {
+export default function IntegrationPillRow({ integrations, showAllOption = true }: IntegrationPillRowProps) {
 
     const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
     const setFocusedIntegrationUuid = useFocusIntegrationStore((state) => state.setFocusedIntegrationUuid)
-
+    
     return (
         <div className="flex flex-row flex-wrap gap-3">
             {integrations.map((integration) => (
@@ -25,13 +26,15 @@ export default function IntegrationPillRow({ integrations }: IntegrationPillRowP
                     borderColorClassName="border-light-gray"
                 />
             ))}
-            <Pill
-                icon={RectangleStackIcon}
-                label="Toutes les plateformes"
-                isSelected={focusedIntegrationUuid === null}
-                onClick={() => setFocusedIntegrationUuid(null)}
-                borderColorClassName="border-light-gray"
-            />
+            {showAllOption && (
+                <Pill
+                    icon={RectangleStackIcon}
+                    label="Toutes les plateformes"
+                    isSelected={focusedIntegrationUuid === null}
+                    onClick={() => setFocusedIntegrationUuid(null)}
+                    borderColorClassName="border-light-gray"
+                />
+            )}
         </div>
     )
 }

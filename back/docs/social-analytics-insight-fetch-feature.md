@@ -353,14 +353,14 @@ YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNee
 | Instagram API Metric | PostInsightType |
 |---------------------|-------------------------------|
 | `reach` | `Reach` |
-| `saved` | `Saved` |
+| `saved` | `Saves` |
 | `views` | `Views` |
 | `likes` | `Likes` |
 | `comments` | `Comments` |
 | `shares` | `Shares` |
 | `ig_reels_avg_watch_time` | `AverageWatchTime` (converted from ms to s) |
 | `ig_reels_video_view_total_time` | `TotalWatchTime` (converted from ms to s) |
-| *(calculated)* | `TotalInteractions` = Likes + Comments + Shares + Saved |
+| *(calculated)* | `TotalInteractions` = Likes + Comments + Shares + Saves |
 
 ### YouTube Post Insight Types
 
@@ -396,7 +396,7 @@ Each platform service has its own `createPostInsights` and `shouldCreateInsight`
 
 `TotalInteractions` is not fetched from any external API. Instead, it is computed and stored by each platform service after persisting individual metrics:
 
-- **Instagram**: `TotalInteractions = Likes + Comments + Shares + Saved`
+- **Instagram**: `TotalInteractions = Likes + Comments + Shares + Saves`
 - **YouTube**: `TotalInteractions = Likes + Dislikes + Comments + Shares`
 
 The calculated value is stored as a regular `PostInsight` entity with the same deduplication logic.

@@ -155,6 +155,42 @@ class IntegrationInsightRepository extends ServiceEntityRepository
     }
 
     /**
+     * Returns the latest TotalFollowers value per integration for a given project/user, keyed by integration id.
+     *
+     * @return array<int, float>
+     */
+    public function getLatestTotalFollowersByProjectAndUserGroupedByIntegration(
+        Project $project,
+        User $user,
+    ): array {
+        $sub = $this->getEntityManager()->createQueryBuilder()
+            ->select('MAX(sub.id)')
+            ->from(IntegrationInsight::class, 'sub')
+            ->innerJoin('sub.integration', 'subInt')
+            ->where('subInt.project = :project')
+            ->andWhere('sub.user = :user')
+            ->andWhere('sub.type = :type')
+            ->groupBy('sub.integration')
+            ->getDQL();
+
+        $rows = $this->createQueryBuilder('ii')
+            ->select('IDENTITY(ii.integration) AS integrationId', 'ii.value AS value')
+            ->where('ii.id IN (' . $sub . ')')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->setParameter('type', IntegrationInsightType::TotalFollowers)
+            ->getQuery()
+            ->getArrayResult();
+
+        $followersByIntegrationId = [];
+        foreach ($rows as $row) {
+            $followersByIntegrationId[(int) $row['integrationId']] = (float) $row['value'];
+        }
+
+        return $followersByIntegrationId;
+    }
+
+    /**
      * Returns the SUM of the latest TotalFollowers per integration before a given date.
      */
     public function getAggregatedTotalFollowersByProjectAndUserBeforeDate(

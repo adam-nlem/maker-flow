@@ -16,8 +16,8 @@ export default function IntegrationProfileInfo({ integration }: IntegrationProfi
     const { createIntegration } = useCreateIntegration({ projectUuid: focusedProjectUuid!, platform: integration.platform });
     return (
         <div className="flex flex-col gap-1">
-            <div className="flex flex-row gap-1 items-center">
-                <div className="relative shrink-0">
+            <div className="flex flex-row justify-between items-center">
+                <div className="flex flex-row gap-1 items-center">
                     {integration.profilePictureUrl ? (
                         <img
                             src={integration.profilePictureUrl}
@@ -29,16 +29,16 @@ export default function IntegrationProfileInfo({ integration }: IntegrationProfi
                             <UserIcon className="size-4 text-gray" />
                         </div>
                     )}
-                    <img
-                        src={platformToIcon[integration.platform]}
-                        alt=""
-                        className="size-3.5 absolute -top-1 -left-1"
-                    />
+                    <div className="flex flex-col">
+                        <h1 className="text-heading-xs">{integration.name}</h1>
+                        <p className="text-body-xs text-gray">{integration.userName}</p>
+                    </div>
                 </div>
-                <div className="flex flex-col">
-                    <h1 className="text-heading-xs">{integration.name}</h1>
-                    <p className="text-body-xs text-gray">{integration.userName}</p>
-                </div>
+                <img
+                    src={platformToIcon[integration.platform]}
+                    alt={platformToIcon[integration.platform]}
+                    className="size-3.5"
+                />
             </div>
             {integration.status !== IntegrationStatus.Active && focusedProjectUuid && <div className="flex flex-row gap-1">
                 <Pill isSelected

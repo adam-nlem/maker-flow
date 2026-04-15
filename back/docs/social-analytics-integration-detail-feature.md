@@ -2,7 +2,7 @@
 
 ## Overview
 
-This feature provides endpoints for listing and viewing integration insights. The list endpoint returns all insights for a project grouped by integration, while the detail endpoint returns aggregated insight data with evolution percentages and daily data points for charting.
+This feature provides endpoints for listing and viewing integration insights. The list endpoint returns all insights for a project — grouped by integration, plus an aggregated overview (KPIs with evolution) and a per-platform views timeline computed for the requested time period. The detail endpoint returns aggregated insight data for a single integration with evolution percentages and daily data points for charting.
 
 ---
 
@@ -15,10 +15,11 @@ This feature provides endpoints for listing and viewing integration insights. Th
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `projectUuid` | string (UUID) | Yes | UUID of the project |
+| `timePeriod` | string | No | One of `last_7_days`, `last_30_days`, `last_year`. Defaults to `last_7_days` when absent or invalid. Drives the period used to compute `overview` and `viewsTimeline`. |
 
 ### Response
 
-Returns an object with integration insight groups (one per integration) and aggregated insights across all integrations:
+Returns the integration insight groups (one per integration), an `overview` of aggregated KPIs with evolution, and a per-platform daily views timeline:
 
 ```json
 {
@@ -49,9 +50,23 @@ Returns an object with integration insight groups (one per integration) and aggr
       ]
     }
   ],
-  "aggregatedInsights": [
-    { "type": "views", "value": 5678 },
-    { "type": "total_followers", "value": 12500 }
+  "overview": {
+    "totalFollowers": 29500,
+    "totalFollowersEvolution": "+312",
+    "totalViews": 428000,
+    "totalViewsEvolution": "+18%",
+    "engagementRate": 4.2,
+    "engagementRateEvolution": "+0.4 pts",
+    "totalReach": 312000,
+    "totalReachEvolution": "-3%"
+  },
+  "viewsTimeline": [
+    {
+      "platform": "tiktok",
+      "points": [
+        { "date": "2026-04-01", "value": 10000 }
+      ]
+    }
   ]
 }
 ```
@@ -63,15 +78,27 @@ Controller
     ├── ProjectRepository (project lookup)
     └── IntegrationInsightService::list()
         ├── IntegrationRepository::getByProjectAndUser() (integrations)
-        └── IntegrationInsightRepository
-            ├── getLatestByUserAndByIntegration() (latest insights per integration)
-            └── getAggregatedLatestByProjectAndUser() (summed across all integrations per type)
+        ├── buildGroups()
+        │   ├── PostInsightRepository::getGrowthByProjectAndUserAndTypesInPeriodGroupedByIntegration() (per-integration growth)
+        │   └── IntegrationInsightRepository::getLatestTotalFollowersByProjectAndUserGroupedByIntegration() (batched followers per integration)
+        ├── buildOverview()
+        │   ├── PostInsightRepository::getGrowthByProjectAndUserAndTypesInPeriod() (current + previous period growth)
+        │   ├── IntegrationInsightRepository::getAggregatedTotalFollowersByProjectAndUserBeforeDate() (current + previous followers)
+        │   ├── InsightHelper::calculateEngagement()
+        │   ├── InsightEvolutionHelper::calculateEvolutionPercentage() (views, reach)
+        │   ├── InsightEvolutionHelper::calculateEvolutionPoints() (engagement rate)
+        │   └── InsightEvolutionHelper::calculateAbsoluteEvolution() (followers)
+        └── buildViewsTimeline()
+            ├── PostInsightRepository::getDailyGrowthByProjectAndUserAndTypeInPeriod() (daily views by platform)
+            └── TimelineGapFillerHelper::fillIntegrationInsightsViewsTimelinePointsDailyGaps() (zero-fills missing days)
 ```
 
 ### Response DTOs
 
-- `ListIntegrationInsightsResponseDTO` wraps `groups` (array of `ListIntegrationInsightsGroupedByIntegrationResponseDTO`) and `aggregatedInsights` (array of `{type, value}`)
-- `ListIntegrationInsightsGroupedByIntegrationResponseDTO` groups an `Integration` entity with its latest `IntegrationInsight[]`. The `Integration` entity is serialized using the `api_integration_insights_list` serialization group.
+- `ListIntegrationInsightsResponseDTO` — wraps `groups` (`ListIntegrationInsightsGroupedByIntegrationResponseDTO[]`), `overview` (`IntegrationInsightsOverviewDTO`) and `viewsTimeline` (`IntegrationInsightsViewsTimelineDTO[]`).
+- `ListIntegrationInsightsGroupedByIntegrationResponseDTO` — groups an `Integration` entity with its latest `IntegrationInsight[]`. The `Integration` entity is serialized using the `api_integration_insights_list` serialization group.
+- `IntegrationInsightsOverviewDTO` — flat KPIs + evolution strings (`totalFollowers`, `totalFollowersEvolution`, `totalViews`, `totalViewsEvolution`, `engagementRate`, `engagementRateEvolution`, `totalReach`, `totalReachEvolution`).
+- `IntegrationInsightsViewsTimelineDTO` / `IntegrationInsightsViewsTimelinePointDTO` — per-platform daily points (`platform`, `points: [{ date, value }]`).
 
 ---
 
@@ -134,8 +161,9 @@ Controller
     └── IntegrationInsightService
         ├── IntegrationInsightRepository (insights by time period)
         │   └── InsightEvolutionHelper (evolution calculation)
-        ├── InsightHelper (extracting insight values)
+        ├── InsightHelper (extracting insight values, engagement calc)
         ├── TimelineGapFillerHelper (fills missing daily data points)
+        ├── PostInsightRepository (period-based growth queries)
         └── PostRepository (post count, streak)
 ```
 
@@ -154,7 +182,11 @@ src/
 │   │       └── ShowIntegrationDetailQueryParamDTO.php
 │   └── Response/
 │       └── IntegrationInsight/
+│           ├── ListIntegrationInsightsResponseDTO.php
 │           ├── ListIntegrationInsightsGroupedByIntegrationResponseDTO.php
+│           ├── IntegrationInsightsOverviewDTO.php
+│           ├── IntegrationInsightsViewsTimelineDTO.php
+│           ├── IntegrationInsightsViewsTimelinePointDTO.php
 │           ├── ShowIntegrationDetailResponseDTO.php
 │           ├── IntegrationInsightTimelineDTO.php
 │           ├── IntegrationInsightTimelinePointDTO.php
@@ -165,17 +197,22 @@ src/
 │   └── TimelineGapFillerHelper.php
 ├── Repository/
 │   ├── IntegrationInsightRepository.php
+│   ├── PostInsightRepository.php
 │   └── PostRepository.php
 └── Service/
-    └── IntegrationInsightService.php
+    └── IntegrationInsight/
+        └── IntegrationInsightService.php
 ```
 
 ---
 
 ## Notes
 
-- Timelines are returned for these insight types: TotalFollowers, Comments, Shares, Saves, Views, Reach, Likes
-- The controller hardcodes the time period to `LastYear`, so the backend always returns a **full year** of `timelines` data
-- **Insight tile values are computed on the frontend**: the dynamic insight tiles display the sum of daily values within the selected time period, computed via `computeTotalValue(getFilteredInsightsForType(...))` in `insightChartDataHelper.ts`. This means tile values update reactively when the user changes the time period filter, without an additional API call.
-- The `InsightEvolutionHelper` and `InsightHelper` are shared with `PostService` and `PostInsightService` to avoid code duplication
-- The detail logic lives in `IntegrationInsightService` alongside the fetch logic (one service per domain)
+- The list endpoint's `overview` and `viewsTimeline` are computed from `PostInsight` snapshots (cumulative per-post values), while `groups[].insights` and `overview.totalFollowers` come from `IntegrationInsight` (account-level data).
+- For period-based metrics, growth is computed as `latest_in_period - baseline_before_period` per post; new posts published during the period contribute their full latest value.
+- The daily views timeline uses a native SQL `LAG()` window function to compute per-snapshot diffs, then aggregates by platform + date. Missing dates are zero-filled via `TimelineGapFillerHelper::fillIntegrationInsightsViewsTimelinePointsDailyGaps()`.
+- Singular `IntegrationInsight*` DTOs (e.g., `IntegrationInsightTimelineDTO`) are scoped to a single integration. Plural `IntegrationInsights*` DTOs (e.g., `IntegrationInsightsOverviewDTO`) represent project-wide aggregates.
+- Detail endpoint timelines are returned for: TotalFollowers, Comments, Shares, Saves, Views, Reach, Likes
+- The detail controller hardcodes the time period to `LastYear`, so the backend always returns a **full year** of `timelines` data
+- **Insight tile values for the detail page are computed on the frontend**: the dynamic insight tiles display the sum of daily values within the selected time period, computed via `computeTotalValue(getFilteredInsightsForType(...))` in `insightChartDataHelper.ts`. This means tile values update reactively when the user changes the time period filter, without an additional API call.
+- `InsightEvolutionHelper` and `InsightHelper` are shared with `PostService` and `PostInsightService` to avoid code duplication.

@@ -405,7 +405,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/integration-insights?projectUuid={{projectUuid}}",
+              "raw": "{{baseUrl}}/api/integration-insights?projectUuid={{projectUuid}}&timePeriod=last_7_days",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -417,6 +417,10 @@
                 {
                   "key": "projectUuid",
                   "value": "{{projectUuid}}"
+                },
+                {
+                  "key": "timePeriod",
+                  "value": "last_7_days"
                 }
               ]
             }

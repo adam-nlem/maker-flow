@@ -2,40 +2,44 @@
 
 namespace App\Service\IntegrationInsight;
 
-use App\Entity\Enum\Platform;
-use App\Entity\Integration;
-use App\Entity\Project;
-use App\Entity\User;
-use App\Helper\DateHelper;
 use App\DTO\External\Instagram\InstagramIntegrationInsightDTO;
 use App\DTO\External\Tiktok\TiktokIntegrationInsightDTO;
 use App\DTO\External\Youtube\YoutubeIntegrationInsightDTO;
-use Google\Service\YouTube;
-use Google\Service\YouTubeAnalytics;
-use App\DTO\Response\IntegrationInsight\ListIntegrationInsightsGroupedByIntegrationResponseDTO;
-use App\DTO\Response\IntegrationInsight\ListIntegrationInsightsResponseDTO;
-use App\DTO\Response\IntegrationInsight\ShowIntegrationDetailResponseDTO;
+use App\DTO\Response\IntegrationInsight\IntegrationInsightsOverviewDTO;
+use App\DTO\Response\IntegrationInsight\IntegrationInsightsViewsTimelineDTO;
+use App\DTO\Response\IntegrationInsight\IntegrationInsightsViewsTimelinePointDTO;
 use App\DTO\Response\IntegrationInsight\IntegrationInsightTimelineDTO;
 use App\DTO\Response\IntegrationInsight\IntegrationInsightTimelinePointDTO;
 use App\DTO\Response\IntegrationInsight\IntegrationInsightWithEvolutionDTO;
-use App\Entity\Enum\IntegrationStatus;
+use App\DTO\Response\IntegrationInsight\ListIntegrationInsightsGroupedByIntegrationResponseDTO;
+use App\DTO\Response\IntegrationInsight\ListIntegrationInsightsResponseDTO;
+use App\DTO\Response\IntegrationInsight\ShowIntegrationDetailResponseDTO;
 use App\Entity\Enum\IntegrationInsightType;
+use App\Entity\Enum\IntegrationStatus;
+use App\Entity\Enum\Platform;
+use App\Entity\Enum\PostInsightType;
 use App\Entity\Enum\TimePeriod;
+use App\Entity\Integration;
 use App\Entity\IntegrationInsight;
+use App\Entity\Project;
+use App\Entity\User;
+use App\Exception\Integration\OAuthTokenRevokedException;
+use App\Helper\DateHelper;
 use App\Helper\InsightEvolutionHelper;
 use App\Helper\InsightHelper;
 use App\Helper\TimelineGapFillerHelper;
 use App\Repository\IntegrationInsightRepository;
+use App\Repository\IntegrationRepository;
+use App\Repository\PostInsightRepository;
 use App\Repository\PostRepository;
 use App\Repository\YoutubeReportingJobRepository;
-use App\Repository\IntegrationRepository;
-use App\Exception\Integration\OAuthTokenRevokedException;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\TiktokOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
 use Google\Client;
 use Google\Service\Exception;
-use Psr\Log\LoggerInterface;
+use Google\Service\YouTube;
+use Google\Service\YouTubeAnalytics;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Contracts\HttpClient\Exception\ClientExceptionInterface;
 use Symfony\Contracts\HttpClient\HttpClientInterface;
@@ -52,10 +56,30 @@ class IntegrationInsightService
         IntegrationInsightType::Likes,
     ];
 
+    private const OVERVIEW_POST_INSIGHT_TYPES = [
+        PostInsightType::Views,
+        PostInsightType::Likes,
+        PostInsightType::Comments,
+        PostInsightType::Shares,
+        PostInsightType::Saves,
+        PostInsightType::Reach,
+    ];
+
+    private const GROUP_GROWTH_INSIGHT_TYPES = [
+        IntegrationInsightType::Views,
+        IntegrationInsightType::Likes,
+        IntegrationInsightType::Comments,
+        IntegrationInsightType::Shares,
+        IntegrationInsightType::Saves,
+        IntegrationInsightType::Reach,
+    ];
+
     private string $instagramGraphUrl;
+    private string $tiktokApiUrl;
 
     public function __construct(
         private readonly IntegrationInsightRepository $integrationInsightRepository,
+        private readonly PostInsightRepository $postInsightRepository,
         private readonly PostRepository $postRepository,
         private readonly IntegrationRepository $integrationRepository,
         private readonly InstagramOAuthService $instagramOAuthService,
@@ -65,34 +89,28 @@ class IntegrationInsightService
         private readonly Client $googleClient,
         private readonly YoutubeOAuthService $youtubeOAuthService,
         private readonly YoutubeReportingJobRepository $youtubeReportingJobRepository,
-        private LoggerInterface $log
     ) {
         $this->instagramGraphUrl = $this->parameterBag->get('app.instagram.graph_url');
+        $this->tiktokApiUrl = $this->parameterBag->get('app.tiktok.api_url');
     }
 
-    public function list(User $user, Project $project, bool $isSubscribed = true): ListIntegrationInsightsResponseDTO
-    {
+    public function list(
+        User $user,
+        Project $project,
+        TimePeriod $timePeriod,
+    ): ListIntegrationInsightsResponseDTO {
+        $bounds = $this->computePeriodBounds($timePeriod);
+
         $integrations = $this->integrationRepository->getByProjectAndUser($project, $user);
 
-        $groups = array_map(
-            fn(Integration $integration) => new ListIntegrationInsightsGroupedByIntegrationResponseDTO(
-                integration: $integration,
-                insights: $this->integrationInsightRepository->getLatestByUserAndByIntegration($user, $integration),
-            ),
-            $integrations,
-        );
-
-        $aggregatedInsights = [];
-        if ($isSubscribed) {
-            foreach ($this->integrationInsightRepository->getAggregatedLatestByProjectAndUser($project, $user) as $row) {
-                $type = $row['type'] instanceof IntegrationInsightType ? $row['type']->value : $row['type'];
-                $aggregatedInsights[] = ['type' => $type, 'value' => (float) $row['totalValue']];
-            }
-        }
+        $groups = $this->buildGroups($user, $project, $integrations, $bounds['currentStart'], $bounds['currentEnd']);
+        $overview = $this->buildOverview($user, $project, $bounds['currentStart'], $bounds['currentEnd'], $bounds['previousStart'], $bounds['previousEnd']);
+        $viewsTimeline = $this->buildViewsTimeline($user, $project, $bounds['currentStart'], $bounds['currentEnd']);
 
         return new ListIntegrationInsightsResponseDTO(
             groups: $groups,
-            aggregatedInsights: $aggregatedInsights,
+            overview: $overview,
+            viewsTimeline: $viewsTimeline,
         );
     }
 
@@ -106,8 +124,6 @@ class IntegrationInsightService
 
         $metrics = implode(',', InstagramIntegrationInsightDTO::getMetricNames(except: ['followers_count']));
 
-        // Single API call with nested insights to reduce API calls
-        // Also fetches profile_picture_url to refresh it on each sync (prevents expiration issues)
         try {
             $response = $this->httpClient->request('GET', sprintf('%s/%s', $this->instagramGraphUrl, $integration->getAccountId()), [
                 'query' => [
@@ -123,12 +139,10 @@ class IntegrationInsightService
             throw $e;
         }
 
-        // Update profile picture URL on the integration to prevent expiration issues
         if (isset($data['profile_picture_url'])) {
             $integration->setProfilePictureUrl($data['profile_picture_url']);
         }
 
-        // Process insights from nested response
         $insightDTOs = [];
         if (isset($data['insights']['data'])) {
             foreach ($data['insights']['data'] as $integrationData) {
@@ -136,12 +150,11 @@ class IntegrationInsightService
             }
         }
 
-        // Add followers_count as an insight DTO
         if (isset($data['followers_count'])) {
             $insightDTOs[] = new InstagramIntegrationInsightDTO('followers_count', 'day', (float) $data['followers_count']);
         }
 
-        $this->createInsightEntities($integration, $insightDTOs);
+        $this->createInsightEntitiesFromDTOs($integration, $insightDTOs, InstagramIntegrationInsightDTO::getMetricMapping());
 
         $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
         $this->integrationRepository->save($integration, true);
@@ -159,7 +172,6 @@ class IntegrationInsightService
         $this->googleClient->setAccessToken($integration->getAccessToken());
 
         try {
-            // Fetch subscriber count from YouTube Data API
             $youtube = new YouTube($this->googleClient);
             $channelResponse = $youtube->channels->listChannels('statistics', ['mine' => true]);
             $channels = $channelResponse->getItems();
@@ -171,7 +183,6 @@ class IntegrationInsightService
                 $insightDTOs[] = new YoutubeIntegrationInsightDTO('subscriberCount', $subscriberCount);
             }
 
-            // Fetch analytics metrics from YouTube Analytics API
             $analytics = new YouTubeAnalytics($this->googleClient);
             $now = DateHelper::createUtcDateTimeImmutable();
             $startDate = $now->modify('-1 month')->format('Y-m-d');
@@ -218,7 +229,7 @@ class IntegrationInsightService
         $fields = implode(',', [...TiktokIntegrationInsightDTO::getMetricNames(), 'avatar_url']);
 
         try {
-            $response = $this->httpClient->request('GET', sprintf('%s/v2/user/info/', $this->parameterBag->get('app.tiktok.api_url')), [
+            $response = $this->httpClient->request('GET', sprintf('%s/v2/user/info/', $this->tiktokApiUrl), [
                 'headers' => [
                     'Authorization' => sprintf('Bearer %s', $integration->getAccessToken()),
                 ],
@@ -236,7 +247,6 @@ class IntegrationInsightService
 
         $user = $data['data']['user'] ?? [];
 
-        // Update profile picture URL on the integration to prevent expiration issues
         if (isset($user['avatar_url'])) {
             $integration->setProfilePictureUrl($user['avatar_url']);
         }
@@ -254,141 +264,138 @@ class IntegrationInsightService
         $this->integrationRepository->save($integration, true);
     }
 
-    private function createInsightEntities(Integration $integration, array $insightDTOs): void
-    {
-        $this->createInsightEntitiesFromDTOs($integration, $insightDTOs, InstagramIntegrationInsightDTO::getMetricMapping());
-    }
-
     /**
-     * @param Integration $integration
-     * @param array<InstagramIntegrationInsightDTO|YoutubeIntegrationInsightDTO> $insightDTOs
-     * @param array<string, IntegrationInsightType> $metricMapping
+     * @param Integration[] $integrations
+     * @return ListIntegrationInsightsGroupedByIntegrationResponseDTO[]
      */
-    private function createInsightEntitiesFromDTOs(Integration $integration, array $insightDTOs, array $metricMapping): void
-    {
-        foreach ($insightDTOs as $dto) {
-            $insightType = $metricMapping[$dto->getName()] ?? null;
-
-            if ($insightType === null) {
-                continue;
-            }
-
-            if ($this->shouldCreateInsight($integration, $insightType, $dto->getValue())) {
-                $insight = new IntegrationInsight();
-                $insight
-                    ->setType($insightType)
-                    ->setValue($dto->getValue())
-                    ->setValueFormat($insightType->getValueFormat())
-                    ->setIntegration($integration)
-                    ->setUser($integration->getUser());
-
-                $this->integrationInsightRepository->save($insight);
-            }
-        }
-    }
-
-    private function shouldCreateInsight(
-        Integration $integration,
-        IntegrationInsightType $type,
-        float $value,
-    ): bool {
-        return $this->integrationInsightRepository->getLatestByIntegrationAndByTypeAndByValue(
-            integration: $integration,
-            type: $type,
-            value: $value
-        ) === null;
-    }
-
-    public function getDetail(
+    private function buildGroups(
         User $user,
-        Integration $integration,
-        TimePeriod $timePeriod,
-    ): ShowIntegrationDetailResponseDTO {
-        $now = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-        $daysCount = $timePeriod->getDaysCount();
-
-        $currentPeriodStart = $now->modify("-{$daysCount} days");
-        $currentPeriodEnd = $now;
-
-        $previousPeriodStart = $currentPeriodStart->modify("-{$daysCount} days");
-        $previousPeriodEnd = $currentPeriodStart;
-
-        $currentInsights = $this->integrationInsightRepository->getByUserAndIntegrationAndTimePeriod(
-            $user,
-            $integration,
-            $currentPeriodStart,
-            $currentPeriodEnd,
-        );
-
-        $previousInsights = $this->integrationInsightRepository->getByUserAndIntegrationAndTimePeriod(
-            $user,
-            $integration,
-            $previousPeriodStart,
-            $previousPeriodEnd,
-        );
-
-        $insightsWithEvolution = $this->buildInsightsWithEvolution($currentInsights, $previousInsights);
-
-        $totalFollowers = InsightHelper::getInsightValueByType($currentInsights, IntegrationInsightType::TotalFollowers) ?? 0.0;
-        $postCount = $this->postRepository->countByIntegration($integration);
-        $streak = $this->postRepository->calculateStreak($integration);
-
-        $timelines = $this->buildTimelines($user, $integration, $currentPeriodStart);
-        $isYoutubeReportPending = $this->isYoutubeReportPending($integration);
-
-        return new ShowIntegrationDetailResponseDTO(
-            totalFollowers: $totalFollowers,
-            postCount: $postCount,
-            streak: $streak,
-            insights: $insightsWithEvolution,
-            timelines: $timelines,
-            isYoutubeReportPending: $isYoutubeReportPending,
-        );
-    }
-
-    /**
-     * @return IntegrationInsightTimelineDTO[]
-     */
-    private function buildTimelines(
-        User $user,
-        Integration $integration,
-        \DateTimeImmutable $periodStart,
+        Project $project,
+        array $integrations,
+        \DateTimeImmutable $startDate,
+        \DateTimeImmutable $endDate,
     ): array {
-        $insights = $this->integrationInsightRepository->getDailyByUserAndIntegrationAndTypes(
-            $user,
-            $integration,
-            self::GRAPH_INSIGHT_TYPES,
-            $periodStart,
+        $perIntegrationGrowths = $this->postInsightRepository->getGrowthByProjectAndUserAndTypesInPeriodGroupedByIntegration(
+            $project, $user, self::OVERVIEW_POST_INSIGHT_TYPES, $startDate, $endDate,
         );
 
-        $insightsByType = [];
-        foreach ($insights as $insight) {
-            $typeValue = $insight->getType()->value;
-            if (!isset($insightsByType[$typeValue])) {
-                $insightsByType[$typeValue] = [];
+        $growthsByIntegration = [];
+        foreach ($perIntegrationGrowths as $row) {
+            $growthsByIntegration[$row['integrationId']][$row['type']] = (float) $row['totalGrowth'];
+        }
+
+        $followersByIntegrationId = $this->integrationInsightRepository
+            ->getLatestTotalFollowersByProjectAndUserGroupedByIntegration($project, $user);
+
+        $groups = [];
+        foreach ($integrations as $integration) {
+            $growths = $growthsByIntegration[$integration->getId()] ?? [];
+            $followers = $followersByIntegrationId[$integration->getId()] ?? 0.0;
+
+            $insights = [
+                new IntegrationInsightWithEvolutionDTO(
+                    type: IntegrationInsightType::TotalFollowers,
+                    value: $followers,
+                    evolutionPercentage: null,
+                ),
+            ];
+
+            foreach (self::GROUP_GROWTH_INSIGHT_TYPES as $type) {
+                $insights[] = new IntegrationInsightWithEvolutionDTO(
+                    type: $type,
+                    value: $growths[$type->value] ?? 0.0,
+                    evolutionPercentage: null,
+                );
             }
-            $insightsByType[$typeValue][] = $insight;
+
+            $groups[] = new ListIntegrationInsightsGroupedByIntegrationResponseDTO(
+                integration: $integration,
+                insights: $insights,
+            );
+        }
+
+        return $groups;
+    }
+
+    private function buildOverview(
+        User $user,
+        Project $project,
+        \DateTimeImmutable $currentStart,
+        \DateTimeImmutable $currentEnd,
+        \DateTimeImmutable $previousStart,
+        \DateTimeImmutable $previousEnd,
+    ): IntegrationInsightsOverviewDTO {
+        $currentSums = $this->postInsightRepository->getGrowthByProjectAndUserAndTypesInPeriod(
+            $project, $user, self::OVERVIEW_POST_INSIGHT_TYPES, $currentStart, $currentEnd,
+        );
+
+        $previousSums = $this->postInsightRepository->getGrowthByProjectAndUserAndTypesInPeriod(
+            $project, $user, self::OVERVIEW_POST_INSIGHT_TYPES, $previousStart, $previousEnd,
+        );
+
+        $currentFollowers = $this->integrationInsightRepository->getAggregatedTotalFollowersByProjectAndUserBeforeDate(
+            $project, $user, $currentEnd,
+        ) ?? 0.0;
+
+        $previousFollowers = $this->integrationInsightRepository->getAggregatedTotalFollowersByProjectAndUserBeforeDate(
+            $project, $user, $currentStart,
+        ) ?? 0.0;
+
+        $currentByType = $this->buildGrowthByType($currentSums);
+        $previousByType = $this->buildGrowthByType($previousSums);
+
+        $currentViews = $currentByType[PostInsightType::Views->value] ?? 0.0;
+        $previousViews = $previousByType[PostInsightType::Views->value] ?? 0.0;
+
+        $currentReach = $currentByType[PostInsightType::Reach->value] ?? 0.0;
+        $previousReach = $previousByType[PostInsightType::Reach->value] ?? 0.0;
+
+        $currentInteractions = $this->sumInteractions($currentByType);
+        $previousInteractions = $this->sumInteractions($previousByType);
+
+        $currentEngagement = InsightHelper::calculateEngagement($currentInteractions, $currentViews);
+        $previousEngagement = InsightHelper::calculateEngagement($previousInteractions, $previousViews);
+
+        return new IntegrationInsightsOverviewDTO(
+            totalFollowers: $currentFollowers,
+            totalFollowersEvolution: InsightEvolutionHelper::calculateAbsoluteEvolution($currentFollowers, $previousFollowers),
+            totalViews: $currentViews,
+            totalViewsEvolution: InsightEvolutionHelper::calculateEvolutionPercentage($currentViews, $previousViews),
+            engagementRate: $currentEngagement,
+            engagementRateEvolution: InsightEvolutionHelper::calculateEvolutionPoints($currentEngagement, $previousEngagement),
+            totalReach: $currentReach,
+            totalReachEvolution: InsightEvolutionHelper::calculateEvolutionPercentage($currentReach, $previousReach),
+        );
+    }
+
+    /**
+     * @return IntegrationInsightsViewsTimelineDTO[]
+     */
+    private function buildViewsTimeline(
+        User $user,
+        Project $project,
+        \DateTimeImmutable $startDate,
+        \DateTimeImmutable $endDate,
+    ): array {
+        $rows = $this->postInsightRepository->getDailyGrowthByProjectAndUserAndTypeInPeriod(
+            $project, $user, PostInsightType::Views, $startDate, $endDate,
+        );
+
+        $pointsByPlatform = [];
+        foreach ($rows as $row) {
+            $pointsByPlatform[$row['platform']][] = new IntegrationInsightsViewsTimelinePointDTO(
+                date: $row['date'],
+                value: (float) $row['value'],
+            );
         }
 
         $timelines = [];
-        foreach (self::GRAPH_INSIGHT_TYPES as $type) {
-            $typeInsights = $insightsByType[$type->value] ?? [];
-
-            // Convert entities to DTOs first
-            $points = array_map(
-                fn ($insight) => new IntegrationInsightTimelinePointDTO(
-                    createdAt: $insight->getCreatedAt(),
-                    value: $insight->getValue(),
+        foreach ($pointsByPlatform as $platform => $points) {
+            $timelines[] = new IntegrationInsightsViewsTimelineDTO(
+                platform: Platform::from($platform),
+                points: TimelineGapFillerHelper::fillIntegrationInsightsViewsTimelinePointsDailyGaps(
+                    $points, $startDate, $endDate,
                 ),
-                $typeInsights,
-            );
-
-            // Fill gaps using DTOs
-            $filledPoints = TimelineGapFillerHelper::fillIntegrationInsightTimelinePointsDailyGaps($points);
-
-            $timelines[] = new IntegrationInsightTimelineDTO(
-                type: $type,
-                points: $filledPoints,
             );
         }
 
@@ -410,17 +417,16 @@ class IntegrationInsightService
             $currentValue = $insight->getValue();
             $previousValue = $previousByType[$type->value] ?? null;
 
-            $evolutionPercentage = InsightEvolutionHelper::calculateEvolutionPercentage($currentValue, $previousValue);
-
             $insightsWithEvolution[] = new IntegrationInsightWithEvolutionDTO(
                 type: $type,
                 value: $currentValue,
-                evolutionPercentage: $evolutionPercentage,
+                evolutionPercentage: InsightEvolutionHelper::calculateEvolutionPercentage($currentValue, $previousValue),
             );
         }
 
         return $insightsWithEvolution;
     }
+
 
     private function isYoutubeReportPending(Integration $integration): ?bool
     {
@@ -441,6 +447,91 @@ class IntegrationInsightService
         }
 
         return false;
+    }
+
+    /**
+     * @return array{currentStart: \DateTimeImmutable, currentEnd: \DateTimeImmutable, previousStart: \DateTimeImmutable, previousEnd: \DateTimeImmutable}
+     */
+    private function computePeriodBounds(TimePeriod $timePeriod): array
+    {
+        $now = DateHelper::createUtcDateTimeImmutable();
+        $daysCount = $timePeriod->getDaysCount();
+
+        $currentStart = $now->modify("-{$daysCount} days");
+        $previousStart = $currentStart->modify("-{$daysCount} days");
+
+        return [
+            'currentStart' => $currentStart,
+            'currentEnd' => $now,
+            'previousStart' => $previousStart,
+            'previousEnd' => $currentStart,
+        ];
+    }
+
+    /**
+     * @param array<string, float> $growthByType
+     */
+    private function sumInteractions(array $growthByType): float
+    {
+        return ($growthByType[PostInsightType::Likes->value] ?? 0.0)
+            + ($growthByType[PostInsightType::Comments->value] ?? 0.0)
+            + ($growthByType[PostInsightType::Shares->value] ?? 0.0)
+            + ($growthByType[PostInsightType::Saves->value] ?? 0.0);
+    }
+
+    /**
+     * @param array<array{type: string, totalGrowth: float|string}> $growths
+     * @return array<string, float>
+     */
+    private function buildGrowthByType(array $growths): array
+    {
+        $byType = [];
+        foreach ($growths as $row) {
+            $byType[$row['type']] = (float) $row['totalGrowth'];
+        }
+
+        return $byType;
+    }
+
+    /**
+     * @param array<InstagramIntegrationInsightDTO|YoutubeIntegrationInsightDTO|TiktokIntegrationInsightDTO> $insightDTOs
+     * @param array<string, IntegrationInsightType> $metricMapping
+     */
+    private function createInsightEntitiesFromDTOs(Integration $integration, array $insightDTOs, array $metricMapping): void
+    {
+        foreach ($insightDTOs as $dto) {
+            $insightType = $metricMapping[$dto->getName()] ?? null;
+
+            if ($insightType === null) {
+                continue;
+            }
+
+            if (!$this->shouldCreateInsight($integration, $insightType, $dto->getValue())) {
+                continue;
+            }
+
+            $insight = new IntegrationInsight();
+            $insight
+                ->setType($insightType)
+                ->setValue($dto->getValue())
+                ->setValueFormat($insightType->getValueFormat())
+                ->setIntegration($integration)
+                ->setUser($integration->getUser());
+
+            $this->integrationInsightRepository->save($insight);
+        }
+    }
+
+    private function shouldCreateInsight(
+        Integration $integration,
+        IntegrationInsightType $type,
+        float $value,
+    ): bool {
+        return $this->integrationInsightRepository->getLatestByIntegrationAndByTypeAndByValue(
+            integration: $integration,
+            type: $type,
+            value: $value,
+        ) === null;
     }
 
     /**

@@ -2,95 +2,148 @@
 
 ## Overview
 
-The home page (`/`) is the main dashboard. It shows an overview of insights across all integrations and highlights the best-performing content via a ranking system.
+The home page (`/`) is a full-width analytics view. It shows aggregated overview KPIs, per-integration metric cards, views evolution charts, engagement comparison, and a ranked list of top posts. All home-page metrics come from a single REST endpoint — there is no separate dashboard endpoint anymore.
 
 ## Layout
 
-Two-column layout (`w-2/3` + `w-1/3`). The content wrapper uses `h-screen overflow-hidden` to constrain both columns to viewport height. The flex row has `h-full` to propagate the height.
+Single-column, full-width, vertically scrollable layout (`h-full overflow-y-auto`). All sections stack vertically with `gap-5` spacing.
 
-- **Left column** (`overflow-y-auto scrollbar-none`): `HomeScriptsList` (filtered scripts list with status pills) + `ScriptCalendar`. Scrolls independently.
-- **Right column** (`min-h-0`): `HomeInsightsOverview` + ranked posts or ranked post groups. The `min-h-0` allows `flex-1 min-h-0` in child ranked list components to work, enabling their internal `overflow-y-auto` scrollable containers.
+## Sections
 
-## Empty State
+1. **Time period selector** — `SelectDropdown` rendering a `Pill` trigger; controls the period applied to the entire page.
+2. **HomeOverviewCards** — 4 KPI stat cards (followers, views, engagement, reach) with evolution indicators.
+3. **HomeHeader** — Per-integration cards (followers, views, engagement, reach) with `IntegrationProfileInfo`.
+4. **HomeViewsEvolutionChart** — Multi-line chart showing daily views per platform.
+5. **HomeEngagementChart** — Horizontal bar chart comparing engagement rate across platforms.
+6. **HomeTopPosts** — Platform pill selector + ranked posts list.
 
-When `integrations.length === 0`, the right column renders `ConnectIntegrationPlaceholder` instead of `HomeInsightsOverview` and ranked lists. This prevents unnecessary API calls and shows the user a CTA to connect an account via `/settings/integrations`.
+## Data Sources
+
+All home page analytics come from a single hook: `useListIntegrationInsights({ projectUuid, timePeriod })`. The `IntegrationInsightsResponseDTO` it returns contains:
+
+- `groups: IntegrationInsightsGroupedByIntegrationDTO[]` — fed to `HomeHeader` and `HomeEngagementChart` (per-integration metrics derived from each group's `insights` array; engagement rate computed client-side).
+- `overview: IntegrationInsightsOverviewDTO` — fed to `HomeOverviewCards` (KPIs + evolution strings).
+- `viewsTimeline: IntegrationInsightsViewsTimelineDTO[]` — fed to `HomeViewsEvolutionChart`.
+
+`HomeTopPosts` uses a separate `useListPaginatedRankedPosts` hook.
+
+## Empty States
+
+- **No integrations:** `ConnectIntegrationPlaceholder`
+- **Not subscribed:** `PremiumPlaceholder`
+- **Loading:** Shimmer skeleton matching header + cards + chart layout
 
 ## Components
 
-### HomeInsightsOverview
+### HomeHeader
 
-**File:** `app/components/home/HomeInsightsOverview.tsx`
+**File:** `app/components/home/HomeHeader.tsx`
 
-Displays integration selection via `IntegrationPillRow` and aggregated insight tiles. Fetches its own data via `useListIntegrationInsights({ projectUuid })`.
+Renders one card per connected integration with `IntegrationProfileInfo` and metrics (Followers, Views, Engagement, Reach). Metrics are extracted from each group's `insights` array via `getInsightValue` and `computeEngagementRate` (in `~/utils/insightHelpers.ts`).
 
-- Reads `focusedIntegrationUuid` from `useFocusIntegrationStore`
-- When an integration is focused: shows its insights + `IntegrationProfileInfo`
-- When "Toutes les plateformes" is selected (null): displays backend-provided `aggregatedInsights` (summed across all integrations per type)
-- Shows 4 `InsightTile` components: TotalFollowers, Views, Likes, Comments
+Props: `groups: IntegrationInsightsGroupedByIntegrationDTO[]`
 
-Props: `projectUuid`
+### HomeOverviewCards
+
+**File:** `app/components/home/HomeOverviewCards.tsx`
+
+Renders 4 `InsightTile` components for Total Followers, Total Views, Engagement Rate, and Total Reach. Each tile shows the value and an evolution indicator from the backend.
+
+Props: `overview: IntegrationInsightsOverviewDTO | null`
+
+### HomeViewsEvolutionChart
+
+**File:** `app/components/home/HomeViewsEvolutionChart.tsx`
+
+Wraps the `MultiLineChart` component with a section heading. Transforms `IntegrationInsightsViewsTimelineDTO[]` into chart series grouped by platform.
+
+Props: `viewsTimeline: IntegrationInsightsViewsTimelineDTO[]`
+
+### HomeEngagementChart
+
+**File:** `app/components/home/HomeEngagementChart.tsx`
+
+Wraps the `HorizontalBarChart` component. Derives engagement comparison data from integration insight groups, computing engagement rate client-side from each group's `insights` array.
+
+Props: `groups: IntegrationInsightsGroupedByIntegrationDTO[]`
+
+### HomeTopPosts
+
+**File:** `app/components/home/HomeTopPosts.tsx`
+
+Shows `IntegrationPillRow` (without "Toutes les plateformes" option) and `RankedPostsList`. Auto-selects the first integration if none is focused. Uses `useFocusIntegrationStore` for selection.
+
+Props: `integrations: Integration[]`
 
 ### RankedPostsList
 
 **File:** `app/components/home/RankedPostsList.tsx`
 
-Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `RankingItemTile` with infinite scroll via `useInfiniteScroll` hook. Outer container uses `flex-1 min-h-0`, inner scrollable div uses `overflow-y-auto scrollbar-none flex-1 min-h-0`. Displays Views, Likes, and Comments metrics for each post.
+Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `RankingItemTile` with infinite scroll. Displays Views, Likes, and Comments metrics.
 
 Props: `integrationUuid`
 
-### RankedPostGroupsList
+## Chart Components
 
-**File:** `app/components/home/RankedPostGroupsList.tsx`
+### MultiLineChart
 
-Calls `useListPaginatedRankedPostGroups({ projectUuid })`, renders post groups using `RankingItemTile` with infinite scroll via `useInfiniteScroll` hook. Outer container uses `flex-1 min-h-0`, inner scrollable div uses `overflow-y-auto scrollbar-none flex-1 min-h-0`. Displays group title, post count, and aggregated Views, Likes, and Comments metrics.
+**File:** `app/components/ui/MultiLineChart.tsx`
 
-Props: `projectUuid`
+Generic multi-line Recharts chart with date X-axis and multiple series. Merges series into a unified data array keyed by date. Each line colored per platform via `platformToChartColor`.
 
-### HomeScriptsList
+Props: `series: { platform: Platform; data: { date: string; value: number }[] }[]`
 
-**File:** `app/components/home/HomeScriptsList.tsx`
+### HorizontalBarChart
 
-Displays a filtered, paginated list of scripts. A row of `Pill` components lets the user select a `ScriptStatus` filter (persisted via `useScriptFilterStore.focusedScriptStatus`). Uses `useListPaginatedScripts({ projectUuid, status, limit: 10 })` to fetch filtered scripts. Renders `ScriptListItem` components in a horizontal list (`overflow-x-auto`) with infinite scroll via `useInfiniteScroll` hook (horizontal direction). Fixed height (`h-40`). Clicking a script opens a `ScriptDetailModal` (read-only preview with "open editor" button).
+**File:** `app/components/ui/HorizontalBarChart.tsx`
 
-Props: `projectUuid`
+Horizontal bar chart using Recharts `BarChart` with `layout="vertical"`. Each bar individually colored via `Cell` components.
 
-### HomeRankingItemTile
-
-**File:** `app/components/home/HomeRankingItemTile.tsx`
-
-Ranking item tile for the home page. Displays rank number with a dotted connecting line, thumbnail, subtitle text, and a Views metric (eye icon + compact number).
-
-Props: `index`, `postUuid?`, `subtitle`, `secondarySubtitle?`, `metricValue`, `isLast`
+Props: `data: { label: string; value: number; color: string }[]`
 
 ## Stores
+
+### useHomePeriodStore
+
+**File:** `app/stores/home/homePeriodStore.ts`
+
+Zustand store with persist middleware (`app:home:period`). Uses `createResettableStore`.
+
+| State | Type | Description |
+|-------|------|-------------|
+| `timePeriod` | `TimePeriod` | Selected home page time period (defaults to `Last7Days`). Drives the `useListIntegrationInsights` hook. |
+
+| Action | Description |
+|--------|-------------|
+| `setTimePeriod(period)` | Sets the time period |
 
 ### useFocusIntegrationStore
 
 **File:** `app/stores/integrations/focusIntegrationStore.ts`
 
-Zustand store with persist middleware (`app:integrations:focus`). Shared across home and insights pages.
+Shared across home and insights pages. Used by `HomeTopPosts` for platform selection.
 
-| State | Type | Description |
-|-------|------|-------------|
-| `focusedIntegrationUuid` | `string \| null` | UUID of the focused integration, or null for all platforms |
+## Hooks
 
-| Action | Description |
-|--------|-------------|
-| `setFocusedIntegrationUuid(uuid)` | Sets the focused integration |
+| Hook | File | API Endpoint | Returns |
+|------|------|-------------|---------|
+| `useListIntegrationInsights` | `app/hooks/api/integrationInsights/useListIntegrationInsights.ts` | `GET /api/integration-insights?projectUuid=...&timePeriod=...` | `{ integrationInsights: IntegrationInsightsResponseDTO \| null, isLoading, error }` |
+| `useListPaginatedRankedPosts` | `app/hooks/api/posts/useListPaginatedRankedPosts.ts` | `GET /api/posts/rank` | `{ posts, isLoading, isLoadingMore, hasMore, error, listMore }` |
 
-### useScriptFilterStore
+## DTOs
 
-**File:** `app/stores/scripts/scriptFilterStore.ts`
+| File | Description |
+|------|-------------|
+| `app/dtos/integrationInsights/IntegrationInsightsResponseDTO.ts` | Top-level wrapper: `groups`, `overview`, `viewsTimeline` |
+| `app/dtos/integrationInsights/IntegrationInsightsGroupedByIntegrationDTO.ts` | Integration + latest insights array |
+| `app/dtos/integrationInsights/IntegrationInsightsOverviewDTO.ts` | 4 KPI values + evolution strings (period-based) |
+| `app/dtos/integrationInsights/IntegrationInsightsViewsTimelineDTO.ts` | Platform + daily data points |
+| `app/dtos/integrationInsights/IntegrationInsightsViewsTimelinePointDTO.ts` | `{ date, value }` |
 
-Zustand store with persist middleware (`app:scripts:filter`).
+## Query Keys
 
-| State | Type | Description |
-|-------|------|-------------|
-| `focusedScriptStatus` | `ScriptStatus` | Selected script status filter (default: `Idea`) |
-
-| Action | Description |
-|--------|-------------|
-| `setFocusedScriptStatus(status)` | Sets the script status filter |
+- `integrationInsightQueryKeys.list(projectUuid, timePeriod)` — `["integrationInsights", "list", projectUuid, timePeriod]`
+- `postQueryKeys.rank(integrationUuid)` — `["posts", "rank", integrationUuid]`
 
 ## Shared Components
 
@@ -98,31 +151,6 @@ Zustand store with persist middleware (`app:scripts:filter`).
 
 **File:** `app/components/integrations/IntegrationPillRow.tsx`
 
-Reusable row of `Pill` components for selecting an integration. Reads/writes `focusedIntegrationUuid` from `useFocusIntegrationStore` directly. Includes a "Toutes les plateformes" option (sets UUID to null). Used in `HomeInsightsOverview` and `InsightsPageView`.
+Reusable row of `Pill` components for selecting an integration. Accepts `showAllOption` prop (default `true`) to conditionally show the "Toutes les plateformes" pill. `HomeTopPosts` passes `showAllOption={false}`.
 
-Props: `integrations: Integration[]`
-
-## Hooks
-
-| Hook | File | API Endpoint | Returns |
-|------|------|-------------|---------|
-| `useListIntegrationInsights` | `app/hooks/api/integrationInsights/useListIntegrationInsights.ts` | `GET /api/integration-insights` | `{ insightsOverview: IntegrationInsightsOverviewDTO \| null }` |
-| `useListPaginatedRankedPosts` | `app/hooks/api/posts/useListPaginatedRankedPosts.ts` | `GET /api/posts/rank` | `{ posts, isLoading, isLoadingMore, hasMore, error, listMore }` |
-| `useListPaginatedRankedPostGroups` | `app/hooks/api/postGroups/useListPaginatedRankedPostGroups.ts` | `GET /api/post-groups/rank` | `{ postGroups, isLoading, isLoadingMore, hasMore, error, listMore }` |
-| `useListPaginatedScripts` | `app/hooks/api/scripts/useListPaginatedScripts.ts` | `GET /api/scripts` | `{ scripts, isLoading, isLoadingMore, hasMore, listMore }` |
-
-## Models & DTOs
-
-| File | Description |
-|------|-------------|
-| `app/models/PostGroup.ts` | PostGroup model (uuid, title, createdAt, updatedAt, posts?) |
-| `app/dtos/posts/PostWithAggregatedInsightsDTO.ts` | Post with aggregated insights (post, aggregatedInsights) |
-| `app/dtos/postGroups/PostGroupWithAggregatedInsightsDTO.ts` | Post group with aggregated insights (postGroup, aggregatedInsights) |
-| `app/dtos/integrationInsights/IntegrationInsightsOverviewDTO.ts` | Overview DTO: groups (per integration) + aggregatedInsights (summed across all) |
-| `app/dtos/integrationInsights/IntegrationInsightsGroupedByIntegrationDTO.ts` | Integration with its latest insights (integration, insights[]) |
-
-## Query Keys
-
-- `postQueryKeys.rank(integrationUuid)` — `["posts", "rank", integrationUuid]`
-- `postGroupQueryKeys.rank(projectUuid)` — `["postGroups", "rank", projectUuid]`
-- `integrationInsightQueryKeys.list(projectUuid)` — `["integrationInsights", "list", projectUuid]`
+Props: `integrations: Integration[]`, `showAllOption?: boolean`

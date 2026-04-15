@@ -13,15 +13,27 @@ export const platformToFrenchTranslation: Record<Platform, string> = {
 export const platformOptions = Object.values(Platform)
 
 export const platformToBgClass: Record<Platform, string> = {
-    [Platform.Instagram]: "bg-purple/30",
-    [Platform.Youtube]: "bg-red/30",
-    [Platform.Tiktok]: "bg-dark/30",
+    [Platform.Instagram]: "bg-purple/10",
+    [Platform.Youtube]: "bg-red/10",
+    [Platform.Tiktok]: "bg-primary/10",
+}
+
+export const platformToBgFullClass: Record<Platform, string> = {
+    [Platform.Instagram]: "bg-purple",
+    [Platform.Youtube]: "bg-red",
+    [Platform.Tiktok]: "bg-primary",
+}
+
+export const platformToBorderClass: Record<Platform, string> = {
+    [Platform.Instagram]: "border border-purple/30",
+    [Platform.Youtube]: "border border-red/30",
+    [Platform.Tiktok]: "border border-primary/30",
 }
 
 export const platformToTextClass: Record<Platform, string> = {
     [Platform.Instagram]: "text-purple",
     [Platform.Youtube]: "text-red",
-    [Platform.Tiktok]: "text-dark",
+    [Platform.Tiktok]: "text-primary",
 }
 
 export const platformToIcon: Record<Platform, string> = {

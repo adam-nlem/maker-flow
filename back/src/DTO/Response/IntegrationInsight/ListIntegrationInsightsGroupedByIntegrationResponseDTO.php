@@ -11,7 +11,7 @@ class ListIntegrationInsightsGroupedByIntegrationResponseDTO implements Response
     public function __construct(
         #[Groups(['api_integration_insights_list'])]
         private readonly Integration $integration,
-        /** @var \App\Entity\IntegrationInsight[] */
+        /** @var IntegrationInsightWithEvolutionDTO[] */
         #[Groups(['api_integration_insights_list'])]
         private readonly array $insights,
     ) {}

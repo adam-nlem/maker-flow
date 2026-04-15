@@ -9,8 +9,9 @@ class ListIntegrationInsightsResponseDTO implements ResponseDTOInterface
     public function __construct(
         /** @var ListIntegrationInsightsGroupedByIntegrationResponseDTO[] */
         private readonly array $groups,
-        /** @var array<array{type: string, value: float}> */
-        private readonly array $aggregatedInsights,
+        private readonly IntegrationInsightsOverviewDTO $overview,
+        /** @var IntegrationInsightsViewsTimelineDTO[] */
+        private readonly array $viewsTimeline,
     ) {}
 
     public function getData(): array
@@ -20,7 +21,11 @@ class ListIntegrationInsightsResponseDTO implements ResponseDTOInterface
                 fn(ListIntegrationInsightsGroupedByIntegrationResponseDTO $g) => $g->getData(),
                 $this->getGroups(),
             ),
-            'aggregatedInsights' => $this->getAggregatedInsights(),
+            'overview' => $this->getOverview()->getData(),
+            'viewsTimeline' => array_map(
+                fn(IntegrationInsightsViewsTimelineDTO $v) => $v->getData(),
+                $this->getViewsTimeline(),
+            ),
         ];
     }
 
@@ -32,11 +37,16 @@ class ListIntegrationInsightsResponseDTO implements ResponseDTOInterface
         return $this->groups;
     }
 
-    /**
-     * @return array<array{type: string, value: float}>
-     */
-    public function getAggregatedInsights(): array
+    public function getOverview(): IntegrationInsightsOverviewDTO
     {
-        return $this->aggregatedInsights;
+        return $this->overview;
+    }
+
+    /**
+     * @return IntegrationInsightsViewsTimelineDTO[]
+     */
+    public function getViewsTimeline(): array
+    {
+        return $this->viewsTimeline;
     }
 }

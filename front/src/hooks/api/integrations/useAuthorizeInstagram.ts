@@ -7,6 +7,7 @@ import { useOAuthPopup } from "~/hooks/useOAuthPopup";
 import { OAuthErrorCode } from "~/models/enums/OAuthErrorCode";
 import { Platform } from "~/models/enums/Platform";
 import { integrationQueryKeys } from "./integrationQueryKeys";
+import { integrationInsightQueryKeys } from "../integrationInsights/integrationInsightQueryKeys";
 
 interface CreateIntegrationResponse {
     authorization_url: string;
@@ -22,6 +23,7 @@ export function useCreateIntegration({ projectUuid, platform }: UseCreateIntegra
 
     const handleOAuthSuccess = useCallback(() => {
         queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
+        queryClient.invalidateQueries({ queryKey: integrationInsightQueryKeys.all });
         track(AnalyticsEvent.IntegrationConnected, { platform })
     }, [queryClient, projectUuid, platform]);
 

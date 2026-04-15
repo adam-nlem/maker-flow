@@ -11,7 +11,6 @@ use App\Exception\Project\ProjectNotFoundException;
 use App\Repository\ProjectRepository;
 use App\Service\IntegrationInsight\IntegrationInsightService;
 use App\Repository\IntegrationRepository;
-use App\Repository\SubscriptionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
@@ -24,7 +23,6 @@ final class IntegrationInsightController extends AbstractController
         ListIntegrationInsightsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
         IntegrationInsightService $insightService,
-        SubscriptionRepository $subscriptionRepository,
     ): Response {
         /** @var User $user */
         $user = $this->getUser();
@@ -35,42 +33,16 @@ final class IntegrationInsightController extends AbstractController
             throw new ProjectNotFoundException();
         }
 
-        $isSubscribed = $subscriptionRepository->getLatestActiveByUser($user) !== null;
-
-        $result = $insightService->list($user, $project, $isSubscribed);
+        $result = $insightService->list(
+            user: $user,
+            project: $project,
+            timePeriod: $queryParamDto->getTimePeriod(),
+        );
 
         return $this->json(
             data: $result->getData(),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_integration_insights_list']],
-        );
-    }
-
-    #[Route('/detail', name: 'api_integration_insights_detail', methods: ['GET'])]
-    public function detail(
-        ShowIntegrationDetailQueryParamDTO $queryParamDto,
-        IntegrationRepository $integrationRepository,
-        IntegrationInsightService $insightService,
-    ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
-
-        if ($integration === null) {
-            throw new IntegrationNotFoundException();
-        }
-
-        $detail = $insightService->getDetail(
-            user: $user,
-            integration: $integration,
-            timePeriod: TimePeriod::LastYear,
-        );
-
-        return $this->json(
-            data: $detail->getData(),
-            status: Response::HTTP_OK,
-            context: ['groups' => ['api_integration_insights_detail']],
         );
     }
 }
