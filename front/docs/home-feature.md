@@ -79,9 +79,13 @@ Props: `integrations: Integration[]`
 
 **File:** `app/components/home/RankedPostsList.tsx`
 
-Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `RankingItemTile` with infinite scroll. Displays Views, Likes, and Comments metrics.
+Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `RankingItemTile` with infinite scroll. Displays Views, Likes, and Comments metrics. Each tile is clickable: clicking a tile calls `selectPost(uuid)` on `useContentsStore` and opens `ContentsRightPanel.PostDetail` via `useContentsRightPanelStore`, which shows the shared `ContentPostDetailPanel` mounted on the home route.
 
 Props: `integrationUuid`
+
+## Detail side panels
+
+The home route mounts the same detail side panels as the contents page (`ContentPostDetailPanel` and `ContentGroupDetailPanel`), wired through the shared `useContentsStore` (`selectedPostUuid`, `selectedGroupUuid`) and `useContentsRightPanelStore` (`activePanel`). This lets ranked tiles open a full detail panel without duplicating the contents-page implementation. Panel state is persisted via the `app:contents:state` / `app:contents:right-panel` Zustand stores, so the panel state is shared across the home and contents routes.
 
 ## Chart Components
 

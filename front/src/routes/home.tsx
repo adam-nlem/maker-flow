@@ -15,7 +15,6 @@ import Pill from "~/components/ui/Pill";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import IntegrationDetailCardRow from "~/components/integrations/IntegrationDetailCardRow";
-import HomeTopPosts from "~/components/home/HomeTopPosts";
 
 export default function HomePage() {
   const { projects, isLoading } = useListPaginatedProjects();
@@ -80,8 +79,8 @@ export default function HomePage() {
   const groups = integrationInsights?.groups ?? [];
 
   return (
-    <div className="h-full flex flex-row gap-3 overflow-y-auto">
-      <div className="p-3 md:p-5 flex flex-col gap-5">
+    <div className="h-full flex flex-row gap-3 overflow-y-auto p-3 md:p-5">
+      <div className="flex flex-col justify-between">
         <div className="flex flex-row gap-3">
           <SelectDropdown
             items={timePeriodOptions}
@@ -115,7 +114,6 @@ export default function HomePage() {
         <HomeEngagementChart groups={groups} />
       </div>
 
-      <HomeTopPosts integrations={integrations} />
     </div>
   );
 }
