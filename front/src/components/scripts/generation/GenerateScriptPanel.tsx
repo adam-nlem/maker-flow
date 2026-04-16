@@ -91,7 +91,7 @@ export default function GenerateScriptPanel({ scriptUuid }: GenerateScriptPanelP
         <SidePanel
             title="Générer avec l'IA"
             icon={SparklesIcon}
-            width="w-96"
+            width="w-120"
             isOpen={isOpen}
             onClose={closePanel}
             footer={
