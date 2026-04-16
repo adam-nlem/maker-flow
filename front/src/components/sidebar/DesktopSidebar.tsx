@@ -8,7 +8,7 @@ import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
 import IconWithTextTile from "../ui/IconWithTextTile";
 import { useLocation, useNavigate } from "react-router-dom";
-import { settingsSubscriptionPath } from "~/routes/routePaths";
+import { settingsSubscriptionPath, privacyPolicyPath, termsOfServicePath } from "~/routes/routePaths";
 import Shimmer from "../ui/Shimmer";
 import SelectDropdown from "../ui/SelectDropdown"
 import type { Project } from "~/models/Project"
@@ -19,6 +19,7 @@ import { platformOptions } from "~/models/enums/Platform";
 import { sidebarMainNavigationItems, sidebarBottomNavigationItems, navigationItemToFrenchTranslation, navigationItemToIcon, navigationItemToIconSolid, navigationItemToPath } from "~/models/enums/NavigationItem";
 import { isNavigationItemSelected } from "~/utils/navigationHelpers";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
+import SimpleTextButton from "../ui/SimpleTextButton";
 import IntegrationTile from "../integrations/IntegrationTile";
 import IntegrationLoginModal from "../integrations/IntegrationLoginModal";
 import { useIntegrationLoginModalStore } from "~/stores/integrations/integrationLoginModalStore";
@@ -181,6 +182,16 @@ export default function DesktopSidebar() {
                 <p className="text-sm">Passer Premium ?</p>
               </div>
             </Button>
+          </div>
+
+          <div className="px-3 pb-3 flex gap-2 justify-center items-center">
+            <SimpleTextButton onClick={() => navigate(privacyPolicyPath)}>
+              Confidentialité
+            </SimpleTextButton>
+            <span className="text-xs text-gray">·</span>
+            <SimpleTextButton onClick={() => navigate(termsOfServicePath)}>
+              CGU
+            </SimpleTextButton>
           </div>
         </div>
       </div>

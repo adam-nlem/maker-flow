@@ -1,5 +1,8 @@
 import type { ComponentType, ReactNode, SVGProps } from "react"
+import { useNavigate } from "react-router-dom"
 import { Button } from "~/components/ui/Button"
+import SimpleTextButton from "~/components/ui/SimpleTextButton"
+import { privacyPolicyPath, termsOfServicePath } from "~/routes/routePaths"
 
 type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>
 
@@ -22,6 +25,8 @@ export default function AuthStepLayout({
     nextLabel = "Suivant",
     children,
 }: AuthStepLayoutProps) {
+    const navigate = useNavigate()
+
     return (
         <div className="min-h-screen flex flex-col gap-3 items-center justify-between px-6 py-12">
             <div className="flex flex-col gap-1 items-center">
@@ -54,6 +59,16 @@ export default function AuthStepLayout({
                     )}
                 </div>
             ) : <div />}
+
+            <div className="flex gap-2 justify-center items-center">
+                <SimpleTextButton onClick={() => navigate(privacyPolicyPath)}>
+                    Confidentialité
+                </SimpleTextButton>
+                <span className="text-xs text-gray">·</span>
+                <SimpleTextButton onClick={() => navigate(termsOfServicePath)}>
+                    CGU
+                </SimpleTextButton>
+            </div>
         </div>
     )
 }
