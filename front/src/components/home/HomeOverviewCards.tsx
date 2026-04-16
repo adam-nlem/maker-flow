@@ -1,4 +1,4 @@
-import { EyeIcon, FireIcon, SignalIcon, UsersIcon } from "@heroicons/react/24/solid";
+import { EyeIcon, FireIcon, UsersIcon } from "@heroicons/react/24/solid";
 import InsightTile from "~/components/insights/InsightTile";
 import type { IntegrationInsightsOverviewDTO } from "~/dtos/integrationInsights/IntegrationInsightsOverviewDTO";
 
