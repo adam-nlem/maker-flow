@@ -15,6 +15,7 @@ import Pill from "~/components/ui/Pill";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import IntegrationDetailCardRow from "~/components/integrations/IntegrationDetailCardRow";
+import HomeScriptsPanel from "~/components/home/HomeScriptsPanel";
 
 export default function HomePage() {
   const { projects, isLoading } = useListPaginatedProjects();
@@ -30,8 +31,8 @@ export default function HomePage() {
 
   if (isLoading) {
     return (
-      <div className="h-full overflow-y-auto p-3 md:p-5">
-        <div className="flex flex-col gap-5">
+      <div className="h-full flex flex-col md:flex-row gap-3 overflow-y-auto p-3 md:p-5">
+        <div className="flex flex-col gap-5 flex-1 min-w-0">
           <div className="flex flex-row justify-between items-center">
             <div className="flex flex-row items-center gap-3">
               <Shimmer width="w-10" height="h-10" radius="rounded-full" />
@@ -54,6 +55,7 @@ export default function HomePage() {
           </div>
           <Shimmer width="w-full" height="h-72" radius="rounded-lg" />
         </div>
+        <Shimmer width="w-1/2" height="h-96" radius="rounded-lg" />
       </div>
     );
   }
@@ -79,8 +81,8 @@ export default function HomePage() {
   const groups = integrationInsights?.groups ?? [];
 
   return (
-    <div className="h-full flex flex-row gap-3 overflow-y-auto p-3 md:p-5">
-      <div className="flex flex-col justify-between">
+    <div className="h-full flex flex-col md:flex-row gap-3 overflow-y-auto p-3 md:p-5">
+      <div className="flex flex-col gap-3 md:justify-between flex-1 min-w-0">
         <div className="flex flex-row gap-3">
           <SelectDropdown
             items={timePeriodOptions}
@@ -114,6 +116,7 @@ export default function HomePage() {
         <HomeEngagementChart groups={groups} />
       </div>
 
+      {focusedProjectUuid && <HomeScriptsPanel projectUuid={focusedProjectUuid} />}
     </div>
   );
 }

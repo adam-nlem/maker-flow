@@ -27,7 +27,7 @@ export default function IntegrationDetailCardRow({ groups }: IntegrationDetailCa
     if (groups.length === 0) return null;
 
     return (
-            <div className="flex flex-col gap-3 md:flex-row">
+            <div className="flex flex-row gap-3">
                 {groups.map((group) => {
                     const { integration, insights } = group;
                     const engagementRate = computeEngagementRate(insights);

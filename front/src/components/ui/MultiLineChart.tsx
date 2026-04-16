@@ -72,7 +72,7 @@ export default function MultiLineChart({ series }: MultiLineChartProps) {
         <div className="w-full h-50 **:outline-none">
             <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={mergedData}>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-light-gray)" />
                     <XAxis
                         dataKey="date"
                         tickFormatter={formatDateLabel}

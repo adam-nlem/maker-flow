@@ -26,7 +26,7 @@ export default function HomeOverviewCards({ overview }: HomeOverviewCardsProps) 
                     evolutionPercentage={overview.totalViewsEvolution}
                 />
                 <InsightTile
-                    label="Taux d'engagement"
+                    label="Engagement"
                     value={overview.engagementRate ?? 0}
                     Icon={FireIcon}
                     evolutionPercentage={overview.engagementRateEvolution}

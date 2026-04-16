@@ -25,7 +25,7 @@ export default function HomeEngagementChart({ groups }: HomeEngagementChartProps
 
     return (
         <div className="border border-light-gray rounded-lg p-3">
-            <h2 className="text-body-sm mb-3">Engagement par plateforme</h2>
+            <h2 className="text-heading-sm mb-3">Engagement par plateforme</h2>
             <HorizontalBarChart data={data} />
         </div>
     );

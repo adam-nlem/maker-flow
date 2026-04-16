@@ -2,20 +2,26 @@
 
 ## Overview
 
-The home page (`/`) is a full-width analytics view. It shows aggregated overview KPIs, per-integration metric cards, views evolution charts, engagement comparison, and a ranked list of top posts. All home-page metrics come from a single REST endpoint — there is no separate dashboard endpoint anymore.
+The home page (`/`) is a two-column view. The left column holds the analytics content (aggregated overview KPIs, per-integration metric cards, views evolution chart, engagement comparison, ranked top posts). The right column holds a persistent Scripts summary panel. All home-page analytics come from a single REST endpoint (`/api/integration-insights`); the Scripts panel uses `/api/scripts`.
 
 ## Layout
 
-Single-column, full-width, vertically scrollable layout (`h-full overflow-y-auto`). All sections stack vertically with `gap-5` spacing.
+Two-column layout: `h-full flex flex-row gap-3 overflow-y-auto p-3 md:p-5`.
+- **Left column** (`flex-1 min-w-0`): stacked analytics sections with `gap-5` spacing.
+- **Right column** (`w-80 shrink-0`): `HomeScriptsPanel`, always visible when the user has integrations + an active subscription.
 
 ## Sections
 
+### Left column
 1. **Time period selector** — `SelectDropdown` rendering a `Pill` trigger; controls the period applied to the entire page.
 2. **HomeOverviewCards** — 4 KPI stat cards (followers, views, engagement, reach) with evolution indicators.
 3. **HomeHeader** — Per-integration cards (followers, views, engagement, reach) with `IntegrationProfileInfo`.
 4. **HomeViewsEvolutionChart** — Multi-line chart showing daily views per platform.
 5. **HomeEngagementChart** — Horizontal bar chart comparing engagement rate across platforms.
 6. **HomeTopPosts** — Platform pill selector + ranked posts list.
+
+### Right column
+7. **HomeScriptsPanel** — Summary of the project's scripts grouped into 3 logical status groups, with a "+ Nouveau" shortcut to create a script and jump into the scripts editor.
 
 ## Data Sources
 
@@ -83,6 +89,26 @@ Calls `useListPaginatedRankedPosts({ integrationUuid })`, renders posts using `R
 
 Props: `integrationUuid`
 
+### HomeScriptsPanel
+
+**File:** `src/components/home/HomeScriptsPanel.tsx`
+
+Right-column summary panel listing the project's scripts grouped into 3 logical status groups. Fetches scripts via `useListPaginatedScripts({ projectUuid, limit: 100 })` (one-page fetch — the per-project limit is already enforced by the subscription plan) and groups them client-side using `groupScriptsByStatusGroup` (from `~/utils/scriptHelpers`). Within each group, scripts are sorted by `updatedAt ?? createdAt` DESC so the list behaves like a "recent activity" feed. The subscription limit check uses `isScriptLimitReached` (from `~/utils/subscriptionHelpers`), shared with `ScriptListPanel`.
+
+The panel contains:
+- **Header** — "Scripts" title + `+ Nouveau` Pill button. Clicking the button reuses the `useCreateScript` + `useFocusScriptStore.setFocusedScriptUuid` flow from `ScriptListPanel`, then navigates to `/scripts` so the user lands directly in the editor. The button is hidden when the subscription script limit is reached (same check as `ScriptListPanel`).
+- **HomeScriptsPanelStatsBar** — 3 colored count labels (`4 idées`, `6 en cours`, `3 terminés`) and a segmented progress bar whose segments flex-grow proportionally to their group counts. Falls back to a flat `bg-light-gray` bar when the total is 0.
+- **HomeScriptsPanelSection** (× 3) — Collapsible sections for `InProgress`, `Idea`, `Done` (in that order). `InProgress` and `Idea` default to open; `Done` defaults to collapsed. Each row is a `HomeScriptRow`. Clicking a row focuses the script via `setFocusedScriptUuid` and navigates to `/scripts`.
+
+The 3 groups are defined in `src/models/enums/ScriptStatusGroup.ts`:
+- **Idées** = `ScriptStatus.Idea`
+- **En cours** = `Scripting + Shooting + Editing + Scheduled`
+- **Terminés** = `Published`
+
+This grouping is intentionally local to this view; the rest of the app still uses the 6 individual `ScriptStatus` values (icons, pill colors, French translations inside each `HomeScriptRow` are still sourced from `ScriptStatus`).
+
+Props: `projectUuid: string`
+
 ## Detail side panels
 
 The home route mounts the same detail side panels as the contents page (`ContentPostDetailPanel` and `ContentGroupDetailPanel`), wired through the shared `useContentsStore` (`selectedPostUuid`, `selectedGroupUuid`) and `useContentsRightPanelStore` (`activePanel`). This lets ranked tiles open a full detail panel without duplicating the contents-page implementation. Panel state is persisted via the `app:contents:state` / `app:contents:right-panel` Zustand stores, so the panel state is shared across the home and contents routes.
@@ -133,6 +159,7 @@ Shared across home and insights pages. Used by `HomeTopPosts` for platform selec
 |------|------|-------------|---------|
 | `useListIntegrationInsights` | `app/hooks/api/integrationInsights/useListIntegrationInsights.ts` | `GET /api/integration-insights?projectUuid=...&timePeriod=...` | `{ integrationInsights: IntegrationInsightsResponseDTO \| null, isLoading, error }` |
 | `useListPaginatedRankedPosts` | `app/hooks/api/posts/useListPaginatedRankedPosts.ts` | `GET /api/posts/rank` | `{ posts, isLoading, isLoadingMore, hasMore, error, listMore }` |
+| `useListPaginatedScripts` | `src/hooks/api/scripts/useListPaginatedScripts.ts` | `GET /api/scripts?projectUuid=...&page=...&limit=...` | `{ scripts, isLoading, isLoadingMore, hasMore, listMore, error }` (used by `HomeScriptsPanel`) |
 
 ## DTOs
 
