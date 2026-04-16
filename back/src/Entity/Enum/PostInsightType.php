@@ -28,4 +28,14 @@ enum PostInsightType: string
             default => InsightValueFormat::Integer,
         };
     }
+
+    public function shouldAverage(): bool
+    {
+        return match ($this) {
+            self::AverageWatchTime,
+            self::ThumbnailImpressionsClickRate,
+            self::AudienceWatchRatio => true,
+            default => false,
+        };
+    }
 }

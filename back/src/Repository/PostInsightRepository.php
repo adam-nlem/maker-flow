@@ -238,11 +238,13 @@ class PostInsightRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns aggregated insight values (summed) per post group and per type,
+     * Returns aggregated insight values per post group and per type,
      * using the latest insight per post per type.
+     * Cumulative metrics (views, likes, etc.) are summed.
+     * Rate/average metrics (average watch time, click rate, etc.) are averaged.
      *
      * @param int[] $postGroupIds
-     * @return array<array{postGroupId: int, type: PostInsightType|string, totalValue: string}>
+     * @return array<array{postGroupId: int, type: PostInsightType|string, totalValue: string|float}>
      */
     public function getAggregatedLatestByPostGroupIds(array $postGroupIds): array
     {
@@ -257,14 +259,28 @@ class PostInsightRepository extends ServiceEntityRepository
             ->groupBy('sub.post, sub.type')
             ->getDQL();
 
-        return $this->createQueryBuilder('pi')
-            ->select('IDENTITY(p.postGroup) as postGroupId, pi.type as type, SUM(pi.value) as totalValue')
+        $rows = $this->createQueryBuilder('pi')
+            ->select('IDENTITY(p.postGroup) as postGroupId, pi.type as type, SUM(pi.value) as sumValue, COUNT(pi.value) as postCount')
             ->innerJoin('pi.post', 'p')
             ->where('pi.id IN (' . $sub . ')')
             ->setParameter('postGroupIds', $postGroupIds)
             ->groupBy('p.postGroup, pi.type')
             ->getQuery()
             ->getResult();
+
+        return array_map(function (array $row): array {
+            $type = $row['type'] instanceof PostInsightType
+                ? $row['type']
+                : PostInsightType::from($row['type']);
+
+            return [
+                'postGroupId' => $row['postGroupId'],
+                'type' => $row['type'],
+                'totalValue' => $type->shouldAverage()
+                    ? (float) $row['sumValue'] / max((int) $row['postCount'], 1)
+                    : $row['sumValue'],
+            ];
+        }, $rows);
     }
 
     /**
