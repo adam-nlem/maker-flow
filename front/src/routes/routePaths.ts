@@ -2,6 +2,7 @@
 export const homePath = '/'
 export const prelaunchPath = '/prelaunch'
 export const privacyPolicyPath = '/privacy-policy'
+export const termsOfServicePath = '/terms-of-service'
 export const onboardingPath = '/onboarding'
 export const loginPath = '/login'
 export const registerPath = '/register'

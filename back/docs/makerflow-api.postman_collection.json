@@ -24,7 +24,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"email\": \"a@g.com\",\n  \"password\": \"a@g.com\"\n}"
+              "raw": "{\n  \"email\": \"adam+1@gmail.com\",\n  \"password\": \"Password1234@\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/login",
@@ -405,7 +405,7 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/integration-insights?projectUuid={{projectUuid}}",
+              "raw": "{{baseUrl}}/api/integration-insights?projectUuid={{projectUuid}}&timePeriod=last_7_days",
               "host": [
                 "{{baseUrl}}"
               ],
@@ -417,6 +417,10 @@
                 {
                   "key": "projectUuid",
                   "value": "{{projectUuid}}"
+                },
+                {
+                  "key": "timePeriod",
+                  "value": "last_7_days"
                 }
               ]
             }

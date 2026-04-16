@@ -2,7 +2,7 @@
 
 ## Overview
 
-This feature fetches insights from Instagram's Graph API and YouTube's Reporting API using an asynchronous message queue architecture. It supports two types of insights:
+This feature fetches insights from Instagram's Graph API, YouTube's Reporting API, and TikTok's API v2 using an asynchronous message queue architecture. It supports two types of insights:
 
 - **Integration Insights**: Profile-level metrics (followers, reach, views, etc.)
 - **Post Insights**: Individual post metrics (likes, comments, saves, etc.)
@@ -49,12 +49,14 @@ Console Command
 │  → YoutubePostInsightService        │
 │  → YoutubeReportingService          │
 │  → InstagramPostInsightService      │
+│  → TiktokPostInsightService         │
 └─────────────────┬───────────────────┘
                   │ API call
                   ▼
 ┌─────────────────────────────────────┐
 │   Instagram Graph API / YouTube     │
-│   Data API / Reporting API          │
+│   Data API / Reporting API /        │
+│   TikTok API v2                     │
 └─────────────────────────────────────┘
 ```
 
@@ -73,15 +75,15 @@ Console Command
 
 | Handler | Service Called |
 |---------|----------------|
-| `FetchIntegrationInsightsHandler` | `IntegrationInsightService::fetchInstagramProfileInsights()` or `fetchYoutubeProfileInsights()` |
-| `FetchPostInsightsHandler` | `PostInsightService::fetchInstagramPostInsights()` or `fetchYoutubePostInsights()` |
+| `FetchIntegrationInsightsHandler` | `IntegrationInsightService::fetchInstagramProfileInsights()`, `fetchYoutubeProfileInsights()`, or `fetchTiktokProfileInsights()` |
+| `FetchPostInsightsHandler` | `PostInsightService::fetchInstagramPostInsights()`, `fetchYoutubePostInsights()`, or `fetchTiktokPostInsights()` |
 
 ### Commands
 
 | Command | Description |
 |---------|-------------|
-| `app:social-analytics:fetch-integration-insights` | Dispatches messages for Instagram and YouTube integrations not synced in the last 24 hours |
-| `app:social-analytics:fetch-post-insights` | Dispatches messages for all Instagram and YouTube integrations to fetch post insights |
+| `app:social-analytics:fetch-integration-insights` | Dispatches messages for Instagram, YouTube, and TikTok integrations not synced in the last 24 hours |
+| `app:social-analytics:fetch-post-insights` | Dispatches messages for all Instagram, YouTube, and TikTok integrations to fetch post insights |
 
 #### Sync Threshold
 
@@ -90,6 +92,7 @@ The `fetch-integration-insights` command only fetches insights for integrations 
 Supported platforms are defined in the command's `SUPPORTED_PLATFORMS` constant:
 - `Platform::Instagram`
 - `Platform::Youtube`
+- `Platform::Tiktok`
 
 ---
 
@@ -350,14 +353,14 @@ YouTube tokens expire after ~1 hour. The `YoutubeOAuthService::refreshTokenIfNee
 | Instagram API Metric | PostInsightType |
 |---------------------|-------------------------------|
 | `reach` | `Reach` |
-| `saved` | `Saved` |
+| `saved` | `Saves` |
 | `views` | `Views` |
 | `likes` | `Likes` |
 | `comments` | `Comments` |
 | `shares` | `Shares` |
 | `ig_reels_avg_watch_time` | `AverageWatchTime` (converted from ms to s) |
 | `ig_reels_video_view_total_time` | `TotalWatchTime` (converted from ms to s) |
-| *(calculated)* | `TotalInteractions` = Likes + Comments + Shares + Saved |
+| *(calculated)* | `TotalInteractions` = Likes + Comments + Shares + Saves |
 
 ### YouTube Post Insight Types
 
@@ -393,7 +396,7 @@ Each platform service has its own `createPostInsights` and `shouldCreateInsight`
 
 `TotalInteractions` is not fetched from any external API. Instead, it is computed and stored by each platform service after persisting individual metrics:
 
-- **Instagram**: `TotalInteractions = Likes + Comments + Shares + Saved`
+- **Instagram**: `TotalInteractions = Likes + Comments + Shares + Saves`
 - **YouTube**: `TotalInteractions = Likes + Dislikes + Comments + Shares`
 
 The calculated value is stored as a regular `PostInsight` entity with the same deduplication logic.
@@ -472,6 +475,96 @@ dce back php bin/console messenger:consume messages --no-debug -vv
 
 ---
 
+## TikTok API Details
+
+### Integration Insights
+
+**Endpoint:** `GET https://open.tiktokapis.com/v2/user/info/`
+**Required scope:** `user.info.stats`
+
+**Query Parameters:**
+- `fields`: `follower_count,video_count,avatar_url`
+
+**Headers:**
+- `Authorization: Bearer {access_token}`
+
+**Metric Mapping:**
+
+| TikTok Field | IntegrationInsightType | Notes |
+|---|---|---|
+| `follower_count` | TotalFollowers | Cumulative total |
+| `video_count` | Videos | Total public video count |
+
+**Note:** TikTok's user info endpoint provides cumulative totals only (no daily deltas like Instagram's insights API). The deduplication system tracks changes over time by storing new entries only when values change.
+
+The `avatar_url` is also refreshed on each sync (like Instagram's `profile_picture_url`).
+
+### Post Insights
+
+**Endpoint:** `POST https://open.tiktokapis.com/v2/video/list/`
+**Required scope:** `video.list`
+
+**Query Parameters:**
+- `fields`: `id,create_time,title,video_description,duration,cover_image_url,share_url,view_count,like_count,comment_count,share_count`
+
+**Request Body (JSON):**
+```json
+{
+    "cursor": 0,
+    "max_count": 20
+}
+```
+
+**Headers:**
+- `Authorization: Bearer {access_token}`
+- `Content-Type: application/json`
+
+**Pagination:** Cursor-based (descending by creation time). Response includes `cursor` (int64 ms timestamp) and `has_more` (boolean). Max 20 videos per page.
+
+**Metric Mapping:**
+
+| TikTok Field | PostInsightType |
+|---|---|
+| `view_count` | Views |
+| `like_count` | Likes |
+| `comment_count` | Comments |
+| `share_count` | Shares |
+| *(calculated)* | TotalInteractions = Likes + Comments + Shares |
+
+**Post Metadata:**
+
+| TikTok Field | Post Property |
+|---|---|
+| `id` | externalId |
+| `create_time` | publishedAt (Unix timestamp → DateTimeImmutable) |
+| `title` | caption |
+| `duration` | duration (seconds) |
+| `cover_image_url` | thumbnailUrl (6-hour TTL, downloaded locally) |
+| `share_url` | externalUrl |
+
+All TikTok posts are stored with `MediaType::Video`.
+
+### Service Architecture
+
+```
+PostInsightService::fetchTiktokPostInsights()
+    └── POST /v2/video/list/ (paginated, 20 per page)
+        └── TiktokPostInsightService::processPostData()
+            ├── TiktokPostDTO::fromArray() (video metadata + insights)
+            ├── PostService::createOrGetTiktokPost() (Post entity)
+            └── createPostInsights() (PostInsight entities with dedup)
+```
+
+### Token Refresh
+
+TikTok access tokens expire in **24 hours**. The `refreshTokenIfNeeded` method in `TiktokOAuthService`:
+1. Checks if `expiresAt` is within 1 hour
+2. If yes, calls TikTok's token refresh endpoint
+3. On success: updates integration with new tokens (TikTok rotates refresh tokens — must always store the new one)
+4. On 4xx error: sets integration status to `Revoked`, throws `OAuthTokenRevokedException`
+
+---
+
 ## Deduplication Logic
 
 Insights are only stored if the value has changed since the last record:
@@ -498,6 +591,13 @@ The `refreshTokenIfNeeded` method in `YoutubeOAuthService`:
 2. If yes, uses Google Client to fetch new access token with refresh token
 3. Updates the integration with new token and expiry
 4. Persists changes to database
+
+### TikTok
+The `refreshTokenIfNeeded` method in `TiktokOAuthService`:
+1. Checks if `expiresAt` is within 1 hour (TikTok tokens expire after 24 hours)
+2. If yes, calls TikTok's token refresh endpoint (`POST /v2/oauth/token/` with `grant_type=refresh_token`)
+3. Updates the integration with new access token, refresh token (TikTok rotates it), and expiry
+4. On 4xx error: sets integration status to `Revoked`, persists, throws `OAuthTokenRevokedException`
 
 ---
 

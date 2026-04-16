@@ -9,7 +9,7 @@ import { useUpdateScriptHook } from "~/hooks/api/scriptHooks/useUpdateScriptHook
 import { useDeleteScriptHook } from "~/hooks/api/scriptHooks/useDeleteScriptHook";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
 import { useHookTemplateStore } from "~/stores/scripts/hookTemplateStore";
-import { hasPlaceholders, replacePlaceholder } from "~/helpers/hookPlaceholderParser";
+import { hasPlaceholders, replacePlaceholder } from "~/utils/hookPlaceholderParser";
 import HookContentRenderer from "./HookContentRenderer";
 import ScriptPartCard from "./ScriptPartCard";
 import ApplyHookTemplateModal from "../hookTemplates/ApplyHookTemplateModal";

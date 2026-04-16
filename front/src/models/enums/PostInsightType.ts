@@ -1,4 +1,4 @@
-import { ArrowUpOnSquareIcon, BookmarkIcon, ChartBarIcon, ChatBubbleLeftIcon, ClockIcon, EyeIcon, HandThumbDownIcon, HeartIcon, SparklesIcon, UserPlusIcon, UsersIcon } from "@heroicons/react/24/solid";
+import { ArrowUpOnSquareIcon, BookmarkIcon, ChartBarIcon, ChatBubbleLeftIcon, ClockIcon, EyeIcon, HandThumbDownIcon, HeartIcon, SparklesIcon, UserPlusIcon, UsersIcon } from "@heroicons/react/24/outline";
 import type { ComponentType, SVGProps } from "react";
 import { formatDurationToFrench } from "~/utils/durationFormatters";
 import { formatCompactNumber } from "~/utils/numberFormatters";
@@ -6,7 +6,7 @@ import { formatCompactNumber } from "~/utils/numberFormatters";
 export enum PostInsightType {
     Reach = 'reach',
     TotalInteractions = 'total_interactions',
-    Saved = 'saved',
+    Saves = 'saves',
     Shares = 'shares',
     Views = 'views',
     Likes = 'likes',
@@ -24,7 +24,7 @@ export enum PostInsightType {
 export const postInsightTypeToIcon: Record<PostInsightType, ComponentType<SVGProps<SVGSVGElement>>> = {
     [PostInsightType.Reach]: UsersIcon,
     [PostInsightType.TotalInteractions]: SparklesIcon,
-    [PostInsightType.Saved]: BookmarkIcon,
+    [PostInsightType.Saves]: BookmarkIcon,
     [PostInsightType.Shares]: ArrowUpOnSquareIcon,
     [PostInsightType.Views]: EyeIcon,
     [PostInsightType.Likes]: HeartIcon,
@@ -41,21 +41,59 @@ export const postInsightTypeToIcon: Record<PostInsightType, ComponentType<SVGPro
 
 export const postInsightTypeToFrenchTranslation: Record<PostInsightType, string> = {
     [PostInsightType.Reach]: "Portée",
-    [PostInsightType.TotalInteractions]: "Interactions",
-    [PostInsightType.Saved]: "Enregistrements",
+    [PostInsightType.TotalInteractions]: "Interactions totales",
+    [PostInsightType.Saves]: "Enregistrements",
     [PostInsightType.Shares]: "Partages",
     [PostInsightType.Views]: "Vues",
     [PostInsightType.Likes]: "Likes",
     [PostInsightType.Comments]: "Commentaires",
-    [PostInsightType.AverageWatchTime]: "Temps de visionnage moyen",
-    [PostInsightType.TotalWatchTime]: "Temps de visionnage total",
-    [PostInsightType.Dislikes]: "Je n'aime pas",
+    [PostInsightType.AverageWatchTime]: "Moy. visionnage",
+    [PostInsightType.TotalWatchTime]: "Temps de visionnage",
+    [PostInsightType.Dislikes]: "Dislikes",
     [PostInsightType.ThumbnailImpressions]: "Impressions miniature",
     [PostInsightType.ThumbnailImpressionsClickRate]: "Taux de clics miniature",
     [PostInsightType.FollowersGained]: "Abonnés gagnés",
     [PostInsightType.FollowersLost]: "Abonnés perdus",
     [PostInsightType.AudienceWatchRatio]: "Ratio de visionnage",
 };
+
+export const postInsightTypeToEngagementColor: Partial<Record<PostInsightType, string>> = {
+    [PostInsightType.Likes]: "var(--color-primary)",
+    [PostInsightType.Comments]: "var(--color-purple)",
+    [PostInsightType.Shares]: "var(--color-green)",
+    [PostInsightType.Dislikes]: "var(--color-danger)",
+};
+
+export const postInsightTypeToEngagementBgClass: Partial<Record<PostInsightType, string>> = {
+    [PostInsightType.Likes]: "bg-primary",
+    [PostInsightType.Comments]: "bg-purple",
+    [PostInsightType.Shares]: "bg-green",
+    [PostInsightType.Dislikes]: "bg-danger",
+};
+
+export const postInsightOverviewTypes = new Set<PostInsightType>([
+    PostInsightType.Views,
+    PostInsightType.TotalInteractions,
+    PostInsightType.AverageWatchTime,
+    PostInsightType.TotalWatchTime,
+    PostInsightType.Reach,
+    PostInsightType.ThumbnailImpressions,
+    PostInsightType.ThumbnailImpressionsClickRate,
+    PostInsightType.AudienceWatchRatio,
+    PostInsightType.Saves,
+]);
+
+export const postInsightEngagementTypes = new Set<PostInsightType>([
+    PostInsightType.Likes,
+    PostInsightType.Comments,
+    PostInsightType.Shares,
+    PostInsightType.Dislikes,
+]);
+
+export const postInsightFollowerTypes = new Set<PostInsightType>([
+    PostInsightType.FollowersGained,
+    PostInsightType.FollowersLost,
+]);
 
 export const postInsightTypeOptions = Object.values(PostInsightType);
 

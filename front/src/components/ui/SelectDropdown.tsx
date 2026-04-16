@@ -55,7 +55,7 @@ export default function SelectDropdown<T>({
               const itemId = getItemId(item)
               const isSelected = selectedItemId ? selectedItemId === itemId : false
 
-              return (
+              return !isSelected && (
                 <div key={itemId}>
                   {renderItem({
                     item,

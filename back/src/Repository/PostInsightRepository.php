@@ -5,7 +5,10 @@ namespace App\Repository;
 use App\Entity\Enum\PostInsightType;
 use App\Entity\Post;
 use App\Entity\PostInsight;
+use App\Entity\Project;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
 
@@ -235,11 +238,13 @@ class PostInsightRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns aggregated insight values (summed) per post group and per type,
+     * Returns aggregated insight values per post group and per type,
      * using the latest insight per post per type.
+     * Cumulative metrics (views, likes, etc.) are summed.
+     * Rate/average metrics (average watch time, click rate, etc.) are averaged.
      *
      * @param int[] $postGroupIds
-     * @return array<array{postGroupId: int, type: PostInsightType|string, totalValue: string}>
+     * @return array<array{postGroupId: int, type: PostInsightType|string, totalValue: string|float}>
      */
     public function getAggregatedLatestByPostGroupIds(array $postGroupIds): array
     {
@@ -254,13 +259,254 @@ class PostInsightRepository extends ServiceEntityRepository
             ->groupBy('sub.post, sub.type')
             ->getDQL();
 
-        return $this->createQueryBuilder('pi')
-            ->select('IDENTITY(p.postGroup) as postGroupId, pi.type as type, SUM(pi.value) as totalValue')
+        $rows = $this->createQueryBuilder('pi')
+            ->select('IDENTITY(p.postGroup) as postGroupId, pi.type as type, SUM(pi.value) as sumValue, COUNT(pi.value) as postCount')
             ->innerJoin('pi.post', 'p')
             ->where('pi.id IN (' . $sub . ')')
             ->setParameter('postGroupIds', $postGroupIds)
             ->groupBy('p.postGroup, pi.type')
             ->getQuery()
             ->getResult();
+
+        return array_map(function (array $row): array {
+            $type = $row['type'] instanceof PostInsightType
+                ? $row['type']
+                : PostInsightType::from($row['type']);
+
+            return [
+                'postGroupId' => $row['postGroupId'],
+                'type' => $row['type'],
+                'totalValue' => $type->shouldAverage()
+                    ? (float) $row['sumValue'] / max((int) $row['postCount'], 1)
+                    : $row['sumValue'],
+            ];
+        }, $rows);
+    }
+
+    /**
+     * Computes total growth per PostInsightType across all posts in a project for a date range.
+     * Growth per post+type = latest snapshot in [startDate, endDate] - latest snapshot before startDate.
+     * If no baseline exists (new post), uses the full latest value.
+     *
+     * @param PostInsightType[] $types
+     * @return array<array{type: string, totalGrowth: float}>
+     */
+    public function getGrowthByProjectAndUserAndTypesInPeriod(
+        Project $project,
+        User $user,
+        array $types,
+        \DateTimeImmutable $startDate,
+        \DateTimeImmutable $endDate,
+    ): array {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            SELECT
+                latest.type,
+                SUM(CASE
+                    WHEN baseline.value IS NOT NULL THEN latest.value - baseline.value
+                    WHEN p.published_at >= :startDate THEN latest.value
+                    ELSE 0
+                END) AS totalGrowth
+            FROM (
+                SELECT pi.post_id, pi.type, pi.value
+                FROM post_insight pi
+                WHERE pi.id IN (
+                    SELECT MAX(pi2.id)
+                    FROM post_insight pi2
+                    INNER JOIN post p2 ON pi2.post_id = p2.id
+                    INNER JOIN integration i2 ON p2.integration_id = i2.id
+                    WHERE i2.project_id = :projectId
+                      AND pi2.user_id = :userId
+                      AND pi2.type IN (:types)
+                      AND pi2.created_at >= :startDate
+                      AND pi2.created_at <= :endDate
+                    GROUP BY pi2.post_id, pi2.type
+                )
+            ) latest
+            INNER JOIN post p ON latest.post_id = p.id
+            LEFT JOIN (
+                SELECT pi.post_id, pi.type, pi.value
+                FROM post_insight pi
+                WHERE pi.id IN (
+                    SELECT MAX(pi3.id)
+                    FROM post_insight pi3
+                    INNER JOIN post p3 ON pi3.post_id = p3.id
+                    INNER JOIN integration i3 ON p3.integration_id = i3.id
+                    WHERE i3.project_id = :projectId
+                      AND pi3.user_id = :userId
+                      AND pi3.type IN (:types)
+                      AND pi3.created_at < :startDate
+                    GROUP BY pi3.post_id, pi3.type
+                )
+            ) baseline ON latest.post_id = baseline.post_id AND latest.type = baseline.type
+            GROUP BY latest.type
+        ";
+
+        $typeValues = array_map(fn(PostInsightType $t) => $t->value, $types);
+
+        return $conn->executeQuery($sql, [
+            'projectId' => $project->getId(),
+            'userId' => $user->getId(),
+            'types' => $typeValues,
+            'startDate' => $startDate->format('Y-m-d H:i:s'),
+            'endDate' => $endDate->format('Y-m-d H:i:s'),
+        ], [
+            'types' => ArrayParameterType::STRING,
+        ])->fetchAllAssociative();
+    }
+
+    /**
+     * Same as getGrowthByProjectAndUserAndTypesInPeriod but grouped by integration.
+     *
+     * @param PostInsightType[] $types
+     * @return array<array{integrationId: int, type: string, totalGrowth: float}>
+     */
+    public function getGrowthByProjectAndUserAndTypesInPeriodGroupedByIntegration(
+        Project $project,
+        User $user,
+        array $types,
+        \DateTimeImmutable $startDate,
+        \DateTimeImmutable $endDate,
+    ): array {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            SELECT
+                p.integration_id AS integrationId,
+                latest.type,
+                SUM(CASE
+                    WHEN baseline.value IS NOT NULL THEN latest.value - baseline.value
+                    WHEN p.published_at >= :startDate THEN latest.value
+                    ELSE 0
+                END) AS totalGrowth
+            FROM (
+                SELECT pi.post_id, pi.type, pi.value
+                FROM post_insight pi
+                WHERE pi.id IN (
+                    SELECT MAX(pi2.id)
+                    FROM post_insight pi2
+                    INNER JOIN post p2 ON pi2.post_id = p2.id
+                    INNER JOIN integration i2 ON p2.integration_id = i2.id
+                    WHERE i2.project_id = :projectId
+                      AND pi2.user_id = :userId
+                      AND pi2.type IN (:types)
+                      AND pi2.created_at >= :startDate
+                      AND pi2.created_at <= :endDate
+                    GROUP BY pi2.post_id, pi2.type
+                )
+            ) latest
+            INNER JOIN post p ON latest.post_id = p.id
+            LEFT JOIN (
+                SELECT pi.post_id, pi.type, pi.value
+                FROM post_insight pi
+                WHERE pi.id IN (
+                    SELECT MAX(pi3.id)
+                    FROM post_insight pi3
+                    INNER JOIN post p3 ON pi3.post_id = p3.id
+                    INNER JOIN integration i3 ON p3.integration_id = i3.id
+                    WHERE i3.project_id = :projectId
+                      AND pi3.user_id = :userId
+                      AND pi3.type IN (:types)
+                      AND pi3.created_at < :startDate
+                    GROUP BY pi3.post_id, pi3.type
+                )
+            ) baseline ON latest.post_id = baseline.post_id AND latest.type = baseline.type
+            GROUP BY p.integration_id, latest.type
+        ";
+
+        $typeValues = array_map(fn(PostInsightType $t) => $t->value, $types);
+
+        return $conn->executeQuery($sql, [
+            'projectId' => $project->getId(),
+            'userId' => $user->getId(),
+            'types' => $typeValues,
+            'startDate' => $startDate->format('Y-m-d H:i:s'),
+            'endDate' => $endDate->format('Y-m-d H:i:s'),
+        ], [
+            'types' => ArrayParameterType::STRING,
+        ])->fetchAllAssociative();
+    }
+
+    /**
+     * Returns daily growth for a given insight type grouped by platform across all posts in a project.
+     * Uses LAG window function to compute per-snapshot diffs, then aggregates by platform and date.
+     *
+     * @return array<array{platform: string, date: string, value: float}>
+     */
+    public function getDailyGrowthByProjectAndUserAndTypeInPeriod(
+        Project $project,
+        User $user,
+        PostInsightType $type,
+        \DateTimeImmutable $startDate,
+        \DateTimeImmutable $endDate,
+    ): array {
+        $conn = $this->getEntityManager()->getConnection();
+
+        $sql = "
+            WITH relevant_snapshots AS (
+                SELECT pi.id, pi.post_id, pi.value, pi.created_at, i.platform, p.published_at
+                FROM post_insight pi
+                INNER JOIN post p ON pi.post_id = p.id
+                INNER JOIN integration i ON p.integration_id = i.id
+                WHERE i.project_id = :projectId
+                  AND pi.user_id = :userId
+                  AND pi.type = :type
+                  AND pi.created_at >= :startDate
+                  AND pi.created_at <= :endDate
+
+                UNION ALL
+
+                SELECT pi.id, pi.post_id, pi.value, pi.created_at, i.platform, p.published_at
+                FROM post_insight pi
+                INNER JOIN post p ON pi.post_id = p.id
+                INNER JOIN integration i ON p.integration_id = i.id
+                WHERE pi.id IN (
+                    SELECT MAX(pi2.id)
+                    FROM post_insight pi2
+                    INNER JOIN post p2 ON pi2.post_id = p2.id
+                    INNER JOIN integration i2 ON p2.integration_id = i2.id
+                    WHERE i2.project_id = :projectId
+                      AND pi2.user_id = :userId
+                      AND pi2.type = :type
+                      AND pi2.created_at < :startDate
+                    GROUP BY pi2.post_id
+                )
+            ),
+            with_lag AS (
+                SELECT
+                    rs.post_id,
+                    rs.value,
+                    rs.created_at,
+                    rs.platform,
+                    rs.published_at,
+                    DATE(rs.created_at) AS snapshot_date,
+                    LAG(rs.value) OVER (PARTITION BY rs.post_id ORDER BY rs.created_at, rs.id) AS prev_value
+                FROM relevant_snapshots rs
+            )
+            SELECT
+                platform,
+                snapshot_date AS date,
+                SUM(CASE
+                    WHEN prev_value IS NOT NULL THEN value - prev_value
+                    WHEN published_at >= :startDate THEN value
+                    ELSE 0
+                END) AS value
+            FROM with_lag
+            WHERE snapshot_date >= :startDateOnly
+              AND snapshot_date <= :endDateOnly
+            GROUP BY platform, snapshot_date
+            ORDER BY snapshot_date ASC, platform ASC
+        ";
+
+        return $conn->executeQuery($sql, [
+            'projectId' => $project->getId(),
+            'userId' => $user->getId(),
+            'type' => $type->value,
+            'startDate' => $startDate->format('Y-m-d H:i:s'),
+            'endDate' => $endDate->format('Y-m-d H:i:s'),
+            'startDateOnly' => $startDate->format('Y-m-d'),
+            'endDateOnly' => $endDate->format('Y-m-d'),
+        ])->fetchAllAssociative();
     }
 }

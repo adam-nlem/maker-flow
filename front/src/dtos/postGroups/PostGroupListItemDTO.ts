@@ -2,10 +2,10 @@ export interface PostGroupListItemDTOJSON {
     uuid: string;
     title: string;
     createdAt: string;
-    postCount: number;
+    postUuids: string[];
     views: number | null;
-    totalInteractions: number | null;
-    engagementByViews: number | null;
+    likes: number | null;
+    comments: number | null;
     scriptTitle: string | null;
 }
 
@@ -14,10 +14,10 @@ export class PostGroupListItemDTO {
         public readonly uuid: string,
         public readonly title: string,
         public readonly createdAt: Date,
-        public readonly postCount: number,
+        public readonly postUuids: string[],
         public readonly views: number | null,
-        public readonly totalInteractions: number | null,
-        public readonly engagementByViews: number | null,
+        public readonly likes: number | null,
+        public readonly comments: number | null,
         public readonly scriptTitle: string | null,
     ) {}
 
@@ -26,10 +26,10 @@ export class PostGroupListItemDTO {
             json.uuid,
             json.title,
             new Date(json.createdAt),
-            json.postCount,
+            json.postUuids,
             json.views,
-            json.totalInteractions,
-            json.engagementByViews,
+            json.likes,
+            json.comments,
             json.scriptTitle,
         );
     }

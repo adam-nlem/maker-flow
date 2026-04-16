@@ -2,7 +2,6 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
 import { track } from "~/services/analytics/analytics";
-import type { Script } from "~/models/Script";
 import { scriptQueryKeys } from "./scriptQueryKeys";
 
 export function useDeleteScript() {
@@ -14,10 +13,6 @@ export function useDeleteScript() {
         },
         onSuccess: (_data, deletedScriptUuid) => {
             queryClient.removeQueries({ queryKey: scriptQueryKeys.parts(deletedScriptUuid) });
-            queryClient.setQueriesData<Script[]>(
-                { queryKey: ['scripts', 'list'] },
-                (old) => old?.filter(s => s.uuid !== deletedScriptUuid)
-            );
             queryClient.invalidateQueries({ queryKey: scriptQueryKeys.all });
             track(AnalyticsEvent.ScriptDeleted)
         },

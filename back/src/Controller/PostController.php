@@ -105,42 +105,6 @@ final class PostController extends AbstractController
         );
     }
 
-    #[Route('/search', name: 'api_posts_search', methods: ['GET'])]
-    public function search(
-        SearchPostsQueryParamDTO $queryParamDto,
-        ProjectRepository $projectRepository,
-        PostRepository $postRepository,
-    ): JsonResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
-
-        if ($project === null) {
-            throw new ProjectNotFoundException();
-        }
-
-        $posts = $postRepository->searchByProjectAndUserAndCaption(
-            $project,
-            $user,
-            $queryParamDto->getPlatform(),
-            $queryParamDto->getSearch(),
-            $queryParamDto->getLimit(),
-        );
-
-        return $this->json(
-            data: array_map(fn($post) => [
-                'uuid' => $post->getUuid(),
-                'caption' => $post->getCaption(),
-                'publishedAt' => $post->getPublishedAt(),
-                'mediaType' => $post->getMediaType()->value,
-                'platform' => $post->getIntegration()->getPlatform()->value,
-                'postGroupUuid' => $post->getPostGroup()?->getUuid(),
-            ], $posts),
-            status: Response::HTTP_OK,
-        );
-    }
-
     #[Route('/{postUuid}/thumbnail', name: 'api_posts_thumbnail', methods: ['GET'])]
     public function getThumbnail(
         string $postUuid,

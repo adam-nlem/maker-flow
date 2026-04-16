@@ -2,6 +2,7 @@
 
 namespace App\Service\Post;
 
+use App\Entity\Enum\Platform;
 use App\Entity\Post;
 use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -24,8 +25,7 @@ class PostThumbnailService
      */
     public function downloadAndStore(Post $post, string $thumbnailUrl): ?string
     {
-        $platform = strtolower($post->getIntegration()->getPlatform()->value);
-        $directory = $this->getDirectory($platform);
+        $directory = $this->getDirectory($post->getIntegration()->getPlatform());
 
         if (!$this->filesystem->exists($directory)) {
             $this->filesystem->mkdir($directory);
@@ -51,8 +51,7 @@ class PostThumbnailService
      */
     public function getPath(Post $post): ?string
     {
-        $platform = strtolower($post->getIntegration()->getPlatform()->value);
-        $directory = $this->getDirectory($platform);
+        $directory = $this->getDirectory($post->getIntegration()->getPlatform());
 
         foreach (self::EXTENSIONS as $extension) {
             $filePath = sprintf('%s/%s.%s', $directory, $post->getUuid(), $extension);
@@ -78,11 +77,11 @@ class PostThumbnailService
         return new File($path, false);
     }
 
-    private function getDirectory(string $platform): string
+    private function getDirectory(Platform $platform): string
     {
         $projectDir = $this->parameterBag->get('kernel.project_dir');
 
-        return sprintf('%s%s', $projectDir, sprintf(self::BASE_PATH, $platform));
+        return sprintf('%s%s', $projectDir, sprintf(self::BASE_PATH, $platform->value));
     }
 
     private function getExtensionFromUrl(string $url): string

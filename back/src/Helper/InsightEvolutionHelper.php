@@ -18,6 +18,31 @@ class InsightEvolutionHelper
         return $sign . $percentage . '%';
     }
 
+    public static function calculateEvolutionPoints(?float $currentValue, ?float $previousValue): ?string
+    {
+        if ($currentValue === null || $previousValue === null || $previousValue == 0) {
+            return null;
+        }
+
+        $diff = round($currentValue - $previousValue, 1);
+        $sign = $diff >= 0 ? '+' : '';
+
+        return $sign . $diff . ' pts';
+    }
+
+    public static function calculateAbsoluteEvolution(float $currentValue, float $previousValue): ?string
+    {
+        $diff = $currentValue - $previousValue;
+
+        if ($diff == 0) {
+            return null;
+        }
+
+        $sign = $diff > 0 ? '+' : '';
+
+        return $sign . number_format($diff, 0, ',', ' ');
+    }
+
     /**
      * @param array $previousInsights Array of insight entities with getType() and getValue() methods
      * @return array<string, float> Map of type value to previous value

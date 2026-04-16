@@ -6,7 +6,7 @@ enum PostInsightType: string
 {
     case Reach = 'reach';
     case TotalInteractions = 'total_interactions';
-    case Saved = 'saved';
+    case Saves = 'saves';
     case Shares = 'shares';
     case Views = 'views';
     case Likes = 'likes';
@@ -26,6 +26,16 @@ enum PostInsightType: string
             self::AverageWatchTime, self::TotalWatchTime => InsightValueFormat::Seconds,
             self::ThumbnailImpressionsClickRate, self::AudienceWatchRatio => InsightValueFormat::Percentage,
             default => InsightValueFormat::Integer,
+        };
+    }
+
+    public function shouldAverage(): bool
+    {
+        return match ($this) {
+            self::AverageWatchTime,
+            self::ThumbnailImpressionsClickRate,
+            self::AudienceWatchRatio => true,
+            default => false,
         };
     }
 }

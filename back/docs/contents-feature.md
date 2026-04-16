@@ -145,6 +145,15 @@ Searches posts by caption within a project. Used by the PostPicker component on 
 | `getPostGroupListItems()` | `src/Service/PostGroup/PostGroupService.php` | Fetches paginated flat group summaries for the list |
 | `getPostGroupDetail()` | `src/Service/PostGroup/PostGroupService.php` | Fetches full group detail with all aggregated insights, posts, and script |
 
+## Post Group Insight Aggregation
+
+When aggregating insights across posts in a post group, the aggregation strategy depends on the metric type:
+
+- **Cumulative metrics** (views, likes, comments, shares, etc.) are **summed** across posts
+- **Rate/average metrics** (`AverageWatchTime`, `ThumbnailImpressionsClickRate`, `AudienceWatchRatio`) are **averaged** across posts
+
+This is controlled by `PostInsightType::shouldAverage()`. The repository method `getAggregatedLatestByPostGroupIds()` fetches both `SUM` and `COUNT`, then divides by count for averaged types.
+
 ## Script Linking
 
 Scripts are linked to post groups via a OneToOne relationship where the FK lives on the `Script` entity (`Script.postGroup`). The `PATCH /api/post-groups/{uuid}` endpoint handles linking/unlinking:

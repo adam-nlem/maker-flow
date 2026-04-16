@@ -12,6 +12,8 @@ class ListPostGroupsQueryParamDTO extends AbstractQueryParamDTO
     #[Assert\NotBlank]
     private string $projectUuid;
 
+    private ?string $searchTerm;
+
     #[Assert\NotBlank]
     #[Assert\Positive]
     private int $page;
@@ -30,6 +32,7 @@ class ListPostGroupsQueryParamDTO extends AbstractQueryParamDTO
     protected function fromQueryParams(array $queryParams): void
     {
         $this->projectUuid = $queryParams["projectUuid"];
+        $this->searchTerm = $queryParams["searchTerm"] ?? null;
         $this->page = (int) $queryParams["page"];
         $this->limit = (int) $queryParams["limit"];
     }
@@ -37,6 +40,11 @@ class ListPostGroupsQueryParamDTO extends AbstractQueryParamDTO
     public function getProjectUuid(): string
     {
         return $this->projectUuid;
+    }
+
+    public function getSearchTerm(): ?string
+    {
+        return $this->searchTerm;
     }
 
     public function getPage(): int

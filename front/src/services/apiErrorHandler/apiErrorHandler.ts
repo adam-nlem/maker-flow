@@ -6,7 +6,12 @@ import { loginPath } from '~/routes/routePaths'
 import { clearSessionData } from '~/services/session/clearSessionData'
 import { resolveErrorMessage } from './errorCodeMessages'
 
-export function handleMutationError(error: HttpException): void {
+export function handleMutationError(error: unknown): void {
+  if (!(error instanceof HttpException)) {
+    Sentry.captureException(error)
+    return
+  }
+
   if (error.response.httpStatus === 401) {
     clearSessionData()
     if (window.location.pathname !== loginPath) {

@@ -38,6 +38,8 @@ class FetchIntegrationInsightsHandler
             match ($integration->getPlatform()) {
                 Platform::Instagram => $this->integrationInsightService->fetchInstagramProfileInsights($integration),
                 Platform::Youtube => $this->integrationInsightService->fetchYoutubeProfileInsights($integration),
+                Platform::Tiktok => $this->integrationInsightService->fetchTiktokProfileInsights($integration),
+                default => null,
             };
         } catch (OAuthTokenRevokedException $e) {
             $this->eventDispatcher->dispatch(

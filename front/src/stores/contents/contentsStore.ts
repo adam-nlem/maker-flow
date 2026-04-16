@@ -8,6 +8,7 @@ type ContentsState = {
     platformFilter: Platform | null
     selectedGroupUuid: string | null
     selectedPostUuid: string | null
+    searchTerm: string | null
     isCreateGroupModalOpen: boolean
 }
 
@@ -16,6 +17,7 @@ type ContentsAction = {
     setPlatformFilter: (platform: Platform | null) => void
     selectGroup: (uuid: string | null) => void
     selectPost: (uuid: string | null) => void
+    setSearchTerm: (searchTerm: string | null) => void
     setIsCreateGroupModalOpen: (open: boolean) => void
     closePanel: () => void
 }
@@ -27,6 +29,7 @@ export const useContentsStore = create<ContentsState & ContentsAction>()(
             platformFilter: null,
             selectedGroupUuid: null,
             selectedPostUuid: null,
+            searchTerm: null,
             isCreateGroupModalOpen: false,
 
             setActiveTab: (tab) => set({
@@ -36,6 +39,7 @@ export const useContentsStore = create<ContentsState & ContentsAction>()(
                 isCreateGroupModalOpen: false,
             }),
             setPlatformFilter: (platform) => set({ platformFilter: platform }),
+            setSearchTerm: (searchTerm) => set({ searchTerm }),
             selectGroup: (uuid) => set({
                 selectedGroupUuid: uuid,
                 selectedPostUuid: null,
@@ -59,6 +63,13 @@ export const useContentsStore = create<ContentsState & ContentsAction>()(
         }),
         {
             name: "app:contents:state",
+            partialize: (state) => ({
+                activeTab: state.activeTab,
+                platformFilter: state.platformFilter,
+                selectedGroupUuid: state.selectedGroupUuid,
+                selectedPostUuid: state.selectedPostUuid,
+                isCreateGroupModalOpen: state.isCreateGroupModalOpen,
+            }),
         }
     )
 )

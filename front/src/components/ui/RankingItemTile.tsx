@@ -1,7 +1,6 @@
-import Shimmer from "~/components/ui/Shimmer"
-import { useShowPostThumbnail } from "~/hooks/api/posts/useShowPostThumbnail"
-import { type PostInsightType, postInsightTypeToIcon } from "~/models/enums/PostInsightType"
-import { formatCompactNumber } from "~/utils/numberFormatters"
+import type { PostInsightType } from "~/models/enums/PostInsightType"
+import CompactMetricRow from "~/components/ui/CompactMetricRow"
+import PostThumbnail from "~/components/ui/PostThumbnail"
 
 interface RankingItemTileProps {
   index: number
@@ -20,8 +19,6 @@ export default function RankingItemTile({
   metrics,
   isLast,
 }: RankingItemTileProps) {
-  const { thumbnailUrl } = useShowPostThumbnail(postUuid)
-
   return (
     <div className="flex flex-row gap-1 items-stretch">
       <div className="flex flex-col items-center w-6 shrink-0">
@@ -34,9 +31,7 @@ export default function RankingItemTile({
       <div className="flex flex-row py-1 gap-1 items-stretch">
 
         {postUuid && (
-          thumbnailUrl
-            ? <img src={thumbnailUrl} alt="" className="w-13 h-13 rounded object-cover shrink-0" />
-            : <Shimmer width="w-10" height="h-10" radius="rounded" />
+          <PostThumbnail postUuid={postUuid} className="w-13 h-13 rounded shrink-0" />
         )}
 
         <div className="flex flex-col min-w-0 max-w-xs justify-center">
@@ -45,19 +40,7 @@ export default function RankingItemTile({
             <p className="text-body-xs text-gray">{subtitle}</p>
           )}
 
-          {metrics.length > 0 && (
-            <div className="flex flex-row items-center gap-2">
-              {metrics.map((metric) => {
-                const Icon = postInsightTypeToIcon[metric.type]
-                return (
-                  <div key={metric.type} className="flex flex-row items-center gap-1">
-                    <Icon className="size-3 text-dark" />
-                    <span className="text-heading-xs">{formatCompactNumber(metric.value)}</span>
-                  </div>
-                )
-              })}
-            </div>
-          )}
+          <CompactMetricRow metrics={metrics} />
         </div>
       </div>
     </div>

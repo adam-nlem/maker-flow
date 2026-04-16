@@ -47,6 +47,13 @@ class FetchPostInsightsCommand extends Command
             $this->bus->dispatch(new FetchPostInsightsMessage($integration->getId()));
         }
 
+        $tiktokIntegrations = $this->integrationRepository->getByPlatformAndStatus(Platform::Tiktok, IntegrationStatus::Active);
+        $io->info(sprintf('Found %d active TikTok integrations', count($tiktokIntegrations)));
+
+        foreach ($tiktokIntegrations as $integration) {
+            $this->bus->dispatch(new FetchPostInsightsMessage($integration->getId()));
+        }
+
         $io->success('Post insights fetch messages dispatched');
 
         return Command::SUCCESS;

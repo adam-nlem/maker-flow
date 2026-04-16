@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { HookTemplate, type HookTemplateJSON } from "~/models/HookTemplate";
 import { hookTemplateQueryKeys } from "./hookTemplateQueryKeys";
@@ -10,62 +10,31 @@ interface UseListPaginatedHookTemplatesProps {
 }
 
 export function useListPaginatedHookTemplates({ searchTerm, limit = 20 }: UseListPaginatedHookTemplatesProps = {}) {
-    const [page, setPage] = useState(1);
-    const [additionalTemplates, setAdditionalTemplates] = useState<HookTemplate[]>([]);
-    const [hasMore, setHasMore] = useState(true);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-    const query = useQuery({
+    const query = useInfiniteQuery({
         queryKey: hookTemplateQueryKeys.list(searchTerm),
-        queryFn: async () => {
+        queryFn: async ({ pageParam }) => {
             const res = await httpClient.get<HookTemplateJSON[]>('/hook-templates', {
                 params: {
                     ...(searchTerm ? { searchTerm } : {}),
-                    page: 1,
+                    page: pageParam,
                     limit,
                 },
             });
-            const templatesData = res.data.map((json) => HookTemplate.fromJSON(json));
-            setHasMore(templatesData.length === limit);
-            setAdditionalTemplates([]);
-            setPage(1);
-            return templatesData;
+            return res.data.map((json) => HookTemplate.fromJSON(json));
         },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, _, lastPageParam) =>
+            lastPage.length === limit ? lastPageParam + 1 : undefined,
     });
 
-    const hookTemplates = useMemo(() => {
-        return [...(query.data ?? []), ...additionalTemplates];
-    }, [query.data, additionalTemplates]);
-
-    const listMore = useCallback(async () => {
-        if (isLoadingMore || !hasMore) return;
-
-        setIsLoadingMore(true);
-        const nextPage = page + 1;
-
-        try {
-            const res = await httpClient.get<HookTemplateJSON[]>('/hook-templates', {
-                params: {
-                    ...(searchTerm ? { searchTerm } : {}),
-                    page: nextPage,
-                    limit,
-                },
-            });
-            const templatesData = res.data.map((json) => HookTemplate.fromJSON(json));
-            setAdditionalTemplates((prev) => [...prev, ...templatesData]);
-            setHasMore(templatesData.length === limit);
-            setPage(nextPage);
-        } finally {
-            setIsLoadingMore(false);
-        }
-    }, [page, isLoadingMore, hasMore, limit, searchTerm]);
+    const hookTemplates = useMemo(() => query.data?.pages.flat() ?? [], [query.data]);
 
     return {
         hookTemplates,
         isLoading: query.isLoading,
-        isLoadingMore,
-        hasMore,
+        isLoadingMore: query.isFetchingNextPage,
+        hasMore: query.hasNextPage,
         error: query.error,
-        listMore,
+        listMore: query.fetchNextPage,
     };
 }

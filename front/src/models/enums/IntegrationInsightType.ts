@@ -41,7 +41,7 @@ export const integrationInsightTypeToFrenchTranslation: Record<IntegrationInsigh
     [IntegrationInsightType.GainedFollowers]: "Nouveaux abonnés",
     [IntegrationInsightType.TotalFollowers]: "Abonnés",
     [IntegrationInsightType.Impressions]: "Impressions",
-    [IntegrationInsightType.Dislikes]: "Je n'aime pas",
+    [IntegrationInsightType.Dislikes]: "Dislikes",
     [IntegrationInsightType.ProfileLinksTaps]: "Clics liens profil",
     [IntegrationInsightType.Reach]: "Portée",
     [IntegrationInsightType.Videos]: "Vidéos",

@@ -1,0 +1,83 @@
+import { PlusIcon } from "@heroicons/react/24/outline"
+import { Button } from "~/components/ui/Button"
+import Pill from "~/components/ui/Pill"
+import { ContentsTab, contentsTabOptions, contentsTabToFrenchTranslation } from "~/models/enums/ContentsTab"
+import { useContentsStore } from "~/stores/contents/contentsStore"
+import { useContentsRightPanelStore } from "~/stores/contents/contentsRightPanelStore"
+import ContentsPlatformFilter from "./ContentsPlatformFilter"
+import CreateGroupModal from "./CreateGroupModal"
+import SearchBar from "../ui/SearchBar"
+import ContentGroupList from "./ContentGroupList"
+import ContentPostList from "./ContentPostList"
+
+interface ContentListPanelProps {
+  projectUuid: string
+}
+
+export default function ContentListPanel({ projectUuid }: ContentListPanelProps) {
+  const activeTab = useContentsStore((s) => s.activeTab)
+  const setActiveTab = useContentsStore((s) => s.setActiveTab)
+  const platformFilter = useContentsStore((s) => s.platformFilter)
+  const setPlatformFilter = useContentsStore((s) => s.setPlatformFilter)
+  const setSearchTerm = useContentsStore((s) => s.setSearchTerm)
+  const isCreateGroupModalOpen = useContentsStore((s) => s.isCreateGroupModalOpen)
+  const setIsCreateGroupModalOpen = useContentsStore((s) => s.setIsCreateGroupModalOpen)
+  const closeRightPanel = useContentsRightPanelStore((s) => s.closePanel)
+
+  const isGroupTab = activeTab === ContentsTab.Groups
+
+  return (
+    <div className="flex-1 h-full flex flex-col overflow-hidden">
+      {/* Header */}
+      <div className="flex flex-row items-center justify-between px-6 py-4 border-b border-light-gray">
+        <h1 className="text-heading-xl">Contenus</h1>
+        <Button
+          style="primary"
+          width="w-fit"
+          onClick={() => setIsCreateGroupModalOpen(true)}
+        >
+          <div className="flex flex-row items-center gap-2">
+            <PlusIcon className="size-4" strokeWidth={2} />
+            <p className="text-sm">Nouveau groupe</p>
+          </div>
+        </Button>
+      </div>
+
+      {/* Tab bar */}
+      <div className="flex flex-row items-center gap-2 px-6 py-3 border-b border-light-gray">
+        {contentsTabOptions.map((tab) => (
+          <Pill
+            key={tab}
+            label={contentsTabToFrenchTranslation[tab]}
+            isSelected={activeTab === tab}
+            onClick={() => {
+              setActiveTab(tab)
+              closeRightPanel()
+            }}
+            bgColorClassName="bg-primary/10"
+            borderColorClassName="border-primary/30"
+            textColorClassName="text-primary"
+          />
+        ))}
+      </div>
+
+      <div className="px-6 py-3 flex flex-row justify-between">
+        <ContentsPlatformFilter
+          projectUuid={projectUuid}
+          platformFilter={platformFilter}
+          onPlatformChange={setPlatformFilter}
+        />
+
+        <SearchBar setDebouncedSearchTerm={setSearchTerm} width="w-1/3" />
+      </div>
+
+      {isGroupTab ? <ContentGroupList projectUuid={projectUuid} /> : <ContentPostList projectUuid={projectUuid} />}
+
+      <CreateGroupModal
+        isOpen={isCreateGroupModalOpen}
+        onClose={() => setIsCreateGroupModalOpen(false)}
+        projectUuid={projectUuid}
+      />
+    </div>
+  )
+}

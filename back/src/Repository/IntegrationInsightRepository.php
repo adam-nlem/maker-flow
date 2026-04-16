@@ -130,33 +130,6 @@ class IntegrationInsightRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns aggregated insight values (summed) across all integrations for a project,
-     * using the latest insight per integration per type.
-     *
-     * @return array<array{type: IntegrationInsightType|string, totalValue: string}>
-     */
-    public function getAggregatedLatestByProjectAndUser(Project $project, User $user): array
-    {
-        $sub = $this->getEntityManager()->createQueryBuilder()
-            ->select('MAX(sub.id)')
-            ->from(IntegrationInsight::class, 'sub')
-            ->innerJoin('sub.integration', 'subInt')
-            ->where('subInt.project = :project')
-            ->andWhere('sub.user = :user')
-            ->groupBy('sub.integration, sub.type')
-            ->getDQL();
-
-        return $this->createQueryBuilder('ii')
-            ->select('ii.type as type, SUM(ii.value) as totalValue')
-            ->where('ii.id IN (' . $sub . ')')
-            ->setParameter('project', $project)
-            ->setParameter('user', $user)
-            ->groupBy('ii.type')
-            ->getQuery()
-            ->getResult();
-    }
-
-    /**
      * @param IntegrationInsightType[] $types
      * @return IntegrationInsight[]
      */
@@ -179,5 +152,73 @@ class IntegrationInsightRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * Returns the latest TotalFollowers value per integration for a given project/user, keyed by integration id.
+     *
+     * @return array<int, float>
+     */
+    public function getLatestTotalFollowersByProjectAndUserGroupedByIntegration(
+        Project $project,
+        User $user,
+    ): array {
+        $sub = $this->getEntityManager()->createQueryBuilder()
+            ->select('MAX(sub.id)')
+            ->from(IntegrationInsight::class, 'sub')
+            ->innerJoin('sub.integration', 'subInt')
+            ->where('subInt.project = :project')
+            ->andWhere('sub.user = :user')
+            ->andWhere('sub.type = :type')
+            ->groupBy('sub.integration')
+            ->getDQL();
+
+        $rows = $this->createQueryBuilder('ii')
+            ->select('IDENTITY(ii.integration) AS integrationId', 'ii.value AS value')
+            ->where('ii.id IN (' . $sub . ')')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->setParameter('type', IntegrationInsightType::TotalFollowers)
+            ->getQuery()
+            ->getArrayResult();
+
+        $followersByIntegrationId = [];
+        foreach ($rows as $row) {
+            $followersByIntegrationId[(int) $row['integrationId']] = (float) $row['value'];
+        }
+
+        return $followersByIntegrationId;
+    }
+
+    /**
+     * Returns the SUM of the latest TotalFollowers per integration before a given date.
+     */
+    public function getAggregatedTotalFollowersByProjectAndUserBeforeDate(
+        Project $project,
+        User $user,
+        \DateTimeImmutable $atDate,
+    ): ?float {
+        $sub = $this->getEntityManager()->createQueryBuilder()
+            ->select('MAX(sub.id)')
+            ->from(IntegrationInsight::class, 'sub')
+            ->innerJoin('sub.integration', 'subInt')
+            ->where('subInt.project = :project')
+            ->andWhere('sub.user = :user')
+            ->andWhere('sub.type = :type')
+            ->andWhere('sub.createdAt <= :atDate')
+            ->groupBy('sub.integration')
+            ->getDQL();
+
+        $result = $this->createQueryBuilder('ii')
+            ->select('SUM(ii.value) as totalValue')
+            ->where('ii.id IN (' . $sub . ')')
+            ->setParameter('project', $project)
+            ->setParameter('user', $user)
+            ->setParameter('type', IntegrationInsightType::TotalFollowers)
+            ->setParameter('atDate', $atDate)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $result !== null ? (float) $result : null;
     }
 }

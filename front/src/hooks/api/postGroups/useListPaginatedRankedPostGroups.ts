@@ -1,5 +1,5 @@
-import { useState, useCallback, useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMemo } from "react";
+import { useInfiniteQuery } from "@tanstack/react-query";
 import { PostGroupWithAggregatedInsightsDTO, type PostGroupWithAggregatedInsightsDTOJSON } from "~/dtos/postGroups/PostGroupWithAggregatedInsightsDTO";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { postGroupQueryKeys } from "./postGroupQueryKeys";
@@ -10,63 +10,32 @@ interface UseListPaginatedRankedPostGroupsProps {
 }
 
 export function useListPaginatedRankedPostGroups({ projectUuid, limit = 10 }: UseListPaginatedRankedPostGroupsProps) {
-    const [page, setPage] = useState(1);
-    const [additionalPostGroups, setAdditionalPostGroups] = useState<PostGroupWithAggregatedInsightsDTO[]>([]);
-    const [hasMore, setHasMore] = useState(true);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
-
-    const query = useQuery({
+    const query = useInfiniteQuery({
         queryKey: postGroupQueryKeys.rank(projectUuid ?? ''),
-        queryFn: async () => {
+        queryFn: async ({ pageParam }) => {
             const res = await httpClient.get<PostGroupWithAggregatedInsightsDTOJSON[]>(`/post-groups/rank`, {
                 params: {
                     projectUuid,
-                    page: 1,
+                    page: pageParam,
                     limit,
                 }
             });
-            const postGroupsData = res.data.map((json) => PostGroupWithAggregatedInsightsDTO.fromJSON(json));
-            setHasMore(postGroupsData.length === limit);
-            setAdditionalPostGroups([]);
-            setPage(1);
-            return postGroupsData;
+            return res.data.map((json) => PostGroupWithAggregatedInsightsDTO.fromJSON(json));
         },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage, _, lastPageParam) =>
+            lastPage.length === limit ? lastPageParam + 1 : undefined,
         enabled: !!projectUuid,
     });
 
-    const postGroups = useMemo(() => {
-        return [...(query.data ?? []), ...additionalPostGroups];
-    }, [query.data, additionalPostGroups]);
-
-    const listMore = useCallback(async () => {
-        if (isLoadingMore || !hasMore) return;
-
-        setIsLoadingMore(true);
-        const nextPage = page + 1;
-
-        try {
-            const res = await httpClient.get<PostGroupWithAggregatedInsightsDTOJSON[]>(`/post-groups/rank`, {
-                params: {
-                    projectUuid,
-                    page: nextPage,
-                    limit,
-                }
-            });
-            const postGroupsData = res.data.map((json) => PostGroupWithAggregatedInsightsDTO.fromJSON(json));
-            setAdditionalPostGroups(prev => [...prev, ...postGroupsData]);
-            setHasMore(postGroupsData.length === limit);
-            setPage(nextPage);
-        } finally {
-            setIsLoadingMore(false);
-        }
-    }, [page, isLoadingMore, hasMore, limit, projectUuid]);
+    const postGroups = useMemo(() => query.data?.pages.flat() ?? [], [query.data]);
 
     return {
         postGroups,
         isLoading: query.isLoading,
-        isLoadingMore,
-        hasMore,
+        isLoadingMore: query.isFetchingNextPage,
+        hasMore: query.hasNextPage,
         error: query.error,
-        listMore,
+        listMore: query.fetchNextPage,
     };
 }

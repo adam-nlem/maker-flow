@@ -1,90 +1,122 @@
-import HomeInsightsOverview from "~/components/home/HomeInsightsOverview";
 import Shimmer from "~/components/ui/Shimmer";
-import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegrationStore";
-import RankedPostsList from "~/components/home/RankedPostsList";
-import RankedPostGroupsList from "~/components/home/RankedPostGroupsList";
-import HomeScriptsSection from "~/components/home/HomeScriptsSection";
-import PremiumPlaceholder from "~/components/ui/PremiumPlaceholder";
-import ConnectIntegrationPlaceholder from "~/components/integrations/ConnectIntegrationPlaceholder";
-import IntegrationPillRow from "~/components/integrations/IntegrationPillRow";
 import { useIsSubscribed } from "~/hooks/useIsSubscribed";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
+import { useListIntegrationInsights } from "~/hooks/api/integrationInsights/useListIntegrationInsights";
+import { useHomePeriodStore } from "~/stores/home/homePeriodStore";
+import PremiumPlaceholder from "~/components/ui/PremiumPlaceholder";
+import ConnectIntegrationPlaceholder from "~/components/integrations/ConnectIntegrationPlaceholder";
+import HomeOverviewCards from "~/components/home/HomeOverviewCards";
+import HomeViewsEvolutionChart from "~/components/home/HomeViewsEvolutionChart";
+import HomeEngagementChart from "~/components/home/HomeEngagementChart";
+import { timePeriodOptions, timePeriodToFrenchTranslation } from "~/models/enums/TimePeriod";
+import Pill from "~/components/ui/Pill";
+import SelectDropdown from "~/components/ui/SelectDropdown";
+import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
+import IntegrationDetailCardRow from "~/components/integrations/IntegrationDetailCardRow";
+import HomeScriptsPanel from "~/components/home/HomeScriptsPanel";
 
 export default function HomePage() {
-  const { projects, isLoading } = useListPaginatedProjects()
-  const { focusedProjectUuid } = useSelectFocusedProject({ projects })
-  const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
-  const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
-  const { isSubscribed } = useIsSubscribed()
-  const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid })
-  const isDesktop = useIsDesktop()
+  const { projects, isLoading } = useListPaginatedProjects();
+  const { focusedProjectUuid } = useSelectFocusedProject({ projects });
+  const { isSubscribed } = useIsSubscribed();
+  const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid });
+  const timePeriod = useHomePeriodStore((state) => state.timePeriod);
+  const setTimePeriod = useHomePeriodStore((state) => state.setTimePeriod);
+  const { integrationInsights } = useListIntegrationInsights({
+    projectUuid: focusedProjectUuid,
+    timePeriod,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="h-full flex flex-col md:flex-row gap-3 overflow-y-auto p-3 md:p-5">
+        <div className="flex flex-col gap-5 flex-1 min-w-0">
+          <div className="flex flex-row justify-between items-center">
+            <div className="flex flex-row items-center gap-3">
+              <Shimmer width="w-10" height="h-10" radius="rounded-full" />
+              <Shimmer width="w-32" height="h-5" />
+            </div>
+            <div className="flex flex-row gap-2">
+              <Shimmer width="w-28" height="h-8" radius="rounded-full" />
+              <Shimmer width="w-20" height="h-8" radius="rounded-full" />
+            </div>
+          </div>
+          <div className="flex flex-row flex-wrap gap-3">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="flex flex-row gap-2 border border-light-gray rounded-lg px-3 py-2 items-center">
+                <Shimmer width="w-5" height="h-5" radius="rounded-md" />
+                <Shimmer width="w-7" height="h-7" radius="rounded-full" />
+                <Shimmer width="w-20" height="h-3" />
+                <Shimmer width="w-2" height="h-2" radius="rounded-full" />
+              </div>
+            ))}
+          </div>
+          <Shimmer width="w-full" height="h-72" radius="rounded-lg" />
+        </div>
+        <Shimmer width="w-1/2" height="h-96" radius="rounded-lg" />
+      </div>
+    );
+  }
+
+  if (integrations.length === 0) {
+    return (
+      <div className="h-full overflow-y-auto p-3 md:p-5">
+        <ConnectIntegrationPlaceholder />
+      </div>
+    );
+  }
+
+  if (!isSubscribed) {
+    return (
+      <div className="h-full overflow-y-auto p-3 md:p-5">
+        <PremiumPlaceholder isRestricted>
+          <div className="h-96" />
+        </PremiumPlaceholder>
+      </div>
+    );
+  }
+
+  const groups = integrationInsights?.groups ?? [];
 
   return (
-    <div className="h-full overflow-y-auto md:overflow-hidden">
-      <div className="p-3 md:p-5 flex flex-col h-full">
-        <div className="flex flex-col md:flex-row gap-3 md:gap-5 flex-1 min-h-0">
-          {isLoading ? (
-            <>
-              {isDesktop && <div className="w-2/3" />}
-              <div className={`${isDesktop ? 'w-1/3' : 'w-full'} flex flex-col gap-3 md:gap-5`}>
-                <div className="flex flex-row flex-wrap gap-2">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="flex flex-row gap-3 border border-light-gray rounded-lg p-2 w-fit items-center">
-                      <div className="flex flex-col gap-1">
-                        <Shimmer width="w-16" height="h-3" />
-                        <Shimmer width="w-10" height="h-4" />
-                      </div>
-                      <Shimmer width="w-4" height="h-4" />
-                    </div>
-                  ))}
-                </div>
-                <div className="flex flex-col">
-                  <Shimmer width="w-40" height="h-4" />
-                  {[...Array(3)].map((_, i) => (
-                    <div key={i} className="flex flex-row gap-3 p-1 border-t border-light-gray items-center">
-                      <Shimmer width="w-4" height="h-4" />
-                      <Shimmer width="w-10" height="h-10" radius="rounded" />
-                      <div className="flex flex-col gap-1">
-                        <Shimmer width="w-32" height="h-3" />
-                        <Shimmer width="w-20" height="h-3" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </>
-          ) : focusedProject && (
-            <>
-              <div className="w-full md:w-2/3 flex flex-col gap-3 md:gap-5 overflow-y-auto scrollbar-none">
-                <HomeScriptsSection projectUuid={focusedProject.uuid} />
-              </div>
-              <div className="w-full md:w-1/3 flex flex-col gap-3 md:gap-5 min-h-0">
-                {integrations.length === 0 ? (
-                  <ConnectIntegrationPlaceholder />
-                ) : focusedIntegrationUuid === null && !isSubscribed ? (
-                  <>
-                    <IntegrationPillRow integrations={integrations} />
-                    <PremiumPlaceholder isRestricted>
-                      <div className="h-96" />
-                    </PremiumPlaceholder>
-                  </>
-                ) : (
-                  <>
-                    <HomeInsightsOverview projectUuid={focusedProject.uuid} />
-                    {focusedIntegrationUuid
-                      ? <RankedPostsList integrationUuid={focusedIntegrationUuid} />
-                      : <RankedPostGroupsList projectUuid={focusedProject.uuid} />
-                    }
-                  </>
-                )}
-              </div>
-            </>
-          )}
+    <div className="h-full flex flex-col md:flex-row gap-3 overflow-y-auto p-3 md:p-5">
+      <div className="flex flex-col gap-3 md:justify-between flex-1 min-w-0">
+        <div className="flex flex-row gap-3">
+          <SelectDropdown
+            items={timePeriodOptions}
+            selectedItemId={timePeriod}
+            getItemId={(period) => period}
+            onSelect={(period) => setTimePeriod(period)}
+            renderTrigger={({ onClick }) => (
+              <Pill
+                icon={ChevronUpDownIcon}
+                label={timePeriodToFrenchTranslation[timePeriod]}
+                isSelected
+                onClick={onClick}
+                borderColorClassName="border-light-gray"
+              />
+            )}
+            renderItem={({ item, isSelected, onSelect }) => {
+              return !isSelected ? <Pill
+                label={timePeriodToFrenchTranslation[item]}
+                isSelected
+                onClick={onSelect}
+                borderColorClassName="border-light-gray"
+              /> : null
+            }}
+          />
         </div>
+        <HomeOverviewCards overview={integrationInsights?.overview ?? null} />
+        <IntegrationDetailCardRow groups={groups} />
+
+
+        <HomeViewsEvolutionChart viewsTimeline={integrationInsights?.viewsTimeline ?? []} />
+        <HomeEngagementChart groups={groups} />
       </div>
+
+      {focusedProjectUuid && <HomeScriptsPanel projectUuid={focusedProjectUuid} />}
     </div>
   );
 }

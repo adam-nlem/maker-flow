@@ -26,8 +26,11 @@ use App\Repository\IntegrationRepository;
 use App\Entity\Enum\YoutubeReportType;
 use App\Service\InstagramPostInsight\InstagramPostInsightService;
 use App\Exception\Integration\OAuthTokenRevokedException;
+use App\DTO\External\Tiktok\TiktokPostInsightDTO;
 use App\Service\Integration\InstagramOAuthService;
+use App\Service\Integration\TiktokOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
+use App\Service\TiktokPostInsight\TiktokPostInsightService;
 use App\Service\YoutubePostInsight\YoutubePostInsightService;
 use App\Service\YoutubeReporting\YoutubeReportingService;
 use Google\Client;
@@ -66,7 +69,9 @@ class PostInsightService
         private readonly IntegrationInsightRepository $integrationInsightRepository,
         private readonly IntegrationRepository $integrationRepository,
         private readonly InstagramOAuthService $instagramOAuthService,
+        private readonly TiktokOAuthService $tiktokOAuthService,
         private readonly YoutubeOAuthService $youtubeOAuthService,
+        private readonly TiktokPostInsightService $tiktokPostInsightService,
         private readonly YoutubePostInsightService $youtubePostInsightService,
         private readonly InstagramPostInsightService $instagramPostInsightService,
         private readonly YoutubeReportingService $youtubeReportingService,
@@ -226,6 +231,61 @@ class PostInsightService
         $this->integrationRepository->save($integration, true);
     }
 
+    public function fetchTiktokPostInsights(Integration $integration): void
+    {
+        if ($integration->getPlatform() !== Platform::Tiktok) {
+            throw new \InvalidArgumentException('Integration must be a TikTok integration');
+        }
+
+        $integrationId = $integration->getId();
+
+        $integration = $this->tiktokOAuthService->refreshTokenIfNeeded($integration);
+
+        $metrics = implode(',', TiktokPostInsightDTO::getMetricNames());
+        $fields = sprintf('id,create_time,title,video_description,duration,cover_image_url,share_url,%s', $metrics);
+        $cursor = 0;
+        $hasMore = true;
+
+        try {
+            while ($hasMore) {
+                $response = $this->httpClient->request('POST', sprintf('%s/v2/video/list/', $this->parameterBag->get('app.tiktok.api_url')), [
+                    'headers' => [
+                        'Authorization' => sprintf('Bearer %s', $integration->getAccessToken()),
+                        'Content-Type' => 'application/json',
+                    ],
+                    'query' => [
+                        'fields' => $fields,
+                    ],
+                    'json' => [
+                        'cursor' => $cursor,
+                        'max_count' => 20,
+                    ],
+                ]);
+
+                $data = $response->toArray();
+                $videos = $data['data']['videos'] ?? [];
+
+                foreach ($videos as $videoData) {
+                    $this->tiktokPostInsightService->processPostData($integration, $videoData);
+                }
+
+                $this->entityManager->flush();
+                $this->entityManager->clear();
+                $integration = $this->integrationRepository->find($integrationId);
+
+                $hasMore = $data['data']['has_more'] ?? false;
+                $cursor = $data['data']['cursor'] ?? 0;
+            }
+        } catch (\Exception $e) {
+            $this->throwIfOAuthAuthError($e, $integration);
+
+            throw $e;
+        }
+
+        $integration->setLastSyncedAt(DateHelper::createUtcDateTimeImmutable());
+        $this->integrationRepository->save($integration, true);
+    }
+
     public function getDetail(User $user, Post $post): ShowPostInsightDetailResponseDTO
     {
         $now = DateHelper::createUtcDateTimeImmutable();
@@ -260,7 +320,7 @@ class PostInsightService
                 PostInsightType::Likes->value,
                 PostInsightType::Comments->value,
                 PostInsightType::Shares->value,
-                PostInsightType::Saved->value,
+                PostInsightType::Saves->value,
                 PostInsightType::TotalInteractions->value,
                 PostInsightType::AverageWatchTime->value,
                 PostInsightType::TotalWatchTime->value,

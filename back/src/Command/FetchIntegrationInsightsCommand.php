@@ -23,6 +23,7 @@ class FetchIntegrationInsightsCommand extends Command
     private const SUPPORTED_PLATFORMS = [
         Platform::Instagram,
         Platform::Youtube,
+        Platform::Tiktok,
     ];
 
     private const SYNC_THRESHOLD_HOURS = 24;

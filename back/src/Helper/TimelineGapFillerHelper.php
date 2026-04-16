@@ -4,6 +4,7 @@ namespace App\Helper;
 
 use App\Helper\DateHelper;
 use App\DTO\Response\IntegrationInsight\IntegrationInsightTimelinePointDTO;
+use App\DTO\Response\IntegrationInsight\IntegrationInsightsViewsTimelinePointDTO;
 use App\DTO\Response\PostInsight\PostInsightTimelinePointDTO;
 
 class TimelineGapFillerHelper
@@ -45,6 +46,40 @@ class TimelineGapFillerHelper
                     averageValue: $previousPoint->getAverageValue(),
                 );
             }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Fills missing daily points between $startDate and $endDate with zero-value points.
+     * Unlike fillIntegrationInsightTimelinePointsDailyGaps() (forward-fill), this variant
+     * zero-fills gaps because the views timeline represents daily growth, not cumulative state.
+     *
+     * @param IntegrationInsightsViewsTimelinePointDTO[] $points
+     * @return IntegrationInsightsViewsTimelinePointDTO[]
+     */
+    public static function fillIntegrationInsightsViewsTimelinePointsDailyGaps(
+        array $points,
+        \DateTimeImmutable $startDate,
+        \DateTimeImmutable $endDate,
+    ): array {
+        $valuesByDate = [];
+        foreach ($points as $point) {
+            $valuesByDate[$point->getDate()] = $point->getValue();
+        }
+
+        $result = [];
+        $currentDate = DateHelper::createUtcDateTimeImmutable($startDate->format('Y-m-d'));
+        $lastDate = DateHelper::createUtcDateTimeImmutable($endDate->format('Y-m-d'));
+
+        while ($currentDate <= $lastDate) {
+            $dateKey = $currentDate->format('Y-m-d');
+            $result[] = new IntegrationInsightsViewsTimelinePointDTO(
+                date: $dateKey,
+                value: $valuesByDate[$dateKey] ?? 0.0,
+            );
+            $currentDate = $currentDate->modify('+1 day');
         }
 
         return $result;

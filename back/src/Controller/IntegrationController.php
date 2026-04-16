@@ -20,6 +20,7 @@ use App\Repository\IntegrationRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Service\Integration\InstagramOAuthService;
+use App\Service\Integration\TiktokOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
 use App\Service\RedisStore\RedisStoreService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -68,6 +69,7 @@ final class IntegrationController extends AbstractController
         RedisStoreService $redisStoreService,
         InstagramOAuthService $instagramOAuthService,
         YoutubeOAuthService $youtubeOAuthService,
+        TiktokOAuthService $tiktokOAuthService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -101,6 +103,7 @@ final class IntegrationController extends AbstractController
         $authorizationUrl = match ($dto->getPlatform()) {
             Platform::Instagram => $instagramOAuthService->getAuthorizationUrl($state),
             Platform::Youtube => $youtubeOAuthService->getAuthorizationUrl($state),
+            Platform::Tiktok => $tiktokOAuthService->getAuthorizationUrl($state),
         };
 
         $responseDto = (new CreateIntegrationResponseDTO($authorizationUrl))->getData();
@@ -121,6 +124,7 @@ final class IntegrationController extends AbstractController
         RedisStoreService $redisStoreService,
         InstagramOAuthService $instagramOAuthService,
         YoutubeOAuthService $youtubeOAuthService,
+        TiktokOAuthService $tiktokOAuthService,
     ): Response {
         $code = $queryParamDto->getCode();
         $state = $queryParamDto->getState();
@@ -164,6 +168,7 @@ final class IntegrationController extends AbstractController
             $integration = match ($platform) {
                 Platform::Instagram => $instagramOAuthService->handleCallback($code, $user, $project),
                 Platform::Youtube => $youtubeOAuthService->handleCallback($code, $user, $project),
+                Platform::Tiktok => $tiktokOAuthService->handleCallback($code, $user, $project),
             };
 
             $redisStoreService->delete(

@@ -3,6 +3,7 @@ import { httpClient } from "~/services/httpClient/httpClient";
 import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent";
 import { track } from "~/services/analytics/analytics";
 import { integrationQueryKeys } from "./integrationQueryKeys";
+import { integrationInsightQueryKeys } from "../integrationInsights/integrationInsightQueryKeys";
 
 export function useRevokeIntegration({ projectUuid }: { projectUuid: string }) {
     const queryClient = useQueryClient();
@@ -13,6 +14,7 @@ export function useRevokeIntegration({ projectUuid }: { projectUuid: string }) {
         },
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: integrationQueryKeys.list(projectUuid) });
+            queryClient.invalidateQueries({ queryKey: integrationInsightQueryKeys.all });
             track(AnalyticsEvent.IntegrationRevoked)
         },
     });

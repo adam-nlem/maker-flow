@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import {
   prelaunchPath,
   privacyPolicyPath,
+  termsOfServicePath,
   verifyOtpPath,
   onboardingPath,
   loginPath,
@@ -16,6 +17,7 @@ import {
 import ErrorBoundary from "./components/ErrorBoundary";
 import PrelaunchPage from "./routes/prelaunch";
 import PrivacyPolicyPage from "./routes/privacy-policy";
+import TermsOfServicePage from "./routes/terms-of-service";
 import VerifyOtpPage from "./routes/verify-otp";
 import PrelaunchGuardLayout from "./routes/prelaunch-guard";
 import OnboardingPage from "./routes/onboarding";
@@ -39,6 +41,7 @@ export const router = createBrowserRouter(
     { path: prelaunchPath, element: <PrelaunchPage /> },
     { path: verifyOtpPath, element: <VerifyOtpPage /> },
     { path: privacyPolicyPath, element: <PrivacyPolicyPage /> },
+    { path: termsOfServicePath, element: <TermsOfServicePage /> },
 
     // All other routes (gated during prelaunch)
     {

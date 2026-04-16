@@ -3,6 +3,7 @@
 namespace App\DTO\Response\Post;
 
 use App\DTO\Response\ResponseDTOInterface;
+use App\Entity\Enum\Platform;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 class PostListItemResponseDTO implements ResponseDTOInterface
@@ -15,13 +16,13 @@ class PostListItemResponseDTO implements ResponseDTOInterface
         #[Groups(['api_posts_list'])]
         private readonly \DateTimeImmutable $publishedAt,
         #[Groups(['api_posts_list'])]
-        private readonly string $platform,
+        private readonly Platform $platform,
         #[Groups(['api_posts_list'])]
         private readonly ?float $views,
         #[Groups(['api_posts_list'])]
-        private readonly ?float $totalInteractions,
+        private readonly ?float $likes,
         #[Groups(['api_posts_list'])]
-        private readonly ?float $engagementByViews,
+        private readonly ?float $comments,
     ) {}
 
     public function getData(): array
@@ -30,10 +31,10 @@ class PostListItemResponseDTO implements ResponseDTOInterface
             'uuid' => $this->uuid,
             'caption' => $this->caption,
             'publishedAt' => $this->publishedAt,
-            'platform' => $this->platform,
+            'platform' => $this->platform->value,
             'views' => $this->views,
-            'totalInteractions' => $this->totalInteractions,
-            'engagementByViews' => $this->engagementByViews,
+            'likes' => $this->likes,
+            'comments' => $this->comments,
         ];
     }
 
@@ -52,7 +53,7 @@ class PostListItemResponseDTO implements ResponseDTOInterface
         return $this->publishedAt;
     }
 
-    public function getPlatform(): string
+    public function getPlatform(): Platform
     {
         return $this->platform;
     }
@@ -62,13 +63,13 @@ class PostListItemResponseDTO implements ResponseDTOInterface
         return $this->views;
     }
 
-    public function getTotalInteractions(): ?float
+    public function getLikes(): ?float
     {
-        return $this->totalInteractions;
+        return $this->likes;
     }
 
-    public function getEngagementByViews(): ?float
+    public function getComments(): ?float
     {
-        return $this->engagementByViews;
+        return $this->comments;
     }
 }

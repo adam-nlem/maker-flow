@@ -41,13 +41,37 @@ Unified card component for both post groups and individual posts. Accepts a `dat
 
 **File:** `app/components/contents/ContentGroupDetailPanel.tsx`
 
-`SidePanel` showing full details of a post group: title, linked posts, aggregated insights, and linked script. Uses `useShowPostGroup` to fetch full group data by UUID from `GET /api/post-groups/{postGroupUuid}`, independent of the paginated list. Supports editing and script linking.
+`SidePanel` showing full details of a post group. Uses `useShowPostGroup` to fetch full group data by UUID from `GET /api/post-groups/{postGroupUuid}`, independent of the paginated list. Supports editing, script linking, and post management.
+
+**Sections (same metric layout as ContentPostDetailPanel, only rendered when data exists):**
+1. **Vue d'ensemble** — overview metrics grid (`grid-cols-3`) with `ContentMetricBox`
+2. **Répartition de l'engagement** — donut chart (`DonutChart`) with legend
+3. **Ratio like / dislike** — progress bar (only when both Likes and Dislikes exist)
+4. **Abonnés** — followers section with Gagnés, Perdus, Net
+5. **Script** — linked script display with unlink button
+6. **Posts** — post list with add/remove functionality
 
 ### ContentPostDetailPanel
 
 **File:** `app/components/contents/ContentPostDetailPanel.tsx`
 
-`SidePanel` showing full details of a single post: thumbnail, caption, platform, published date, and per-post insights. Uses `useShowPost` to fetch full post data by UUID from `GET /api/posts/{postUuid}`, independent of the paginated list.
+`SidePanel` showing full details of a single post. Uses `useShowPost` to fetch full post data by UUID from `GET /api/posts/{postUuid}`, independent of the paginated list.
+
+**Sections (only rendered when data exists for each):**
+1. **Thumbnail** — post thumbnail image via `useShowPostThumbnail`
+2. **Platform + date** — platform pill and formatted publish date
+3. **Caption** — post description text
+4. **Vue d'ensemble** — overview metrics grid (`grid-cols-3`): Views, Engagement %, AverageWatchTime, TotalInteractions, TotalWatchTime, Reach, etc. Uses `ContentMetricBox`
+5. **Répartition de l'engagement** — donut chart (`DonutChart`) with legend showing Likes, Comments, Shares, Dislikes with color coding and percentages
+6. **Ratio like / dislike** — progress bar showing the like/dislike ratio percentage (only when both Likes and Dislikes exist)
+7. **Abonnés** — followers section with Gagnés, Perdus, and Net (calculated) in a `grid-cols-3` layout
+8. **Group link** — link to the parent post group (opens group detail panel)
+9. **External URL** — link to the post on the original platform
+
+Insights are categorized into three groups:
+- **Overview:** Views, TotalInteractions, AverageWatchTime, TotalWatchTime, Reach, ThumbnailImpressions, ThumbnailImpressionsClickRate, AudienceWatchRatio, Saved
+- **Engagement:** Likes, Comments, Shares, Dislikes
+- **Followers:** FollowersGained, FollowersLost
 
 ### CreateGroupPanel
 
