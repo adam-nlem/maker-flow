@@ -1,7 +1,7 @@
 import ModalOverlay from "~/components/ui/ModalOverlay";
 import { Button } from "~/components/ui/Button";
 import type { HookTemplate } from "~/models/HookTemplate";
-import { parseHookPlaceholders } from "~/helpers/hookPlaceholderParser";
+import { parseHookPlaceholders } from "~/utils/hookPlaceholderParser";
 import Pill from "~/components/ui/Pill";
 
 interface ApplyHookTemplateModalProps {

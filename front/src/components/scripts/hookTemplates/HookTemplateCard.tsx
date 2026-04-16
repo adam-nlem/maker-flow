@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import type { HookTemplate } from "~/models/HookTemplate";
-import { parseHookPlaceholders } from "~/helpers/hookPlaceholderParser";
+import { parseHookPlaceholders } from "~/utils/hookPlaceholderParser";
 import Pill from "~/components/ui/Pill";
 import { useDeleteHookTemplate } from "~/hooks/api/hookTemplates/useDeleteHookTemplate";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";

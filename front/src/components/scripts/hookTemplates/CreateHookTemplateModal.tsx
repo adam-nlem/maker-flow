@@ -6,7 +6,7 @@ import { Button } from "~/components/ui/Button";
 import Pill from "~/components/ui/Pill";
 import { useCreateHookTemplate } from "~/hooks/api/hookTemplates/useCreateHookTemplate";
 import { HookTemplatePlaceholder, hookTemplatePlaceholderOptions, hookTemplatePlaceholderToFrenchTranslation } from "~/models/enums/HookTemplatePlaceholder";
-import { insertPlaceholder, formatPlaceholderToken } from "~/helpers/hookPlaceholderParser";
+import { insertPlaceholder, formatPlaceholderToken } from "~/utils/hookPlaceholderParser";
 import ModalOverlay from "~/components/ui/ModalOverlay";
 
 interface CreateHookTemplateModalProps {

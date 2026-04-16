@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { parseHookPlaceholders } from "~/helpers/hookPlaceholderParser";
+import { parseHookPlaceholders } from "~/utils/hookPlaceholderParser";
 import Pill from "~/components/ui/Pill";
 import { Input } from "~/components/ui/Input";
 

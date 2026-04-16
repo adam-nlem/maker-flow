@@ -1,4 +1,4 @@
-import { getWidthClassFromPercentage } from "~/helpers/percentageHelper";
+import { getWidthClassFromPercentage } from "~/utils/percentageHelper";
 
 interface PercentageProgressBarProps {
   name: string;

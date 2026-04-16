@@ -9,6 +9,7 @@ import { SidePanel } from "~/components/ui/SidePanel";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
+import { isScriptLimitReached } from "~/utils/subscriptionHelpers";
 import { HttpException } from "~/services/httpClient/HttpException";
 
 interface ScriptListPanelProps {
@@ -28,9 +29,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     useInfiniteScroll(scrollRef, hasMore, isLoadingMore, listMore);
     const { subscription } = useShowCurrentSubscription();
     const { plans } = useListPlans();
-    const currentPlanConfig = plans.find((p) => p.plan === subscription?.plan);
-    const maxScripts = subscription ? (currentPlanConfig?.maxScriptsPerProject ?? null) : 1;
-    const isLimitReached = maxScripts !== null && scripts.length >= maxScripts;
+    const isLimitReached = isScriptLimitReached(scripts.length, subscription, plans);
 
     const handleNewScript = async () => {
         try {
