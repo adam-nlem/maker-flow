@@ -170,16 +170,13 @@ class IntegrationRepository extends ServiceEntityRepository
      * @param Platform[] $platforms
      * @return Integration[]
      */
-    public function getByPlatformsNotSyncedSinceAndStatus(array $platforms, \DateTimeImmutable $since, IntegrationStatus $status): array
+    public function getByMultiplePlatformsAndStatus(array $platforms, IntegrationStatus $status): array
     {
         return $this->createQueryBuilder('i')
             ->where('i.platform IN (:platforms)')
-            ->andWhere('i.lastSyncedAt < :since')
             ->andWhere('i.status = :status')
             ->setParameter('platforms', $platforms)
-            ->setParameter('since', $since)
             ->setParameter('status', $status)
-            ->orderBy('i.lastSyncedAt', 'ASC')
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);

@@ -26,8 +26,6 @@ class FetchIntegrationInsightsCommand extends Command
         Platform::Tiktok,
     ];
 
-    private const SYNC_THRESHOLD_HOURS = 24;
-
     public function __construct(
         private readonly IntegrationRepository $integrationRepository,
         private readonly MessageBusInterface $bus,
@@ -41,16 +39,12 @@ class FetchIntegrationInsightsCommand extends Command
 
         $io->title('Fetching integration insights');
 
-        $since = DateHelper::createUtcDateTimeImmutable()
-            ->modify('-' . self::SYNC_THRESHOLD_HOURS . ' hours');
-
-        $integrations = $this->integrationRepository->getByPlatformsNotSyncedSinceAndStatus(
+        $integrations = $this->integrationRepository->getByMultiplePlatformsAndStatus(
             self::SUPPORTED_PLATFORMS,
-            $since,
             IntegrationStatus::Active
         );
 
-        $io->info(sprintf('Found %d integrations needing sync (last synced > %d hours ago)', count($integrations), self::SYNC_THRESHOLD_HOURS));
+        $io->info(sprintf('Found %d integrations needing sync', count($integrations)));
 
         foreach ($integrations as $integration) {
             $io->text(sprintf(
