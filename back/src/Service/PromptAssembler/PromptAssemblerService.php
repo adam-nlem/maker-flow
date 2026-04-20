@@ -18,10 +18,6 @@ class PromptAssemblerService
 
         if ($profile !== null) {
             $blocks[] = $this->buildCreatorProfileBlock($profile);
-
-            if ($profile->getStyleSample() !== null && $profile->getStyleSample() !== '') {
-                $blocks[] = $this->buildStyleSampleBlock($profile);
-            }
         }
 
         $blocks[] = $this->buildScriptBriefBlock($generation);
@@ -38,10 +34,6 @@ class PromptAssemblerService
 
         if ($profile->getNiche() !== null && $profile->getNiche() !== '') {
             $lines[] = "Sa niche est {$profile->getNiche()}.";
-        }
-
-        if ($profile->getTargetAudience() !== null && $profile->getTargetAudience() !== '') {
-            $lines[] = "Son audience cible est : {$profile->getTargetAudience()}.";
         }
 
         if ($profile->getTones() !== null && count($profile->getTones()) > 0) {
@@ -72,11 +64,6 @@ class PromptAssemblerService
         }
 
         return implode("\n", $lines);
-    }
-
-    private function buildStyleSampleBlock(CreatorProfile $profile): string
-    {
-        return "Référence de style (reproduis la structure, l'énergie et le vocabulaire — ne copie pas) :\n{$profile->getStyleSample()}";
     }
 
     private function buildScriptBriefBlock(ScriptGeneration $generation): string

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Input } from "~/components/ui/Input";
-import { TextArea } from "~/components/ui/TextArea";
 import { Button } from "~/components/ui/Button";
 import { Tone, toneOptions, toneToFrenchTranslation } from "~/models/enums/Tone";
 import { useCreateOrUpdateCreatorProfile } from "~/hooks/api/creatorProfiles/useCreateOrUpdateCreatorProfile";
@@ -17,11 +16,9 @@ interface CreatorProfileFormProps {
 
 export default function CreatorProfileForm({ projectUuid, creatorProfile, onSuccess, variant = 'settings' }: CreatorProfileFormProps) {
     const [niche, setNiche] = useState(creatorProfile?.niche ?? "");
-    const [targetAudience, setTargetAudience] = useState(creatorProfile?.targetAudience ?? "");
     const [tones, setTones] = useState<Tone[]>(creatorProfile?.tones ?? []);
     const [signaturePhrases, setSignaturePhrases] = useState<string[]>(creatorProfile?.signaturePhrases ?? []);
     const [neverList, setNeverList] = useState<string[]>(creatorProfile?.neverList ?? []);
-    const [styleSample, setStyleSample] = useState(creatorProfile?.styleSample ?? "");
 
     const [newPhrase, setNewPhrase] = useState("");
     const [newNeverItem, setNewNeverItem] = useState("");
@@ -32,11 +29,9 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
 
     const hasChanges =
         niche !== (creatorProfile?.niche ?? "") ||
-        targetAudience !== (creatorProfile?.targetAudience ?? "") ||
         JSON.stringify(tones) !== JSON.stringify(creatorProfile?.tones ?? []) ||
         JSON.stringify(signaturePhrases) !== JSON.stringify(creatorProfile?.signaturePhrases ?? []) ||
-        JSON.stringify(neverList) !== JSON.stringify(creatorProfile?.neverList ?? []) ||
-        styleSample !== (creatorProfile?.styleSample ?? "");
+        JSON.stringify(neverList) !== JSON.stringify(creatorProfile?.neverList ?? []);
 
     const handleAddPhrase = () => {
         if (newPhrase.trim()) {
@@ -65,11 +60,9 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
         await createOrUpdateCreatorProfile({
             projectUuid,
             niche: niche.trim() || undefined,
-            targetAudience: targetAudience.trim() || undefined,
             tones,
             signaturePhrases: isOnboarding ? [] : signaturePhrases,
             neverList: isOnboarding ? [] : neverList,
-            styleSample: styleSample.trim() || undefined,
         });
         onSuccess();
     };
@@ -91,13 +84,6 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
                 placeholder="Ex: Fitness, Cuisine, Tech..."
                 value={niche}
                 onChange={(e) => setNiche(e.target.value)}
-            />
-
-            <Input
-                label="Audience cible"
-                placeholder="Ex: Hommes 25-35 intéressés par la musculation"
-                value={targetAudience}
-                onChange={(e) => setTargetAudience(e.target.value)}
             />
 
             <div>
@@ -184,12 +170,6 @@ export default function CreatorProfileForm({ projectUuid, creatorProfile, onSucc
             </div>
             )}
 
-            <TextArea
-                label="Échantillon de style"
-                placeholder="Collez un extrait de votre contenu existant pour que l'IA s'inspire de votre style..."
-                value={styleSample}
-                onChange={(e) => setStyleSample(e.target.value)}
-            />
                 </div>
             </div>
 

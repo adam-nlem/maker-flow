@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Entity\Enum\Tone;
 use App\Helper\DateHelper;
 use App\Repository\CreatorProfileRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -37,14 +39,6 @@ class CreatorProfile
     ])]
     private ?string $niche = null;
 
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([
-        'api_creator_profiles_show',
-        'api_creator_profiles_create',
-        'api_creator_profiles_update',
-    ])]
-    private ?string $targetAudience = null;
-
     #[ORM\Column(type: Types::JSON, nullable: true)]
     #[Groups([
         'api_creator_profiles_show',
@@ -68,14 +62,6 @@ class CreatorProfile
         'api_creator_profiles_update',
     ])]
     private ?array $neverList = null;
-
-    #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups([
-        'api_creator_profiles_show',
-        'api_creator_profiles_create',
-        'api_creator_profiles_update',
-    ])]
-    private ?string $styleSample = null;
 
     #[ORM\Column]
     #[Groups([
@@ -101,6 +87,12 @@ class CreatorProfile
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Project $project = null;
 
+    /**
+     * @var Collection<int, TargetAudience>
+     */
+    #[ORM\OneToMany(targetEntity: TargetAudience::class, mappedBy: 'creatorProfile', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $targetAudiences;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -114,6 +106,8 @@ class CreatorProfile
         if ($this->updatedAt === null) {
             $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
+
+        $this->targetAudiences = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -151,18 +145,6 @@ class CreatorProfile
         return $this;
     }
 
-    public function getTargetAudience(): ?string
-    {
-        return $this->targetAudience;
-    }
-
-    public function setTargetAudience(?string $targetAudience): static
-    {
-        $this->targetAudience = $targetAudience;
-
-        return $this;
-    }
-
     public function getTones(): ?array
     {
         return $this->tones;
@@ -195,18 +177,6 @@ class CreatorProfile
     public function setNeverList(?array $neverList): static
     {
         $this->neverList = $neverList;
-
-        return $this;
-    }
-
-    public function getStyleSample(): ?string
-    {
-        return $this->styleSample;
-    }
-
-    public function setStyleSample(?string $styleSample): static
-    {
-        $this->styleSample = $styleSample;
 
         return $this;
     }
@@ -257,5 +227,13 @@ class CreatorProfile
         $this->project = $project;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, TargetAudience>
+     */
+    public function getTargetAudiences(): Collection
+    {
+        return $this->targetAudiences;
     }
 }

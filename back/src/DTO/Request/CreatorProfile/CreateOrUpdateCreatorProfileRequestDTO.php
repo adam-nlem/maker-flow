@@ -12,11 +12,9 @@ class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
 {
     private string $projectUuid;
     private ?string $niche;
-    private ?string $targetAudience;
     private ?array $tones;
     private ?array $signaturePhrases;
     private ?array $neverList;
-    private ?string $styleSample;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -29,11 +27,9 @@ class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
     {
         $this->projectUuid = $payload["projectUuid"];
         $this->niche = $payload["niche"] ?? null;
-        $this->targetAudience = $payload["targetAudience"] ?? null;
         $this->tones = $payload["tones"] ?? null;
         $this->signaturePhrases = $payload["signaturePhrases"] ?? null;
         $this->neverList = $payload["neverList"] ?? null;
-        $this->styleSample = $payload["styleSample"] ?? null;
     }
 
     protected function buildObject(): CreatorProfile
@@ -42,11 +38,9 @@ class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
 
         return $creatorProfile
             ->setNiche($this->niche)
-            ->setTargetAudience($this->targetAudience)
             ->setTones($this->tones)
             ->setSignaturePhrases($this->signaturePhrases)
-            ->setNeverList($this->neverList)
-            ->setStyleSample($this->styleSample);
+            ->setNeverList($this->neverList);
     }
 
     public function getProjectUuid(): string
@@ -57,11 +51,6 @@ class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
     public function getNiche(): ?string
     {
         return $this->niche;
-    }
-
-    public function getTargetAudience(): ?string
-    {
-        return $this->targetAudience;
     }
 
     public function getTones(): ?array
@@ -79,8 +68,4 @@ class CreateOrUpdateCreatorProfileRequestDTO extends AbstractRequestDTO
         return $this->neverList;
     }
 
-    public function getStyleSample(): ?string
-    {
-        return $this->styleSample;
-    }
 }

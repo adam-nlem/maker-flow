@@ -8,11 +8,9 @@ import type { Tone } from "~/models/enums/Tone";
 interface CreateOrUpdateCreatorProfileData {
     projectUuid: string;
     niche?: string;
-    targetAudience?: string;
     tones?: Tone[];
     signaturePhrases?: string[];
     neverList?: string[];
-    styleSample?: string;
 }
 
 export function useCreateOrUpdateCreatorProfile() {

@@ -76,6 +76,10 @@ class ScriptText
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
     private ?ScriptGeneration $scriptGeneration = null;
 
+    #[ORM\ManyToOne(targetEntity: ScriptVersion::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
+    private ?ScriptVersion $scriptVersion = null;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -215,6 +219,28 @@ class ScriptText
     public function setScriptGeneration(?ScriptGeneration $scriptGeneration): static
     {
         $this->scriptGeneration = $scriptGeneration;
+
+        return $this;
+    }
+
+    #[Groups([
+        'api_scripts_texts_list',
+        'api_scripts_texts_create',
+        'api_scripts_parts_list',
+    ])]
+    public function getVersionUuid(): ?string
+    {
+        return $this->scriptVersion?->getUuid();
+    }
+
+    public function getScriptVersion(): ?ScriptVersion
+    {
+        return $this->scriptVersion;
+    }
+
+    public function setScriptVersion(?ScriptVersion $scriptVersion): static
+    {
+        $this->scriptVersion = $scriptVersion;
 
         return $this;
     }

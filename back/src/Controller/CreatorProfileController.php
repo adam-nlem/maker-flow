@@ -75,11 +75,9 @@ final class CreatorProfileController extends AbstractController
             $creatorProfile = $existingProfile;
             $creatorProfile
                 ->setNiche($dto->getNiche())
-                ->setTargetAudience($dto->getTargetAudience())
                 ->setTones($dto->getTones())
                 ->setSignaturePhrases($dto->getSignaturePhrases())
-                ->setNeverList($dto->getNeverList())
-                ->setStyleSample($dto->getStyleSample());
+                ->setNeverList($dto->getNeverList());
         }
 
         $creatorProfileRepository->save($creatorProfile, true);

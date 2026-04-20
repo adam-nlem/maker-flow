@@ -194,6 +194,18 @@ class Script
     #[ORM\OneToMany(targetEntity: ScriptGeneration::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
     private Collection $scriptGenerations;
 
+    /**
+     * @var Collection<int, Chat>
+     */
+    #[ORM\OneToMany(targetEntity: Chat::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $chats;
+
+    /**
+     * @var Collection<int, ScriptVersion>
+     */
+    #[ORM\OneToMany(targetEntity: ScriptVersion::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptVersions;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -218,6 +230,8 @@ class Script
         $this->scriptRetentionCues = new ArrayCollection();
         $this->scriptHooks = new ArrayCollection();
         $this->scriptGenerations = new ArrayCollection();
+        $this->chats = new ArrayCollection();
+        $this->scriptVersions = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -625,5 +639,21 @@ class Script
     public function getScriptGenerations(): Collection
     {
         return $this->scriptGenerations;
+    }
+
+    /**
+     * @return Collection<int, Chat>
+     */
+    public function getChats(): Collection
+    {
+        return $this->chats;
+    }
+
+    /**
+     * @return Collection<int, ScriptVersion>
+     */
+    public function getScriptVersions(): Collection
+    {
+        return $this->scriptVersions;
     }
 }

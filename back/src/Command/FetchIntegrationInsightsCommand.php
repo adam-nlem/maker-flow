@@ -25,7 +25,7 @@ class FetchIntegrationInsightsCommand extends Command
         Platform::Youtube,
         Platform::Tiktok,
     ];
-
+    
     public function __construct(
         private readonly IntegrationRepository $integrationRepository,
         private readonly MessageBusInterface $bus,
