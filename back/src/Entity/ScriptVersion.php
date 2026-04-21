@@ -63,6 +63,10 @@ class ScriptVersion
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Message $message = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -169,6 +173,18 @@ class ScriptVersion
     public function setMessage(?Message $message): static
     {
         $this->message = $message;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

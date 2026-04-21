@@ -2,8 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\CreatorProfile;
 use App\Entity\TargetAudience;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
 
 class TargetAudienceRepository extends ServiceEntityRepository
@@ -29,5 +32,28 @@ class TargetAudienceRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    public function getByCreatorProfile(CreatorProfile $creatorProfile): array
+    {
+        return $this->createQueryBuilder('ta')
+            ->where('ta.creatorProfile = :creatorProfile')
+            ->setParameter('creatorProfile', $creatorProfile)
+            ->orderBy('ta.createdAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByUuidAndUser(string $uuid, User $user): ?TargetAudience
+    {
+        return $this->createQueryBuilder('ta')
+            ->where('ta.uuid = :uuid')
+            ->andWhere('ta.user = :user')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 }

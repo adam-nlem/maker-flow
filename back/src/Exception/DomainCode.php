@@ -19,4 +19,7 @@ enum DomainCode: int
     case Validation = 22;
     case Auth = 23;
     case CreatorProfile = 24;
+    case Chat = 25;
+    case TargetAudience = 26;
+    case ScriptVersion = 27;
 }

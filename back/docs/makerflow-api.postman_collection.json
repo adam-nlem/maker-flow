@@ -2895,6 +2895,239 @@
         }
       ],
       "id": "onboarding-folder-0001-000000000000"
+    },
+    {
+      "name": "Target Audiences",
+      "item": [
+        {
+          "name": "Create Target Audience",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"projectUuid\": \"{{projectUuid}}\",\n  \"name\": \"Jeunes entrepreneurs 25-35 ans\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/target-audiences",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "target-audiences"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Target Audiences",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/target-audiences?projectUuid={{projectUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "target-audiences"],
+              "query": [
+                { "key": "projectUuid", "value": "{{projectUuid}}" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Target Audience",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/target-audiences/{{targetAudienceUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "target-audiences", "{{targetAudienceUuid}}"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "target-audiences-folder-0001-000000"
+    },
+    {
+      "name": "Chats",
+      "item": [
+        {
+          "name": "Create Chat",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"scriptUuid\": \"{{scriptUuid}}\",\n  \"aiModel\": \"gemini\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chats",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Chats",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/chats?scriptUuid={{scriptUuid}}&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chats"],
+              "query": [
+                { "key": "scriptUuid", "value": "{{scriptUuid}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Chat",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/chats/{{chatUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chats", "{{chatUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Chat Title",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Mon premier script\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chats/{{chatUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chats", "{{chatUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Chat",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/chats/{{chatUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chats", "{{chatUuid}}"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "chats-folder-0001-000000000000"
+    },
+    {
+      "name": "Chat Messages",
+      "item": [
+        {
+          "name": "Create Message",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"chatUuid\": \"{{chatUuid}}\",\n  \"content\": \"Créer un nouveau script\",\n  \"metadata\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/chat-messages",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat-messages"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Messages",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/chat-messages?chatUuid={{chatUuid}}&page=1&limit=50",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "chat-messages"],
+              "query": [
+                { "key": "chatUuid", "value": "{{chatUuid}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "50" }
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "chat-messages-folder-0001-000000"
+    },
+    {
+      "name": "Script Versions",
+      "item": [
+        {
+          "name": "List Script Versions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/script-versions?scriptUuid={{scriptUuid}}&page=1&limit=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "script-versions"],
+              "query": [
+                { "key": "scriptUuid", "value": "{{scriptUuid}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Script Version",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/script-versions/{{versionUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "script-versions", "{{versionUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Script Version Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"accepted\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/script-versions/{{versionUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "script-versions", "{{versionUuid}}"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "script-versions-folder-0001-00000"
     }
   ],
   "event": [
@@ -3002,6 +3235,26 @@
     {
       "id": "b2a3c4d5-e6f7-8901-abcd-999999999999",
       "key": "hookTemplateUuid",
+      "value": ""
+    },
+    {
+      "id": "c3a4d5e6-f7a8-9012-bcde-aaaaaaaaaaaa",
+      "key": "chatUuid",
+      "value": ""
+    },
+    {
+      "id": "c3a4d5e6-f7a8-9012-bcde-bbbbbbbbbbbb",
+      "key": "targetAudienceUuid",
+      "value": ""
+    },
+    {
+      "id": "c3a4d5e6-f7a8-9012-bcde-cccccccccccc",
+      "key": "versionUuid",
+      "value": ""
+    },
+    {
+      "id": "c3a4d5e6-f7a8-9012-bcde-dddddddddddd",
+      "key": "messageUuid",
       "value": ""
     }
   ]

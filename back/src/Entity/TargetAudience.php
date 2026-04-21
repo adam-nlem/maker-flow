@@ -55,6 +55,10 @@ class TargetAudience
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?CreatorProfile $creatorProfile = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?User $user = null;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -137,6 +141,18 @@ class TargetAudience
     public function setCreatorProfile(?CreatorProfile $creatorProfile): static
     {
         $this->creatorProfile = $creatorProfile;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

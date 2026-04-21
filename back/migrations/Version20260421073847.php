@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260420135136 extends AbstractMigration
+final class Version20260421073847 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -22,8 +22,8 @@ final class Version20260420135136 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE chat (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, title VARCHAR(255) DEFAULT NULL, ai_model VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, user_id INT NOT NULL, script_id INT NOT NULL, INDEX IDX_659DF2AAA76ED395 (user_id), INDEX IDX_659DF2AAA1C01850 (script_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
         $this->addSql('CREATE TABLE message (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, content LONGTEXT NOT NULL, type VARCHAR(255) NOT NULL, suggested_answers JSON DEFAULT NULL, metadata JSON DEFAULT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, user_id INT DEFAULT NULL, chat_id INT NOT NULL, parent_message_id INT DEFAULT NULL, INDEX IDX_B6BD307FA76ED395 (user_id), INDEX IDX_B6BD307F1A9A7125 (chat_id), INDEX IDX_B6BD307F14399779 (parent_message_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
-        $this->addSql('CREATE TABLE script_version (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, status VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, script_id INT NOT NULL, chat_id INT NOT NULL, message_id INT NOT NULL, INDEX IDX_E2141489A1C01850 (script_id), INDEX IDX_E21414891A9A7125 (chat_id), INDEX IDX_E2141489537A1329 (message_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
-        $this->addSql('CREATE TABLE target_audience (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, name VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, creator_profile_id INT NOT NULL, INDEX IDX_27664471B4043523 (creator_profile_id), UNIQUE INDEX unique_name_creator_profile (name, creator_profile_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE script_version (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, status VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, script_id INT NOT NULL, chat_id INT NOT NULL, message_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_E2141489A1C01850 (script_id), INDEX IDX_E21414891A9A7125 (chat_id), INDEX IDX_E2141489537A1329 (message_id), INDEX IDX_E2141489A76ED395 (user_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE target_audience (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, name VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, creator_profile_id INT NOT NULL, user_id INT NOT NULL, INDEX IDX_27664471B4043523 (creator_profile_id), INDEX IDX_27664471A76ED395 (user_id), UNIQUE INDEX unique_name_creator_profile (name, creator_profile_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
         $this->addSql('ALTER TABLE chat ADD CONSTRAINT FK_659DF2AAA76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE chat ADD CONSTRAINT FK_659DF2AAA1C01850 FOREIGN KEY (script_id) REFERENCES script (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE message ADD CONSTRAINT FK_B6BD307FA76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
@@ -32,7 +32,9 @@ final class Version20260420135136 extends AbstractMigration
         $this->addSql('ALTER TABLE script_version ADD CONSTRAINT FK_E2141489A1C01850 FOREIGN KEY (script_id) REFERENCES script (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE script_version ADD CONSTRAINT FK_E21414891A9A7125 FOREIGN KEY (chat_id) REFERENCES chat (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE script_version ADD CONSTRAINT FK_E2141489537A1329 FOREIGN KEY (message_id) REFERENCES message (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE script_version ADD CONSTRAINT FK_E2141489A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE target_audience ADD CONSTRAINT FK_27664471B4043523 FOREIGN KEY (creator_profile_id) REFERENCES creator_profile (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE target_audience ADD CONSTRAINT FK_27664471A76ED395 FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE creator_profile DROP target_audience, DROP style_sample');
         $this->addSql('ALTER TABLE script_call_to_action ADD script_version_id INT DEFAULT NULL');
         $this->addSql('ALTER TABLE script_call_to_action ADD CONSTRAINT FK_AF7D2479BCD1E6F5 FOREIGN KEY (script_version_id) REFERENCES script_version (id) ON DELETE CASCADE');
@@ -71,7 +73,9 @@ final class Version20260420135136 extends AbstractMigration
         $this->addSql('ALTER TABLE script_version DROP FOREIGN KEY FK_E2141489A1C01850');
         $this->addSql('ALTER TABLE script_version DROP FOREIGN KEY FK_E21414891A9A7125');
         $this->addSql('ALTER TABLE script_version DROP FOREIGN KEY FK_E2141489537A1329');
+        $this->addSql('ALTER TABLE script_version DROP FOREIGN KEY FK_E2141489A76ED395');
         $this->addSql('ALTER TABLE target_audience DROP FOREIGN KEY FK_27664471B4043523');
+        $this->addSql('ALTER TABLE target_audience DROP FOREIGN KEY FK_27664471A76ED395');
         $this->addSql('DROP TABLE chat');
         $this->addSql('DROP TABLE message');
         $this->addSql('DROP TABLE script_version');
