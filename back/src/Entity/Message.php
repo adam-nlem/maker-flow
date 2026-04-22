@@ -21,50 +21,50 @@ class Message
 
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
-        'api_messages_list',
-        'api_messages_create',
+        'api_chat_messages_list',
+        'api_chat_messages_create',
     ])]
     private ?string $uuid = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Groups([
-        'api_messages_list',
-        'api_messages_create',
+        'api_chat_messages_list',
+        'api_chat_messages_create',
     ])]
     private ?string $content = null;
 
     #[ORM\Column(enumType: MessageType::class)]
     #[Groups([
-        'api_messages_list',
-        'api_messages_create',
+        'api_chat_messages_list',
+        'api_chat_messages_create',
     ])]
     private ?MessageType $type = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
     #[Groups([
-        'api_messages_list',
-        'api_messages_create',
+        'api_chat_messages_list',
+        'api_chat_messages_create',
     ])]
     private ?array $suggestedAnswers = null;
 
     #[ORM\Column(type: Types::JSON, nullable: true)]
     #[Groups([
-        'api_messages_list',
-        'api_messages_create',
+        'api_chat_messages_list',
+        'api_chat_messages_create',
     ])]
     private ?array $metadata = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_messages_list',
-        'api_messages_create',
+        'api_chat_messages_list',
+        'api_chat_messages_create',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_messages_list',
-        'api_messages_create',
+        'api_chat_messages_list',
+        'api_chat_messages_create',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 

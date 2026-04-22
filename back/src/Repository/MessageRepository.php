@@ -46,6 +46,30 @@ class MessageRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    public function getById(int $id): ?Message
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return Message[]
+     */
+    public function getAllByChat(Chat $chat): array
+    {
+        return $this->createQueryBuilder('m')
+            ->where('m.chat = :chat')
+            ->setParameter('chat', $chat)
+            ->orderBy('m.createdAt', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     public function getByUuidAndChat(string $uuid, Chat $chat): ?Message
     {
         return $this->createQueryBuilder('m')

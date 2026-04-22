@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Script;
 use App\Entity\ScriptGeneration;
 use App\Entity\ScriptHook;
+use App\Entity\ScriptVersion;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
@@ -117,5 +118,51 @@ class ScriptHookRepository extends ServiceEntityRepository
             ->setParameter('generation', $generation)
             ->getQuery()
             ->execute();
+    }
+
+    /**
+     * @return ScriptHook[]
+     */
+    public function getByScriptAndUserMainParts(Script $script, User $user): array
+    {
+        return $this->createQueryBuilder('sh')
+            ->where('sh.script = :script')
+            ->andWhere('sh.user = :user')
+            ->andWhere('sh.scriptVersion IS NULL')
+            ->setParameter('script', $script)
+            ->setParameter('user', $user)
+            ->orderBy('sh.position', 'ASC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function deleteMainPartsByScript(Script $script): void
+    {
+        $this->createQueryBuilder('sh')
+            ->delete()
+            ->where('sh.script = :script')
+            ->andWhere('sh.scriptVersion IS NULL')
+            ->setParameter('script', $script)
+            ->getQuery()
+            ->execute();
+    }
+
+    public function promoteVersionPartsToMain(ScriptVersion $scriptVersion): void
+    {
+        $this->getEntityManager()->getConnection()->executeStatement(
+            'UPDATE script_hook SET script_version_id = NULL WHERE script_version_id = :versionId',
+            ['versionId' => $scriptVersion->getId()],
+        );
+    }
+
+    public function existsByScriptVersion(ScriptVersion $scriptVersion): bool
+    {
+        return (int) $this->createQueryBuilder('sh')
+            ->select('COUNT(sh.id)')
+            ->where('sh.scriptVersion = :version')
+            ->setParameter('version', $scriptVersion)
+            ->getQuery()
+            ->getSingleScalarResult() > 0;
     }
 }

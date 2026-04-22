@@ -88,7 +88,7 @@ class GenerateScriptHandler
             );
 
             // Assemble the prompt
-            $prompt = $this->promptAssemblerService->assemble($creatorProfile, $generation);
+            $prompt = $this->promptAssemblerService->   assemble($creatorProfile, $generation);
             $generation->setAssembledPrompt($prompt);
 
             // Call the selected AI model

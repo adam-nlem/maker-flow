@@ -1,13 +1,13 @@
 <?php
 
-namespace App\DTO\QueryParam\Message;
+namespace App\DTO\QueryParam\ChatMessage;
 
 use App\DTO\QueryParam\AbstractQueryParamDTO;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class ListMessagesQueryParamDTO extends AbstractQueryParamDTO
+class ListChatMessagesQueryParamDTO extends AbstractQueryParamDTO
 {
     #[Assert\NotBlank]
     private string $chatUuid;

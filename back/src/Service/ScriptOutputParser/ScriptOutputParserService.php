@@ -17,6 +17,7 @@ use App\Entity\ScriptRetentionCue;
 use App\Entity\ScriptShot;
 use App\Entity\ScriptHook;
 use App\Entity\ScriptText;
+use App\Entity\ScriptVersion;
 use App\Entity\ScriptVoiceOver;
 use App\Entity\User;
 use App\Repository\ScriptCallToActionRepository;
@@ -43,6 +44,16 @@ class ScriptOutputParserService
 
     public function parseAndCreateParts(string $output, Script $script, User $user, ScriptGeneration $generation): ScriptOutputDTO
     {
+        return $this->doParse($output, $script, $user, $generation, null);
+    }
+
+    public function parseAndCreatePartsForVersion(string $output, Script $script, User $user, ScriptVersion $scriptVersion): ScriptOutputDTO
+    {
+        return $this->doParse($output, $script, $user, null, $scriptVersion);
+    }
+
+    private function doParse(string $output, Script $script, User $user, ?ScriptGeneration $generation, ?ScriptVersion $scriptVersion): ScriptOutputDTO
+    {
         $cleanOutput = $this->stripMarkdownCodeFences($output);
         $decoded = json_decode($cleanOutput, true);
 
@@ -57,13 +68,13 @@ class ScriptOutputParserService
             $content = trim($part->getContent() ?? '');
 
             match ($part->getType()) {
-                ScriptPartType::Chapter->value => $this->createChapter($part->getTitle(), $part->getDescription(), $script, $user, $position++, $generation),
-                ScriptPartType::VoiceOver->value => $content !== '' ? $this->createVoiceOver($content, $part->getTone(), $script, $user, $position++, $generation) : null,
-                ScriptPartType::Shot->value => $content !== '' ? $this->createShot($content, $script, $user, $position++, $generation) : null,
-                ScriptPartType::CallToAction->value => $content !== '' ? $this->createCallToAction($content, $part->getCallToActionType(), $script, $user, $position++, $generation) : null,
-                ScriptPartType::RetentionCue->value => $content !== '' ? $this->createRetentionCue($content, $part->getRetentionCueType(), $script, $user, $position++, $generation) : null,
-                ScriptPartType::Text->value => $content !== '' ? $this->createText($content, $script, $user, $position++, $generation) : null,
-                ScriptPartType::Hook->value => $content !== '' ? $this->createHook($content, $script, $user, 0, $generation) : null,
+                ScriptPartType::Chapter->value => $this->createChapter($part->getTitle(), $part->getDescription(), $script, $user, $position++, $generation, $scriptVersion),
+                ScriptPartType::VoiceOver->value => $content !== '' ? $this->createVoiceOver($content, $part->getTone(), $script, $user, $position++, $generation, $scriptVersion) : null,
+                ScriptPartType::Shot->value => $content !== '' ? $this->createShot($content, $script, $user, $position++, $generation, $scriptVersion) : null,
+                ScriptPartType::CallToAction->value => $content !== '' ? $this->createCallToAction($content, $part->getCallToActionType(), $script, $user, $position++, $generation, $scriptVersion) : null,
+                ScriptPartType::RetentionCue->value => $content !== '' ? $this->createRetentionCue($content, $part->getRetentionCueType(), $script, $user, $position++, $generation, $scriptVersion) : null,
+                ScriptPartType::Text->value => $content !== '' ? $this->createText($content, $script, $user, $position++, $generation, $scriptVersion) : null,
+                ScriptPartType::Hook->value => $content !== '' ? $this->createHook($content, $script, $user, 0, $generation, $scriptVersion) : null,
                 default => null,
             };
         }
@@ -82,7 +93,7 @@ class ScriptOutputParserService
         return $output;
     }
 
-    private function createChapter(?string $title, ?string $description, Script $script, User $user, int $position, ScriptGeneration $generation): void
+    private function createChapter(?string $title, ?string $description, Script $script, User $user, int $position, ?ScriptGeneration $generation, ?ScriptVersion $scriptVersion): void
     {
         $chapterTitle = trim($title ?? '');
         if ($chapterTitle === '') {
@@ -97,11 +108,12 @@ class ScriptOutputParserService
             ->setDescription($description !== null && trim($description) !== '' ? trim($description) : null)
             ->setChapterType(ChapterType::OffScreen)
             ->setPosition($position)
-            ->setScriptGeneration($generation);
+            ->setScriptGeneration($generation)
+            ->setScriptVersion($scriptVersion);
         $this->chapterRepository->save($chapter);
     }
 
-    private function createVoiceOver(string $content, ?string $tone, Script $script, User $user, int $position, ScriptGeneration $generation): void
+    private function createVoiceOver(string $content, ?string $tone, Script $script, User $user, int $position, ?ScriptGeneration $generation, ?ScriptVersion $scriptVersion): void
     {
         $voiceOver = new ScriptVoiceOver();
         $voiceOver
@@ -110,11 +122,12 @@ class ScriptOutputParserService
             ->setContent($content)
             ->setTone(Tone::tryFrom($tone ?? '') ?? Tone::Neutral)
             ->setPosition($position)
-            ->setScriptGeneration($generation);
+            ->setScriptGeneration($generation)
+            ->setScriptVersion($scriptVersion);
         $this->voiceOverRepository->save($voiceOver);
     }
 
-    private function createShot(string $content, Script $script, User $user, int $position, ScriptGeneration $generation): void
+    private function createShot(string $content, Script $script, User $user, int $position, ?ScriptGeneration $generation, ?ScriptVersion $scriptVersion): void
     {
         $shot = new ScriptShot();
         $shot
@@ -123,11 +136,12 @@ class ScriptOutputParserService
             ->setContent($content)
             ->setShotType(ShotType::BRoll)
             ->setPosition($position)
-            ->setScriptGeneration($generation);
+            ->setScriptGeneration($generation)
+            ->setScriptVersion($scriptVersion);
         $this->shotRepository->save($shot);
     }
 
-    private function createCallToAction(string $content, ?string $callToActionType, Script $script, User $user, int $position, ScriptGeneration $generation): void
+    private function createCallToAction(string $content, ?string $callToActionType, Script $script, User $user, int $position, ?ScriptGeneration $generation, ?ScriptVersion $scriptVersion): void
     {
         $callToAction = new ScriptCallToAction();
         $callToAction
@@ -136,11 +150,12 @@ class ScriptOutputParserService
             ->setContent($content)
             ->setCallToActionType(CallToActionType::tryFrom($callToActionType ?? '') ?? CallToActionType::Custom)
             ->setPosition($position)
-            ->setScriptGeneration($generation);
+            ->setScriptGeneration($generation)
+            ->setScriptVersion($scriptVersion);
         $this->callToActionRepository->save($callToAction);
     }
 
-    private function createRetentionCue(string $content, ?string $retentionCueType, Script $script, User $user, int $position, ScriptGeneration $generation): void
+    private function createRetentionCue(string $content, ?string $retentionCueType, Script $script, User $user, int $position, ?ScriptGeneration $generation, ?ScriptVersion $scriptVersion): void
     {
         $retentionCue = new ScriptRetentionCue();
         $retentionCue
@@ -149,11 +164,12 @@ class ScriptOutputParserService
             ->setContent($content)
             ->setRetentionCueType(RetentionCueType::tryFrom($retentionCueType ?? '') ?? RetentionCueType::Question)
             ->setPosition($position)
-            ->setScriptGeneration($generation);
+            ->setScriptGeneration($generation)
+            ->setScriptVersion($scriptVersion);
         $this->retentionCueRepository->save($retentionCue);
     }
 
-    private function createText(string $content, Script $script, User $user, int $position, ScriptGeneration $generation): void
+    private function createText(string $content, Script $script, User $user, int $position, ?ScriptGeneration $generation, ?ScriptVersion $scriptVersion): void
     {
         $text = new ScriptText();
         $text
@@ -161,11 +177,12 @@ class ScriptOutputParserService
             ->setUser($user)
             ->setContent($content)
             ->setPosition($position)
-            ->setScriptGeneration($generation);
+            ->setScriptGeneration($generation)
+            ->setScriptVersion($scriptVersion);
         $this->textRepository->save($text);
     }
 
-    private function createHook(string $content, Script $script, User $user, int $position, ScriptGeneration $generation): void
+    private function createHook(string $content, Script $script, User $user, int $position, ?ScriptGeneration $generation, ?ScriptVersion $scriptVersion): void
     {
         $hook = new ScriptHook();
         $hook
@@ -173,7 +190,8 @@ class ScriptOutputParserService
             ->setUser($user)
             ->setContent($content)
             ->setPosition($position)
-            ->setScriptGeneration($generation);
+            ->setScriptGeneration($generation)
+            ->setScriptVersion($scriptVersion);
         $this->hookRepository->save($hook);
     }
 }
