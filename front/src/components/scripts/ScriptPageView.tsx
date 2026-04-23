@@ -4,6 +4,7 @@ import { useIsDesktop } from "~/hooks/useIsDesktop";
 import ScriptListPanel from "./ScriptListPanel";
 import ScriptEditorPanel from "./ScriptEditorPanel";
 import GenerateScriptPanel from "./generation/GenerateScriptPanel";
+import ChatPanel from "./chat/ChatPanel";
 import HookTemplatePanel from "./hookTemplates/HookTemplatePanel";
 
 interface ScriptPageViewProps {
@@ -32,6 +33,11 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
         <>
             <GenerateScriptPanel
                 key={`generate-${focusedScript.uuid}`}
+                scriptUuid={focusedScript.uuid}
+                projectUuid={projectUuid}
+            />
+            <ChatPanel
+                key={`chat-${focusedScript.uuid}`}
                 scriptUuid={focusedScript.uuid}
                 projectUuid={projectUuid}
             />

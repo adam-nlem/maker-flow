@@ -42,6 +42,7 @@ export default function ScriptEditorPanel({ script, projectUuid, isReadOnly, hid
                 script={script}
                 projectUuid={projectUuid}
                 onOpenGenerateModal={() => togglePanel(ScriptRightPanel.Generate)}
+                onOpenChat={() => togglePanel(ScriptRightPanel.Chat)}
                 isReadOnly={isReadOnly}
                 hidePanelTriggers={hidePanelTriggers}
                 onOpenEditor={onOpenEditor}

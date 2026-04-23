@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeftIcon, CalendarDaysIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { ArrowLeftIcon, CalendarDaysIcon, ChatBubbleLeftRightIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import type { Script } from "~/models/Script";
 import { type ScriptStatus, scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToBorderClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
@@ -17,13 +17,14 @@ interface ScriptMetaHeaderProps {
     script: Script;
     projectUuid: string;
     onOpenGenerateModal: () => void;
+    onOpenChat: () => void;
     isReadOnly?: boolean;
     hidePanelTriggers?: boolean;
     onOpenEditor?: () => void;
     onBack?: () => void;
 }
 
-export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal, isReadOnly, hidePanelTriggers, onOpenEditor, onBack }: ScriptMetaHeaderProps) {
+export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal, onOpenChat, isReadOnly, hidePanelTriggers, onOpenEditor, onBack }: ScriptMetaHeaderProps) {
     const [title, setTitle] = useState(script.title);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [status, setStatus] = useState<ScriptStatus | undefined>(script.status);
@@ -77,9 +78,14 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                         borderColorClassName="border border-primary/30"
                     />
                 ) : !isReadOnly && !hidePanelTriggers ? (
-                    <button onClick={onOpenGenerateModal} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Générer avec l'IA">
-                        <SparklesIcon className="size-5" strokeWidth={2} />
-                    </button>
+                    <>
+                        <button onClick={onOpenGenerateModal} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Générer avec l'IA">
+                            <SparklesIcon className="size-5" strokeWidth={2} />
+                        </button>
+                        <button onClick={onOpenChat} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Chat IA">
+                            <ChatBubbleLeftRightIcon className="size-5" strokeWidth={2} />
+                        </button>
+                    </>
                 ) : null}
                 <button onClick={toggle} className="shrink-0 text-gray hover:text-dark transition-colors cursor-pointer">
                     {isExpanded
