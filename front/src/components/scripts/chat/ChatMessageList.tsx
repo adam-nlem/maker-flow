@@ -16,9 +16,15 @@ interface ChatMessageListProps {
 }
 
 export default function ChatMessageList({ chatUuid, scriptUuid, onActionSelect, onSuggestionClick }: ChatMessageListProps) {
-    const { messages, isLoading } = useListChatMessages({ chatUuid });
+    const { messages, isLoading, isLoadingMore, hasMore, listMore } = useListChatMessages({ chatUuid });
     const isWaitingForAi = useChatStore((s) => s.isWaitingForAi);
     const bottomRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        if (hasMore && !isLoadingMore) {
+            listMore();
+        }
+    }, [hasMore, isLoadingMore, listMore]);
 
     useEffect(() => {
         bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -54,6 +60,11 @@ export default function ChatMessageList({ chatUuid, scriptUuid, onActionSelect, 
 
     return (
         <div className="flex flex-col gap-3 p-4">
+            {isLoadingMore && (
+                <div className="flex justify-center py-2">
+                    <Shimmer height="h-8" width="w-1/2" />
+                </div>
+            )}
             {messages.map((message) => (
                 <ChatMessageBubble
                     key={message.uuid}
