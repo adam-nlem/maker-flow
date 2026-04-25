@@ -39,7 +39,7 @@ final class ChatMessageController extends AbstractController
             throw new ChatNotFoundException();
         }
 
-        if ($dto->getChatAction() !== null && $creditService->getTotalCredits($user) < 1) {
+        if ($creditService->getTotalCredits($user) < 1) {
             throw new InsufficientCreditsException(requested: 1, available: $creditService->getTotalCredits($user));
         }
 
@@ -60,12 +60,7 @@ final class ChatMessageController extends AbstractController
 
         $messageRepository->save($message, true);
 
-        if ($dto->getChatAction() !== null) {
-            $messageBus->dispatch(new GenerateChatMessageResponseMessage(
-                $message->getId(),
-                $dto->getChatAction(),
-            ));
-        }
+        $messageBus->dispatch(new GenerateChatMessageResponseMessage($message->getId()));
 
         return $this->json(
             data: $message,

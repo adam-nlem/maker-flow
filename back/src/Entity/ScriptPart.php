@@ -2,19 +2,18 @@
 
 namespace App\Entity;
 
-use App\Entity\Enum\AiModel;
+use App\Entity\Enum\ScriptPartType;
 use App\Helper\DateHelper;
-use App\Repository\ChatRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use App\Repository\ScriptPartRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-#[ORM\Entity(repositoryClass: ChatRepository::class)]
+#[ORM\Entity(repositoryClass: ScriptPartRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class Chat
+#[ORM\Index(columns: ['script_id', 'position'])]
+class ScriptPart
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -23,62 +22,59 @@ class Chat
 
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
-        'api_chats_list',
-        'api_chats_create',
-        'api_chats_show',
-        'api_chats_update',
+        'api_scripts_parts_list',
+        'api_scripts_parts_create',
+        'api_scripts_parts_update',
     ])]
     private ?string $uuid = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(type: Types::TEXT)]
     #[Groups([
-        'api_chats_list',
-        'api_chats_create',
-        'api_chats_show',
-        'api_chats_update',
+        'api_scripts_parts_list',
+        'api_scripts_parts_create',
+        'api_scripts_parts_update',
     ])]
-    private ?string $title = null;
-
-    #[ORM\Column(enumType: AiModel::class)]
-    #[Groups([
-        'api_chats_list',
-        'api_chats_create',
-        'api_chats_show',
-        'api_chats_update',
-    ])]
-    private ?AiModel $aiModel = null;
+    private ?string $content = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_chats_list',
-        'api_chats_create',
-        'api_chats_show',
-        'api_chats_update',
+        'api_scripts_parts_list',
+        'api_scripts_parts_create',
+        'api_scripts_parts_update',
+    ])]
+    private ?int $position = null;
+
+    #[ORM\Column(enumType: ScriptPartType::class)]
+    #[Groups([
+        'api_scripts_parts_list',
+        'api_scripts_parts_create',
+        'api_scripts_parts_update',
+    ])]
+    private ?ScriptPartType $type = null;
+
+    #[ORM\Column]
+    #[Groups([
+        'api_scripts_parts_list',
+        'api_scripts_parts_create',
+        'api_scripts_parts_update',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_chats_list',
-        'api_chats_create',
-        'api_chats_show',
-        'api_chats_update',
+        'api_scripts_parts_list',
+        'api_scripts_parts_create',
+        'api_scripts_parts_update',
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
+
+    #[ORM\ManyToOne(inversedBy: 'scriptParts')]
+    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    private ?Script $script = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
-
-    #[ORM\ManyToOne(inversedBy: 'chats')]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?Script $script = null;
-
-    /**
-     * @var Collection<int, Message>
-     */
-    #[ORM\OneToMany(targetEntity: Message::class, mappedBy: 'chat', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $messages;
 
     public function __construct()
     {
@@ -93,8 +89,6 @@ class Chat
         if ($this->updatedAt === null) {
             $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
-
-        $this->messages = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -120,26 +114,38 @@ class Chat
         return $this;
     }
 
-    public function getTitle(): ?string
+    public function getContent(): ?string
     {
-        return $this->title;
+        return $this->content;
     }
 
-    public function setTitle(?string $title): static
+    public function setContent(string $content): static
     {
-        $this->title = $title;
+        $this->content = $content;
 
         return $this;
     }
 
-    public function getAiModel(): ?AiModel
+    public function getPosition(): ?int
     {
-        return $this->aiModel;
+        return $this->position;
     }
 
-    public function setAiModel(AiModel $aiModel): static
+    public function setPosition(int $position): static
     {
-        $this->aiModel = $aiModel;
+        $this->position = $position;
+
+        return $this;
+    }
+
+    public function getType(): ?ScriptPartType
+    {
+        return $this->type;
+    }
+
+    public function setType(ScriptPartType $type): static
+    {
+        $this->type = $type;
 
         return $this;
     }
@@ -168,18 +174,6 @@ class Chat
         return $this;
     }
 
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
-
-        return $this;
-    }
-
     public function getScript(): ?Script
     {
         return $this->script;
@@ -192,11 +186,15 @@ class Chat
         return $this;
     }
 
-    /**
-     * @return Collection<int, Message>
-     */
-    public function getMessages(): Collection
+    public function getUser(): ?User
     {
-        return $this->messages;
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
     }
 }

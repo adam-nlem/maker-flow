@@ -141,70 +141,22 @@ class Script
     private Collection $tags;
 
     /**
-     * @var Collection<int, ScriptChapter>
+     * @var Collection<int, ScriptPart>
      */
-    #[ORM\OneToMany(targetEntity: ScriptChapter::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptChapters;
+    #[ORM\OneToMany(targetEntity: ScriptPart::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptParts;
 
     /**
-     * @var Collection<int, ScriptVoiceOver>
+     * @var Collection<int, ScriptPartSuggestion>
      */
-    #[ORM\OneToMany(targetEntity: ScriptVoiceOver::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptVoiceOvers;
-
-    /**
-     * @var Collection<int, ScriptDialogue>
-     */
-    #[ORM\OneToMany(targetEntity: ScriptDialogue::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptDialogues;
-
-    /**
-     * @var Collection<int, ScriptShot>
-     */
-    #[ORM\OneToMany(targetEntity: ScriptShot::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptShots;
-
-    /**
-     * @var Collection<int, ScriptText>
-     */
-    #[ORM\OneToMany(targetEntity: ScriptText::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptTexts;
-
-    /**
-     * @var Collection<int, ScriptCallToAction>
-     */
-    #[ORM\OneToMany(targetEntity: ScriptCallToAction::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptCallToActions;
-
-    /**
-     * @var Collection<int, ScriptRetentionCue>
-     */
-    #[ORM\OneToMany(targetEntity: ScriptRetentionCue::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptRetentionCues;
-
-    /**
-     * @var Collection<int, ScriptHook>
-     */
-    #[ORM\OneToMany(targetEntity: ScriptHook::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptHooks;
-
-    /**
-     * @var Collection<int, ScriptGeneration>
-     */
-    #[ORM\OneToMany(targetEntity: ScriptGeneration::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptGenerations;
+    #[ORM\OneToMany(targetEntity: ScriptPartSuggestion::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptPartSuggestions;
 
     /**
      * @var Collection<int, Chat>
      */
     #[ORM\OneToMany(targetEntity: Chat::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
     private Collection $chats;
-
-    /**
-     * @var Collection<int, ScriptVersion>
-     */
-    #[ORM\OneToMany(targetEntity: ScriptVersion::class, mappedBy: 'script', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $scriptVersions;
 
     public function __construct()
     {
@@ -221,17 +173,9 @@ class Script
         }
 
         $this->tags = new ArrayCollection();
-        $this->scriptChapters = new ArrayCollection();
-        $this->scriptVoiceOvers = new ArrayCollection();
-        $this->scriptDialogues = new ArrayCollection();
-        $this->scriptShots = new ArrayCollection();
-        $this->scriptTexts = new ArrayCollection();
-        $this->scriptCallToActions = new ArrayCollection();
-        $this->scriptRetentionCues = new ArrayCollection();
-        $this->scriptHooks = new ArrayCollection();
-        $this->scriptGenerations = new ArrayCollection();
+        $this->scriptParts = new ArrayCollection();
+        $this->scriptPartSuggestions = new ArrayCollection();
         $this->chats = new ArrayCollection();
-        $this->scriptVersions = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -402,243 +346,19 @@ class Script
     }
 
     /**
-     * @return Collection<int, ScriptChapter>
+     * @return Collection<int, ScriptPart>
      */
-    public function getScriptChapters(): Collection
+    public function getScriptParts(): Collection
     {
-        return $this->scriptChapters;
-    }
-
-    public function addScriptChapter(ScriptChapter $scriptChapter): static
-    {
-        if (!$this->scriptChapters->contains($scriptChapter)) {
-            $this->scriptChapters->add($scriptChapter);
-            $scriptChapter->setScript($this);
-        }
-
-        return $this;
-    }
-
-    public function removeScriptChapter(ScriptChapter $scriptChapter): static
-    {
-        if ($this->scriptChapters->removeElement($scriptChapter)) {
-            if ($scriptChapter->getScript() === $this) {
-                $scriptChapter->setScript(null);
-            }
-        }
-
-        return $this;
+        return $this->scriptParts;
     }
 
     /**
-     * @return Collection<int, ScriptVoiceOver>
+     * @return Collection<int, ScriptPartSuggestion>
      */
-    public function getScriptVoiceOvers(): Collection
+    public function getScriptPartSuggestions(): Collection
     {
-        return $this->scriptVoiceOvers;
-    }
-
-    public function addScriptVoiceOver(ScriptVoiceOver $scriptVoiceOver): static
-    {
-        if (!$this->scriptVoiceOvers->contains($scriptVoiceOver)) {
-            $this->scriptVoiceOvers->add($scriptVoiceOver);
-            $scriptVoiceOver->setScript($this);
-        }
-
-        return $this;
-    }
-
-    public function removeScriptVoiceOver(ScriptVoiceOver $scriptVoiceOver): static
-    {
-        if ($this->scriptVoiceOvers->removeElement($scriptVoiceOver)) {
-            if ($scriptVoiceOver->getScript() === $this) {
-                $scriptVoiceOver->setScript(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ScriptDialogue>
-     */
-    public function getScriptDialogues(): Collection
-    {
-        return $this->scriptDialogues;
-    }
-
-    public function addScriptDialogue(ScriptDialogue $scriptDialogue): static
-    {
-        if (!$this->scriptDialogues->contains($scriptDialogue)) {
-            $this->scriptDialogues->add($scriptDialogue);
-            $scriptDialogue->setScript($this);
-        }
-
-        return $this;
-    }
-
-    public function removeScriptDialogue(ScriptDialogue $scriptDialogue): static
-    {
-        if ($this->scriptDialogues->removeElement($scriptDialogue)) {
-            if ($scriptDialogue->getScript() === $this) {
-                $scriptDialogue->setScript(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ScriptShot>
-     */
-    public function getScriptShots(): Collection
-    {
-        return $this->scriptShots;
-    }
-
-    public function addScriptShot(ScriptShot $scriptShot): static
-    {
-        if (!$this->scriptShots->contains($scriptShot)) {
-            $this->scriptShots->add($scriptShot);
-            $scriptShot->setScript($this);
-        }
-
-        return $this;
-    }
-
-    public function removeScriptShot(ScriptShot $scriptShot): static
-    {
-        if ($this->scriptShots->removeElement($scriptShot)) {
-            if ($scriptShot->getScript() === $this) {
-                $scriptShot->setScript(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ScriptText>
-     */
-    public function getScriptTexts(): Collection
-    {
-        return $this->scriptTexts;
-    }
-
-    public function addScriptText(ScriptText $scriptText): static
-    {
-        if (!$this->scriptTexts->contains($scriptText)) {
-            $this->scriptTexts->add($scriptText);
-            $scriptText->setScript($this);
-        }
-
-        return $this;
-    }
-
-    public function removeScriptText(ScriptText $scriptText): static
-    {
-        if ($this->scriptTexts->removeElement($scriptText)) {
-            if ($scriptText->getScript() === $this) {
-                $scriptText->setScript(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ScriptCallToAction>
-     */
-    public function getScriptCallToActions(): Collection
-    {
-        return $this->scriptCallToActions;
-    }
-
-    public function addScriptCallToAction(ScriptCallToAction $scriptCallToAction): static
-    {
-        if (!$this->scriptCallToActions->contains($scriptCallToAction)) {
-            $this->scriptCallToActions->add($scriptCallToAction);
-            $scriptCallToAction->setScript($this);
-        }
-
-        return $this;
-    }
-
-    public function removeScriptCallToAction(ScriptCallToAction $scriptCallToAction): static
-    {
-        if ($this->scriptCallToActions->removeElement($scriptCallToAction)) {
-            if ($scriptCallToAction->getScript() === $this) {
-                $scriptCallToAction->setScript(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ScriptRetentionCue>
-     */
-    public function getScriptRetentionCues(): Collection
-    {
-        return $this->scriptRetentionCues;
-    }
-
-    public function addScriptRetentionCue(ScriptRetentionCue $scriptRetentionCue): static
-    {
-        if (!$this->scriptRetentionCues->contains($scriptRetentionCue)) {
-            $this->scriptRetentionCues->add($scriptRetentionCue);
-            $scriptRetentionCue->setScript($this);
-        }
-
-        return $this;
-    }
-
-    public function removeScriptRetentionCue(ScriptRetentionCue $scriptRetentionCue): static
-    {
-        if ($this->scriptRetentionCues->removeElement($scriptRetentionCue)) {
-            if ($scriptRetentionCue->getScript() === $this) {
-                $scriptRetentionCue->setScript(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ScriptHook>
-     */
-    public function getScriptHooks(): Collection
-    {
-        return $this->scriptHooks;
-    }
-
-    public function addScriptHook(ScriptHook $scriptHook): static
-    {
-        if (!$this->scriptHooks->contains($scriptHook)) {
-            $this->scriptHooks->add($scriptHook);
-            $scriptHook->setScript($this);
-        }
-
-        return $this;
-    }
-
-    public function removeScriptHook(ScriptHook $scriptHook): static
-    {
-        if ($this->scriptHooks->removeElement($scriptHook)) {
-            if ($scriptHook->getScript() === $this) {
-                $scriptHook->setScript(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, ScriptGeneration>
-     */
-    public function getScriptGenerations(): Collection
-    {
-        return $this->scriptGenerations;
+        return $this->scriptPartSuggestions;
     }
 
     /**
@@ -647,13 +367,5 @@ class Script
     public function getChats(): Collection
     {
         return $this->chats;
-    }
-
-    /**
-     * @return Collection<int, ScriptVersion>
-     */
-    public function getScriptVersions(): Collection
-    {
-        return $this->scriptVersions;
     }
 }

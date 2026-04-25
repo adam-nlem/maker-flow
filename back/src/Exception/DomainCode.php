@@ -20,6 +20,6 @@ enum DomainCode: int
     case Auth = 23;
     case CreatorProfile = 24;
     case Chat = 25;
-    case TargetAudience = 26;
-    case ScriptVersion = 27;
+    case ScriptPart = 26;
+    case ScriptPartSuggestion = 27;
 }

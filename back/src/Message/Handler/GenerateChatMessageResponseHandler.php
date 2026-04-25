@@ -3,9 +3,7 @@
 namespace App\Message\Handler;
 
 use App\Entity\Enum\CreditTransactionType;
-use App\Entity\Enum\MessageType;
 use App\Entity\Enum\SourceBucket;
-use App\Entity\Message;
 use App\Exception\AiClient\AiClientRetryableException;
 use App\Exception\Credit\InsufficientCreditsException;
 use App\Message\GenerateChatMessageResponseMessage;
@@ -53,7 +51,6 @@ class GenerateChatMessageResponseHandler
         $chat = $userMessage->getChat();
         $script = $chat->getScript();
         $user = $userMessage->getUser();
-        $chatAction = $message->getChatAction();
 
         $debitedFromSubscription = $message->getDebitedFromSubscription();
         $debitedFromRefill = $message->getDebitedFromRefill();
@@ -81,11 +78,11 @@ class GenerateChatMessageResponseHandler
                 $user,
             );
 
-            $prompt = $this->chatPromptAssemblerService->assemble($chat, $userMessage, $chatAction, $creatorProfile);
+            $prompt = $this->chatPromptAssemblerService->assemble($chat, $userMessage, $creatorProfile);
 
             $output = $this->aiClientResolver->resolve($chat->getAiModel())->generateScript($prompt);
 
-            $this->chatResponseProcessorService->processOutput($output, $chatAction, $chat, $script, $user);
+            $this->chatResponseProcessorService->processOutput($output, $chat, $script, $user);
         } catch (AiClientRetryableException $e) {
             if ($message->getRetryCount() < self::MAX_RETRIES) {
                 $delay = $this->calculateRetryDelay($message->getRetryCount());
@@ -93,7 +90,6 @@ class GenerateChatMessageResponseHandler
                 $this->messageBus->dispatch(
                     new GenerateChatMessageResponseMessage(
                         $message->getMessageId(),
-                        $chatAction,
                         $message->getRetryCount() + 1,
                         $debitedFromSubscription,
                         $debitedFromRefill,

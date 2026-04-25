@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Entity\Enum\MessageType;
 use App\Helper\DateHelper;
 use App\Repository\MessageRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
@@ -80,6 +82,12 @@ class Message
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Message $parentMessage = null;
 
+    /**
+     * @var Collection<int, ScriptPartSuggestion>
+     */
+    #[ORM\OneToMany(targetEntity: ScriptPartSuggestion::class, mappedBy: 'message', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $scriptPartSuggestions;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -93,6 +101,8 @@ class Message
         if ($this->updatedAt === null) {
             $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
+
+        $this->scriptPartSuggestions = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -224,5 +234,13 @@ class Message
         $this->parentMessage = $parentMessage;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, ScriptPartSuggestion>
+     */
+    public function getScriptPartSuggestions(): Collection
+    {
+        return $this->scriptPartSuggestions;
     }
 }
