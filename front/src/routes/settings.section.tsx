@@ -5,7 +5,6 @@ import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedP
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import GeneralSettings from "~/components/settings/GeneralSettings";
 import ProjectsSettings from "~/components/settings/ProjectsSettings";
-import CreatorProfileSettings from "~/components/settings/CreatorProfileSettings";
 import SubscriptionSettings from "~/components/settings/SubscriptionSettings";
 
 export default function SettingsSectionRoute() {
@@ -20,7 +19,6 @@ export default function SettingsSectionRoute() {
     const sectionNodes: Record<string, ReactNode> = {
         "general": <GeneralSettings />,
         "projects": <ProjectsSettings />,
-        "creator-profile": <CreatorProfileSettings projectUuid={focusedProject.uuid} />,
         "subscription": <SubscriptionSettings />,
     };
 

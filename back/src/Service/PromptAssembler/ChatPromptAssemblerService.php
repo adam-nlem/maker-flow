@@ -3,59 +3,37 @@
 namespace App\Service\PromptAssembler;
 
 use App\Entity\Chat;
-use App\Entity\CreatorProfile;
-use App\Entity\Enum\ChatAction;
 use App\Entity\Enum\MessageType;
 use App\Entity\Message;
 use App\Entity\Script;
 use App\Repository\MessageRepository;
-use App\Repository\ScriptHookRepository;
+use App\Repository\ScriptPartRepository;
 use App\Repository\ScriptRepository;
-use App\Repository\ScriptTextRepository;
 
 class ChatPromptAssemblerService
 {
     public function __construct(
         private readonly MessageRepository $messageRepository,
-        private readonly ScriptHookRepository $hookRepository,
-        private readonly ScriptTextRepository $textRepository,
+        private readonly ScriptPartRepository $scriptPartRepository,
         private readonly ScriptRepository $scriptRepository,
     ) {}
 
     public function assemble(
         Chat $chat,
         Message $userMessage,
-        ChatAction $chatAction,
-        ?CreatorProfile $creatorProfile,
     ): string {
         $blocks = [];
 
         $blocks[] = $this->buildSystemRoleBlock();
-
-        if ($creatorProfile !== null) {
-            $profileBlock = CreatorProfilePromptHelper::buildBlock($creatorProfile);
-            if ($profileBlock !== '') {
-                $blocks[] = $profileBlock;
-            }
-        }
 
         $referenceBlock = $this->buildReferenceScriptBlock($userMessage, $chat);
         if ($referenceBlock !== null) {
             $blocks[] = $referenceBlock;
         }
 
-        if ($chatAction !== ChatAction::GenerateScript) {
-            $currentScriptBlock = $this->buildCurrentScriptBlock($chat->getScript(), $chat->getUser());
-            if ($currentScriptBlock !== null) {
-                $blocks[] = $currentScriptBlock;
-            }
-        }
-
-        if ($chatAction === ChatAction::GenerateScript) {
-            $briefBlock = $this->buildBriefDataBlock($userMessage);
-            if ($briefBlock !== null) {
-                $blocks[] = $briefBlock;
-            }
+        $currentScriptBlock = $this->buildCurrentScriptBlock($chat->getScript(), $chat->getUser());
+        if ($currentScriptBlock !== null) {
+            $blocks[] = $currentScriptBlock;
         }
 
         $historyBlock = $this->buildConversationHistoryBlock($chat, $userMessage);
@@ -64,14 +42,29 @@ class ChatPromptAssemblerService
         }
 
         $blocks[] = "Message de l'utilisateur :\n{$userMessage->getContent()}";
-        $blocks[] = $this->buildOutputFormatBlock($chatAction);
+        $blocks[] = $this->buildOutputFormatBlock();
 
         return implode("\n\n", array_filter($blocks));
     }
 
     private function buildSystemRoleBlock(): string
     {
-        return "Tu es un assistant expert en création de scripts vidéo pour les créateurs de contenu.\nTu réponds toujours en français.";
+        return <<<PROMPT
+Tu es un assistant expert en création de scripts vidéo pour les créateurs de contenu.
+Tu réponds toujours en français.
+
+Le script est composé de "parts" (lignes) ordonnées. Chaque part a un identifiant unique (uuid), un type (hook, text, dialogue, shot, voice_over, call_to_action, retention_cue, chapter) et un contenu.
+
+Quand l'utilisateur te demande de modifier le script, tu peux proposer une ou plusieurs opérations sur les parts existantes :
+- "rewrite" : reformuler le contenu d'une part existante
+- "insert" : insérer une nouvelle part à une position donnée
+- "delete" : supprimer une part existante
+- "reorder" : déplacer une part à une nouvelle position
+
+Tes propositions ne sont pas appliquées immédiatement : l'utilisateur les acceptera ou les refusera une par une.
+
+Si tu as besoin de plus d'informations avant de proposer des modifications (par exemple sur l'audience, l'objectif, la durée), pose des questions naturelles en texte libre dans `replyText` et laisse `suggestions` vide.
+PROMPT;
     }
 
     private function buildReferenceScriptBlock(Message $userMessage, Chat $chat): ?string
@@ -89,7 +82,7 @@ class ChatPromptAssemblerService
             return null;
         }
 
-        $content = $this->serializeScriptParts($referenceScript, $chat->getUser());
+        $content = $this->serializeScriptParts($referenceScript, $chat->getUser(), withUuids: false);
 
         if ($content === '') {
             return null;
@@ -100,60 +93,27 @@ class ChatPromptAssemblerService
 
     private function buildCurrentScriptBlock(Script $script, $user): ?string
     {
-        $content = $this->serializeScriptParts($script, $user);
+        $content = $this->serializeScriptParts($script, $user, withUuids: true);
 
         if ($content === '') {
-            return null;
+            return "Script actuel : (vide)";
         }
 
-        return "Contenu actuel du script :\n{$content}";
+        return "Script actuel (parts ordonnées) :\n{$content}";
     }
 
-    private function serializeScriptParts(Script $script, $user): string
+    private function serializeScriptParts(Script $script, $user, bool $withUuids): string
     {
-        $lines = [];
-
-        $hooks = $this->hookRepository->getByScriptAndUserMainParts($script, $user);
-        foreach ($hooks as $hook) {
-            $lines[] = "[Hook] : {$hook->getContent()}";
-        }
-
-        $texts = $this->textRepository->getByScriptAndUserMainParts($script, $user);
-        foreach ($texts as $text) {
-            $lines[] = "[Texte] : {$text->getContent()}";
-        }
-
-        return implode("\n", $lines);
-    }
-
-    private function buildBriefDataBlock(Message $userMessage): ?string
-    {
-        $metadata = $userMessage->getMetadata();
-
-        if ($metadata === null) {
-            return null;
-        }
+        $parts = $this->scriptPartRepository->getByScriptAndUserOrderedByPosition($script, $user);
 
         $lines = [];
-
-        if (isset($metadata['audience'])) {
-            $lines[] = "Audience cible : {$metadata['audience']}";
-        }
-
-        if (isset($metadata['goal'])) {
-            $lines[] = "Objectif : {$metadata['goal']}";
-        }
-
-        if (isset($metadata['duration'])) {
-            $lines[] = "Durée cible : {$metadata['duration']}";
-        }
-
-        if (isset($metadata['keyPoints']) && $metadata['keyPoints'] !== '') {
-            $lines[] = "Points clés à couvrir :\n{$metadata['keyPoints']}";
-        }
-
-        if (count($lines) === 0) {
-            return null;
+        foreach ($parts as $part) {
+            $type = $part->getType()?->value ?? 'text';
+            if ($withUuids) {
+                $lines[] = "[position={$part->getPosition()}][type={$type}][uuid={$part->getUuid()}] : {$part->getContent()}";
+            } else {
+                $lines[] = "[{$type}] : {$part->getContent()}";
+            }
         }
 
         return implode("\n", $lines);
@@ -186,50 +146,27 @@ class ChatPromptAssemblerService
         return "Historique de la conversation :\n" . implode("\n", $lines);
     }
 
-    private function buildOutputFormatBlock(ChatAction $chatAction): string
-    {
-        return match ($chatAction) {
-            ChatAction::GenerateScript => $this->buildGenerateScriptFormatBlock(),
-            ChatAction::ImproveHook => $this->buildImproveHookFormatBlock(),
-            ChatAction::AnalyzeScript => "Réponds en texte libre en français. Pas de JSON.",
-            ChatAction::FreeChat => $this->buildFreeChatFormatBlock(),
-        };
-    }
-
-    private function buildGenerateScriptFormatBlock(): string
+    private function buildOutputFormatBlock(): string
     {
         $lines = [];
-        $lines[] = 'Formate ta sortie UNIQUEMENT en JSON valide, sans blocs de code markdown ni texte autour. Utilise cette structure exacte :';
+        $lines[] = "Réponds UNIQUEMENT en JSON valide, sans blocs de code markdown ni texte autour. Structure :";
         $lines[] = '{';
-        $lines[] = '  "parts": [';
-        $lines[] = '    { "type": "hook", "content": "Accroche du script" },';
-        $lines[] = '    { "type": "text", "content": "Contenu du script" }';
+        $lines[] = '  "replyText": "Ta réponse conversationnelle à l\'utilisateur (en français)",';
+        $lines[] = '  "suggestions": [';
+        $lines[] = '    { "action": "rewrite", "scriptPartUuid": "...", "proposedContent": "Nouveau contenu" },';
+        $lines[] = '    { "action": "insert", "proposedPosition": 2, "proposedType": "text", "proposedContent": "Nouvelle ligne" },';
+        $lines[] = '    { "action": "delete", "scriptPartUuid": "..." },';
+        $lines[] = '    { "action": "reorder", "scriptPartUuid": "...", "proposedPosition": 0 }';
         $lines[] = '  ]';
         $lines[] = '}';
-        $lines[] = "L'ordre des éléments dans le tableau \"parts\" définit l'ordre du script. Tu peux inclure plusieurs éléments de type \"text\".";
-        $lines[] = "Écris maintenant le script en français. N'ajoute pas de préambule — commence directement par le JSON.";
-
-        return implode("\n", $lines);
-    }
-
-    private function buildImproveHookFormatBlock(): string
-    {
-        $lines = [];
-        $lines[] = "Propose 3 alternatives d'accroche pour ce script.";
-        $lines[] = 'Formate ta sortie UNIQUEMENT en JSON valide, sans blocs de code markdown ni texte autour :';
-        $lines[] = '{ "suggestions": ["accroche 1", "accroche 2", "accroche 3"] }';
-        $lines[] = "N'ajoute pas de préambule — commence directement par le JSON.";
-
-        return implode("\n", $lines);
-    }
-
-    private function buildFreeChatFormatBlock(): string
-    {
-        $lines = [];
-        $lines[] = "Si l'utilisateur te demande de modifier, écrire ou améliorer le script, réponds en JSON valide :";
-        $lines[] = '{ "parts": [{ "type": "hook", "content": "..." }, { "type": "text", "content": "..." }] }';
-        $lines[] = 'Inclus uniquement les parties que tu modifies (hook et/ou text).';
-        $lines[] = "Si l'utilisateur pose des questions ou demande une analyse, réponds en texte libre en français.";
+        $lines[] = '';
+        $lines[] = "Règles :";
+        $lines[] = "- `replyText` est obligatoire (peut être court).";
+        $lines[] = "- `suggestions` est obligatoire mais peut être un tableau vide.";
+        $lines[] = "- `scriptPartUuid` doit être un UUID exact d'une part existante du script actuel.";
+        $lines[] = "- `proposedType` doit être l'une des valeurs : hook, text, dialogue, shot, voice_over, call_to_action, retention_cue, chapter.";
+        $lines[] = "- `proposedPosition` est un entier (0 = début).";
+        $lines[] = "- N'ajoute aucun préambule. Commence directement par `{`.";
 
         return implode("\n", $lines);
     }

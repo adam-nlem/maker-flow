@@ -3,33 +3,52 @@
 namespace App\Service\ChatGeneration;
 
 use App\Entity\Chat;
-use App\Entity\Enum\ChatAction;
 use App\Entity\Enum\MessageType;
-use App\Entity\Enum\ScriptVersionStatus;
+use App\Entity\Enum\ScriptPartSuggestionAction;
+use App\Entity\Enum\ScriptPartType;
 use App\Entity\Message;
 use App\Entity\Script;
-use App\Entity\ScriptVersion;
+use App\Entity\ScriptPart;
+use App\Entity\ScriptPartSuggestion;
 use App\Entity\User;
 use App\Repository\MessageRepository;
-use App\Repository\ScriptVersionRepository;
-use App\Service\ScriptOutputParser\ScriptOutputParserService;
+use App\Repository\ScriptPartRepository;
+use App\Repository\ScriptPartSuggestionRepository;
 
 class ChatResponseProcessorService
 {
     public function __construct(
         private readonly MessageRepository $messageRepository,
-        private readonly ScriptVersionRepository $scriptVersionRepository,
-        private readonly ScriptOutputParserService $outputParserService,
+        private readonly ScriptPartRepository $scriptPartRepository,
+        private readonly ScriptPartSuggestionRepository $scriptPartSuggestionRepository,
     ) {}
 
-    public function processOutput(string $output, ChatAction $chatAction, Chat $chat, Script $script, User $user): void
+    public function processOutput(string $output, Chat $chat, Script $script, User $user): void
     {
-        match ($chatAction) {
-            ChatAction::GenerateScript => $this->processGenerateScript($output, $chat, $script, $user),
-            ChatAction::ImproveHook => $this->processImproveHook($output, $chat),
-            ChatAction::AnalyzeScript => $this->processAnalyzeScript($output, $chat),
-            ChatAction::FreeChat => $this->processFreeChat($output, $chat, $script, $user),
-        };
+        $cleanOutput = $this->stripMarkdownCodeFences($output);
+        $decoded = json_decode($cleanOutput, true);
+
+        $replyText = is_array($decoded) && isset($decoded['replyText']) && is_string($decoded['replyText'])
+            ? $decoded['replyText']
+            : $output;
+
+        $aiMessage = $this->createAiMessage($chat, $replyText);
+
+        $rawSuggestions = is_array($decoded) && isset($decoded['suggestions']) && is_array($decoded['suggestions'])
+            ? $decoded['suggestions']
+            : [];
+
+        $createdUuids = [];
+        foreach ($rawSuggestions as $rawSuggestion) {
+            $suggestion = $this->createSuggestion($rawSuggestion, $aiMessage, $script, $user);
+            if ($suggestion !== null) {
+                $createdUuids[] = $suggestion->getUuid();
+            }
+        }
+
+        $aiMessage->setMetadata([
+            'suggestionUuids' => $createdUuids,
+        ]);
     }
 
     public function createAiMessage(Chat $chat, string $content): Message
@@ -44,73 +63,75 @@ class ChatResponseProcessorService
         return $aiMessage;
     }
 
-    private function processGenerateScript(string $output, Chat $chat, Script $script, User $user): void
+    private function createSuggestion(mixed $raw, Message $aiMessage, Script $script, User $user): ?ScriptPartSuggestion
     {
-        $aiMessage = $this->createAiMessage($chat, "Voici une nouvelle version de votre script.");
+        if (!is_array($raw) || !isset($raw['action']) || !is_string($raw['action'])) {
+            return null;
+        }
 
-        $scriptVersion = new ScriptVersion();
-        $scriptVersion
-            ->setStatus(ScriptVersionStatus::Draft)
+        $action = ScriptPartSuggestionAction::tryFrom($raw['action']);
+        if ($action === null) {
+            return null;
+        }
+
+        $suggestion = new ScriptPartSuggestion();
+        $suggestion
             ->setScript($script)
-            ->setChat($chat)
+            ->setUser($user)
             ->setMessage($aiMessage)
-            ->setUser($user);
-        $this->scriptVersionRepository->save($scriptVersion);
+            ->setAction($action);
 
-        $this->outputParserService->parseAndCreatePartsForVersion($output, $script, $user, $scriptVersion);
+        $partUuid = isset($raw['scriptPartUuid']) && is_string($raw['scriptPartUuid']) ? $raw['scriptPartUuid'] : null;
+        $part = $partUuid !== null ? $this->scriptPartRepository->getByUuidAndUser($partUuid, $user) : null;
 
-        $aiMessage->setMetadata(['scriptVersionUuid' => $scriptVersion->getUuid()]);
-    }
+        $proposedContent = isset($raw['proposedContent']) && is_string($raw['proposedContent']) ? $raw['proposedContent'] : null;
+        $proposedTypeRaw = isset($raw['proposedType']) && is_string($raw['proposedType']) ? $raw['proposedType'] : null;
+        $proposedType = $proposedTypeRaw !== null ? ScriptPartType::tryFrom($proposedTypeRaw) : null;
+        $proposedPosition = isset($raw['proposedPosition']) ? (int) $raw['proposedPosition'] : null;
 
-    private function processImproveHook(string $output, Chat $chat): void
-    {
-        $cleanOutput = $this->stripMarkdownCodeFences($output);
-        $decoded = json_decode($cleanOutput, true);
+        switch ($action) {
+            case ScriptPartSuggestionAction::Rewrite:
+                if ($part === null || $proposedContent === null) {
+                    return null;
+                }
+                $suggestion
+                    ->setScriptPart($part)
+                    ->setOriginalContent($part->getContent())
+                    ->setProposedContent($proposedContent);
+                break;
 
-        $suggestions = [];
-        if ($decoded !== null && isset($decoded['suggestions']) && is_array($decoded['suggestions'])) {
-            $suggestions = $decoded['suggestions'];
+            case ScriptPartSuggestionAction::Insert:
+                if ($proposedContent === null) {
+                    return null;
+                }
+                $suggestion
+                    ->setProposedContent($proposedContent)
+                    ->setProposedType($proposedType ?? ScriptPartType::Text)
+                    ->setProposedPosition($proposedPosition);
+                break;
+
+            case ScriptPartSuggestionAction::Delete:
+                if ($part === null) {
+                    return null;
+                }
+                $suggestion
+                    ->setScriptPart($part)
+                    ->setOriginalContent($part->getContent());
+                break;
+
+            case ScriptPartSuggestionAction::Reorder:
+                if ($part === null || $proposedPosition === null) {
+                    return null;
+                }
+                $suggestion
+                    ->setScriptPart($part)
+                    ->setProposedPosition($proposedPosition);
+                break;
         }
 
-        $aiMessage = $this->createAiMessage($chat, "Voici 3 suggestions d'accroche pour ton script.");
-        $aiMessage->setSuggestedAnswers($suggestions);
-    }
+        $this->scriptPartSuggestionRepository->save($suggestion);
 
-    private function processAnalyzeScript(string $output, Chat $chat): void
-    {
-        $this->createAiMessage($chat, $output);
-    }
-
-    private function processFreeChat(string $output, Chat $chat, Script $script, User $user): void
-    {
-        $cleanOutput = $this->stripMarkdownCodeFences($output);
-        $decoded = json_decode($cleanOutput, true);
-
-        if ($decoded !== null && isset($decoded['parts']) && is_array($decoded['parts'])) {
-            $aiMessage = $this->createAiMessage($chat, "J'ai modifié le script selon ta demande.");
-
-            $scriptVersion = new ScriptVersion();
-            $scriptVersion
-                ->setStatus(ScriptVersionStatus::Draft)
-                ->setScript($script)
-                ->setChat($chat)
-                ->setMessage($aiMessage)
-                ->setUser($user);
-            $this->scriptVersionRepository->save($scriptVersion);
-
-            $this->outputParserService->parseAndCreatePartsForVersion($output, $script, $user, $scriptVersion);
-
-            $aiMessage->setMetadata(['scriptVersionUuid' => $scriptVersion->getUuid()]);
-            return;
-        }
-
-        if ($decoded !== null && isset($decoded['suggestions']) && is_array($decoded['suggestions'])) {
-            $aiMessage = $this->createAiMessage($chat, "Voici mes suggestions.");
-            $aiMessage->setSuggestedAnswers($decoded['suggestions']);
-            return;
-        }
-
-        $this->createAiMessage($chat, $output);
+        return $suggestion;
     }
 
     private function stripMarkdownCodeFences(string $output): string

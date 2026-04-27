@@ -19,6 +19,5 @@ export const settingsPath = '/settings'
 // Settings sections
 export const settingsGeneralPath = '/settings/general'
 export const settingsProjectsPath = '/settings/projects'
-export const settingsCreatorProfilePath = '/settings/creator-profile'
 export const settingsSubscriptionPath = '/settings/subscription'
 

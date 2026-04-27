@@ -1,13 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { ChatMessage, type ChatMessageJSON } from "~/models/ChatMessage";
-import type { ChatAction } from "~/models/enums/ChatAction";
 import { chatMessageQueryKeys } from "./chatMessageQueryKeys";
 
 interface CreateChatMessageData {
     chatUuid: string;
     content: string;
-    chatAction?: ChatAction;
     parentMessageUuid?: string;
     metadata?: Record<string, unknown>;
 }
@@ -20,7 +18,6 @@ export function useCreateChatMessage() {
             const res = await httpClient.post<ChatMessageJSON>('/chat-messages', {
                 chatUuid: data.chatUuid,
                 content: data.content,
-                ...(data.chatAction && { chatAction: data.chatAction }),
                 ...(data.parentMessageUuid && { parentMessageUuid: data.parentMessageUuid }),
                 ...(data.metadata && { metadata: data.metadata }),
             });

@@ -7,7 +7,6 @@ use App\Entity\Enum\SourceBucket;
 use App\Exception\AiClient\AiClientRetryableException;
 use App\Exception\Credit\InsufficientCreditsException;
 use App\Message\GenerateChatMessageResponseMessage;
-use App\Repository\CreatorProfileRepository;
 use App\Repository\MessageRepository;
 use App\Service\AiClient\AiClientResolver;
 use App\Service\ChatGeneration\ChatResponseProcessorService;
@@ -30,7 +29,6 @@ class GenerateChatMessageResponseHandler
 
     public function __construct(
         private readonly MessageRepository $messageRepository,
-        private readonly CreatorProfileRepository $creatorProfileRepository,
         private readonly ChatPromptAssemblerService $chatPromptAssemblerService,
         private readonly AiClientResolver $aiClientResolver,
         private readonly ChatResponseProcessorService $chatResponseProcessorService,
@@ -73,12 +71,7 @@ class GenerateChatMessageResponseHandler
         }
 
         try {
-            $creatorProfile = $this->creatorProfileRepository->getByProjectAndUser(
-                $script->getProject(),
-                $user,
-            );
-
-            $prompt = $this->chatPromptAssemblerService->assemble($chat, $userMessage, $creatorProfile);
+            $prompt = $this->chatPromptAssemblerService->assemble($chat, $userMessage);
 
             $output = $this->aiClientResolver->resolve($chat->getAiModel())->generateScript($prompt);
 

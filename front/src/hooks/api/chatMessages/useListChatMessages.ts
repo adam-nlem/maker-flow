@@ -7,9 +7,10 @@ import { chatMessageQueryKeys } from "./chatMessageQueryKeys";
 interface UseListChatMessagesProps {
     chatUuid: string | null;
     limit?: number;
+    isWaitingForAi?: boolean;
 }
 
-export function useListChatMessages({ chatUuid, limit = 50 }: UseListChatMessagesProps) {
+export function useListChatMessages({ chatUuid, limit = 50, isWaitingForAi = false }: UseListChatMessagesProps) {
     const query = useInfiniteQuery({
         queryKey: chatMessageQueryKeys.list(chatUuid ?? ''),
         queryFn: async ({ pageParam }) => {
@@ -26,6 +27,7 @@ export function useListChatMessages({ chatUuid, limit = 50 }: UseListChatMessage
         getNextPageParam: (lastPage, _, lastPageParam) =>
             lastPage.length === limit ? lastPageParam + 1 : undefined,
         enabled: !!chatUuid,
+        refetchInterval: isWaitingForAi ? 2000 : false,
     });
 
     const messages = useMemo(() => query.data?.pages.flat() ?? [], [query.data]);

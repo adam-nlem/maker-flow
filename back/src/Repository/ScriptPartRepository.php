@@ -87,4 +87,20 @@ class ScriptPartRepository extends ServiceEntityRepository
             ->getQuery()
             ->execute();
     }
+
+    public function shiftPositionsBetween(Script $script, int $fromPosition, int $toPosition, int $delta): void
+    {
+        $this->createQueryBuilder('sp')
+            ->update()
+            ->set('sp.position', 'sp.position + :delta')
+            ->where('sp.script = :script')
+            ->andWhere('sp.position >= :fromPosition')
+            ->andWhere('sp.position <= :toPosition')
+            ->setParameter('script', $script)
+            ->setParameter('fromPosition', $fromPosition)
+            ->setParameter('toPosition', $toPosition)
+            ->setParameter('delta', $delta)
+            ->getQuery()
+            ->execute();
+    }
 }

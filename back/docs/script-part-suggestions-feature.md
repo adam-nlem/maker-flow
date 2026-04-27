@@ -45,17 +45,19 @@ Indexes on `(script_id, status)` and `message_id`.
 
 ## Endpoints
 
-### Script parts (`ScriptPartController`, `ScriptController`)
+All endpoints follow the app convention: each entity has its own top-level URL prefix and parent UUIDs are passed in the request payload (body for POST/PATCH, query string for GET) — never in the URL path.
 
-- `GET /api/scripts/{scriptUuid}/parts` — list ordered parts (in `ScriptController::listParts`)
-- `POST /api/scripts/{scriptUuid}/parts` — create a part. Body: `{ content, type, position? }`. Used by the editor's Enter-key handler.
+### Script parts (`ScriptPartController`)
+
+- `GET /api/script-parts?scriptUuid=…` — list ordered parts for a script.
+- `POST /api/script-parts` — create a part. Body: `{ scriptUuid, content, type, position? }`. Used by the editor's Enter-key handler.
+- `PATCH /api/script-parts/reorder` — bulk reorder. Body: `{ scriptUuid, orderedParts: [{ uuid, type? }] }`. Only `uuid` is used; `type` is optional.
 - `PATCH /api/script-parts/{partUuid}` — update content / type / position.
 - `DELETE /api/script-parts/{partUuid}`
-- `PATCH /api/scripts/{scriptUuid}/reorder-parts` — bulk reorder (body keeps the existing `{ orderedParts: [{ uuid, type }] }` shape for backwards compatibility; only `uuid` is used).
 
 ### Script part suggestions (`ScriptPartSuggestionController`)
 
-- `GET /api/scripts/{scriptUuid}/script-part-suggestions?status=pending` — list suggestions for a script (optionally filtered by status).
+- `GET /api/script-part-suggestions?scriptUuid=…&status=pending` — list suggestions for a script (optionally filtered by status).
 - `POST /api/script-part-suggestions/{suggestionUuid}/accept` — apply the operation, mark suggestion `Accepted`.
 - `POST /api/script-part-suggestions/{suggestionUuid}/reject` — mark suggestion `Rejected` (no mutation on parts).
 
@@ -135,6 +137,6 @@ Two migrations:
 
 ## Exceptions
 
-- `ScriptPartNotFoundException` (`DomainCode::ScriptPart` = 28, code 1, 404)
-- `ScriptPartSuggestionNotFoundException` (`DomainCode::ScriptPartSuggestion` = 29, code 1, 404)
-- `ScriptPartSuggestionNotPendingException` (`DomainCode::ScriptPartSuggestion` = 29, code 2, 409)
+- `ScriptPartNotFoundException` (`DomainCode::ScriptPart` = 26, code 1, 404)
+- `ScriptPartSuggestionNotFoundException` (`DomainCode::ScriptPartSuggestion` = 27, code 1, 404)
+- `ScriptPartSuggestionNotPendingException` (`DomainCode::ScriptPartSuggestion` = 27, code 2, 409)

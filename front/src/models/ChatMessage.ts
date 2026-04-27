@@ -33,7 +33,8 @@ export class ChatMessage {
         );
     }
 
-    get scriptVersionUuid(): string | undefined {
-        return this.metadata?.scriptVersionUuid as string | undefined;
+    get suggestionUuids(): string[] {
+        const raw = this.metadata?.suggestionUuids;
+        return Array.isArray(raw) ? (raw as string[]) : [];
     }
 }

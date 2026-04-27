@@ -3,7 +3,6 @@ import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import ScriptListPanel from "./ScriptListPanel";
 import ScriptEditorPanel from "./ScriptEditorPanel";
-import GenerateScriptPanel from "./generation/GenerateScriptPanel";
 import ChatPanel from "./chat/ChatPanel";
 import HookTemplatePanel from "./hookTemplates/HookTemplatePanel";
 
@@ -31,11 +30,6 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
 
     const rightPanels = focusedScript && (
         <>
-            <GenerateScriptPanel
-                key={`generate-${focusedScript.uuid}`}
-                scriptUuid={focusedScript.uuid}
-                projectUuid={projectUuid}
-            />
             <ChatPanel
                 key={`chat-${focusedScript.uuid}`}
                 scriptUuid={focusedScript.uuid}
