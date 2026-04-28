@@ -5,39 +5,39 @@ import { ChatMessage, type ChatMessageJSON } from "~/models/ChatMessage";
 import { chatMessageQueryKeys } from "./chatMessageQueryKeys";
 
 interface UseListChatMessagesProps {
-    chatUuid: string | null;
-    limit?: number;
-    isWaitingForAi?: boolean;
+  chatUuid: string | null;
+  limit?: number;
+  isWaitingForAi?: boolean;
 }
 
 export function useListChatMessages({ chatUuid, limit = 50, isWaitingForAi = false }: UseListChatMessagesProps) {
-    const query = useInfiniteQuery({
-        queryKey: chatMessageQueryKeys.list(chatUuid ?? ''),
-        queryFn: async ({ pageParam }) => {
-            const res = await httpClient.get<ChatMessageJSON[]>('/chat-messages', {
-                params: {
-                    chatUuid,
-                    page: pageParam,
-                    limit,
-                },
-            });
-            return res.data.map((json) => ChatMessage.fromJSON(json));
+  const query = useInfiniteQuery({
+    queryKey: chatMessageQueryKeys.list(chatUuid ?? ''),
+    queryFn: async ({ pageParam }) => {
+      const res = await httpClient.get<ChatMessageJSON[]>('/chat-messages', {
+        params: {
+          chatUuid,
+          page: pageParam,
+          limit,
         },
-        initialPageParam: 1,
-        getNextPageParam: (lastPage, _, lastPageParam) =>
-            lastPage.length === limit ? lastPageParam + 1 : undefined,
-        enabled: !!chatUuid,
-        refetchInterval: isWaitingForAi ? 2000 : false,
-    });
+      });
+      return res.data.map((json) => ChatMessage.fromJSON(json));
+    },
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, _, lastPageParam) =>
+      lastPage.length === limit ? lastPageParam + 1 : undefined,
+    enabled: !!chatUuid,
+    refetchInterval: isWaitingForAi ? 2000 : false,
+  });
 
-    const messages = useMemo(() => query.data?.pages.flat() ?? [], [query.data]);
+  const messages = useMemo(() => query.data?.pages.flat() ?? [], [query.data]);
 
-    return {
-        messages,
-        isLoading: query.isLoading,
-        isLoadingMore: query.isFetchingNextPage,
-        hasMore: query.hasNextPage,
-        error: query.error,
-        listMore: query.fetchNextPage,
-    };
+  return {
+    messages,
+    isLoading: query.isLoading,
+    isLoadingMore: query.isFetchingNextPage,
+    hasMore: query.hasNextPage,
+    error: query.error,
+    listMore: query.fetchNextPage,
+  };
 }

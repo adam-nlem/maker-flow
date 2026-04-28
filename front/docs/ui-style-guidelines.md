@@ -425,13 +425,14 @@ Reusable side panel layout with header, optional toolbar, scrollable body, and o
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
-| `title` | `string` | — | Header title |
-| `icon` | `HeroIcon` | — | Optional icon before the title |
+| `title` | `string` | — | Header title (ignored when `header` is provided) |
+| `icon` | `HeroIcon` | — | Optional icon before the title (ignored when `header` is provided) |
 | `width` | `"w-72" \| "w-96"` | `"w-72"` | Panel width |
 | `side` | `"left" \| "right"` | `"right"` | Border side (`border-r` for left, `border-l` for right) |
 | `isOpen` | `boolean` | — | If provided, wraps in collapsible animation. If omitted, always visible |
 | `onClose` | `() => void` | — | If provided, shows close button in header |
-| `headerActions` | `ReactNode` | — | Extra buttons right of title, before close button |
+| `headerActions` | `ReactNode` | — | Extra buttons right of title, before close button (ignored when `header` is provided) |
+| `header` | `ReactNode` | — | Fully custom header that replaces the default title/icon/actions/close bar. Consumer owns padding, border, and close button |
 | `toolbar` | `ReactNode` | — | Fixed content between header and scrollable body |
 | `footer` | `ReactNode` | — | Sticky footer content (wrapped in `px-4 py-3 border-t`) |
 | `children` | `ReactNode` | — | Scrollable body content (consumer handles padding) |
@@ -453,6 +454,17 @@ Reusable side panel layout with header, optional toolbar, scrollable body, and o
 <SidePanel title="Hooks" isOpen={isOpen} onClose={closePanel}
     toolbar={<div className="px-4 py-3 border-b border-light-gray"><Input /></div>}>
     <div className="p-3 flex flex-col gap-2">{/* list */}</div>
+</SidePanel>
+
+// Fully custom header (consumer owns close button)
+<SidePanel isOpen={isOpen} onClose={closePanel}
+    header={
+        <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
+            <h2 className="text-heading-md">{customTitle}</h2>
+            <button onClick={closePanel}><XMarkIcon className="size-4" /></button>
+        </div>
+    }>
+    <div className="p-4">{/* body */}</div>
 </SidePanel>
 ```
 

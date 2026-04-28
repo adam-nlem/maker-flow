@@ -34,7 +34,7 @@ export default function ChatInput({ onSend, isPending, placeholder = "Envoyer un
   };
 
   return (
-    <div className="flex flex-col items-end gap-2 border border-light-gray rounded-lg p-3">
+    <div className="flex flex-col items-end gap-2 border border-light-gray rounded-lg p-3 bg-clear">
       <TextArea
         simple
         value={text}

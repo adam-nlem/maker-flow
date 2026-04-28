@@ -6,13 +6,14 @@ type HeroIcon = ComponentType<SVGProps<SVGSVGElement>>;
 type PanelWidth = "w-72" | "w-120";
 
 interface SidePanelProps {
-    title: string;
+    title?: string;
     icon?: HeroIcon;
     width?: PanelWidth;
     side?: "left" | "right";
     isOpen?: boolean;
     onClose?: () => void;
     headerActions?: ReactNode;
+    header?: ReactNode;
     toolbar?: ReactNode;
     footer?: ReactNode;
     bodyRef?: RefObject<HTMLDivElement | null>;
@@ -30,17 +31,19 @@ function PanelContent({
     borderClass,
     onClose,
     headerActions,
+    header,
     toolbar,
     footer,
     bodyRef,
     className,
     children,
 }: {
-    title: string;
+    title?: string;
     icon?: HeroIcon;
     borderClass: string;
     onClose?: () => void;
     headerActions?: ReactNode;
+    header?: ReactNode;
     toolbar?: ReactNode;
     footer?: ReactNode;
     bodyRef?: RefObject<HTMLDivElement | null>;
@@ -49,26 +52,27 @@ function PanelContent({
 }) {
     return (
         <div className={`shrink-0 ${borderClass} border-light-gray h-full flex flex-col bg-clear ${className}`}>
-            {/* Header */}
-            <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
-                <div className="flex flex-row items-center gap-2">
-                    {Icon && <Icon className="size-5 text-primary" strokeWidth={2} />}
-                    <h2 className="text-heading-md">{title}</h2>
-                </div>
-                {(headerActions || onClose) && (
+            {header ?? (
+                <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
                     <div className="flex flex-row items-center gap-2">
-                        {headerActions}
-                        {onClose && (
-                            <button
-                                onClick={onClose}
-                                className="text-gray hover:text-dark transition-colors cursor-pointer"
-                            >
-                                <XMarkIcon className="size-4" strokeWidth={2} />
-                            </button>
-                        )}
+                        {Icon && <Icon className="size-5 text-primary" strokeWidth={2} />}
+                        <h2 className="text-heading-md">{title}</h2>
                     </div>
-                )}
-            </div>
+                    {(headerActions || onClose) && (
+                        <div className="flex flex-row items-center gap-2">
+                            {headerActions}
+                            {onClose && (
+                                <button
+                                    onClick={onClose}
+                                    className="text-gray hover:text-dark transition-colors cursor-pointer"
+                                >
+                                    <XMarkIcon className="size-4" strokeWidth={2} />
+                                </button>
+                            )}
+                        </div>
+                    )}
+                </div>
+            )}
 
             {toolbar}
 
@@ -95,6 +99,7 @@ export function SidePanel({
     isOpen,
     onClose,
     headerActions,
+    header,
     toolbar,
     footer,
     bodyRef,
@@ -104,7 +109,7 @@ export function SidePanel({
     const minWidthClass = panelMinWidth[width];
     const isCollapsible = isOpen !== undefined;
 
-    const panelProps = { title, icon, borderClass, onClose, headerActions, toolbar, footer, bodyRef, children };
+    const panelProps = { title, icon, borderClass, onClose, headerActions, header, toolbar, footer, bodyRef, children };
 
     const isDesktop = useIsDesktop();
 
