@@ -1,4 +1,7 @@
 import { ChatBubbleLeftRightIcon, ClockIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
+import { useChatStore } from "~/stores/scripts/chatStore";
+import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
 
 interface ChatHeaderProps {
   title: string;
@@ -6,13 +9,11 @@ interface ChatHeaderProps {
 }
 
 export function ChatHeader({ title, onClose }: ChatHeaderProps) {
-  function onOpenHistory() {
+  const openPanel = useScriptRightPanelStore((s) => s.openPanel);
+  const setActiveChatUuid = useChatStore((s) => s.setActiveChatUuid);
 
-  }
-
-  function onCreateChat() {
-
-  }
+  const handleOpenHistory = () => openPanel(ScriptRightPanel.ChatHistory);
+  const handleCreateChat = () => setActiveChatUuid(null);
 
   return (
     <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
@@ -21,10 +22,10 @@ export function ChatHeader({ title, onClose }: ChatHeaderProps) {
         <h2 className="text-heading-md">{title}</h2>
       </div>
       <div className="flex flex-row items-center gap-3 text-gray">
-        <button onClick={onOpenHistory} className="shrink-0 hover:text-dark transition-colors cursor-pointer" title="Ouvrir l'historique de conversations">
+        <button onClick={handleOpenHistory} className="shrink-0 hover:text-dark transition-colors cursor-pointer" title="Ouvrir l'historique des conversations">
           <ClockIcon className="size-4" strokeWidth={2} />
         </button>
-        <button onClick={onCreateChat} className="shrink-0 hover:text-dark transition-colors cursor-pointer" title="Créer une nouvelle conversation">
+        <button onClick={handleCreateChat} className="shrink-0 hover:text-dark transition-colors cursor-pointer" title="Nouvelle conversation">
           <PlusIcon className="size-4" strokeWidth={2} />
         </button>
         <button onClick={onClose} className="shrink-0 hover:text-dark transition-colors cursor-pointer" title="Fermer">

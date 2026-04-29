@@ -3,10 +3,12 @@ import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
 import { useChatStore } from "~/stores/scripts/chatStore";
 import { useCreateChatMessage } from "~/hooks/api/chatMessages/useCreateChatMessage";
+import { useCreateChat } from "~/hooks/api/chats/useCreateChat";
 import ChatMessageList from "./ChatMessageList";
 import ChatInput from "./ChatInput";
 import { ChatHeader } from "./ChatHeader";
 import { useShowChat } from "~/hooks/api/chats/useShowChat";
+import { AiModel } from "~/models/enums/AiModel";
 
 interface ChatPanelProps {
   scriptUuid: string;
@@ -17,17 +19,21 @@ export default function ChatPanel({ scriptUuid }: ChatPanelProps) {
   const isOpen = useScriptRightPanelStore((s) => s.activePanel === ScriptRightPanel.Chat);
   const closePanel = useScriptRightPanelStore((s) => s.closePanel);
   const activeChatUuid = useChatStore((s) => s.activeChatUuid);
+  const setActiveChatUuid = useChatStore((s) => s.setActiveChatUuid);
   const setIsWaitingForAi = useChatStore((s) => s.setIsWaitingForAi);
   const { chat } = useShowChat(activeChatUuid ?? undefined);
-  const { createChatMessage, isPending } = useCreateChatMessage();
+  const { createChat, isPending: isCreatingChat } = useCreateChat();
+  const { createChatMessage, isPending: isSendingMessage } = useCreateChatMessage();
 
-  const sendMessage = async (content: string) => {
-    if (!activeChatUuid) return;
+  const sendMessage = async (content: string, aiModel: AiModel) => {
+    let chatUuid = activeChatUuid;
+    if (!chatUuid) {
+      const newChat = await createChat({ scriptUuid, aiModel });
+      setActiveChatUuid(newChat.uuid);
+      chatUuid = newChat.uuid;
+    }
     setIsWaitingForAi(true);
-    await createChatMessage({
-      chatUuid: activeChatUuid,
-      content,
-    });
+    await createChatMessage({ chatUuid, content });
   };
 
   return (
@@ -42,17 +48,19 @@ export default function ChatPanel({ scriptUuid }: ChatPanelProps) {
           <ChatMessageList
             chatUuid={activeChatUuid}
             scriptUuid={scriptUuid}
-            onSuggestionClick={sendMessage}
+            onSuggestionClick={(suggestion) => sendMessage(suggestion, chat?.aiModel ?? AiModel.Claude)}
           />
         </div>
-        {activeChatUuid && (
-          <div className="sticky bottom-0 left-0 right-0 pointer-events-none">
-            <div className="h-8 bg-linear-to-t from-clear to-transparent" />
-            <div className="bg-clear pointer-events-auto px-2 pb-2">
-              <ChatInput onSend={sendMessage} isPending={isPending} />
-            </div>
+        <div className="sticky bottom-0 left-0 right-0 pointer-events-none">
+          <div className="h-8 bg-linear-to-t from-clear to-transparent" />
+          <div className="bg-clear pointer-events-auto px-2 pb-2">
+            <ChatInput
+              onSend={sendMessage}
+              isPending={isCreatingChat || isSendingMessage}
+              lockedAiModel={chat?.aiModel}
+            />
           </div>
-        )}
+        </div>
       </div>
     </SidePanel>
   );

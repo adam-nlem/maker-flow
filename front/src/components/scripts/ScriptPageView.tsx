@@ -4,6 +4,7 @@ import { useIsDesktop } from "~/hooks/useIsDesktop";
 import ScriptListPanel from "./ScriptListPanel";
 import ScriptEditorPanel from "./ScriptEditorPanel";
 import ChatPanel from "./chat/ChatPanel";
+import ChatHistoryPanel from "./chat/ChatHistoryPanel";
 import HookTemplatePanel from "./hookTemplates/HookTemplatePanel";
 
 interface ScriptPageViewProps {
@@ -34,6 +35,10 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
                 key={`chat-${focusedScript.uuid}`}
                 scriptUuid={focusedScript.uuid}
                 projectUuid={projectUuid}
+            />
+            <ChatHistoryPanel
+                key={`chat-history-${focusedScript.uuid}`}
+                scriptUuid={focusedScript.uuid}
             />
             <HookTemplatePanel />
         </>

@@ -43,10 +43,11 @@ Accept / reject mutations invalidate `scriptPartSuggestionQueryKeys.all`, `scrip
 - **`InteractiveAwarePointerSensor`** — custom dnd-kit `PointerSensor` that ignores pointer-down events originating from inputs / textareas / buttons / contenteditable, so users can click and type inside a draggable card without accidentally starting a drag.
 
 ### Chat
-- **`ChatPanel`** — single send path that always uses FreeChat (no more `ChatAction` switch). No more `useApplyHookSuggestion` or `handleHookSuggestionClick`.
+- **`ChatPanel`** — single send path that always uses FreeChat (no more `ChatAction` switch). The `ChatInput` is rendered as a floating wrapper (`sticky bottom-0` with a gradient fade) on top of the message list. The input is always visible, even with no active chat: when `activeChatUuid` is `null`, the user can pick an AI model in the input dropdown and on first send the chat is created (`useCreateChat`) before the message is dispatched. Once a chat is active, `lockedAiModel={chat.aiModel}` makes the input render the model as a non-interactive `Pill` (no dropdown).
+- **`ChatHeader`** — passed via the `SidePanel` `header` slot. Holds the chat title, the clock icon (opens the `ChatHistory` right panel), the plus icon (clears `activeChatUuid` to start a new chat in-place), and the close button.
+- **`ChatHistoryPanel`** (`components/scripts/chat/ChatHistoryPanel.tsx`) — dedicated right panel keyed under `ScriptRightPanel.ChatHistory`. Lists the script's chats via `useListPaginatedChats` with vertical infinite scroll. Each row shows the AI model icon, the chat title (fallback "Nouveau Chat") and the relative date; click switches `activeChatUuid` and auto-opens the `Chat` panel; a hover-only trash icon opens `ConfirmDeleteDialog` (`useDeleteChat`, clears `activeChatUuid` first if deleting the active chat).
 - **`ChatMessageBubble`** — renders the message text. If the AI message has `metadata.suggestionUuids`, renders `ChatSuggestionsCard` underneath.
 - **`ChatSuggestionsCard`** — fetches all pending suggestions for the script and filters by `suggestionUuids`, then renders a `ScriptPartDiffBlock` for each. Accept/reject from here is identical to in-editor.
-- **`ChatStartPlaceholder`** — three free-text starter prompts (no more `ChatAction` enum chips).
 
 ### Editor panel
 - **`ScriptEditorPanel`** — simplified. No more `GenerationHistoryBar`, `GenerationStatusBanner`, `VersionPreviewBanner`, `focusedVersionUuid` / `focusedGenerationUuid` wiring.

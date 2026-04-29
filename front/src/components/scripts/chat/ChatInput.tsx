@@ -9,20 +9,22 @@ import SelectDropdown from "~/components/ui/SelectDropdown";
 import Pill from "~/components/ui/Pill";
 
 interface ChatInputProps {
-  onSend: (content: string) => void;
+  onSend: (content: string, aiModel: AiModel) => void;
   isPending: boolean;
+  lockedAiModel?: AiModel;
   placeholder?: string;
 }
 
-export default function ChatInput({ onSend, isPending, placeholder = "Envoyer un message..." }: ChatInputProps) {
+export default function ChatInput({ onSend, isPending, lockedAiModel, placeholder = "Envoyer un message..." }: ChatInputProps) {
   const [text, setText] = useState("");
-  const [aiModel, setAiModel] = useState<AiModel>(AiModel.Claude);
+  const [selectedAiModel, setSelectedAiModel] = useState<AiModel>(AiModel.Claude);
 
+  const aiModel = lockedAiModel ?? selectedAiModel;
   const canSend = text.trim().length > 0 && !isPending;
 
   const handleSubmit = () => {
     if (!canSend) return;
-    onSend(text.trim());
+    onSend(text.trim(), aiModel);
     setText("");
   };
 
@@ -49,33 +51,44 @@ export default function ChatInput({ onSend, isPending, placeholder = "Envoyer un
             <PaperClipIcon className="size-3" />
             <p >Ajouter un script</p>
           </SimpleTextButton>
-          <SelectDropdown
-            items={aiModelOptions}
-            selectedItemId={aiModel}
-            getItemId={(s) => s}
-            onSelect={(item) => setAiModel(item)}
-            renderTrigger={({ onClick }) => (
-              <Pill
-                onClick={onClick}
-                isSelected
-                imageUrl={aiModelToIcon[aiModel]}
-                label={aiModelToFrenchTranslation[aiModel]}
-                bgColorClassName={aiModelToBgClass[aiModel]}
-                borderColorClassName={aiModelToBorderClass[aiModel]}
-                textColorClassName={aiModelToTextClass[aiModel]} />)
-            }
-            renderItem={({ item, isSelected, onSelect }) => {
-              return !isSelected ? <Pill
-                imageUrl={aiModelToIcon[item]}
-                label={aiModelToFrenchTranslation[item]}
-                bgColorClassName={aiModelToBgClass[item]}
-                borderColorClassName={aiModelToBorderClass[item]}
-                textColorClassName={aiModelToTextClass[item]}
-                isSelected
-                onClick={onSelect}
-              /> : null
-            }}
-          />
+          {lockedAiModel ? (
+            <Pill
+              isSelected
+              imageUrl={aiModelToIcon[aiModel]}
+              label={aiModelToFrenchTranslation[aiModel]}
+              bgColorClassName={aiModelToBgClass[aiModel]}
+              borderColorClassName={aiModelToBorderClass[aiModel]}
+              textColorClassName={aiModelToTextClass[aiModel]}
+            />
+          ) : (
+            <SelectDropdown
+              items={aiModelOptions}
+              selectedItemId={aiModel}
+              getItemId={(s) => s}
+              onSelect={(item) => setSelectedAiModel(item)}
+              renderTrigger={({ onClick }) => (
+                <Pill
+                  onClick={onClick}
+                  isSelected
+                  imageUrl={aiModelToIcon[aiModel]}
+                  label={aiModelToFrenchTranslation[aiModel]}
+                  bgColorClassName={aiModelToBgClass[aiModel]}
+                  borderColorClassName={aiModelToBorderClass[aiModel]}
+                  textColorClassName={aiModelToTextClass[aiModel]} />)
+              }
+              renderItem={({ item, isSelected, onSelect }) => {
+                return !isSelected ? <Pill
+                  imageUrl={aiModelToIcon[item]}
+                  label={aiModelToFrenchTranslation[item]}
+                  bgColorClassName={aiModelToBgClass[item]}
+                  borderColorClassName={aiModelToBorderClass[item]}
+                  textColorClassName={aiModelToTextClass[item]}
+                  isSelected
+                  onClick={onSelect}
+                /> : null
+              }}
+            />
+          )}
         </div>
         <Button width="w-min" style={canSend ? "primary" : "secondary"} onClick={handleSubmit} className="flex flex-row gap-3">
           <p>Envoyer</p>
