@@ -3,6 +3,7 @@ import type { TodoListTask } from "~/models/TodoListTask";
 import { TextArea } from "~/components/ui/TextArea";
 import { Badge } from "~/components/ui/Badge";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { TodoListStatus, todoListStatusOptions, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
 import { TodoListPriority, todoListPriorityOptions, todoListPriorityToFrenchTranslation } from "~/models/enums/TodoListPriority";
 import { useUpdateTodoListTask } from "~/hooks/api/todoListTasks/useUpdateTodoListTask";
@@ -27,6 +28,7 @@ interface DetailTodoListTaskModalProps {
 }
 
 export default function DetailTodoListTaskModal({ todoListUuid, task, showModal, onClose, onTaskDeleted }: DetailTodoListTaskModalProps) {
+    const { t } = useTranslation()
     const [title, setTitle] = useState(task.title)
     const [content, setContent] = useState(task.content)
     const [status, setStatus] = useState(task.status)
@@ -82,7 +84,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                 <div className="flex flex-col gap-3 flex-1 min-h-0 overflow-y-auto scrollbar-none px-5 py-5 scroll-pb-5">
                     <div className="flex flex-row justify-around items-start">
                         <TextArea
-                            placeholder="Titre de la tâche"
+                            placeholder={t("tasks:task.detail.titlePlaceholder")}
                             id="title"
                             name="title"
 
@@ -97,19 +99,22 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                             hoverColor={"hover:text-danger"}
                         >
                             <TrashIcon className="size-3.5" strokeWidth={2} />
-                            <p>Supprimer</p>
+                            <p>{t("tasks:task.detail.delete")}</p>
                         </SimpleTextButton>
                     </div>
 
-                    <p className="text-body-xs mb-1.5">Crée le {task.createdAt.toLocaleDateString('fr-FR')} à {task.createdAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}{task.updatedAt && ` • Modifié le ${task.updatedAt.toLocaleDateString('fr-FR')} à ${task.updatedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}`}</p>
+                    <p className="text-body-xs mb-1.5">
+                        {t("tasks:task.detail.createdAt", { date: task.createdAt.toLocaleDateString('fr-FR'), time: task.createdAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) })}
+                        {task.updatedAt && ` • ${t("tasks:task.detail.modifiedAt", { date: task.updatedAt.toLocaleDateString('fr-FR'), time: task.updatedAt.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) })}`}
+                    </p>
 
                     <div>
-                        <h2 className="text-heading-sm mb-1.5">Tags</h2>
+                        <h2 className="text-heading-sm mb-1.5">{t("tasks:task.detail.tagsHeader")}</h2>
                         <div className="flex flex-col gap-1 min-w-fit">
                             <div ref={tagButtonRef}>
                                 <SimpleTextButton onClick={() => setShowTagsDropdown(!showTagsDropdown)}>
                                     <TagIcon className="size-3.5" strokeWidth={2} />
-                                    <p>Ajouter un tag</p>
+                                    <p>{t("tasks:task.addTag")}</p>
                                 </SimpleTextButton>
                             </div>
                             {showTagsDropdown && <ListTodoListTagsDropdown
@@ -137,7 +142,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                     </div>
 
                     <div>
-                        <h2 className="text-heading-sm mb-1.5">Priorité</h2>
+                        <h2 className="text-heading-sm mb-1.5">{t("tasks:task.detail.priorityHeader")}</h2>
                         <div className="flex flex-col gap-1">
                             <SelectDropdown<TodoListPriority>
                                 items={todoListPriorityOptions}
@@ -157,7 +162,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                     ) : (
                                         <SimpleTextButton onClick={onClick}>
                                             <ExclamationTriangleIcon className="size-3.5" strokeWidth={2} />
-                                            <p>Ajouter une priorité</p>
+                                            <p>{t("tasks:task.addPriority")}</p>
                                         </SimpleTextButton>
                                     )
                                 )}
@@ -175,7 +180,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                     </div>
 
                     <div>
-                        <h2 className="text-heading-sm mb-1.5">Statut</h2>
+                        <h2 className="text-heading-sm mb-1.5">{t("tasks:task.detail.statusHeader")}</h2>
                         <div className="flex flex-col gap-1">
                             <SelectDropdown<TodoListStatus>
                                 items={todoListStatusOptions}
@@ -205,7 +210,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                     </div>
 
                     <div>
-                        <h2 className="text-heading-sm mb-1.5">Date d'échéance</h2>
+                        <h2 className="text-heading-sm mb-1.5">{t("tasks:task.detail.dueDateHeader")}</h2>
                         <div className="flex flex-col gap-1">
 
                             <div ref={dueDateButtonRef}>
@@ -220,7 +225,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                 ) : (
                                     <SimpleTextButton onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}>
                                         <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
-                                        <p>Ajouter une date</p>
+                                        <p>{t("tasks:task.addDueDate")}</p>
                                     </SimpleTextButton>
                                 )}
                             </div>
@@ -239,7 +244,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                     <div className="border-t border-light-gray rounded w-full my-5"></div>
 
                     <TextArea
-                        placeholder="Contenu de la tâche"
+                        placeholder={t("tasks:task.detail.contentPlaceholder")}
                         id="content"
                         name="content"
                         simple
@@ -258,7 +263,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                 await deleteTodoListTask({ taskUuid: task.uuid, todoListUuid });
                 onTaskDeleted();
             }}
-            message="Êtes-vous sûr de vouloir supprimer cette tâche ? Cette action est irréversible."
+            message={t("tasks:task.detail.deleteConfirm")}
         />
         </>
     );

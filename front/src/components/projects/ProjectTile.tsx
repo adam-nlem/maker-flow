@@ -1,5 +1,6 @@
 import type { Project } from "~/models/Project";
 import { useMemo, useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { formatToFrenchDateShort } from "~/utils/dateFormatters";
 import { createAvatar } from '@dicebear/core';
 import { shapes } from '@dicebear/collection';
@@ -21,6 +22,7 @@ export default function ProjectTile({
   onHoverRightIcon,
   onClick
 }: ProjectTileProps) {
+  const { t } = useTranslation()
   const [isHovered, setIsHovered] = useState(false)
 
   const avatar = useMemo(() => {
@@ -45,7 +47,7 @@ export default function ProjectTile({
         <div className="flex flex-col">
           <h1 className="text-heading-sm whitespace-nowrap">{project.name}</h1>
           {showCreatedAt && (
-            <p className="text-body-xs text-gray whitespace-nowrap">Créé le {formatToFrenchDateShort(project.createdAt)}</p>
+            <p className="text-body-xs text-gray whitespace-nowrap">{t("projects:tile.createdAt", { date: formatToFrenchDateShort(project.createdAt) })}</p>
           )}
         </div>
       </div>

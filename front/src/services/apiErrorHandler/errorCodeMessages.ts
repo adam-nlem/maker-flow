@@ -1,86 +1,86 @@
+import i18n from '~/services/i18n/i18n'
 import { HttpException } from '~/services/httpClient/HttpException'
 
-export const errorCodeMessages: Record<number, string> = {
+const FALLBACK_KEY = 'errors:fallback'
+
+export const errorCodeKeys: Record<number, string> = {
   // Integration (10xxx)
-  10001: 'Votre connexion a expiré. Veuillez vous reconnecter.',
-  10002: 'Intégration introuvable.',
-  10003: 'Ce projet a déjà une intégration pour cette plateforme.',
+  10001: 'errors:integration.expired',
+  10002: 'errors:integration.notFound',
+  10003: 'errors:integration.alreadyConnected',
 
   // Credit (12xxx)
-  12001: "Vous n'avez pas assez de crédits.",
+  12001: 'errors:credit.insufficient',
 
   // Stripe (13xxx)
-  13001: 'Impossible de créer la session de paiement.',
-  13002: 'Signature de webhook invalide.',
-  13003: "Impossible de gérer l'abonnement.",
-  13004: 'Aucun abonnement actif trouvé.',
-  13005: 'Signature Stripe manquante.',
-  13006: 'Un abonnement actif est requis.',
+  13001: 'errors:stripe.checkoutFailed',
+  13002: 'errors:stripe.invalidWebhookSignature',
+  13003: 'errors:stripe.subscriptionFailed',
+  13004: 'errors:stripe.noActiveSubscription',
+  13005: 'errors:stripe.missingSignature',
+  13006: 'errors:stripe.subscriptionRequired',
 
   // OTP (15xxx)
-  15001: 'Code incorrect.',
-  15002: 'Code expiré. Veuillez en demander un nouveau.',
-  15003: 'Nombre maximum de tentatives atteint. Veuillez renvoyer un nouveau code.',
-  15004: 'Session invalide ou expirée.',
-  15005: 'Session invalide ou expirée.',
+  15001: 'errors:otp.incorrect',
+  15002: 'errors:otp.expired',
+  15003: 'errors:otp.tooManyAttempts',
+  15004: 'errors:otp.invalidSession',
+  15005: 'errors:otp.expiredSession',
 
   // Prelaunch (16xxx)
-  16001: 'Trop de tentatives. Veuillez réessayer plus tard.',
-  16002: 'Abonné introuvable.',
-  16003: 'Fonctionnalité indisponible.',
+  16001: 'errors:prelaunch.tooManyAttempts',
+  16002: 'errors:prelaunch.subscriberNotFound',
+  16003: 'errors:prelaunch.featureUnavailable',
 
   // Project (17xxx)
-  17001: 'Projet introuvable.',
-  17002: 'Ce nom de projet est déjà utilisé.',
-  17003: 'Vous avez atteint la limite de projets pour votre abonnement.',
-  17004: 'Ce projet est déjà terminé.',
-  17005: 'Ce projet est déjà ouvert.',
+  17001: 'errors:project.notFound',
+  17002: 'errors:project.nameTaken',
+  17003: 'errors:project.limitReached',
+  17004: 'errors:project.alreadyClosed',
+  17005: 'errors:project.alreadyOpened',
 
   // Script (18xxx)
-  18001: 'Script introuvable.',
-  18002: 'Vous avez atteint la limite de scripts pour votre abonnement.',
-  18003: 'Génération introuvable.',
-  18004: 'Plan introuvable.',
-  18005: 'Tag introuvable.',
-  18006: 'Ce titre de tag est déjà utilisé.',
-  18007: 'Une génération de script est déjà en cours.',
-  18008: 'Impossible de supprimer une génération en cours.',
+  18001: 'errors:script.notFound',
+  18002: 'errors:script.limitReached',
+  18003: 'errors:script.generationNotFound',
+  18004: 'errors:script.planNotFound',
+  18005: 'errors:script.tagNotFound',
+  18006: 'errors:script.tagTitleTaken',
+  18007: 'errors:script.generationInProgress',
+  18008: 'errors:script.cannotDeleteRunningGeneration',
 
   // TodoList (19xxx)
-  19001: 'Liste introuvable.',
-  19002: 'Tâche introuvable.',
-  19003: 'Tag introuvable.',
-  19004: 'Ce titre de tag est déjà utilisé.',
+  19001: 'errors:todoList.listNotFound',
+  19002: 'errors:todoList.taskNotFound',
+  19003: 'errors:todoList.tagNotFound',
+  19004: 'errors:todoList.tagTitleTaken',
 
   // Post (20xxx)
-  20001: 'Publication introuvable.',
-  20002: 'Miniature introuvable.',
-  20003: 'Groupe de publications introuvable.',
+  20001: 'errors:post.notFound',
+  20002: 'errors:post.thumbnailNotFound',
+  20003: 'errors:post.groupNotFound',
 
   // User (21xxx)
-  21001: 'Le mot de passe ne respecte pas les critères de sécurité.',
-  21002: 'Le mot de passe actuel est incorrect.',
-  21003: 'Les mots de passe ne correspondent pas.',
-  21004: 'Tous les champs de mot de passe sont requis.',
+  21001: 'errors:user.invalidPassword',
+  21002: 'errors:user.incorrectCurrentPassword',
+  21003: 'errors:user.passwordMismatch',
+  21004: 'errors:user.missingPasswordFields',
 
   // Validation (22xxx)
-  22001: 'Cette valeur est déjà utilisée.',
+  22001: 'errors:validation.duplicateValue',
 
   // Auth (23xxx)
-  23001: 'Veuillez fournir un email et un mot de passe.',
-  23002: 'Email ou mot de passe incorrect.',
-  23003: 'Session expirée. Veuillez vous reconnecter.',
-  23004: 'Session expirée. Veuillez vous reconnecter.',
-  23005: 'Session invalide. Veuillez vous reconnecter.',
-  23006: "Votre email n'est pas vérifié.",
-
-  // Fallback
-  99999: 'Une erreur est survenue',
+  23001: 'errors:auth.missingCredentials',
+  23002: 'errors:auth.invalidCredentials',
+  23003: 'errors:auth.sessionExpired',
+  23004: 'errors:auth.tokenExpired',
+  23005: 'errors:auth.invalidSession',
+  23006: 'errors:auth.emailNotVerified',
 }
 
 export function resolveErrorMessage(error: unknown): string {
   if (error instanceof HttpException) {
-    return errorCodeMessages[error.response.code] ?? errorCodeMessages[99999]
+    return i18n.t(errorCodeKeys[error.response.code] ?? FALLBACK_KEY)
   }
-  return errorCodeMessages[99999]
+  return i18n.t(FALLBACK_KEY)
 }

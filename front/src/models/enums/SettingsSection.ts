@@ -9,10 +9,10 @@ export enum SettingsSection {
 
 export const settingsSectionOptions = Object.values(SettingsSection);
 
-export const settingsSectionToFrenchTranslation: Record<SettingsSection, string> = {
-    [SettingsSection.General]: "Général",
-    [SettingsSection.Projects]: "Projets",
-    [SettingsSection.Subscription]: "Abonnement",
+export const settingsSectionTranslationKeys: Record<SettingsSection, string> = {
+    [SettingsSection.General]: "settings:sections.general",
+    [SettingsSection.Projects]: "settings:sections.projects",
+    [SettingsSection.Subscription]: "settings:sections.subscription",
 }
 
 export const settingsSectionToIcon: Record<SettingsSection, ComponentType<SVGProps<SVGSVGElement>>> = {

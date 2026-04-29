@@ -1,0 +1,49 @@
+{
+    "createTodoList": "Create a new Todo List",
+    "todoList": {
+        "create": {
+            "modalTitle": "Create a new Todo List",
+            "modalDescription": "Each Todo List is tied to a project so you keep things clean and organized. Create as many Todo Lists as you need.",
+            "titleLabel": "Title",
+            "titlePlaceholder": "Enter the Todo List title",
+            "submit": "Create Todo List"
+        },
+        "update": {
+            "modalTitle": "Edit Todo List",
+            "submit": "Edit Todo List",
+            "delete": "Delete Todo List",
+            "deleteConfirm": "Are you sure you want to delete this todo list? This action is irreversible."
+        },
+        "tile": {
+            "createdAt": "Created on {{date}}"
+        }
+    },
+    "task": {
+        "newTask": "New task",
+        "loadMore": "Load more tasks",
+        "titlePlaceholder": "Title",
+        "addTag": "Add a tag",
+        "addPriority": "Add a priority",
+        "addDueDate": "Add a date",
+        "create": "Create",
+        "detail": {
+            "titlePlaceholder": "Task title",
+            "tagsHeader": "Tags",
+            "priorityHeader": "Priority",
+            "statusHeader": "Status",
+            "dueDateHeader": "Due date",
+            "contentPlaceholder": "Task content",
+            "createdAt": "Created on {{date}} at {{time}}",
+            "modifiedAt": "Updated on {{date}} at {{time}}",
+            "delete": "Delete",
+            "deleteConfirm": "Are you sure you want to delete this task? This action is irreversible."
+        }
+    },
+    "tags": {
+        "tagPlaceholder": "Tag",
+        "delete": "Delete",
+        "deleteConfirm": "Are you sure you want to delete this tag? This action is irreversible.",
+        "createPrefix": "Create {{title}}",
+        "emptyHint": "Start typing to create a new tag."
+    }
+}

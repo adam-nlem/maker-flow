@@ -1,0 +1,49 @@
+{
+    "createTodoList": "Créer une nouvelle Todo List",
+    "todoList": {
+        "create": {
+            "modalTitle": "Créez une nouvelle Todo List",
+            "modalDescription": "Chaque Todo List est associée à un project. Cela permet de garder une organisation propre et simple. Vous pouvez créer autant de Todo List que vous souhaitez.",
+            "titleLabel": "Titre",
+            "titlePlaceholder": "Entrez le titre de la Todo List",
+            "submit": "Créer la Todo List"
+        },
+        "update": {
+            "modalTitle": "Modifier la Todo List",
+            "submit": "Modifier la Todo List",
+            "delete": "Supprimer la Todo List",
+            "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette todo list ? Cette action est irréversible."
+        },
+        "tile": {
+            "createdAt": "Créé le {{date}}"
+        }
+    },
+    "task": {
+        "newTask": "Nouvelle tâche",
+        "loadMore": "Charger plus de tâches",
+        "titlePlaceholder": "Titre",
+        "addTag": "Ajouter un tag",
+        "addPriority": "Ajouter une priorité",
+        "addDueDate": "Ajouter une date",
+        "create": "Créer",
+        "detail": {
+            "titlePlaceholder": "Titre de la tâche",
+            "tagsHeader": "Tags",
+            "priorityHeader": "Priorité",
+            "statusHeader": "Statut",
+            "dueDateHeader": "Date d'échéance",
+            "contentPlaceholder": "Contenu de la tâche",
+            "createdAt": "Crée le {{date}} à {{time}}",
+            "modifiedAt": "Modifié le {{date}} à {{time}}",
+            "delete": "Supprimer",
+            "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette tâche ? Cette action est irréversible."
+        }
+    },
+    "tags": {
+        "tagPlaceholder": "Tag",
+        "delete": "Supprimer",
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce tag ? Cette action est irréversible.",
+        "createPrefix": "Créer {{title}}",
+        "emptyHint": "Commencez à écrire pour créer un nouveau tag."
+    }
+}

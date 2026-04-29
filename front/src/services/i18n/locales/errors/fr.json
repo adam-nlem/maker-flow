@@ -1,0 +1,76 @@
+{
+    "integration": {
+        "expired": "Votre connexion a expiré. Veuillez vous reconnecter.",
+        "notFound": "Intégration introuvable.",
+        "alreadyConnected": "Ce projet a déjà une intégration pour cette plateforme."
+    },
+    "credit": {
+        "insufficient": "Vous n'avez pas assez de crédits."
+    },
+    "stripe": {
+        "checkoutFailed": "Impossible de créer la session de paiement.",
+        "invalidWebhookSignature": "Signature de webhook invalide.",
+        "subscriptionFailed": "Impossible de gérer l'abonnement.",
+        "noActiveSubscription": "Aucun abonnement actif trouvé.",
+        "missingSignature": "Signature Stripe manquante.",
+        "subscriptionRequired": "Un abonnement actif est requis."
+    },
+    "otp": {
+        "incorrect": "Code incorrect.",
+        "expired": "Code expiré. Veuillez en demander un nouveau.",
+        "tooManyAttempts": "Nombre maximum de tentatives atteint. Veuillez renvoyer un nouveau code.",
+        "invalidSession": "Session invalide ou expirée.",
+        "expiredSession": "Session invalide ou expirée."
+    },
+    "prelaunch": {
+        "tooManyAttempts": "Trop de tentatives. Veuillez réessayer plus tard.",
+        "subscriberNotFound": "Abonné introuvable.",
+        "featureUnavailable": "Fonctionnalité indisponible."
+    },
+    "project": {
+        "notFound": "Projet introuvable.",
+        "nameTaken": "Ce nom de projet est déjà utilisé.",
+        "limitReached": "Vous avez atteint la limite de projets pour votre abonnement.",
+        "alreadyClosed": "Ce projet est déjà terminé.",
+        "alreadyOpened": "Ce projet est déjà ouvert."
+    },
+    "script": {
+        "notFound": "Script introuvable.",
+        "limitReached": "Vous avez atteint la limite de scripts pour votre abonnement.",
+        "generationNotFound": "Génération introuvable.",
+        "planNotFound": "Plan introuvable.",
+        "tagNotFound": "Tag introuvable.",
+        "tagTitleTaken": "Ce titre de tag est déjà utilisé.",
+        "generationInProgress": "Une génération de script est déjà en cours.",
+        "cannotDeleteRunningGeneration": "Impossible de supprimer une génération en cours."
+    },
+    "todoList": {
+        "listNotFound": "Liste introuvable.",
+        "taskNotFound": "Tâche introuvable.",
+        "tagNotFound": "Tag introuvable.",
+        "tagTitleTaken": "Ce titre de tag est déjà utilisé."
+    },
+    "post": {
+        "notFound": "Publication introuvable.",
+        "thumbnailNotFound": "Miniature introuvable.",
+        "groupNotFound": "Groupe de publications introuvable."
+    },
+    "user": {
+        "invalidPassword": "Le mot de passe ne respecte pas les critères de sécurité.",
+        "incorrectCurrentPassword": "Le mot de passe actuel est incorrect.",
+        "passwordMismatch": "Les mots de passe ne correspondent pas.",
+        "missingPasswordFields": "Tous les champs de mot de passe sont requis."
+    },
+    "validation": {
+        "duplicateValue": "Cette valeur est déjà utilisée."
+    },
+    "auth": {
+        "missingCredentials": "Veuillez fournir un email et un mot de passe.",
+        "invalidCredentials": "Email ou mot de passe incorrect.",
+        "sessionExpired": "Session expirée. Veuillez vous reconnecter.",
+        "tokenExpired": "Session expirée. Veuillez vous reconnecter.",
+        "invalidSession": "Session invalide. Veuillez vous reconnecter.",
+        "emailNotVerified": "Votre email n'est pas vérifié."
+    },
+    "fallback": "Une erreur est survenue"
+}

@@ -16,7 +16,8 @@ import { useCreateProjectModalStore } from "~/stores/project/createProjectModalS
 import UpdateProjectModal from "../projects/UpdateProjectModal";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
 import { platformOptions } from "~/models/enums/Platform";
-import { sidebarMainNavigationItems, sidebarBottomNavigationItems, navigationItemToFrenchTranslation, navigationItemToIcon, navigationItemToIconSolid, navigationItemToPath } from "~/models/enums/NavigationItem";
+import { sidebarMainNavigationItems, sidebarBottomNavigationItems, navigationItemTranslationKeys, navigationItemToIcon, navigationItemToIconSolid, navigationItemToPath } from "~/models/enums/NavigationItem";
+import { useTranslation } from "react-i18next";
 import { isNavigationItemSelected } from "~/utils/navigationHelpers";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
 import SimpleTextButton from "../ui/SimpleTextButton";
@@ -27,6 +28,7 @@ import { useIntegrationLoginModalStore } from "~/stores/integrations/integration
 export default function DesktopSidebar() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const { projects, isLoading: isLoadingProjects } = useListPaginatedProjects()
   const { subscription } = useShowCurrentSubscription()
@@ -65,7 +67,7 @@ export default function DesktopSidebar() {
                   setFocusedProjectUuid(project.uuid)
                 }}
                 onClickCreateButton={isAtProjectLimit ? undefined : () => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
-                createButtonLabel="Créer un nouveau Projet"
+                createButtonLabel={t("sidebar:createProject")}
                 renderTrigger={({ onClick }) => (
                   <ProjectTile
                     project={focusedProject}
@@ -93,11 +95,11 @@ export default function DesktopSidebar() {
                 <div className="flex flex-col items-center gap-1">
                   <Button type="button" disabled>
                     <div className="flex flex-row justify-center items-center gap-3 shrink-0">
-                      <p className="text-sm">Créer un nouveau Projet</p>
+                      <p className="text-sm">{t("sidebar:createProject")}</p>
                       <PlusIcon className="size-4" strokeWidth={2} />
                     </div>
                   </Button>
-                  <p className="text-body-xs text-gray text-center">Limite de projets atteinte</p>
+                  <p className="text-body-xs text-gray text-center">{t("sidebar:projectLimitReached")}</p>
                 </div>
               ) : (
                 <Button
@@ -107,7 +109,7 @@ export default function DesktopSidebar() {
                   }}
                 >
                   <div className="flex flex-row justify-center items-center gap-3 shrink-0">
-                    <p className="text-sm">Créer un nouveau Projet</p>
+                    <p className="text-sm">{t("sidebar:createProject")}</p>
                     <PlusIcon className="size-4" strokeWidth={2} />
                   </div>
                 </Button>
@@ -124,7 +126,7 @@ export default function DesktopSidebar() {
                 <IconWithTextTile
                   key={item}
                   icon={selected ? navigationItemToIconSolid[item] : navigationItemToIcon[item]}
-                  label={navigationItemToFrenchTranslation[item]}
+                  label={t(navigationItemTranslationKeys[item])}
                   isSelected={selected}
                   onClick={() => navigate(navigationItemToPath[item])}
                 />
@@ -135,7 +137,7 @@ export default function DesktopSidebar() {
           {/* INTEGRATION SECTION */}
           <div className="mt-10 flex flex-col gap-1">
             <h1 className="text-body-xs whitespace-nowrap px-2">
-              PLATEFORMES
+              {t("sidebar:platformsHeader")}
             </h1>
             {platformOptions.map((platform) => (
               <IntegrationTile
@@ -160,7 +162,7 @@ export default function DesktopSidebar() {
                 <IconWithTextTile
                   key={item}
                   icon={selected ? navigationItemToIconSolid[item] : navigationItemToIcon[item]}
-                  label={navigationItemToFrenchTranslation[item]}
+                  label={t(navigationItemTranslationKeys[item])}
                   isBold={false}
                   isSelected={selected}
                   onClick={() => navigate(navigationItemToPath[item])}
@@ -179,18 +181,18 @@ export default function DesktopSidebar() {
             >
               <div className="flex flex-row justify-center items-center gap-3">
                 <SparklesIcon className="size-4" strokeWidth={2} />
-                <p className="text-sm">Passer Premium ?</p>
+                <p className="text-sm">{t("sidebar:premiumCta")}</p>
               </div>
             </Button>
           </div>
 
           <div className="px-3 pb-3 flex gap-2 justify-center items-center">
             <SimpleTextButton onClick={() => navigate(privacyPolicyPath)}>
-              Confidentialité
+              {t("legal.privacyPolicy")}
             </SimpleTextButton>
             <span className="text-xs text-gray">·</span>
             <SimpleTextButton onClick={() => navigate(termsOfServicePath)}>
-              CGU
+              {t("legal.termsOfService")}
             </SimpleTextButton>
           </div>
         </div>

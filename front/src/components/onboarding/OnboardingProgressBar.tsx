@@ -1,10 +1,12 @@
 import { ChevronRightIcon } from "@heroicons/react/24/solid"
+import { useTranslation } from "react-i18next"
 import { useIsDesktop } from "~/hooks/useIsDesktop"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 import { type OnboardingStep, ONBOARDING_STEP_ORDER, onboardingStepToIcon, onboardingStepToShortLabel } from "~/models/enums/OnboardingStep"
 import { WELCOME_STEP_ORDER, welcomeStepToIcon, welcomeStepToShortLabel } from "~/models/enums/WelcomeStep"
 
 export default function OnboardingProgressBar() {
+    const { t } = useTranslation()
     const { isAuthenticated, onboarding, currentOnboardingStep, currentWelcomeStep, currentStep, totalSteps } = useOnboardingFlow()
     const isDesktop = useIsDesktop()
 
@@ -32,7 +34,7 @@ export default function OnboardingProgressBar() {
             <div className="flex flex-col gap-1 w-full">
                 <div className="flex items-center justify-between">
                     <span className="text-body-xs text-gray uppercase">
-                        Étape {currentStep + 1} sur {totalSteps}
+                        {t("onboarding:progress.stepCount", { current: currentStep + 1, total: totalSteps })}
                     </span>
                     <span className="text-body-xs text-gray">
                         {percentage}%

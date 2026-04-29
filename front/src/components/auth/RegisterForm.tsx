@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
@@ -15,6 +16,7 @@ interface RegisterFormProps {
 }
 
 export default function RegisterForm({ onRegistered, initialEmail = "", formSpacing = "space-y-4" }: RegisterFormProps) {
+    const { t } = useTranslation()
     const setStoredEmail = useAuthPrefillStore((s) => s.setEmail)
 
     const [firstName, setFirstName] = useState("")
@@ -22,7 +24,7 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
     const [email, setEmail] = useState(initialEmail)
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
-    const [validationError, setValidationError] = useState<string | null>(null)
+    const [validationErrorKey, setValidationErrorKey] = useState<string | null>(null)
 
     const { register, isPending, error } = useRegister()
 
@@ -30,10 +32,10 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
         e.preventDefault()
         const validationErr = validateRegisterForm({ firstName, lastName, email, password, confirmPassword })
         if (validationErr) {
-            setValidationError(validationErr)
+            setValidationErrorKey(validationErr)
             return
         }
-        setValidationError(null)
+        setValidationErrorKey(null)
         setStoredEmail(email)
         const response = await register({ firstName, lastName, email, password })
         if (response.requiresEmailVerification) {
@@ -41,7 +43,7 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
         }
     }
 
-    const errorMessage = validationError || (error?.message ?? null)
+    const errorMessage = (validationErrorKey ? t(validationErrorKey) : null) || (error?.message ?? null)
 
     return (
         <>
@@ -53,7 +55,7 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
 
             <form className={formSpacing} onSubmit={handleSubmit}>
                 <Input
-                    label="Prénom"
+                    label={t("auth:fields.firstName")}
                     id="firstName"
                     name="firstName"
                     type="text"
@@ -64,7 +66,7 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                 />
 
                 <Input
-                    label="Nom"
+                    label={t("auth:fields.lastName")}
                     id="lastName"
                     name="lastName"
                     type="text"
@@ -75,7 +77,7 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                 />
 
                 <Input
-                    label="Adresse email"
+                    label={t("auth:fields.email")}
                     id="email"
                     name="email"
                     type="email"
@@ -86,7 +88,7 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                 />
 
                 <Input
-                    label="Mot de passe"
+                    label={t("auth:fields.password")}
                     id="password"
                     name="password"
                     type="password"
@@ -100,7 +102,7 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                 )}
 
                 <Input
-                    label="Confirmer le mot de passe"
+                    label={t("auth:fields.confirmPassword")}
                     id="confirmPassword"
                     name="confirmPassword"
                     type="password"
@@ -116,7 +118,7 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                     isLoading={isPending}
                     disabled={isPending}
                 >
-                    Créer mon compte
+                    {t("auth:register.submit")}
                 </Button>
             </form>
         </>

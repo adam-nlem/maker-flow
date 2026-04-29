@@ -1,6 +1,7 @@
 import ModalOverlay from "~/components/ui/ModalOverlay";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { ChevronRightIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/Button";
 import { Input } from "~/components/ui/Input";
 import { useState } from "react";
@@ -18,6 +19,7 @@ interface UpdateProjectModalProps {
 }
 
 export default function UpdateProjectModal({ showModal, project, onClose }: UpdateProjectModalProps) {
+    const { t } = useTranslation();
 
     const [name, setName] = useState(project?.name ?? "");
     const [description, setDescription] = useState(project?.description ?? "");
@@ -49,12 +51,12 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
         <ModalOverlay isOpen={showModal} onClose={onClose} height="h-fit">
             <div className="flex flex-col gap-3 py-5 px-10 flex-1 min-h-0 overflow-y-auto">
                 <h1 className="text-heading-lg">
-                    Modifier le Projet
+                    {t("projects:update.modalTitle")}
                 </h1>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <Input
-                        label="Titre"
-                        placeholder="Entrez le nom du Projet"
+                        label={t("projects:update.fields.title")}
+                        placeholder={t("projects:create.fields.namePlaceholder")}
                         id="name"
                         name="name"
                         type="text"
@@ -65,8 +67,8 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                     />
 
                     <TextArea
-                        label="Description"
-                        placeholder="Écrivez une description (optionel)"
+                        label={t("projects:create.fields.description")}
+                        placeholder={t("projects:create.fields.descriptionPlaceholder")}
                         id="description"
                         name="description"
 
@@ -75,7 +77,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                     />
 
                     <div>
-                        <h1 className="text-heading-sm">Types</h1>
+                        <h1 className="text-heading-sm">{t("projects:create.fields.types")}</h1>
                         <div className="flex flex-wrap gap-2 mt-2">
                             {projectTypeOptions.map((type) => (
                                 <ToggleChip
@@ -98,7 +100,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                         disabled={isUpdating}
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
-                            <p className="text-sm">Modifier le Projet</p>
+                            <p className="text-sm">{t("projects:update.submit")}</p>
                             <ChevronRightIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>
@@ -112,7 +114,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                         onClick={() => setShowDeleteConfirmation(true)}
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
-                            <p className="text-sm">Supprimer le Projet</p>
+                            <p className="text-sm">{t("projects:update.delete")}</p>
                             <TrashIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>
@@ -126,7 +128,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                         onClose();
                     }}
                     isPending={isDeleting}
-                    message="Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible."
+                    message={t("projects:update.deleteConfirm")}
                 />
 
             </div>

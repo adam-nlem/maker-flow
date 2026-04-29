@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { CheckBadgeIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/Button";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { useCancelSubscription } from "~/hooks/api/subscriptions/useCancelSubscription";
@@ -14,6 +15,7 @@ interface CurrentSubscriptionCardProps {
 }
 
 export default function CurrentSubscriptionCard({ subscription }: CurrentSubscriptionCardProps) {
+    const { t } = useTranslation();
     const [showCancelConfirmation, setShowCancelConfirmation] = useState(false);
 
     const { cancelSubscription, isPending: isCanceling } = useCancelSubscription();
@@ -27,7 +29,7 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
         <div className="flex flex-col gap-4">
             <div className="border border-light-gray rounded-xl p-5">
                 <div className="flex flex-row items-center justify-between mb-4">
-                    <h3 className="text-heading-md">Abonnement actuel</h3>
+                    <h3 className="text-heading-md">{t("settings:subscription.current.title")}</h3>
                     <span className={`text-body-xs px-3 py-1 rounded-full ${subscription.isActive ? 'bg-primary/10 text-primary' : 'bg-yellow/10 text-yellow'}`}>
                         {subscriptionStatusToFrenchTranslation[subscription.status]}
                     </span>
@@ -41,7 +43,10 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
                     <div className="flex flex-row items-center gap-2">
                         <CheckBadgeIcon className="size-4 text-gray" strokeWidth={1.5} />
                         <p className="text-body-sm text-gray">
-                            Période : {formatToFrenchDateLong(subscription.currentPeriodStart)} — {formatToFrenchDateLong(subscription.currentPeriodEnd)}
+                            {t("settings:subscription.current.period", {
+                                start: formatToFrenchDateLong(subscription.currentPeriodStart),
+                                end: formatToFrenchDateLong(subscription.currentPeriodEnd),
+                            })}
                         </p>
                     </div>
 
@@ -49,7 +54,7 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
                         <div className="flex flex-row items-center gap-2">
                             <ExclamationTriangleIcon className="size-4 text-yellow" strokeWidth={1.5} />
                             <p className="text-body-sm text-yellow">
-                                Annulation prévue le {formatToFrenchDateLong(subscription.currentPeriodEnd)}
+                                {t("settings:subscription.current.cancellationScheduled", { date: formatToFrenchDateLong(subscription.currentPeriodEnd) })}
                             </p>
                         </div>
                     )}
@@ -64,7 +69,7 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
                                 height="h-9"
                                 onClick={() => setShowCancelConfirmation(true)}
                             >
-                                Annuler l'abonnement
+                                {t("settings:subscription.current.cancel")}
                             </Button>
                             <ConfirmDeleteDialog
                                 isOpen={showCancelConfirmation}
@@ -74,7 +79,7 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
                                     setShowCancelConfirmation(false);
                                 }}
                                 isPending={isCanceling}
-                                message="Êtes-vous sûr de vouloir annuler votre abonnement ? Celui-ci restera actif jusqu'à la fin de la période en cours."
+                                message={t("settings:subscription.current.cancelConfirm")}
                             />
                         </>
                     )}
@@ -87,7 +92,7 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
                             isLoading={isResuming}
                             onClick={handleResume}
                         >
-                            Reprendre l'abonnement
+                            {t("settings:subscription.current.resume")}
                         </Button>
                     )}
                 </div>

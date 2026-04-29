@@ -1,0 +1,38 @@
+{
+    "actions": {
+        "cancel": "Cancel",
+        "save": "Save",
+        "close": "Close",
+        "continue": "Continue",
+        "delete": "Delete",
+        "create": "Create",
+        "edit": "Edit",
+        "confirm": "Confirm",
+        "next": "Next",
+        "back": "Back",
+        "previous": "Previous"
+    },
+    "language": {
+        "label": "Language"
+    },
+    "legal": {
+        "privacyPolicy": "Privacy",
+        "termsOfService": "Terms"
+    },
+    "searchBar": {
+        "defaultPlaceholder": "Search a post..."
+    },
+    "premium": {
+        "title": "Premium feature",
+        "description": "Upgrade to a paid plan to access this feature.",
+        "upgradeAction": "Upgrade plan"
+    },
+    "calendarHeatmap": {
+        "title": "Unique accounts reached"
+    },
+    "lineChart": {
+        "durationAfterPublication": "Time after publishing: {{duration}}",
+        "thisContentValue": "This content's value",
+        "averageContentValue": "Average value of the last 10 pieces of content"
+    }
+}

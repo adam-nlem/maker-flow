@@ -1,0 +1,17 @@
+{
+    "allPlatforms": "All platforms",
+    "engagement": "Engagement",
+    "notConnected": "Not connected",
+    "connect": "Connect",
+    "reconnect": "Reconnect",
+    "disconnect": "Disconnect",
+    "loginAction": "Sign in",
+    "lastSync": "Last sync: {{when}}",
+    "noAccount": "No account connected.",
+    "disconnectConfirm": "Are you sure you want to disconnect this account? This action is irreversible.",
+    "placeholder": {
+        "title": "No integration connected",
+        "description": "Connect an Instagram or YouTube account to access your statistics.",
+        "action": "Connect an account"
+    }
+}

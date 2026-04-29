@@ -1,4 +1,5 @@
 import { ArrowPathIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import { TodoListStatus, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
 import type { TodoListTask } from "~/models/TodoListTask";
@@ -19,6 +20,7 @@ interface TodoListStatusColumnProps {
 }
 
 export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskClick }: TodoListStatusColumnProps) {
+    const { t } = useTranslation()
     const [showCreateTaskCard, setShowCreateTaskCard] = useState(false)
 
     const { setNodeRef } = useDroppable({ id: status });
@@ -45,7 +47,7 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
                                 <CreateTodoListTaskCard todoListUuid={todoListUuid} onTaskCreated={() => setShowCreateTaskCard(false)} /> :
                                 <SimpleTextButton onClick={() => setShowCreateTaskCard(true)}>
                                     <PlusIcon className="size-3.5" strokeWidth={2} />
-                                    <p>Nouvelle tâche</p>
+                                    <p>{t("tasks:task.newTask")}</p>
                                 </SimpleTextButton>
                             )}
 
@@ -53,7 +55,7 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
 
                             {hasMore && <SimpleTextButton onClick={onLoadMore}>
                                 <ArrowPathIcon className="size-3.5" strokeWidth={2} />
-                                <p>Charger plus de tâches</p>
+                                <p>{t("tasks:task.loadMore")}</p>
                             </SimpleTextButton>}
                         </>
                     )}

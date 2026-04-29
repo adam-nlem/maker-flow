@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
 import { useLogin } from "~/hooks/api/users/useLogin"
@@ -12,6 +13,7 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail = "" }: LoginFormProps) {
+    const { t } = useTranslation()
     const setStoredEmail = useAuthPrefillStore((s) => s.setEmail)
 
     const [email, setEmail] = useState(initialEmail)
@@ -45,7 +47,7 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail 
         <>
             <form className="space-y-4" onSubmit={handleSubmit}>
                 <Input
-                    label="Adresse email"
+                    label={t("auth:fields.email")}
                     id="email"
                     name="email"
                     type="email"
@@ -56,7 +58,7 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail 
                 />
 
                 <Input
-                    label="Mot de passe"
+                    label={t("auth:fields.password")}
                     id="password"
                     name="password"
                     type="password"
@@ -72,7 +74,7 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail 
                     isLoading={isPending}
                     disabled={isPending}
                 >
-                    Connexion
+                    {t("auth:login.submit")}
                 </Button>
             </form>
         </>

@@ -9,15 +9,16 @@ interface RegisterFormData {
 }
 
 /**
- * Validates a register form and returns the first error message, or null if valid.
+ * Validates a register form and returns the first failing i18n key, or null if valid.
+ * Callers run the returned key through `t()` to render the localized message.
  */
 export function validateRegisterForm({ firstName, lastName, email, password, confirmPassword }: RegisterFormData): string | null {
-    if (!firstName.trim()) return "Le prénom est requis"
-    if (!lastName.trim()) return "Le nom est requis"
-    if (!email.trim()) return "L'email est requis"
-    if (!password.trim()) return "Le mot de passe est requis"
-    if (!isPasswordValid(password)) return "Le mot de passe ne respecte pas les critères de sécurité"
-    if (!confirmPassword.trim()) return "La confirmation du mot de passe est requise"
-    if (password !== confirmPassword) return "Les mots de passe ne correspondent pas"
+    if (!firstName.trim()) return "auth:validation.firstNameRequired"
+    if (!lastName.trim()) return "auth:validation.lastNameRequired"
+    if (!email.trim()) return "auth:validation.emailRequired"
+    if (!password.trim()) return "auth:validation.passwordRequired"
+    if (!isPasswordValid(password)) return "auth:validation.passwordCriteriaUnmet"
+    if (!confirmPassword.trim()) return "auth:validation.confirmPasswordRequired"
+    if (password !== confirmPassword) return "auth:validation.passwordMismatch"
     return null
 }

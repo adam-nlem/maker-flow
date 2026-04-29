@@ -1,0 +1,42 @@
+{
+    "noPosts": "No posts found.",
+    "noGroups": "No content groups found.",
+    "selectedCount_one": "{{count}} post selected",
+    "selectedCount_other": "{{count}} posts selected",
+    "post": {
+        "detailTitle": "Post details",
+        "noThumbnail": "No thumbnail",
+        "noCaption": "No description",
+        "overview": "Overview",
+        "engagement": "Engagement",
+        "engagementDistribution": "Engagement breakdown",
+        "engagementCenter": "actions",
+        "likeRatio": "Like / dislike ratio",
+        "likesPositive": "{{count}} positive",
+        "dislikesNegative": "{{count}} negative",
+        "followers": "Followers",
+        "gained": "Gained",
+        "lost": "Lost",
+        "net": "Net",
+        "groupPrefix": "Group",
+        "viewOnPlatform": "View on platform"
+    },
+    "group": {
+        "noScript": "No linked script.",
+        "unlinkScript": "Unlink",
+        "scriptHeader": "Script",
+        "postsHeader": "Posts ({{count}})",
+        "noPostsInGroup": "No posts in this group.",
+        "deleteConfirm": "Are you sure you want to delete this group? This action is irreversible."
+    },
+    "create": {
+        "modalTitle": "New group",
+        "titleLabel": "Title",
+        "titlePlaceholder": "Group name...",
+        "postsHeader": "Posts (optional)"
+    },
+    "picker": {
+        "modalTitle": "Add posts",
+        "addPosts": "Add"
+    }
+}

@@ -1,0 +1,39 @@
+{
+    "features": {
+        "title": "Gérez vos contenus comme un pro",
+        "subtitle": "MakerFlow vous aide à planifier, rédiger et analyser vos contenus vidéo sur Instagram et YouTube.",
+        "next": "Découvrir",
+        "scripts": {
+            "title": "Scripts",
+            "description": "Rédigez vos scripts vidéo avec un éditeur structuré : hooks, chapitres, dialogues, voix-off et plus."
+        },
+        "stats": {
+            "title": "Statistiques",
+            "description": "Suivez vos performances Instagram et YouTube avec des statistiques détaillés en temps réel."
+        },
+        "calendar": {
+            "title": "Calendrier",
+            "description": "Planifiez vos publications et visualisez votre planning de contenu sur un calendrier mensuel."
+        },
+        "ai": {
+            "title": "Génération IA",
+            "description": "Générez des scripts complets avec l'intelligence artificielle en quelques secondes."
+        }
+    },
+    "howItWorks": {
+        "title": "Comment ça marche ?",
+        "subtitle": "Trois étapes pour commencer.",
+        "createProject": {
+            "title": "Créez un projet",
+            "description": "Regroupez vos scripts, réseaux sociaux et analytics autour d'un projet."
+        },
+        "connectAccounts": {
+            "title": "Connectez vos réseaux",
+            "description": "Liez vos comptes Instagram et YouTube pour importer vos données."
+        },
+        "createAndAnalyze": {
+            "title": "Créez et analysez",
+            "description": "Rédigez vos prochains contenus et suivez vos performances."
+        }
+    }
+}

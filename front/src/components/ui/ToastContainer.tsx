@@ -1,12 +1,14 @@
 import { useEffect } from 'react'
 import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/outline'
 import { XMarkIcon } from '@heroicons/react/20/solid'
+import { useTranslation } from 'react-i18next'
 import { ToastType } from '~/models/enums/ToastType'
 import { useToastStore, type Toast } from '~/stores/toast/toastStore'
 
 const AUTO_DISMISS_MS = 5000
 
 function ToastItem({ toast }: { toast: Toast }) {
+  const { t } = useTranslation()
   const removeToast = useToastStore((state) => state.removeToast)
 
   useEffect(() => {
@@ -35,7 +37,7 @@ function ToastItem({ toast }: { toast: Toast }) {
               onClick={() => removeToast(toast.id)}
               className="inline-flex cursor-pointer rounded-md bg-clear text-gray hover:text-dark"
             >
-              <span className="sr-only">Fermer</span>
+              <span className="sr-only">{t("actions.close")}</span>
               <XMarkIcon aria-hidden="true" className="size-5" />
             </button>
           </div>

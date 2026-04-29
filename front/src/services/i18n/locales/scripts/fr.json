@@ -1,0 +1,81 @@
+{
+    "header": "Scripts",
+    "noScripts": "Aucun script.",
+    "newScriptHint": "Cliquez sur + pour en créer un.",
+    "newScriptTitle": "Nouveau script",
+    "limitReached": "Votre abonnement ne vous permet plus de générer de script",
+    "selectOrCreate": "Sélectionnez ou créez un script.",
+    "card": {
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce script ? Cette action est irréversible."
+    },
+    "meta": {
+        "titlePlaceholder": "Titre du script",
+        "edit": "Modifier",
+        "generateAi": "Générer avec l'IA",
+        "chatAi": "Chat IA",
+        "statusPlaceholder": "Statut",
+        "noPublishDate": "Pas de date"
+    },
+    "tags": {
+        "tagPlaceholder": "Tag",
+        "delete": "Supprimer",
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce tag ? Cette action est irréversible.",
+        "createPrefix": "Créer {{title}}",
+        "emptyHint": "Commencez à écrire pour créer un nouveau tag."
+    },
+    "calendar": {
+        "today": "Aujourd'hui"
+    },
+    "chat": {
+        "history": {
+            "title": "Historique des conversations",
+            "empty": "Aucune conversation pour le moment.",
+            "deleteTitle": "Supprimer la conversation",
+            "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cette conversation ? Cette action est irréversible.",
+            "untitledChat": "Nouveau Chat"
+        },
+        "header": {
+            "openHistory": "Ouvrir l'historique des conversations",
+            "newConversation": "Nouvelle conversation"
+        },
+        "bar": {
+            "newChat": "Nouveau chat"
+        },
+        "messages": {
+            "intro": "Discutez avec l'IA pour générer un script, l'analyser ou proposer des modifications précises."
+        }
+    },
+    "parts": {
+        "addPart": "+ Ajouter une partie",
+        "emptyTitle": "Vous n'avez pas encore d'éléments dans votre script.",
+        "emptyHint": "Cliquez sur « Ajouter une partie » pour commencer.",
+        "rowPlaceholder": "Écrivez ici...",
+        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible.",
+        "diff": {
+            "accept": "Accepter",
+            "reject": "Rejeter",
+            "reorderDescription": "Déplacer cette part à la position {{position}}."
+        }
+    },
+    "hooks": {
+        "panelTitle": "Hooks",
+        "searchPlaceholder": "Rechercher...",
+        "empty": "Aucun template.",
+        "applyTitle": "Appliquer ce template ?",
+        "applyHint": "Le hook actuel sera remplacé par le contenu de ce template.",
+        "apply": "Appliquer",
+        "create": {
+            "modalTitle": "Nouveau template de hook",
+            "modalDescription": "Créez un template réutilisable pour vos hooks. Ajoutez des placeholders pour personnaliser le contenu à chaque utilisation.",
+            "titleLabel": "Titre",
+            "titlePlaceholder": "Nom du template",
+            "contentLabel": "Contenu",
+            "contentPlaceholder": "Écrivez le contenu du hook...",
+            "placeholdersHeader": "Placeholders",
+            "submit": "Créer le template"
+        },
+        "card": {
+            "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce modèle ? Cette action est irréversible."
+        }
+    }
+}

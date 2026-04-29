@@ -3,7 +3,8 @@ import { useEffect, useCallback, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { Bars3Icon, ChevronRightIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { useMobileSidebarStore } from "~/stores/sidebar/mobileSidebarStore";
-import { getCurrentPageLabel } from "~/utils/navigationHelpers";
+import { getCurrentPageLabelKey } from "~/utils/navigationHelpers";
+import { useTranslation } from "react-i18next";
 import DesktopSidebar from "./DesktopSidebar";
 
 export default function MobileSidebar() {
@@ -12,7 +13,8 @@ export default function MobileSidebar() {
   const toggle = useMobileSidebarStore((state) => state.toggle);
   const location = useLocation();
   const previousPathname = useRef(location.pathname);
-  const currentPageLabel = getCurrentPageLabel(location.pathname);
+  const { t } = useTranslation();
+  const currentPageLabelKey = getCurrentPageLabelKey(location.pathname);
 
   // Auto-close on route change
   useEffect(() => {
@@ -50,10 +52,10 @@ export default function MobileSidebar() {
           }
         </button>
         <span className="text-heading-sm text-primary">MakerFlow</span>
-        {currentPageLabel && (
+        {currentPageLabelKey && (
           <>
             <ChevronRightIcon className="size-4 text-gray shrink-0" strokeWidth={2} />
-            <span className="text-body-sm text-dark">{currentPageLabel}</span>
+            <span className="text-body-sm text-dark">{t(currentPageLabelKey)}</span>
           </>
         )}
       </div>

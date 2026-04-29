@@ -2,6 +2,7 @@ import ModalOverlay from "~/components/ui/ModalOverlay";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import type { TodoList } from "~/models/TodoList";
 import { ChevronRightIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/Button";
 import { Input } from "~/components/ui/Input";
 import { useUpdateTodoList } from "~/hooks/api/todoLists/useUpdateTodoList";
@@ -15,6 +16,7 @@ interface UpdateTodoListModalProps {
 }
 
 export default function UpdateTodoListModal({ showModal, todoList, onClose }: UpdateTodoListModalProps) {
+    const { t } = useTranslation();
 
     const [title, setTitle] = useState(todoList?.title ?? "");
     const [showDeleteConfirmation, setShowDeleteConfirmation] = useState(false)
@@ -38,12 +40,12 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose }: Up
         <ModalOverlay isOpen={showModal} onClose={onClose}>
             <div className="flex flex-col gap-3 py-5 px-10 flex-1 min-h-0 overflow-y-auto">
                 <h1 className="text-heading-lg">
-                    Modifier la Todo List
+                    {t("tasks:todoList.update.modalTitle")}
                 </h1>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <Input
-                        label="Titre"
-                        placeholder="Entrez le titre de la Todo List"
+                        label={t("tasks:todoList.create.titleLabel")}
+                        placeholder={t("tasks:todoList.create.titlePlaceholder")}
                         id="name"
                         name="name"
                         type="text"
@@ -59,7 +61,7 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose }: Up
                         disabled={isUpdating}
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
-                            <p className="text-sm">Modifier la Todo List</p>
+                            <p className="text-sm">{t("tasks:todoList.update.submit")}</p>
                             <ChevronRightIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>
@@ -73,7 +75,7 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose }: Up
                         onClick={() => setShowDeleteConfirmation(true)}
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
-                            <p className="text-sm">Supprimer la Todo List</p>
+                            <p className="text-sm">{t("tasks:todoList.update.delete")}</p>
                             <TrashIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>
@@ -87,7 +89,7 @@ export default function UpdateTodoListModal({ showModal, todoList, onClose }: Up
                         onClose();
                     }}
                     isPending={isDeleting}
-                    message="Êtes-vous sûr de vouloir supprimer cette todo list ? Cette action est irréversible."
+                    message={t("tasks:todoList.update.deleteConfirm")}
                 />
 
             </div>

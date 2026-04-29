@@ -1,5 +1,6 @@
 import type { ComponentType, ReactNode, SVGProps } from "react"
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 import { Button } from "~/components/ui/Button"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { privacyPolicyPath, termsOfServicePath } from "~/routes/routePaths"
@@ -22,10 +23,12 @@ export default function AuthStepLayout({
     subtitle,
     onBack,
     onNext,
-    nextLabel = "Suivant",
+    nextLabel,
     children,
 }: AuthStepLayoutProps) {
+    const { t } = useTranslation()
     const navigate = useNavigate()
+    const resolvedNextLabel = nextLabel ?? t("actions.next")
 
     return (
         <div className="min-h-screen flex flex-col gap-3 items-center justify-between px-6 py-12">
@@ -49,12 +52,12 @@ export default function AuthStepLayout({
                 <div className="flex flex-row gap-3 items-center justify-center w-full max-w-sm ">
                     {onBack && (
                         <Button style="secondary" width="w-1/4" onClick={onBack}>
-                            Retour
+                            {t("actions.back")}
                         </Button>
                     )}
                     {onNext && (
                         <Button style="primary" width="w-full sm:w-3/4" onClick={onNext}>
-                            {nextLabel}
+                            {resolvedNextLabel}
                         </Button>
                     )}
                 </div>
@@ -62,11 +65,11 @@ export default function AuthStepLayout({
 
             <div className="flex gap-2 justify-center items-center">
                 <SimpleTextButton onClick={() => navigate(privacyPolicyPath)}>
-                    Confidentialité
+                    {t("legal.privacyPolicy")}
                 </SimpleTextButton>
                 <span className="text-xs text-gray">·</span>
                 <SimpleTextButton onClick={() => navigate(termsOfServicePath)}>
-                    CGU
+                    {t("legal.termsOfService")}
                 </SimpleTextButton>
             </div>
         </div>

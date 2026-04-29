@@ -1,0 +1,69 @@
+{
+    "title": "Settings",
+    "sections": {
+        "general": "General",
+        "projects": "Projects",
+        "subscription": "Subscription"
+    },
+    "general": {
+        "preferences": "Preferences",
+        "account": "My account",
+        "password": "Change password",
+        "session": "Session",
+        "fields": {
+            "firstName": "First name",
+            "lastName": "Last name",
+            "email": "Email",
+            "currentPassword": "Current password",
+            "newPassword": "New password",
+            "confirmPassword": "Confirm password"
+        },
+        "validation": {
+            "passwordFieldsRequired": "Please fill in all password fields",
+            "passwordCriteriaUnmet": "The password does not meet the security requirements"
+        },
+        "logout": "Log out"
+    },
+    "projects": {
+        "subtitle": "Manage your projects and their settings.",
+        "card": {
+            "namePlaceholder": "Enter the project name",
+            "createdAt": "Created on {{date}}",
+            "descriptionPlaceholder": "Write a description (optional)",
+            "types": "Types",
+            "deleteConfirm": "Deleting this project will delete all data associated with it. This action is irreversible."
+        }
+    },
+    "subscription": {
+        "subtitle": "Manage your subscription and credits.",
+        "credits": {
+            "title": "Credits",
+            "subscription": "Subscription credits",
+            "extra": "Extra credits",
+            "refill": "Top up"
+        },
+        "history": {
+            "title": "Transaction history",
+            "previous": "Previous",
+            "next": "Next",
+            "page": "Page {{page}}"
+        },
+        "current": {
+            "title": "Current subscription",
+            "period": "Period: {{start}} — {{end}}",
+            "cancellationScheduled": "Cancellation scheduled on {{date}}",
+            "cancel": "Cancel subscription",
+            "cancelConfirm": "Are you sure you want to cancel your subscription? It will remain active until the end of the current period.",
+            "resume": "Resume subscription"
+        },
+        "plans": {
+            "title": "Choose a plan",
+            "loadError": "Unable to load plans. Please try again later.",
+            "recommended": "Recommended",
+            "perMonth": "/ month",
+            "creditsPerMonth": "{{count}} credits / month",
+            "choose": "Choose"
+        },
+        "checkoutSuccess": "Payment successful"
+    }
+}

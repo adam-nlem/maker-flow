@@ -1,0 +1,17 @@
+{
+    "allPlatforms": "Toutes les plateformes",
+    "engagement": "Engagement",
+    "notConnected": "Non connecté",
+    "connect": "Connecter",
+    "reconnect": "Reconnecter",
+    "disconnect": "Déconnecter",
+    "loginAction": "Se Connecter",
+    "lastSync": "Dernière synchro : {{when}}",
+    "noAccount": "Aucun compte connecté.",
+    "disconnectConfirm": "Êtes-vous sûr de vouloir déconnecter ce compte ? Cette action est irréversible.",
+    "placeholder": {
+        "title": "Aucune intégration connectée",
+        "description": "Connectez un compte Instagram ou YouTube pour accéder à vos statistiques.",
+        "action": "Connecter un compte"
+    }
+}

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import type { Project } from "~/models/Project";
 import { ProjectType, projectTypeOptions, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
 import { Input } from "~/components/ui/Input";
@@ -18,6 +19,7 @@ interface ProjectSettingsCardProps {
 }
 
 export default function ProjectSettingsCard({ project }: ProjectSettingsCardProps) {
+    const { t } = useTranslation();
     const [name, setName] = useState(project.name);
     const [description, setDescription] = useState(project.description);
     const [types, setTypes] = useState<ProjectType[]>(project.types);
@@ -61,13 +63,13 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
 
                             <Input
                                 simple
-                                placeholder="Entrez le nom du Projet"
+                                placeholder={t("settings:projects.card.namePlaceholder")}
                                 value={name}
                                 onChange={(e) => setName(e.target.value)}
                                 textStyle="text-heading-sm"
                                 required
                             />
-                            <p className="text-body-xs text-gray">Créé le {formatToNumericDate(project.createdAt)}</p>
+                            <p className="text-body-xs text-gray">{t("settings:projects.card.createdAt", { date: formatToNumericDate(project.createdAt) })}</p>
                         </div>
                         <TrashIcon
                             className="ml-auto size-4 text-gray hover:text-danger cursor-pointer transition-colors shrink-0"
@@ -79,12 +81,12 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
 
                     <TextArea
                         simple
-                        placeholder="Écrivez une description (optionnel)"
+                        placeholder={t("settings:projects.card.descriptionPlaceholder")}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                     />
 
-                    <h3 className="text-heading-sm">Types</h3>
+                    <h3 className="text-heading-sm">{t("settings:projects.card.types")}</h3>
                     <div className="flex flex-wrap gap-2 mt-2">
                         {projectTypeOptions.map(type => (
                             <Pill
@@ -104,7 +106,7 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                 {hasChanges && (
                     <div className="border-t border-light-gray px-5 py-3">
                         <Button type="submit" style="primary" isLoading={isUpdating} disabled={isUpdating}>
-                            <p className="text-sm">Enregistrer</p>
+                            <p className="text-sm">{t("actions.save")}</p>
                         </Button>
                     </div>
                 )}
@@ -118,7 +120,7 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                     setShowDeleteConfirm(false);
                 }}
                 isPending={isDeleting}
-                message="En supprimant ce projet, vous supprimez toutes les données qui lui sont associés. Cette action est irréversible."
+                message={t("settings:projects.card.deleteConfirm")}
             />
         </>
     );

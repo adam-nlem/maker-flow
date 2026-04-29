@@ -1,5 +1,6 @@
 import { UserPlusIcon } from "@heroicons/react/24/outline"
 import { useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 import AuthStepLayout from "~/components/auth/AuthStepLayout"
 import RegisterForm from "~/components/auth/RegisterForm"
@@ -8,6 +9,7 @@ import { OtpType } from "~/models/enums/OtpType"
 import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore"
 
 export default function RegisterPage() {
+    const { t } = useTranslation()
     const navigate = useNavigate()
     const prefillEmail = useAuthPrefillStore((s) => s.email)
 
@@ -15,11 +17,11 @@ export default function RegisterPage() {
         <div className="bg-clear bg-dot-pattern min-h-screen relative">
             <AuthStepLayout
                 icon={UserPlusIcon}
-                title="Créez votre compte"
-                subtitle="Commencez gratuitement et gérez vos contenus dès maintenant."
+                title={t("auth:register.title")}
+                subtitle={t("auth:register.subtitle")}
                 onBack={() => navigate(onboardingPath)}
                 onNext={() => navigate(loginPath)}
-                nextLabel="J'ai déjà un compte"
+                nextLabel={t("auth:register.switchToLogin")}
             >
                 <div className="min-w-sm">
                     <RegisterForm
