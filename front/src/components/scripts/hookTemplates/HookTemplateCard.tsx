@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import type { HookTemplate } from "~/models/HookTemplate";
 import { parseHookPlaceholders } from "~/utils/hookPlaceholderParser";
 import Pill from "~/components/ui/Pill";
@@ -13,6 +14,7 @@ interface HookTemplateCardProps {
 }
 
 export default function HookTemplateCard({ template, isSelected = false, onClick }: HookTemplateCardProps) {
+    const { t } = useTranslation();
     const parts = parseHookPlaceholders(template.content);
     const { deleteHookTemplate, isPending: isDeleting } = useDeleteHookTemplate();
     const [showConfirm, setShowConfirm] = useState(false);
@@ -48,7 +50,7 @@ export default function HookTemplateCard({ template, isSelected = false, onClick
                 onClose={() => setShowConfirm(false)}
                 onConfirm={() => deleteHookTemplate(template.uuid)}
                 isPending={isDeleting}
-                message="Êtes-vous sûr de vouloir supprimer ce modèle ? Cette action est irréversible."
+                message={t("scripts:hooks.card.deleteConfirm")}
             />
         </>
     );

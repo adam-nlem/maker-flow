@@ -8,7 +8,7 @@ import { useState } from "react";
 import type { Project } from "~/models/Project";
 import { useDeleteProject } from "~/hooks/api/projects/useDeleteProject";
 import { useUpdateProject } from "~/hooks/api/projects/useUpdateProject";
-import { ProjectType, projectTypeOptions, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
+import { ProjectType, projectTypeOptions, projectTypeTranslationKeys } from "~/models/enums/ProjectType";
 import { TextArea } from "../ui/TextArea";
 import { ToggleChip } from "../ui/ToggleChip";
 
@@ -82,7 +82,7 @@ export default function UpdateProjectModal({ showModal, project, onClose }: Upda
                             {projectTypeOptions.map((type) => (
                                 <ToggleChip
                                     key={type}
-                                    label={projectTypeToFrenchTranslation[type]}
+                                    label={t(projectTypeTranslationKeys[type])}
                                     isSelected={types.includes(type)}
                                     onToggle={() => setTypes(prev =>
                                         prev.includes(type)

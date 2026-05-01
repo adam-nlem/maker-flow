@@ -6,7 +6,7 @@ import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
 import { TextArea } from "~/components/ui/TextArea"
 import Pill from "~/components/ui/Pill"
-import { ProjectType, projectTypeOptions, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType"
+import { ProjectType, projectTypeOptions, projectTypeTranslationKeys } from "~/models/enums/ProjectType"
 import { useCreateProject } from "~/hooks/api/projects/useCreateProject"
 import { HttpException } from "~/services/httpClient/HttpException"
 
@@ -69,7 +69,7 @@ export default function CreateProjectForm({ onProjectCreated, formSpacing = "spa
                     {projectTypeOptions.map((type) => (
                         <Pill
                             key={type}
-                            label={projectTypeToFrenchTranslation[type]}
+                            label={t(projectTypeTranslationKeys[type])}
                             isSelected={types.includes(type)}
                             bgColorClassName="bg-primary/10"
                             borderColorClassName="border border-primary/30"

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import Pill from "~/components/ui/Pill";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
@@ -8,7 +9,7 @@ import { useCreateChat } from "~/hooks/api/chats/useCreateChat";
 import { useDeleteChat } from "~/hooks/api/chats/useDeleteChat";
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { useChatStore } from "~/stores/scripts/chatStore";
-import { type AiModel, aiModelOptions, aiModelToFrenchTranslation, aiModelToIcon } from "~/models/enums/AiModel";
+import { type AiModel, aiModelOptions, aiModelTranslationKeys, aiModelToIcon } from "~/models/enums/AiModel";
 import { formatToFrenchRelative } from "~/utils/dateFormatters";
 
 interface ChatHistoryBarProps {
@@ -17,6 +18,7 @@ interface ChatHistoryBarProps {
 }
 
 export default function ChatHistoryBar({ scriptUuid }: ChatHistoryBarProps) {
+    const { t } = useTranslation();
     const { chats, hasMore, isLoadingMore, listMore } = useListPaginatedChats({ scriptUuid });
     const { createChat, isPending: isCreatingChat } = useCreateChat();
     const { deleteChat } = useDeleteChat();
@@ -51,14 +53,14 @@ export default function ChatHistoryBar({ scriptUuid }: ChatHistoryBarProps) {
                 <div ref={containerRef} className="flex flex-row items-center gap-2 overflow-x-auto scrollbar-none">
                     <Pill
                         icon={PlusIcon}
-                        label="Nouveau chat"
+                        label={t("scripts:chat.bar.newChat")}
                         onClick={() => setIsCreatingChat(true)}
                     />
                     {chats.map((chat) => (
                         <Pill
                             key={chat.uuid}
                             imageUrl={aiModelToIcon[chat.aiModel]}
-                            label={`${aiModelToFrenchTranslation[chat.aiModel]} - ${formatToFrenchRelative(chat.createdAt)}`}
+                            label={`${t(aiModelTranslationKeys[chat.aiModel])} - ${formatToFrenchRelative(chat.createdAt)}`}
                             isSelected={activeChatUuid === chat.uuid}
                             bgColorClassName="bg-primary/10"
                             borderColorClassName="border border-primary/30"
@@ -75,14 +77,14 @@ export default function ChatHistoryBar({ scriptUuid }: ChatHistoryBarProps) {
                             <Pill
                                 key={model}
                                 imageUrl={aiModelToIcon[model]}
-                                label={aiModelToFrenchTranslation[model]}
+                                label={t(aiModelTranslationKeys[model])}
                                 onClick={() => handleCreateChat(model)}
                                 isSelected={isCreatingChat}
                                 borderColorClassName="border-light-gray"
                             />
                         ))}
                         <SimpleTextButton onClick={() => setIsCreatingChat(false)}>
-                            Annuler
+                            {t("actions.cancel")}
                         </SimpleTextButton>
                     </div>
                 )}
@@ -92,7 +94,7 @@ export default function ChatHistoryBar({ scriptUuid }: ChatHistoryBarProps) {
                 isOpen={!!pendingDeleteUuid}
                 onClose={() => setPendingDeleteUuid(null)}
                 onConfirm={handleConfirmDelete}
-                message="Êtes-vous sûr de vouloir supprimer cette conversation ? Cette action est irréversible."
+                message={t("scripts:chat.history.deleteConfirm")}
             />
         </>
     );

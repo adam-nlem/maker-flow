@@ -6,43 +6,52 @@ Internationalization is provided by [i18next](https://www.i18next.com/) + [react
 
 French (`fr`) is the **source / default** language. English (`en`) is added as a translated locale. New copy is authored in French first, then translated to English.
 
-The current state is **infrastructure + pilot**: only the sidebar (`NavigationItem`) and the API error toasts (`errorCodeMessages.ts`) consume the i18n system today. The remaining ~100+ components still hold hardcoded French strings and are migrated gradually in follow-up PRs (see "Migrating a feature" below).
+The whole frontend has been migrated. **The only files that still hold hardcoded French are [`routes/privacy-policy.tsx`](../src/routes/privacy-policy.tsx) and [`routes/terms-of-service.tsx`](../src/routes/terms-of-service.tsx)** (~180 lines of legal content each, deferred to a dedicated PR). Every other component, enum translation map, validation utility, and route renders fully through `t()`.
 
 ## Architecture
 
 ```
 front/src/services/i18n/
-├── i18n.ts                 # i18next.init(...) — singleton, side-effect import in main.tsx
+├── i18n.ts                  # i18next.init(...) — singleton, side-effect import in main.tsx
 └── locales/
-    ├── common/             # generic words (actions, labels) used across features
-    │   ├── fr.json
-    │   └── en.json
-    ├── navigation/         # sidebar items
-    │   ├── fr.json
-    │   └── en.json
-    └── errors/             # API error code translations (one key per backend numeric code)
-        ├── fr.json
-        └── en.json
+    ├── common/              # cross-cutting (actions, language label, legal links, search bar, etc.)
+    ├── navigation/          # sidebar nav items
+    ├── errors/              # API error code translations (one key per backend numeric code)
+    ├── settings/            # settings page (general / projects / subscription)
+    ├── sidebar/             # sidebar-specific labels (create project, premium CTA, …)
+    ├── auth/                # login / register / verify-otp + form validation messages
+    ├── onboarding/          # onboarding step strings + generating phase + first script title
+    ├── welcome/             # welcome flow features + how-it-works
+    ├── prelaunch/           # prelaunch landing + dashboard + reward tiers
+    ├── projects/            # create/update project modals
+    ├── tasks/               # todo lists + tasks + tags
+    ├── contents/            # contents page (post & group panels) + page header
+    ├── home/                # home dashboard (overview, scripts panel, rankings)
+    ├── scripts/             # scripts panel + meta + parts + chat + hooks + calendar filters
+    ├── integrations/        # integration login card + placeholder + OAuth errors
+    └── enums/               # all 38 enum translation maps (one section per enum)
 ```
 
 ```
 front/src/hooks/
-└── useChangeLanguage.ts    # change locale + update <html lang>; also exposes currentLanguage
+└── useChangeLanguage.ts     # change locale + update <html lang>; also exposes currentLanguage
 
 front/src/models/enums/
-└── Language.ts             # Language enum + languageToLabel (self-labelling: Français / English)
+└── Language.ts              # Language enum + languageToLabel (self-labelling: Français / English)
 
 front/src/components/settings/
-└── LanguageSwitcher.tsx    # the in-app language picker, mounted inside GeneralSettings
+└── LanguageSwitcher.tsx     # in-app language picker, mounted inside GeneralSettings
 ```
 
 The locales are organised **feature-folder-first** (one folder per domain, with `fr.json` and `en.json` inside), to mirror the rest of the codebase (`components/auth/`, `stores/contents/`, etc.). Adding a new translated feature = drop a new `locales/<feature>/` folder and register it in [`i18n.ts`](../src/services/i18n/i18n.ts) — no edits in two parallel locale trees.
 
+There are **16 namespaces** today: `common, navigation, errors, settings, sidebar, auth, onboarding, welcome, prelaunch, projects, tasks, contents, home, scripts, integrations, enums`.
+
 ## Key naming convention
 
-- Dot-nested camelCase: `navigation.items.home`, `errors.project.notFound`, `common.actions.save`.
-- Always use the explicit namespace prefix when calling `t()` outside the default namespace: `t("navigation:items.home")`, `t("errors:project.notFound")`. The default namespace is `common`, so `t("actions.save")` works without a prefix.
-- Feature folder name = namespace name. Don't introduce one-off namespaces.
+- Dot-nested camelCase: `navigation.items.home`, `errors.project.notFound`, `enums.aiModel.names.gemini`.
+- **Always prefix with the namespace** when calling `t()` outside the default namespace: `t("navigation:items.home")`, `t("errors:project.notFound")`. The default namespace is `common`, so `t("actions.save")` works without a prefix.
+- Feature folder name = namespace name. The single exception is `enums`, which centralizes all enum translations under one namespace with a sub-key per enum (`enums:aiModel.names.gemini`, `enums:scriptStatus.idea`, `enums:projectType.contentCreation`, …).
 
 ## Usage
 
@@ -82,60 +91,43 @@ changeLanguage(Language.En);
 
 `useChangeLanguage` updates the i18next instance (which auto-persists to `localStorage` via the language detector) and sets `document.documentElement.lang` for accessibility.
 
-## Migrating a feature
-
-The two example migrations to copy from:
+## Migrating a feature (for future strings)
 
 ### Pattern A — an enum's translation record
 
-Before (typical existing pattern):
+Every existing enum already follows this pattern. The companion map is named `xxxTranslationKeys` (or `xxxLabelKeys` / `xxxDescriptionKeys` / `xxxShortLabelKeys` for enums that expose multiple translation faces, like `aiModel`, `onboardingStep`, `prelaunchRewardTier`, `skillModule`).
 
 ```ts
 // models/enums/NavigationItem.ts
-export const navigationItemToFrenchTranslation: Record<NavigationItem, string> = {
-    [NavigationItem.Home]: "Accueil",
+export const navigationItemTranslationKeys: Record<NavigationItem, string> = {
+    [NavigationItem.Home]: "navigation:items.home",
     ...
 };
 ```
 
-After:
-
-1. Replace the record with translation **keys**:
-   ```ts
-   export const navigationItemTranslationKeys: Record<NavigationItem, string> = {
-       [NavigationItem.Home]: "navigation:items.home",
-       ...
-   };
-   ```
-2. Add the strings to the locale files (create the namespace folder if it doesn't exist):
-   ```json
-   // services/i18n/locales/navigation/fr.json
-   { "items": { "home": "Accueil", ... } }
-   // services/i18n/locales/navigation/en.json
-   { "items": { "home": "Home", ... } }
-   ```
-3. Register the namespace in [`i18n.ts`](../src/services/i18n/i18n.ts):
-   ```ts
-   import navigationFr from "./locales/navigation/fr.json";
-   import navigationEn from "./locales/navigation/en.json";
-
-   resources: {
-       fr: { ..., navigation: navigationFr },
-       en: { ..., navigation: navigationEn },
-   },
-   ns: ["common", "navigation", "errors"],
-   ```
-4. Update each consumer to call `t(navigationItemTranslationKeys[item])` instead of indexing the old record.
-
-If a non-React utility (e.g., [`navigationHelpers.ts`](../src/utils/navigationHelpers.ts)) used to return the translated label, return the translation **key** instead and let the caller run it through `t()`.
+To add a new enum: declare the map, add the strings under the matching `enums:<enumName>.…` (or feature-specific) sub-tree in `locales/enums/{fr,en}.json`, and consume via `t(navigationItemTranslationKeys[item])`.
 
 ### Pattern B — `Record<number, string>` lookup table
 
-The migration of [`errorCodeMessages.ts`](../src/services/apiErrorHandler/errorCodeMessages.ts) is the reference. The export shape changed from `errorCodeMessages: Record<number, string>` (with French strings inline) to `errorCodeKeys: Record<number, string>` (with i18n key strings), and `resolveErrorMessage()` now calls `i18n.t(key)`.
+The migration of [`errorCodeMessages.ts`](../src/services/apiErrorHandler/errorCodeMessages.ts) is the reference. The export shape is `errorCodeKeys: Record<number, string>` (i18n key per code), and `resolveErrorMessage()` calls `i18n.t(key)`.
 
 ### Pattern C — hardcoded JSX copy
 
 For literal strings inside components, just replace `"Some French text"` with `t("namespace:some.key")` after adding the key to the relevant locale files. If the component is not yet using `useTranslation`, add the hook.
+
+### Pattern D — interpolation
+
+i18next supports `{{var}}` placeholders:
+
+```json
+{ "createdAt": "Créé le {{date}}" }
+```
+
+```tsx
+t("projects:tile.createdAt", { date: formatToFrenchDateShort(project.createdAt) })
+```
+
+Pluralization uses i18next's `_one` / `_other` suffix (see `contents:selectedCount_one` / `contents:selectedCount_other`).
 
 ## Adding a new locale
 
@@ -144,19 +136,15 @@ For literal strings inside components, just replace `"Some French text"` with `t
 3. Add the imports + a top-level entry to the `resources` object in [`i18n.ts`](../src/services/i18n/i18n.ts).
 4. Add the locale to `supportedLngs`.
 
-## Why no backend i18n yet
+## Why no backend i18n
 
-The Symfony backend doesn't return user-facing strings — its [structured exception system](exception-system.md) emits numeric error codes (`{ "code": 17001 }`) that the frontend resolves to localized messages via the `errors` namespace described above. So there's no API surface that benefits from Symfony's translation component today.
+The Symfony backend doesn't return user-facing strings — its [structured exception system](exception-system.md) emits numeric error codes (`{ "code": 17001 }`) that the frontend resolves to localized messages via the `errors` namespace. No API surface benefits from Symfony's translation component today.
 
-The remaining backend user-facing surface is **email content** (Resend templates rendered server-side in workers). Adding Symfony i18n there will require a way to know each recipient's language, which depends on persisting `language` on the `User` entity — explicitly out of scope of the current setup.
+The remaining backend user-facing surface is **email content** (Resend templates rendered server-side in workers). Adding Symfony i18n there will require a way to know each recipient's language, which depends on persisting `language` on the `User` entity — out of scope of this work.
 
-## What's still in French
+## What's still in French (deferred follow-ups)
 
-The pilot covers only the sidebar and API error toasts. Everything else is hardcoded French and is migrated incrementally:
-
-- ~14-19 enum translation maps in [`front/src/models/enums/`](../src/models/enums/) following the `xxxToFrenchTranslation` pattern (e.g., `ProjectType`, `OnboardingStep`, `AiModel`, `SettingsSection`, `TodoListPriority`, etc.).
-- ~100+ components with hardcoded French JSX (auth forms, project modals, insights cards, settings sub-pages, etc.).
-- Validation messages in [`front/src/utils/registerValidation.ts`](../src/utils/registerValidation.ts), [`passwordValidation.ts`](../src/utils/passwordValidation.ts).
-- Date/duration formatter fallback strings in [`dateFormatters.ts`](../src/utils/dateFormatters.ts), [`durationFormatters.ts`](../src/utils/durationFormatters.ts).
-
-Each future PR migrates one feature/enum at a time using the patterns above.
+- [`routes/privacy-policy.tsx`](../src/routes/privacy-policy.tsx) — ~80 lines of legal content
+- [`routes/terms-of-service.tsx`](../src/routes/terms-of-service.tsx) — ~100 lines of legal content
+- The `'fr-FR'` locale literal passed to `Date.prototype.toLocaleDateString/toLocaleTimeString` and to `Number.prototype.toLocaleString` in a handful of components — these still format dates/numbers as French. Wiring them to the active i18n locale (`i18n.language === 'en' ? 'en-US' : 'fr-FR'`) is a future polish pass.
+- The `MONTHS_FR` / `DAYS_FR_FULL` constants in [`utils/dateHelpers.ts`](../src/utils/dateHelpers.ts) used by `ScriptCalendar`. Since these are calendar labels (not free-form copy), localizing them properly is best done by switching to `Intl.DateTimeFormat(i18n.language, ...)` rather than hand-curated month arrays.

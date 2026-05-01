@@ -24,7 +24,13 @@
         "emptyHint": "Commencez à écrire pour créer un nouveau tag."
     },
     "calendar": {
-        "today": "Aujourd'hui"
+        "today": "Aujourd'hui",
+        "filters": {
+            "title": "Filtres",
+            "platforms": "Plateformes",
+            "statuses": "Statuts",
+            "tags": "Tags"
+        }
     },
     "chat": {
         "history": {
@@ -40,6 +46,11 @@
         },
         "bar": {
             "newChat": "Nouveau chat"
+        },
+        "input": {
+            "placeholder": "Envoyer un message...",
+            "attachScript": "Ajouter un script",
+            "send": "Envoyer"
         },
         "messages": {
             "intro": "Discutez avec l'IA pour générer un script, l'analyser ou proposer des modifications précises."

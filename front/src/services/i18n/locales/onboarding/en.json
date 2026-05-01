@@ -24,5 +24,7 @@
     },
     "progress": {
         "stepCount": "Step {{current}} of {{total}}"
-    }
+    },
+    "firstScriptTitle": "My first script",
+    "findScriptHint": "Find your script in the Scripts tab"
 }

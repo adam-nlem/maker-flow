@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import { MessageType } from "~/models/enums/MessageType";
 import { useListChatMessages } from "~/hooks/api/chatMessages/useListChatMessages";
 import { useChatStore } from "~/stores/scripts/chatStore";
@@ -12,7 +13,8 @@ interface ChatMessageListProps {
   onSuggestionClick?: (suggestion: string) => void;
 }
 
-export default function ChatMessageList({ chatUuid, scriptUuid, onSuggestionClick }: ChatMessageListProps) {
+export default function ChatMessageList({ chatUuid, scriptUuid }: ChatMessageListProps) {
+  const { t } = useTranslation();
   const isWaitingForAi = useChatStore((s) => s.isWaitingForAi);
   const setIsWaitingForAi = useChatStore((s) => s.setIsWaitingForAi);
 
@@ -44,7 +46,7 @@ export default function ChatMessageList({ chatUuid, scriptUuid, onSuggestionClic
     return (
       <div className="p-4">
         <p className="text-body-sm text-gray">
-          Discutez avec l'IA pour générer un script, l'analyser ou proposer des modifications précises.
+          {t("scripts:chat.messages.intro")}
         </p>
       </div>
     );
@@ -66,7 +68,7 @@ export default function ChatMessageList({ chatUuid, scriptUuid, onSuggestionClic
     return (
       <div className="p-4">
         <p className="text-body-sm text-gray">
-          Discutez avec l'IA pour générer un script, l'analyser ou proposer des modifications précises.
+          {t("scripts:chat.messages.intro")}
         </p>
       </div>
     );

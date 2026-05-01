@@ -6,8 +6,8 @@ export enum SubscriptionPlan {
 
 export const subscriptionPlanOptions = Object.values(SubscriptionPlan);
 
-export const subscriptionPlanToFrenchTranslation: Record<SubscriptionPlan, string> = {
-    [SubscriptionPlan.Starter]: "Starter",
-    [SubscriptionPlan.Creator]: "Créateur",
-    [SubscriptionPlan.Agency]: "Agence",
+export const subscriptionPlanTranslationKeys: Record<SubscriptionPlan, string> = {
+    [SubscriptionPlan.Starter]: "enums:subscriptionPlan.starter",
+    [SubscriptionPlan.Creator]: "enums:subscriptionPlan.creator",
+    [SubscriptionPlan.Agency]: "enums:subscriptionPlan.agency",
 };

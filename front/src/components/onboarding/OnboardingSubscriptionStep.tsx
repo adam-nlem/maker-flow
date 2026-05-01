@@ -7,7 +7,7 @@ import SubscriptionOverview from "~/components/settings/subscription/Subscriptio
 import Shimmer from "~/components/ui/Shimmer"
 import { Button } from "~/components/ui/Button"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
-import { subscriptionPlanToFrenchTranslation } from "~/models/enums/SubscriptionPlan"
+import { subscriptionPlanTranslationKeys } from "~/models/enums/SubscriptionPlan"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 
 export default function OnboardingSubscriptionStep() {
@@ -24,7 +24,7 @@ export default function OnboardingSubscriptionStep() {
                             <CheckCircleIcon className="size-8 text-primary" />
                         </div>
                         <h3 className="text-heading-xl text-dark mb-2">
-                            {t("onboarding:subscriptionStep.activatedTitle", { plan: subscriptionPlanToFrenchTranslation[subscription.plan] })}
+                            {t("onboarding:subscriptionStep.activatedTitle", { plan: t(subscriptionPlanTranslationKeys[subscription.plan]) })}
                         </h3>
                         <p className="text-body-sm text-gray">
                             {t("onboarding:subscriptionStep.activatedSubtitle")}

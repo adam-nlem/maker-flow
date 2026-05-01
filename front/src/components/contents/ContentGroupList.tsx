@@ -1,4 +1,5 @@
 import { useRef } from "react"
+import { useTranslation } from "react-i18next"
 import Shimmer from "~/components/ui/Shimmer"
 import { useListPaginatedPostGroups } from "~/hooks/api/postGroups/useListPaginatedPostGroups"
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
@@ -11,6 +12,7 @@ interface ContentGroupListProps {
 }
 
 export default function ContentGroupList({ projectUuid }: ContentGroupListProps) {
+    const { t } = useTranslation()
 
     const searchTerm = useContentsStore((s) => s.searchTerm)
     const selectGroup = useContentsStore((s) => s.selectGroup)
@@ -57,7 +59,7 @@ export default function ContentGroupList({ projectUuid }: ContentGroupListProps)
         return (
             <div className="flex items-center justify-center py-20">
                 <p className="text-body-sm text-gray">
-                    Aucun groupe de contenu trouvé.
+                    {t("contents:noGroups")}
                 </p>
             </div>
         )

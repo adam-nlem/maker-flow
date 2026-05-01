@@ -1,7 +1,7 @@
 import { ArrowPathIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import { TodoListStatus, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
+import { TodoListStatus, todoListStatusToBgClass, todoListStatusTranslationKeys, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
 import type { TodoListTask } from "~/models/TodoListTask";
 import CreateTodoListTaskCard from "./CreateTodoListTaksCard";
 import TodoListTaskCard from "./TodoListTaskCard";
@@ -29,7 +29,7 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
         <div className="flex flex-col w-1/3 gap-3 min-h-0" ref={setNodeRef}>
 
             <div className={`text-sm w-full rounded-sm text-center ${todoListStatusToTextClass[status]} ${todoListStatusToBgClass[status]} shrink-0`}>
-                {todoListStatusToFrenchTranslation[status]}
+                {t(todoListStatusTranslationKeys[status])}
             </div>
 
             <div className="relative flex-1 min-h-0">

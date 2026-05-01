@@ -1,5 +1,6 @@
+import { useTranslation } from "react-i18next";
 import { platformToBgFullClass } from "~/models/enums/Platform";
-import { IntegrationInsightType, integrationInsightTypeToFrenchTranslation } from "~/models/enums/IntegrationInsightType";
+import { IntegrationInsightType, integrationInsightTypeTranslationKeys } from "~/models/enums/IntegrationInsightType";
 import { formatCompactNumber } from "~/utils/numberFormatters";
 import { getInsightValue, computeEngagementRate } from "~/utils/insightHelpers";
 import type { IntegrationInsightsGroupedByIntegrationDTO } from "~/dtos/integrationInsights/IntegrationInsightsGroupedByIntegrationDTO";
@@ -24,6 +25,8 @@ function MetricRow({ label, value }: MetricRowProps) {
 }
 
 export default function IntegrationDetailCardRow({ groups }: IntegrationDetailCardRowProps) {
+    const { t } = useTranslation();
+
     if (groups.length === 0) return null;
 
     return (
@@ -37,10 +40,10 @@ export default function IntegrationDetailCardRow({ groups }: IntegrationDetailCa
                             <IntegrationProfileInfo integration={integration} />
 
                             <div className="flex flex-col gap-2">
-                                <MetricRow label={integrationInsightTypeToFrenchTranslation[IntegrationInsightType.TotalFollowers]} value={formatCompactNumber(getInsightValue(insights, IntegrationInsightType.TotalFollowers))} />
-                                <MetricRow label={integrationInsightTypeToFrenchTranslation[IntegrationInsightType.Views]} value={formatCompactNumber(getInsightValue(insights, IntegrationInsightType.Views))} />
-                                <MetricRow label="Engagement" value={engagementRate !== null ? `${engagementRate.toFixed(1)}%` : "—"} />
-                                <MetricRow label={integrationInsightTypeToFrenchTranslation[IntegrationInsightType.Reach]} value={formatCompactNumber(getInsightValue(insights, IntegrationInsightType.Reach))} />
+                                <MetricRow label={t(integrationInsightTypeTranslationKeys[IntegrationInsightType.TotalFollowers])} value={formatCompactNumber(getInsightValue(insights, IntegrationInsightType.TotalFollowers))} />
+                                <MetricRow label={t(integrationInsightTypeTranslationKeys[IntegrationInsightType.Views])} value={formatCompactNumber(getInsightValue(insights, IntegrationInsightType.Views))} />
+                                <MetricRow label={t("integrations:engagement")} value={engagementRate !== null ? `${engagementRate.toFixed(1)}%` : "—"} />
+                                <MetricRow label={t(integrationInsightTypeTranslationKeys[IntegrationInsightType.Reach])} value={formatCompactNumber(getInsightValue(insights, IntegrationInsightType.Reach))} />
                             </div>
                         </div>
                     );

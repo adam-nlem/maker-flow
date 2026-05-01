@@ -1,4 +1,6 @@
 {
+    "pageTitle": "Content",
+    "newGroup": "New group",
     "noPosts": "No posts found.",
     "noGroups": "No content groups found.",
     "selectedCount_one": "{{count}} post selected",

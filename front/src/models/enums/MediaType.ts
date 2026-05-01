@@ -4,11 +4,10 @@ export enum MediaType {
     Carousel = 'carousel',
 }
 
-export const mediaTypeToFrenchTranslation: Record<MediaType, string> = {
-    [MediaType.Image]: "Image",
-    [MediaType.Video]: "Video",
-    [MediaType.Carousel]: "Carousel",
-
+export const mediaTypeTranslationKeys: Record<MediaType, string> = {
+    [MediaType.Image]: "enums:mediaType.image",
+    [MediaType.Video]: "enums:mediaType.video",
+    [MediaType.Carousel]: "enums:mediaType.carousel",
 };
 
 export const mediaTypeOptions = Object.values(MediaType)

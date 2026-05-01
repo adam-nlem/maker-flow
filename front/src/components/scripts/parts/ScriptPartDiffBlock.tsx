@@ -1,13 +1,13 @@
 import { CheckIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import type { ScriptPartSuggestion } from "~/models/ScriptPartSuggestion";
 import {
   ScriptPartSuggestionAction,
-  scriptPartSuggestionActionToFrenchTranslation,
+  scriptPartSuggestionActionTranslationKeys,
   scriptPartSuggestionActionToIcon,
 } from "~/models/enums/ScriptPartSuggestionAction";
 import { useAcceptScriptPartSuggestion } from "~/hooks/api/scriptPartSuggestions/useAcceptScriptPartSuggestion";
 import { useRejectScriptPartSuggestion } from "~/hooks/api/scriptPartSuggestions/useRejectScriptPartSuggestion";
-import { Button } from "~/components/ui/Button";
 import Pill from "~/components/ui/Pill";
 
 interface ScriptPartDiffBlockProps {
@@ -17,12 +17,12 @@ interface ScriptPartDiffBlockProps {
 }
 
 export default function ScriptPartDiffBlock({ suggestion, scriptUuid, chatUuid }: ScriptPartDiffBlockProps) {
-  const { acceptScriptPartSuggestion, isPending: isAccepting } = useAcceptScriptPartSuggestion();
-  const { rejectScriptPartSuggestion, isPending: isRejecting } = useRejectScriptPartSuggestion();
-  const isPending = isAccepting || isRejecting;
+  const { t } = useTranslation();
+  const { acceptScriptPartSuggestion } = useAcceptScriptPartSuggestion();
+  const { rejectScriptPartSuggestion } = useRejectScriptPartSuggestion();
 
   const Icon = scriptPartSuggestionActionToIcon[suggestion.action];
-  const label = scriptPartSuggestionActionToFrenchTranslation[suggestion.action];
+  const label = t(scriptPartSuggestionActionTranslationKeys[suggestion.action]);
 
   const handleAccept = () => {
     acceptScriptPartSuggestion({ suggestionUuid: suggestion.uuid, scriptUuid, chatUuid });
@@ -38,17 +38,17 @@ export default function ScriptPartDiffBlock({ suggestion, scriptUuid, chatUuid }
         <Icon className="size-4 text-primary" strokeWidth={2} />
         <span className="text-body-xs text-primary font-medium">{label}</span>
         <div className="flex-1" />
-        <Pill icon={XMarkIcon} label="Rejeter" isSelected onClick={handleReject} textColorClassName="text-red" bgColorClassName="bg-red/10" borderColorClassName="border border-red/30" />
-        <Pill icon={CheckIcon} label="Accepter" isSelected onClick={handleAccept} textColorClassName="text-primary" bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" />
+        <Pill icon={XMarkIcon} label={t("scripts:parts.diff.reject")} isSelected onClick={handleReject} textColorClassName="text-red" bgColorClassName="bg-red/10" borderColorClassName="border border-red/30" />
+        <Pill icon={CheckIcon} label={t("scripts:parts.diff.accept")} isSelected onClick={handleAccept} textColorClassName="text-primary" bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" />
       </div>
       <div className="p-3 text-body-sm whitespace-pre-wrap">
-        {renderBody(suggestion)}
+        {renderBody(suggestion, t)}
       </div>
     </div>
   );
 }
 
-function renderBody(suggestion: ScriptPartSuggestion) {
+function renderBody(suggestion: ScriptPartSuggestion, t: (key: string, options?: Record<string, unknown>) => string) {
   switch (suggestion.action) {
     case ScriptPartSuggestionAction.Rewrite:
       return (
@@ -74,7 +74,7 @@ function renderBody(suggestion: ScriptPartSuggestion) {
     case ScriptPartSuggestionAction.Reorder:
       return (
         <div className="text-gray text-body-xs">
-          Déplacer cette part à la position {suggestion.proposedPosition}.
+          {t("scripts:parts.diff.reorderDescription", { position: suggestion.proposedPosition })}
         </div>
       );
     case ScriptPartSuggestionAction.Insert:

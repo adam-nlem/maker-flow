@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useFloating, offset, flip, shift, autoUpdate, useDismiss, useInteractions, FloatingPortal } from "@floating-ui/react"
+import { useTranslation } from "react-i18next";
 import Pill from "~/components/ui/Pill";
 import { useListScriptTagsWithSearch } from "~/hooks/api/scriptTags/useListScriptTagsWithSearch";
 import { EllipsisHorizontalIcon } from "@heroicons/react/24/outline";
@@ -21,6 +22,7 @@ interface ListScriptTagsDropdownProps {
 }
 
 export default function ListScriptTagsDropdown({ anchorRef, projectUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListScriptTagsDropdownProps) {
+    const { t } = useTranslation();
     const { setSearchTerm, scriptTags, isLoading } = useListScriptTagsWithSearch({ projectUuid: projectUuid });
     const [title, setTitle] = useState("");
     const [color, setColor] = useState(Color.Purple);
@@ -108,7 +110,7 @@ export default function ListScriptTagsDropdown({ anchorRef, projectUuid, selecte
                 <SimpleTextButton onClick={handleCreateTag} children={
                     <>
                         <PlusIcon className="size-3.5" strokeWidth={2} />
-                        <p>{`Créer ${title}`}</p>
+                        <p>{t("scripts:tags.createPrefix", { title })}</p>
                     </>
                 }
                 />
@@ -117,7 +119,7 @@ export default function ListScriptTagsDropdown({ anchorRef, projectUuid, selecte
             )
         }
 
-        return <p className="text-body-xs">Commencez à écrire pour créer un nouveau tag.</p>
+        return <p className="text-body-xs">{t("scripts:tags.emptyHint")}</p>
     }
 
     return (
@@ -130,7 +132,7 @@ export default function ListScriptTagsDropdown({ anchorRef, projectUuid, selecte
             >
                 <Input
                     ref={inputRef}
-                    placeholder="Tag"
+                    placeholder={t("scripts:tags.tagPlaceholder")}
                     id="title"
                     name="title"
                     type="text"

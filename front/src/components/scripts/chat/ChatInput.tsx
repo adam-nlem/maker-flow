@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { PaperAirplaneIcon } from "@heroicons/react/24/solid";
+import { useTranslation } from "react-i18next";
 import { TextArea } from "~/components/ui/TextArea";
 import { Button } from "~/components/ui/Button";
 import { PaperClipIcon } from "@heroicons/react/24/outline";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import { AiModel, aiModelOptions, aiModelToBgClass, aiModelToBorderClass, aiModelToFrenchTranslation, aiModelToIcon, aiModelToTextClass } from "~/models/enums/AiModel";
+import { AiModel, aiModelOptions, aiModelToBgClass, aiModelToBorderClass, aiModelTranslationKeys, aiModelToIcon, aiModelToTextClass } from "~/models/enums/AiModel";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import Pill from "~/components/ui/Pill";
 
@@ -15,12 +16,14 @@ interface ChatInputProps {
   placeholder?: string;
 }
 
-export default function ChatInput({ onSend, isPending, lockedAiModel, placeholder = "Envoyer un message..." }: ChatInputProps) {
+export default function ChatInput({ onSend, isPending, lockedAiModel, placeholder }: ChatInputProps) {
+  const { t } = useTranslation();
   const [text, setText] = useState("");
   const [selectedAiModel, setSelectedAiModel] = useState<AiModel>(AiModel.Claude);
 
   const aiModel = lockedAiModel ?? selectedAiModel;
   const canSend = text.trim().length > 0 && !isPending;
+  const resolvedPlaceholder = placeholder ?? t("scripts:chat.input.placeholder");
 
   const handleSubmit = () => {
     if (!canSend) return;
@@ -42,20 +45,20 @@ export default function ChatInput({ onSend, isPending, lockedAiModel, placeholde
         value={text}
         onChange={(e) => setText(e.target.value)}
         onKeyDown={handleKeyDown}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         textStyle="text-sm"
       />
       <div className="flex flex-row w-full justify-between">
         <div className="flex flex-col gap-1">
           <SimpleTextButton hoverColor="text-primary">
             <PaperClipIcon className="size-3" />
-            <p >Ajouter un script</p>
+            <p>{t("scripts:chat.input.attachScript")}</p>
           </SimpleTextButton>
           {lockedAiModel ? (
             <Pill
               isSelected
               imageUrl={aiModelToIcon[aiModel]}
-              label={aiModelToFrenchTranslation[aiModel]}
+              label={t(aiModelTranslationKeys[aiModel])}
               bgColorClassName={aiModelToBgClass[aiModel]}
               borderColorClassName={aiModelToBorderClass[aiModel]}
               textColorClassName={aiModelToTextClass[aiModel]}
@@ -71,7 +74,7 @@ export default function ChatInput({ onSend, isPending, lockedAiModel, placeholde
                   onClick={onClick}
                   isSelected
                   imageUrl={aiModelToIcon[aiModel]}
-                  label={aiModelToFrenchTranslation[aiModel]}
+                  label={t(aiModelTranslationKeys[aiModel])}
                   bgColorClassName={aiModelToBgClass[aiModel]}
                   borderColorClassName={aiModelToBorderClass[aiModel]}
                   textColorClassName={aiModelToTextClass[aiModel]} />)
@@ -79,7 +82,7 @@ export default function ChatInput({ onSend, isPending, lockedAiModel, placeholde
               renderItem={({ item, isSelected, onSelect }) => {
                 return !isSelected ? <Pill
                   imageUrl={aiModelToIcon[item]}
-                  label={aiModelToFrenchTranslation[item]}
+                  label={t(aiModelTranslationKeys[item])}
                   bgColorClassName={aiModelToBgClass[item]}
                   borderColorClassName={aiModelToBorderClass[item]}
                   textColorClassName={aiModelToTextClass[item]}
@@ -91,7 +94,7 @@ export default function ChatInput({ onSend, isPending, lockedAiModel, placeholde
           )}
         </div>
         <Button width="w-min" style={canSend ? "primary" : "secondary"} onClick={handleSubmit} className="flex flex-row gap-3">
-          <p>Envoyer</p>
+          <p>{t("scripts:chat.input.send")}</p>
           <PaperAirplaneIcon className={`size-4`} />
         </Button>
       </div>

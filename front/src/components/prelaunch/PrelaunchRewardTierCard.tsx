@@ -2,8 +2,8 @@ import { CheckCircleIcon, LockClosedIcon } from "@heroicons/react/24/outline"
 import { useTranslation } from "react-i18next"
 import {
     PrelaunchRewardTier,
-    prelaunchRewardTierToLabel,
-    prelaunchRewardTierToDescription,
+    prelaunchRewardTierLabelKeys,
+    prelaunchRewardTierDescriptionKeys,
     prelaunchRewardTierToThreshold,
     prelaunchRewardTierToBgClass,
     prelaunchRewardTierToTextClass,
@@ -18,8 +18,8 @@ interface PrelaunchRewardTierCardProps {
 
 export default function PrelaunchRewardTierCard({ tier, isUnlocked }: PrelaunchRewardTierCardProps) {
     const { t } = useTranslation()
-    const label = prelaunchRewardTierToLabel[tier]
-    const description = prelaunchRewardTierToDescription[tier]
+    const label = t(prelaunchRewardTierLabelKeys[tier])
+    const description = t(prelaunchRewardTierDescriptionKeys[tier])
     const threshold = prelaunchRewardTierToThreshold[tier]
     const textClass = isUnlocked ? prelaunchRewardTierToTextClass[tier] : ""
     const borderClass = isUnlocked ? prelaunchRewardTierToBorderClass[tier] : "border-light-gray"

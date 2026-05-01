@@ -1,10 +1,11 @@
 import type { Script } from "~/models/Script";
+import { useTranslation } from "react-i18next";
 import Pill from "~/components/ui/Pill";
 import {
     ScriptStatus,
     scriptStatusToBgClass,
     scriptStatusToBorderClass,
-    scriptStatusToFrenchTranslation,
+    scriptStatusTranslationKeys,
     scriptStatusToIcon,
     scriptStatusToTextClass,
 } from "~/models/enums/ScriptStatus";
@@ -16,9 +17,10 @@ interface HomeScriptTileProps {
 }
 
 export default function HomeScriptTile({ script, onClick }: HomeScriptTileProps) {
+    const { t } = useTranslation();
     const status = script.status ?? ScriptStatus.Idea;
     const Icon = scriptStatusToIcon[status];
-    const statusLabel = scriptStatusToFrenchTranslation[status];    
+    const statusLabel = t(scriptStatusTranslationKeys[status]);
 
     return (
         <div
@@ -30,7 +32,7 @@ export default function HomeScriptTile({ script, onClick }: HomeScriptTileProps)
             </div>
             <div className="flex flex-col min-w-0 flex-1">
                 <p className="text-heading-sm truncate">{script.title}</p>
-                <p className="text-body-xs text-gray truncate">{statusLabel} {script.updatedAt && `· Modifié ${formatToFrenchRelative(script.updatedAt)}`}</p>
+                <p className="text-body-xs text-gray truncate">{statusLabel} {script.updatedAt && `· ${t("home:scripts.modifiedRelative", { when: formatToFrenchRelative(script.updatedAt) })}`}</p>
             </div>
             <Pill
                 label={statusLabel}

@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import { ClockIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import { SidePanel } from "~/components/ui/SidePanel";
 import Shimmer from "~/components/ui/Shimmer";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
@@ -9,7 +10,7 @@ import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
 import { useListPaginatedChats } from "~/hooks/api/chats/useListPaginatedChats";
 import { useDeleteChat } from "~/hooks/api/chats/useDeleteChat";
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
-import { aiModelToFrenchTranslation, aiModelToIcon } from "~/models/enums/AiModel";
+import { aiModelTranslationKeys, aiModelToIcon } from "~/models/enums/AiModel";
 import { formatToFrenchRelative } from "~/utils/dateFormatters";
 
 interface ChatHistoryPanelProps {
@@ -17,6 +18,7 @@ interface ChatHistoryPanelProps {
 }
 
 export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) {
+  const { t } = useTranslation();
   const isOpen = useScriptRightPanelStore((s) => s.activePanel === ScriptRightPanel.ChatHistory);
   const closePanel = useScriptRightPanelStore((s) => s.closePanel);
   const openPanel = useScriptRightPanelStore((s) => s.openPanel);
@@ -47,7 +49,7 @@ export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) 
   return (
     <>
       <SidePanel
-        title="Historique des conversations"
+        title={t("scripts:chat.history.title")}
         icon={ClockIcon}
         width="w-120"
         isOpen={isOpen}
@@ -63,7 +65,7 @@ export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) 
             </>
           ) : chats.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-12 text-gray">
-              <p className="text-body-sm text-center">Aucune conversation pour le moment.</p>
+              <p className="text-body-sm text-center">{t("scripts:chat.history.empty")}</p>
             </div>
           ) : (
             <>
@@ -79,15 +81,15 @@ export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) 
                 >
                   <img
                     src={aiModelToIcon[chat.aiModel]}
-                    alt={aiModelToFrenchTranslation[chat.aiModel]}
+                    alt={t(aiModelTranslationKeys[chat.aiModel])}
                     className="size-5 shrink-0 rounded-md object-cover"
                   />
                   <div className="flex flex-col flex-1 min-w-0">
                     <p className="text-body-sm text-dark truncate">
-                      {chat.title ?? "Nouveau Chat"}
+                      {chat.title ?? t("scripts:chat.history.untitledChat")}
                     </p>
                     <p className="text-body-xs text-gray">
-                      {aiModelToFrenchTranslation[chat.aiModel]} · {formatToFrenchRelative(chat.createdAt)}
+                      {t(aiModelTranslationKeys[chat.aiModel])} · {formatToFrenchRelative(chat.createdAt)}
                     </p>
                   </div>
                   <button
@@ -96,7 +98,7 @@ export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) 
                       setPendingDeleteUuid(chat.uuid);
                     }}
                     className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray hover:text-danger cursor-pointer"
-                    title="Supprimer la conversation"
+                    title={t("scripts:chat.history.deleteTitle")}
                   >
                     <TrashIcon className="size-4" strokeWidth={2} />
                   </button>
@@ -113,7 +115,7 @@ export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) 
         onClose={() => setPendingDeleteUuid(null)}
         onConfirm={handleConfirmDelete}
         isPending={isDeleting}
-        message="Êtes-vous sûr de vouloir supprimer cette conversation ? Cette action est irréversible."
+        message={t("scripts:chat.history.deleteConfirm")}
       />
     </>
   );

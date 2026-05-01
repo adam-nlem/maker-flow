@@ -1,4 +1,5 @@
 import { useRef } from "react"
+import { useTranslation } from "react-i18next"
 import RankingItemTile from "~/components/ui/RankingItemTile"
 import Shimmer from "~/components/ui/Shimmer"
 import { useListPaginatedRankedPostGroups } from "~/hooks/api/postGroups/useListPaginatedRankedPostGroups"
@@ -12,6 +13,7 @@ interface RankedPostGroupsListProps {
 }
 
 export default function RankedPostGroupsList({ projectUuid }: RankedPostGroupsListProps) {
+  const { t } = useTranslation()
   const { postGroups, isLoading, isLoadingMore, hasMore, listMore } = useListPaginatedRankedPostGroups({ projectUuid })
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -37,12 +39,12 @@ export default function RankedPostGroupsList({ projectUuid }: RankedPostGroupsLi
   }
 
   if (postGroups.length === 0) {
-    return <p className="text-body-sm text-gray">Aucun groupe de posts trouvé.</p>
+    return <p className="text-body-sm text-gray">{t("home:noPostGroups")}</p>
   }
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <h2 className="text-heading-sm mb-2">Classement des groupes de posts</h2>
+      <h2 className="text-heading-sm mb-2">{t("home:rankingPostGroups")}</h2>
       <div ref={scrollContainerRef} className="overflow-y-auto scrollbar-none flex-1 min-h-0">
         {postGroups.map((group, index) => (
           <RankingItemTile
@@ -50,7 +52,7 @@ export default function RankedPostGroupsList({ projectUuid }: RankedPostGroupsLi
             index={index}
             postUuid={group.postGroup.posts[0]?.uuid}
             title={group.postGroup.title}
-            subtitle={`${group.postGroup.posts.length} post${group.postGroup.posts.length > 1 ? 's' : ''}`}
+            subtitle={t("home:postsCount", { count: group.postGroup.posts.length })}
             metrics={DISPLAYED_METRIC_TYPES.map((type) => ({
               type,
               value: group.aggregatedInsights.find((i) => i.type === type)?.value ?? 0,

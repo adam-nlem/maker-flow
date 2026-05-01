@@ -12,18 +12,18 @@ export enum ProjectType {
     Iot = 'iot',
 }
 
-export const projectTypeToFrenchTranslation: Record<ProjectType, string> = {
-    [ProjectType.Saas]: "SaaS",
-    [ProjectType.ContentCreation]: "Création de contenu",
-    [ProjectType.MobileApp]: "Application mobile",
-    [ProjectType.Extension]: "Extension",
-    [ProjectType.Automation]: "Automatisation",
-    [ProjectType.WebApp]: "Application web",
-    [ProjectType.LandingPage]: "Landing page",
-    [ProjectType.Blog]: "Blog",
-    [ProjectType.Portfolio]: "Portfolio",
-    [ProjectType.Hardware]: "Hardware",
-    [ProjectType.Iot]: "IoT",
+export const projectTypeTranslationKeys: Record<ProjectType, string> = {
+    [ProjectType.Saas]: "enums:projectType.saas",
+    [ProjectType.ContentCreation]: "enums:projectType.contentCreation",
+    [ProjectType.MobileApp]: "enums:projectType.mobileApp",
+    [ProjectType.Extension]: "enums:projectType.extension",
+    [ProjectType.Automation]: "enums:projectType.automation",
+    [ProjectType.WebApp]: "enums:projectType.webApp",
+    [ProjectType.LandingPage]: "enums:projectType.landingPage",
+    [ProjectType.Blog]: "enums:projectType.blog",
+    [ProjectType.Portfolio]: "enums:projectType.portfolio",
+    [ProjectType.Hardware]: "enums:projectType.hardware",
+    [ProjectType.Iot]: "enums:projectType.iot",
 };
 
 export const projectTypeOptions = Object.values(ProjectType);

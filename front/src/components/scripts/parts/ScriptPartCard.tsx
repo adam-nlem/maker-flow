@@ -1,6 +1,7 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import type { ScriptPartType } from "~/models/enums/ScriptPartType";
-import { scriptPartTypeToIcon, scriptPartTypeToFrenchTranslation, scriptPartTypeToBgClass, scriptPartTypeToBorderClass } from "~/models/enums/ScriptPartType";
+import { scriptPartTypeToIcon, scriptPartTypeTranslationKeys, scriptPartTypeToBgClass, scriptPartTypeToBorderClass } from "~/models/enums/ScriptPartType";
 import Pill from "~/components/ui/Pill";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -24,6 +25,7 @@ export default function ScriptPartCard({
     headerActions,
     children,
 }: ScriptPartCardProps) {
+    const { t } = useTranslation();
     const [showConfirm, setShowConfirm] = useState(false);
 
     return (
@@ -38,7 +40,7 @@ export default function ScriptPartCard({
                         <Pill
                             icon={scriptPartTypeToIcon[partType]}
                             isSelected
-                            label={scriptPartTypeToFrenchTranslation[partType]}
+                            label={t(scriptPartTypeTranslationKeys[partType])}
                             bgColorClassName={scriptPartTypeToBgClass[partType]}
                             borderColorClassName={scriptPartTypeToBorderClass[partType]}
                         />
@@ -64,7 +66,7 @@ export default function ScriptPartCard({
                 onClose={() => setShowConfirm(false)}
                 onConfirm={onDelete!}
                 isPending={isDeleting}
-                message="Êtes-vous sûr de vouloir supprimer cet élément ? Cette action est irréversible."
+                message={t("scripts:parts.deleteConfirm")}
             />
         </div>
     );

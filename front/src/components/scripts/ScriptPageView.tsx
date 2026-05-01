@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
@@ -12,6 +13,7 @@ interface ScriptPageViewProps {
 }
 
 export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
+    const { t } = useTranslation();
     const { scripts, hasMore, isLoadingMore, listMore } = useListPaginatedScripts({ projectUuid });
     const focusedScriptUuid = useFocusScriptStore((s) => s.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid);
@@ -70,7 +72,7 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
                     <ScriptEditorPanel key={focusedScript.uuid} script={focusedScript} projectUuid={projectUuid} />
                 ) : (
                     <div className="flex flex-col items-center justify-center h-full text-gray">
-                        <p className="text-body-md">Sélectionnez ou créez un script.</p>
+                        <p className="text-body-md">{t("scripts:selectOrCreate")}</p>
                     </div>
                 )}
             </div>

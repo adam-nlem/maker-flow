@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import { useTranslation } from "react-i18next"
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import ScriptEditorPanel from "~/components/scripts/ScriptEditorPanel"
 import Shimmer from "~/components/ui/Shimmer"
@@ -10,6 +11,7 @@ import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore"
 
 export default function OnboardingCreateScriptStep() {
+    const { t } = useTranslation()
     const projectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
     const focusedScriptUuid = useFocusScriptStore((s) => s.focusedScriptUuid)
     const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid)
@@ -29,7 +31,7 @@ export default function OnboardingCreateScriptStep() {
         if (existingScripts.length > 0) {
             setFocusedScriptUuid(existingScripts[0].uuid)
         } else {
-            createScript({ projectUuid, title: "Mon premier script", publishedAt: new Date().toLocaleDateString("sv-SE") }).then((created) => {
+            createScript({ projectUuid, title: t("onboarding:firstScriptTitle"), publishedAt: new Date().toLocaleDateString("sv-SE") }).then((created) => {
                 setFocusedScriptUuid(created.uuid)
             })
         }
@@ -57,7 +59,7 @@ export default function OnboardingCreateScriptStep() {
                     disabled={!script}
                     onClick={advanceStep}
                 >
-                    Continuer
+                    {t("actions.continue")}
                 </Button>
             </div>
         </OnboardingStepLayout>

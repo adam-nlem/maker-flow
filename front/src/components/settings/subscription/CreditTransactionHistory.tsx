@@ -4,7 +4,7 @@ import { useTranslation } from "react-i18next";
 import { Button } from "~/components/ui/Button";
 import Shimmer from "~/components/ui/Shimmer";
 import { useListCreditTransactions } from "~/hooks/api/credits/useListCreditTransactions";
-import { creditTransactionTypeToFrenchTranslation } from "~/models/enums/CreditTransactionType";
+import { creditTransactionTypeTranslationKeys } from "~/models/enums/CreditTransactionType";
 import { formatToFrenchDateShort } from "~/utils/dateFormatters";
 
 const LIMIT = 10;
@@ -39,7 +39,7 @@ export default function CreditTransactionHistory() {
                     <div key={transaction.uuid} className="flex flex-row items-center justify-between py-3 first:pt-0 last:pb-0">
                         <div className="flex flex-col gap-0.5">
                             <p className="text-body-sm">
-                                {creditTransactionTypeToFrenchTranslation[transaction.type]}
+                                {t(creditTransactionTypeTranslationKeys[transaction.type])}
                             </p>
                             <p className="text-body-xs text-gray">
                                 {formatToFrenchDateShort(transaction.createdAt)}

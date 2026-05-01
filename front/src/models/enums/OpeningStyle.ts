@@ -8,10 +8,10 @@ export enum OpeningStyle {
 
 export const openingStyleOptions = Object.values(OpeningStyle);
 
-export const openingStyleToFrenchTranslation: Record<OpeningStyle, string> = {
-    [OpeningStyle.BoldHook]: "Accroche audacieuse",
-    [OpeningStyle.ShockingStat]: "Statistique choc",
-    [OpeningStyle.PersonalStory]: "Histoire personnelle",
-    [OpeningStyle.RelatableQuestion]: "Question relatable",
-    [OpeningStyle.JumpIntoContent]: "Direct dans le contenu",
+export const openingStyleTranslationKeys: Record<OpeningStyle, string> = {
+    [OpeningStyle.BoldHook]: "enums:openingStyle.boldHook",
+    [OpeningStyle.ShockingStat]: "enums:openingStyle.shockingStat",
+    [OpeningStyle.PersonalStory]: "enums:openingStyle.personalStory",
+    [OpeningStyle.RelatableQuestion]: "enums:openingStyle.relatableQuestion",
+    [OpeningStyle.JumpIntoContent]: "enums:openingStyle.jumpIntoContent",
 }

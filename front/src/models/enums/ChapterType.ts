@@ -3,9 +3,9 @@ export enum ChapterType {
     OffScreen = 'off_screen',
 }
 
-export const chapterTypeToFrenchTranslation: Record<ChapterType, string> = {
-    [ChapterType.OnScreen]: "On-screen",
-    [ChapterType.OffScreen]: "Off-screen",
+export const chapterTypeTranslationKeys: Record<ChapterType, string> = {
+    [ChapterType.OnScreen]: "enums:chapterType.onScreen",
+    [ChapterType.OffScreen]: "enums:chapterType.offScreen",
 }
 
 export const chapterTypeToBgClass: Record<ChapterType, string> = {

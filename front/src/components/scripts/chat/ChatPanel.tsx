@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { SidePanel } from "~/components/ui/SidePanel";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
 import { ScriptRightPanel } from "~/models/enums/ScriptRightPanel";
@@ -16,6 +17,7 @@ interface ChatPanelProps {
 }
 
 export default function ChatPanel({ scriptUuid }: ChatPanelProps) {
+  const { t } = useTranslation();
   const isOpen = useScriptRightPanelStore((s) => s.activePanel === ScriptRightPanel.Chat);
   const closePanel = useScriptRightPanelStore((s) => s.closePanel);
   const activeChatUuid = useChatStore((s) => s.activeChatUuid);
@@ -41,7 +43,7 @@ export default function ChatPanel({ scriptUuid }: ChatPanelProps) {
       width="w-120"
       isOpen={isOpen}
       onClose={closePanel}
-      header={<ChatHeader title={chat?.title ?? "Nouveau Chat"} onClose={closePanel} />}
+      header={<ChatHeader title={chat?.title ?? t("scripts:chat.history.untitledChat")} onClose={closePanel} />}
     >
       <div className="relative">
         <div className="pb-40">

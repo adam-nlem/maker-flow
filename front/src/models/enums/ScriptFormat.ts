@@ -4,10 +4,10 @@ export enum ScriptFormat {
     Hybrid = 'hybrid',
 }
 
-export const scriptFormatToFrenchTranslation: Record<ScriptFormat, string> = {
-    [ScriptFormat.FullScript]: "Script complet",
-    [ScriptFormat.Outline]: "Plan détaillé",
-    [ScriptFormat.Hybrid]: "Hybride",
+export const scriptFormatTranslationKeys: Record<ScriptFormat, string> = {
+    [ScriptFormat.FullScript]: "enums:scriptFormat.fullScript",
+    [ScriptFormat.Outline]: "enums:scriptFormat.outline",
+    [ScriptFormat.Hybrid]: "enums:scriptFormat.hybrid",
 }
 
 export const scriptFormatOptions = Object.values(ScriptFormat);

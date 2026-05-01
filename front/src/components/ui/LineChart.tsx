@@ -1,4 +1,5 @@
 import { Line, LineChart as RechartsLineChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
+import { useTranslation } from "react-i18next";
 import { formatDurationToFrench } from "~/utils/durationFormatters";
 
 function formatHoursToFrench(hours: number): string {
@@ -23,18 +24,20 @@ interface CustomTooltipProps {
 }
 
 function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
+    const { t } = useTranslation();
+
     if (!active || !payload || payload.length === 0 || label === undefined) {
         return null;
     }
 
     return (
         <div className="bg-clear border border-light-gray rounded-md p-2 shadow-sm flex flex-col gap-1">
-            <p className="text-body-xs text-gray mb-1">Durée après publication: {formatHoursToFrench(label)}</p>
+            <p className="text-body-xs text-gray mb-1">{t("lineChart.durationAfterPublication", { duration: formatHoursToFrench(label) })}</p>
             {payload.map((entry) => (
                 <div className="flex flex-row gap-1">
                     <div className={`rounded-full p-1 ${entry.dataKey === "value" ? 'bg-primary' : 'bg-light-gray'}`}></div>
                     <p key={entry.dataKey} className="text-xs">
-                        {entry.dataKey === "value" ? "Valeur de ce contenu" : "Valeur de la moyenne des 10 derniers contenus"}:{" "}
+                        {entry.dataKey === "value" ? t("lineChart.thisContentValue") : t("lineChart.averageContentValue")}:{" "}
                         <span className="text-heading-xs">{entry.value?.toLocaleString("fr-FR") ?? "—"}</span>
                     </p>
                 </div>

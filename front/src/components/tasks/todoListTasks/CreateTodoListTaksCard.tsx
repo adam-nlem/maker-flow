@@ -9,7 +9,7 @@ import { useCreateTodoListTask } from "~/hooks/api/todoListTasks/useCreateTodoLi
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import type { TodoListTag } from "~/models/TodoListTag";
-import { todoListPriorityOptions, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoListPriorityToTextClass } from "~/models/enums/TodoListPriority";
+import { todoListPriorityOptions, todoListPriorityToBgClass, todoListPriorityTranslationKeys, todoListPriorityToTextClass } from "~/models/enums/TodoListPriority";
 import { TodoListPriority } from "~/models/enums/TodoListPriority";
 import AddDueDateDropdown from "./AddDueDateDropdown";
 import { Button } from "~/components/ui/Button";
@@ -93,7 +93,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                     priority ? (
                         <Badge
                             icon={ExclamationTriangleIcon}
-                            label={todoListPriorityToFrenchTranslation[priority]}
+                            label={t(todoListPriorityTranslationKeys[priority])}
                             textColor={todoListPriorityToTextClass[priority]}
                             bgColor={todoListPriorityToBgClass[priority]}
                             onRemoveClick={() => setPriority(undefined)}
@@ -109,7 +109,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                 renderItem={({ item, onSelect }) => (
                     <Badge
                         icon={ExclamationTriangleIcon}
-                        label={todoListPriorityToFrenchTranslation[item]}
+                        label={t(todoListPriorityTranslationKeys[item])}
                         textColor={todoListPriorityToTextClass[item]}
                         bgColor={todoListPriorityToBgClass[item]}
                         onRemoveClick={() => setPriority(undefined)}

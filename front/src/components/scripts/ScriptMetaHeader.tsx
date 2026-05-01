@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { ArrowLeftIcon, CalendarDaysIcon, ChatBubbleLeftRightIcon, ChevronDownIcon, ChevronUpIcon, PencilSquareIcon, SparklesIcon, SwatchIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import type { Script } from "~/models/Script";
-import { type ScriptStatus, scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToBorderClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
+import { type ScriptStatus, scriptStatusOptions, scriptStatusTranslationKeys, scriptStatusToBgClass, scriptStatusToBorderClass, scriptStatusToTextClass, scriptStatusToIcon } from "~/models/enums/ScriptStatus";
 import { Input } from "~/components/ui/Input";
 import Pill from "~/components/ui/Pill";
 import { DatePicker } from "~/components/ui/DatePicker";
@@ -25,6 +26,7 @@ interface ScriptMetaHeaderProps {
 }
 
 export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateModal, onOpenChat, isReadOnly, hidePanelTriggers, onOpenEditor, onBack }: ScriptMetaHeaderProps) {
+    const { t } = useTranslation();
     const [title, setTitle] = useState(script.title);
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [status, setStatus] = useState<ScriptStatus | undefined>(script.status);
@@ -64,13 +66,13 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                     onChange={(e) => setTitle(e.target.value)}
                     onBlur={handleTitleBlur}
                     readOnly={isReadOnly}
-                    placeholder="Titre du script"
+                    placeholder={t("scripts:meta.titlePlaceholder")}
                     textStyle="text-heading-xl"
                 />
                 {isReadOnly && onOpenEditor ? (
                      <Pill
                         icon={PencilSquareIcon}
-                        label="Modifier"
+                        label={t("scripts:meta.edit")}
                         isSelected
                         onClick={onOpenEditor}
                         textColorClassName="text-primary"
@@ -79,10 +81,10 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                     />
                 ) : !isReadOnly && !hidePanelTriggers ? (
                     <>
-                        <button onClick={onOpenGenerateModal} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Générer avec l'IA">
+                        <button onClick={onOpenGenerateModal} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title={t("scripts:meta.generateAi")}>
                             <SparklesIcon className="size-5" strokeWidth={2} />
                         </button>
-                        <button onClick={onOpenChat} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title="Chat IA">
+                        <button onClick={onOpenChat} className="shrink-0 text-primary hover:text-primary-200 transition-colors cursor-pointer" title={t("scripts:meta.chatAi")}>
                             <ChatBubbleLeftRightIcon className="size-5" strokeWidth={2} />
                         </button>
                     </>
@@ -104,7 +106,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                     {isReadOnly ? (
                         <Pill
                             icon={status ? scriptStatusToIcon[status] : SwatchIcon}
-                            label={status ? scriptStatusToFrenchTranslation[status] : "Statut"}
+                            label={status ? t(scriptStatusTranslationKeys[status]) : t("scripts:meta.statusPlaceholder")}
                             isSelected={!!status}
                             bgColorClassName={status ? scriptStatusToBgClass[status] : ""}
                             borderColorClassName={status ? scriptStatusToBorderClass[status] : ""}
@@ -120,7 +122,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                                 <Pill
                                     onClick={onClick}
                                     icon={status ? scriptStatusToIcon[status] : SwatchIcon}
-                                    label={status ? scriptStatusToFrenchTranslation[status] : "Statut"}
+                                    label={status ? t(scriptStatusTranslationKeys[status]) : t("scripts:meta.statusPlaceholder")}
                                     isSelected={!!status}
                                     bgColorClassName={status ? scriptStatusToBgClass[status] : ""}
                                     borderColorClassName={status ? scriptStatusToBorderClass[status] : ""}
@@ -128,7 +130,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                             }
                             renderItem={({ item, isSelected, onSelect }) => {
                                 return !isSelected ? <Pill
-                                    label={scriptStatusToFrenchTranslation[item]}
+                                    label={t(scriptStatusTranslationKeys[item])}
                                     icon={scriptStatusToIcon[item]}
                                     isSelected
                                     onClick={onSelect}
@@ -152,7 +154,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                                         year: "numeric"
                                     }
                                 )
-                                : "Pas de date"}
+                                : t("scripts:meta.noPublishDate")}
                             isSelected={!!script.publishedAt}
                             borderColorClassName="border-light-gray"
                             suffixIcon={!isReadOnly && script.publishedAt ? XMarkIcon : undefined}

@@ -6,16 +6,16 @@ export enum PrelaunchRewardTier {
 
 export const prelaunchRewardTierOptions = Object.values(PrelaunchRewardTier)
 
-export const prelaunchRewardTierToLabel: Record<PrelaunchRewardTier, string> = {
-    [PrelaunchRewardTier.EarlyBetaAccess]: "Accès anticipé à la bêta",
-    [PrelaunchRewardTier.DevDiscordAccess]: "Accès au Discord développeurs",
-    [PrelaunchRewardTier.LifetimeDiscount]: "20% de réduction à vie",
+export const prelaunchRewardTierLabelKeys: Record<PrelaunchRewardTier, string> = {
+    [PrelaunchRewardTier.EarlyBetaAccess]: "enums:prelaunchRewardTier.labels.earlyBetaAccess",
+    [PrelaunchRewardTier.DevDiscordAccess]: "enums:prelaunchRewardTier.labels.devDiscordAccess",
+    [PrelaunchRewardTier.LifetimeDiscount]: "enums:prelaunchRewardTier.labels.lifetimeDiscount",
 }
 
-export const prelaunchRewardTierToDescription: Record<PrelaunchRewardTier, string> = {
-    [PrelaunchRewardTier.EarlyBetaAccess]: "Soyez parmi les premiers à tester MakerFlow avant tout le monde.",
-    [PrelaunchRewardTier.DevDiscordAccess]: "Rejoignez notre Discord privé pour donner votre avis et influencer le développement.",
-    [PrelaunchRewardTier.LifetimeDiscount]: "Profitez de 20% de réduction sur tous les abonnements, à vie.",
+export const prelaunchRewardTierDescriptionKeys: Record<PrelaunchRewardTier, string> = {
+    [PrelaunchRewardTier.EarlyBetaAccess]: "enums:prelaunchRewardTier.descriptions.earlyBetaAccess",
+    [PrelaunchRewardTier.DevDiscordAccess]: "enums:prelaunchRewardTier.descriptions.devDiscordAccess",
+    [PrelaunchRewardTier.LifetimeDiscount]: "enums:prelaunchRewardTier.descriptions.lifetimeDiscount",
 }
 
 export const prelaunchRewardTierToThreshold: Record<PrelaunchRewardTier, number> = {

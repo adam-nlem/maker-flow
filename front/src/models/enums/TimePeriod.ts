@@ -5,11 +5,11 @@ export enum TimePeriod {
     LastYear = 'last_year',
 }
 
-export const timePeriodToFrenchTranslation: Record<TimePeriod, string> = {
-    [TimePeriod.Last7Days]: "Ces 7 derniers jours",
-    [TimePeriod.Last30Days]: "Ce dernier mois",
-    [TimePeriod.Last90Days]: "Ces 3 derniers mois",
-    [TimePeriod.LastYear]: "Cette dernière année",
+export const timePeriodTranslationKeys: Record<TimePeriod, string> = {
+    [TimePeriod.Last7Days]: "enums:timePeriod.last7Days",
+    [TimePeriod.Last30Days]: "enums:timePeriod.last30Days",
+    [TimePeriod.Last90Days]: "enums:timePeriod.last90Days",
+    [TimePeriod.LastYear]: "enums:timePeriod.lastYear",
 };
 
 export const timePeriodOptions = Object.values(TimePeriod)

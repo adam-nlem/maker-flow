@@ -6,8 +6,8 @@ import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import { useCancelSubscription } from "~/hooks/api/subscriptions/useCancelSubscription";
 import { useResumeSubscription } from "~/hooks/api/subscriptions/useResumeSubscription";
 import type { Subscription } from "~/models/Subscription";
-import { subscriptionPlanToFrenchTranslation } from "~/models/enums/SubscriptionPlan";
-import { subscriptionStatusToFrenchTranslation } from "~/models/enums/SubscriptionStatus";
+import { subscriptionPlanTranslationKeys } from "~/models/enums/SubscriptionPlan";
+import { subscriptionStatusTranslationKeys } from "~/models/enums/SubscriptionStatus";
 import { formatToFrenchDateLong } from "~/utils/dateFormatters";
 
 interface CurrentSubscriptionCardProps {
@@ -31,12 +31,12 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
                 <div className="flex flex-row items-center justify-between mb-4">
                     <h3 className="text-heading-md">{t("settings:subscription.current.title")}</h3>
                     <span className={`text-body-xs px-3 py-1 rounded-full ${subscription.isActive ? 'bg-primary/10 text-primary' : 'bg-yellow/10 text-yellow'}`}>
-                        {subscriptionStatusToFrenchTranslation[subscription.status]}
+                        {t(subscriptionStatusTranslationKeys[subscription.status])}
                     </span>
                 </div>
 
                 <p className="text-heading-xl text-dark">
-                    {subscriptionPlanToFrenchTranslation[subscription.plan]}
+                    {t(subscriptionPlanTranslationKeys[subscription.plan])}
                 </p>
 
                 <div className="flex flex-col gap-2 mt-4">

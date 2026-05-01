@@ -1,8 +1,10 @@
+import { useTranslation } from "react-i18next"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
-import { onboardingStepToFrenchTranslation, onboardingStepToDescription } from "~/models/enums/OnboardingStep"
+import { onboardingStepTranslationKeys, onboardingStepDescriptionKeys } from "~/models/enums/OnboardingStep"
 import OnboardingProgressBar from "./OnboardingProgressBar"
 
 export default function OnboardingStepHeader() {
+    const { t } = useTranslation()
     const { currentOnboardingStep } = useOnboardingFlow()
 
     return (
@@ -10,10 +12,10 @@ export default function OnboardingStepHeader() {
             <OnboardingProgressBar />
 
             <h2 className="text-heading-3xl text-dark mb-2 text-center">
-                {onboardingStepToFrenchTranslation[currentOnboardingStep]}
+                {t(onboardingStepTranslationKeys[currentOnboardingStep])}
             </h2>
             <p className="text-body-sm text-gray text-center">
-                {onboardingStepToDescription[currentOnboardingStep]}
+                {t(onboardingStepDescriptionKeys[currentOnboardingStep])}
             </p>
         </div>
     )

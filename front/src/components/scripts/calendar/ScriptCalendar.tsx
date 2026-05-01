@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/16/solid";
+import { useTranslation } from "react-i18next";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import type { Script } from "~/models/Script";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
@@ -19,6 +20,7 @@ interface ScriptCalendarProps {
 }
 
 export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
+    const { t } = useTranslation();
     const today = new Date();
     const { currentMonth, currentYear, selectedDay, setSelectedDay, goToPrevMonth, goToNextMonth, goToToday } = useCalendarStore();
     const [selectedScript, setSelectedScript] = useState<Script | null>(null);
@@ -28,7 +30,7 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
     const isDesktop = useIsDesktop();
 
     const handleCreateScript = (date: Date) => {
-        createScript({ projectUuid, title: "Nouveau script", publishedAt: date.toLocaleDateString("sv-SE") });
+        createScript({ projectUuid, title: t("scripts:newScriptTitle"), publishedAt: date.toLocaleDateString("sv-SE") });
     };
 
     const days = buildMonthGridDays(currentYear, currentMonth);
@@ -55,7 +57,7 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
                     >
                         <ChevronLeftIcon className="size-5 text-gray" />
                     </button>
-                    <Pill label="Aujourd'hui" isSelected={isCurrentMonth} onClick={goToToday} textColorClassName="text-primary" bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" />
+                    <Pill label={t("scripts:calendar.today")} isSelected={isCurrentMonth} onClick={goToToday} textColorClassName="text-primary" bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" />
                     <button
                         onClick={goToNextMonth}
                         className="p-1.5 hover:bg-light-gray rounded-md transition-colors cursor-pointer"

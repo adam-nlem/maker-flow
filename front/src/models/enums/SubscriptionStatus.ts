@@ -9,11 +9,11 @@ export enum SubscriptionStatus {
 
 export const subscriptionStatusOptions = Object.values(SubscriptionStatus);
 
-export const subscriptionStatusToFrenchTranslation: Record<SubscriptionStatus, string> = {
-    [SubscriptionStatus.Active]: "Actif",
-    [SubscriptionStatus.PastDue]: "En retard",
-    [SubscriptionStatus.Canceled]: "Annulé",
-    [SubscriptionStatus.Incomplete]: "Incomplet",
-    [SubscriptionStatus.Trialing]: "Essai",
-    [SubscriptionStatus.Unpaid]: "Impayé",
+export const subscriptionStatusTranslationKeys: Record<SubscriptionStatus, string> = {
+    [SubscriptionStatus.Active]: "enums:subscriptionStatus.active",
+    [SubscriptionStatus.PastDue]: "enums:subscriptionStatus.pastDue",
+    [SubscriptionStatus.Canceled]: "enums:subscriptionStatus.canceled",
+    [SubscriptionStatus.Incomplete]: "enums:subscriptionStatus.incomplete",
+    [SubscriptionStatus.Trialing]: "enums:subscriptionStatus.trialing",
+    [SubscriptionStatus.Unpaid]: "enums:subscriptionStatus.unpaid",
 };

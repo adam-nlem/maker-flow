@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { SidePanel } from "~/components/ui/SidePanel"
 import Shimmer from "~/components/ui/Shimmer"
 import DonutChart from "~/components/ui/DonutChart"
@@ -7,7 +8,7 @@ import { useDeletePostGroup } from "~/hooks/api/postGroups/useDeletePostGroup"
 import { useContentsStore } from "~/stores/contents/contentsStore"
 import { useContentsRightPanelStore, ContentsRightPanel } from "~/stores/contents/contentsRightPanelStore"
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
-import { PostInsightType, postInsightTypeToFrenchTranslation, postInsightTypeToEngagementColor, postInsightTypeToEngagementBgClass, postInsightOverviewTypes, postInsightEngagementTypes, postInsightFollowerTypes, formatPostInsightValue } from "~/models/enums/PostInsightType"
+import { PostInsightType, postInsightTypeTranslationKeys, postInsightTypeToEngagementColor, postInsightTypeToEngagementBgClass, postInsightOverviewTypes, postInsightEngagementTypes, postInsightFollowerTypes, formatPostInsightValue } from "~/models/enums/PostInsightType"
 import { formatCompactNumber } from "~/utils/numberFormatters"
 import { DocumentTextIcon, TrashIcon, PlusIcon } from "@heroicons/react/24/outline"
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog"
@@ -21,6 +22,7 @@ interface ContentGroupDetailPanelProps {
 }
 
 export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetailPanelProps) {
+    const { t } = useTranslation()
     const closePanel = useContentsStore((s) => s.closePanel)
     const selectPost = useContentsStore((s) => s.selectPost)
     const isOpen = useContentsRightPanelStore((s) => s.activePanel === ContentsRightPanel.GroupDetail)
@@ -131,18 +133,18 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                         {/* Vue d'ensemble */}
                         {(overviewMetrics.length > 0 || group.engagementByViews !== null) && (
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-heading-xs text-gray uppercase">Vue d'ensemble</h3>
+                                <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.overview")}</h3>
                                 <div className="grid grid-cols-3 gap-1">
                                     {overviewMetrics.map((insight) => (
                                         <ContentMetricBox
                                             key={insight.type}
-                                            label={postInsightTypeToFrenchTranslation[insight.type]}
+                                            label={t(postInsightTypeTranslationKeys[insight.type])}
                                             value={formatPostInsightValue(insight.type, insight.value)}
                                         />
                                     ))}
                                     {group.engagementByViews !== null && (
                                         <ContentMetricBox
-                                            label="Engagement"
+                                            label={t("contents:post.engagement")}
                                             value={`${group.engagementByViews.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}%`}
                                         />
                                     )}
@@ -153,17 +155,17 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                         {/* Répartition de l'engagement */}
                         {engagementMetrics.length > 0 && (
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-heading-xs text-gray uppercase">Répartition de l'engagement</h3>
+                                <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.engagementDistribution")}</h3>
                                 <div className="flex flex-row items-center gap-4">
                                     <DonutChart
                                         data={engagementMetrics.map((m) => ({
-                                            label: postInsightTypeToFrenchTranslation[m.type],
+                                            label: t(postInsightTypeTranslationKeys[m.type]),
                                             value: m.value,
                                             color: postInsightTypeToEngagementColor[m.type] ?? "var(--color-gray)",
                                         }))}
                                         size={120}
                                         centerLabel={formatCompactNumber(totalEngagement)}
-                                        centerSubLabel="actions"
+                                        centerSubLabel={t("contents:post.engagementCenter")}
                                     />
                                     <div className="flex flex-col gap-1.5 flex-1">
                                         {engagementMetrics.map((metric) => {
@@ -174,7 +176,7 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                                                 <div key={metric.type} className="flex flex-row items-center justify-between">
                                                     <div className="flex flex-row items-center gap-2">
                                                         <div className={`size-2.5 rounded-sm ${postInsightTypeToEngagementBgClass[metric.type] ?? "bg-gray"}`} />
-                                                        <span className="text-body-xs">{postInsightTypeToFrenchTranslation[metric.type]}</span>
+                                                        <span className="text-body-xs">{t(postInsightTypeTranslationKeys[metric.type])}</span>
                                                     </div>
                                                     <div className="flex flex-row items-center gap-2">
                                                         <span className="text-heading-xs">{formatCompactNumber(metric.value)}</span>
@@ -192,7 +194,7 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                         {likesValue !== null && dislikesValue !== null && (
                             <div className="flex flex-col gap-1.5">
                                 <div className="flex flex-row items-center justify-between">
-                                    <span className="text-body-xs text-gray">Ratio like / dislike</span>
+                                    <span className="text-body-xs text-gray">{t("contents:post.likeRatio")}</span>
                                     <span className="text-heading-xs">{likePercentage.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}%</span>
                                 </div>
                                 <div className="w-full h-2 bg-light-gray rounded-full">
@@ -202,8 +204,8 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                                     />
                                 </div>
                                 <div className="flex flex-row justify-between">
-                                    <span className="text-body-xs text-gray">{formatCompactNumber(likesValue)} positifs</span>
-                                    <span className="text-body-xs text-gray">{formatCompactNumber(dislikesValue)} négatifs</span>
+                                    <span className="text-body-xs text-gray">{t("contents:post.likesPositive", { count: likesValue })}</span>
+                                    <span className="text-body-xs text-gray">{t("contents:post.dislikesNegative", { count: dislikesValue })}</span>
                                 </div>
                             </div>
                         )}
@@ -211,23 +213,23 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                         {/* Abonnés */}
                         {followerMetrics.length > 0 && (
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-heading-xs text-gray uppercase">Abonnés</h3>
+                                <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.followers")}</h3>
                                 <div className="grid grid-cols-3 gap-1">
                                     {gainedInsight && (
                                         <ContentMetricBox
-                                            label="Gagnés"
+                                            label={t("contents:post.gained")}
                                             value={`+${formatCompactNumber(gainedInsight.value)}`}
                                         />
                                     )}
                                     {lostInsight && (
                                         <ContentMetricBox
-                                            label="Perdus"
+                                            label={t("contents:post.lost")}
                                             value={formatCompactNumber(lostInsight.value)}
                                         />
                                     )}
                                     {gainedInsight && lostInsight && (
                                         <ContentMetricBox
-                                            label="Net"
+                                            label={t("contents:post.net")}
                                             value={`${netFollowers >= 0 ? "+" : ""}${formatCompactNumber(netFollowers)}`}
                                         />
                                     )}
@@ -237,7 +239,7 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
 
                         {/* Script section */}
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-heading-xs text-gray uppercase">Script</h3>
+                            <h3 className="text-heading-xs text-gray uppercase">{t("contents:group.scriptHeader")}</h3>
                             {group.script ? (
                                 <div className="flex flex-row items-center justify-between gap-2 border border-light-gray rounded-md p-2">
                                     <div className="flex flex-row items-center gap-1.5 min-w-0">
@@ -249,11 +251,11 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                                         disabled={isUpdating}
                                         className="text-gray hover:text-danger transition-colors cursor-pointer text-body-xs whitespace-nowrap disabled:opacity-50"
                                     >
-                                        Délier
+                                        {t("contents:group.unlinkScript")}
                                     </button>
                                 </div>
                             ) : (
-                                <p className="text-body-xs text-gray">Aucun script lié.</p>
+                                <p className="text-body-xs text-gray">{t("contents:group.noScript")}</p>
                             )}
                         </div>
 
@@ -261,7 +263,7 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                         <div className="flex flex-col gap-2">
                             <div className="flex flex-row items-center justify-between">
                                 <h3 className="text-heading-xs text-gray uppercase">
-                                    Posts ({group.postGroup.posts.length})
+                                    {t("contents:group.postsHeader", { count: group.postGroup.posts.length })}
                                 </h3>
                                 <button
                                     onClick={() => setIsPostPickerOpen(true)}
@@ -285,7 +287,7 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                                     />
                                 ))}
                                 {group.postGroup.posts.length === 0 && (
-                                    <p className="text-body-xs text-gray">Aucun post dans ce groupe.</p>
+                                    <p className="text-body-xs text-gray">{t("contents:group.noPostsInGroup")}</p>
                                 )}
                             </div>
                         </div>
@@ -302,7 +304,7 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                     handleClose()
                 }}
                 isPending={isDeleting}
-                message="Êtes-vous sûr de vouloir supprimer ce groupe ? Cette action est irréversible."
+                message={t("contents:group.deleteConfirm")}
             />
 
             <PostPickerModal

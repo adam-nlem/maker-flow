@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useFloating, offset, flip, shift, autoUpdate, useDismiss, useInteractions, FloatingPortal } from "@floating-ui/react"
+import { useTranslation } from "react-i18next";
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
 import { colorOptions, colorToBgClass } from "~/models/enums/Color";
@@ -18,6 +19,7 @@ interface UpdateScriptTagDropdownProps {
 }
 
 export default function UpdateScriptTagDropdown({ anchorRef, tag, onClose, onTagDeleted }: UpdateScriptTagDropdownProps) {
+    const { t } = useTranslation();
     const [title, setTitle] = useState(tag.title);
     const [color, setColor] = useState(tag.color);
 
@@ -59,7 +61,7 @@ export default function UpdateScriptTagDropdown({ anchorRef, tag, onClose, onTag
                 >
                     <Input
                         ref={inputRef}
-                        placeholder="Tag"
+                        placeholder={t("scripts:tags.tagPlaceholder")}
                         id="title"
                         name="title"
                         type="text"
@@ -83,7 +85,7 @@ export default function UpdateScriptTagDropdown({ anchorRef, tag, onClose, onTag
                         onClick={handleSave}
                         disabled={isUpdating || title.trim() === ""}
                     >
-                        Enregistrer
+                        {t("actions.save")}
                     </Button>
 
                     <SimpleTextButton
@@ -91,7 +93,7 @@ export default function UpdateScriptTagDropdown({ anchorRef, tag, onClose, onTag
                         hoverColor={"hover:text-danger"}
                     >
                         <TrashIcon className="size-3.5" strokeWidth={2} />
-                        <p>Supprimer</p>
+                        <p>{t("scripts:tags.delete")}</p>
                     </SimpleTextButton>
                 </div>
             </FloatingPortal>
@@ -105,7 +107,7 @@ export default function UpdateScriptTagDropdown({ anchorRef, tag, onClose, onTag
                     onClose();
                 }}
                 isPending={isDeleting}
-                message="Êtes-vous sûr de vouloir supprimer ce tag ? Cette action est irréversible."
+                message={t("scripts:tags.deleteConfirm")}
             />
         </>
     );

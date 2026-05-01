@@ -1,4 +1,5 @@
 import { useRef } from "react"
+import { useTranslation } from "react-i18next"
 import RankingItemTile from "~/components/ui/RankingItemTile"
 import Shimmer from "~/components/ui/Shimmer"
 import { useListPaginatedRankedPosts } from "~/hooks/api/posts/useListPaginatedRankedPosts"
@@ -13,6 +14,7 @@ interface RankedPostsListProps {
 }
 
 export default function RankedPostsList({ integrationUuid }: RankedPostsListProps) {
+  const { t } = useTranslation()
   const { posts, isLoading, isLoadingMore, hasMore, listMore } = useListPaginatedRankedPosts({ integrationUuid })
 
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -37,12 +39,12 @@ export default function RankedPostsList({ integrationUuid }: RankedPostsListProp
   }
 
   if (posts.length === 0) {
-    return <p className="text-body-sm text-gray">Aucun post trouvé.</p>
+    return <p className="text-body-sm text-gray">{t("home:noPosts")}</p>
   }
 
   return (
     <div className="flex flex-col flex-1 min-h-0">
-      <h2 className="text-heading-sm mb-2">Classement des posts</h2>
+      <h2 className="text-heading-sm mb-2">{t("home:rankingPosts")}</h2>
       <div ref={scrollContainerRef} className="overflow-y-auto scrollbar-none flex-1 min-h-0">
         {posts.map((post, index) => (
           <RankingItemTile

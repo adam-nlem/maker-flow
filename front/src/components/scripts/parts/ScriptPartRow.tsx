@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { useDraggable, useDroppable } from "@dnd-kit/core";
+import { useTranslation } from "react-i18next";
 
 import { TextArea } from "~/components/ui/TextArea";
 import type { ScriptPart } from "~/models/ScriptPart";
@@ -17,6 +18,7 @@ interface ScriptPartRowProps {
 }
 
 export default function ScriptPartRow({ part, scriptUuid, isReadOnly, isDragDisabled }: ScriptPartRowProps) {
+    const { t } = useTranslation();
     const [content, setContent] = useState(part.content);
 
     useEffect(() => {
@@ -75,7 +77,7 @@ export default function ScriptPartRow({ part, scriptUuid, isReadOnly, isDragDisa
                     onBlur={persistContent}
                     onKeyDown={handleKeyDown}
                     readOnly={isReadOnly}
-                    placeholder="Écrivez ici..."
+                    placeholder={t("scripts:parts.rowPlaceholder")}
                     textStyle="text-sm"
                 />
             </ScriptPartCard>

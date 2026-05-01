@@ -12,13 +12,13 @@ export enum ScriptStatus {
 
 export const scriptStatusOptions = Object.values(ScriptStatus);
 
-export const scriptStatusToFrenchTranslation: Record<ScriptStatus, string> = {
-    [ScriptStatus.Idea]: 'Idée',
-    [ScriptStatus.Scripting]: 'Écriture du Script',
-    [ScriptStatus.Shooting]: 'Tournage',
-    [ScriptStatus.Editing]: 'Montage',
-    [ScriptStatus.Scheduled]: 'Planifié',
-    [ScriptStatus.Published]: 'Publié',
+export const scriptStatusTranslationKeys: Record<ScriptStatus, string> = {
+    [ScriptStatus.Idea]: 'enums:scriptStatus.idea',
+    [ScriptStatus.Scripting]: 'enums:scriptStatus.scripting',
+    [ScriptStatus.Shooting]: 'enums:scriptStatus.shooting',
+    [ScriptStatus.Editing]: 'enums:scriptStatus.editing',
+    [ScriptStatus.Scheduled]: 'enums:scriptStatus.scheduled',
+    [ScriptStatus.Published]: 'enums:scriptStatus.published',
 }
 
 export const scriptStatusToBgClass: Record<ScriptStatus, string> = {

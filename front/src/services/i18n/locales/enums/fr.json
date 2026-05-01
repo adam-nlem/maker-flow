@@ -1,0 +1,306 @@
+{
+    "aiModel": {
+        "names": {
+            "gemini": "Gemini",
+            "chatGpt": "ChatGPT",
+            "claude": "Claude"
+        },
+        "descriptions": {
+            "gemini": "Google — rapide et créatif",
+            "chatGpt": "OpenAI — précis et structuré",
+            "claude": "Anthropic — nuancé et détaillé"
+        }
+    },
+    "callToActionType": {
+        "subscribe": "S'abonner",
+        "like": "Liker",
+        "comment": "Commenter",
+        "share": "Partager",
+        "link": "Lien",
+        "custom": "Personnalisé"
+    },
+    "chapterType": {
+        "onScreen": "On-screen",
+        "offScreen": "Off-screen"
+    },
+    "contentType": {
+        "shortForm": "Format court",
+        "longForm": "Format long"
+    },
+    "contentsTab": {
+        "groups": "Groupes",
+        "posts": "Posts"
+    },
+    "creditTransactionType": {
+        "subscriptionRenewal": "Renouvellement",
+        "refillPurchase": "Recharge",
+        "scriptGeneration": "Génération de script",
+        "scriptGenerationRefund": "Remboursement suite a une génération de script echouée",
+        "refund": "Remboursement",
+        "manualAdjustment": "Ajustement",
+        "welcomeBonus": "Crédits de bienvenue"
+    },
+    "hookTemplateCategory": {
+        "all": "Tous",
+        "public": "Publics",
+        "private": "Privés"
+    },
+    "hookTemplatePlaceholder": {
+        "topic": "Sujet",
+        "audience": "Audience",
+        "benefit": "Bénéfice",
+        "statistic": "Statistique",
+        "problem": "Problème",
+        "product": "Produit",
+        "result": "Résultat",
+        "emotion": "Émotion",
+        "number": "Nombre",
+        "goal": "Objectif",
+        "date": "Date"
+    },
+    "insightType": {
+        "post": "Contenus",
+        "integration": "Comptes"
+    },
+    "integrationInsightType": {
+        "views": "Vues",
+        "likes": "J'aime",
+        "saves": "Enregistrements",
+        "comments": "Commentaires",
+        "shares": "Partages",
+        "gainedFollowers": "Nouveaux abonnés",
+        "totalFollowers": "Abonnés",
+        "impressions": "Impressions",
+        "dislikes": "Dislikes",
+        "profileLinksTaps": "Clics liens profil",
+        "reach": "Portée",
+        "videos": "Vidéos"
+    },
+    "integrationStatus": {
+        "active": "Connecté",
+        "revoked": "Expiré",
+        "error": "Erreur"
+    },
+    "mediaType": {
+        "image": "Image",
+        "video": "Video",
+        "carousel": "Carousel"
+    },
+    "oAuthErrorCode": {
+        "invalidState": "Session expirée, veuillez réessayer",
+        "missingCode": "Code d'autorisation manquant",
+        "userNotFound": "Utilisateur introuvable",
+        "tokenExchangeFailed": "Échec de la connexion, veuillez réessayer",
+        "platformError": "Erreur de la plateforme d'authentification",
+        "popupBlocked": "La fenêtre popup a été bloquée par votre navigateur",
+        "unknown": "Une erreur est survenue, veuillez réessayer"
+    },
+    "onboardingStep": {
+        "titles": {
+            "createFirstProject": "Créez votre premier projet",
+            "connectIntegration": "Connectez vos réseaux sociaux",
+            "createFirstScript": "Créez votre premier script",
+            "generateFirstScript": "Améliorez votre script avec l'IA",
+            "showSubscriptions": "Découvrez nos offres"
+        },
+        "descriptions": {
+            "createFirstProject": "Les projets vous permettent de regrouper vos contenus et vos réseaux sociaux.",
+            "connectIntegration": "Connectez vos comptes pour analyser vos performances et centraliser vos contenus.",
+            "createFirstScript": "Voici votre premier script vidéo. Vous pourrez le modifier plus tard.",
+            "generateFirstScript": "L'IA va créer un script vidéo complet basé sur vos indications.",
+            "showSubscriptions": "Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités."
+        },
+        "shortLabels": {
+            "createFirstProject": "Projet",
+            "connectIntegration": "Réseau social",
+            "createFirstScript": "Script",
+            "generateFirstScript": "Génération",
+            "showSubscriptions": "Abonnements"
+        }
+    },
+    "openingStyle": {
+        "boldHook": "Accroche audacieuse",
+        "shockingStat": "Statistique choc",
+        "personalStory": "Histoire personnelle",
+        "relatableQuestion": "Question relatable",
+        "jumpIntoContent": "Direct dans le contenu"
+    },
+    "otpType": {
+        "login": "Vérification de connexion",
+        "emailVerification": "Vérification de votre email",
+        "prelaunchVerification": "Vérification de votre inscription"
+    },
+    "platform": {
+        "instagram": "Instagram",
+        "youtube": "YouTube",
+        "tiktok": "TikTok"
+    },
+    "postInsightType": {
+        "reach": "Portée",
+        "totalInteractions": "Interactions totales",
+        "saves": "Enregistrements",
+        "shares": "Partages",
+        "views": "Vues",
+        "likes": "Likes",
+        "comments": "Commentaires",
+        "averageWatchTime": "Moy. visionnage",
+        "totalWatchTime": "Temps de visionnage",
+        "dislikes": "Dislikes",
+        "thumbnailImpressions": "Impressions miniature",
+        "thumbnailImpressionsClickRate": "Taux de clics miniature",
+        "followersGained": "Abonnés gagnés",
+        "followersLost": "Abonnés perdus",
+        "audienceWatchRatio": "Ratio de visionnage"
+    },
+    "prelaunchRewardTier": {
+        "labels": {
+            "earlyBetaAccess": "Accès anticipé à la bêta",
+            "devDiscordAccess": "Accès au Discord développeurs",
+            "lifetimeDiscount": "20% de réduction à vie"
+        },
+        "descriptions": {
+            "earlyBetaAccess": "Soyez parmi les premiers à tester MakerFlow avant tout le monde.",
+            "devDiscordAccess": "Rejoignez notre Discord privé pour donner votre avis et influencer le développement.",
+            "lifetimeDiscount": "Profitez de 20% de réduction sur tous les abonnements, à vie."
+        }
+    },
+    "projectType": {
+        "saas": "SaaS",
+        "contentCreation": "Création de contenu",
+        "mobileApp": "Application mobile",
+        "extension": "Extension",
+        "automation": "Automatisation",
+        "webApp": "Application web",
+        "landingPage": "Landing page",
+        "blog": "Blog",
+        "portfolio": "Portfolio",
+        "hardware": "Hardware",
+        "iot": "IoT"
+    },
+    "retentionCueType": {
+        "question": "Question",
+        "teaser": "Teaser",
+        "patternBreak": "Rupture de pattern",
+        "cliffhanger": "Cliffhanger"
+    },
+    "scriptFormat": {
+        "fullScript": "Script complet",
+        "outline": "Plan détaillé",
+        "hybrid": "Hybride"
+    },
+    "scriptGenerationStatus": {
+        "pending": "En attente",
+        "processing": "Génération en cours",
+        "completed": "Terminé",
+        "failed": "Échoué"
+    },
+    "scriptGoal": {
+        "educate": "Éduquer",
+        "entertain": "Divertir",
+        "inspire": "Inspirer",
+        "sellPromote": "Vendre / Promouvoir",
+        "growAudience": "Développer l'audience",
+        "startConversation": "Lancer une conversation"
+    },
+    "scriptPartSuggestionAction": {
+        "rewrite": "Réécriture suggérée",
+        "insert": "Insertion suggérée",
+        "delete": "Suppression suggérée",
+        "reorder": "Repositionnement suggéré"
+    },
+    "scriptPartType": {
+        "hook": "Hook",
+        "text": "Texte",
+        "chapter": "Chapitre",
+        "voiceOver": "Voix off",
+        "dialogue": "Dialogue",
+        "shot": "Plan",
+        "callToAction": "Appel à l'action",
+        "retentionCue": "Signal de rétention"
+    },
+    "scriptStatus": {
+        "idea": "Idée",
+        "scripting": "Écriture du Script",
+        "shooting": "Tournage",
+        "editing": "Montage",
+        "scheduled": "Planifié",
+        "published": "Publié"
+    },
+    "scriptStatusGroup": {
+        "idea": "Idées",
+        "inProgress": "En cours",
+        "done": "Terminés"
+    },
+    "shotType": {
+        "aRoll": "A-Roll",
+        "bRoll": "B-Roll"
+    },
+    "skillModule": {
+        "names": {
+            "strongHook": "Accroche forte",
+            "retentionBoosters": "Boosters de rétention",
+            "storytellingMode": "Mode storytelling",
+            "seoOptimization": "Optimisation SEO",
+            "scriptFormat": "Format du script",
+            "bRollCues": "Indications B-Roll",
+            "callToAction": "Appel à l'action"
+        },
+        "descriptions": {
+            "strongHook": "Les 3 premières secondes créent de la curiosité ou une affirmation audacieuse",
+            "retentionBoosters": "Un moment de ré-engagement toutes les 60-90 secondes",
+            "storytellingMode": "Ancrer le script dans une histoire personnelle",
+            "seoOptimization": "Intégrer naturellement un mot-clé cible",
+            "scriptFormat": "Choisir le format de sortie : script complet, plan ou hybride",
+            "bRollCues": "Ajouter des indications de B-Roll visuelles dans le script",
+            "callToAction": "Ajouter un appel à l'action dans le script"
+        }
+    },
+    "sourceBucket": {
+        "subscriptionCredits": "Abonnement",
+        "refillCredits": "Recharge"
+    },
+    "subscriptionPlan": {
+        "starter": "Starter",
+        "creator": "Créateur",
+        "agency": "Agence"
+    },
+    "subscriptionStatus": {
+        "active": "Actif",
+        "pastDue": "En retard",
+        "canceled": "Annulé",
+        "incomplete": "Incomplet",
+        "trialing": "Essai",
+        "unpaid": "Impayé"
+    },
+    "timePeriod": {
+        "last7Days": "Ces 7 derniers jours",
+        "last30Days": "Ce dernier mois",
+        "last90Days": "Ces 3 derniers mois",
+        "lastYear": "Cette dernière année"
+    },
+    "todoListPriority": {
+        "low": "Basse",
+        "medium": "Moyenne",
+        "high": "Haute"
+    },
+    "todoListStatus": {
+        "pending": "À Faire",
+        "inProgress": "En Cours",
+        "completed": "Terminée"
+    },
+    "videoDuration": {
+        "thirtySeconds": "30 secondes",
+        "oneMinute": "1 minute",
+        "oneMinuteThirty": "1 min 30",
+        "twoMinutes": "2 minutes",
+        "fiveToTenMinutes": "5-10 minutes",
+        "tenToTwentyMinutes": "10-20 minutes",
+        "twentyPlusMinutes": "20+ minutes"
+    },
+    "welcomeStep": {
+        "shortLabels": {
+            "features": "Fonctionnalités",
+            "howItWorks": "Guide"
+        }
+    }
+}

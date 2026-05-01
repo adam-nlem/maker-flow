@@ -1,4 +1,5 @@
 import { useRef } from "react"
+import { useTranslation } from "react-i18next"
 import Shimmer from "~/components/ui/Shimmer"
 import { useListPaginatedPosts } from "~/hooks/api/posts/useListPaginatedPosts"
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
@@ -11,6 +12,7 @@ interface ContentPostListProps {
 }
 
 export default function ContentPostList({ projectUuid }: ContentPostListProps) {
+    const { t } = useTranslation()
     const platformFilter = useContentsStore((s) => s.platformFilter)
     const selectPost = useContentsStore((s) => s.selectPost)
     const searchTerm = useContentsStore((s) => s.searchTerm)
@@ -59,7 +61,7 @@ export default function ContentPostList({ projectUuid }: ContentPostListProps) {
         return (
             <div className="flex items-center justify-center py-20">
                 <p className="text-body-sm text-gray">
-                    Aucun post trouvé.
+                    {t("contents:noPosts")}
                 </p>
             </div>
         )

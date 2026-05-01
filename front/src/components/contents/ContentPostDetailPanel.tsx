@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { SidePanel } from "~/components/ui/SidePanel"
 import PlatformPill from "~/components/ui/PlatformPill"
 import Shimmer from "~/components/ui/Shimmer"
@@ -6,7 +7,7 @@ import { useShowPost } from "~/hooks/api/posts/useShowPost"
 import { useShowPostThumbnail } from "~/hooks/api/posts/useShowPostThumbnail"
 import { useContentsStore } from "~/stores/contents/contentsStore"
 import { useContentsRightPanelStore, ContentsRightPanel } from "~/stores/contents/contentsRightPanelStore"
-import { PostInsightType, postInsightTypeToFrenchTranslation, postInsightTypeToEngagementColor, postInsightTypeToEngagementBgClass, postInsightOverviewTypes, postInsightEngagementTypes, postInsightFollowerTypes, formatPostInsightValue } from "~/models/enums/PostInsightType"
+import { PostInsightType, postInsightTypeTranslationKeys, postInsightTypeToEngagementColor, postInsightTypeToEngagementBgClass, postInsightOverviewTypes, postInsightEngagementTypes, postInsightFollowerTypes, formatPostInsightValue } from "~/models/enums/PostInsightType"
 import { formatCompactNumber } from "~/utils/numberFormatters"
 import { formatToFrenchDateShort } from "~/utils/dateFormatters"
 import { ArrowTopRightOnSquareIcon, FolderIcon } from "@heroicons/react/24/outline"
@@ -17,6 +18,7 @@ interface ContentPostDetailPanelProps {
 }
 
 export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPanelProps) {
+    const { t } = useTranslation()
     const closePanel = useContentsStore((s) => s.closePanel)
     const closeRightPanel = useContentsRightPanelStore((s) => s.closePanel)
     const isOpen = useContentsRightPanelStore((s) => s.activePanel === ContentsRightPanel.PostDetail)
@@ -31,7 +33,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
     const { post: postData, isLoading } = useShowPost(postUuid ?? undefined)
     const { thumbnailUrl, isLoading: isLoadingThumbnail } = useShowPostThumbnail(postUuid ?? undefined)
 
-    const caption = postData?.post.caption ?? "Sans description"
+    const caption = postData?.post.caption ?? t("contents:post.noCaption")
 
     const overviewMetrics = postData?.aggregatedInsights.filter((i) => postInsightOverviewTypes.has(i.type)) ?? []
     const engagementMetrics = postData?.aggregatedInsights.filter((i) => postInsightEngagementTypes.has(i.type)) ?? []
@@ -52,7 +54,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
 
     return (
         <SidePanel
-            title="Détail du post"
+            title={t("contents:post.detailTitle")}
             width="w-120"
             side="right"
             isOpen={isOpen}
@@ -93,7 +95,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                             <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                                <span className="text-body-xs text-gray">Aucune miniature</span>
+                                <span className="text-body-xs text-gray">{t("contents:post.noThumbnail")}</span>
                             </div>
                         )}
                     </div>
@@ -109,21 +111,20 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                     {/* Caption */}
                     <p className="text-body-xs select-text">{caption}</p>
 
-                    {/* Vue d'ensemble */}
                     {(overviewMetrics.length > 0 || postData.engagementByViews !== null) && (
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-heading-xs text-gray uppercase">Vue d'ensemble</h3>
+                            <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.overview")}</h3>
                             <div className="grid grid-cols-3 gap-1">
                                 {overviewMetrics.map((insight) => (
                                     <ContentMetricBox
                                         key={insight.type}
-                                        label={postInsightTypeToFrenchTranslation[insight.type]}
+                                        label={t(postInsightTypeTranslationKeys[insight.type])}
                                         value={formatPostInsightValue(insight.type, insight.value)}
                                     />
                                 ))}
                                 {postData.engagementByViews !== null && (
                                     <ContentMetricBox
-                                        label="Engagement"
+                                        label={t("contents:post.engagement")}
                                         value={`${postData.engagementByViews.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}%`}
                                     />
                                 )}
@@ -131,20 +132,19 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                         </div>
                     )}
 
-                    {/* Répartition de l'engagement */}
                     {engagementMetrics.length > 0 && (
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-heading-xs text-gray uppercase">Répartition de l'engagement</h3>
+                            <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.engagementDistribution")}</h3>
                             <div className="flex flex-row items-center gap-4">
                                 <DonutChart
                                     data={engagementMetrics.map((m) => ({
-                                        label: postInsightTypeToFrenchTranslation[m.type],
+                                        label: t(postInsightTypeTranslationKeys[m.type]),
                                         value: m.value,
                                         color: postInsightTypeToEngagementColor[m.type] ?? "var(--color-gray)",
                                     }))}
                                     size={120}
                                     centerLabel={formatCompactNumber(totalEngagement)}
-                                    centerSubLabel="actions"
+                                    centerSubLabel={t("contents:post.engagementCenter")}
                                 />
                                 <div className="flex flex-col gap-1.5 flex-1">
                                     {engagementMetrics.map((metric) => {
@@ -155,7 +155,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                                             <div key={metric.type} className="flex flex-row items-center justify-between">
                                                 <div className="flex flex-row items-center gap-2">
                                                     <div className={`size-2.5 rounded-sm ${postInsightTypeToEngagementBgClass[metric.type] ?? "bg-gray"}`} />
-                                                    <span className="text-body-xs">{postInsightTypeToFrenchTranslation[metric.type]}</span>
+                                                    <span className="text-body-xs">{t(postInsightTypeTranslationKeys[metric.type])}</span>
                                                 </div>
                                                 <div className="flex flex-row items-center gap-2">
                                                     <span className="text-heading-xs">{formatCompactNumber(metric.value)}</span>
@@ -169,11 +169,10 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                         </div>
                     )}
 
-                    {/* Ratio like / dislike */}
                     {likesValue !== null && dislikesValue !== null && (
                         <div className="flex flex-col gap-1.5">
                             <div className="flex flex-row items-center justify-between">
-                                <span className="text-body-xs text-gray">Ratio like / dislike</span>
+                                <span className="text-body-xs text-gray">{t("contents:post.likeRatio")}</span>
                                 <span className="text-heading-xs">{likePercentage.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}%</span>
                             </div>
                             <div className="w-full h-2 bg-light-gray rounded-full">
@@ -183,32 +182,31 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                                 />
                             </div>
                             <div className="flex flex-row justify-between">
-                                <span className="text-body-xs text-gray">{formatCompactNumber(likesValue)} positifs</span>
-                                <span className="text-body-xs text-gray">{formatCompactNumber(dislikesValue)} négatifs</span>
+                                <span className="text-body-xs text-gray">{t("contents:post.likesPositive", { count: likesValue })}</span>
+                                <span className="text-body-xs text-gray">{t("contents:post.dislikesNegative", { count: dislikesValue })}</span>
                             </div>
                         </div>
                     )}
 
-                    {/* Abonnés */}
                     {followerMetrics.length > 0 && (
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-heading-xs text-gray uppercase">Abonnés</h3>
+                            <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.followers")}</h3>
                             <div className="grid grid-cols-3 gap-1">
                                 {gainedInsight && (
                                     <ContentMetricBox
-                                        label="Gagnés"
+                                        label={t("contents:post.gained")}
                                         value={`+${formatCompactNumber(gainedInsight.value)}`}
                                     />
                                 )}
                                 {lostInsight && (
                                     <ContentMetricBox
-                                        label="Perdus"
+                                        label={t("contents:post.lost")}
                                         value={formatCompactNumber(lostInsight.value)}
                                     />
                                 )}
                                 {gainedInsight && lostInsight && (
                                     <ContentMetricBox
-                                        label="Net"
+                                        label={t("contents:post.net")}
                                         value={`${netFollowers >= 0 ? "+" : ""}${formatCompactNumber(netFollowers)}`}
                                     />
                                 )}
@@ -216,7 +214,6 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                         </div>
                     )}
 
-                    {/* Group link */}
                     {postData.postGroupTitle && postData.postGroupUuid && (
                         <div className="flex flex-col gap-1">
                             <button
@@ -227,12 +224,11 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                                 className="flex flex-row items-center gap-1.5 text-primary hover:text-primary/80 transition-colors cursor-pointer"
                             >
                                 <FolderIcon className="size-3.5" strokeWidth={2} />
-                                <span className="text-body-xs">Groupe <strong>{postData.postGroupTitle}</strong></span>
+                                <span className="text-body-xs">{t("contents:post.groupPrefix")} <strong>{postData.postGroupTitle}</strong></span>
                             </button>
                         </div>
                     )}
 
-                    {/* External URL */}
                     {postData.post.externalUrl && (
                         <a
                             href={postData.post.externalUrl}
@@ -241,7 +237,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                             className="flex flex-row items-center gap-1.5 text-primary hover:text-primary/80 transition-colors"
                         >
                             <ArrowTopRightOnSquareIcon className="size-3.5" strokeWidth={2} />
-                            <span className="text-body-xs">Voir sur la plateforme</span>
+                            <span className="text-body-xs">{t("contents:post.viewOnPlatform")}</span>
                         </a>
                     )}
                 </div>

@@ -9,13 +9,13 @@ export enum CallToActionType {
 
 export const callToActionTypeOptions = Object.values(CallToActionType);
 
-export const callToActionTypeToFrenchTranslation: Record<CallToActionType, string> = {
-    [CallToActionType.Subscribe]: "S'abonner",
-    [CallToActionType.Like]: "Liker",
-    [CallToActionType.Comment]: "Commenter",
-    [CallToActionType.Share]: "Partager",
-    [CallToActionType.Link]: "Lien",
-    [CallToActionType.Custom]: "Personnalisé",
+export const callToActionTypeTranslationKeys: Record<CallToActionType, string> = {
+    [CallToActionType.Subscribe]: "enums:callToActionType.subscribe",
+    [CallToActionType.Like]: "enums:callToActionType.like",
+    [CallToActionType.Comment]: "enums:callToActionType.comment",
+    [CallToActionType.Share]: "enums:callToActionType.share",
+    [CallToActionType.Link]: "enums:callToActionType.link",
+    [CallToActionType.Custom]: "enums:callToActionType.custom",
 }
 
 export const callToActionTypeToBgClass: Record<CallToActionType, string> = {

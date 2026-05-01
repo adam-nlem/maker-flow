@@ -1,4 +1,5 @@
-import { IntegrationStatus, integrationStatusToBgClass, integrationStatusToBorderClass, integrationStatusToFrenchTranslation, integrationStatusToTextClass } from "~/models/enums/IntegrationStatus"
+import { useTranslation } from "react-i18next"
+import { IntegrationStatus, integrationStatusToBgClass, integrationStatusToBorderClass, integrationStatusTranslationKeys, integrationStatusToTextClass } from "~/models/enums/IntegrationStatus"
 import type { Integration } from "~/models/Integration"
 import { platformToIcon } from "~/models/enums/Platform"
 import { UserIcon } from "@heroicons/react/24/solid"
@@ -11,6 +12,7 @@ interface IntegrationProfileInfoProps {
 }
 
 export default function IntegrationProfileInfo({ integration }: IntegrationProfileInfoProps) {
+    const { t } = useTranslation()
     const focusedProjectUuid = useFocusProjectStore((state) => state.focusedProjectUuid)
 
     const { createIntegration } = useCreateIntegration({ projectUuid: focusedProjectUuid!, platform: integration.platform });
@@ -42,11 +44,11 @@ export default function IntegrationProfileInfo({ integration }: IntegrationProfi
             </div>
             {integration.status !== IntegrationStatus.Active && focusedProjectUuid && <div className="flex flex-row gap-1">
                 <Pill isSelected
-                    label={integrationStatusToFrenchTranslation[integration.status]}
+                    label={t(integrationStatusTranslationKeys[integration.status])}
                     textColorClassName={integrationStatusToTextClass[integration.status]}
                     bgColorClassName={integrationStatusToBgClass[integration.status]}
                     borderColorClassName={integrationStatusToBorderClass[integration.status]} />
-                <Pill label="Se Connecter"
+                <Pill label={t("integrations:loginAction")}
                     onClick={() => createIntegration()} />
             </div>}
         </div>

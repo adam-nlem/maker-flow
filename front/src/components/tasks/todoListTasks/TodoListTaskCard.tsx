@@ -1,8 +1,9 @@
 import { Badge } from "~/components/ui/Badge";
 import { useDraggable } from '@dnd-kit/core';
 import { ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon } from "@heroicons/react/24/solid";
+import { useTranslation } from "react-i18next";
 import type { TodoListTask } from "~/models/TodoListTask";
-import { todoListPriorityToTextClass, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation } from "~/models/enums/TodoListPriority";
+import { todoListPriorityToTextClass, todoListPriorityToBgClass, todoListPriorityTranslationKeys } from "~/models/enums/TodoListPriority";
 import { colorToTextClass, colorToBgClass } from "~/models/enums/Color";
 
 interface TodoListTaskCardProps {
@@ -13,6 +14,7 @@ interface TodoListTaskCardProps {
 }
 
 export default function TodoListTaskCard({ task, onClick, isDragDisabled = false }: TodoListTaskCardProps) {
+    const { t } = useTranslation();
     const { attributes, listeners, setNodeRef, isDragging } = useDraggable({
         id: task.uuid,
         disabled: isDragDisabled,
@@ -50,7 +52,7 @@ export default function TodoListTaskCard({ task, onClick, isDragDisabled = false
                     {hasPriority &&
                         <Badge
                             icon={ExclamationTriangleIcon}
-                            label={todoListPriorityToFrenchTranslation[task.priority!]}
+                            label={t(todoListPriorityTranslationKeys[task.priority!])}
                             textColor={todoListPriorityToTextClass[task.priority!]}
                             bgColor={todoListPriorityToBgClass[task.priority!]} />}
 

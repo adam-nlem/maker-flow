@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import type { ChartDataPoint } from "~/utils/chartDataHelpers";
 import { formatToIso8601Tz } from "~/utils/dateFormatters";
 
@@ -17,6 +18,7 @@ export function CalendarHeatMap({
     totalValue,
     daysToDisplay,
 }: CalendarHeatMapProps) {
+    const { t } = useTranslation();
     const weeksGrid = buildWeeksGrid(data, daysToDisplay);
 
     if (weeksGrid.length === 0) {
@@ -25,12 +27,12 @@ export function CalendarHeatMap({
 
     return (
         <div className="flex flex-col gap-1 border border-light-gray rounded-lg p-2">
-            <h1 className="text-heading-xs">Comptes uniques touchés</h1>
+            <h1 className="text-heading-xs">{t("calendarHeatmap.title")}</h1>
             <h2 className="text-heading-sm">{totalValue}</h2>
             <div className="flex gap-1 p-2">
 
 
-                
+
                 {weeksGrid.map((week, i) => (
                     <div key={i} className="flex flex-col gap-1">
                         {week.map((day, j) => (

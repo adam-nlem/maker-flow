@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { DndContext, DragOverlay, useSensor, useSensors, type DragEndEvent, type DragStartEvent } from "@dnd-kit/core";
+import { useTranslation } from "react-i18next";
 
 import type { Script } from "~/models/Script";
 import type { ScriptPart } from "~/models/ScriptPart";
@@ -24,6 +25,7 @@ interface ScriptPartsListProps {
 }
 
 export default function ScriptPartsList({ parts, script, isReadOnly }: ScriptPartsListProps) {
+  const { t } = useTranslation();
   const scriptUuid = script.uuid;
 
   const [activePart, setActivePart] = useState<ScriptPart | null>(null);
@@ -98,8 +100,8 @@ export default function ScriptPartsList({ parts, script, isReadOnly }: ScriptPar
 
           {!isReadOnly && localParts.length === 0 && (
             <div className="flex flex-col items-center justify-center text-gray py-8">
-              <p className="text-body-sm text-center">Vous n'avez pas encore d'éléments dans votre script.</p>
-              <p className="text-body-sm text-center">Cliquez sur « Ajouter une partie » pour commencer.</p>
+              <p className="text-body-sm text-center">{t("scripts:parts.emptyTitle")}</p>
+              <p className="text-body-sm text-center">{t("scripts:parts.emptyHint")}</p>
             </div>
           )}
 
@@ -115,7 +117,7 @@ export default function ScriptPartsList({ parts, script, isReadOnly }: ScriptPar
 
       {!isReadOnly && (
         <div className="min-h-0 px-6 py-4 border-t border-light-gray bg-clear">
-          <Button onClick={handleAddPart} isLoading={isCreating}>+ Ajouter une partie</Button>
+          <Button onClick={handleAddPart} isLoading={isCreating}>{t("scripts:parts.addPart")}</Button>
         </div>
       )}
     </div>

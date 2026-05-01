@@ -6,16 +6,16 @@ export enum AiModel {
 
 export const aiModelOptions = Object.values(AiModel);
 
-export const aiModelToFrenchTranslation: Record<AiModel, string> = {
-  [AiModel.Gemini]: 'Gemini',
-  [AiModel.ChatGpt]: 'ChatGPT',
-  [AiModel.Claude]: 'Claude',
+export const aiModelTranslationKeys: Record<AiModel, string> = {
+  [AiModel.Gemini]: 'enums:aiModel.names.gemini',
+  [AiModel.ChatGpt]: 'enums:aiModel.names.chatGpt',
+  [AiModel.Claude]: 'enums:aiModel.names.claude',
 };
 
-export const aiModelToDescription: Record<AiModel, string> = {
-  [AiModel.Gemini]: 'Google — rapide et créatif',
-  [AiModel.ChatGpt]: 'OpenAI — précis et structuré',
-  [AiModel.Claude]: 'Anthropic — nuancé et détaillé',
+export const aiModelDescriptionKeys: Record<AiModel, string> = {
+  [AiModel.Gemini]: 'enums:aiModel.descriptions.gemini',
+  [AiModel.ChatGpt]: 'enums:aiModel.descriptions.chatGpt',
+  [AiModel.Claude]: 'enums:aiModel.descriptions.claude',
 };
 
 export const aiModelToIcon: Record<AiModel, string> = {

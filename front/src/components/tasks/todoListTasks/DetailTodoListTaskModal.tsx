@@ -4,8 +4,8 @@ import { TextArea } from "~/components/ui/TextArea";
 import { Badge } from "~/components/ui/Badge";
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { TodoListStatus, todoListStatusOptions, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
-import { TodoListPriority, todoListPriorityOptions, todoListPriorityToFrenchTranslation } from "~/models/enums/TodoListPriority";
+import { TodoListStatus, todoListStatusOptions, todoListStatusToBgClass, todoListStatusTranslationKeys, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
+import { TodoListPriority, todoListPriorityOptions, todoListPriorityTranslationKeys } from "~/models/enums/TodoListPriority";
 import { useUpdateTodoListTask } from "~/hooks/api/todoListTasks/useUpdateTodoListTask";
 import { TagIcon, ExclamationTriangleIcon, CheckBadgeIcon, CalendarDateRangeIcon } from "@heroicons/react/24/solid";
 import { colorToTextClass, colorToBgClass } from "~/models/enums/Color";
@@ -153,7 +153,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                     priority ? (
                                         <Badge
                                             icon={ExclamationTriangleIcon}
-                                            label={todoListPriorityToFrenchTranslation[priority]}
+                                            label={t(todoListPriorityTranslationKeys[priority])}
                                             textColor={todoListPriorityToTextClass[priority]}
                                             bgColor={todoListPriorityToBgClass[priority]}
                                             onRemoveClick={() => setPriority(undefined)}
@@ -169,7 +169,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                 renderItem={({ item, onSelect }) => (
                                     <Badge
                                         icon={ExclamationTriangleIcon}
-                                        label={todoListPriorityToFrenchTranslation[item]}
+                                        label={t(todoListPriorityTranslationKeys[item])}
                                         textColor={todoListPriorityToTextClass[item]}
                                         bgColor={todoListPriorityToBgClass[item]}
                                         onClick={onSelect}
@@ -190,7 +190,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                 renderTrigger={({ onClick }) => (
                                     <Badge
                                         icon={CheckBadgeIcon}
-                                        label={todoListStatusToFrenchTranslation[status]}
+                                        label={t(todoListStatusTranslationKeys[status])}
                                         textColor={todoListStatusToTextClass[status]}
                                         bgColor={todoListStatusToBgClass[status]}
                                         onClick={onClick}
@@ -199,7 +199,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                 renderItem={({ item, onSelect }) => (
                                     <Badge
                                         icon={CheckBadgeIcon}
-                                        label={todoListStatusToFrenchTranslation[item]}
+                                        label={t(todoListStatusTranslationKeys[item])}
                                         textColor={todoListStatusToTextClass[item]}
                                         bgColor={todoListStatusToBgClass[item]}
                                         onClick={onSelect}

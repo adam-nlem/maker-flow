@@ -10,11 +10,11 @@ export enum ScriptPartSuggestionAction {
 
 export const scriptPartSuggestionActionOptions = Object.values(ScriptPartSuggestionAction);
 
-export const scriptPartSuggestionActionToFrenchTranslation: Record<ScriptPartSuggestionAction, string> = {
-    [ScriptPartSuggestionAction.Rewrite]: "Réécriture suggérée",
-    [ScriptPartSuggestionAction.Insert]: "Insertion suggérée",
-    [ScriptPartSuggestionAction.Delete]: "Suppression suggérée",
-    [ScriptPartSuggestionAction.Reorder]: "Repositionnement suggéré",
+export const scriptPartSuggestionActionTranslationKeys: Record<ScriptPartSuggestionAction, string> = {
+    [ScriptPartSuggestionAction.Rewrite]: "enums:scriptPartSuggestionAction.rewrite",
+    [ScriptPartSuggestionAction.Insert]: "enums:scriptPartSuggestionAction.insert",
+    [ScriptPartSuggestionAction.Delete]: "enums:scriptPartSuggestionAction.delete",
+    [ScriptPartSuggestionAction.Reorder]: "enums:scriptPartSuggestionAction.reorder",
 }
 
 export const scriptPartSuggestionActionToIcon: Record<ScriptPartSuggestionAction, ComponentType<SVGProps<SVGSVGElement>>> = {

@@ -3,9 +3,9 @@ export enum ContentType {
     LongForm = 'long_form',
 }
 
-export const contentTypeToFrenchTranslation: Record<ContentType, string> = {
-    [ContentType.ShortForm]: "Format court",
-    [ContentType.LongForm]: "Format long",
+export const contentTypeTranslationKeys: Record<ContentType, string> = {
+    [ContentType.ShortForm]: "enums:contentType.shortForm",
+    [ContentType.LongForm]: "enums:contentType.longForm",
 }
 
 export const contentTypeOptions = Object.values(ContentType);

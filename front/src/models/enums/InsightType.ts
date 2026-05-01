@@ -3,9 +3,9 @@ export enum InsightType {
     Integration = 'integration',
 }
 
-export const insightTypeToFrenchTranslation: Record<InsightType, string> = {
-    [InsightType.Post]: "Contenus",
-    [InsightType.Integration]: "Comptes",
+export const insightTypeTranslationKeys: Record<InsightType, string> = {
+    [InsightType.Post]: "enums:insightType.post",
+    [InsightType.Integration]: "enums:insightType.integration",
 };
 
 

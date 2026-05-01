@@ -4,10 +4,10 @@ export enum Platform {
     Tiktok = 'tiktok',
 }
 
-export const platformToFrenchTranslation: Record<Platform, string> = {
-    [Platform.Instagram]: "Instagram",
-    [Platform.Youtube]: "YouTube",
-    [Platform.Tiktok]: "TikTok",
+export const platformTranslationKeys: Record<Platform, string> = {
+    [Platform.Instagram]: "enums:platform.instagram",
+    [Platform.Youtube]: "enums:platform.youtube",
+    [Platform.Tiktok]: "enums:platform.tiktok",
 }
 
 export const platformOptions = Object.values(Platform)

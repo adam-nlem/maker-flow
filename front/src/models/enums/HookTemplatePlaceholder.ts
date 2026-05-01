@@ -13,18 +13,18 @@ export enum HookTemplatePlaceholder {
 
 }
 
-export const hookTemplatePlaceholderToFrenchTranslation: Record<HookTemplatePlaceholder, string> = {
-    [HookTemplatePlaceholder.Topic]: "Sujet",
-    [HookTemplatePlaceholder.Audience]: "Audience",
-    [HookTemplatePlaceholder.Benefit]: "Bénéfice",
-    [HookTemplatePlaceholder.Statistic]: "Statistique",
-    [HookTemplatePlaceholder.Problem]: "Problème",
-    [HookTemplatePlaceholder.Product]: "Produit",
-    [HookTemplatePlaceholder.Result]: "Résultat",
-    [HookTemplatePlaceholder.Emotion]: "Émotion",
-    [HookTemplatePlaceholder.Number]: "Nombre",
-    [HookTemplatePlaceholder.Goal]: "Objectif",
-    [HookTemplatePlaceholder.Date]: "Date",
+export const hookTemplatePlaceholderTranslationKeys: Record<HookTemplatePlaceholder, string> = {
+    [HookTemplatePlaceholder.Topic]: "enums:hookTemplatePlaceholder.topic",
+    [HookTemplatePlaceholder.Audience]: "enums:hookTemplatePlaceholder.audience",
+    [HookTemplatePlaceholder.Benefit]: "enums:hookTemplatePlaceholder.benefit",
+    [HookTemplatePlaceholder.Statistic]: "enums:hookTemplatePlaceholder.statistic",
+    [HookTemplatePlaceholder.Problem]: "enums:hookTemplatePlaceholder.problem",
+    [HookTemplatePlaceholder.Product]: "enums:hookTemplatePlaceholder.product",
+    [HookTemplatePlaceholder.Result]: "enums:hookTemplatePlaceholder.result",
+    [HookTemplatePlaceholder.Emotion]: "enums:hookTemplatePlaceholder.emotion",
+    [HookTemplatePlaceholder.Number]: "enums:hookTemplatePlaceholder.number",
+    [HookTemplatePlaceholder.Goal]: "enums:hookTemplatePlaceholder.goal",
+    [HookTemplatePlaceholder.Date]: "enums:hookTemplatePlaceholder.date",
 }
 
 export const hookTemplatePlaceholderOptions = Object.values(HookTemplatePlaceholder);

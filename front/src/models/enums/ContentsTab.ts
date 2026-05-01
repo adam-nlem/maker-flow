@@ -5,7 +5,7 @@ export enum ContentsTab {
 
 export const contentsTabOptions = Object.values(ContentsTab)
 
-export const contentsTabToFrenchTranslation: Record<ContentsTab, string> = {
-    [ContentsTab.Groups]: "Groupes",
-    [ContentsTab.Posts]: "Posts",
+export const contentsTabTranslationKeys: Record<ContentsTab, string> = {
+    [ContentsTab.Groups]: "enums:contentsTab.groups",
+    [ContentsTab.Posts]: "enums:contentsTab.posts",
 }

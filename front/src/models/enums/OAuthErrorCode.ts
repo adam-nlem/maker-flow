@@ -8,12 +8,12 @@ export enum OAuthErrorCode {
     Unknown = 'unknown',
 }
 
-export const oAuthErrorCodeToFrenchTranslation: Record<OAuthErrorCode, string> = {
-    [OAuthErrorCode.InvalidState]: "Session expirée, veuillez réessayer",
-    [OAuthErrorCode.MissingCode]: "Code d'autorisation manquant",
-    [OAuthErrorCode.UserNotFound]: "Utilisateur introuvable",
-    [OAuthErrorCode.TokenExchangeFailed]: "Échec de la connexion, veuillez réessayer",
-    [OAuthErrorCode.PlatformError]: "Erreur de la plateforme d'authentification",
-    [OAuthErrorCode.PopupBlocked]: "La fenêtre popup a été bloquée par votre navigateur",
-    [OAuthErrorCode.Unknown]: "Une erreur est survenue, veuillez réessayer",
+export const oAuthErrorCodeTranslationKeys: Record<OAuthErrorCode, string> = {
+    [OAuthErrorCode.InvalidState]: "enums:oAuthErrorCode.invalidState",
+    [OAuthErrorCode.MissingCode]: "enums:oAuthErrorCode.missingCode",
+    [OAuthErrorCode.UserNotFound]: "enums:oAuthErrorCode.userNotFound",
+    [OAuthErrorCode.TokenExchangeFailed]: "enums:oAuthErrorCode.tokenExchangeFailed",
+    [OAuthErrorCode.PlatformError]: "enums:oAuthErrorCode.platformError",
+    [OAuthErrorCode.PopupBlocked]: "enums:oAuthErrorCode.popupBlocked",
+    [OAuthErrorCode.Unknown]: "enums:oAuthErrorCode.unknown",
 };

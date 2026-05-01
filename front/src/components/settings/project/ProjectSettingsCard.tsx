@@ -2,7 +2,7 @@ import { useMemo, useState } from "react";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import type { Project } from "~/models/Project";
-import { ProjectType, projectTypeOptions, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType";
+import { ProjectType, projectTypeOptions, projectTypeTranslationKeys } from "~/models/enums/ProjectType";
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { Button } from "~/components/ui/Button";
@@ -91,7 +91,7 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                         {projectTypeOptions.map(type => (
                             <Pill
                                 key={type}
-                                label={projectTypeToFrenchTranslation[type]}
+                                label={t(projectTypeTranslationKeys[type])}
                                 isSelected={types.includes(type)}
                                 bgColorClassName="bg-primary/10"
                                 borderColorClassName="border border-primary/30"
