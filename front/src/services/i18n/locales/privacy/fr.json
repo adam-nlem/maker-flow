@@ -1,0 +1,110 @@
+{
+    "title": "Politique de Confidentialité",
+    "lastUpdated": "Dernière mise à jour : {{date}}",
+    "lastUpdatedDate": "8 avril 2026",
+    "backToHome": "Retour à l'accueil",
+    "introduction": {
+        "title": "1. Introduction",
+        "p1": "MakerFlow est une application destinée aux créateurs de contenu. Elle permet de connecter des comptes de réseaux sociaux (Instagram, YouTube) afin de consulter des statistiques de performance sur vos publications, et de rédiger des scripts pour vos contenus.",
+        "p2": "La présente politique de confidentialité décrit les données que nous collectons, comment nous les utilisons, les stockons et les protégeons, ainsi que vos droits en tant qu'utilisateur."
+    },
+    "dataCollected": {
+        "title": "2. Données collectées",
+        "intro": "Lorsque vous connectez un compte de réseau social à MakerFlow via le protocole OAuth, nous collectons et stockons les données suivantes selon la plateforme :",
+        "instagram": {
+            "title": "Instagram",
+            "profileLabel": "Profil",
+            "profileItems": [
+                "Identifiant utilisateur, nom d'utilisateur, nom d'affichage",
+                "Photo de profil (URL)"
+            ],
+            "contentLabel": "Contenu",
+            "contentItems": [
+                "Identifiants des publications",
+                "Type de média (image, vidéo, carrousel)",
+                "Légendes, miniatures (URL), liens permanents",
+                "Date de publication"
+            ],
+            "analyticsLabel": "Analyse",
+            "analyticsItems": [
+                "Portée, vues, mentions J'aime, commentaires, partages, sauvegardes",
+                "Temps de visionnage moyen et total (vidéos)",
+                "Nombre d'abonnés"
+            ]
+        },
+        "youtube": {
+            "title": "YouTube",
+            "channelLabel": "Chaîne",
+            "channelItems": [
+                "Identifiant de chaîne, nom de la chaîne, URL personnalisée",
+                "Photo de profil (miniature)"
+            ],
+            "contentLabel": "Contenu",
+            "contentItems": [
+                "Identifiants des vidéos",
+                "Titres, miniatures (URL), liens permanents",
+                "Durée des vidéos",
+                "Date de publication"
+            ],
+            "analyticsLabel": "Analyse",
+            "analyticsItems": [
+                "Vues, mentions J'aime, commentaires, partages",
+                "Temps de visionnage moyen et total",
+                "Impressions de miniatures et taux de clics",
+                "Abonnés gagnés et perdus",
+                "Répartition par pays, statut d'abonnement et type de contenu (en direct / à la demande)"
+            ]
+        },
+        "auth": {
+            "title": "Données d'authentification (toutes plateformes)",
+            "items": [
+                "Jetons d'accès et de rafraîchissement OAuth (chiffrés au repos, jamais exposés au navigateur)"
+            ]
+        }
+    },
+    "dataUsage": {
+        "title": "3. Utilisation des données",
+        "intro": "Les données collectées sont utilisées exclusivement pour :",
+        "items": [
+            "Afficher vos statistiques de performance dans votre tableau de bord personnel",
+            "Synchroniser périodiquement vos données afin de maintenir vos analyses à jour",
+            "Vous notifier en cas d'expiration ou de révocation de votre connexion à une plateforme"
+        ],
+        "outro": "Vos données sont uniquement accessibles par vous. Nous ne vendons, ne louons et ne partageons vos données avec aucun tiers à des fins commerciales ou publicitaires."
+    },
+    "storage": {
+        "title": "4. Stockage et sécurité",
+        "intro": "Nous mettons en œuvre des mesures techniques appropriées pour protéger vos données :",
+        "items": [
+            "Les jetons d'accès OAuth sont chiffrés au repos",
+            "Les données sont stockées dans une base de données sécurisée à accès restreint",
+            "Les communications entre votre navigateur et nos serveurs sont chiffrées via HTTPS"
+        ]
+    },
+    "sharing": {
+        "title": "5. Partage des données",
+        "paragraph": "MakerFlow ne partage vos données avec aucun tiers. Les données obtenues via les API des plateformes sont traitées conformément aux <metaLink>Conditions de la Plateforme Meta</metaLink> et aux <youtubeLink>Conditions d'utilisation des services API YouTube</youtubeLink>."
+    },
+    "retention": {
+        "title": "6. Conservation et suppression",
+        "intro": "Vos données sont conservées tant que votre compte MakerFlow est actif.",
+        "items": [
+            "Lorsque vous déconnectez un compte (Instagram ou YouTube) de MakerFlow, les données d'analyse déjà collectées sont conservées afin de préserver votre historique de statistiques",
+            "Lorsque vous supprimez votre compte MakerFlow, l'ensemble de vos données est supprimé définitivement"
+        ]
+    },
+    "rights": {
+        "title": "7. Vos droits",
+        "intro": "En tant qu'utilisateur, vous avez le droit de :",
+        "items": [
+            "Accéder aux données que nous détenons à votre sujet",
+            "Demander la suppression de vos données à tout moment",
+            "Déconnecter vos comptes (Instagram, YouTube) depuis les paramètres de l'application",
+            "Révoquer l'accès de MakerFlow depuis les paramètres de votre compte Instagram ou YouTube"
+        ]
+    },
+    "contact": {
+        "title": "8. Contact",
+        "paragraph": "Pour toute question relative à cette politique de confidentialité ou à vos données personnelles, vous pouvez nous contacter à l'adresse suivante :"
+    }
+}

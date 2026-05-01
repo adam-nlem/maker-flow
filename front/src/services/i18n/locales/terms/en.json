@@ -1,0 +1,91 @@
+{
+    "title": "Terms of Service",
+    "lastUpdated": "Last updated: {{date}}",
+    "lastUpdatedDate": "April 9, 2026",
+    "backToHome": "Back to home",
+    "purpose": {
+        "title": "1. Purpose",
+        "p1": "These Terms of Service (hereafter \"Terms\") define the terms and conditions of use of the MakerFlow application, available online.",
+        "p2": "MakerFlow is an application designed for content creators. It lets you connect social media accounts (Instagram, YouTube), view performance analytics and write scripts for your content.",
+        "p3": "Using MakerFlow implies full and complete acceptance of these Terms. If you do not accept these conditions, please do not use the application."
+    },
+    "access": {
+        "title": "2. Access and registration",
+        "intro": "Access to MakerFlow requires the creation of a user account. When registering, you must provide accurate and up-to-date information.",
+        "items": [
+            "Use of MakerFlow is reserved for people aged 16 or over",
+            "You are responsible for the accuracy of the information provided when registering",
+            "MakerFlow reserves the right to refuse or suspend access to any user not complying with these Terms"
+        ]
+    },
+    "services": {
+        "title": "3. Description of services",
+        "intro": "MakerFlow offers the following features:",
+        "items": [
+            "Connection of Instagram and YouTube accounts via the OAuth protocol to collect performance analytics",
+            "Analytics dashboard to visualize the performance of your posts",
+            "Writing and organizing scripts for your content"
+        ],
+        "outro": "MakerFlow reserves the right to evolve, modify or remove certain features at any time, without prior notice."
+    },
+    "billing": {
+        "title": "4. Subscriptions and payments",
+        "intro": "MakerFlow offers different paid subscription plans with various features and usage limits. Details of the offers (prices, included credits, limits) can be viewed from the application.",
+        "items": [
+            "Payments are managed by Stripe, a secure payment provider. MakerFlow does not store any banking data",
+            "Subscriptions are automatically renewed at each billing period, unless previously cancelled by the user",
+            "You can cancel your subscription at any time from the application settings. Cancellation takes effect at the end of the current billing period",
+            "In case of cancellation, you retain access to paid features until the end of the period already paid for",
+            "Each subscription includes a number of monthly credits. Additional credit top-ups can be purchased separately"
+        ],
+        "outro": "MakerFlow reserves the right to change subscription pricing and conditions. Users will be informed of any modification before the next renewal."
+    },
+    "account": {
+        "title": "5. User account",
+        "intro": "You are entirely responsible for the security of your account and the confidentiality of your login credentials.",
+        "item1": "You must not share your credentials with third parties",
+        "item2": "Any activity carried out from your account is deemed to have been performed by you",
+        "item3": "In case of suspicion of unauthorized use of your account, you must notify us immediately at <contactLink>contact@maker-flow.com</contactLink>"
+    },
+    "obligations": {
+        "title": "6. User obligations",
+        "intro": "When using MakerFlow, you agree to:",
+        "items": [
+            "Comply with these Terms as well as applicable legislation",
+            "Not use the application for unlawful, fraudulent purposes or purposes infringing the rights of third parties",
+            "Not attempt to gain unauthorized access to MakerFlow's systems or data",
+            "Not disrupt the normal operation of the application",
+            "Comply with the terms of use of connected third-party platforms (Instagram, YouTube)"
+        ]
+    },
+    "intellectualProperty": {
+        "title": "7. Intellectual property",
+        "p1": "All elements composing MakerFlow (interface, design, source code, logos, texts) are the exclusive property of MakerFlow and are protected by intellectual property laws.",
+        "p2": "You retain all rights over the content you create through the application (scripts). MakerFlow does not claim any ownership rights over your content."
+    },
+    "liability": {
+        "title": "8. Limitation of liability",
+        "intro": "MakerFlow is provided \"as is\". We strive to ensure the availability and proper functioning of the application, but cannot guarantee:",
+        "items": [
+            "The absence of interruptions or errors in the operation of the service",
+            "The permanent availability of third-party APIs (Instagram, YouTube) on which certain features depend",
+            "The absolute accuracy of statistical data collected from third-party platforms"
+        ],
+        "outro": "MakerFlow cannot be held responsible for direct or indirect damages resulting from the use or inability to use the application."
+    },
+    "personalData": {
+        "title": "9. Personal data",
+        "p1": "MakerFlow collects and processes personal data as part of its operation. The details of the collection, use and protection of your data are described in our <privacyLink>Privacy Policy</privacyLink>.",
+        "p2": "By using MakerFlow, you acknowledge that you have read this policy and accept its terms."
+    },
+    "modifications": {
+        "title": "10. Modification of the Terms",
+        "p1": "MakerFlow reserves the right to modify these Terms at any time. Users will be informed of any substantial modification.",
+        "p2": "Continued use of the application after modification of the Terms constitutes acceptance of the new conditions."
+    },
+    "contact": {
+        "title": "11. Applicable law and contact",
+        "p1": "These Terms are governed by French law. In case of dispute regarding the interpretation or execution of these Terms, French courts will have sole jurisdiction.",
+        "p2": "For any question regarding these Terms, you can contact us at the following address:"
+    }
+}
