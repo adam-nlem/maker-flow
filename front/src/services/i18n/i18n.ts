@@ -30,7 +30,8 @@ i18next
     .init({
         resources,
         supportedLngs: [Language.Fr, Language.En],
-        fallbackLng: Language.Fr,
+        fallbackLng: Language.En,
+        load: "languageOnly",
         defaultNS: "common",
         ns: Array.from(namespaces),
         detection: {
