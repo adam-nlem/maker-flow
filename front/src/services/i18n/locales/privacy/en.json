@@ -1,0 +1,110 @@
+{
+    "title": "Privacy Policy",
+    "lastUpdated": "Last updated: {{date}}",
+    "lastUpdatedDate": "April 8, 2026",
+    "backToHome": "Back to home",
+    "introduction": {
+        "title": "1. Introduction",
+        "p1": "MakerFlow is an application designed for content creators. It lets you connect social media accounts (Instagram, YouTube) to view performance analytics on your posts, and to write scripts for your content.",
+        "p2": "This privacy policy describes the data we collect, how we use, store and protect it, and your rights as a user."
+    },
+    "dataCollected": {
+        "title": "2. Data collected",
+        "intro": "When you connect a social media account to MakerFlow via the OAuth protocol, we collect and store the following data depending on the platform:",
+        "instagram": {
+            "title": "Instagram",
+            "profileLabel": "Profile",
+            "profileItems": [
+                "User ID, username, display name",
+                "Profile picture (URL)"
+            ],
+            "contentLabel": "Content",
+            "contentItems": [
+                "Post IDs",
+                "Media type (image, video, carousel)",
+                "Captions, thumbnails (URL), permalinks",
+                "Publish date"
+            ],
+            "analyticsLabel": "Analytics",
+            "analyticsItems": [
+                "Reach, views, likes, comments, shares, saves",
+                "Average and total watch time (videos)",
+                "Follower count"
+            ]
+        },
+        "youtube": {
+            "title": "YouTube",
+            "channelLabel": "Channel",
+            "channelItems": [
+                "Channel ID, channel name, custom URL",
+                "Profile picture (thumbnail)"
+            ],
+            "contentLabel": "Content",
+            "contentItems": [
+                "Video IDs",
+                "Titles, thumbnails (URL), permalinks",
+                "Video duration",
+                "Publish date"
+            ],
+            "analyticsLabel": "Analytics",
+            "analyticsItems": [
+                "Views, likes, comments, shares",
+                "Average and total watch time",
+                "Thumbnail impressions and click-through rate",
+                "Subscribers gained and lost",
+                "Breakdown by country, subscription status and content type (live / on-demand)"
+            ]
+        },
+        "auth": {
+            "title": "Authentication data (all platforms)",
+            "items": [
+                "OAuth access and refresh tokens (encrypted at rest, never exposed to the browser)"
+            ]
+        }
+    },
+    "dataUsage": {
+        "title": "3. Data usage",
+        "intro": "The data collected is used exclusively to:",
+        "items": [
+            "Display your performance analytics in your personal dashboard",
+            "Periodically synchronize your data to keep your analytics up to date",
+            "Notify you when your connection to a platform expires or is revoked"
+        ],
+        "outro": "Your data is only accessible by you. We do not sell, rent or share your data with any third party for commercial or advertising purposes."
+    },
+    "storage": {
+        "title": "4. Storage and security",
+        "intro": "We implement appropriate technical measures to protect your data:",
+        "items": [
+            "OAuth access tokens are encrypted at rest",
+            "Data is stored in a secure database with restricted access",
+            "Communications between your browser and our servers are encrypted via HTTPS"
+        ]
+    },
+    "sharing": {
+        "title": "5. Data sharing",
+        "paragraph": "MakerFlow does not share your data with any third party. Data obtained via the platforms' APIs is processed in accordance with the <metaLink>Meta Platform Terms</metaLink> and the <youtubeLink>YouTube API Services Terms of Service</youtubeLink>."
+    },
+    "retention": {
+        "title": "6. Retention and deletion",
+        "intro": "Your data is retained for as long as your MakerFlow account is active.",
+        "items": [
+            "When you disconnect an account (Instagram or YouTube) from MakerFlow, the analytics data already collected is retained to preserve your statistics history",
+            "When you delete your MakerFlow account, all of your data is permanently deleted"
+        ]
+    },
+    "rights": {
+        "title": "7. Your rights",
+        "intro": "As a user, you have the right to:",
+        "items": [
+            "Access the data we hold about you",
+            "Request the deletion of your data at any time",
+            "Disconnect your accounts (Instagram, YouTube) from the application settings",
+            "Revoke MakerFlow's access from your Instagram or YouTube account settings"
+        ]
+    },
+    "contact": {
+        "title": "8. Contact",
+        "paragraph": "For any question regarding this privacy policy or your personal data, you can contact us at the following address:"
+    }
+}

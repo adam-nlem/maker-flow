@@ -1,0 +1,91 @@
+{
+    "title": "Conditions Générales d'Utilisation",
+    "lastUpdated": "Dernière mise à jour : {{date}}",
+    "lastUpdatedDate": "9 avril 2026",
+    "backToHome": "Retour à l'accueil",
+    "purpose": {
+        "title": "1. Objet",
+        "p1": "Les présentes Conditions Générales d'Utilisation (ci-après « CGU ») ont pour objet de définir les modalités et conditions d'utilisation de l'application MakerFlow, accessible en ligne.",
+        "p2": "MakerFlow est une application destinée aux créateurs de contenu. Elle permet de connecter des comptes de réseaux sociaux (Instagram, YouTube), de consulter des statistiques de performance et de rédiger des scripts pour vos contenus.",
+        "p3": "L'utilisation de MakerFlow implique l'acceptation pleine et entière des présentes CGU. Si vous n'acceptez pas ces conditions, veuillez ne pas utiliser l'application."
+    },
+    "access": {
+        "title": "2. Accès et inscription",
+        "intro": "L'accès à MakerFlow nécessite la création d'un compte utilisateur. Lors de l'inscription, vous devez fournir des informations exactes et à jour.",
+        "items": [
+            "L'utilisation de MakerFlow est réservée aux personnes âgées d'au moins 16 ans",
+            "Vous êtes responsable de la véracité des informations fournies lors de votre inscription",
+            "MakerFlow se réserve le droit de refuser ou de suspendre l'accès à tout utilisateur ne respectant pas les présentes CGU"
+        ]
+    },
+    "services": {
+        "title": "3. Description des services",
+        "intro": "MakerFlow propose les fonctionnalités suivantes :",
+        "items": [
+            "Connexion de comptes Instagram et YouTube via le protocole OAuth pour la collecte de statistiques de performance",
+            "Tableau de bord analytique permettant de visualiser les performances de vos publications",
+            "Rédaction et organisation de scripts pour vos contenus"
+        ],
+        "outro": "MakerFlow se réserve le droit de faire évoluer, modifier ou supprimer certaines fonctionnalités à tout moment, sans préavis."
+    },
+    "billing": {
+        "title": "4. Abonnements et paiements",
+        "intro": "MakerFlow propose différentes formules d'abonnement payant offrant des fonctionnalités et des limites d'utilisation variées. Les détails des offres (prix, crédits inclus, limites) sont consultables depuis l'application.",
+        "items": [
+            "Les paiements sont gérés par Stripe, prestataire de paiement sécurisé. MakerFlow ne stocke aucune donnée bancaire",
+            "Les abonnements sont renouvelés automatiquement à chaque période de facturation, sauf résiliation préalable par l'utilisateur",
+            "Vous pouvez résilier votre abonnement à tout moment depuis les paramètres de l'application. La résiliation prend effet à la fin de la période de facturation en cours",
+            "En cas de résiliation, vous conservez l'accès aux fonctionnalités payantes jusqu'à la fin de la période déjà réglée",
+            "Chaque abonnement inclut un nombre de crédits mensuels. Des recharges de crédits supplémentaires peuvent être achetées séparément"
+        ],
+        "outro": "MakerFlow se réserve le droit de modifier les tarifs et les conditions des abonnements. Les utilisateurs seront informés de toute modification avant le prochain renouvellement."
+    },
+    "account": {
+        "title": "5. Compte utilisateur",
+        "intro": "Vous êtes entièrement responsable de la sécurité de votre compte et de la confidentialité de vos identifiants de connexion.",
+        "item1": "Vous ne devez pas partager vos identifiants avec des tiers",
+        "item2": "Toute activité réalisée depuis votre compte est réputée avoir été effectuée par vous",
+        "item3": "En cas de suspicion d'utilisation non autorisée de votre compte, vous devez nous en informer immédiatement à l'adresse <contactLink>contact@maker-flow.com</contactLink>"
+    },
+    "obligations": {
+        "title": "6. Obligations de l'utilisateur",
+        "intro": "En utilisant MakerFlow, vous vous engagez à :",
+        "items": [
+            "Respecter les présentes CGU ainsi que la législation en vigueur",
+            "Ne pas utiliser l'application à des fins illicites, frauduleuses ou portant atteinte aux droits de tiers",
+            "Ne pas tenter d'accéder de manière non autorisée aux systèmes ou données de MakerFlow",
+            "Ne pas perturber le fonctionnement normal de l'application",
+            "Respecter les conditions d'utilisation des plateformes tierces connectées (Instagram, YouTube)"
+        ]
+    },
+    "intellectualProperty": {
+        "title": "7. Propriété intellectuelle",
+        "p1": "L'ensemble des éléments composant MakerFlow (interface, design, code source, logos, textes) sont la propriété exclusive de MakerFlow et sont protégés par les lois relatives à la propriété intellectuelle.",
+        "p2": "Vous conservez l'intégralité de vos droits sur les contenus que vous créez via l'application (scripts). MakerFlow ne revendique aucun droit de propriété sur vos contenus."
+    },
+    "liability": {
+        "title": "8. Limitation de responsabilité",
+        "intro": "MakerFlow est fourni « en l'état ». Nous nous efforçons d'assurer la disponibilité et le bon fonctionnement de l'application, mais ne pouvons garantir :",
+        "items": [
+            "L'absence d'interruptions ou d'erreurs dans le fonctionnement du service",
+            "La disponibilité permanente des API tierces (Instagram, YouTube) dont dépendent certaines fonctionnalités",
+            "L'exactitude absolue des données statistiques collectées auprès des plateformes tierces"
+        ],
+        "outro": "MakerFlow ne saurait être tenu responsable des dommages directs ou indirects résultant de l'utilisation ou de l'impossibilité d'utilisation de l'application."
+    },
+    "personalData": {
+        "title": "9. Données personnelles",
+        "p1": "MakerFlow collecte et traite des données personnelles dans le cadre de son fonctionnement. Le détail de la collecte, de l'utilisation et de la protection de vos données est décrit dans notre <privacyLink>Politique de Confidentialité</privacyLink>.",
+        "p2": "En utilisant MakerFlow, vous reconnaissez avoir pris connaissance de cette politique et en acceptez les termes."
+    },
+    "modifications": {
+        "title": "10. Modification des CGU",
+        "p1": "MakerFlow se réserve le droit de modifier les présentes CGU à tout moment. Les utilisateurs seront informés de toute modification substantielle.",
+        "p2": "La poursuite de l'utilisation de l'application après modification des CGU vaut acceptation des nouvelles conditions."
+    },
+    "contact": {
+        "title": "11. Droit applicable et contact",
+        "p1": "Les présentes CGU sont régies par le droit français. En cas de litige relatif à l'interprétation ou à l'exécution des présentes, les tribunaux français seront seuls compétents.",
+        "p2": "Pour toute question relative aux présentes CGU, vous pouvez nous contacter à l'adresse suivante :"
+    }
+}
