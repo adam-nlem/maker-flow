@@ -1,11 +1,12 @@
 import { useState, useRef } from "react";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import { Button } from "~/components/ui/Button";
 import Pill from "~/components/ui/Pill";
 import { useCreateHookTemplate } from "~/hooks/api/hookTemplates/useCreateHookTemplate";
-import { HookTemplatePlaceholder, hookTemplatePlaceholderOptions, hookTemplatePlaceholderToFrenchTranslation } from "~/models/enums/HookTemplatePlaceholder";
+import { HookTemplatePlaceholder, hookTemplatePlaceholderOptions, hookTemplatePlaceholderTranslationKeys } from "~/models/enums/HookTemplatePlaceholder";
 import { insertPlaceholder, formatPlaceholderToken } from "~/utils/hookPlaceholderParser";
 import ModalOverlay from "~/components/ui/ModalOverlay";
 
@@ -15,6 +16,7 @@ interface CreateHookTemplateModalProps {
 }
 
 export default function CreateHookTemplateModal({ showModal, onClose }: CreateHookTemplateModalProps) {
+    const { t } = useTranslation();
     const [title, setTitle] = useState("");
     const [content, setContent] = useState("");
     const [isPublic, setIsPublic] = useState(false);
@@ -56,13 +58,13 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
         <ModalOverlay isOpen={showModal} onClose={onClose}>
             <div className="flex flex-col gap-3 py-5 px-10 flex-1 min-h-0 overflow-y-auto">
                 <h1 className="text-heading-lg">
-                    Nouveau template de hook
+                    {t("scripts:hooks.create.modalTitle")}
                 </h1>
-                <p className="text-body-xs">Créez un template réutilisable pour vos hooks. Ajoutez des placeholders pour personnaliser le contenu à chaque utilisation.</p>
+                <p className="text-body-xs">{t("scripts:hooks.create.modalDescription")}</p>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <Input
-                        label="Titre"
-                        placeholder="Nom du template"
+                        label={t("scripts:hooks.create.titleLabel")}
+                        placeholder={t("scripts:hooks.create.titlePlaceholder")}
                         id="title"
                         name="title"
                         type="text"
@@ -74,8 +76,8 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                     <div>
                         <TextArea
                             ref={textAreaRef}
-                            label="Contenu"
-                            placeholder="Écrivez le contenu du hook..."
+                            label={t("scripts:hooks.create.contentLabel")}
+                            placeholder={t("scripts:hooks.create.contentPlaceholder")}
                             id="content"
                             name="content"
                             required
@@ -84,7 +86,7 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                         />
 
                         <div className="mt-3">
-                            <p className="text-heading-sm">Placeholders</p>
+                            <p className="text-heading-sm">{t("scripts:hooks.create.placeholdersHeader")}</p>
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {hookTemplatePlaceholderOptions.map((placeholder) => {
                                     const isUsed = content.includes(formatPlaceholderToken(placeholder));
@@ -96,7 +98,7 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                                             className={isUsed ? "opacity-40 pointer-events-none" : "cursor-pointer"}
                                         >
                                             <Pill
-                                                label={hookTemplatePlaceholderToFrenchTranslation[placeholder]}
+                                                label={t(hookTemplatePlaceholderTranslationKeys[placeholder])}
                                                 isSelected
                                                 bgColorClassName="bg-purple/10 hover:bg-purple/20" borderColorClassName="border-primary/30"
                                                 textColorClassName="text-primary"
@@ -115,7 +117,7 @@ export default function CreateHookTemplateModal({ showModal, onClose }: CreateHo
                         disabled={isPending}
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
-                            <p className="text-sm">Créer le template</p>
+                            <p className="text-sm">{t("scripts:hooks.create.submit")}</p>
                             <ChevronRightIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>

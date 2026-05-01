@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { TagIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import type { Script } from "~/models/Script";
 import type { ScriptTag } from "~/models/ScriptTag";
 import { colorToBgClass, colorToBorderClass, colorToTextClass } from "~/models/enums/Color";
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props) {
+    const { t } = useTranslation();
     const [showDropdown, setShowDropdown] = useState(false);
     const [localTags, setLocalTags] = useState<ScriptTag[]>(script.tags);
     const pendingMutations = useRef(0);
@@ -72,7 +74,7 @@ export default function ScriptTagsRow({ script, projectUuid, isReadOnly }: Props
                     <Pill
                         onClick={() => setShowDropdown(!showDropdown)}
                         icon={TagIcon}
-                        label="Tag"
+                        label={t("scripts:tags.tagPlaceholder")}
                     />
                     {showDropdown && (
                         <ListScriptTagsDropdown

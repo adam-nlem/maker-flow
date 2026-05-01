@@ -8,11 +8,11 @@ export enum ScriptGenerationStatus {
     Failed = 'failed',
 }
 
-export const scriptGenerationStatusToFrenchTranslation: Record<ScriptGenerationStatus, string> = {
-    [ScriptGenerationStatus.Pending]: "En attente",
-    [ScriptGenerationStatus.Processing]: "Génération en cours",
-    [ScriptGenerationStatus.Completed]: "Terminé",
-    [ScriptGenerationStatus.Failed]: "Échoué",
+export const scriptGenerationStatusTranslationKeys: Record<ScriptGenerationStatus, string> = {
+    [ScriptGenerationStatus.Pending]: "enums:scriptGenerationStatus.pending",
+    [ScriptGenerationStatus.Processing]: "enums:scriptGenerationStatus.processing",
+    [ScriptGenerationStatus.Completed]: "enums:scriptGenerationStatus.completed",
+    [ScriptGenerationStatus.Failed]: "enums:scriptGenerationStatus.failed",
 }
 
 export const scriptGenerationStatusToBgClass: Record<ScriptGenerationStatus, string> = {

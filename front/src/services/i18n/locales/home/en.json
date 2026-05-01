@@ -1,0 +1,26 @@
+{
+    "noPosts": "No posts found.",
+    "noPostGroups": "No post groups found.",
+    "rankingPostGroups": "Top post groups",
+    "rankingPosts": "Top posts",
+    "postsCount_one": "{{count}} post",
+    "postsCount_other": "{{count}} posts",
+    "overview": {
+        "header": "Overview — All platforms",
+        "totalFollowers": "Total followers",
+        "totalViews": "Total views",
+        "engagement": "Engagement"
+    },
+    "viewsEvolution": {
+        "title": "Views evolution"
+    },
+    "scripts": {
+        "header": "Scripts",
+        "newScript": "New",
+        "newScriptTitle": "New script",
+        "noScripts": "No scripts yet.",
+        "newScriptHint": "Click + New to create one.",
+        "modifiedRelative": "Updated {{when}}",
+        "noScriptsInCategory": "No scripts in this category."
+    }
+}

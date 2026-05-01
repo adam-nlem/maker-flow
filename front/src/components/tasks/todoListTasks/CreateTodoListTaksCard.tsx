@@ -1,5 +1,6 @@
 import { ExclamationTriangleIcon, TagIcon, CalendarDateRangeIcon } from "@heroicons/react/16/solid";
 import { useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Badge } from "~/components/ui/Badge";
 import { Input } from "~/components/ui/Input";
 import ListTodoListTagsDropdown from "../todoListTags/ListTodoListTagsDropdown";
@@ -8,7 +9,7 @@ import { useCreateTodoListTask } from "~/hooks/api/todoListTasks/useCreateTodoLi
 import { colorToBgClass, colorToTextClass } from "~/models/enums/Color";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
 import type { TodoListTag } from "~/models/TodoListTag";
-import { todoListPriorityOptions, todoListPriorityToBgClass, todoListPriorityToFrenchTranslation, todoListPriorityToTextClass } from "~/models/enums/TodoListPriority";
+import { todoListPriorityOptions, todoListPriorityToBgClass, todoListPriorityTranslationKeys, todoListPriorityToTextClass } from "~/models/enums/TodoListPriority";
 import { TodoListPriority } from "~/models/enums/TodoListPriority";
 import AddDueDateDropdown from "./AddDueDateDropdown";
 import { Button } from "~/components/ui/Button";
@@ -21,6 +22,7 @@ interface CreateTodoListTaskCardProps {
 
 
 export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: CreateTodoListTaskCardProps) {
+    const { t } = useTranslation();
     const [title, setTitle] = useState("");
     const [priority, setPriority] = useState<TodoListPriority | undefined>(undefined);
     const [dueDate, setDueDate] = useState<Date | undefined>(undefined);
@@ -44,7 +46,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
     return (
         <div className="border border-light-gray rounded-lg p-2 flex flex-col gap-3">
             <Input
-                placeholder="Titre"
+                placeholder={t("tasks:task.titlePlaceholder")}
                 id="title"
                 name="title"
                 type="text"
@@ -57,7 +59,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
             <div ref={tagButtonRef}>
                 <SimpleTextButton onClick={() => setShowTagsDropdown(!showTagsDropdown)}>
                     <TagIcon className="size-3.5" strokeWidth={2} />
-                    <p>Ajouter un tag</p>
+                    <p>{t("tasks:task.addTag")}</p>
                 </SimpleTextButton>
             </div>
             {showTagsDropdown && <ListTodoListTagsDropdown
@@ -91,7 +93,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                     priority ? (
                         <Badge
                             icon={ExclamationTriangleIcon}
-                            label={todoListPriorityToFrenchTranslation[priority]}
+                            label={t(todoListPriorityTranslationKeys[priority])}
                             textColor={todoListPriorityToTextClass[priority]}
                             bgColor={todoListPriorityToBgClass[priority]}
                             onRemoveClick={() => setPriority(undefined)}
@@ -100,14 +102,14 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                     ) : (
                         <SimpleTextButton onClick={onClick}>
                             <ExclamationTriangleIcon className="size-3.5" strokeWidth={2} />
-                            <p>Ajouter une priorité</p>
+                            <p>{t("tasks:task.addPriority")}</p>
                         </SimpleTextButton>
                     )
                 )}
                 renderItem={({ item, onSelect }) => (
                     <Badge
                         icon={ExclamationTriangleIcon}
-                        label={todoListPriorityToFrenchTranslation[item]}
+                        label={t(todoListPriorityTranslationKeys[item])}
                         textColor={todoListPriorityToTextClass[item]}
                         bgColor={todoListPriorityToBgClass[item]}
                         onRemoveClick={() => setPriority(undefined)}
@@ -128,7 +130,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                 ) : (
                     <SimpleTextButton onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}>
                         <CalendarDateRangeIcon className="size-3.5" strokeWidth={2} />
-                        <p>Ajouter une date</p>
+                        <p>{t("tasks:task.addDueDate")}</p>
                     </SimpleTextButton>
                 )}
             </div>
@@ -150,7 +152,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                 }}
                 disabled={isPending || title.trim() === ""}
             >
-                Créer
+                {t("tasks:task.create")}
             </Button>}
         </div>
     );

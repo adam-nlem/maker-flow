@@ -8,14 +8,14 @@ export enum VideoDuration {
     TwentyPlusMinutes = '20_plus_minutes',
 }
 
-export const videoDurationToFrenchTranslation: Record<VideoDuration, string> = {
-    [VideoDuration.ThirtySeconds]: "30 secondes",
-    [VideoDuration.OneMinute]: "1 minute",
-    [VideoDuration.OneMinuteThirty]: "1 min 30",
-    [VideoDuration.TwoMinutes]: "2 minutes",
-    [VideoDuration.FiveToTenMinutes]: "5-10 minutes",
-    [VideoDuration.TenToTwentyMinutes]: "10-20 minutes",
-    [VideoDuration.TwentyPlusMinutes]: "20+ minutes",
+export const videoDurationTranslationKeys: Record<VideoDuration, string> = {
+    [VideoDuration.ThirtySeconds]: "enums:videoDuration.thirtySeconds",
+    [VideoDuration.OneMinute]: "enums:videoDuration.oneMinute",
+    [VideoDuration.OneMinuteThirty]: "enums:videoDuration.oneMinuteThirty",
+    [VideoDuration.TwoMinutes]: "enums:videoDuration.twoMinutes",
+    [VideoDuration.FiveToTenMinutes]: "enums:videoDuration.fiveToTenMinutes",
+    [VideoDuration.TenToTwentyMinutes]: "enums:videoDuration.tenToTwentyMinutes",
+    [VideoDuration.TwentyPlusMinutes]: "enums:videoDuration.twentyPlusMinutes",
 }
 
 export const videoDurationOptions = Object.values(VideoDuration);

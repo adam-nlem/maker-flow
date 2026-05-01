@@ -9,11 +9,11 @@ export enum ScriptGoal {
 
 export const scriptGoalOptions = Object.values(ScriptGoal);
 
-export const scriptGoalToFrenchTranslation: Record<ScriptGoal, string> = {
-    [ScriptGoal.Educate]: "Éduquer",
-    [ScriptGoal.Entertain]: "Divertir",
-    [ScriptGoal.Inspire]: "Inspirer",
-    [ScriptGoal.SellPromote]: "Vendre / Promouvoir",
-    [ScriptGoal.GrowAudience]: "Développer l'audience",
-    [ScriptGoal.StartConversation]: "Lancer une conversation",
+export const scriptGoalTranslationKeys: Record<ScriptGoal, string> = {
+    [ScriptGoal.Educate]: "enums:scriptGoal.educate",
+    [ScriptGoal.Entertain]: "enums:scriptGoal.entertain",
+    [ScriptGoal.Inspire]: "enums:scriptGoal.inspire",
+    [ScriptGoal.SellPromote]: "enums:scriptGoal.sellPromote",
+    [ScriptGoal.GrowAudience]: "enums:scriptGoal.growAudience",
+    [ScriptGoal.StartConversation]: "enums:scriptGoal.startConversation",
 }

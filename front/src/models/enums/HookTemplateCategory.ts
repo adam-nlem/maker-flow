@@ -4,10 +4,10 @@ export enum HookTemplateCategory {
     Private = 'private',
 }
 
-export const hookTemplateCategoryToFrenchTranslation: Record<HookTemplateCategory, string> = {
-    [HookTemplateCategory.All]: "Tous",
-    [HookTemplateCategory.Public]: "Publics",
-    [HookTemplateCategory.Private]: "Privés",
+export const hookTemplateCategoryTranslationKeys: Record<HookTemplateCategory, string> = {
+    [HookTemplateCategory.All]: "enums:hookTemplateCategory.all",
+    [HookTemplateCategory.Public]: "enums:hookTemplateCategory.public",
+    [HookTemplateCategory.Private]: "enums:hookTemplateCategory.private",
 }
 
 export const hookTemplateCategoryOptions = Object.values(HookTemplateCategory);

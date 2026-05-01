@@ -3,9 +3,9 @@ export enum ShotType {
     BRoll = 'b_roll',
 }
 
-export const shotTypeToFrenchTranslation: Record<ShotType, string> = {
-    [ShotType.ARoll]: "A-Roll",
-    [ShotType.BRoll]: "B-Roll",
+export const shotTypeTranslationKeys: Record<ShotType, string> = {
+    [ShotType.ARoll]: "enums:shotType.aRoll",
+    [ShotType.BRoll]: "enums:shotType.bRoll",
 }
 
 export const shotTypeToBgClass: Record<ShotType, string> = {

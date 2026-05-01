@@ -1,4 +1,5 @@
-import { HookTemplatePlaceholder, hookTemplatePlaceholderToFrenchTranslation } from "~/models/enums/HookTemplatePlaceholder";
+import i18n from "~/services/i18n/i18n";
+import { HookTemplatePlaceholder, hookTemplatePlaceholderTranslationKeys } from "~/models/enums/HookTemplatePlaceholder";
 
 export interface HookPart {
     type: 'text' | 'placeholder';
@@ -14,7 +15,8 @@ export function parseHookPlaceholders(content: string): HookPart[] {
         .map((part) => {
             if (part.startsWith("[") && part.endsWith("]")) {
                 const key = part.slice(1, -1) as HookTemplatePlaceholder;
-                const label = hookTemplatePlaceholderToFrenchTranslation[key] ?? part;
+                const translationKey = hookTemplatePlaceholderTranslationKeys[key];
+                const label = translationKey ? i18n.t(translationKey) : part;
                 return { type: 'placeholder' as const, value: key, label };
             }
             return { type: 'text' as const, value: part, label: part };

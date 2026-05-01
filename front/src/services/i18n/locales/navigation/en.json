@@ -1,0 +1,10 @@
+{
+    "items": {
+        "home": "Home",
+        "scripts": "Script",
+        "calendar": "Calendar",
+        "contents": "Content",
+        "tasks": "Tasks",
+        "settings": "Settings"
+    }
+}

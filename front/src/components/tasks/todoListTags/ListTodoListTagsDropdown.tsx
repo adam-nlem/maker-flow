@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useFloating, offset, flip, shift, autoUpdate, useDismiss, useInteractions, FloatingPortal } from "@floating-ui/react"
+import { useTranslation } from "react-i18next";
 import { Badge } from "~/components/ui/Badge";
 import { useListTodoListTagsWithSearch } from "~/hooks/api/todoListTags/useListTodoListTagsWithSearch";
 import { TagIcon } from "@heroicons/react/16/solid";
@@ -21,6 +22,7 @@ interface ListTodoListTagsDropdownProps {
 }
 
 export default function ListTodoListTagsDropdown({ anchorRef, todoListUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListTodoListTagsDropdownProps) {
+    const { t } = useTranslation();
     const { setSearchTerm, todoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
     const [title, setTitle] = useState("");
     const [color, setColor] = useState(Color.Purple);
@@ -106,7 +108,7 @@ export default function ListTodoListTagsDropdown({ anchorRef, todoListUuid, sele
                 <SimpleTextButton onClick={handleCreateTag} children={
                     <>
                         <PlusIcon className="size-3.5" strokeWidth={2} />
-                        <p>{`Créer ${title}`}</p>
+                        <p>{t("tasks:tags.createPrefix", { title })}</p>
                     </>
                 }
                 />
@@ -115,7 +117,7 @@ export default function ListTodoListTagsDropdown({ anchorRef, todoListUuid, sele
             )
         }
 
-        return <p className="text-body-xs">Commencez à écrire pour créer un nouveau tag.</p>
+        return <p className="text-body-xs">{t("tasks:tags.emptyHint")}</p>
     }
 
     return (
@@ -128,7 +130,7 @@ export default function ListTodoListTagsDropdown({ anchorRef, todoListUuid, sele
             >
                 <Input
                     ref={inputRef}
-                    placeholder="Tag"
+                    placeholder={t("tasks:tags.tagPlaceholder")}
                     id="title"
                     name="title"
                     type="text"

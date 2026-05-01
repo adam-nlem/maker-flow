@@ -17,7 +17,7 @@ export function useReorderScriptParts() {
 
     const mutation = useMutation({
         mutationFn: async ({ scriptUuid, orderedParts }: ReorderScriptPartsData) => {
-            await httpClient.patch(`/scripts/${scriptUuid}/reorder-parts`, { orderedParts })
+            await httpClient.patch('/script-parts/reorder', { scriptUuid, orderedParts })
         },
         onSuccess: (_, { scriptUuid }) => {
             queryClient.invalidateQueries({ queryKey: scriptQueryKeys.parts(scriptUuid) })

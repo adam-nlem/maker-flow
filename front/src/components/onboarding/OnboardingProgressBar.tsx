@@ -1,16 +1,18 @@
 import { ChevronRightIcon } from "@heroicons/react/24/solid"
+import { useTranslation } from "react-i18next"
 import { useIsDesktop } from "~/hooks/useIsDesktop"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
-import { type OnboardingStep, ONBOARDING_STEP_ORDER, onboardingStepToIcon, onboardingStepToShortLabel } from "~/models/enums/OnboardingStep"
-import { WELCOME_STEP_ORDER, welcomeStepToIcon, welcomeStepToShortLabel } from "~/models/enums/WelcomeStep"
+import { type OnboardingStep, ONBOARDING_STEP_ORDER, onboardingStepToIcon, onboardingStepShortLabelKeys } from "~/models/enums/OnboardingStep"
+import { WELCOME_STEP_ORDER, welcomeStepToIcon, welcomeStepShortLabelKeys } from "~/models/enums/WelcomeStep"
 
 export default function OnboardingProgressBar() {
+    const { t } = useTranslation()
     const { isAuthenticated, onboarding, currentOnboardingStep, currentWelcomeStep, currentStep, totalSteps } = useOnboardingFlow()
     const isDesktop = useIsDesktop()
 
     const steps = isAuthenticated ? ONBOARDING_STEP_ORDER : WELCOME_STEP_ORDER
     const iconMap = isAuthenticated ? onboardingStepToIcon : welcomeStepToIcon
-    const labelMap = isAuthenticated ? onboardingStepToShortLabel : welcomeStepToShortLabel
+    const labelMap = isAuthenticated ? onboardingStepShortLabelKeys : welcomeStepShortLabelKeys
 
     const currentWelcomeIndex = WELCOME_STEP_ORDER.indexOf(currentWelcomeStep)
 
@@ -32,14 +34,14 @@ export default function OnboardingProgressBar() {
             <div className="flex flex-col gap-1 w-full">
                 <div className="flex items-center justify-between">
                     <span className="text-body-xs text-gray uppercase">
-                        Étape {currentStep + 1} sur {totalSteps}
+                        {t("onboarding:progress.stepCount", { current: currentStep + 1, total: totalSteps })}
                     </span>
                     <span className="text-body-xs text-gray">
                         {percentage}%
                     </span>
                 </div>
                 <span className="text-body-sm text-dark font-semibold">
-                    {labelMap[currentStepKey as keyof typeof labelMap]}
+                    {t(labelMap[currentStepKey as keyof typeof labelMap])}
                 </span>
                 <div className="h-1.5 w-full bg-light-gray rounded-full">
                     <div
@@ -68,7 +70,7 @@ export default function OnboardingProgressBar() {
                             <div className="flex items-center gap-1.5 shrink-0">
                                 <Icon className={`size-5 shrink-0 ${completed ? 'text-primary' : 'text-gray'}`} />
                                 <span className={`text-body-xs whitespace-nowrap ${current ? 'text-dark' : completed ? 'text-dark' : 'text-gray'}`}>
-                                    {labelMap[step as keyof typeof labelMap]}
+                                    {t(labelMap[step as keyof typeof labelMap])}
                                 </span>
                             </div>
                         </div>

@@ -5,7 +5,7 @@ export enum SourceBucket {
 
 export const sourceBucketOptions = Object.values(SourceBucket);
 
-export const sourceBucketToFrenchTranslation: Record<SourceBucket, string> = {
-    [SourceBucket.SubscriptionCredits]: "Abonnement",
-    [SourceBucket.RefillCredits]: "Recharge",
+export const sourceBucketTranslationKeys: Record<SourceBucket, string> = {
+    [SourceBucket.SubscriptionCredits]: "enums:sourceBucket.subscriptionCredits",
+    [SourceBucket.RefillCredits]: "enums:sourceBucket.refillCredits",
 };

@@ -1,0 +1,76 @@
+{
+    "integration": {
+        "expired": "Your connection has expired. Please reconnect.",
+        "notFound": "Integration not found.",
+        "alreadyConnected": "This project already has an integration for this platform."
+    },
+    "credit": {
+        "insufficient": "You don't have enough credits."
+    },
+    "stripe": {
+        "checkoutFailed": "Unable to create the checkout session.",
+        "invalidWebhookSignature": "Invalid webhook signature.",
+        "subscriptionFailed": "Unable to manage the subscription.",
+        "noActiveSubscription": "No active subscription found.",
+        "missingSignature": "Stripe signature missing.",
+        "subscriptionRequired": "An active subscription is required."
+    },
+    "otp": {
+        "incorrect": "Incorrect code.",
+        "expired": "Code expired. Please request a new one.",
+        "tooManyAttempts": "Maximum number of attempts reached. Please request a new code.",
+        "invalidSession": "Invalid or expired session.",
+        "expiredSession": "Invalid or expired session."
+    },
+    "prelaunch": {
+        "tooManyAttempts": "Too many attempts. Please try again later.",
+        "subscriberNotFound": "Subscriber not found.",
+        "featureUnavailable": "Feature unavailable."
+    },
+    "project": {
+        "notFound": "Project not found.",
+        "nameTaken": "This project name is already in use.",
+        "limitReached": "You have reached the project limit for your subscription.",
+        "alreadyClosed": "This project is already closed.",
+        "alreadyOpened": "This project is already open."
+    },
+    "script": {
+        "notFound": "Script not found.",
+        "limitReached": "You have reached the script limit for your subscription.",
+        "generationNotFound": "Generation not found.",
+        "planNotFound": "Plan not found.",
+        "tagNotFound": "Tag not found.",
+        "tagTitleTaken": "This tag title is already in use.",
+        "generationInProgress": "A script generation is already running.",
+        "cannotDeleteRunningGeneration": "Cannot delete a running generation."
+    },
+    "todoList": {
+        "listNotFound": "List not found.",
+        "taskNotFound": "Task not found.",
+        "tagNotFound": "Tag not found.",
+        "tagTitleTaken": "This tag title is already in use."
+    },
+    "post": {
+        "notFound": "Post not found.",
+        "thumbnailNotFound": "Thumbnail not found.",
+        "groupNotFound": "Post group not found."
+    },
+    "user": {
+        "invalidPassword": "The password does not meet the security requirements.",
+        "incorrectCurrentPassword": "The current password is incorrect.",
+        "passwordMismatch": "The passwords do not match.",
+        "missingPasswordFields": "All password fields are required."
+    },
+    "validation": {
+        "duplicateValue": "This value is already in use."
+    },
+    "auth": {
+        "missingCredentials": "Please provide an email and password.",
+        "invalidCredentials": "Incorrect email or password.",
+        "sessionExpired": "Session expired. Please log in again.",
+        "tokenExpired": "Session expired. Please log in again.",
+        "invalidSession": "Invalid session. Please log in again.",
+        "emailNotVerified": "Your email is not verified."
+    },
+    "fallback": "An error occurred"
+}

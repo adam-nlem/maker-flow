@@ -7,11 +7,11 @@ export enum RetentionCueType {
 
 export const retentionCueTypeOptions = Object.values(RetentionCueType);
 
-export const retentionCueTypeToFrenchTranslation: Record<RetentionCueType, string> = {
-    [RetentionCueType.Question]: "Question",
-    [RetentionCueType.Teaser]: "Teaser",
-    [RetentionCueType.PatternBreak]: "Rupture de pattern",
-    [RetentionCueType.Cliffhanger]: "Cliffhanger",
+export const retentionCueTypeTranslationKeys: Record<RetentionCueType, string> = {
+    [RetentionCueType.Question]: "enums:retentionCueType.question",
+    [RetentionCueType.Teaser]: "enums:retentionCueType.teaser",
+    [RetentionCueType.PatternBreak]: "enums:retentionCueType.patternBreak",
+    [RetentionCueType.Cliffhanger]: "enums:retentionCueType.cliffhanger",
 }
 
 export const retentionCueTypeToBgClass: Record<RetentionCueType, string> = {

@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { ArrowPathIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import type { Integration } from "~/models/Integration";
-import { IntegrationStatus, integrationStatusToBgClass, integrationStatusToBorderClass, integrationStatusToFrenchTranslation, integrationStatusToTextClass } from "~/models/enums/IntegrationStatus";
-import { type Platform, platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform";
-import { oAuthErrorCodeToFrenchTranslation } from "~/models/enums/OAuthErrorCode";
+import { IntegrationStatus, integrationStatusToBgClass, integrationStatusToBorderClass, integrationStatusTranslationKeys, integrationStatusToTextClass } from "~/models/enums/IntegrationStatus";
+import { type Platform, platformTranslationKeys, platformToIcon } from "~/models/enums/Platform";
+import { oAuthErrorCodeTranslationKeys } from "~/models/enums/OAuthErrorCode";
 import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInstagram";
 import { useRevokeIntegration } from "~/hooks/api/integrations/useRevokeIntegration";
 import { Button } from "~/components/ui/Button";
@@ -18,6 +19,7 @@ interface IntegrationLoginCardProps {
 }
 
 export default function IntegrationLoginCard({ projectUuid, platform, integration }: IntegrationLoginCardProps) {
+    const { t } = useTranslation();
     const [isPendingRevoke, setIsPendingRevoke] = useState(false);
 
     const { createIntegration, isPending: isConnecting, oauthError } = useCreateIntegration({ projectUuid, platform });
@@ -34,13 +36,13 @@ export default function IntegrationLoginCard({ projectUuid, platform, integratio
             {/* Header: platform name + status badge */}
             <div className="flex flex-row items-center justify-between gap-20 mb-4">
                 <div className="flex flex-row items-center gap-3">
-                    <img src={platformToIcon[platform]} className="size-6" alt={platformToFrenchTranslation[platform]} />
-                    <h3 className="text-heading-md">{platformToFrenchTranslation[platform]}</h3>
+                    <img src={platformToIcon[platform]} className="size-6" alt={t(platformTranslationKeys[platform])} />
+                    <h3 className="text-heading-md">{t(platformTranslationKeys[platform])}</h3>
                 </div>
                 {integration ? (
-                    <Pill isSelected label={integrationStatusToFrenchTranslation[integration.status]} textColorClassName={integrationStatusToTextClass[integration.status]} bgColorClassName={integrationStatusToBgClass[integration.status]} borderColorClassName={integrationStatusToBorderClass[integration.status]} />
+                    <Pill isSelected label={t(integrationStatusTranslationKeys[integration.status])} textColorClassName={integrationStatusToTextClass[integration.status]} bgColorClassName={integrationStatusToBgClass[integration.status]} borderColorClassName={integrationStatusToBorderClass[integration.status]} />
                 ) : (
-                    <Pill label="Non connecté" />
+                    <Pill label={t("integrations:notConnected")} />
 
                 )}
             </div>
@@ -64,12 +66,12 @@ export default function IntegrationLoginCard({ projectUuid, platform, integratio
                     <div className="flex flex-row items-center gap-2">
                         <ArrowPathIcon className="size-4 text-gray shrink-0" strokeWidth={1.5} />
                         <p className="text-body-xs text-gray">
-                            Dernière synchro : {formatToFrenchRelative(integration.lastSyncedAt)}
+                            {t("integrations:lastSync", { when: formatToFrenchRelative(integration.lastSyncedAt) })}
                         </p>
                     </div>
                 </div>
             ) : (
-                <p className="text-body-sm text-gray">Aucun compte connecté.</p>
+                <p className="text-body-sm text-gray">{t("integrations:noAccount")}</p>
             )}
 
             {/* Actions */}
@@ -84,7 +86,7 @@ export default function IntegrationLoginCard({ projectUuid, platform, integratio
                             disabled={isConnecting}
                             onClick={() => createIntegration()}
                         >
-                            {integration ? 'Reconnecter' : 'Connecter'}
+                            {integration ? t("integrations:reconnect") : t("integrations:connect")}
                         </Button>
                     ) : <Button
                         style="danger"
@@ -93,12 +95,12 @@ export default function IntegrationLoginCard({ projectUuid, platform, integratio
                         disabled={isRevoking}
                         onClick={() => setIsPendingRevoke(true)}
                     >
-                        Déconnecter
+                        {t("integrations:disconnect")}
                     </Button>}
                 </div>
                 {oauthError && (
                     <p className="text-body-xs text-danger text-right">
-                        {oAuthErrorCodeToFrenchTranslation[oauthError]}
+                        {t(oAuthErrorCodeTranslationKeys[oauthError])}
                     </p>
                 )}
             </div>
@@ -108,7 +110,7 @@ export default function IntegrationLoginCard({ projectUuid, platform, integratio
                 onClose={() => setIsPendingRevoke(false)}
                 onConfirm={handleConfirmRevoke}
                 isPending={isRevoking}
-                message="Êtes-vous sûr de vouloir déconnecter ce compte ? Cette action est irréversible."
+                message={t("integrations:disconnectConfirm")}
             />
         </div>
     );

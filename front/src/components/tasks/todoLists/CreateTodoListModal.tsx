@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import ModalOverlay from "~/components/ui/ModalOverlay";
 import { useCreateTodoList } from "~/hooks/api/todoLists/useCreateTodoList";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
@@ -13,6 +14,7 @@ interface CreateTodoListModalProps {
 }
 
 export default function CreateTodoListModal({ projectUuid, showModal, onClose, onTodoListCreated }: CreateTodoListModalProps) {
+    const { t } = useTranslation();
     const [title, setTitle] = useState("");
 
     const { createTodoList, isPending, reset } = useCreateTodoList({ projectUuid });
@@ -31,13 +33,13 @@ export default function CreateTodoListModal({ projectUuid, showModal, onClose, o
         <ModalOverlay isOpen={showModal} onClose={onClose}>
             <div className="flex flex-col gap-3 py-5 px-10 flex-1 min-h-0 overflow-y-auto">
                 <h1 className="text-heading-lg">
-                    Créez une nouvelle Todo List
+                    {t("tasks:todoList.create.modalTitle")}
                 </h1>
-                <p className="text-body-xs w-100">Chaque Todo List est associée à un project. Cela permet de garder une organisation propre et simple. Vous pouvez créer autant de Todo List que vous souhaitez.</p>
+                <p className="text-body-xs w-100">{t("tasks:todoList.create.modalDescription")}</p>
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <Input
-                        label="Titre"
-                        placeholder="Entrez le titre de la Todo List"
+                        label={t("tasks:todoList.create.titleLabel")}
+                        placeholder={t("tasks:todoList.create.titlePlaceholder")}
                         id="name"
                         name="name"
                         type="text"
@@ -54,7 +56,7 @@ export default function CreateTodoListModal({ projectUuid, showModal, onClose, o
                         disabled={isPending}
                     >
                         <div className="flex flex-row justify-center items-center gap-3">
-                            <p className="text-sm">Créer la Todo List</p>
+                            <p className="text-sm">{t("tasks:todoList.create.submit")}</p>
                             <ChevronRightIcon className="size-4" strokeWidth={2} />
                         </div>
                     </Button>

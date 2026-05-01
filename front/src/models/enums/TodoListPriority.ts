@@ -4,10 +4,10 @@ export enum TodoListPriority {
     High = 'high',
 }
 
-export const todoListPriorityToFrenchTranslation: Record<TodoListPriority, string> = {
-    [TodoListPriority.Low]: "Basse",
-    [TodoListPriority.Medium]: "Moyenne",
-    [TodoListPriority.High]: "Haute",
+export const todoListPriorityTranslationKeys: Record<TodoListPriority, string> = {
+    [TodoListPriority.Low]: "enums:todoListPriority.low",
+    [TodoListPriority.Medium]: "enums:todoListPriority.medium",
+    [TodoListPriority.High]: "enums:todoListPriority.high",
 }
 
 export const todoListPriorityToTextClass: Record<TodoListPriority, string> = {

@@ -19,7 +19,6 @@ export enum AnalyticsEvent {
     SubscriptionCancelled = 'subscription_cancelled',
     SubscriptionResumed = 'subscription_resumed',
     CreditRefillCheckoutStarted = 'credit_refill_checkout_started',
-    CreatorProfileSaved = 'creator_profile_saved',
     HookTemplateCreated = 'hook_template_created',
 }
 

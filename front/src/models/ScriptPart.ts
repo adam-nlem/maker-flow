@@ -1,42 +1,47 @@
 import { ScriptPartType } from "./enums/ScriptPartType";
-import { ScriptChapter, type ScriptChapterJSON } from "./ScriptChapter";
-import { ScriptVoiceOver, type ScriptVoiceOverJSON } from "./ScriptVoiceOver";
-import { ScriptDialogue, type ScriptDialogueJSON } from "./ScriptDialogue";
-import { ScriptShot, type ScriptShotJSON } from "./ScriptShot";
-import { ScriptText, type ScriptTextJSON } from "./ScriptText";
-import { ScriptCallToAction, type ScriptCallToActionJSON } from "./ScriptCallToAction";
-import { ScriptRetentionCue, type ScriptRetentionCueJSON } from "./ScriptRetentionCue";
-import { ScriptHook, type ScriptHookJSON } from "./ScriptHook";
 
-export type ScriptPart = ScriptChapter | ScriptVoiceOver | ScriptDialogue | ScriptShot | ScriptText | ScriptCallToAction | ScriptRetentionCue | ScriptHook;
+export interface ScriptPartJSON {
+    uuid: string;
+    content: string;
+    position: number;
+    type: ScriptPartType;
+    createdAt: string;
+    updatedAt?: string;
+}
 
-export type ScriptPartJSON =
-    | ScriptChapterJSON
-    | ScriptVoiceOverJSON
-    | ScriptDialogueJSON
-    | ScriptShotJSON
-    | ScriptTextJSON
-    | ScriptCallToActionJSON
-    | ScriptRetentionCueJSON
-    | ScriptHookJSON;
+export class ScriptPart {
+    constructor(
+        public readonly uuid: string,
+        public content: string,
+        public position: number,
+        public type: ScriptPartType,
+        public readonly createdAt: Date,
+        public readonly updatedAt?: Date,
+    ) {}
+
+    static fromJSON(json: ScriptPartJSON): ScriptPart {
+        return new ScriptPart(
+            json.uuid,
+            json.content,
+            json.position,
+            json.type,
+            new Date(json.createdAt),
+            json.updatedAt ? new Date(json.updatedAt) : undefined,
+        );
+    }
+
+    toJSON(): ScriptPartJSON {
+        return {
+            uuid: this.uuid,
+            content: this.content,
+            position: this.position,
+            type: this.type,
+            createdAt: this.createdAt.toISOString(),
+            updatedAt: this.updatedAt?.toISOString(),
+        };
+    }
+}
 
 export function scriptPartFromJSON(json: ScriptPartJSON): ScriptPart {
-    switch (json.type) {
-        case ScriptPartType.Chapter:
-            return ScriptChapter.fromJSON(json);
-        case ScriptPartType.VoiceOver:
-            return ScriptVoiceOver.fromJSON(json);
-        case ScriptPartType.Dialogue:
-            return ScriptDialogue.fromJSON(json);
-        case ScriptPartType.Shot:
-            return ScriptShot.fromJSON(json);
-        case ScriptPartType.Text:
-            return ScriptText.fromJSON(json);
-        case ScriptPartType.CallToAction:
-            return ScriptCallToAction.fromJSON(json);
-        case ScriptPartType.RetentionCue:
-            return ScriptRetentionCue.fromJSON(json);
-        case ScriptPartType.Hook:
-            return ScriptHook.fromJSON(json);
-    }
+    return ScriptPart.fromJSON(json);
 }

@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { DocumentTextIcon, PlusIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
 import Pill from "~/components/ui/Pill";
@@ -21,6 +22,7 @@ interface HomeScriptsPanelProps {
 }
 
 export default function HomeScriptsPanel({ projectUuid }: HomeScriptsPanelProps) {
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const { scripts, isLoading } = useListPaginatedScripts({ projectUuid, limit: 100 });
     const { createScript, isPending } = useCreateScript();
@@ -32,7 +34,7 @@ export default function HomeScriptsPanel({ projectUuid }: HomeScriptsPanelProps)
     const counts = computeScriptGroupCounts(grouped);
 
     const handleNewScript = async () => {
-        const newScript = await createScript({ projectUuid, title: "Nouveau script" });
+        const newScript = await createScript({ projectUuid, title: t("home:scripts.newScriptTitle") });
         setFocusedScriptUuid(newScript.uuid);
         navigate(scriptsPath);
     };
@@ -47,12 +49,12 @@ export default function HomeScriptsPanel({ projectUuid }: HomeScriptsPanelProps)
             <div className="flex flex-row items-center justify-between px-4 py-3 border-b border-light-gray">
                 <div className="flex flex-row items-center gap-2">
                     <DocumentTextIcon className="size-5 text-gray" strokeWidth={2} />
-                    <h2 className="text-heading-md">Scripts</h2>
+                    <h2 className="text-heading-md">{t("home:scripts.header")}</h2>
                 </div>
                 {!isLimitReached && (
                     <Pill
                         icon={PlusIcon}
-                        label="Nouveau"
+                        label={t("home:scripts.newScript")}
                         isSelected
                         onClick={isPending ? undefined : handleNewScript}
                         bgColorClassName="bg-primary/10"
@@ -81,8 +83,8 @@ export default function HomeScriptsPanel({ projectUuid }: HomeScriptsPanelProps)
                     <HomeScriptsPanelStatsBar counts={counts} />
                     {scripts.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 px-4 text-gray">
-                            <p className="text-body-sm text-center">Aucun script.</p>
-                            <p className="text-body-xs text-center mt-1">Cliquez sur + Nouveau pour en créer un.</p>
+                            <p className="text-body-sm text-center">{t("home:scripts.noScripts")}</p>
+                            <p className="text-body-xs text-center mt-1">{t("home:scripts.newScriptHint")}</p>
                         </div>
                     ) : (
                         <div className="flex-1 overflow-y-auto scrollbar-none flex flex-col">

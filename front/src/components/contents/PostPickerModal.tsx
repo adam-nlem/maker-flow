@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react"
+import { useTranslation } from "react-i18next"
 import ModalOverlay from "~/components/ui/ModalOverlay"
 import { Button } from "~/components/ui/Button"
 import PostPicker from "./PostPicker"
@@ -13,6 +14,7 @@ interface PostPickerModalProps {
 }
 
 export default function PostPickerModal({ isOpen, onClose, onConfirm, projectUuid, excludeUuids = [], isConfirming = false }: PostPickerModalProps) {
+    const { t } = useTranslation()
     const [selectedUuids, setSelectedUuids] = useState<string[]>([])
 
     useEffect(() => {
@@ -29,7 +31,7 @@ export default function PostPickerModal({ isOpen, onClose, onConfirm, projectUui
         <ModalOverlay isOpen={isOpen} onClose={onClose}>
             <div className="flex flex-col gap-4 p-6 flex-1 min-h-0">
                 {/* Header */}
-                <h2 className="text-heading-sm shrink-0">Ajouter des posts</h2>
+                <h2 className="text-heading-sm shrink-0">{t("contents:picker.modalTitle")}</h2>
 
                 {/* Growable post picker */}
                 <div className="flex flex-col gap-2 flex-1 min-h-0">
@@ -41,7 +43,7 @@ export default function PostPickerModal({ isOpen, onClose, onConfirm, projectUui
                     />
                     {selectedUuids.length > 0 && (
                         <p className="text-body-xs text-gray shrink-0">
-                            {selectedUuids.length} post{selectedUuids.length > 1 ? "s" : ""} sélectionné{selectedUuids.length > 1 ? "s" : ""}
+                            {t("contents:selectedCount", { count: selectedUuids.length })}
                         </p>
                     )}
                 </div>
@@ -54,7 +56,7 @@ export default function PostPickerModal({ isOpen, onClose, onConfirm, projectUui
                         disabled={isConfirming}
                         onClick={onClose}
                     >
-                        Annuler
+                        {t("actions.cancel")}
                     </Button>
                     <Button
                         style="primary"
@@ -63,7 +65,7 @@ export default function PostPickerModal({ isOpen, onClose, onConfirm, projectUui
                         isLoading={isConfirming}
                         disabled={selectedUuids.length === 0}
                     >
-                        Ajouter
+                        {t("contents:picker.addPosts")}
                     </Button>
                 </div>
             </div>

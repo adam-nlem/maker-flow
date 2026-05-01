@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useCreateSubscriptionCheckout } from "~/hooks/api/subscriptions/useCreateSubscriptionCheckout";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import type { SubscriptionPlan } from "~/models/enums/SubscriptionPlan";
@@ -11,6 +12,7 @@ interface PlanSelectorProps {
 }
 
 export default function PlanSelector({ checkoutRedirectPath, disabledPlan }: PlanSelectorProps) {
+    const { t } = useTranslation();
     const { createCheckout, isPending } = useCreateSubscriptionCheckout();
     const { plans, isLoading, error } = useListPlans();
     const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
@@ -23,8 +25,8 @@ export default function PlanSelector({ checkoutRedirectPath, disabledPlan }: Pla
     if (error) {
         return (
             <div className="w-full">
-                <h3 className="text-heading-md mb-4">Choisir un abonnement</h3>
-                <p className="text-body-sm text-gray">Impossible de charger les abonnements. Veuillez réessayer plus tard.</p>
+                <h3 className="text-heading-md mb-4">{t("settings:subscription.plans.title")}</h3>
+                <p className="text-body-sm text-gray">{t("settings:subscription.plans.loadError")}</p>
             </div>
         );
     }
@@ -32,7 +34,7 @@ export default function PlanSelector({ checkoutRedirectPath, disabledPlan }: Pla
     if (isLoading) {
         return (
             <div className="w-full">
-                <h3 className="text-heading-md mb-4">Choisir un abonnement</h3>
+                <h3 className="text-heading-md mb-4">{t("settings:subscription.plans.title")}</h3>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {[1, 2, 3].map((i) => (
                         <Shimmer key={i} height="h-64" />
@@ -44,7 +46,7 @@ export default function PlanSelector({ checkoutRedirectPath, disabledPlan }: Pla
 
     return (
         <div className="w-full">
-            <h3 className="text-heading-md mb-4">Choisir un abonnement</h3>
+            <h3 className="text-heading-md mb-4">{t("settings:subscription.plans.title")}</h3>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {plans.map((config) => (
                     <PlanCard

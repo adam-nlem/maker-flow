@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import type { Script } from "~/models/Script";
 import { useDeleteScript } from "~/hooks/api/scripts/useDeleteScript";
 import ScriptSimpleMetaColumn from "./ScriptSimpleMetaCol";
@@ -12,6 +13,7 @@ interface ScriptCardProps {
 }
 
 export default function ScriptCard({ script, isSelected, onClick }: ScriptCardProps) {
+    const { t } = useTranslation();
     const { deleteScript, isPending: isDeleting } = useDeleteScript();
     const [showConfirm, setShowConfirm] = useState(false);
 
@@ -39,7 +41,7 @@ export default function ScriptCard({ script, isSelected, onClick }: ScriptCardPr
                 onClose={() => setShowConfirm(false)}
                 onConfirm={() => deleteScript(script.uuid)}
                 isPending={isDeleting}
-                message="Êtes-vous sûr de vouloir supprimer ce script ? Cette action est irréversible."
+                message={t("scripts:card.deleteConfirm")}
             />
         </>
     );

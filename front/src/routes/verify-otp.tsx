@@ -1,11 +1,12 @@
 import { EnvelopeIcon } from "@heroicons/react/24/outline"
 import { useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
+import { useTranslation } from "react-i18next"
 
 import AuthStepLayout from "~/components/auth/AuthStepLayout"
 import VerifyOtpForm from "~/components/auth/VerifyOtpForm"
 import { homePath, loginPath, prelaunchPath } from "~/routes/routePaths"
-import { OtpType, otpTypeToFrenchTranslation } from "~/models/enums/OtpType"
+import { OtpType, otpTypeTranslationKeys } from "~/models/enums/OtpType"
 
 interface VerifyOtpState {
     pendingOtpToken: string
@@ -14,6 +15,7 @@ interface VerifyOtpState {
 }
 
 export default function VerifyOtpPage() {
+    const { t } = useTranslation()
     const location = useLocation()
     const navigate = useNavigate()
     const state = location.state as VerifyOtpState | null
@@ -34,8 +36,8 @@ export default function VerifyOtpPage() {
         <div className="bg-clear bg-dot-pattern min-h-screen relative">
             <AuthStepLayout
                 icon={EnvelopeIcon}
-                title={otpTypeToFrenchTranslation[state.purpose]}
-                subtitle={<>Un code a été envoyé à <span className="text-dark font-medium">{state.email}</span></>}
+                title={t(otpTypeTranslationKeys[state.purpose])}
+                subtitle={<>{t("auth:verify.subtitlePrefix")} <span className="text-dark font-medium">{state.email}</span></>}
                 onBack={() => navigate(backPath)}
             >
                 <VerifyOtpForm

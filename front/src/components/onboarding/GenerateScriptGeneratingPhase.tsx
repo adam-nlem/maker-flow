@@ -1,14 +1,15 @@
 import { SparklesIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "~/components/ui/Button"
 
-const GENERATING_MESSAGES = [
-    "Analyse du sujet...",
-    "Structure du script...",
-    "Rédaction du hook...",
-    "Développement des parties...",
-    "Ajout des détails...",
-    "Finalisation...",
+const GENERATING_MESSAGE_KEYS = [
+    "onboarding:generating.messages.analysis",
+    "onboarding:generating.messages.structure",
+    "onboarding:generating.messages.hook",
+    "onboarding:generating.messages.parts",
+    "onboarding:generating.messages.details",
+    "onboarding:generating.messages.finalization",
 ]
 
 interface GenerateScriptGeneratingPhaseProps {
@@ -18,6 +19,8 @@ interface GenerateScriptGeneratingPhaseProps {
 }
 
 export default function GenerateScriptGeneratingPhase({ isFailed, messageIndex, onNext }: GenerateScriptGeneratingPhaseProps) {
+    const { t } = useTranslation()
+
     if (isFailed) {
         return (
             <div className="flex flex-col items-center text-center">
@@ -25,13 +28,13 @@ export default function GenerateScriptGeneratingPhase({ isFailed, messageIndex, 
                     <ExclamationTriangleIcon className="size-10 text-danger" />
                 </div>
                 <h2 className="text-heading-2xl text-dark mb-2">
-                    Une erreur est survenue
+                    {t("onboarding:generating.errorTitle")}
                 </h2>
                 <p className="text-body-sm text-gray mb-8">
-                    La génération a échoué. Vous pourrez réessayer depuis l'éditeur de script.
+                    {t("onboarding:generating.errorDescription")}
                 </p>
                 <Button style="primary" onClick={onNext}>
-                    Continuer
+                    {t("actions.continue")}
                 </Button>
             </div>
         )
@@ -43,10 +46,10 @@ export default function GenerateScriptGeneratingPhase({ isFailed, messageIndex, 
                 <SparklesIcon className="size-10 text-primary" />
             </div>
             <h2 className="text-heading-2xl text-dark mb-2">
-                L'IA rédige votre script
+                {t("onboarding:generating.title")}
             </h2>
             <p className="text-body-sm text-gray h-6 transition-opacity duration-500">
-                {GENERATING_MESSAGES[messageIndex]}
+                {t(GENERATING_MESSAGE_KEYS[messageIndex])}
             </p>
             <div className="mt-8 flex gap-1.5">
                 {[0, 1, 2].map((i) => (

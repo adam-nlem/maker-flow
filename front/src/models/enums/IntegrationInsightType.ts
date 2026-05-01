@@ -32,19 +32,19 @@ export const integrationInsightTypeToIcon: Record<IntegrationInsightType, Compon
     [IntegrationInsightType.Videos]: FilmIcon,
 };
 
-export const integrationInsightTypeToFrenchTranslation: Record<IntegrationInsightType, string> = {
-    [IntegrationInsightType.Views]: "Vues",
-    [IntegrationInsightType.Likes]: "J'aime",
-    [IntegrationInsightType.Saves]: "Enregistrements",
-    [IntegrationInsightType.Comments]: "Commentaires",
-    [IntegrationInsightType.Shares]: "Partages",
-    [IntegrationInsightType.GainedFollowers]: "Nouveaux abonnés",
-    [IntegrationInsightType.TotalFollowers]: "Abonnés",
-    [IntegrationInsightType.Impressions]: "Impressions",
-    [IntegrationInsightType.Dislikes]: "Dislikes",
-    [IntegrationInsightType.ProfileLinksTaps]: "Clics liens profil",
-    [IntegrationInsightType.Reach]: "Portée",
-    [IntegrationInsightType.Videos]: "Vidéos",
+export const integrationInsightTypeTranslationKeys: Record<IntegrationInsightType, string> = {
+    [IntegrationInsightType.Views]: "enums:integrationInsightType.views",
+    [IntegrationInsightType.Likes]: "enums:integrationInsightType.likes",
+    [IntegrationInsightType.Saves]: "enums:integrationInsightType.saves",
+    [IntegrationInsightType.Comments]: "enums:integrationInsightType.comments",
+    [IntegrationInsightType.Shares]: "enums:integrationInsightType.shares",
+    [IntegrationInsightType.GainedFollowers]: "enums:integrationInsightType.gainedFollowers",
+    [IntegrationInsightType.TotalFollowers]: "enums:integrationInsightType.totalFollowers",
+    [IntegrationInsightType.Impressions]: "enums:integrationInsightType.impressions",
+    [IntegrationInsightType.Dislikes]: "enums:integrationInsightType.dislikes",
+    [IntegrationInsightType.ProfileLinksTaps]: "enums:integrationInsightType.profileLinksTaps",
+    [IntegrationInsightType.Reach]: "enums:integrationInsightType.reach",
+    [IntegrationInsightType.Videos]: "enums:integrationInsightType.videos",
 };
 
 export const integrationInsightTypeOptions = Object.values(IntegrationInsightType)

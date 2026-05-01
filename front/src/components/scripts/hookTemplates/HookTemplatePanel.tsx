@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 import { MagnifyingGlassIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import { Input } from "~/components/ui/Input";
 import { ToggleChip } from "~/components/ui/ToggleChip";
 import { SidePanel } from "~/components/ui/SidePanel";
-import { HookTemplateCategory, hookTemplateCategoryOptions, hookTemplateCategoryToFrenchTranslation } from "~/models/enums/HookTemplateCategory";
+import { HookTemplateCategory, hookTemplateCategoryOptions, hookTemplateCategoryTranslationKeys } from "~/models/enums/HookTemplateCategory";
 import { useListPaginatedHookTemplates } from "~/hooks/api/hookTemplates/useListPaginatedHookTemplates";
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { useScriptRightPanelStore } from "~/stores/scripts/scriptRightPanelStore";
@@ -13,6 +14,7 @@ import HookTemplateCard from "./HookTemplateCard";
 import CreateHookTemplateModal from "./CreateHookTemplateModal";
 
 export default function HookTemplatePanel() {
+    const { t } = useTranslation();
     const focusedHookTemplateUuid = useHookTemplateStore((s) => s.focusedHookTemplateUuid);
     const setSelectedTemplate = useHookTemplateStore((s) => s.setSelectedTemplate);
     const [activeCategory, setActiveCategory] = useState<HookTemplateCategory>(HookTemplateCategory.All);
@@ -52,7 +54,7 @@ export default function HookTemplatePanel() {
     return (
         <>
             <SidePanel
-                title="Hooks"
+                title={t("scripts:hooks.panelTitle")}
                 isOpen={isOpen}
                 onClose={closePanel}
                 bodyRef={scrollContainerRef}
@@ -71,7 +73,7 @@ export default function HookTemplatePanel() {
                                 simple
                                 value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}
-                                placeholder="Rechercher..."
+                                placeholder={t("scripts:hooks.searchPlaceholder")}
                                 textStyle="text-body-sm"
                                 icon={<MagnifyingGlassIcon className="size-4 text-gray" strokeWidth={2} />}
                             />
@@ -80,7 +82,7 @@ export default function HookTemplatePanel() {
                             {hookTemplateCategoryOptions.map((category) => (
                                 <ToggleChip
                                     key={category}
-                                    label={hookTemplateCategoryToFrenchTranslation[category]}
+                                    label={t(hookTemplateCategoryTranslationKeys[category])}
                                     isSelected={activeCategory === category}
                                     onToggle={() => setActiveCategory(category)}
                                 />
@@ -92,7 +94,7 @@ export default function HookTemplatePanel() {
                 <div className="p-3 flex flex-col gap-2">
                     {filteredTemplates.length === 0 ? (
                         <div className="flex flex-col items-center justify-center py-12 text-gray">
-                            <p className="text-body-sm text-center">Aucun template.</p>
+                            <p className="text-body-sm text-center">{t("scripts:hooks.empty")}</p>
                         </div>
                     ) : (
                         <>

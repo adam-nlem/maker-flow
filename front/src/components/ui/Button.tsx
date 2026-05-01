@@ -37,7 +37,7 @@ export function Button({
             type={type}
             onClick={onClick}
             disabled={disabled || isLoading}
-            className={`inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 border focus-visible:ring-blue-500 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ${variantStyles[style]} ${width} ${height} ${className}  px-4 py-2 rounded-xl text-heading-sm cursor-pointer`}
+            className={`inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none border  focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ${variantStyles[style]} ${width} ${height} ${className}  px-4 py-2 rounded-xl text-heading-sm cursor-pointer`}
         >
             {isLoading ? (
                 <span className="mr-2">

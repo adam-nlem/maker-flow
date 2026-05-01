@@ -1,8 +1,9 @@
+import { useTranslation } from "react-i18next";
 import {
     ScriptStatusGroup,
     scriptStatusGroupOptions,
     scriptStatusGroupToBgFullClass,
-    scriptStatusGroupToFrenchTranslation,
+    scriptStatusGroupTranslationKeys,
     scriptStatusGroupToTextClass,
 } from "~/models/enums/ScriptStatusGroup";
 
@@ -11,6 +12,7 @@ interface HomeScriptsPanelStatsBarProps {
 }
 
 export default function HomeScriptsPanelStatsBar({ counts }: HomeScriptsPanelStatsBarProps) {
+    const { t } = useTranslation();
     const total = counts[ScriptStatusGroup.Idea] + counts[ScriptStatusGroup.InProgress] + counts[ScriptStatusGroup.Done];
 
     return (
@@ -18,7 +20,7 @@ export default function HomeScriptsPanelStatsBar({ counts }: HomeScriptsPanelSta
             <div className="flex flex-row items-center justify-between gap-2">
                 {scriptStatusGroupOptions.map((group) => (
                     <span key={group} className={`text-heading-xs ${scriptStatusGroupToTextClass[group]}`}>
-                        {counts[group]} {scriptStatusGroupToFrenchTranslation[group].toLowerCase()}
+                        {counts[group]} {t(scriptStatusGroupTranslationKeys[group]).toLowerCase()}
                     </span>
                 ))}
             </div>

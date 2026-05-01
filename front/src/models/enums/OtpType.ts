@@ -4,10 +4,10 @@ export enum OtpType {
     PrelaunchVerification = 'prelaunch_verification',
 }
 
-export const otpTypeToFrenchTranslation: Record<OtpType, string> = {
-    [OtpType.Login]: "Vérification de connexion",
-    [OtpType.EmailVerification]: "Vérification de votre email",
-    [OtpType.PrelaunchVerification]: "Vérification de votre inscription",
+export const otpTypeTranslationKeys: Record<OtpType, string> = {
+    [OtpType.Login]: "enums:otpType.login",
+    [OtpType.EmailVerification]: "enums:otpType.emailVerification",
+    [OtpType.PrelaunchVerification]: "enums:otpType.prelaunchVerification",
 }
 
 export const otpTypeToEndpoint: Record<OtpType, string> = {

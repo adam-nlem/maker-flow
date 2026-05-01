@@ -12,15 +12,15 @@ export enum ScriptPartType {
     RetentionCue = 'retention_cue',
 }
 
-export const scriptPartTypeToFrenchTranslation: Record<ScriptPartType, string> = {
-    [ScriptPartType.Hook]: "Hook",
-    [ScriptPartType.Text]: "Texte",
-    [ScriptPartType.Chapter]: "Chapitre",
-    [ScriptPartType.VoiceOver]: "Voix off",
-    [ScriptPartType.Dialogue]: "Dialogue",
-    [ScriptPartType.Shot]: "Plan",
-    [ScriptPartType.CallToAction]: "Appel à l'action",
-    [ScriptPartType.RetentionCue]: "Signal de rétention",
+export const scriptPartTypeTranslationKeys: Record<ScriptPartType, string> = {
+    [ScriptPartType.Hook]: "enums:scriptPartType.hook",
+    [ScriptPartType.Text]: "enums:scriptPartType.text",
+    [ScriptPartType.Chapter]: "enums:scriptPartType.chapter",
+    [ScriptPartType.VoiceOver]: "enums:scriptPartType.voiceOver",
+    [ScriptPartType.Dialogue]: "enums:scriptPartType.dialogue",
+    [ScriptPartType.Shot]: "enums:scriptPartType.shot",
+    [ScriptPartType.CallToAction]: "enums:scriptPartType.callToAction",
+    [ScriptPartType.RetentionCue]: "enums:scriptPartType.retentionCue",
 }
 
 export const scriptPartTypeToIcon: Record<ScriptPartType, ComponentType<SVGProps<SVGSVGElement>>> = {

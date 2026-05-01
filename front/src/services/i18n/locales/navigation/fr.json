@@ -1,0 +1,10 @@
+{
+    "items": {
+        "home": "Accueil",
+        "scripts": "Script",
+        "calendar": "Calendrier",
+        "contents": "Contenu",
+        "tasks": "Tâches",
+        "settings": "Paramètres"
+    }
+}

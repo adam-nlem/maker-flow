@@ -4,10 +4,10 @@ export enum IntegrationStatus {
     Error = 'error',
 }
 
-export const integrationStatusToFrenchTranslation: Record<IntegrationStatus, string> = {
-    [IntegrationStatus.Active]: "Connecté",
-    [IntegrationStatus.Revoked]: "Expiré",
-    [IntegrationStatus.Error]: "Erreur",
+export const integrationStatusTranslationKeys: Record<IntegrationStatus, string> = {
+    [IntegrationStatus.Active]: "enums:integrationStatus.active",
+    [IntegrationStatus.Revoked]: "enums:integrationStatus.revoked",
+    [IntegrationStatus.Error]: "enums:integrationStatus.error",
 }
 
 export const integrationStatusToBgClass: Record<IntegrationStatus, string> = {

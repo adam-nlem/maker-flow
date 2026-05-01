@@ -1,5 +1,6 @@
 import { useEffect, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { ToastType } from "~/models/enums/ToastType";
 import { useToastStore } from "~/stores/toast/toastStore";
@@ -17,6 +18,7 @@ interface SubscriptionOverviewProps {
 }
 
 export default function SubscriptionOverview({ checkoutRedirectPath, subscribedView, loadingView }: SubscriptionOverviewProps) {
+    const { t } = useTranslation();
     const [searchParams, setSearchParams] = useSearchParams();
     const isCheckoutSuccess = searchParams.get("checkout") === "success";
 
@@ -27,10 +29,10 @@ export default function SubscriptionOverview({ checkoutRedirectPath, subscribedV
     useEffect(() => {
         if (isCheckoutSuccess && subscription) {
             track(AnalyticsEvent.SubscriptionPurchased, { plan: subscription.plan })
-            useToastStore.getState().addToast(ToastType.Success, "Paiement effectué avec succès");
+            useToastStore.getState().addToast(ToastType.Success, t("settings:subscription.checkoutSuccess"));
             setSearchParams({}, { replace: true });
         }
-    }, [isCheckoutSuccess, subscription, setSearchParams]);
+    }, [isCheckoutSuccess, subscription, setSearchParams, t]);
 
     if (isLoading) {
         return loadingView ?? (

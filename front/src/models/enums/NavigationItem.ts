@@ -25,13 +25,13 @@ export const sidebarBottomNavigationItems: NavigationItem[] = [
     NavigationItem.Settings,
 ];
 
-export const navigationItemToFrenchTranslation: Record<NavigationItem, string> = {
-    [NavigationItem.Home]: "Accueil",
-    [NavigationItem.Scripts]: "Script",
-    [NavigationItem.Calendar]: "Calendrier",
-    [NavigationItem.Contents]: "Contenu",
-    [NavigationItem.Tasks]: "Tâches",
-    [NavigationItem.Settings]: "Paramètres",
+export const navigationItemTranslationKeys: Record<NavigationItem, string> = {
+    [NavigationItem.Home]: "navigation:items.home",
+    [NavigationItem.Scripts]: "navigation:items.scripts",
+    [NavigationItem.Calendar]: "navigation:items.calendar",
+    [NavigationItem.Contents]: "navigation:items.contents",
+    [NavigationItem.Tasks]: "navigation:items.tasks",
+    [NavigationItem.Settings]: "navigation:items.settings",
 }
 
 export const navigationItemToPath: Record<NavigationItem, string> = {

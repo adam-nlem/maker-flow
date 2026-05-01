@@ -4,7 +4,6 @@ import WelcomeFeatureStep from "~/components/welcome/WelcomeFeatureStep"
 import WelcomeHowItWorksStep from "~/components/welcome/WelcomeHowItWorksStep"
 import OnboardingCreateProjectStep from "~/components/onboarding/OnboardingCreateProjectStep"
 import OnboardingConnectIntegrationStep from "~/components/onboarding/OnboardingConnectIntegrationStep"
-import OnboardingCreatorProfileStep from "~/components/onboarding/OnboardingCreatorProfileStep"
 import OnboardingCreateScriptStep from "~/components/onboarding/OnboardingCreateScriptStep"
 import OnboardingGenerateScriptStep from "~/components/onboarding/OnboardingGenerateScriptStep"
 import OnboardingSubscriptionStep from "~/components/onboarding/OnboardingSubscriptionStep"
@@ -20,7 +19,6 @@ const welcomeNodes: Record<WelcomeStep, ReactNode> = {
 const onboardingNodes: Record<OnboardingStep, ReactNode> = {
     [OnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
     [OnboardingStep.ConnectIntegration]: <OnboardingConnectIntegrationStep />,
-    [OnboardingStep.CreateCreatorProfile]: <OnboardingCreatorProfileStep />,
     [OnboardingStep.CreateFirstScript]: <OnboardingCreateScriptStep />,
     [OnboardingStep.GenerateFirstScript]: <OnboardingGenerateScriptStep />,
     [OnboardingStep.ShowSubscriptions]: <OnboardingSubscriptionStep />,

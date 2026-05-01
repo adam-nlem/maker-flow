@@ -9,6 +9,7 @@ import ToastContainer from "~/components/ui/ToastContainer";
 import { Settings } from "luxon";
 import { router } from "./router";
 import { PostHogProvider } from '@posthog/react'
+import "~/services/i18n/i18n";
 import "./app.css";
 
 Sentry.init({

@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import ScriptEditorPanel from "~/components/scripts/ScriptEditorPanel"
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import { Button } from "~/components/ui/Button"
@@ -10,6 +11,7 @@ interface GenerateScriptPreviewPhaseProps {
 }
 
 export default function GenerateScriptPreviewPhase({ script, projectUuid, onNext }: GenerateScriptPreviewPhaseProps) {
+    const { t } = useTranslation()
     return (
         <OnboardingStepLayout maxWidth="max-w-xl">
             <div className="flex flex-col items-center gap-5 w-full">
@@ -20,11 +22,11 @@ export default function GenerateScriptPreviewPhase({ script, projectUuid, onNext
                 )}
 
                 <Button style="primary" onClick={onNext}>
-                    Continuer
+                    {t("actions.continue")}
                 </Button>
 
                 <p className="text-body-xs text-gray text-center">
-                    Retrouvez votre script dans l'onglet Scripts
+                    {t("onboarding:findScriptHint")}
                 </p>
             </div>
         </OnboardingStepLayout>

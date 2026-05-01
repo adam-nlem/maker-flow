@@ -1,0 +1,30 @@
+{
+    "generating": {
+        "messages": {
+            "analysis": "Analyse du sujet...",
+            "structure": "Structure du script...",
+            "hook": "Rédaction du hook...",
+            "parts": "Développement des parties...",
+            "details": "Ajout des détails...",
+            "finalization": "Finalisation..."
+        },
+        "title": "L'IA rédige votre script",
+        "errorTitle": "Une erreur est survenue",
+        "errorDescription": "La génération a échoué. Vous pourrez réessayer depuis l'éditeur de script."
+    },
+    "generateStep": {
+        "title": "Discutez avec l'IA pour générer votre script",
+        "subtitle": "Ouvrez le chat IA dans l'éditeur et décrivez votre vidéo. L'assistant proposera des modifications ligne par ligne que vous pourrez accepter ou rejeter."
+    },
+    "subscriptionStep": {
+        "activatedTitle": "Abonnement {{plan}} activé",
+        "activatedSubtitle": "Votre abonnement est actif.",
+        "primaryAction": "Commencer à utiliser MakerFlow",
+        "skip": "Ignorer"
+    },
+    "progress": {
+        "stepCount": "Étape {{current}} sur {{total}}"
+    },
+    "firstScriptTitle": "Mon premier script",
+    "findScriptHint": "Retrouvez votre script dans l'onglet Scripts"
+}

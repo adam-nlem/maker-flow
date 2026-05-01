@@ -1,4 +1,4 @@
-import { navigationItemOptions, navigationItemToFrenchTranslation, navigationItemToPath } from "~/models/enums/NavigationItem";
+import { navigationItemOptions, navigationItemTranslationKeys, navigationItemToPath } from "~/models/enums/NavigationItem";
 import type { NavigationItem } from "~/models/enums/NavigationItem";
 
 /**
@@ -14,11 +14,12 @@ export function getCurrentNavigationItem(pathname: string): NavigationItem | nul
 }
 
 /**
- * Returns the French label of the current page based on the pathname.
+ * Returns the i18n translation key of the current page based on the pathname.
+ * Callers must run it through `t()` to get the localized label.
  */
-export function getCurrentPageLabel(pathname: string): string | null {
+export function getCurrentPageLabelKey(pathname: string): string | null {
     const item = getCurrentNavigationItem(pathname);
-    return item ? navigationItemToFrenchTranslation[item] : null;
+    return item ? navigationItemTranslationKeys[item] : null;
 }
 
 /**

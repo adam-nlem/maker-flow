@@ -1,5 +1,6 @@
 import { useRef } from "react";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import type { Script } from "~/models/Script";
 import ScriptCard from "./ScriptCard";
 import { useCreateScript } from "~/hooks/api/scripts/useCreateScript";
@@ -21,6 +22,7 @@ interface ScriptListPanelProps {
 }
 
 export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadingMore, listMore }: ScriptListPanelProps) {
+    const { t } = useTranslation();
     const { createScript, isPending } = useCreateScript();
     const focusedScriptUuid = useFocusScriptStore((state) => state.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((state) => state.setFocusedScriptUuid);
@@ -33,7 +35,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
 
     const handleNewScript = async () => {
         try {
-            const newScript = await createScript({ projectUuid, title: "Nouveau script" });
+            const newScript = await createScript({ projectUuid, title: t("scripts:newScriptTitle") });
             setFocusedScriptUuid(newScript.uuid);
         } catch (error) {
             if (error instanceof HttpException && error.response.httpStatus === 402) {
@@ -45,12 +47,12 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
 
     const createButton = (
         isLimitReached ?
-            <p className="text-body-xs text-center ">Votre abonnement ne vous permet plus de générer de script</p> :
+            <p className="text-body-xs text-center ">{t("scripts:limitReached")}</p> :
             <button
                 onClick={handleNewScript}
                 disabled={isPending || isLimitReached}
                 className="text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
-                title={"Nouveau script"}
+                title={t("scripts:newScriptTitle")}
             >
                 <PlusIcon className="size-4" strokeWidth={2} />
             </button>
@@ -60,8 +62,8 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
         <div className="p-3 flex flex-col gap-1">
             {scripts.length === 0 ? (
                 <div className="flex flex-col items-center justify-center py-12 text-gray">
-                    <p className="text-body-sm text-center">Aucun script.</p>
-                    <p className="text-body-xs text-center mt-1">Cliquez sur + pour en créer un.</p>
+                    <p className="text-body-sm text-center">{t("scripts:noScripts")}</p>
+                    <p className="text-body-xs text-center mt-1">{t("scripts:newScriptHint")}</p>
                 </div>
             ) : (
                 <>
@@ -81,7 +83,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
 
     if (isDesktop) {
         return (
-            <SidePanel title="Scripts" side="left" headerActions={createButton} bodyRef={scrollRef}>
+            <SidePanel title={t("scripts:header")} side="left" headerActions={createButton} bodyRef={scrollRef}>
                 {listContent}
             </SidePanel>
         );
@@ -90,7 +92,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     return (
         <div className="flex flex-col h-full">
             <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
-                <h2 className="text-heading-md">Scripts</h2>
+                <h2 className="text-heading-md">{t("scripts:header")}</h2>
                 {createButton}
             </div>
             <div ref={scrollRef} className="flex-1 overflow-y-auto scrollbar-none">

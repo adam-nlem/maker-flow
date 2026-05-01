@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import { useListPaginatedTodoListTasks } from "~/hooks/api/todoListTasks/useListPaginatedTodoListTasks"
 import { useUpdateTodoListTask } from "~/hooks/api/todoListTasks/useUpdateTodoListTask"
 import { TodoListStatus } from "~/models/enums/TodoListStatus"
@@ -26,6 +27,7 @@ export default function TodoListDashboardContent({
     focusedTodoList,
     setFocusedTodoListUuid
 }: TodoListDashboardContentProps) {
+    const { t } = useTranslation()
     const {
         todoListTasksGroupedByStatus,
         paginationByStatus,
@@ -58,7 +60,7 @@ export default function TodoListDashboardContent({
                     getItemId={(todoList) => todoList.uuid}
                     onSelect={(todoList) => setFocusedTodoListUuid(todoList.uuid)}
                     onClickCreateButton={() => setIsCreateTodoListModalOpen(!isCreateTodoListModalOpen)}
-                    createButtonLabel="Créer une nouvelle Todo List"
+                    createButtonLabel={t("tasks:createTodoList")}
                     renderTrigger={({ onClick }) => (
                         <TodoListTile
                             todoList={focusedTodoList}

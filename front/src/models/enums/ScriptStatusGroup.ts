@@ -22,10 +22,10 @@ export const scriptStatusToGroup: Record<ScriptStatus, ScriptStatusGroup> = {
 };
 
 
-export const scriptStatusGroupToFrenchTranslation: Record<ScriptStatusGroup, string> = {
-    [ScriptStatusGroup.Idea]: 'Idées',
-    [ScriptStatusGroup.InProgress]: 'En cours',
-    [ScriptStatusGroup.Done]: 'Terminés',
+export const scriptStatusGroupTranslationKeys: Record<ScriptStatusGroup, string> = {
+    [ScriptStatusGroup.Idea]: 'enums:scriptStatusGroup.idea',
+    [ScriptStatusGroup.InProgress]: 'enums:scriptStatusGroup.inProgress',
+    [ScriptStatusGroup.Done]: 'enums:scriptStatusGroup.done',
 };
 
 export const scriptStatusGroupToBgClass: Record<ScriptStatusGroup, string> = {

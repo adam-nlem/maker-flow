@@ -8,24 +8,24 @@ export enum SkillModule {
     CallToAction = 'call_to_action',
 }
 
-export const skillModuleToFrenchTranslation: Record<SkillModule, string> = {
-    [SkillModule.StrongHook]: "Accroche forte",
-    [SkillModule.RetentionBoosters]: "Boosters de rétention",
-    [SkillModule.StorytellingMode]: "Mode storytelling",
-    [SkillModule.SeoOptimization]: "Optimisation SEO",
-    [SkillModule.ScriptFormat]: "Format du script",
-    [SkillModule.BRollCues]: "Indications B-Roll",
-    [SkillModule.CallToAction]: "Appel à l'action",
+export const skillModuleTranslationKeys: Record<SkillModule, string> = {
+    [SkillModule.StrongHook]: "enums:skillModule.names.strongHook",
+    [SkillModule.RetentionBoosters]: "enums:skillModule.names.retentionBoosters",
+    [SkillModule.StorytellingMode]: "enums:skillModule.names.storytellingMode",
+    [SkillModule.SeoOptimization]: "enums:skillModule.names.seoOptimization",
+    [SkillModule.ScriptFormat]: "enums:skillModule.names.scriptFormat",
+    [SkillModule.BRollCues]: "enums:skillModule.names.bRollCues",
+    [SkillModule.CallToAction]: "enums:skillModule.names.callToAction",
 }
 
-export const skillModuleToDescription: Record<SkillModule, string> = {
-    [SkillModule.StrongHook]: "Les 3 premières secondes créent de la curiosité ou une affirmation audacieuse",
-    [SkillModule.RetentionBoosters]: "Un moment de ré-engagement toutes les 60-90 secondes",
-    [SkillModule.StorytellingMode]: "Ancrer le script dans une histoire personnelle",
-    [SkillModule.SeoOptimization]: "Intégrer naturellement un mot-clé cible",
-    [SkillModule.ScriptFormat]: "Choisir le format de sortie : script complet, plan ou hybride",
-    [SkillModule.BRollCues]: "Ajouter des indications de B-Roll visuelles dans le script",
-    [SkillModule.CallToAction]: "Ajouter un appel à l'action dans le script",
+export const skillModuleDescriptionKeys: Record<SkillModule, string> = {
+    [SkillModule.StrongHook]: "enums:skillModule.descriptions.strongHook",
+    [SkillModule.RetentionBoosters]: "enums:skillModule.descriptions.retentionBoosters",
+    [SkillModule.StorytellingMode]: "enums:skillModule.descriptions.storytellingMode",
+    [SkillModule.SeoOptimization]: "enums:skillModule.descriptions.seoOptimization",
+    [SkillModule.ScriptFormat]: "enums:skillModule.descriptions.scriptFormat",
+    [SkillModule.BRollCues]: "enums:skillModule.descriptions.bRollCues",
+    [SkillModule.CallToAction]: "enums:skillModule.descriptions.callToAction",
 }
 
 export const skillModuleHasExtraInput: Record<SkillModule, boolean> = {

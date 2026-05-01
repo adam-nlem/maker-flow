@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next"
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import IntegrationLoginCard from "~/components/integrations/IntegrationLoginCard"
 import Shimmer from "~/components/ui/Shimmer"
@@ -10,6 +11,7 @@ import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboa
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 
 export default function OnboardingConnectIntegrationStep() {
+    const { t } = useTranslation()
     const projectUuid = useFocusProjectStore((s) => s.focusedProjectUuid)
     const { integrations, isLoading } = useListIntegrations({ projectUuid })
     const { advanceStep } = useAdvanceOnboardingStep()
@@ -41,11 +43,11 @@ export default function OnboardingConnectIntegrationStep() {
                     disabled={!hasConnectedIntegration}
                     onClick={advanceStep}
                 >
-                    Continuer
+                    {t("actions.continue")}
                 </Button>
 
                 <SimpleTextButton onClick={advanceStep}>
-                    Ignorer
+                    {t("onboarding:subscriptionStep.skip")}
                 </SimpleTextButton>
             </div>
         </OnboardingStepLayout>

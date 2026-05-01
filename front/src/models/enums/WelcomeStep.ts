@@ -16,7 +16,7 @@ export const welcomeStepToIcon: Record<WelcomeStep, ComponentType<SVGProps<SVGSV
     [WelcomeStep.HowItWorks]: ListBulletIcon,
 }
 
-export const welcomeStepToShortLabel: Record<WelcomeStep, string> = {
-    [WelcomeStep.Features]: "Fonctionnalités",
-    [WelcomeStep.HowItWorks]: "Guide",
+export const welcomeStepShortLabelKeys: Record<WelcomeStep, string> = {
+    [WelcomeStep.Features]: "enums:welcomeStep.shortLabels.features",
+    [WelcomeStep.HowItWorks]: "enums:welcomeStep.shortLabels.howItWorks",
 }

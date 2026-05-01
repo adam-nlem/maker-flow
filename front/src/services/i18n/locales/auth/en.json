@@ -1,0 +1,45 @@
+{
+    "login": {
+        "title": "Log in",
+        "subtitle": "Log in to access your content.",
+        "submit": "Log in",
+        "switchToRegister": "Create an account"
+    },
+    "register": {
+        "title": "Create your account",
+        "subtitle": "Start for free and manage your content from now on.",
+        "submit": "Create my account",
+        "switchToLogin": "I already have an account"
+    },
+    "verify": {
+        "subtitlePrefix": "A code has been sent to",
+        "codeLabel": "Verification code",
+        "submit": "Verify",
+        "resend": "Resend code",
+        "resendCooldown": "Resend code ({{seconds}}s)"
+    },
+    "fields": {
+        "email": "Email address",
+        "password": "Password",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "confirmPassword": "Confirm password"
+    },
+    "validation": {
+        "firstNameRequired": "First name is required",
+        "lastNameRequired": "Last name is required",
+        "emailRequired": "Email is required",
+        "passwordRequired": "Password is required",
+        "passwordCriteriaUnmet": "The password does not meet the security requirements",
+        "confirmPasswordRequired": "Password confirmation is required",
+        "passwordMismatch": "Passwords do not match",
+        "otpDigitsRequired": "Please enter a 6-digit code."
+    },
+    "passwordRules": {
+        "minLength": "At least 8 characters",
+        "uppercase": "At least one uppercase letter",
+        "lowercase": "At least one lowercase letter",
+        "digit": "At least one digit",
+        "specialChar": "At least one special character"
+    }
+}

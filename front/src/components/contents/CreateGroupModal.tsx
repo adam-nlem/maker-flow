@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useTranslation } from "react-i18next"
 import ModalOverlay from "~/components/ui/ModalOverlay"
 import { Input } from "~/components/ui/Input"
 import { Button } from "~/components/ui/Button"
@@ -12,6 +13,7 @@ interface CreateGroupModalProps {
 }
 
 export default function CreateGroupModal({ isOpen, onClose, projectUuid }: CreateGroupModalProps) {
+    const { t } = useTranslation()
     const { createPostGroup, isPending: isCreating } = useCreatePostGroup({ projectUuid })
 
     const [title, setTitle] = useState("")
@@ -41,14 +43,14 @@ export default function CreateGroupModal({ isOpen, onClose, projectUuid }: Creat
             <div className="flex flex-col gap-4 p-6 flex-1 min-h-0">
                 {/* Header */}
                 <div className="flex flex-col gap-4 shrink-0">
-                    <h2 className="text-heading-sm">Nouveau groupe</h2>
+                    <h2 className="text-heading-sm">{t("contents:create.modalTitle")}</h2>
                     <Input
-                        label="Titre"
-                        placeholder="Nom du groupe..."
+                        label={t("contents:create.titleLabel")}
+                        placeholder={t("contents:create.titlePlaceholder")}
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
-                    <h3 className="text-heading-xs text-gray">Posts (optionnel)</h3>
+                    <h3 className="text-heading-xs text-gray">{t("contents:create.postsHeader")}</h3>
                 </div>
 
                 {/* Growable post picker */}
@@ -60,7 +62,7 @@ export default function CreateGroupModal({ isOpen, onClose, projectUuid }: Creat
                     />
                     {selectedPostUuids.length > 0 && (
                         <p className="text-body-xs text-gray shrink-0">
-                            {selectedPostUuids.length} post{selectedPostUuids.length > 1 ? "s" : ""} sélectionné{selectedPostUuids.length > 1 ? "s" : ""}
+                            {t("contents:selectedCount", { count: selectedPostUuids.length })}
                         </p>
                     )}
                 </div>
@@ -72,7 +74,7 @@ export default function CreateGroupModal({ isOpen, onClose, projectUuid }: Creat
                         width="w-full"
                         onClick={handleClose}
                     >
-                        Annuler
+                        {t("actions.cancel")}
                     </Button>
                     <Button
                         style="primary"
@@ -81,7 +83,7 @@ export default function CreateGroupModal({ isOpen, onClose, projectUuid }: Creat
                         isLoading={isCreating}
                         disabled={!title.trim()}
                     >
-                        Créer
+                        {t("actions.create")}
                     </Button>
                 </div>
             </div>

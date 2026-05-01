@@ -1,6 +1,7 @@
 import { ArrowPathIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import { TodoListStatus, todoListStatusToBgClass, todoListStatusToFrenchTranslation, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
+import { TodoListStatus, todoListStatusToBgClass, todoListStatusTranslationKeys, todoListStatusToTextClass } from "~/models/enums/TodoListStatus";
 import type { TodoListTask } from "~/models/TodoListTask";
 import CreateTodoListTaskCard from "./CreateTodoListTaksCard";
 import TodoListTaskCard from "./TodoListTaskCard";
@@ -19,6 +20,7 @@ interface TodoListStatusColumnProps {
 }
 
 export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading, todoListUuid, onLoadMore, onTaskClick }: TodoListStatusColumnProps) {
+    const { t } = useTranslation()
     const [showCreateTaskCard, setShowCreateTaskCard] = useState(false)
 
     const { setNodeRef } = useDroppable({ id: status });
@@ -27,7 +29,7 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
         <div className="flex flex-col w-1/3 gap-3 min-h-0" ref={setNodeRef}>
 
             <div className={`text-sm w-full rounded-sm text-center ${todoListStatusToTextClass[status]} ${todoListStatusToBgClass[status]} shrink-0`}>
-                {todoListStatusToFrenchTranslation[status]}
+                {t(todoListStatusTranslationKeys[status])}
             </div>
 
             <div className="relative flex-1 min-h-0">
@@ -45,7 +47,7 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
                                 <CreateTodoListTaskCard todoListUuid={todoListUuid} onTaskCreated={() => setShowCreateTaskCard(false)} /> :
                                 <SimpleTextButton onClick={() => setShowCreateTaskCard(true)}>
                                     <PlusIcon className="size-3.5" strokeWidth={2} />
-                                    <p>Nouvelle tâche</p>
+                                    <p>{t("tasks:task.newTask")}</p>
                                 </SimpleTextButton>
                             )}
 
@@ -53,7 +55,7 @@ export default function TodoListStatusColumn({ status, tasks, hasMore, isLoading
 
                             {hasMore && <SimpleTextButton onClick={onLoadMore}>
                                 <ArrowPathIcon className="size-3.5" strokeWidth={2} />
-                                <p>Charger plus de tâches</p>
+                                <p>{t("tasks:task.loadMore")}</p>
                             </SimpleTextButton>}
                         </>
                     )}

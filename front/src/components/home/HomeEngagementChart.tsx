@@ -1,6 +1,7 @@
+import { useTranslation } from "react-i18next";
 import HorizontalBarChart from "~/components/ui/HorizontalBarChart";
 import type { IntegrationInsightsGroupedByIntegrationDTO } from "~/dtos/integrationInsights/IntegrationInsightsGroupedByIntegrationDTO";
-import { platformToChartColor, platformToFrenchTranslation } from "~/models/enums/Platform";
+import { platformToChartColor, platformTranslationKeys } from "~/models/enums/Platform";
 import { computeEngagementRate } from "~/utils/insightHelpers";
 
 interface HomeEngagementChartProps {
@@ -8,13 +9,14 @@ interface HomeEngagementChartProps {
 }
 
 export default function HomeEngagementChart({ groups }: HomeEngagementChartProps) {
+    const { t } = useTranslation();
     const data = groups
         .map((group) => {
             const engagementRate = computeEngagementRate(group.insights);
             if (engagementRate === null) return null;
 
             return {
-                label: platformToFrenchTranslation[group.integration.platform],
+                label: t(platformTranslationKeys[group.integration.platform]),
                 value: engagementRate,
                 color: platformToChartColor[group.integration.platform],
             };
@@ -25,7 +27,7 @@ export default function HomeEngagementChart({ groups }: HomeEngagementChartProps
 
     return (
         <div className="border border-light-gray rounded-lg p-3">
-            <h2 className="text-heading-sm mb-3">Engagement par plateforme</h2>
+            <h2 className="text-heading-sm mb-3">{t("home:engagementByPlatform")}</h2>
             <HorizontalBarChart data={data} />
         </div>
     );

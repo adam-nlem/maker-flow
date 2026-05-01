@@ -1,15 +1,18 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages";
-import { SettingsSection, settingsSectionToFrenchTranslation } from "~/models/enums/SettingsSection";
+import { SettingsSection, settingsSectionTranslationKeys } from "~/models/enums/SettingsSection";
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
 import PasswordRules from "~/components/ui/PasswordRules";
+import LanguageSwitcher from "~/components/settings/LanguageSwitcher";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useUpdateUser } from "~/hooks/api/users/useUpdateUser";
 import { useLogout } from "~/hooks/api/users/useLogout";
 import { getPasswordRules, isPasswordValid } from "~/utils/passwordValidation";
 
 export default function GeneralSettings() {
+    const { t } = useTranslation();
     const { user } = useCurrentUser();
 
     const [firstName, setFirstName] = useState(user?.firstName ?? '');
@@ -41,11 +44,11 @@ export default function GeneralSettings() {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (hasPasswordChanges && (!currentPassword || !newPassword || !confirmNewPassword)) {
-            setValidationError('Veuillez remplir tous les champs de mots de passe');
+            setValidationError(t("settings:general.validation.passwordFieldsRequired"));
             return;
         }
         if (newPassword && !isPasswordValid(newPassword)) {
-            setValidationError('Le mot de passe ne respecte pas les critères de sécurité');
+            setValidationError(t("settings:general.validation.passwordCriteriaUnmet"));
             return;
         }
         const data: Parameters<typeof updateUser>[0] = { firstName, lastName };
@@ -69,42 +72,45 @@ export default function GeneralSettings() {
     return (
         <div className="h-full flex flex-col overflow-hidden">
             <div className="px-4 md:px-6 py-4 md:py-5 border-b border-light-gray">
-                <h2 className="text-heading-xl">{settingsSectionToFrenchTranslation[SettingsSection.General]}</h2>
+                <h2 className="text-heading-xl">{t(settingsSectionTranslationKeys[SettingsSection.General])}</h2>
             </div>
 
             <form className="flex-1 flex flex-col min-h-0" onSubmit={handleSubmit}>
                 <div className="flex-1 overflow-y-auto scrollbar-none px-4 md:px-6 py-4 md:py-5">
                     <div className="flex flex-col gap-5">
-                        <h3 className="text-heading-sm">Mon compte</h3>
+                        <h3 className="text-heading-sm">{t("settings:general.account")}</h3>
                         <Input
-                            label="Prénom"
+                            label={t("settings:general.fields.firstName")}
                             value={firstName}
                             onChange={(e) => setFirstName(e.target.value)}
                             required
                         />
                         <Input
-                            label="Nom"
+                            label={t("settings:general.fields.lastName")}
                             value={lastName}
                             onChange={(e) => setLastName(e.target.value)}
                             required
                         />
                         <Input
-                            label="Email"
+                            label={t("settings:general.fields.email")}
                             value={user.email}
                             readOnly
                             className="text-gray cursor-not-allowed"
                         />
 
-                        <h3 className="text-heading-sm mt-5">Changer de mot de passe</h3>
+                        <h3 className="text-heading-sm mt-5">{t("settings:general.preferences")}</h3>
+                        <LanguageSwitcher />
+
+                        <h3 className="text-heading-sm mt-5">{t("settings:general.password")}</h3>
                         <Input
-                            label="Mot de passe actuel"
+                            label={t("settings:general.fields.currentPassword")}
                             type="password"
                             value={currentPassword}
                             onChange={(e) => { setCurrentPassword(e.target.value); setValidationError(null); reset(); }}
                             autoComplete="current-password"
                         />
                         <Input
-                            label="Nouveau mot de passe"
+                            label={t("settings:general.fields.newPassword")}
                             type="password"
                             value={newPassword}
                             onChange={(e) => { setNewPassword(e.target.value); setValidationError(null); reset(); }}
@@ -114,7 +120,7 @@ export default function GeneralSettings() {
                             <PasswordRules rules={getPasswordRules(newPassword)} />
                         )}
                         <Input
-                            label="Confirmer le mot de passe"
+                            label={t("settings:general.fields.confirmPassword")}
                             type="password"
                             value={confirmNewPassword}
                             onChange={(e) => { setConfirmNewPassword(e.target.value); setValidationError(null); reset(); }}
@@ -124,9 +130,9 @@ export default function GeneralSettings() {
                             <p className="text-body-sm text-danger">{validationError ?? errorMessage}</p>
                         )}
 
-                        <h3 className="text-heading-sm">Session</h3>
+                        <h3 className="text-heading-sm">{t("settings:general.session")}</h3>
                         <Button type="button" style="danger" onClick={logout} isLoading={isLoggingOut} disabled={isLoggingOut} width="w-auto">
-                            <p className="text-sm">Se déconnecter</p>
+                            <p className="text-sm">{t("settings:general.logout")}</p>
                         </Button>
                     </div>
                 </div>
@@ -134,7 +140,7 @@ export default function GeneralSettings() {
                 {hasChanges && (
                     <div className="px-4 md:px-6 py-3 md:py-4 border-t border-light-gray">
                         <Button type="submit" style="primary" isLoading={isPending} disabled={isPending}>
-                            <p className="text-sm">Enregistrer</p>
+                            <p className="text-sm">{t("actions.save")}</p>
                         </Button>
                     </div>
                 )}

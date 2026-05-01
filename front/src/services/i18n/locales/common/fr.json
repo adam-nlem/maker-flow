@@ -1,0 +1,38 @@
+{
+    "actions": {
+        "cancel": "Annuler",
+        "save": "Enregistrer",
+        "close": "Fermer",
+        "continue": "Continuer",
+        "delete": "Supprimer",
+        "create": "Créer",
+        "edit": "Modifier",
+        "confirm": "Confirmer",
+        "next": "Suivant",
+        "back": "Retour",
+        "previous": "Précédent"
+    },
+    "language": {
+        "label": "Langue"
+    },
+    "legal": {
+        "privacyPolicy": "Confidentialité",
+        "termsOfService": "CGU"
+    },
+    "searchBar": {
+        "defaultPlaceholder": "Rechercher un post..."
+    },
+    "premium": {
+        "title": "Fonctionnalite Premium",
+        "description": "Passez à un abonnement payant pour acceder à cette fonctionnalite.",
+        "upgradeAction": "Passer à un abonnement superieur"
+    },
+    "calendarHeatmap": {
+        "title": "Comptes uniques touchés"
+    },
+    "lineChart": {
+        "durationAfterPublication": "Durée après publication: {{duration}}",
+        "thisContentValue": "Valeur de ce contenu",
+        "averageContentValue": "Valeur de la moyenne des 10 derniers contenus"
+    }
+}

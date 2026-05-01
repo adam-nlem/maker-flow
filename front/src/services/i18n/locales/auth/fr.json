@@ -1,0 +1,45 @@
+{
+    "login": {
+        "title": "Connexion",
+        "subtitle": "Connectez-vous pour retrouver vos contenus.",
+        "submit": "Connexion",
+        "switchToRegister": "Créer un compte"
+    },
+    "register": {
+        "title": "Créez votre compte",
+        "subtitle": "Commencez gratuitement et gérez vos contenus dès maintenant.",
+        "submit": "Créer mon compte",
+        "switchToLogin": "J'ai déjà un compte"
+    },
+    "verify": {
+        "subtitlePrefix": "Un code a été envoyé à",
+        "codeLabel": "Code de vérification",
+        "submit": "Vérifier",
+        "resend": "Renvoyer le code",
+        "resendCooldown": "Renvoyer le code ({{seconds}}s)"
+    },
+    "fields": {
+        "email": "Adresse email",
+        "password": "Mot de passe",
+        "firstName": "Prénom",
+        "lastName": "Nom",
+        "confirmPassword": "Confirmer le mot de passe"
+    },
+    "validation": {
+        "firstNameRequired": "Le prénom est requis",
+        "lastNameRequired": "Le nom est requis",
+        "emailRequired": "L'email est requis",
+        "passwordRequired": "Le mot de passe est requis",
+        "passwordCriteriaUnmet": "Le mot de passe ne respecte pas les critères de sécurité",
+        "confirmPasswordRequired": "La confirmation du mot de passe est requise",
+        "passwordMismatch": "Les mots de passe ne correspondent pas",
+        "otpDigitsRequired": "Veuillez entrer un code à 6 chiffres."
+    },
+    "passwordRules": {
+        "minLength": "Au moins 8 caractères",
+        "uppercase": "Au moins une lettre majuscule",
+        "lowercase": "Au moins une lettre minuscule",
+        "digit": "Au moins un chiffre",
+        "specialChar": "Au moins un caractère spécial"
+    }
+}

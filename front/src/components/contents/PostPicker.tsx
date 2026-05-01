@@ -1,4 +1,5 @@
 import { useState, useRef } from "react"
+import { useTranslation } from "react-i18next"
 import Shimmer from "~/components/ui/Shimmer"
 import { useListPaginatedPosts } from "~/hooks/api/posts/useListPaginatedPosts"
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
@@ -15,6 +16,7 @@ interface PostPickerProps {
 }
 
 export default function PostPicker({ projectUuid, selectedUuids, onSelectionChange, excludeUuids = [] }: PostPickerProps) {
+  const { t } = useTranslation()
   const [platformFilter, setPlatformFilter] = useState<Platform | null>(null)
   const [searchTerm, setSerachTerm] = useState("")
 
@@ -57,7 +59,7 @@ export default function PostPicker({ projectUuid, selectedUuids, onSelectionChan
             ))}
           </div>
         ) : items.length === 0 ? (
-          <p className="text-body-xs text-gray py-4 text-center">Aucun post trouvé.</p>
+          <p className="text-body-xs text-gray py-4 text-center">{t("contents:noPosts")}</p>
         ) : (
           <>
             {items.map((item) => (

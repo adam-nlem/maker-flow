@@ -1,7 +1,8 @@
 import { RectangleStackIcon } from "@heroicons/react/24/outline"
+import { useTranslation } from "react-i18next"
 import Pill from "~/components/ui/Pill"
 import type { Integration } from "~/models/Integration"
-import { platformToFrenchTranslation, platformToIcon } from "~/models/enums/Platform"
+import { platformTranslationKeys, platformToIcon } from "~/models/enums/Platform"
 import { useFocusIntegrationStore } from "~/stores/integrations/focusIntegrationStore"
 
 interface IntegrationPillRowProps {
@@ -10,6 +11,7 @@ interface IntegrationPillRowProps {
 }
 
 export default function IntegrationPillRow({ integrations, showAllOption = true }: IntegrationPillRowProps) {
+    const { t } = useTranslation()
 
     const focusedIntegrationUuid = useFocusIntegrationStore((state) => state.focusedIntegrationUuid)
     const setFocusedIntegrationUuid = useFocusIntegrationStore((state) => state.setFocusedIntegrationUuid)
@@ -20,7 +22,7 @@ export default function IntegrationPillRow({ integrations, showAllOption = true 
                 <Pill
                     key={integration.uuid}
                     imageUrl={platformToIcon[integration.platform]}
-                    label={platformToFrenchTranslation[integration.platform]}
+                    label={t(platformTranslationKeys[integration.platform])}
                     isSelected={integration.uuid === focusedIntegrationUuid}
                     onClick={() => setFocusedIntegrationUuid(integration.uuid)}
                     borderColorClassName="border-light-gray"
@@ -29,7 +31,7 @@ export default function IntegrationPillRow({ integrations, showAllOption = true 
             {showAllOption && (
                 <Pill
                     icon={RectangleStackIcon}
-                    label="Toutes les plateformes"
+                    label={t("integrations:allPlatforms")}
                     isSelected={focusedIntegrationUuid === null}
                     onClick={() => setFocusedIntegrationUuid(null)}
                     borderColorClassName="border-light-gray"

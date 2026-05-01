@@ -1,0 +1,47 @@
+{
+    "earlyAccessOpen": "ACCÈS ANTICIPÉ OUVERT",
+    "invitedByFriend": "Vous avez été invité par un ami !",
+    "headlinePrefix": "Arrêtez de jongler entre 7 onglets pour publier",
+    "headlineHighlight": "un seul contenu.",
+    "tagline": "centralise tout votre workflow créatif en un seul endroit pour que vous passiez moins de temps à gérer des outils, et plus de temps à créer ce qui compte vraiment.",
+    "emailPlaceholder": "votre@mail.com",
+    "submit": "Réserver ma place",
+    "emailRequired": "Veuillez entrer votre adresse email.",
+    "concreteChange": "CE QUE ÇA CHANGE CONCRÈTEMENT",
+    "features": {
+        "workspace": {
+            "title": "Un seul espace, zéro friction",
+            "description": "Idées, scripts, planning et stats réunis dans un workspace unique. Fini les allers-retours entre 7 outils."
+        },
+        "scripts": {
+            "title": "Des scripts prêts en 60 secondes",
+            "description": "L'IA analyse votre style et génère des scripts qui vous ressemblent vraiment. Vous ajustez, vous publiez."
+        },
+        "stats": {
+            "title": "Vos stats, enfin lisibles",
+            "description": "Un seul dashboard pour toutes vos plateformes. Comparez les performances d'une même vidéo sur différents réseaux, en un coup d'œil."
+        },
+        "calendar": {
+            "title": "Planifiez sans vous prendre la tête",
+            "description": "Visualisez votre calendrier de publication et gardez le rythme sans stress."
+        }
+    },
+    "rewards": {
+        "headlinePrefix": "Invitez des amis. Débloquez des",
+        "headlineHighlight": "récompenses.",
+        "subtitle": "Plus vous invitez de créateurs dans l'aventure, plus vos avantages augmentent.",
+        "signupFirstNotice": "Inscrivez-vous d'abord, puis recevez votre lien de parrainage unique.",
+        "tierThreshold": "{{count}} parrainages"
+    },
+    "dashboard": {
+        "title": "Merci pour votre inscription !",
+        "subtitle": "Partagez votre lien de parrainage pour débloquer des récompenses exclusives.",
+        "linkLabel": "Votre lien de parrainage",
+        "copyLink": "Copier le lien",
+        "linkCopied": "Lien copié !",
+        "shareTwitter": "Partager sur X",
+        "verifiedReferrals": "Parrainages vérifiés",
+        "rewardsTitle": "Récompenses",
+        "twitterShareText": "Je viens de rejoindre la liste d'attente de MakerFlow, l'outil tout-en-un pour les créateurs de contenu ! Rejoignez-moi :"
+    }
+}

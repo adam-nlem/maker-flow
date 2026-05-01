@@ -1,7 +1,8 @@
 import { PlusIcon } from "@heroicons/react/24/outline"
+import { useTranslation } from "react-i18next"
 import { Button } from "~/components/ui/Button"
 import Pill from "~/components/ui/Pill"
-import { ContentsTab, contentsTabOptions, contentsTabToFrenchTranslation } from "~/models/enums/ContentsTab"
+import { ContentsTab, contentsTabOptions, contentsTabTranslationKeys } from "~/models/enums/ContentsTab"
 import { useContentsStore } from "~/stores/contents/contentsStore"
 import { useContentsRightPanelStore } from "~/stores/contents/contentsRightPanelStore"
 import ContentsPlatformFilter from "./ContentsPlatformFilter"
@@ -15,6 +16,7 @@ interface ContentListPanelProps {
 }
 
 export default function ContentListPanel({ projectUuid }: ContentListPanelProps) {
+  const { t } = useTranslation()
   const activeTab = useContentsStore((s) => s.activeTab)
   const setActiveTab = useContentsStore((s) => s.setActiveTab)
   const platformFilter = useContentsStore((s) => s.platformFilter)
@@ -30,7 +32,7 @@ export default function ContentListPanel({ projectUuid }: ContentListPanelProps)
     <div className="flex-1 h-full flex flex-col overflow-hidden">
       {/* Header */}
       <div className="flex flex-row items-center justify-between px-6 py-4 border-b border-light-gray">
-        <h1 className="text-heading-xl">Contenus</h1>
+        <h1 className="text-heading-xl">{t("contents:pageTitle")}</h1>
         <Button
           style="primary"
           width="w-fit"
@@ -38,7 +40,7 @@ export default function ContentListPanel({ projectUuid }: ContentListPanelProps)
         >
           <div className="flex flex-row items-center gap-2">
             <PlusIcon className="size-4" strokeWidth={2} />
-            <p className="text-sm">Nouveau groupe</p>
+            <p className="text-sm">{t("contents:newGroup")}</p>
           </div>
         </Button>
       </div>
@@ -48,7 +50,7 @@ export default function ContentListPanel({ projectUuid }: ContentListPanelProps)
         {contentsTabOptions.map((tab) => (
           <Pill
             key={tab}
-            label={contentsTabToFrenchTranslation[tab]}
+            label={t(contentsTabTranslationKeys[tab])}
             isSelected={activeTab === tab}
             onClick={() => {
               setActiveTab(tab)

@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { AdjustmentsHorizontalIcon } from "@heroicons/react/24/outline";
+import { useTranslation } from "react-i18next";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { platformOptions } from "~/models/enums/Platform";
-import { scriptStatusOptions, scriptStatusToFrenchTranslation, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon, scriptStatusToBorderClass } from "~/models/enums/ScriptStatus";
+import { scriptStatusOptions, scriptStatusTranslationKeys, scriptStatusToBgClass, scriptStatusToTextClass, scriptStatusToIcon, scriptStatusToBorderClass } from "~/models/enums/ScriptStatus";
 import { colorToBgClass, colorToBorderClass, colorToTextClass } from "~/models/enums/Color";
 import { useListScriptTags } from "~/hooks/api/scriptTags/useListScriptTags";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
@@ -14,6 +15,7 @@ interface CalendarFilterPanelProps {
 }
 
 export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanelProps) {
+    const { t } = useTranslation();
     const { selectedPlatforms, selectedStatuses, selectedTagUuids, togglePlatform, toggleStatus, toggleTag } = useCalendarStore();
     const { scriptTags } = useListScriptTags({ projectUuid });
     const isDesktop = useIsDesktop();
@@ -29,7 +31,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
         <>
             {/* Platforms */}
             <div className="flex flex-col gap-2">
-                <span className="text-heading-xs text-gray">Plateformes</span>
+                <span className="text-heading-xs text-gray">{t("scripts:calendar.filters.platforms")}</span>
                 <div className="flex flex-row flex-wrap gap-2">
                     {platformOptions.map((platform) => (
                         <PlatformPill
@@ -44,13 +46,13 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
 
             {/* Statuses */}
             <div className="flex flex-col gap-2">
-                <span className="text-heading-xs text-gray">Statuts</span>
+                <span className="text-heading-xs text-gray">{t("scripts:calendar.filters.statuses")}</span>
                 <div className="flex flex-row flex-wrap gap-2">
                     {scriptStatusOptions.map((status) => (
                         <Pill
                             key={status}
                             icon={scriptStatusToIcon[status]}
-                            label={scriptStatusToFrenchTranslation[status]}
+                            label={t(scriptStatusTranslationKeys[status])}
                             isSelected={selectedStatusSet.has(status)}
                             onClick={() => toggleStatus(status)}
                             bgColorClassName={scriptStatusToBgClass[status]}
@@ -64,7 +66,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
             {/* Tags */}
             {scriptTags.length > 0 && (
                 <div className="flex flex-col gap-2">
-                    <span className="text-heading-xs text-gray">Tags</span>
+                    <span className="text-heading-xs text-gray">{t("scripts:calendar.filters.tags")}</span>
                     <div className="flex flex-row flex-wrap gap-2">
                         {scriptTags.map((tag) => (
                             <Pill
@@ -91,7 +93,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
                     className="flex flex-row items-center gap-2 px-3 py-2 border border-light-gray rounded-xl hover:bg-surface-hover transition-colors cursor-pointer"
                 >
                     <AdjustmentsHorizontalIcon className="size-4 text-gray" />
-                    <span className="text-heading-xs text-gray">Filtres</span>
+                    <span className="text-heading-xs text-gray">{t("scripts:calendar.filters.title")}</span>
                     {activeFilterCount > 0 && (
                         <span className="flex items-center justify-center size-5 rounded-full bg-primary/10 text-primary text-body-xs font-semibold">
                             {activeFilterCount}

@@ -39,22 +39,22 @@ export const postInsightTypeToIcon: Record<PostInsightType, ComponentType<SVGPro
     [PostInsightType.AudienceWatchRatio]: ChartBarIcon,
 };
 
-export const postInsightTypeToFrenchTranslation: Record<PostInsightType, string> = {
-    [PostInsightType.Reach]: "Portée",
-    [PostInsightType.TotalInteractions]: "Interactions totales",
-    [PostInsightType.Saves]: "Enregistrements",
-    [PostInsightType.Shares]: "Partages",
-    [PostInsightType.Views]: "Vues",
-    [PostInsightType.Likes]: "Likes",
-    [PostInsightType.Comments]: "Commentaires",
-    [PostInsightType.AverageWatchTime]: "Moy. visionnage",
-    [PostInsightType.TotalWatchTime]: "Temps de visionnage",
-    [PostInsightType.Dislikes]: "Dislikes",
-    [PostInsightType.ThumbnailImpressions]: "Impressions miniature",
-    [PostInsightType.ThumbnailImpressionsClickRate]: "Taux de clics miniature",
-    [PostInsightType.FollowersGained]: "Abonnés gagnés",
-    [PostInsightType.FollowersLost]: "Abonnés perdus",
-    [PostInsightType.AudienceWatchRatio]: "Ratio de visionnage",
+export const postInsightTypeTranslationKeys: Record<PostInsightType, string> = {
+    [PostInsightType.Reach]: "enums:postInsightType.reach",
+    [PostInsightType.TotalInteractions]: "enums:postInsightType.totalInteractions",
+    [PostInsightType.Saves]: "enums:postInsightType.saves",
+    [PostInsightType.Shares]: "enums:postInsightType.shares",
+    [PostInsightType.Views]: "enums:postInsightType.views",
+    [PostInsightType.Likes]: "enums:postInsightType.likes",
+    [PostInsightType.Comments]: "enums:postInsightType.comments",
+    [PostInsightType.AverageWatchTime]: "enums:postInsightType.averageWatchTime",
+    [PostInsightType.TotalWatchTime]: "enums:postInsightType.totalWatchTime",
+    [PostInsightType.Dislikes]: "enums:postInsightType.dislikes",
+    [PostInsightType.ThumbnailImpressions]: "enums:postInsightType.thumbnailImpressions",
+    [PostInsightType.ThumbnailImpressionsClickRate]: "enums:postInsightType.thumbnailImpressionsClickRate",
+    [PostInsightType.FollowersGained]: "enums:postInsightType.followersGained",
+    [PostInsightType.FollowersLost]: "enums:postInsightType.followersLost",
+    [PostInsightType.AudienceWatchRatio]: "enums:postInsightType.audienceWatchRatio",
 };
 
 export const postInsightTypeToEngagementColor: Partial<Record<PostInsightType, string>> = {

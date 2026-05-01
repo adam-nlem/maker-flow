@@ -10,7 +10,8 @@ import ConnectIntegrationPlaceholder from "~/components/integrations/ConnectInte
 import HomeOverviewCards from "~/components/home/HomeOverviewCards";
 import HomeViewsEvolutionChart from "~/components/home/HomeViewsEvolutionChart";
 import HomeEngagementChart from "~/components/home/HomeEngagementChart";
-import { timePeriodOptions, timePeriodToFrenchTranslation } from "~/models/enums/TimePeriod";
+import { useTranslation } from "react-i18next";
+import { timePeriodOptions, timePeriodTranslationKeys } from "~/models/enums/TimePeriod";
 import Pill from "~/components/ui/Pill";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
@@ -18,6 +19,7 @@ import IntegrationDetailCardRow from "~/components/integrations/IntegrationDetai
 import HomeScriptsPanel from "~/components/home/HomeScriptsPanel";
 
 export default function HomePage() {
+  const { t } = useTranslation();
   const { projects, isLoading } = useListPaginatedProjects();
   const { focusedProjectUuid } = useSelectFocusedProject({ projects });
   const { isSubscribed } = useIsSubscribed();
@@ -92,7 +94,7 @@ export default function HomePage() {
             renderTrigger={({ onClick }) => (
               <Pill
                 icon={ChevronUpDownIcon}
-                label={timePeriodToFrenchTranslation[timePeriod]}
+                label={t(timePeriodTranslationKeys[timePeriod])}
                 isSelected
                 onClick={onClick}
                 borderColorClassName="border-light-gray"
@@ -100,7 +102,7 @@ export default function HomePage() {
             )}
             renderItem={({ item, isSelected, onSelect }) => {
               return !isSelected ? <Pill
-                label={timePeriodToFrenchTranslation[item]}
+                label={t(timePeriodTranslationKeys[item])}
                 isSelected
                 onClick={onSelect}
                 borderColorClassName="border-light-gray"

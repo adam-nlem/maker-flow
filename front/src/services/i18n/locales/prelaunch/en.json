@@ -1,0 +1,47 @@
+{
+    "earlyAccessOpen": "EARLY ACCESS OPEN",
+    "invitedByFriend": "You were invited by a friend!",
+    "headlinePrefix": "Stop juggling 7 tabs just to publish",
+    "headlineHighlight": "a single piece of content.",
+    "tagline": "centralizes your entire creative workflow in one place so you can spend less time managing tools and more time creating what really matters.",
+    "emailPlaceholder": "your@email.com",
+    "submit": "Reserve my spot",
+    "emailRequired": "Please enter your email address.",
+    "concreteChange": "WHAT IT ACTUALLY CHANGES",
+    "features": {
+        "workspace": {
+            "title": "One space, zero friction",
+            "description": "Ideas, scripts, planning, and stats all in one workspace. No more bouncing between 7 tools."
+        },
+        "scripts": {
+            "title": "Scripts ready in 60 seconds",
+            "description": "AI analyzes your style and generates scripts that actually sound like you. You tweak, you publish."
+        },
+        "stats": {
+            "title": "Your stats, finally readable",
+            "description": "A single dashboard for every platform. Compare how the same video performs across networks at a glance."
+        },
+        "calendar": {
+            "title": "Plan without overthinking",
+            "description": "Visualize your publishing calendar and stay on rhythm without the stress."
+        }
+    },
+    "rewards": {
+        "headlinePrefix": "Invite friends. Unlock",
+        "headlineHighlight": "rewards.",
+        "subtitle": "The more creators you bring along, the more perks you unlock.",
+        "signupFirstNotice": "Sign up first, then get your unique referral link.",
+        "tierThreshold": "{{count}} referrals"
+    },
+    "dashboard": {
+        "title": "Thanks for signing up!",
+        "subtitle": "Share your referral link to unlock exclusive rewards.",
+        "linkLabel": "Your referral link",
+        "copyLink": "Copy link",
+        "linkCopied": "Link copied!",
+        "shareTwitter": "Share on X",
+        "verifiedReferrals": "Verified referrals",
+        "rewardsTitle": "Rewards",
+        "twitterShareText": "I just joined the MakerFlow waitlist, the all-in-one tool for content creators! Join me:"
+    }
+}

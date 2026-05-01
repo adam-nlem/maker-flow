@@ -3,35 +3,21 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\Script\ListCalendarScriptsQueryParamDTO;
-use App\DTO\QueryParam\Script\ListScriptPartsQueryParamDTO;
 use App\DTO\QueryParam\Script\ListScriptsQueryParamDTO;
 use App\DTO\Response\Script\ListScriptsGroupedByDayResponseDTO;
 use App\DTO\Request\Script\CreateScriptRequestDTO;
-use App\DTO\Request\Script\ReorderScriptPartsRequestDTO;
 use App\DTO\Request\Script\UpdateScriptRequestDTO;
-use App\Entity\Enum\ScriptPartType;
 use App\Entity\Script;
 use App\Entity\User;
 use App\Exception\Project\ProjectNotFoundException;
 use App\Exception\Script\ScriptNotFoundException;
 use App\Exception\Script\ScriptLimitReachedException;
-use App\Exception\Script\ScriptGenerationNotFoundException;
 use App\Repository\PostGroupRepository;
 use App\Repository\ProjectRepository;
-use App\Repository\ScriptChapterRepository;
-use App\Repository\ScriptDialogueRepository;
 use App\Repository\ScriptRepository;
-use App\Repository\ScriptShotRepository;
 use App\Repository\SubscriptionRepository;
 use App\Service\Stripe\StripePlanService;
 use App\Repository\ScriptTagRepository;
-use App\Repository\ScriptTextRepository;
-use App\Repository\ScriptVoiceOverRepository;
-use App\Repository\ScriptCallToActionRepository;
-use App\Repository\ScriptGenerationRepository;
-use App\Repository\ScriptHookRepository;
-use App\Repository\ScriptRetentionCueRepository;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -261,122 +247,5 @@ final class ScriptController extends AbstractController
         $scriptRepository->remove($script, true);
 
         return $this->json(data: ["message" => "Script deleted successfully"], status: Response::HTTP_OK);
-    }
-
-    #[Route('/{scriptUuid}/parts', name: 'api_scripts_parts_list', methods: ['GET'])]
-    public function listParts(
-        string $scriptUuid,
-        ListScriptPartsQueryParamDTO $queryParamDto,
-        ScriptRepository $scriptRepository,
-        ScriptGenerationRepository $generationRepository,
-        ScriptChapterRepository $chapterRepository,
-        ScriptVoiceOverRepository $voiceOverRepository,
-        ScriptDialogueRepository $dialogueRepository,
-        ScriptShotRepository $shotRepository,
-        ScriptTextRepository $textRepository,
-        ScriptCallToActionRepository $callToActionRepository,
-        ScriptRetentionCueRepository $retentionCueRepository,
-        ScriptHookRepository $hookRepository,
-    ): JsonResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
-
-        if ($script === null) {
-            throw new ScriptNotFoundException();
-        }
-
-        $generationUuid = $queryParamDto->getGenerationUuid();
-        $generation = null;
-
-        if ($generationUuid !== null) {
-            $generation = $generationRepository->getByUuidAndUser($generationUuid, $user);
-
-            if ($generation === null) {
-                throw new ScriptGenerationNotFoundException();
-            }
-        }
-
-        $chapters = $chapterRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
-        $voiceOvers = $voiceOverRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
-        $dialogues = $dialogueRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
-        $shots = $shotRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
-        $texts = $textRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
-        $callToActions = $callToActionRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
-        $retentionCues = $retentionCueRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
-        $hooks = $hookRepository->getByScriptUserAndGenerationOrderedByPosition($script, $user, $generation);
-
-        $allParts = array_merge($chapters, $voiceOvers, $dialogues, $shots, $texts, $callToActions, $retentionCues, $hooks);
-
-        usort($allParts, fn($a, $b) => $a->getPosition() <=> $b->getPosition());
-
-        return $this->json(
-            data: $allParts,
-            status: Response::HTTP_OK,
-            context: ['groups' => ['api_scripts_parts_list']]
-        );
-    }
-
-    #[Route('/{scriptUuid}/reorder-parts', name: 'api_scripts_parts_reorder', methods: ['PATCH'])]
-    public function reorderParts(
-        string $scriptUuid,
-        ReorderScriptPartsRequestDTO $dto,
-        ScriptRepository $scriptRepository,
-        ScriptChapterRepository $chapterRepository,
-        ScriptVoiceOverRepository $voiceOverRepository,
-        ScriptDialogueRepository $dialogueRepository,
-        ScriptShotRepository $shotRepository,
-        ScriptTextRepository $textRepository,
-        ScriptCallToActionRepository $callToActionRepository,
-        ScriptRetentionCueRepository $retentionCueRepository,
-        ScriptHookRepository $hookRepository,
-        EntityManagerInterface $entityManager,
-    ): JsonResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
-
-        if ($script === null) {
-            throw new ScriptNotFoundException();
-        }
-
-        foreach ($dto->getOrderedParts() as $index => $part) {
-            $partUuid = $part["uuid"];
-            $partType = ScriptPartType::tryFrom($part["type"]);
-
-            $entity = match ($partType) {
-                ScriptPartType::Chapter => $chapterRepository->getByUuidAndUser($partUuid, $user),
-                ScriptPartType::VoiceOver => $voiceOverRepository->getByUuidAndUser($partUuid, $user),
-                ScriptPartType::Dialogue => $dialogueRepository->getByUuidAndUser($partUuid, $user),
-                ScriptPartType::Shot => $shotRepository->getByUuidAndUser($partUuid, $user),
-                ScriptPartType::Text => $textRepository->getByUuidAndUser($partUuid, $user),
-                ScriptPartType::CallToAction => $callToActionRepository->getByUuidAndUser($partUuid, $user),
-                ScriptPartType::RetentionCue => $retentionCueRepository->getByUuidAndUser($partUuid, $user),
-                ScriptPartType::Hook => $hookRepository->getByUuidAndUser($partUuid, $user),
-                default => null,
-            };
-
-            if ($entity !== null) {
-                $entity->setPosition($index);
-
-                match ($partType) {
-                    ScriptPartType::Chapter => $chapterRepository->save($entity),
-                    ScriptPartType::VoiceOver => $voiceOverRepository->save($entity),
-                    ScriptPartType::Dialogue => $dialogueRepository->save($entity),
-                    ScriptPartType::Shot => $shotRepository->save($entity),
-                    ScriptPartType::Text => $textRepository->save($entity),
-                    ScriptPartType::CallToAction => $callToActionRepository->save($entity),
-                    ScriptPartType::RetentionCue => $retentionCueRepository->save($entity),
-                    ScriptPartType::Hook => $hookRepository->save($entity),
-                    default => null,
-                };
-            }
-        }
-
-        $entityManager->flush();
-
-        return $this->json(data: ["message" => "Parts reordered successfully"], status: Response::HTTP_OK);
     }
 }

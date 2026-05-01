@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { useTranslation } from "react-i18next";
 import { formatToFrenchDateShort } from "~/utils/dateFormatters";
 import type { TodoList } from "~/models/TodoList";
 
@@ -19,6 +20,7 @@ export default function TodoListTile({
     onHoverRightIcon,
     onClick
 }: TodoListTileProps) {
+    const { t } = useTranslation()
     const [isHovered, setIsHovered] = useState(false)
     return (
 
@@ -34,7 +36,7 @@ export default function TodoListTile({
                 <div className="flex flex-col">
                     <h1 className="text-heading-sm whitespace-nowrap">{todoList.title}</h1>
                     {showCreatedAt && (
-                        <p className="text-body-xs text-gray whitespace-nowrap">Créé le {formatToFrenchDateShort(todoList.createdAt)}</p>
+                        <p className="text-body-xs text-gray whitespace-nowrap">{t("tasks:todoList.tile.createdAt", { date: formatToFrenchDateShort(todoList.createdAt) })}</p>
                     )}
                 </div>
             </div>

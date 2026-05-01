@@ -1,11 +1,12 @@
 import { useState } from "react"
 import { ChevronRightIcon } from "@heroicons/react/24/outline"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
 import { TextArea } from "~/components/ui/TextArea"
 import Pill from "~/components/ui/Pill"
-import { ProjectType, projectTypeOptions, projectTypeToFrenchTranslation } from "~/models/enums/ProjectType"
+import { ProjectType, projectTypeOptions, projectTypeTranslationKeys } from "~/models/enums/ProjectType"
 import { useCreateProject } from "~/hooks/api/projects/useCreateProject"
 import { HttpException } from "~/services/httpClient/HttpException"
 
@@ -16,6 +17,7 @@ interface CreateProjectFormProps {
 }
 
 export default function CreateProjectForm({ onProjectCreated, formSpacing = "space-y-4", buttonStyle }: CreateProjectFormProps) {
+    const { t } = useTranslation()
     const [name, setName] = useState("")
     const [description, setDescription] = useState("")
     const [types, setTypes] = useState<ProjectType[]>([])
@@ -42,8 +44,8 @@ export default function CreateProjectForm({ onProjectCreated, formSpacing = "spa
     return (
         <form className={formSpacing} onSubmit={handleSubmit}>
             <Input
-                label="Nom"
-                placeholder="Entrez le nom du Projet"
+                label={t("projects:create.fields.name")}
+                placeholder={t("projects:create.fields.namePlaceholder")}
                 id="project-name"
                 name="name"
                 type="text"
@@ -53,8 +55,8 @@ export default function CreateProjectForm({ onProjectCreated, formSpacing = "spa
             />
 
             <TextArea
-                label="Description"
-                placeholder="Écrivez une description (optionel)"
+                label={t("projects:create.fields.description")}
+                placeholder={t("projects:create.fields.descriptionPlaceholder")}
                 id="project-description"
                 name="description"
                 value={description}
@@ -62,12 +64,12 @@ export default function CreateProjectForm({ onProjectCreated, formSpacing = "spa
             />
 
             <div>
-                <h3 className="text-heading-sm">Types</h3>
+                <h3 className="text-heading-sm">{t("projects:create.fields.types")}</h3>
                 <div className="flex flex-wrap gap-2 mt-2">
                     {projectTypeOptions.map((type) => (
                         <Pill
                             key={type}
-                            label={projectTypeToFrenchTranslation[type]}
+                            label={t(projectTypeTranslationKeys[type])}
                             isSelected={types.includes(type)}
                             bgColorClassName="bg-primary/10"
                             borderColorClassName="border border-primary/30"
@@ -89,14 +91,14 @@ export default function CreateProjectForm({ onProjectCreated, formSpacing = "spa
                 disabled={isPending}
             >
                 <div className="flex flex-row justify-center items-center gap-3">
-                    <p className="text-sm">Créer le projet</p>
+                    <p className="text-sm">{t("projects:create.submit")}</p>
                     <ChevronRightIcon className="size-4" strokeWidth={2} />
                 </div>
             </Button>
 
             {limitError && (
                 <p className="text-body-xs text-danger text-center">
-                    Vous avez atteint la limite de projets pour votre abonnement. Passez à un abonnement supérieur pour en créer davantage.
+                    {t("projects:create.limitReached")}
                 </p>
             )}
         </form>

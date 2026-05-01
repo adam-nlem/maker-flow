@@ -1,10 +1,9 @@
-import { FolderPlusIcon, LinkIcon, UserCircleIcon, DocumentPlusIcon, SparklesIcon } from "@heroicons/react/24/outline"
+import { FolderPlusIcon, LinkIcon, DocumentPlusIcon, SparklesIcon } from "@heroicons/react/24/outline"
 import type { ComponentType, SVGProps } from "react"
 
 export enum OnboardingStep {
     CreateFirstProject = 'create_first_project',
     ConnectIntegration = 'connect_integration',
-    CreateCreatorProfile = 'create_creator_profile',
     CreateFirstScript = 'create_first_script',
     GenerateFirstScript = 'generate_first_script',
     ShowSubscriptions = 'show_subscriptions',
@@ -15,46 +14,41 @@ export const onboardingStepOptions = Object.values(OnboardingStep);
 export const ONBOARDING_STEP_ORDER = [
     OnboardingStep.CreateFirstProject,
     OnboardingStep.ConnectIntegration,
-    OnboardingStep.CreateCreatorProfile,
     OnboardingStep.CreateFirstScript,
     OnboardingStep.GenerateFirstScript,
     OnboardingStep.ShowSubscriptions,
 ]
 
-export const onboardingStepToFrenchTranslation: Record<OnboardingStep, string> = {
-    [OnboardingStep.CreateFirstProject]: "Créez votre premier projet",
-    [OnboardingStep.ConnectIntegration]: "Connectez vos réseaux sociaux",
-    [OnboardingStep.CreateCreatorProfile]: "Personnalisez votre compte créateur",
-    [OnboardingStep.CreateFirstScript]: "Créez votre premier script",
-    [OnboardingStep.GenerateFirstScript]: "Améliorez votre script avec l'IA",
-    [OnboardingStep.ShowSubscriptions]: "Découvrez nos offres",
+export const onboardingStepTranslationKeys: Record<OnboardingStep, string> = {
+    [OnboardingStep.CreateFirstProject]: "enums:onboardingStep.titles.createFirstProject",
+    [OnboardingStep.ConnectIntegration]: "enums:onboardingStep.titles.connectIntegration",
+    [OnboardingStep.CreateFirstScript]: "enums:onboardingStep.titles.createFirstScript",
+    [OnboardingStep.GenerateFirstScript]: "enums:onboardingStep.titles.generateFirstScript",
+    [OnboardingStep.ShowSubscriptions]: "enums:onboardingStep.titles.showSubscriptions",
 }
 
-export const onboardingStepToDescription: Record<OnboardingStep, string> = {
-    [OnboardingStep.CreateFirstProject]: "Les projets vous permettent de regrouper vos contenus et vos réseaux sociaux.",
-    [OnboardingStep.ConnectIntegration]: "Connectez vos comptes pour analyser vos performances et centraliser vos contenus.",
-    [OnboardingStep.CreateCreatorProfile]: "Ces informations permettent à l'IA de s'adapter à votre style.",
-    [OnboardingStep.CreateFirstScript]: "Voici votre premier script vidéo. Vous pourrez le modifier plus tard.",
-    [OnboardingStep.GenerateFirstScript]: "L'IA va créer un script vidéo complet basé sur vos indications.",
-    [OnboardingStep.ShowSubscriptions]: "Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités.",
+export const onboardingStepDescriptionKeys: Record<OnboardingStep, string> = {
+    [OnboardingStep.CreateFirstProject]: "enums:onboardingStep.descriptions.createFirstProject",
+    [OnboardingStep.ConnectIntegration]: "enums:onboardingStep.descriptions.connectIntegration",
+    [OnboardingStep.CreateFirstScript]: "enums:onboardingStep.descriptions.createFirstScript",
+    [OnboardingStep.GenerateFirstScript]: "enums:onboardingStep.descriptions.generateFirstScript",
+    [OnboardingStep.ShowSubscriptions]: "enums:onboardingStep.descriptions.showSubscriptions",
 }
 
 export const onboardingStepToIcon: Record<OnboardingStep, ComponentType<SVGProps<SVGSVGElement>>> = {
     [OnboardingStep.CreateFirstProject]: FolderPlusIcon,
     [OnboardingStep.ConnectIntegration]: LinkIcon,
-    [OnboardingStep.CreateCreatorProfile]: UserCircleIcon,
     [OnboardingStep.CreateFirstScript]: DocumentPlusIcon,
     [OnboardingStep.GenerateFirstScript]: SparklesIcon,
     [OnboardingStep.ShowSubscriptions]: SparklesIcon,
 }
 
-export const onboardingStepToShortLabel: Record<OnboardingStep, string> = {
-    [OnboardingStep.CreateFirstProject]: "Projet",
-    [OnboardingStep.ConnectIntegration]: "Réseau social",
-    [OnboardingStep.CreateCreatorProfile]: "Profil créateur",
-    [OnboardingStep.CreateFirstScript]: "Script",
-    [OnboardingStep.GenerateFirstScript]: "Génération",
-    [OnboardingStep.ShowSubscriptions]: "Abonnements",
+export const onboardingStepShortLabelKeys: Record<OnboardingStep, string> = {
+    [OnboardingStep.CreateFirstProject]: "enums:onboardingStep.shortLabels.createFirstProject",
+    [OnboardingStep.ConnectIntegration]: "enums:onboardingStep.shortLabels.connectIntegration",
+    [OnboardingStep.CreateFirstScript]: "enums:onboardingStep.shortLabels.createFirstScript",
+    [OnboardingStep.GenerateFirstScript]: "enums:onboardingStep.shortLabels.generateFirstScript",
+    [OnboardingStep.ShowSubscriptions]: "enums:onboardingStep.shortLabels.showSubscriptions",
 }
 
 export const onboardingStepToNavigateTo: Partial<Record<OnboardingStep, string>> = {

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react"
+import { useTranslation } from "react-i18next"
 
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
@@ -17,6 +18,7 @@ interface VerifyOtpFormProps {
 }
 
 export default function VerifyOtpForm({ pendingOtpToken: initialToken, type, onVerified, formSpacing = "space-y-4" }: VerifyOtpFormProps) {
+  const { t } = useTranslation()
   const [code, setCode] = useState("")
   const [pendingOtpToken, setPendingOtpToken] = useState(initialToken)
   const [error, setError] = useState<string | null>(null)
@@ -45,7 +47,7 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, type, onV
     setError(null)
 
     if (code.length !== 6) {
-      setError("Veuillez entrer un code à 6 chiffres.")
+      setError(t("auth:validation.otpDigitsRequired"))
       return
     }
 
@@ -94,7 +96,7 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, type, onV
       <form className={formSpacing} onSubmit={handleSubmit}>
         <Input
           ref={inputRef}
-          label="Code de vérification"
+          label={t("auth:verify.codeLabel")}
           id="otp-code"
           name="code"
           type="text"
@@ -112,7 +114,7 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, type, onV
           isLoading={isVerifying}
           disabled={isVerifying || code.length !== 6}
         >
-          Vérifier
+          {t("auth:verify.submit")}
         </Button>
       </form>
 
@@ -123,8 +125,8 @@ export default function VerifyOtpForm({ pendingOtpToken: initialToken, type, onV
           hoverColor={isResendDisabled ? "hover:text-gray" : "hover:text-dark"}
         >
           {resendCooldown > 0
-            ? `Renvoyer le code (${resendCooldown}s)`
-            : "Renvoyer le code"
+            ? t("auth:verify.resendCooldown", { seconds: resendCooldown })
+            : t("auth:verify.resend")
           }
         </SimpleTextButton>
       </div>
