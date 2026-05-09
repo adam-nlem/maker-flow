@@ -119,7 +119,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 45, nullable: true)]
     private ?string $ipAddress = null;
 
-    #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'members')]
+    #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'collaborators')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?Agency $agency = null;
 

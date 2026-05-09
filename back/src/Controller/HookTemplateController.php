@@ -6,9 +6,12 @@ use App\DTO\QueryParam\HookTemplate\ListHookTemplatesQueryParamDTO;
 use App\DTO\Request\HookTemplate\CreateHookTemplateRequestDTO;
 use App\DTO\Request\HookTemplate\UpdateHookTemplateRequestDTO;
 use App\Entity\Enum\HookTemplatePlaceholder;
+use App\Entity\Enum\UserRole;
 use App\Entity\HookTemplate;
 use App\Entity\User;
 use App\Exception\Agency\MissingAgencyException;
+use App\Exception\HookTemplate\HookTemplateModificationForbiddenException;
+use App\Exception\HookTemplate\HookTemplateNotFoundException;
 use App\Repository\AgencyRepository;
 use App\Repository\HookTemplateRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -75,14 +78,18 @@ final class HookTemplateController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        if ($agencyRepository->getByCollaborator($user) === null) {
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
             throw new MissingAgencyException();
         }
 
         /** @var HookTemplate $hookTemplate */
         $hookTemplate = $dto->build();
 
-        $hookTemplate->setUser($user);
+        $hookTemplate
+            ->setAgency($agency)
+            ->setCreatedBy($user);
 
         $hookTemplateRepository->save($hookTemplate, true);
 
@@ -106,7 +113,11 @@ final class HookTemplateController extends AbstractController
         $hookTemplate = $hookTemplateRepository->getAccessibleByUuidForUser($hookTemplateUuid, $user);
 
         if ($hookTemplate === null) {
-            return $this->json(data: ["message" => "You don't have any hook template with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new HookTemplateNotFoundException();
+        }
+
+        if ($hookTemplate->getCreatedBy() !== $user && !$user->hasRole(UserRole::Admin)) {
+            throw new HookTemplateModificationForbiddenException();
         }
 
         if ($dto->getTitle() !== null && $dto->getTitle() !== $hookTemplate->getTitle()) {
@@ -142,7 +153,11 @@ final class HookTemplateController extends AbstractController
         $hookTemplate = $hookTemplateRepository->getAccessibleByUuidForUser($hookTemplateUuid, $user);
 
         if ($hookTemplate === null) {
-            return $this->json(data: ["message" => "You don't have any hook template with this uuid"], status: Response::HTTP_NOT_FOUND);
+            throw new HookTemplateNotFoundException();
+        }
+
+        if ($hookTemplate->getCreatedBy() !== $user && !$user->hasRole(UserRole::Admin)) {
+            throw new HookTemplateModificationForbiddenException();
         }
 
         $hookTemplateRepository->remove($hookTemplate, true);

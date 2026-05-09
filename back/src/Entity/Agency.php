@@ -58,7 +58,7 @@ class Agency
      * @var Collection<int, User>
      */
     #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'agency')]
-    private Collection $members;
+    private Collection $collaborators;
 
     /**
      * @var Collection<int, Project>
@@ -89,7 +89,7 @@ class Agency
             $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
 
-        $this->members = new ArrayCollection();
+        $this->collaborators = new ArrayCollection();
         $this->projects = new ArrayCollection();
         $this->subscriptions = new ArrayCollection();
     }
@@ -204,9 +204,9 @@ class Agency
     /**
      * @return Collection<int, User>
      */
-    public function getMembers(): Collection
+    public function getCollaborators(): Collection
     {
-        return $this->members;
+        return $this->collaborators;
     }
 
     /**

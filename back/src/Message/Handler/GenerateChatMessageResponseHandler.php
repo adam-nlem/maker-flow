@@ -55,7 +55,10 @@ class GenerateChatMessageResponseHandler
         $debitedFromRefill = $message->getDebitedFromRefill();
 
         if ($agency === null) {
-            $this->chatResponseProcessorService->createAiMessage($chat, "Une erreur est survenue lors de la génération.");
+            $this->chatResponseProcessorService->createAiMessage(
+                $chat,
+                "Impossible de générer la réponse : ce chat n'est lié à aucune agence active. L'équipe a été alertée.",
+            );
             $this->entityManager->flush();
             return;
         }

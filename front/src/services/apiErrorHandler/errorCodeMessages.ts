@@ -76,6 +76,10 @@ export const errorCodeKeys: Record<number, string> = {
   23004: 'errors:auth.tokenExpired',
   23005: 'errors:auth.invalidSession',
   23006: 'errors:auth.emailNotVerified',
+
+  // HookTemplate (28xxx)
+  28001: 'errors:hookTemplate.notFound',
+  28002: 'errors:hookTemplate.modificationForbidden',
 }
 
 export function resolveErrorMessage(error: unknown): string {

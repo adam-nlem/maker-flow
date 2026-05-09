@@ -137,7 +137,7 @@ final class PostGroupController extends AbstractController
         $postGroup = $dto->build();
 
         $postGroup
-            ->setUser($user)
+            ->setCreatedBy($user)
             ->setProject($project);
 
         $posts = $postRepository->getAccessibleByUuidsForUser($dto->getPostUuids(), $user);

@@ -4,6 +4,8 @@
 
 The Hook Template feature provides a reusable library of video hook templates. Users can browse public and private templates from a toggleable right panel in the script editor, then apply a template to a script hook part. Applying a template copies the template content into the hook's content and links the template reference to the `ScriptHook` entity.
 
+Templates are owned at the **agency** level: every member of an agency sees and can apply every template their agency owns, plus all templates flagged `isPublic` from any other agency. Editing or deleting a template is restricted to the original creator or any user with the `Admin` role inside the owning agency — non-creator non-admin members get a `403` from the API.
+
 ---
 
 ## Model
@@ -43,8 +45,8 @@ hookTemplateQueryKeys.list(term) // ['hookTemplates', 'list', term ?? '']
 | `useListPaginatedHookTemplates` | GET | `/hook-templates` | Infinite scroll (page/limit/hasMore), optional `searchTerm` |
 | `useListHookTemplates` | GET | `/hook-templates` | List all accessible templates, optional `searchTerm` |
 | `useCreateHookTemplate` | POST | `/hook-templates` | Create a new template (`title`, `content`, `isPublic?`) |
-| `useUpdateHookTemplate` | PATCH | `/hook-templates/{uuid}` | Update own template |
-| `useDeleteHookTemplate` | DELETE | `/hook-templates/{uuid}` | Delete own template |
+| `useUpdateHookTemplate` | PATCH | `/hook-templates/{uuid}` | Update a template — backend allows the original creator or an agency `Admin` (otherwise 403) |
+| `useDeleteHookTemplate` | DELETE | `/hook-templates/{uuid}` | Delete a template — same authorization as update |
 
 All mutation hooks invalidate `hookTemplateQueryKeys.all` on success.
 

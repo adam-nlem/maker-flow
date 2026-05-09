@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\Integration;
-use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Entity\Enum\InsightValueFormat;
 use App\Entity\Enum\IntegrationInsightType;
@@ -67,10 +66,6 @@ class IntegrationInsight
     #[ORM\ManyToOne(targetEntity: Integration::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Integration $integration = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
 
     public function __construct()
     {
@@ -154,18 +149,6 @@ class IntegrationInsight
     public function setIntegration(?Integration $integration): static
     {
         $this->integration = $integration;
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
-
         return $this;
     }
 }

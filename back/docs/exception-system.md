@@ -55,7 +55,11 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | User | 21 | `DomainCode::User` |
 | Validation | 22 | `DomainCode::Validation` |
 | Auth | 23 | `DomainCode::Auth` |
-| CreatorProfile | 24 | `DomainCode::CreatorProfile` |
+| Chat | 24 | `DomainCode::Chat` |
+| ScriptPart | 25 | `DomainCode::ScriptPart` |
+| ScriptPartSuggestion | 26 | `DomainCode::ScriptPartSuggestion` |
+| Agency | 27 | `DomainCode::Agency` |
+| HookTemplate | 28 | `DomainCode::HookTemplate` |
 
 ## Exception Inventory
 
@@ -127,8 +131,11 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 23004 | `TokenExpiredException` | 401 | — | `src/Exception/Auth/` |
 | 23005 | `InvalidTokenException` | 401 | — | `src/Exception/Auth/` |
 | 23006 | `EmailNotVerifiedException` | 403 | — | `src/Exception/Auth/` |
-| **CreatorProfile (24xxx)** |
-| 24001 | `CreatorProfileNotFoundException` | 404 | — | `src/Exception/CreatorProfile/` |
+| **Agency (27xxx)** |
+| 27001 | `MissingAgencyException` | 403 | — | `src/Exception/Agency/` |
+| **HookTemplate (28xxx)** |
+| 28001 | `HookTemplateNotFoundException` | 404 | — | `src/Exception/HookTemplate/` |
+| 28002 | `HookTemplateModificationForbiddenException` | 403 | — | `src/Exception/HookTemplate/` |
 
 ## Controller Pattern
 

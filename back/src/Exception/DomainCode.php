@@ -22,4 +22,5 @@ enum DomainCode: int
     case ScriptPart = 25;
     case ScriptPartSuggestion = 26;
     case Agency = 27;
+    case HookTemplate = 28;
 }

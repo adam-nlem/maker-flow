@@ -72,5 +72,9 @@
         "invalidSession": "Session invalide. Veuillez vous reconnecter.",
         "emailNotVerified": "Votre email n'est pas vérifié."
     },
+    "hookTemplate": {
+        "notFound": "Modèle d'accroche introuvable.",
+        "modificationForbidden": "Seul le créateur d'origine ou un admin de l'agence peut modifier ce modèle."
+    },
     "fallback": "Une erreur est survenue"
 }

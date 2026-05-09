@@ -510,8 +510,7 @@ class IntegrationInsightService
                 ->setType($insightType)
                 ->setValue($dto->getValue())
                 ->setValueFormat($insightType->getValueFormat())
-                ->setIntegration($integration)
-                ->setUser($integration->getCreatedBy());
+                ->setIntegration($integration);
 
             $this->integrationInsightRepository->save($insight);
         }

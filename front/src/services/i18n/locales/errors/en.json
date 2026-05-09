@@ -72,5 +72,9 @@
         "invalidSession": "Invalid session. Please log in again.",
         "emailNotVerified": "Your email is not verified."
     },
+    "hookTemplate": {
+        "notFound": "Hook template not found.",
+        "modificationForbidden": "Only the original creator or an agency admin can modify this template."
+    },
     "fallback": "An error occurred"
 }

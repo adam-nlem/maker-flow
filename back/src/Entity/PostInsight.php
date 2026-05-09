@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Entity\Enum\InsightValueFormat;
 use App\Entity\Enum\PostInsightType;
@@ -48,10 +47,6 @@ class PostInsight
     #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'postInsights')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Post $post = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
 
     public function __construct()
     {
@@ -135,18 +130,6 @@ class PostInsight
     public function setPost(?Post $post): static
     {
         $this->post = $post;
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
-
         return $this;
     }
 }

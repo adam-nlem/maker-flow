@@ -60,8 +60,8 @@ class AgencyRepository extends ServiceEntityRepository
     public function getByCollaborator(User $user): ?Agency
     {
         return $this->createQueryBuilder('a')
-            ->join('a.members', 'm')
-            ->where('m = :user')
+            ->join('a.collaborators', 'c')
+            ->where('c = :user')
             ->setParameter('user', $user)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)

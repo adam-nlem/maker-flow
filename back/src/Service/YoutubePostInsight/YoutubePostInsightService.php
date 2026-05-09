@@ -209,8 +209,7 @@ class YoutubePostInsightService
                     ->setType($postInsightDTO->getType())
                     ->setValue($postInsightDTO->getValue())
                     ->setValueFormat($postInsightDTO->getType()->getValueFormat())
-                    ->setPost($post)
-                    ->setUser($post->getUser());
+                    ->setPost($post);
 
                 $this->postInsightRepository->save($insight);
             }
