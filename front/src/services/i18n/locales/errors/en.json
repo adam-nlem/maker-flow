@@ -4,8 +4,15 @@
         "notFound": "Integration not found.",
         "alreadyConnected": "This project already has an integration for this platform."
     },
+    "aiClient": {
+        "retryable": "The AI service is temporarily unavailable. Please try again in a moment.",
+        "permanent": "The AI service returned an error. Please contact support if the issue persists."
+    },
     "credit": {
         "insufficient": "You don't have enough credits."
+    },
+    "mailing": {
+        "retryable": "The email service is temporarily unavailable. We'll retry automatically."
     },
     "stripe": {
         "checkoutFailed": "Unable to create the checkout session.",
@@ -37,12 +44,8 @@
     "script": {
         "notFound": "Script not found.",
         "limitReached": "You have reached the script limit for your subscription.",
-        "generationNotFound": "Generation not found.",
-        "planNotFound": "Plan not found.",
         "tagNotFound": "Tag not found.",
-        "tagTitleTaken": "This tag title is already in use.",
-        "generationInProgress": "A script generation is already running.",
-        "cannotDeleteRunningGeneration": "Cannot delete a running generation."
+        "tagTitleTaken": "This tag title is already in use."
     },
     "todoList": {
         "listNotFound": "List not found.",
@@ -71,6 +74,19 @@
         "tokenExpired": "Session expired. Please log in again.",
         "invalidSession": "Invalid session. Please log in again.",
         "emailNotVerified": "Your email is not verified."
+    },
+    "chat": {
+        "notFound": "Chat not found."
+    },
+    "scriptPart": {
+        "notFound": "Script part not found."
+    },
+    "scriptPartSuggestion": {
+        "notFound": "Suggestion not found.",
+        "notPending": "This suggestion is no longer pending."
+    },
+    "agency": {
+        "missing": "You're not attached to any agency."
     },
     "hookTemplate": {
         "notFound": "Hook template not found.",

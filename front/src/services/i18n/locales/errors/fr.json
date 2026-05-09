@@ -4,8 +4,15 @@
         "notFound": "Intégration introuvable.",
         "alreadyConnected": "Ce projet a déjà une intégration pour cette plateforme."
     },
+    "aiClient": {
+        "retryable": "Le service IA est temporairement indisponible. Veuillez réessayer dans un instant.",
+        "permanent": "Le service IA a renvoyé une erreur. Veuillez contacter le support si le problème persiste."
+    },
     "credit": {
         "insufficient": "Vous n'avez pas assez de crédits."
+    },
+    "mailing": {
+        "retryable": "Le service d'envoi d'emails est temporairement indisponible. Une nouvelle tentative sera effectuée automatiquement."
     },
     "stripe": {
         "checkoutFailed": "Impossible de créer la session de paiement.",
@@ -37,12 +44,8 @@
     "script": {
         "notFound": "Script introuvable.",
         "limitReached": "Vous avez atteint la limite de scripts pour votre abonnement.",
-        "generationNotFound": "Génération introuvable.",
-        "planNotFound": "Plan introuvable.",
         "tagNotFound": "Tag introuvable.",
-        "tagTitleTaken": "Ce titre de tag est déjà utilisé.",
-        "generationInProgress": "Une génération de script est déjà en cours.",
-        "cannotDeleteRunningGeneration": "Impossible de supprimer une génération en cours."
+        "tagTitleTaken": "Ce titre de tag est déjà utilisé."
     },
     "todoList": {
         "listNotFound": "Liste introuvable.",
@@ -71,6 +74,19 @@
         "tokenExpired": "Session expirée. Veuillez vous reconnecter.",
         "invalidSession": "Session invalide. Veuillez vous reconnecter.",
         "emailNotVerified": "Votre email n'est pas vérifié."
+    },
+    "chat": {
+        "notFound": "Conversation introuvable."
+    },
+    "scriptPart": {
+        "notFound": "Partie de script introuvable."
+    },
+    "scriptPartSuggestion": {
+        "notFound": "Suggestion introuvable.",
+        "notPending": "Cette suggestion n'est plus en attente."
+    },
+    "agency": {
+        "missing": "Vous n'êtes rattaché à aucune agence."
     },
     "hookTemplate": {
         "notFound": "Modèle d'accroche introuvable.",

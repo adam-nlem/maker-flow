@@ -9,6 +9,10 @@ export const errorCodeKeys: Record<number, string> = {
   10002: 'errors:integration.notFound',
   10003: 'errors:integration.alreadyConnected',
 
+  // AiClient (11xxx)
+  11001: 'errors:aiClient.retryable',
+  11002: 'errors:aiClient.permanent',
+
   // Credit (12xxx)
   12001: 'errors:credit.insufficient',
 
@@ -19,6 +23,9 @@ export const errorCodeKeys: Record<number, string> = {
   13004: 'errors:stripe.noActiveSubscription',
   13005: 'errors:stripe.missingSignature',
   13006: 'errors:stripe.subscriptionRequired',
+
+  // Mailing (14xxx)
+  14001: 'errors:mailing.retryable',
 
   // OTP (15xxx)
   15001: 'errors:otp.incorrect',
@@ -42,12 +49,8 @@ export const errorCodeKeys: Record<number, string> = {
   // Script (18xxx)
   18001: 'errors:script.notFound',
   18002: 'errors:script.limitReached',
-  18003: 'errors:script.generationNotFound',
-  18004: 'errors:script.planNotFound',
   18005: 'errors:script.tagNotFound',
   18006: 'errors:script.tagTitleTaken',
-  18007: 'errors:script.generationInProgress',
-  18008: 'errors:script.cannotDeleteRunningGeneration',
 
   // TodoList (19xxx)
   19001: 'errors:todoList.listNotFound',
@@ -76,6 +79,19 @@ export const errorCodeKeys: Record<number, string> = {
   23004: 'errors:auth.tokenExpired',
   23005: 'errors:auth.invalidSession',
   23006: 'errors:auth.emailNotVerified',
+
+  // Chat (24xxx)
+  24001: 'errors:chat.notFound',
+
+  // ScriptPart (25xxx)
+  25001: 'errors:scriptPart.notFound',
+
+  // ScriptPartSuggestion (26xxx)
+  26001: 'errors:scriptPartSuggestion.notFound',
+  26002: 'errors:scriptPartSuggestion.notPending',
+
+  // Agency (27xxx)
+  27001: 'errors:agency.missing',
 
   // HookTemplate (28xxx)
   28001: 'errors:hookTemplate.notFound',
