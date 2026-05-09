@@ -2,6 +2,7 @@
 
 namespace App\Service\Credit;
 
+use App\Entity\Agency;
 use App\Entity\CreditBalance;
 use App\Entity\CreditTransaction;
 use App\Entity\Enum\CreditTransactionType;
@@ -20,36 +21,37 @@ class CreditService
         private readonly CreditTransactionRepository $creditTransactionRepository,
     ) {}
 
-    public function getOrCreateBalance(User $user): CreditBalance
+    public function getOrCreateBalance(Agency $agency): CreditBalance
     {
-        $balance = $this->creditBalanceRepository->getByUser($user);
+        $balance = $this->creditBalanceRepository->getByAgency($agency);
 
         if ($balance !== null) {
             return $balance;
         }
 
         $balance = new CreditBalance();
-        $balance->setUser($user);
+        $balance->setAgency($agency);
         $this->creditBalanceRepository->save($balance, true);
 
         return $balance;
     }
 
     public function addRefillCredits(
-        User $user,
+        Agency $agency,
         int $amount,
+        ?User $performedBy = null,
         ?string $stripePaymentIntentId = null,
         ?string $stripeInvoiceId = null,
     ): CreditTransaction {
         $this->entityManager->beginTransaction();
 
         try {
-            $balance = $this->getOrCreateBalance($user);
+            $balance = $this->getOrCreateBalance($agency);
 
             $balance->setRefillCredits($balance->getRefillCredits() + $amount);
 
             $transaction = $this->createTransaction(
-                user: $user,
+                createdBy: $performedBy,
                 balance: $balance,
                 amount: $amount,
                 type: CreditTransactionType::RefillPurchase,
@@ -69,20 +71,20 @@ class CreditService
     }
 
     public function renewSubscriptionCredits(
-        User $user,
+        Agency $agency,
         int $planCredits,
         ?string $stripeInvoiceId = null,
     ): CreditTransaction {
         $this->entityManager->beginTransaction();
 
         try {
-            $balance = $this->getOrCreateBalance($user);
+            $balance = $this->getOrCreateBalance($agency);
 
             $delta = $planCredits - $balance->getSubscriptionCredits();
             $balance->setSubscriptionCredits($planCredits);
 
             $transaction = $this->createTransaction(
-                user: $user,
+                createdBy: null,
                 balance: $balance,
                 amount: $delta,
                 type: CreditTransactionType::SubscriptionRenewal,
@@ -101,16 +103,17 @@ class CreditService
     }
 
     public function refundCredit(
-        User $user,
+        Agency $agency,
         int $amount,
         CreditTransactionType $type,
         SourceBucket $bucket,
         ?string $description = null,
+        ?User $performedBy = null,
     ): CreditTransaction {
         $this->entityManager->beginTransaction();
 
         try {
-            $balance = $this->getOrCreateBalance($user);
+            $balance = $this->getOrCreateBalance($agency);
 
             if ($bucket === SourceBucket::SubscriptionCredits) {
                 $balance->setSubscriptionCredits($balance->getSubscriptionCredits() + $amount);
@@ -119,7 +122,7 @@ class CreditService
             }
 
             $transaction = $this->createTransaction(
-                user: $user,
+                createdBy: $performedBy,
                 balance: $balance,
                 amount: $amount,
                 type: $type,
@@ -142,14 +145,15 @@ class CreditService
      * @throws InsufficientCreditsException
      */
     public function debitCredits(
-        User $user,
+        Agency $agency,
         int $amount,
         CreditTransactionType $type,
+        ?User $performedBy = null,
     ): array {
         $this->entityManager->beginTransaction();
 
         try {
-            $balance = $this->creditBalanceRepository->getByUserWithLock($user);
+            $balance = $this->creditBalanceRepository->getByAgencyWithLock($agency);
 
             if ($balance === null || $balance->getTotalCredits() < $amount) {
                 $this->entityManager->rollback();
@@ -168,7 +172,7 @@ class CreditService
                 $balance->setSubscriptionCredits($balance->getSubscriptionCredits() - $fromSubscription);
 
                 $transactions[] = $this->createTransaction(
-                    user: $user,
+                    createdBy: $performedBy,
                     balance: $balance,
                     amount: -$fromSubscription,
                     type: $type,
@@ -180,7 +184,7 @@ class CreditService
                 $balance->setRefillCredits($balance->getRefillCredits() - $fromRefill);
 
                 $transactions[] = $this->createTransaction(
-                    user: $user,
+                    createdBy: $performedBy,
                     balance: $balance,
                     amount: -$fromRefill,
                     type: $type,
@@ -200,17 +204,17 @@ class CreditService
         }
     }
 
-    public function addWelcomeCredits(User $user, int $amount): CreditTransaction
+    public function addWelcomeCredits(Agency $agency, int $amount, ?User $performedBy = null): CreditTransaction
     {
         $this->entityManager->beginTransaction();
 
         try {
-            $balance = $this->getOrCreateBalance($user);
+            $balance = $this->getOrCreateBalance($agency);
 
             $balance->setRefillCredits($balance->getRefillCredits() + $amount);
 
             $transaction = $this->createTransaction(
-                user: $user,
+                createdBy: $performedBy,
                 balance: $balance,
                 amount: $amount,
                 type: CreditTransactionType::WelcomeBonus,
@@ -227,15 +231,15 @@ class CreditService
         }
     }
 
-    public function getTotalCredits(User $user): int
+    public function getTotalCredits(Agency $agency): int
     {
-        $balance = $this->getOrCreateBalance($user);
+        $balance = $this->getOrCreateBalance($agency);
 
         return $balance->getTotalCredits();
     }
 
     private function createTransaction(
-        User $user,
+        ?User $createdBy,
         CreditBalance $balance,
         int $amount,
         CreditTransactionType $type,
@@ -245,7 +249,7 @@ class CreditService
         ?string $description = null,
     ): CreditTransaction {
         $transaction = new CreditTransaction();
-        $transaction->setUser($user)
+        $transaction->setCreatedBy($createdBy)
             ->setCreditBalance($balance)
             ->setAmount($amount)
             ->setType($type)

@@ -82,7 +82,7 @@ class ChatResponseProcessorService
             ->setAction($action);
 
         $partUuid = isset($raw['scriptPartUuid']) && is_string($raw['scriptPartUuid']) ? $raw['scriptPartUuid'] : null;
-        $part = $partUuid !== null ? $this->scriptPartRepository->getByUuidAndUser($partUuid, $user) : null;
+        $part = $partUuid !== null ? $this->scriptPartRepository->getAccessibleByUuidForUser($partUuid, $user) : null;
 
         $proposedContent = isset($raw['proposedContent']) && is_string($raw['proposedContent']) ? $raw['proposedContent'] : null;
         $proposedTypeRaw = isset($raw['proposedType']) && is_string($raw['proposedType']) ? $raw['proposedType'] : null;

@@ -14,11 +14,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/script-part-suggestions', requirements: ['suggestionUuid' => Requirement::UUID])]
 final class ScriptPartSuggestionController extends AbstractController
 {
     #[Route('', name: 'api_script_part_suggestions_list', methods: ['GET'])]
+    #[IsGranted('ROLE_VIEWER')]
     public function list(
         ListScriptPartSuggestionsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -27,15 +29,14 @@ final class ScriptPartSuggestionController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($queryParamDto->getScriptUuid(), $user);
+        $script = $scriptRepository->getAccessibleByUuidForUser($queryParamDto->getScriptUuid(), $user);
 
         if ($script === null) {
             throw new ScriptNotFoundException();
         }
 
-        $suggestions = $scriptPartSuggestionRepository->getByScriptAndUser(
+        $suggestions = $scriptPartSuggestionRepository->getByScript(
             $script,
-            $user,
             $queryParamDto->getStatus(),
         );
 
@@ -47,6 +48,7 @@ final class ScriptPartSuggestionController extends AbstractController
     }
 
     #[Route('/{suggestionUuid}/accept', name: 'api_script_part_suggestions_accept', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function accept(
         string $suggestionUuid,
         ScriptPartSuggestionRepository $scriptPartSuggestionRepository,
@@ -55,7 +57,7 @@ final class ScriptPartSuggestionController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $suggestion = $scriptPartSuggestionRepository->getByUuidAndUser($suggestionUuid, $user);
+        $suggestion = $scriptPartSuggestionRepository->getAccessibleByUuidForUser($suggestionUuid, $user);
 
         if ($suggestion === null) {
             throw new ScriptPartSuggestionNotFoundException();
@@ -63,7 +65,6 @@ final class ScriptPartSuggestionController extends AbstractController
 
         $scriptPartSuggestionService->accept($suggestion);
 
-        //TODO: Delete the suggestion after acceptation by the user ? (we don't need to keep the history here)
         return $this->json(
             data: $suggestion,
             status: Response::HTTP_OK,
@@ -72,6 +73,7 @@ final class ScriptPartSuggestionController extends AbstractController
     }
 
     #[Route('/{suggestionUuid}/reject', name: 'api_script_part_suggestions_reject', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function reject(
         string $suggestionUuid,
         ScriptPartSuggestionRepository $scriptPartSuggestionRepository,
@@ -80,7 +82,7 @@ final class ScriptPartSuggestionController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $suggestion = $scriptPartSuggestionRepository->getByUuidAndUser($suggestionUuid, $user);
+        $suggestion = $scriptPartSuggestionRepository->getAccessibleByUuidForUser($suggestionUuid, $user);
 
         if ($suggestion === null) {
             throw new ScriptPartSuggestionNotFoundException();
@@ -88,7 +90,6 @@ final class ScriptPartSuggestionController extends AbstractController
 
         $scriptPartSuggestionService->reject($suggestion);
 
-        //TODO: Delete the suggestion after rejection by the user ? (we don't need to keep the history here)
         return $this->json(
             data: $suggestion,
             status: Response::HTTP_OK,

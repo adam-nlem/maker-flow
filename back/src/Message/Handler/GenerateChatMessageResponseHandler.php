@@ -49,13 +49,20 @@ class GenerateChatMessageResponseHandler
         $chat = $userMessage->getChat();
         $script = $chat->getScript();
         $user = $userMessage->getUser();
+        $agency = $script?->getProject()?->getAgency();
 
         $debitedFromSubscription = $message->getDebitedFromSubscription();
         $debitedFromRefill = $message->getDebitedFromRefill();
 
+        if ($agency === null) {
+            $this->chatResponseProcessorService->createAiMessage($chat, "Une erreur est survenue lors de la génération.");
+            $this->entityManager->flush();
+            return;
+        }
+
         if ($message->getRetryCount() === 0) {
             try {
-                $transactions = $this->creditService->debitCredits($user, 1, CreditTransactionType::ChatGeneration);
+                $transactions = $this->creditService->debitCredits($agency, 1, CreditTransactionType::ChatGeneration, $user);
                 foreach ($transactions as $tx) {
                     if ($tx->getSourceBucket() === SourceBucket::SubscriptionCredits) {
                         $debitedFromSubscription = abs($tx->getAmount());
@@ -94,26 +101,28 @@ class GenerateChatMessageResponseHandler
             }
 
             captureException($e);
-            $this->handlePermanentFailure($chat, $user, $debitedFromSubscription, $debitedFromRefill);
+            $this->handlePermanentFailure($chat, $agency, $user, $debitedFromSubscription, $debitedFromRefill);
             return;
         } catch (\Exception $e) {
             captureException($e);
-            $this->handlePermanentFailure($chat, $user, $debitedFromSubscription, $debitedFromRefill);
+            $this->handlePermanentFailure($chat, $agency, $user, $debitedFromSubscription, $debitedFromRefill);
             return;
         }
 
         $this->entityManager->flush();
     }
 
-    private function handlePermanentFailure($chat, $user, int $debitedFromSubscription, int $debitedFromRefill): void
+    private function handlePermanentFailure($chat, $agency, $user, int $debitedFromSubscription, int $debitedFromRefill): void
     {
         if ($debitedFromSubscription > 0) {
             try {
                 $this->creditService->refundCredit(
-                    $user,
+                    $agency,
                     $debitedFromSubscription,
                     CreditTransactionType::ChatGenerationRefund,
                     SourceBucket::SubscriptionCredits,
+                    null,
+                    $user,
                 );
             } catch (\Throwable $e) {
                 captureException($e);
@@ -123,10 +132,12 @@ class GenerateChatMessageResponseHandler
         if ($debitedFromRefill > 0) {
             try {
                 $this->creditService->refundCredit(
-                    $user,
+                    $agency,
                     $debitedFromRefill,
                     CreditTransactionType::ChatGenerationRefund,
                     SourceBucket::RefillCredits,
+                    null,
+                    $user,
                 );
             } catch (\Throwable $e) {
                 captureException($e);

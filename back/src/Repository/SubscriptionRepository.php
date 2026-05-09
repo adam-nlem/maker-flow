@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
+use App\Entity\Agency;
 use App\Entity\Enum\SubscriptionStatus;
 use App\Entity\Subscription;
-use App\Entity\User;
 use App\Helper\DateHelper;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
@@ -38,13 +38,13 @@ class SubscriptionRepository extends ServiceEntityRepository
         }
     }
 
-    public function getLatestActiveByUser(User $user): ?Subscription
+    public function getLatestActiveByAgency(Agency $agency): ?Subscription
     {
         return $this->createQueryBuilder('s')
-            ->where('s.user = :user')
+            ->where('s.agency = :agency')
             ->andWhere('s.status = :status')
             ->andWhere('s.currentPeriodEnd >= :now')
-            ->setParameter('user', $user)
+            ->setParameter('agency', $agency)
             ->setParameter('status', SubscriptionStatus::Active)
             ->setParameter('now', DateHelper::createUtcDateTimeImmutable())
             ->orderBy('s.createdAt', 'DESC')
@@ -54,11 +54,11 @@ class SubscriptionRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getLatestByUser(User $user): ?Subscription
+    public function getLatestByAgency(Agency $agency): ?Subscription
     {
         return $this->createQueryBuilder('s')
-            ->where('s.user = :user')
-            ->setParameter('user', $user)
+            ->where('s.agency = :agency')
+            ->setParameter('agency', $agency)
             ->orderBy('s.createdAt', 'DESC')
             ->setMaxResults(1)
             ->getQuery()

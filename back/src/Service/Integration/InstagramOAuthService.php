@@ -107,7 +107,7 @@ class InstagramOAuthService
 
         $integration = new Integration();
         $integration
-            ->setUser($user)
+            ->setCreatedBy($user)
             ->setPlatform(Platform::Instagram)
             ->setAccessToken($tokenDTO->getAccessToken())
             ->setAccountId($instagramUserProfile->getUserId())
@@ -173,8 +173,8 @@ class InstagramOAuthService
         $longLivedToken = $this->exchangeForLongLivedToken($shortLivedToken->getAccessToken());
         $instagramUserProfile = $this->getUserProfile($longLivedToken->getAccessToken());
 
-        $existingIntegration = $this->integrationRepository->getByUserAndPlatformAndAccountId(
-            $user,
+        $existingIntegration = $this->integrationRepository->getByAgencyAndPlatformAndAccountId(
+            $project->getAgency(),
             Platform::Instagram,
             $instagramUserProfile->getUserId()
         );

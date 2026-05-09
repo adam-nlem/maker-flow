@@ -286,7 +286,7 @@ class PostInsightService
         $this->integrationRepository->save($integration, true);
     }
 
-    public function getDetail(User $user, Post $post): ShowPostInsightDetailResponseDTO
+    public function getDetail(Post $post): ShowPostInsightDetailResponseDTO
     {
         $now = DateHelper::createUtcDateTimeImmutable();
 
@@ -331,8 +331,7 @@ class PostInsightService
         $currentPostTimelineInsights = $this->postInsightRepository->getByPostAndTypes($post, self::TIMELINE_TYPES);
 
         // 4. Fetch 10 previous posts
-        $previousPosts = $this->postRepository->getByUserAndIntegrationAndPublishedBeforeLimited(
-            $user,
+        $previousPosts = $this->postRepository->getByIntegrationAndPublishedBeforeLimited(
             $post->getIntegration(),
             $post->getPublishedAt(),
             10,
@@ -349,8 +348,7 @@ class PostInsightService
         $timelines = $this->buildTimelines($post, $currentPostTimelineInsights, $previousPosts, $previousPostsInsights);
 
         // 7. Compute engagement
-        $totalFollowersInsight = $this->integrationInsightRepository->getLatestByUserAndByIntegrationAndByType(
-            $user,
+        $totalFollowersInsight = $this->integrationInsightRepository->getLatestByIntegrationAndByType(
             $post->getIntegration(),
             IntegrationInsightType::TotalFollowers,
         );

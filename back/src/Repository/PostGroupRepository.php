@@ -36,13 +36,15 @@ class PostGroupRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?PostGroup
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?PostGroup
     {
         return $this->createQueryBuilder('pg')
+            ->join('pg.project', 'p')
             ->where('pg.uuid = :uuid')
-            ->andWhere('pg.user = :user')
+            ->andWhere('(p.agency = :agency OR p = :clientProject)')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -51,18 +53,15 @@ class PostGroupRepository extends ServiceEntityRepository
     /**
      * @return PostGroup[]
      */
-    public function getByProjectAndUserPaginatedAndSearchTerm(
+    public function getByProjectPaginatedAndSearchTerm(
         Project $project,
-        User $user,
         ?string $searchTerm,
         int $page,
         int $limit
     ): array {
         $qb = $this->createQueryBuilder('pg')
             ->where('pg.project = :project')
-            ->andWhere('pg.user = :user')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->orderBy('pg.createdAt', 'DESC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
@@ -80,9 +79,8 @@ class PostGroupRepository extends ServiceEntityRepository
     /**
      * @return int[]
      */
-    public function getRankedIdsByProjectAndUserSortedByInsightValue(
+    public function getRankedIdsByProjectSortedByInsightValue(
         Project $project,
-        User $user,
         PostInsightType $sortByType,
         int $page,
         int $limit,
@@ -93,7 +91,6 @@ class PostGroupRepository extends ServiceEntityRepository
             ->innerJoin('sub.post', 'subPost')
             ->innerJoin('subPost.postGroup', 'subPg')
             ->where('subPg.project = :project')
-            ->andWhere('subPg.user = :user')
             ->andWhere('sub.type = :type')
             ->groupBy('sub.post')
             ->getDQL();
@@ -104,9 +101,7 @@ class PostGroupRepository extends ServiceEntityRepository
             ->innerJoin('p.postInsights', 'pi')
             ->where('pi.id IN (' . $sub . ')')
             ->andWhere('pg.project = :project')
-            ->andWhere('pg.user = :user')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->setParameter('type', $sortByType)
             ->groupBy('pg.id')
             ->orderBy('SUM(pi.value)', 'DESC')

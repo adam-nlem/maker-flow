@@ -8,31 +8,42 @@ use App\DTO\Request\HookTemplate\UpdateHookTemplateRequestDTO;
 use App\Entity\Enum\HookTemplatePlaceholder;
 use App\Entity\HookTemplate;
 use App\Entity\User;
+use App\Exception\Agency\MissingAgencyException;
+use App\Repository\AgencyRepository;
 use App\Repository\HookTemplateRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/hook-templates', requirements: ['hookTemplateUuid' => Requirement::UUID])]
 final class HookTemplateController extends AbstractController
 {
     #[Route('', name: 'api_hook_templates_list', methods: ['GET'])]
+    #[IsGranted('ROLE_VIEWER')]
     public function list(
         ListHookTemplatesQueryParamDTO $queryParamDto,
+        AgencyRepository $agencyRepository,
         HookTemplateRepository $hookTemplateRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
         $page = $queryParamDto->getPage();
         $limit = $queryParamDto->getLimit();
 
         if ($queryParamDto->getSearchTerm() !== null) {
-            $hookTemplates = $hookTemplateRepository->searchByTitlePublicOrByUserPaginated($queryParamDto->getSearchTerm(), $user, $page, $limit);
+            $hookTemplates = $hookTemplateRepository->searchByTitlePublicOrByAgencyPaginated($queryParamDto->getSearchTerm(), $agency, $page, $limit);
         } else {
-            $hookTemplates = $hookTemplateRepository->getPublicOrByUserPaginated($user, $page, $limit);
+            $hookTemplates = $hookTemplateRepository->getPublicOrByAgencyPaginated($agency, $page, $limit);
         }
 
         return $this->json(
@@ -43,6 +54,7 @@ final class HookTemplateController extends AbstractController
     }
 
     #[Route('/placeholders', name: 'api_hook_templates_placeholders', methods: ['GET'])]
+    #[IsGranted('ROLE_VIEWER')]
     public function placeholders(): JsonResponse
     {
         $placeholders = array_map(
@@ -54,12 +66,18 @@ final class HookTemplateController extends AbstractController
     }
 
     #[Route('', name: 'api_hook_templates_create', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function create(
         CreateHookTemplateRequestDTO $dto,
+        AgencyRepository $agencyRepository,
         HookTemplateRepository $hookTemplateRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
+
+        if ($agencyRepository->getByCollaborator($user) === null) {
+            throw new MissingAgencyException();
+        }
 
         /** @var HookTemplate $hookTemplate */
         $hookTemplate = $dto->build();
@@ -76,6 +94,7 @@ final class HookTemplateController extends AbstractController
     }
 
     #[Route('/{hookTemplateUuid}', name: 'api_hook_templates_update', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function update(
         string $hookTemplateUuid,
         UpdateHookTemplateRequestDTO $dto,
@@ -84,7 +103,7 @@ final class HookTemplateController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $hookTemplate = $hookTemplateRepository->getByUuidAndUser($hookTemplateUuid, $user);
+        $hookTemplate = $hookTemplateRepository->getAccessibleByUuidForUser($hookTemplateUuid, $user);
 
         if ($hookTemplate === null) {
             return $this->json(data: ["message" => "You don't have any hook template with this uuid"], status: Response::HTTP_NOT_FOUND);
@@ -112,6 +131,7 @@ final class HookTemplateController extends AbstractController
     }
 
     #[Route('/{hookTemplateUuid}', name: 'api_hook_templates_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(
         string $hookTemplateUuid,
         HookTemplateRepository $hookTemplateRepository,
@@ -119,7 +139,7 @@ final class HookTemplateController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $hookTemplate = $hookTemplateRepository->getByUuidAndUser($hookTemplateUuid, $user);
+        $hookTemplate = $hookTemplateRepository->getAccessibleByUuidForUser($hookTemplateUuid, $user);
 
         if ($hookTemplate === null) {
             return $this->json(data: ["message" => "You don't have any hook template with this uuid"], status: Response::HTTP_NOT_FOUND);

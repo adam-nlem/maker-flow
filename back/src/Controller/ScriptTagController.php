@@ -17,11 +17,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/scripts/tags', requirements: ['tagUuid' => Requirement::UUID])]
 final class ScriptTagController extends AbstractController
 {
     #[Route('', name: 'api_scripts_tags_list', methods: ['GET'])]
+    #[IsGranted('ROLE_VIEWER')]
     public function list(
         ListScriptTagsQueryParamDTO $queryParamDto,
         ScriptTagRepository $tagRepository,
@@ -30,16 +32,16 @@ final class ScriptTagController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
         if ($queryParamDto->getSearchTerm() !== null) {
-            $tags = $tagRepository->getBySearchTermAndUserAndProjectLimited($queryParamDto->getSearchTerm(), $user, $project, 20);
+            $tags = $tagRepository->getBySearchTermAndProjectLimited($queryParamDto->getSearchTerm(), $project, 20);
         } else {
-            $tags = $tagRepository->getByUserAndProjectLimited($user, $project, 20);
+            $tags = $tagRepository->getByProjectLimited($project, 20);
         }
 
         return $this->json(
@@ -50,6 +52,7 @@ final class ScriptTagController extends AbstractController
     }
 
     #[Route('', name: 'api_scripts_tags_create', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function create(
         CreateScriptTagRequestDTO $dto,
         ProjectRepository $projectRepository,
@@ -58,7 +61,7 @@ final class ScriptTagController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
@@ -81,6 +84,7 @@ final class ScriptTagController extends AbstractController
     }
 
     #[Route('/{tagUuid}', name: 'api_scripts_tags_update', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function update(
         string $tagUuid,
         UpdateScriptTagRequestDTO $dto,
@@ -89,14 +93,14 @@ final class ScriptTagController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
+        $tag = $tagRepository->getAccessibleByUuidForUser($tagUuid, $user);
 
         if ($tag === null) {
             throw new ScriptTagNotFoundException();
         }
 
         if ($dto->getTitle() !== null && $dto->getTitle() != $tag->getTitle()) {
-            $tagWithSameTitle = $tagRepository->getByTitleAndProjectAndUser($dto->getTitle(), $tag->getProject(), $user);
+            $tagWithSameTitle = $tagRepository->getByTitleAndProject($dto->getTitle(), $tag->getProject());
             if ($tagWithSameTitle !== null) {
                 throw new ScriptTagTitleConflictException();
             }
@@ -113,12 +117,13 @@ final class ScriptTagController extends AbstractController
     }
 
     #[Route('/{tagUuid}', name: 'api_scripts_tags_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(string $tagUuid, ScriptTagRepository $tagRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
+        $tag = $tagRepository->getAccessibleByUuidForUser($tagUuid, $user);
 
         if ($tag === null) {
             throw new ScriptTagNotFoundException();

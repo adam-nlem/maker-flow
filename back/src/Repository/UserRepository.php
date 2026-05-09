@@ -45,16 +45,6 @@ class UserRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByStripeCustomerId(string $stripeCustomerId): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->where('u.stripeCustomerId = :stripeCustomerId')
-            ->setParameter('stripeCustomerId', $stripeCustomerId)
-            ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
-    }
-
     public function getByEmail(string $email): ?User
     {
         return $this->createQueryBuilder('u')

@@ -8,9 +8,11 @@ use App\DTO\Request\PostGroup\CreatePostGroupRequestDTO;
 use App\DTO\Request\PostGroup\UpdatePostGroupRequestDTO;
 use App\Entity\PostGroup;
 use App\Entity\User;
+use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Post\PostGroupNotFoundException;
 use App\Exception\Project\ProjectNotFoundException;
 use App\Exception\Stripe\ActiveSubscriptionRequiredException;
+use App\Repository\AgencyRepository;
 use App\Repository\PostGroupRepository;
 use App\Repository\PostRepository;
 use App\Repository\ProjectRepository;
@@ -22,6 +24,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/post-groups', requirements: ['postGroupUuid' => Requirement::UUID])]
 final class PostGroupController extends AbstractController
@@ -29,6 +32,7 @@ final class PostGroupController extends AbstractController
     public function __construct(private PostGroupService $service) {}
 
     #[Route('', name: 'api_post_groups_list', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function list(
         ListPostGroupsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
@@ -36,14 +40,13 @@ final class PostGroupController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
         $result = $this->service->getPostGroupListItems(
-            user: $user,
             project: $project,
             searchTerm: $queryParamDto->getSearchTerm(),
             page: $queryParamDto->getPage(),
@@ -58,12 +61,13 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('/{postGroupUuid}', name: 'api_post_groups_show', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function show(string $postGroupUuid, PostGroupRepository $postGroupRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $postGroup = $postGroupRepository->getByUuidAndUser($postGroupUuid, $user);
+        $postGroup = $postGroupRepository->getAccessibleByUuidForUser($postGroupUuid, $user);
 
         if ($postGroup === null) {
             throw new PostGroupNotFoundException();
@@ -77,25 +81,33 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('/rank', name: 'api_post_groups_rank', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function rank(
         RankPostGroupsQueryParamDTO $queryParamDto,
+        AgencyRepository $agencyRepository,
         ProjectRepository $projectRepository,
         SubscriptionRepository $subscriptionRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        if ($subscriptionRepository->getLatestActiveByUser($user) === null) {
-            throw new ActiveSubscriptionRequiredException();
-        }
-
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
-        $result = $this->service->getRankedPostGroups($user, $project, $queryParamDto->getPage(), $queryParamDto->getLimit());
+        $agency = $agencyRepository->getByProject($project);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        if ($subscriptionRepository->getLatestActiveByAgency($agency) === null) {
+            throw new ActiveSubscriptionRequiredException();
+        }
+
+        $result = $this->service->getRankedPostGroups($project, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(
             data: $result,
@@ -105,6 +117,7 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('', name: 'api_post_groups_create', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function create(
         CreatePostGroupRequestDTO $dto,
         ProjectRepository $projectRepository,
@@ -114,7 +127,7 @@ final class PostGroupController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
@@ -127,7 +140,7 @@ final class PostGroupController extends AbstractController
             ->setUser($user)
             ->setProject($project);
 
-        $posts = $postRepository->getByUuidsAndUser($dto->getPostUuids(), $user);
+        $posts = $postRepository->getAccessibleByUuidsForUser($dto->getPostUuids(), $user);
 
         foreach ($posts as $post) {
             $post->setPostGroup($postGroup);
@@ -143,6 +156,7 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('/{postGroupUuid}', name: 'api_post_groups_update', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function update(
         string $postGroupUuid,
         UpdatePostGroupRequestDTO $dto,
@@ -153,7 +167,7 @@ final class PostGroupController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $postGroup = $postGroupRepository->getByUuidAndUser($postGroupUuid, $user);
+        $postGroup = $postGroupRepository->getAccessibleByUuidForUser($postGroupUuid, $user);
 
         if ($postGroup === null) {
             throw new PostGroupNotFoundException();
@@ -164,7 +178,7 @@ final class PostGroupController extends AbstractController
         }
 
         if ($dto->getAddPostUuids() !== null) {
-            $postsToAdd = $postRepository->getByUuidsAndUser($dto->getAddPostUuids(), $user);
+            $postsToAdd = $postRepository->getAccessibleByUuidsForUser($dto->getAddPostUuids(), $user);
 
             foreach ($postsToAdd as $post) {
                 $post->setPostGroup($postGroup);
@@ -172,7 +186,7 @@ final class PostGroupController extends AbstractController
         }
 
         if ($dto->getRemovePostUuids() !== null) {
-            $postsToRemove = $postRepository->getByUuidsAndUser($dto->getRemovePostUuids(), $user);
+            $postsToRemove = $postRepository->getAccessibleByUuidsForUser($dto->getRemovePostUuids(), $user);
 
             foreach ($postsToRemove as $post) {
                 $post->setPostGroup(null);
@@ -188,7 +202,7 @@ final class PostGroupController extends AbstractController
                     $scriptRepository->save($currentScript);
                 }
             } else {
-                $script = $scriptRepository->getByUuidAndUser($dto->getScriptUuid(), $user);
+                $script = $scriptRepository->getAccessibleByUuidForUser($dto->getScriptUuid(), $user);
 
                 if ($script !== null) {
                     if ($currentScript !== null && $currentScript !== $script) {
@@ -212,6 +226,7 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('/{postGroupUuid}', name: 'api_post_groups_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(
         string $postGroupUuid,
         PostGroupRepository $postGroupRepository,
@@ -220,7 +235,7 @@ final class PostGroupController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $postGroup = $postGroupRepository->getByUuidAndUser($postGroupUuid, $user);
+        $postGroup = $postGroupRepository->getAccessibleByUuidForUser($postGroupUuid, $user);
 
         if ($postGroup === null) {
             throw new PostGroupNotFoundException();

@@ -21,4 +21,5 @@ enum DomainCode: int
     case Chat = 24;
     case ScriptPart = 25;
     case ScriptPartSuggestion = 26;
+    case Agency = 27;
 }

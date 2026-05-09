@@ -40,9 +40,9 @@ class CreditBalance
     #[Groups(['api_credit_balance_show'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\OneToOne(inversedBy: 'creditBalance')]
+    #[ORM\OneToOne(targetEntity: Agency::class, inversedBy: 'creditBalance')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    private ?Agency $agency = null;
 
     /**
      * @var Collection<int, CreditTransaction>
@@ -143,14 +143,14 @@ class CreditBalance
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getAgency(): ?Agency
     {
-        return $this->user;
+        return $this->agency;
     }
 
-    public function setUser(?User $user): static
+    public function setAgency(?Agency $agency): static
     {
-        $this->user = $user;
+        $this->agency = $agency;
 
         return $this;
     }

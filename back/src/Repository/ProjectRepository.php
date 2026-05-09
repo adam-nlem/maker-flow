@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Agency;
 use App\Entity\Project;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -36,45 +37,58 @@ class ProjectRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?Project
+    public function getByUuidAndAgency(string $uuid, Agency $agency): ?Project
     {
         return $this->createQueryBuilder('p')
             ->where('p.uuid = :uuid')
-            ->andWhere('p.user = :user')
+            ->andWhere('p.agency = :agency')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $agency)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByNameAndUser(string $name, User $user): ?Project
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?Project
+    {
+        return $this->createQueryBuilder('p')
+            ->where('p.uuid = :uuid')
+            ->andWhere('(p.agency = :agency OR p = :clientProject)')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByNameAndAgency(string $name, Agency $agency): ?Project
     {
         return $this->createQueryBuilder('p')
             ->where('p.name = :name')
-            ->andWhere('p.user = :user')
+            ->andWhere('p.agency = :agency')
             ->setParameter('name', $name)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $agency)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function countByUser(User $user): int
+    public function countByAgency(Agency $agency): int
     {
         return (int) $this->createQueryBuilder('p')
             ->select('COUNT(p.id)')
-            ->where('p.user = :user')
-            ->setParameter('user', $user)
+            ->where('p.agency = :agency')
+            ->setParameter('agency', $agency)
             ->getQuery()
             ->getSingleScalarResult();
     }
 
-    public function getByUserPaginated(User $user, int $page, int $limit): array
+    public function getByAgencyPaginated(Agency $agency, int $page, int $limit): array
     {
         $query = $this->createQueryBuilder('p')
-            ->where('p.user = :user')
-            ->setParameter('user', $user)
+            ->where('p.agency = :agency')
+            ->setParameter('agency', $agency)
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
             ->orderBy('p.createdAt', 'DESC')

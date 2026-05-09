@@ -12,6 +12,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/prelaunch')]
 final class PrelaunchController extends AbstractController
@@ -49,6 +50,7 @@ final class PrelaunchController extends AbstractController
     }
 
     #[Route('/status', name: 'api_prelaunch_status', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function status(
         PrelaunchService $prelaunchService,
     ): JsonResponse {

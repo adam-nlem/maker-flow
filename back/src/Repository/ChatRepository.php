@@ -34,13 +34,11 @@ class ChatRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByScriptAndUserPaginated(Script $script, User $user, int $page, int $limit): array
+    public function getByScriptPaginated(Script $script, int $page, int $limit): array
     {
         return $this->createQueryBuilder('c')
             ->where('c.script = :script')
-            ->andWhere('c.user = :user')
             ->setParameter('script', $script)
-            ->setParameter('user', $user)
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
             ->orderBy('c.createdAt', 'DESC')
@@ -49,13 +47,16 @@ class ChatRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?Chat
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?Chat
     {
         return $this->createQueryBuilder('c')
+            ->join('c.script', 's')
+            ->join('s.project', 'p')
             ->where('c.uuid = :uuid')
-            ->andWhere('c.user = :user')
+            ->andWhere('(p.agency = :agency OR p = :clientProject)')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);

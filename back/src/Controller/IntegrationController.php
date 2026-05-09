@@ -19,6 +19,7 @@ use App\Exception\Project\ProjectNotFoundException;
 use App\Repository\IntegrationRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
+use App\Security\Voter\ProjectVoter;
 use App\Service\Integration\InstagramOAuthService;
 use App\Service\Integration\TiktokOAuthService;
 use App\Service\Integration\YoutubeOAuthService;
@@ -28,6 +29,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/integrations', requirements: ['integrationUuid' => Requirement::UUID])]
 final class IntegrationController extends AbstractController
@@ -38,6 +40,7 @@ final class IntegrationController extends AbstractController
     }
 
     #[Route('', name: 'api_integrations_list', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function list(
         ListIntegrationsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
@@ -46,13 +49,13 @@ final class IntegrationController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
-        $integrations = $integrationRepository->getByProjectAndUser($project, $user);
+        $integrations = $integrationRepository->getByProject($project);
 
         return $this->json(
             data: $integrations,
@@ -74,11 +77,14 @@ final class IntegrationController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
+
+        // Editors+ on the agency, or the client linked to this project, may connect integrations.
+        $this->denyAccessUnlessGranted(ProjectVoter::MANAGE_INTEGRATIONS, $project);
 
         $existingIntegration = $integrationRepository->getOneByProjectAndPlatformAndStatus($project, $dto->getPlatform(), IntegrationStatus::Active);
 
@@ -158,7 +164,7 @@ final class IntegrationController extends AbstractController
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $platform, OAuthErrorCode::UserNotFound);
         }
 
-        $project = $projectRepository->getByUuidAndUser($stateModel->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($stateModel->getProjectUuid(), $user);
 
         if ($project === null) {
             return $this->redirectToFrontendCallback(OAuthCallbackStatus::Error, $platform, OAuthErrorCode::UserNotFound);
@@ -194,12 +200,13 @@ final class IntegrationController extends AbstractController
     }
 
     #[Route('/{integrationUuid}', name: 'api_integrations_show', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function show(string $integrationUuid, IntegrationRepository $integrationRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $integration = $integrationRepository->getByUuidAndUser($integrationUuid, $user);
+        $integration = $integrationRepository->getAccessibleByUuidForUser($integrationUuid, $user);
 
         if ($integration === null) {
             throw new IntegrationNotFoundException();
@@ -218,11 +225,14 @@ final class IntegrationController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $integration = $integrationRepository->getByUuidAndUser($integrationUuid, $user);
+        $integration = $integrationRepository->getAccessibleByUuidForUser($integrationUuid, $user);
 
         if ($integration === null) {
             throw new IntegrationNotFoundException();
         }
+
+        // Editors+ on the agency, or the client linked to this project, may delete integrations.
+        $this->denyAccessUnlessGranted(ProjectVoter::MANAGE_INTEGRATIONS, $integration->getProject());
 
         $integrationRepository->remove($integration, true);
 
@@ -238,11 +248,14 @@ final class IntegrationController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $integration = $integrationRepository->getByUuidAndUser($integrationUuid, $user);
+        $integration = $integrationRepository->getAccessibleByUuidForUser($integrationUuid, $user);
 
         if ($integration === null) {
             throw new IntegrationNotFoundException();
         }
+
+        // Editors+ on the agency, or the client linked to this project, may revoke integration tokens.
+        $this->denyAccessUnlessGranted(ProjectVoter::MANAGE_INTEGRATIONS, $integration->getProject());
 
         $integration
             ->setAccessToken(null)

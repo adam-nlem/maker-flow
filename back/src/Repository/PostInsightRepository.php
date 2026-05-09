@@ -6,7 +6,6 @@ use App\Entity\Enum\PostInsightType;
 use App\Entity\Post;
 use App\Entity\PostInsight;
 use App\Entity\Project;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\Persistence\ManagerRegistry;
@@ -291,9 +290,8 @@ class PostInsightRepository extends ServiceEntityRepository
      * @param PostInsightType[] $types
      * @return array<array{type: string, totalGrowth: float}>
      */
-    public function getGrowthByProjectAndUserAndTypesInPeriod(
+    public function getGrowthByProjectAndTypesInPeriod(
         Project $project,
-        User $user,
         array $types,
         \DateTimeImmutable $startDate,
         \DateTimeImmutable $endDate,
@@ -317,7 +315,6 @@ class PostInsightRepository extends ServiceEntityRepository
                     INNER JOIN post p2 ON pi2.post_id = p2.id
                     INNER JOIN integration i2 ON p2.integration_id = i2.id
                     WHERE i2.project_id = :projectId
-                      AND pi2.user_id = :userId
                       AND pi2.type IN (:types)
                       AND pi2.created_at >= :startDate
                       AND pi2.created_at <= :endDate
@@ -334,7 +331,6 @@ class PostInsightRepository extends ServiceEntityRepository
                     INNER JOIN post p3 ON pi3.post_id = p3.id
                     INNER JOIN integration i3 ON p3.integration_id = i3.id
                     WHERE i3.project_id = :projectId
-                      AND pi3.user_id = :userId
                       AND pi3.type IN (:types)
                       AND pi3.created_at < :startDate
                     GROUP BY pi3.post_id, pi3.type
@@ -347,7 +343,6 @@ class PostInsightRepository extends ServiceEntityRepository
 
         return $conn->executeQuery($sql, [
             'projectId' => $project->getId(),
-            'userId' => $user->getId(),
             'types' => $typeValues,
             'startDate' => $startDate->format('Y-m-d H:i:s'),
             'endDate' => $endDate->format('Y-m-d H:i:s'),
@@ -357,14 +352,13 @@ class PostInsightRepository extends ServiceEntityRepository
     }
 
     /**
-     * Same as getGrowthByProjectAndUserAndTypesInPeriod but grouped by integration.
+     * Same as getGrowthByProjectAndTypesInPeriod but grouped by integration.
      *
      * @param PostInsightType[] $types
      * @return array<array{integrationId: int, type: string, totalGrowth: float}>
      */
-    public function getGrowthByProjectAndUserAndTypesInPeriodGroupedByIntegration(
+    public function getGrowthByProjectAndTypesInPeriodGroupedByIntegration(
         Project $project,
-        User $user,
         array $types,
         \DateTimeImmutable $startDate,
         \DateTimeImmutable $endDate,
@@ -389,7 +383,6 @@ class PostInsightRepository extends ServiceEntityRepository
                     INNER JOIN post p2 ON pi2.post_id = p2.id
                     INNER JOIN integration i2 ON p2.integration_id = i2.id
                     WHERE i2.project_id = :projectId
-                      AND pi2.user_id = :userId
                       AND pi2.type IN (:types)
                       AND pi2.created_at >= :startDate
                       AND pi2.created_at <= :endDate
@@ -406,7 +399,6 @@ class PostInsightRepository extends ServiceEntityRepository
                     INNER JOIN post p3 ON pi3.post_id = p3.id
                     INNER JOIN integration i3 ON p3.integration_id = i3.id
                     WHERE i3.project_id = :projectId
-                      AND pi3.user_id = :userId
                       AND pi3.type IN (:types)
                       AND pi3.created_at < :startDate
                     GROUP BY pi3.post_id, pi3.type
@@ -419,7 +411,6 @@ class PostInsightRepository extends ServiceEntityRepository
 
         return $conn->executeQuery($sql, [
             'projectId' => $project->getId(),
-            'userId' => $user->getId(),
             'types' => $typeValues,
             'startDate' => $startDate->format('Y-m-d H:i:s'),
             'endDate' => $endDate->format('Y-m-d H:i:s'),
@@ -434,9 +425,8 @@ class PostInsightRepository extends ServiceEntityRepository
      *
      * @return array<array{platform: string, date: string, value: float}>
      */
-    public function getDailyGrowthByProjectAndUserAndTypeInPeriod(
+    public function getDailyGrowthByProjectAndTypeInPeriod(
         Project $project,
-        User $user,
         PostInsightType $type,
         \DateTimeImmutable $startDate,
         \DateTimeImmutable $endDate,
@@ -450,7 +440,6 @@ class PostInsightRepository extends ServiceEntityRepository
                 INNER JOIN post p ON pi.post_id = p.id
                 INNER JOIN integration i ON p.integration_id = i.id
                 WHERE i.project_id = :projectId
-                  AND pi.user_id = :userId
                   AND pi.type = :type
                   AND pi.created_at >= :startDate
                   AND pi.created_at <= :endDate
@@ -467,7 +456,6 @@ class PostInsightRepository extends ServiceEntityRepository
                     INNER JOIN post p2 ON pi2.post_id = p2.id
                     INNER JOIN integration i2 ON p2.integration_id = i2.id
                     WHERE i2.project_id = :projectId
-                      AND pi2.user_id = :userId
                       AND pi2.type = :type
                       AND pi2.created_at < :startDate
                     GROUP BY pi2.post_id
@@ -501,7 +489,6 @@ class PostInsightRepository extends ServiceEntityRepository
 
         return $conn->executeQuery($sql, [
             'projectId' => $project->getId(),
-            'userId' => $user->getId(),
             'type' => $type->value,
             'startDate' => $startDate->format('Y-m-d H:i:s'),
             'endDate' => $endDate->format('Y-m-d H:i:s'),

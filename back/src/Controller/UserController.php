@@ -5,29 +5,35 @@ namespace App\Controller;
 use App\DTO\Request\User\RegisterUserRequestDTO;
 use App\DTO\Request\User\UpdateUserRequestDTO;
 use App\DTO\Response\User\RegisterResponseDTO;
+use App\Entity\Agency;
 use App\Entity\Enum\OtpType;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\User\IncorrectCurrentPasswordException;
 use App\Exception\User\InvalidPasswordException;
 use App\Exception\User\MissingPasswordFieldsException;
 use App\Exception\User\PasswordMismatchException;
 use App\Helper\PasswordHelper;
+use App\Repository\AgencyRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Service\Cookie\CookieService;
 use App\Service\Credit\CreditService;
 use App\Service\Otp\OtpService;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/users')]
 final class UserController extends AbstractController
 {
     #[Route('/logout', name: 'api_user_logout', methods: ["GET"])]
+    #[IsGranted('ROLE_USER')]
     public function logout(
         Request $request,
         CookieService $cookieService,
@@ -49,6 +55,8 @@ final class UserController extends AbstractController
     public function register(
         RegisterUserRequestDTO $dto,
         UserRepository $userRepository,
+        AgencyRepository $agencyRepository,
+        EntityManagerInterface $entityManager,
         OtpService $otpService,
         CreditService $creditService,
     ): Response {
@@ -64,9 +72,22 @@ final class UserController extends AbstractController
         /** @var User $user */
         $user = $dto->build();
 
-        $userRepository->save($user, true);
+        $agency = $this->buildAgencyForUser($user);
 
-        $creditService->addWelcomeCredits($user, 3);
+        $entityManager->beginTransaction();
+        try {
+            $agencyRepository->save($agency);
+
+            $user->setAgency($agency)->setRole(UserRole::Admin);
+            $userRepository->save($user, true);
+
+            $entityManager->commit();
+        } catch (\Throwable $e) {
+            $entityManager->rollback();
+            throw $e;
+        }
+
+        $creditService->addWelcomeCredits($agency, 3, $user);
 
         $otp = $otpService->createAndSend($user, OtpType::EmailVerification);
 
@@ -79,6 +100,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/me', name: 'api_user_me', methods: ["GET"])]
+    #[IsGranted('ROLE_USER')]
     public function me(): Response
     {
         /** @var User $user */
@@ -88,6 +110,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('', name: 'api_user_update', methods: ["PATCH"])]
+    #[IsGranted('ROLE_USER')]
     public function updateMe(
         UpdateUserRequestDTO $dto,
         UserRepository $userRepository,
@@ -127,5 +150,17 @@ final class UserController extends AbstractController
         $userRepository->save($user, true);
 
         return $this->json(data: $user, status: Response::HTTP_OK, context: ['groups' => ['api_user_update']]);
+    }
+
+    private function buildAgencyForUser(User $user): Agency
+    {
+        $firstName = $user->getFirstName();
+        $emailLocalPart = explode('@', $user->getEmail() ?? '', 2)[0] ?? '';
+        $ownerLabel = $firstName !== null && trim($firstName) !== '' ? $firstName : $emailLocalPart;
+
+        $agency = new Agency();
+        $agency->setName(sprintf("%s's Agency", $ownerLabel));
+
+        return $agency;
     }
 }

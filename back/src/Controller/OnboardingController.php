@@ -9,11 +9,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/onboarding')]
 final class OnboardingController extends AbstractController
 {
     #[Route('', name: 'api_onboarding_show', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function show(OnboardingService $onboardingService): JsonResponse
     {
         /** @var User $user */
@@ -25,6 +27,7 @@ final class OnboardingController extends AbstractController
     }
 
     #[Route('/complete-step', name: 'api_onboarding_complete_step', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function completeStep(CompleteOnboardingStepRequestDTO $dto, OnboardingService $onboardingService): JsonResponse
     {
         /** @var User $user */
@@ -37,6 +40,7 @@ final class OnboardingController extends AbstractController
     }
 
     #[Route('/dismiss', name: 'api_onboarding_dismiss', methods: ['POST'])]
+    #[IsGranted('ROLE_USER')]
     public function dismiss(OnboardingService $onboardingService): JsonResponse
     {
         /** @var User $user */

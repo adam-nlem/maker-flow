@@ -73,7 +73,7 @@ class PostRepository extends ServiceEntityRepository
                 WHERE integration_id = :integration_id
             ),
             streak_check AS (
-                SELECT 
+                SELECT
                     post_date,
                     DATE_SUB(post_date, INTERVAL ROW_NUMBER() OVER (ORDER BY post_date ASC) DAY) AS streak_group
                 FROM unique_days
@@ -82,8 +82,8 @@ class PostRepository extends ServiceEntityRepository
                 SELECT MAX(post_date) AS last_post_date
                 FROM unique_days
             )
-            SELECT 
-                CASE 
+            SELECT
+                CASE
                     WHEN (SELECT last_post_date FROM most_recent) IS NULL
                     THEN 0
                     WHEN (SELECT last_post_date FROM most_recent) < DATE_SUB(CURRENT_DATE, INTERVAL 1 DAY)
@@ -92,9 +92,9 @@ class PostRepository extends ServiceEntityRepository
                         SELECT COUNT(*)
                         FROM streak_check
                         WHERE streak_group = (
-                            SELECT streak_group 
-                            FROM streak_check 
-                            ORDER BY post_date DESC 
+                            SELECT streak_group
+                            FROM streak_check
+                            ORDER BY post_date DESC
                             LIMIT 1
                         )
                     )
@@ -108,13 +108,16 @@ class PostRepository extends ServiceEntityRepository
         return (int) ($result ?? 0);
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?Post
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?Post
     {
         return $this->createQueryBuilder('p')
+            ->join('p.integration', 'i')
+            ->join('i.project', 'pr')
             ->where('p.uuid = :uuid')
-            ->andWhere('p.user = :user')
+            ->andWhere('(pr.agency = :agency OR pr = :clientProject)')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -123,17 +126,14 @@ class PostRepository extends ServiceEntityRepository
     /**
      * @return Post[]
      */
-    public function getByUserAndIntegrationAndPublishedBeforeLimited(
-        User $user,
+    public function getByIntegrationAndPublishedBeforeLimited(
         Integration $integration,
         \DateTimeImmutable $publishedBefore,
         int $limit,
     ): array {
         return $this->createQueryBuilder('p')
-            ->where('p.user = :user')
-            ->andWhere('p.integration = :integration')
+            ->where('p.integration = :integration')
             ->andWhere('p.publishedAt < :publishedBefore')
-            ->setParameter('user', $user)
             ->setParameter('integration', $integration)
             ->setParameter('publishedBefore', $publishedBefore)
             ->orderBy('p.publishedAt', 'DESC')
@@ -182,7 +182,6 @@ class PostRepository extends ServiceEntityRepository
      */
     public function getByProjectAndPublishedAtWindow(
         Project $project,
-        User $user,
         \DateTimeImmutable $publishedAt,
         int $hoursWindow,
         Integration $excludeIntegration,
@@ -193,11 +192,9 @@ class PostRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('p')
             ->join('p.integration', 'i')
             ->where('i.project = :project')
-            ->andWhere('p.user = :user')
             ->andWhere('p.integration != :excludeIntegration')
             ->andWhere('p.publishedAt BETWEEN :from AND :to')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->setParameter('excludeIntegration', $excludeIntegration)
             ->setParameter('from', $from)
             ->setParameter('to', $to)
@@ -207,10 +204,6 @@ class PostRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    /**
-     * @param string[] $uuids
-     * @return Post[]
-     */
     public function unlinkPostsByPostGroup(PostGroup $postGroup): void
     {
         $this->createQueryBuilder('p')
@@ -227,13 +220,16 @@ class PostRepository extends ServiceEntityRepository
      * @param string[] $uuids
      * @return Post[]
      */
-    public function getByUuidsAndUser(array $uuids, User $user): array
+    public function getAccessibleByUuidsForUser(array $uuids, User $user): array
     {
         return $this->createQueryBuilder('p')
+            ->join('p.integration', 'i')
+            ->join('i.project', 'pr')
             ->where('p.uuid IN (:uuids)')
-            ->andWhere('p.user = :user')
+            ->andWhere('(pr.agency = :agency OR pr = :clientProject)')
             ->setParameter('uuids', $uuids)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -242,8 +238,7 @@ class PostRepository extends ServiceEntityRepository
     /**
      * @return int[]
      */
-    public function getRankedIdsByUserAndIntegrationSortedByInsightValue(
-        User $user,
+    public function getRankedIdsByIntegrationSortedByInsightValue(
         Integration $integration,
         PostInsightType $sortByType,
         int $page,
@@ -253,8 +248,7 @@ class PostRepository extends ServiceEntityRepository
             ->select('MAX(sub.id)')
             ->from(PostInsight::class, 'sub')
             ->innerJoin('sub.post', 'subPost')
-            ->where('subPost.user = :user')
-            ->andWhere('subPost.integration = :integration')
+            ->where('subPost.integration = :integration')
             ->andWhere('sub.type = :type')
             ->groupBy('sub.post')
             ->getDQL();
@@ -263,9 +257,7 @@ class PostRepository extends ServiceEntityRepository
             ->select('p.id')
             ->innerJoin('p.postInsights', 'pi')
             ->where('pi.id IN (' . $sub . ')')
-            ->andWhere('p.user = :user')
             ->andWhere('p.integration = :integration')
-            ->setParameter('user', $user)
             ->setParameter('integration', $integration)
             ->setParameter('type', $sortByType)
             ->orderBy('pi.value', 'DESC')
@@ -292,9 +284,8 @@ class PostRepository extends ServiceEntityRepository
     /**
      * @return Post[]
      */
-    public function getByProjectAndUserPaginatedAndSearchTerm(
+    public function getByProjectPaginatedAndSearchTerm(
         Project $project,
-        User $user,
         ?Platform $platform,
         ?string $searchTerm,
         int $page,
@@ -303,9 +294,7 @@ class PostRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('p')
             ->join('p.integration', 'i')
             ->where('i.project = :project')
-            ->andWhere('p.user = :user')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->orderBy('p.publishedAt', 'DESC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
@@ -328,9 +317,8 @@ class PostRepository extends ServiceEntityRepository
     /**
      * @return Post[]
      */
-    public function searchByProjectAndUserAndCaption(
+    public function searchByProjectAndCaption(
         Project $project,
-        User $user,
         ?Platform $platform,
         string $search,
         int $limit = 20,
@@ -338,10 +326,8 @@ class PostRepository extends ServiceEntityRepository
         $qb = $this->createQueryBuilder('p')
             ->join('p.integration', 'i')
             ->where('i.project = :project')
-            ->andWhere('p.user = :user')
             ->andWhere('p.caption LIKE :search')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->setParameter('search', '%' . $search . '%')
             ->orderBy('p.publishedAt', 'DESC')
             ->setMaxResults($limit);

@@ -34,13 +34,16 @@ class ScriptPartRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?ScriptPart
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?ScriptPart
     {
         return $this->createQueryBuilder('sp')
+            ->join('sp.script', 's')
+            ->join('s.project', 'p')
             ->where('sp.uuid = :uuid')
-            ->andWhere('sp.user = :user')
+            ->andWhere('(p.agency = :agency OR p = :clientProject)')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -49,13 +52,11 @@ class ScriptPartRepository extends ServiceEntityRepository
     /**
      * @return ScriptPart[]
      */
-    public function getByScriptAndUserOrderedByPosition(Script $script, User $user): array
+    public function getByScriptOrderedByPosition(Script $script): array
     {
         return $this->createQueryBuilder('sp')
             ->where('sp.script = :script')
-            ->andWhere('sp.user = :user')
             ->setParameter('script', $script)
-            ->setParameter('user', $user)
             ->orderBy('sp.position', 'ASC')
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)

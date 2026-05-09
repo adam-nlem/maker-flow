@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Integration;
-use App\Entity\User;
 use App\Entity\Enum\IntegrationInsightType;
 use App\Entity\IntegrationInsight;
 use App\Entity\Project;
@@ -39,23 +38,17 @@ class IntegrationInsightRepository extends ServiceEntityRepository
         }
     }
 
-    public function getLatestByUserAndByIntegration(
-        User $user,
-        Integration $integration,
-    ): array {
-
+    public function getLatestByIntegration(Integration $integration): array
+    {
         $subQuery = $this->createQueryBuilder('si')
             ->select('MAX(si.createdAt)')
-            ->where('si.user = :user')
-            ->andWhere('si.integration = :integration')
+            ->where('si.integration = :integration')
             ->andWhere('si.type = i.type')
             ->getDQL();
 
         return $this->createQueryBuilder('i')
-            ->where('i.user = :user')
-            ->andWhere('i.integration = :integration')
+            ->where('i.integration = :integration')
             ->andWhere("i.createdAt = ($subQuery)")
-            ->setParameter('user', $user)
             ->setParameter('integration', $integration)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
@@ -80,16 +73,13 @@ class IntegrationInsightRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getLatestByUserAndByIntegrationAndByType(
-        User $user,
+    public function getLatestByIntegrationAndByType(
         Integration $integration,
         IntegrationInsightType $type,
     ): ?IntegrationInsight {
         return $this->createQueryBuilder('ii')
-            ->where('ii.user = :user')
-            ->andWhere('ii.integration = :integration')
+            ->where('ii.integration = :integration')
             ->andWhere('ii.type = :type')
-            ->setParameter('user', $user)
             ->setParameter('integration', $integration)
             ->setParameter('type', $type)
             ->orderBy('ii.createdAt', 'DESC')
@@ -99,28 +89,24 @@ class IntegrationInsightRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserAndIntegrationAndTimePeriod(
-        User $user,
+    public function getByIntegrationAndTimePeriod(
         Integration $integration,
         \DateTimeImmutable $startDate,
         \DateTimeImmutable $endDate,
     ): array {
         $subQuery = $this->createQueryBuilder('si')
             ->select('MAX(si.createdAt)')
-            ->where('si.user = :user')
-            ->andWhere('si.integration = :integration')
+            ->where('si.integration = :integration')
             ->andWhere('si.createdAt >= :startDate')
             ->andWhere('si.createdAt <= :endDate')
             ->andWhere('si.type = i.type')
             ->getDQL();
 
         return $this->createQueryBuilder('i')
-            ->where('i.user = :user')
-            ->andWhere('i.integration = :integration')
+            ->where('i.integration = :integration')
             ->andWhere('i.createdAt >= :startDate')
             ->andWhere('i.createdAt <= :endDate')
             ->andWhere("i.createdAt = ($subQuery)")
-            ->setParameter('user', $user)
             ->setParameter('integration', $integration)
             ->setParameter('startDate', $startDate)
             ->setParameter('endDate', $endDate)
@@ -133,18 +119,15 @@ class IntegrationInsightRepository extends ServiceEntityRepository
      * @param IntegrationInsightType[] $types
      * @return IntegrationInsight[]
      */
-    public function getDailyByUserAndIntegrationAndTypes(
-        User $user,
+    public function getDailyByIntegrationAndTypes(
         Integration $integration,
         array $types,
         \DateTimeImmutable $startDate,
     ): array {
         return $this->createQueryBuilder('i')
-            ->where('i.user = :user')
-            ->andWhere('i.integration = :integration')
+            ->where('i.integration = :integration')
             ->andWhere('i.type IN (:types)')
             ->andWhere('i.createdAt >= :startDate')
-            ->setParameter('user', $user)
             ->setParameter('integration', $integration)
             ->setParameter('types', $types)
             ->setParameter('startDate', $startDate)
@@ -155,20 +138,18 @@ class IntegrationInsightRepository extends ServiceEntityRepository
     }
 
     /**
-     * Returns the latest TotalFollowers value per integration for a given project/user, keyed by integration id.
+     * Returns the latest TotalFollowers value per integration for a given project, keyed by integration id.
      *
      * @return array<int, float>
      */
-    public function getLatestTotalFollowersByProjectAndUserGroupedByIntegration(
+    public function getLatestTotalFollowersByProjectGroupedByIntegration(
         Project $project,
-        User $user,
     ): array {
         $sub = $this->getEntityManager()->createQueryBuilder()
             ->select('MAX(sub.id)')
             ->from(IntegrationInsight::class, 'sub')
             ->innerJoin('sub.integration', 'subInt')
             ->where('subInt.project = :project')
-            ->andWhere('sub.user = :user')
             ->andWhere('sub.type = :type')
             ->groupBy('sub.integration')
             ->getDQL();
@@ -177,7 +158,6 @@ class IntegrationInsightRepository extends ServiceEntityRepository
             ->select('IDENTITY(ii.integration) AS integrationId', 'ii.value AS value')
             ->where('ii.id IN (' . $sub . ')')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->setParameter('type', IntegrationInsightType::TotalFollowers)
             ->getQuery()
             ->getArrayResult();
@@ -193,9 +173,8 @@ class IntegrationInsightRepository extends ServiceEntityRepository
     /**
      * Returns the SUM of the latest TotalFollowers per integration before a given date.
      */
-    public function getAggregatedTotalFollowersByProjectAndUserBeforeDate(
+    public function getAggregatedTotalFollowersByProjectBeforeDate(
         Project $project,
-        User $user,
         \DateTimeImmutable $atDate,
     ): ?float {
         $sub = $this->getEntityManager()->createQueryBuilder()
@@ -203,7 +182,6 @@ class IntegrationInsightRepository extends ServiceEntityRepository
             ->from(IntegrationInsight::class, 'sub')
             ->innerJoin('sub.integration', 'subInt')
             ->where('subInt.project = :project')
-            ->andWhere('sub.user = :user')
             ->andWhere('sub.type = :type')
             ->andWhere('sub.createdAt <= :atDate')
             ->groupBy('sub.integration')
@@ -213,7 +191,6 @@ class IntegrationInsightRepository extends ServiceEntityRepository
             ->select('SUM(ii.value) as totalValue')
             ->where('ii.id IN (' . $sub . ')')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->setParameter('type', IntegrationInsightType::TotalFollowers)
             ->setParameter('atDate', $atDate)
             ->getQuery()

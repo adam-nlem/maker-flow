@@ -17,11 +17,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/script-parts', requirements: ['partUuid' => Requirement::UUID])]
 final class ScriptPartController extends AbstractController
 {
     #[Route('', name: 'api_script_parts_list', methods: ['GET'])]
+    #[IsGranted('ROLE_VIEWER')]
     public function list(
         ListScriptPartsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -30,13 +32,13 @@ final class ScriptPartController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($queryParamDto->getScriptUuid(), $user);
+        $script = $scriptRepository->getAccessibleByUuidForUser($queryParamDto->getScriptUuid(), $user);
 
         if ($script === null) {
             throw new ScriptNotFoundException();
         }
 
-        $parts = $scriptPartRepository->getByScriptAndUserOrderedByPosition($script, $user);
+        $parts = $scriptPartRepository->getByScriptOrderedByPosition($script);
 
         return $this->json(
             data: $parts,
@@ -46,6 +48,7 @@ final class ScriptPartController extends AbstractController
     }
 
     #[Route('', name: 'api_script_parts_create', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function create(
         CreateScriptPartRequestDTO $dto,
         ScriptRepository $scriptRepository,
@@ -54,7 +57,7 @@ final class ScriptPartController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($dto->getScriptUuid(), $user);
+        $script = $scriptRepository->getAccessibleByUuidForUser($dto->getScriptUuid(), $user);
 
         if ($script === null) {
             throw new ScriptNotFoundException();
@@ -76,6 +79,7 @@ final class ScriptPartController extends AbstractController
     }
 
     #[Route('/reorder', name: 'api_script_parts_reorder', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function reorder(
         ReorderScriptPartsRequestDTO $dto,
         ScriptRepository $scriptRepository,
@@ -84,7 +88,7 @@ final class ScriptPartController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($dto->getScriptUuid(), $user);
+        $script = $scriptRepository->getAccessibleByUuidForUser($dto->getScriptUuid(), $user);
 
         if ($script === null) {
             throw new ScriptNotFoundException();
@@ -96,7 +100,7 @@ final class ScriptPartController extends AbstractController
                 continue;
             }
 
-            $part = $scriptPartRepository->getByUuidAndUser($partUuid, $user);
+            $part = $scriptPartRepository->getAccessibleByUuidForUser($partUuid, $user);
 
             if ($part !== null && $part->getScript() !== null && $part->getScript()->getId() === $script->getId()) {
                 $part->setPosition($index);
@@ -110,6 +114,7 @@ final class ScriptPartController extends AbstractController
     }
 
     #[Route('/{partUuid}', name: 'api_script_parts_update', methods: ['PATCH'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function update(
         string $partUuid,
         UpdateScriptPartRequestDTO $dto,
@@ -119,7 +124,7 @@ final class ScriptPartController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $part = $scriptPartRepository->getByUuidAndUser($partUuid, $user);
+        $part = $scriptPartRepository->getAccessibleByUuidForUser($partUuid, $user);
 
         if ($part === null) {
             throw new ScriptPartNotFoundException();
@@ -140,6 +145,7 @@ final class ScriptPartController extends AbstractController
     }
 
     #[Route('/{partUuid}', name: 'api_script_parts_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(
         string $partUuid,
         ScriptPartRepository $scriptPartRepository,
@@ -148,7 +154,7 @@ final class ScriptPartController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $part = $scriptPartRepository->getByUuidAndUser($partUuid, $user);
+        $part = $scriptPartRepository->getAccessibleByUuidForUser($partUuid, $user);
 
         if ($part === null) {
             throw new ScriptPartNotFoundException();

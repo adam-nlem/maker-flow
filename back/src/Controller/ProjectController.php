@@ -7,43 +7,56 @@ use App\DTO\Request\Project\CreateProjectRequestDTO;
 use App\DTO\Request\Project\UpdateProjectRequestDTO;
 use App\Entity\Project;
 use App\Entity\User;
+use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Project\ProjectAlreadyFinishedException;
 use App\Exception\Project\ProjectAlreadyOpenException;
 use App\Exception\Project\ProjectLimitReachedException;
 use App\Exception\Project\ProjectNameConflictException;
 use App\Exception\Project\ProjectNotFoundException;
 use App\Helper\DateHelper;
+use App\Repository\AgencyRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\SubscriptionRepository;
 use App\Service\Stripe\StripePlanService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\DependencyInjection\Security\Factory\StatelessAuthenticatorFactoryInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/projects', requirements: ['projectUuid' => Requirement::UUID])]
 final class ProjectController extends AbstractController
 {
     #[Route('', name: 'api_projects_create', methods: ['POST'])]
-    public function create(CreateProjectRequestDTO $dto, ProjectRepository $projectRepository, SubscriptionRepository $subscriptionRepository, StripePlanService $stripePlanService): JsonResponse
-    {
+    #[IsGranted('ROLE_EDITOR')]
+    public function create(
+        CreateProjectRequestDTO $dto,
+        AgencyRepository $agencyRepository,
+        ProjectRepository $projectRepository,
+        SubscriptionRepository $subscriptionRepository,
+        StripePlanService $stripePlanService,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $plan = $subscriptionRepository->getLatestActiveByUser($user)?->getPlan();
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        $plan = $subscriptionRepository->getLatestActiveByAgency($agency)?->getPlan();
         $maxProjects = $plan !== null ? $stripePlanService->getPlanConfigFromSubscription($plan)?->getMaxProjects() : 1;
 
-        if ($maxProjects !== null && $projectRepository->countByUser($user) >= $maxProjects) {
+        if ($maxProjects !== null && $projectRepository->countByAgency($agency) >= $maxProjects) {
             throw new ProjectLimitReachedException();
         }
 
         /** @var Project $project */
         $project = $dto->build();
 
-        $project->setUser($user);
+        $project->setAgency($agency);
 
         $projectRepository->save($project, true);
 
@@ -51,19 +64,20 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}', name: 'api_projects_update', methods: ['PATCH'])]
-    public function update(string $projectUuid, UpdateProjectRequestDTO $dto, ProjectRepository $projectRepository, EntityManagerInterface $entityManager): JsonResponse
+    #[IsGranted('ROLE_EDITOR')]
+    public function update(string $projectUuid, UpdateProjectRequestDTO $dto, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($projectUuid, $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
         if ($dto->getName() !== null && $dto->getName() != $project->getName()) {
-            $projectWithSameName = $projectRepository->getByNameAndUser($dto->getName(), $user);
+            $projectWithSameName = $projectRepository->getByNameAndAgency($dto->getName(), $project->getAgency());
             if ($projectWithSameName !== null) {
                 throw new ProjectNameConflictException();
             }
@@ -84,12 +98,13 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}', name: 'api_projects_show', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function show(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($projectUuid, $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
@@ -99,12 +114,13 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}/finish', name: 'api_projects_finish', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function finish(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($projectUuid, $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
@@ -122,12 +138,13 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}/reopen', name: 'api_projects_reopen', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function reopen(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($projectUuid, $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
@@ -145,17 +162,28 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('', name: 'api_projects_list', methods: ['GET'])]
-    public function list(ListProjectsQueryParamDTO $queryParamDto, ProjectRepository $projectRepository): JsonResponse
-    {
+    #[IsGranted('ROLE_VIEWER')]
+    public function list(
+        ListProjectsQueryParamDTO $queryParamDto,
+        AgencyRepository $agencyRepository,
+        ProjectRepository $projectRepository,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $projects = $projectRepository->getByUserPaginated($user, $queryParamDto->getPage(), $queryParamDto->getLimit());
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            return $this->json(data: [], status: Response::HTTP_OK);
+        }
+
+        $projects = $projectRepository->getByAgencyPaginated($agency, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(data: $projects, status: Response::HTTP_OK, context: ['groups' => ['api_projects_get_paginated']]);
     }
 
     #[Route('/{projectUuid}', name: 'api_projects_delete', methods: ['DELETE'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function delete(
         string $projectUuid,
         ProjectRepository $projectRepository,
@@ -163,7 +191,7 @@ final class ProjectController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($projectUuid, $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($projectUuid, $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();

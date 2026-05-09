@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\UserRole;
 use App\Helper\DateHelper;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -19,9 +20,6 @@ use Symfony\Component\Uid\Uuid;
 #[ORMAssert\UniqueEntity('email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    public const ROLE_USER = 'ROLE_USER';
-    public const ROLE_ADMIN = 'ROLE_ADMIN';
-
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -101,13 +99,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     ])]
     private ?\DateTimeImmutable $verifiedAt = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups([
-        'api_user_me',
-        'api_user_update'
-    ])]
-    private ?string $stripeCustomerId = null;
-
     #[ORM\Column(length: 8, unique: true, nullable: true)]
     #[Groups([
         'api_user_me',
@@ -128,32 +119,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 45, nullable: true)]
     private ?string $ipAddress = null;
 
+    #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'members')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Agency $agency = null;
+
+    #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'clientUsers')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?Project $project = null;
+
     /**
      * @var Collection<int, Token>
      */
     #[ORM\OneToMany(targetEntity: Token::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
     private Collection $tokens;
-
-    /**
-     * @var Collection<int, Integration>
-     */
-    #[ORM\OneToMany(targetEntity: Integration::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $integrations;
-
-    /**
-     * @var Collection<int, Project>
-     */
-    #[ORM\OneToMany(targetEntity: Project::class, mappedBy: 'user', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $projects;
-
-    #[ORM\OneToOne(targetEntity: CreditBalance::class, mappedBy: 'user', cascade: ['remove'])]
-    private ?CreditBalance $creditBalance = null;
-
-    /**
-     * @var Collection<int, Subscription>
-     */
-    #[ORM\OneToMany(targetEntity: Subscription::class, mappedBy: 'user', cascade: ['remove'])]
-    private Collection $subscriptions;
 
     #[ORM\OneToOne(targetEntity: Onboarding::class, mappedBy: 'user', cascade: ['remove'])]
     private ?Onboarding $onboarding = null;
@@ -170,16 +148,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             $this->uuid = Uuid::v4();
         }
 
-        $this->addRole(self::ROLE_USER);
+        $this->addRole(UserRole::User->value);
 
         if ($this->createdAt === null) {
             $this->createdAt = DateHelper::createUtcDateTimeImmutable();
         }
 
         $this->tokens = new ArrayCollection();
-        $this->integrations = new ArrayCollection();
-        $this->projects = new ArrayCollection();
-        $this->subscriptions = new ArrayCollection();
         $this->otps = new ArrayCollection();
         $this->referrals = new ArrayCollection();
     }
@@ -273,12 +248,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    public function setRole(UserRole $role): static
+    {
+        $this->roles = [UserRole::User->value];
+
+        if ($role !== UserRole::User) {
+            $this->roles[] = $role->value;
+        }
+
+        return $this;
+    }
+
     public function addRole(string $role): static
     {
         if (!in_array($role, $this->roles)) {
             $this->roles[] = $role;
         }
         return $this;
+    }
+
+    public function hasRole(UserRole $role): bool
+    {
+        return in_array($role->value, $this->roles, true);
     }
 
     public function getVerifiedAt(): ?\DateTimeImmutable
@@ -296,18 +287,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function isVerified(): bool
     {
         return $this->verifiedAt !== null;
-    }
-
-    public function getStripeCustomerId(): ?string
-    {
-        return $this->stripeCustomerId;
-    }
-
-    public function setStripeCustomerId(?string $stripeCustomerId): static
-    {
-        $this->stripeCustomerId = $stripeCustomerId;
-
-        return $this;
     }
 
     public function getReferralCode(): ?string
@@ -399,84 +378,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // TODO: Implement eraseCredentials() method.
     }
 
-    /**
-     * @return Collection<int, Integration>
-     */
-    public function getIntegrations(): Collection
+    public function getAgency(): ?Agency
     {
-        return $this->integrations;
+        return $this->agency;
     }
 
-    public function addIntegration(Integration $integration): static
+    public function setAgency(?Agency $agency): static
     {
-        if (!$this->integrations->contains($integration)) {
-            $this->integrations->add($integration);
-            $integration->setUser($this);
-        }
+        $this->agency = $agency;
 
         return $this;
     }
 
-    public function removeIntegration(Integration $integration): static
+    public function getProject(): ?Project
     {
-        if ($this->integrations->removeElement($integration)) {
-            // set the owning side to null (unless already changed)
-            if ($integration->getUser() === $this) {
-                $integration->setUser(null);
-            }
-        }
+        return $this->project;
+    }
+
+    public function setProject(?Project $project): static
+    {
+        $this->project = $project;
 
         return $this;
-    }
-
-    /**
-     * @return Collection<int, Project>
-     */
-    public function getProjects(): Collection
-    {
-        return $this->projects;
-    }
-
-    public function addProject(Project $project): static
-    {
-        if (!$this->projects->contains($project)) {
-            $this->projects->add($project);
-            $project->setUser($this);
-        }
-
-        return $this;
-    }
-
-    public function removeProject(Project $project): static
-    {
-        if ($this->projects->removeElement($project)) {
-            // set the owning side to null (unless already changed)
-            if ($project->getUser() === $this) {
-                $project->setUser(null);
-            }
-        }
-
-        return $this;
-    }
-
-    public function getCreditBalance(): ?CreditBalance
-    {
-        return $this->creditBalance;
-    }
-
-    public function setCreditBalance(?CreditBalance $creditBalance): static
-    {
-        $this->creditBalance = $creditBalance;
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Subscription>
-     */
-    public function getSubscriptions(): Collection
-    {
-        return $this->subscriptions;
     }
 
     /**

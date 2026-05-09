@@ -6,9 +6,11 @@ use App\DTO\QueryParam\ChatMessage\ListChatMessagesQueryParamDTO;
 use App\DTO\Request\ChatMessage\CreateChatMessageRequestDTO;
 use App\Entity\Message;
 use App\Entity\User;
+use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Chat\ChatNotFoundException;
 use App\Exception\Credit\InsufficientCreditsException;
 use App\Message\GenerateChatMessageResponseMessage;
+use App\Repository\AgencyRepository;
 use App\Repository\ChatRepository;
 use App\Repository\MessageRepository;
 use App\Service\Credit\CreditService;
@@ -18,13 +20,16 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/chat-messages', requirements: ['messageUuid' => Requirement::UUID])]
 final class ChatMessageController extends AbstractController
 {
     #[Route('', name: 'api_chat_messages_create', methods: ['POST'])]
+    #[IsGranted('ROLE_EDITOR')]
     public function create(
         CreateChatMessageRequestDTO $dto,
+        AgencyRepository $agencyRepository,
         ChatRepository $chatRepository,
         MessageRepository $messageRepository,
         CreditService $creditService,
@@ -33,14 +38,20 @@ final class ChatMessageController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $chat = $chatRepository->getByUuidAndUser($dto->getChatUuid(), $user);
+        $chat = $chatRepository->getAccessibleByUuidForUser($dto->getChatUuid(), $user);
 
         if ($chat === null) {
             throw new ChatNotFoundException();
         }
 
-        if ($creditService->getTotalCredits($user) < 1) {
-            throw new InsufficientCreditsException(requested: 1, available: $creditService->getTotalCredits($user));
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        if ($creditService->getTotalCredits($agency) < 1) {
+            throw new InsufficientCreditsException(requested: 1, available: $creditService->getTotalCredits($agency));
         }
 
         /** @var Message $message */
@@ -70,6 +81,7 @@ final class ChatMessageController extends AbstractController
     }
 
     #[Route('', name: 'api_chat_messages_list', methods: ['GET'])]
+    #[IsGranted('ROLE_VIEWER')]
     public function list(
         ListChatMessagesQueryParamDTO $queryParamDto,
         ChatRepository $chatRepository,
@@ -78,7 +90,7 @@ final class ChatMessageController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $chat = $chatRepository->getByUuidAndUser($queryParamDto->getChatUuid(), $user);
+        $chat = $chatRepository->getAccessibleByUuidForUser($queryParamDto->getChatUuid(), $user);
 
         if ($chat === null) {
             throw new ChatNotFoundException();

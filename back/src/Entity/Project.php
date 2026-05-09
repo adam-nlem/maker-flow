@@ -14,7 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints as ORMAssert;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[ORMAssert\UniqueEntity(fields: ['name', 'user'])]
+#[ORMAssert\UniqueEntity(fields: ['name', 'agency'])]
 #[ORM\HasLifecycleCallbacks]
 class Project
 {
@@ -100,9 +100,15 @@ class Project
     ])]
     private array $types = [];
 
-    #[ORM\ManyToOne(inversedBy: 'projects')]
+    #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'projects')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    private ?Agency $agency = null;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'project')]
+    private Collection $clientUsers;
 
     /**
      * @var Collection<int, TodoList>
@@ -141,6 +147,7 @@ class Project
         if ($this->updatedAt === null) {
             $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
+        $this->clientUsers = new ArrayCollection();
         $this->todoLists = new ArrayCollection();
         $this->integrations = new ArrayCollection();
         $this->scripts = new ArrayCollection();
@@ -245,16 +252,24 @@ class Project
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getAgency(): ?Agency
     {
-        return $this->user;
+        return $this->agency;
     }
 
-    public function setUser(?User $user): static
+    public function setAgency(?Agency $agency): static
     {
-        $this->user = $user;
+        $this->agency = $agency;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getClientUsers(): Collection
+    {
+        return $this->clientUsers;
     }
 
     /**

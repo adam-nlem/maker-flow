@@ -14,11 +14,13 @@ use App\Repository\IntegrationRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/integration-insights')]
 final class IntegrationInsightController extends AbstractController
 {
     #[Route('', name: 'api_integration_insights_list', methods: ['GET'])]
+    #[IsGranted('ROLE_USER')]
     public function list(
         ListIntegrationInsightsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
@@ -27,14 +29,13 @@ final class IntegrationInsightController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
         $result = $insightService->list(
-            user: $user,
             project: $project,
             timePeriod: $queryParamDto->getTimePeriod(),
         );

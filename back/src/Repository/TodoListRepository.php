@@ -3,8 +3,8 @@
 namespace App\Repository;
 
 use App\Entity\Project;
-use App\Entity\User;
 use App\Entity\TodoList;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
@@ -37,25 +37,28 @@ class TodoListRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?TodoList
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?TodoList
     {
         return $this->createQueryBuilder('tl')
+            ->join('tl.project', 'p')
             ->where('tl.uuid = :uuid')
-            ->andWhere('tl.user = :user')
+            ->andWhere('(p.agency = :agency OR p = :clientProject)')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByProjectAndUser(Project $project, User $user): array
+    /**
+     * @return TodoList[]
+     */
+    public function getByProject(Project $project): array
     {
         return $this->createQueryBuilder('tl')
             ->where('tl.project = :project')
-            ->andWhere('tl.user = :user')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
