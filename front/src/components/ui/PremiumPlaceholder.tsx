@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { settingsSubscriptionPath } from "~/routes/routePaths";
+import { agencySettingsSubscriptionPath } from "~/routes/routePaths";
 import { LockClosedIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
 
@@ -34,7 +34,7 @@ export default function PremiumPlaceholder({
                 <LockClosedIcon className="size-6 text-gray mb-2" />
                 <h2 className="text-heading-md mb-1">{resolvedTitle}</h2>
                 <p className="text-body-sm text-gray mb-3 text-center max-w-xs">{resolvedDescription}</p>
-                <Button style="primary" width="w-fit" onClick={() => navigate(settingsSubscriptionPath)}>
+                <Button style="primary" width="w-fit" onClick={() => navigate(agencySettingsSubscriptionPath)}>
                     {t("premium.upgradeAction")}
                 </Button>
             </div>

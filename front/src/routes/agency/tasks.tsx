@@ -1,17 +1,17 @@
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import ContentsPageView from "~/components/contents/ContentsPageView";
+import TodoListDashboardView from "~/components/tasks/TodoListDashboardView";
 
-export default function ContentsPage() {
+export default function AgencyTasksPage() {
   const { projects } = useListPaginatedProjects()
   const { focusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
 
   return (
-    <div className="h-full">
+    <>
       {focusedProject && (
-        <ContentsPageView projectUuid={focusedProject.uuid} />
+        <TodoListDashboardView projectUuid={focusedProject.uuid} />
       )}
-    </div>
+    </>
   );
 }

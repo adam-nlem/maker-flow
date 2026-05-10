@@ -2,7 +2,7 @@
 
 ## Overview
 
-The billing frontend displays credit balances, current subscription information, and a plan selector for subscribing via Stripe Checkout. It lives under the `/settings/subscription` route.
+The billing frontend displays credit balances, current subscription information, and a plan selector for subscribing via Stripe Checkout. It lives under the `/agency/settings/subscription` route.
 
 ---
 
@@ -10,22 +10,26 @@ The billing frontend displays credit balances, current subscription information,
 
 The settings page uses React Router 7 nested routes with a dynamic `:section` parameter.
 
-### Route Configuration (`routes.ts`)
+### Route Configuration (`router.tsx`)
 
-```ts
-route("settings", "routes/settings.tsx", [
-    index("routes/settings.index.tsx"),          // /settings -> redirect to /settings/general
-    route(":section", "routes/settings.section.tsx"), // /settings/:section
-]),
+```tsx
+{
+    path: agencySettingsPath,                                // /agency/settings
+    element: <AgencySettingsLayout />,
+    children: [
+        { index: true, element: <AgencySettingsIndex /> },         // → redirect to /agency/settings/general
+        { path: ":section", element: <AgencySettingsSectionRoute /> },
+    ],
+},
 ```
 
 ### Key Files
 
 | File | Purpose |
 |------|---------|
-| `routes/settings.tsx` | Layout: renders `SideBar` + `SettingsPageView` |
-| `routes/settings.index.tsx` | Redirects `/settings` to `/settings/general` |
-| `routes/settings.section.tsx` | Maps `:section` param to the correct component |
+| `routes/agency/settings.tsx` | Layout: renders `SettingsPageView` |
+| `routes/agency/settings.index.tsx` | Redirects `/agency/settings` to `/agency/settings/general` |
+| `routes/agency/settings.section.tsx` | Maps `:section` param to the correct component |
 | `components/settings/SettingsPageView.tsx` | Settings sidebar (SidePanel) + `<Outlet />` |
 
 ### Adding a New Settings Section
@@ -166,7 +170,7 @@ Props:
 - `description?: string` -- overlay description
 - `children: ReactNode` -- content to blur/show
 
-When restricted, children are rendered with `blur-sm pointer-events-none select-none` and an absolute overlay shows a lock icon, heading, description, and a primary Button navigating to `/settings/subscription`.
+When restricted, children are rendered with `blur-sm pointer-events-none select-none` and an absolute overlay shows a lock icon, heading, description, and a primary Button navigating to `/agency/settings/subscription`.
 
 ### Current Frontend Restrictions
 

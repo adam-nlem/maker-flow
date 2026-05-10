@@ -8,11 +8,13 @@ import {
   loginPath,
   registerPath,
   integrationCallbackPath,
-  tasksPath,
-  contentsPath,
-  scriptsPath,
-  calendarPath,
-  settingsPath,
+  agencyHomePath,
+  agencyTasksPath,
+  agencyContentsPath,
+  agencyScriptsPath,
+  agencyCalendarPath,
+  agencySettingsPath,
+  clientHomePath,
 } from "./routes/routePaths";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PrelaunchPage from "./routes/prelaunch";
@@ -25,15 +27,18 @@ import LoginPage from "./routes/login";
 import RegisterPage from "./routes/register";
 import IntegrationsCallback from "./routes/integrations.callback";
 import ProtectedLayout from "./routes/protected";
-import SidebarLayout from "./components/sidebar/SidebarLayout";
-import HomePage from "./routes/home";
-import TasksPage from "./routes/tasks";
-import ContentsPage from "./routes/contents";
-import ScriptsPage from "./routes/scripts";
-import CalendarPage from "./routes/calendar";
-import SettingsLayout from "./routes/settings";
-import SettingsIndex from "./routes/settings.index";
-import SettingsSectionRoute from "./routes/settings.section";
+import RootRedirect from "./components/auth/RootRedirect";
+import AgencyShellLayout from "./components/agency/AgencyShellLayout";
+import ClientShellLayout from "./components/client-portal/ClientShellLayout";
+import AgencyHomePage from "./routes/agency/home";
+import AgencyTasksPage from "./routes/agency/tasks";
+import AgencyContentsPage from "./routes/agency/contents";
+import AgencyScriptsPage from "./routes/agency/scripts";
+import AgencyCalendarPage from "./routes/agency/calendar";
+import AgencySettingsLayout from "./routes/agency/settings";
+import AgencySettingsIndex from "./routes/agency/settings.index";
+import AgencySettingsSectionRoute from "./routes/agency/settings.section";
+import ClientHomePage from "./routes/client/home";
 
 export const router = createBrowserRouter(
   [
@@ -53,27 +58,39 @@ export const router = createBrowserRouter(
         { path: registerPath, element: <RegisterPage /> },
         { path: integrationCallbackPath, element: <IntegrationsCallback /> },
 
-        // Protected routes
+        // Protected routes (auth + onboarding)
         {
           element: <ProtectedLayout />,
           errorElement: <ErrorBoundary />,
           children: [
+            // Smart redirect at root: dispatches by role
+            { index: true, element: <RootRedirect /> },
+
+            // Agency shell — asserts non-client role internally
             {
-              element: <SidebarLayout />,
+              element: <AgencyShellLayout />,
               children: [
-                { index: true, element: <HomePage /> },
-                { path: tasksPath, element: <TasksPage /> },
-                { path: contentsPath, element: <ContentsPage /> },
-                { path: scriptsPath, element: <ScriptsPage /> },
-                { path: calendarPath, element: <CalendarPage /> },
+                { path: agencyHomePath, element: <AgencyHomePage /> },
+                { path: agencyTasksPath, element: <AgencyTasksPage /> },
+                { path: agencyContentsPath, element: <AgencyContentsPage /> },
+                { path: agencyScriptsPath, element: <AgencyScriptsPage /> },
+                { path: agencyCalendarPath, element: <AgencyCalendarPage /> },
                 {
-                  path: settingsPath,
-                  element: <SettingsLayout />,
+                  path: agencySettingsPath,
+                  element: <AgencySettingsLayout />,
                   children: [
-                    { index: true, element: <SettingsIndex /> },
-                    { path: ":section", element: <SettingsSectionRoute /> },
+                    { index: true, element: <AgencySettingsIndex /> },
+                    { path: ":section", element: <AgencySettingsSectionRoute /> },
                   ],
                 },
+              ],
+            },
+
+            // Client shell — asserts client role internally
+            {
+              element: <ClientShellLayout />,
+              children: [
+                { path: clientHomePath, element: <ClientHomePage /> },
               ],
             },
           ],

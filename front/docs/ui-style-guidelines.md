@@ -334,7 +334,7 @@ Placeholder for premium-only content. Blurs children and shows an upgrade CTA wh
 **When restricted:**
 - Children: `blur-sm pointer-events-none select-none`
 - Placeholder: `absolute inset-0 bg-clear/60 z-10 rounded-xl`
-- Content: `LockClosedIcon` (size-6, text-gray) + heading (`text-heading-md`) + description (`text-body-sm text-gray`) + primary Button to `/settings/subscription`
+- Content: `LockClosedIcon` (size-6, text-gray) + heading (`text-heading-md`) + description (`text-body-sm text-gray`) + primary Button to `/agency/settings/subscription`
 
 **When not restricted:** Renders children as-is.
 

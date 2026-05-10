@@ -134,6 +134,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'collaborators')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    #[Groups([
+        'api_user_me',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+    ])]
     private ?Agency $agency = null;
 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'clientUsers')]
@@ -283,6 +288,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function hasRole(UserRole $role): bool
     {
         return in_array($role->value, $this->roles, true);
+    }
+
+    #[Groups([
+        'api_user_me',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+    ])]
+    public function getRole(): ?string
+    {
+        foreach ([UserRole::Admin, UserRole::Editor, UserRole::Viewer, UserRole::Client] as $candidate) {
+            if (in_array($candidate->value, $this->roles, true)) {
+                return $candidate->value;
+            }
+        }
+
+        return null;
+    }
+
+    #[Groups([
+        'api_user_me',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+    ])]
+    public function getClientProjectUuid(): ?string
+    {
+        return $this->project?->getUuid();
     }
 
     public function getVerifiedAt(): ?\DateTimeImmutable

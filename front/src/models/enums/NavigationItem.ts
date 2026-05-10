@@ -1,7 +1,7 @@
 import type { ComponentType, SVGProps } from "react";
 import { CalendarDaysIcon, ChartBarIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { CalendarDaysIcon as CalendarDaysIconSolid, ChartBarIcon as ChartBarIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, HomeIcon as HomeIconSolid } from "@heroicons/react/24/solid";
-import { homePath, scriptsPath, calendarPath, contentsPath, tasksPath, settingsPath } from "~/routes/routePaths";
+import { agencyHomePath, agencyScriptsPath, agencyCalendarPath, agencyContentsPath, agencyTasksPath, agencySettingsPath } from "~/routes/routePaths";
 
 export enum NavigationItem {
     Home = 'home',
@@ -35,12 +35,12 @@ export const navigationItemTranslationKeys: Record<NavigationItem, string> = {
 }
 
 export const navigationItemToPath: Record<NavigationItem, string> = {
-    [NavigationItem.Home]: homePath,
-    [NavigationItem.Scripts]: scriptsPath,
-    [NavigationItem.Calendar]: calendarPath,
-    [NavigationItem.Contents]: contentsPath,
-    [NavigationItem.Tasks]: tasksPath,
-    [NavigationItem.Settings]: settingsPath,
+    [NavigationItem.Home]: agencyHomePath,
+    [NavigationItem.Scripts]: agencyScriptsPath,
+    [NavigationItem.Calendar]: agencyCalendarPath,
+    [NavigationItem.Contents]: agencyContentsPath,
+    [NavigationItem.Tasks]: agencyTasksPath,
+    [NavigationItem.Settings]: agencySettingsPath,
 }
 
 export const navigationItemToIcon: Record<NavigationItem, ComponentType<SVGProps<SVGSVGElement>>> = {

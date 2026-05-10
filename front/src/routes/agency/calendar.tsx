@@ -10,7 +10,7 @@ import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
 import ScriptCalendar from "~/components/scripts/calendar/ScriptCalendar";
 
-export default function CalendarPage() {
+export default function AgencyCalendarPage() {
   const { projects } = useListPaginatedProjects()
   const { focusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null

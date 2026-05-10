@@ -18,7 +18,7 @@ import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import IntegrationDetailCardRow from "~/components/integrations/IntegrationDetailCardRow";
 import HomeScriptsPanel from "~/components/home/HomeScriptsPanel";
 
-export default function HomePage() {
+export default function AgencyHomePage() {
   const { t } = useTranslation();
   const { projects, isLoading } = useListPaginatedProjects();
   const { focusedProjectUuid } = useSelectFocusedProject({ projects });

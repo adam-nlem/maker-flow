@@ -8,7 +8,7 @@ import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
 import IconWithTextTile from "../ui/IconWithTextTile";
 import { useLocation, useNavigate } from "react-router-dom";
-import { settingsSubscriptionPath, privacyPolicyPath, termsOfServicePath } from "~/routes/routePaths";
+import { agencySettingsSubscriptionPath, privacyPolicyPath, termsOfServicePath } from "~/routes/routePaths";
 import Shimmer from "../ui/Shimmer";
 import SelectDropdown from "../ui/SelectDropdown"
 import type { Project } from "~/models/Project"
@@ -177,7 +177,7 @@ export default function DesktopSidebar() {
             <Button
               type="button"
               style="primary"
-              onClick={() => navigate(settingsSubscriptionPath)}
+              onClick={() => navigate(agencySettingsSubscriptionPath)}
             >
               <div className="flex flex-row justify-center items-center gap-3">
                 <SparklesIcon className="size-4" strokeWidth={2} />

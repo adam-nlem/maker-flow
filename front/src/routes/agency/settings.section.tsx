@@ -1,19 +1,19 @@
 import type { ReactNode } from "react";
 import { Navigate, useParams } from "react-router-dom";
-import { settingsGeneralPath } from "~/routes/routePaths";
+import { agencySettingsGeneralPath } from "~/routes/routePaths";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import GeneralSettings from "~/components/settings/GeneralSettings";
 import ProjectsSettings from "~/components/settings/ProjectsSettings";
 import SubscriptionSettings from "~/components/settings/SubscriptionSettings";
 
-export default function SettingsSectionRoute() {
+export default function AgencySettingsSectionRoute() {
     const { section } = useParams();
     const { projects } = useListPaginatedProjects();
     const { focusedProjectUuid } = useSelectFocusedProject({ projects });
     const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null;
 
-    if (!section) return <Navigate to={settingsGeneralPath} replace />;
+    if (!section) return <Navigate to={agencySettingsGeneralPath} replace />;
     if (!focusedProject) return null;
 
     const sectionNodes: Record<string, ReactNode> = {
@@ -23,6 +23,6 @@ export default function SettingsSectionRoute() {
     };
 
     const node = sectionNodes[section];
-    if (!node) return <Navigate to={settingsGeneralPath} replace />;
+    if (!node) return <Navigate to={agencySettingsGeneralPath} replace />;
     return node;
 }

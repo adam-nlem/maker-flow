@@ -9,30 +9,29 @@ This document describes the coding conventions, patterns, and best practices use
 ## Project Structure
 
 ```
-front/app/
+front/src/
 ├── components/           # Reusable UI components
+│   ├── agency/           # Agency-shell-only components (e.g. AgencyShellLayout)
+│   ├── auth/             # Auth helpers (RootRedirect, AuthStepLayout, forms)
+│   ├── client-portal/    # Client-shell-only components (e.g. ClientShellLayout)
 │   ├── insights/         # Insights feature components
 │   ├── projects/         # Project feature components
-│   ├── sidebar/          # Sidebar components
+│   ├── sidebar/          # Sidebar primitives (Desktop/Mobile)
 │   ├── tasks/            # Tasks feature components
 │   └── ui/               # Generic UI components
 ├── hooks/                # Custom React hooks
 │   └── api/              # API-related hooks (React Query)
-│       ├── integrations/
-│       ├── posts/
-│       ├── projects/
-│       ├── todoLists/
-│       └── users/
 ├── models/               # Data models (classes)
 │   ├── dtos/             # DTO interfaces
 │   └── enums/            # TypeScript enums
 ├── routes/               # Route components (pages)
+│   ├── agency/           # Pages under /agency/*
+│   ├── client/           # Pages under /client/*
+│   ├── (flat files)      # Public/auth pages + ProtectedLayout/PrelaunchGuardLayout
+│   └── routePaths.ts     # Centralised path constants
 ├── services/             # External services
 │   └── httpClient/       # Axios HTTP client
 ├── stores/               # Zustand state stores
-│   ├── project/
-│   ├── sidebar/
-│   └── insights/
 └── utils/                # Utility functions
 ```
 
@@ -748,7 +747,7 @@ export class NotFoundException extends CustomHttpException {
 
 ### Route Configuration
 
-Routes are defined in `app/router.tsx` using `createBrowserRouter` from `react-router-dom`:
+Routes are defined in `src/router.tsx` using `createBrowserRouter` from `react-router-dom`. The protected tree is split into two **shells** — one for agency users, one for clients — each with its own layout that asserts the role:
 
 ```tsx
 import { createBrowserRouter } from "react-router-dom";
@@ -764,14 +763,26 @@ export const router = createBrowserRouter([
                 element: <ProtectedLayout />,
                 errorElement: <ErrorBoundary />,
                 children: [
-                    { index: true, element: <HomePage /> },
-                    { path: tasksPath, element: <TasksPage /> },
-                    { path: insightsPath, element: <InsightsPage /> },
+                    { index: true, element: <RootRedirect /> },
+                    {
+                        element: <AgencyShellLayout />,
+                        children: [
+                            { path: agencyHomePath, element: <AgencyHomePage /> },
+                            { path: agencyTasksPath, element: <AgencyTasksPage /> },
+                            // ...
+                        ],
+                    },
+                    {
+                        element: <ClientShellLayout />,
+                        children: [
+                            { path: clientHomePath, element: <ClientHomePage /> },
+                        ],
+                    },
                 ],
             },
         ],
     },
-], { basename: "/maker-flow" });
+]);
 ```
 
 ### Protected Layout
@@ -798,26 +809,37 @@ export default function ProtectedLayout() {
 ### Conventions
 
 1. **Layout components** for shared UI (sidebar, auth checks)
-2. **Protected routes** wrapped in auth-checking layout
+2. **Protected routes** wrapped in auth-checking layout (`ProtectedLayout`) and then in a **shell layout** (`AgencyShellLayout` or `ClientShellLayout`) that asserts the role
 3. **Redirect to login** if not authenticated
 4. **Show loading** while checking auth state
-5. **Feature routes** are top-level paths under the protected layout (e.g., `/tasks`, `/insights`)
+5. **Feature routes** live under their shell prefix (e.g. `/agency/tasks`, `/agency/contents`); files live under `routes/agency/` or `routes/client/`
+6. **Public/auth routes** stay flat at the root of `routes/` (`login.tsx`, `register.tsx`, `verify-otp.tsx`, etc.)
 
 ### Route Path Constants
 
-All route paths are defined as camelCase constants in `app/routes/routePaths.ts`. Never hardcode route paths as strings — always import and use the constant.
+All route paths are defined as camelCase constants in `src/routes/routePaths.ts`. Never hardcode route paths as strings — always import and use the constant. Shell-scoped paths are prefixed with the shell name (`agency*Path`, `client*Path`) and derived from a single area-prefix constant per shell:
 
 ```tsx
-// app/routes/routePaths.ts
-export const loginPath = '/login'
-export const settingsSubscriptionPath = '/settings/subscription'
+// src/routes/routePaths.ts
+export const homePath = '/'  // smart redirect entry — RootRedirect dispatches by role
+
+export const agencyAreaPrefix = '/agency'
+export const agencyHomePath = agencyAreaPrefix
+export const agencyTasksPath = `${agencyAreaPrefix}/tasks`
+export const agencySettingsSubscriptionPath = `${agencyAreaPrefix}/settings/subscription`
+
+export const clientAreaPrefix = '/client'
+export const clientHomePath = clientAreaPrefix
+
+// Dynamic helper
 export function insightsPostDetailPath(postUuid: string): string {
-    return `/insights/posts/${postUuid}`
+    return `${agencyAreaPrefix}/insights/posts/${postUuid}`
 }
 
 // Usage
-import { loginPath } from "~/routes/routePaths"
-navigate(loginPath, { replace: true })
+import { agencyTasksPath, homePath } from "~/routes/routePaths"
+navigate(agencyTasksPath, { replace: true })
+navigate(homePath)  // public callers stay role-agnostic; RootRedirect dispatches
 ```
 
 ---

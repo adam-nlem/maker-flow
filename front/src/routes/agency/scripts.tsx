@@ -1,8 +1,8 @@
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import TodoListDashboardView from "~/components/tasks/TodoListDashboardView";
+import ScriptPageView from "~/components/scripts/ScriptPageView";
 
-export default function TasksPage() {
+export default function AgencyScriptsPage() {
   const { projects } = useListPaginatedProjects()
   const { focusedProjectUuid } = useSelectFocusedProject({ projects })
   const focusedProject = projects.find((p) => p.uuid === focusedProjectUuid) ?? null
@@ -10,7 +10,7 @@ export default function TasksPage() {
   return (
     <>
       {focusedProject && (
-        <TodoListDashboardView projectUuid={focusedProject.uuid} />
+        <ScriptPageView projectUuid={focusedProject.uuid} />
       )}
     </>
   );

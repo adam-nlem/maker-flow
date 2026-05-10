@@ -1,5 +1,5 @@
 import SettingsPageView from "~/components/settings/SettingsPageView";
 
-export default function SettingsLayout() {
+export default function AgencySettingsLayout() {
     return <SettingsPageView />;
 }

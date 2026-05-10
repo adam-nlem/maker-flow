@@ -2,7 +2,7 @@
 
 ## Overview
 
-The home page (`/`) is a two-column view. The left column holds the analytics content (aggregated overview KPIs, per-integration metric cards, views evolution chart, engagement comparison, ranked top posts). The right column holds a persistent Scripts summary panel. All home-page analytics come from a single REST endpoint (`/api/integration-insights`); the Scripts panel uses `/api/scripts`.
+The home page (`/agency`) is a two-column view. The left column holds the analytics content (aggregated overview KPIs, per-integration metric cards, views evolution chart, engagement comparison, ranked top posts). The right column holds a persistent Scripts summary panel. All home-page analytics come from a single REST endpoint (`/api/integration-insights`); the Scripts panel uses `/api/scripts`.
 
 ## Layout
 
@@ -96,9 +96,9 @@ Props: `integrationUuid`
 Right-column summary panel listing the project's scripts grouped into 3 logical status groups. Fetches scripts via `useListPaginatedScripts({ projectUuid, limit: 100 })` (one-page fetch — the per-project limit is already enforced by the subscription plan) and groups them client-side using `groupScriptsByStatusGroup` (from `~/utils/scriptHelpers`). Within each group, scripts are sorted by `updatedAt ?? createdAt` DESC so the list behaves like a "recent activity" feed. The subscription limit check uses `isScriptLimitReached` (from `~/utils/subscriptionHelpers`), shared with `ScriptListPanel`.
 
 The panel contains:
-- **Header** — "Scripts" title + `+ Nouveau` Pill button. Clicking the button reuses the `useCreateScript` + `useFocusScriptStore.setFocusedScriptUuid` flow from `ScriptListPanel`, then navigates to `/scripts` so the user lands directly in the editor. The button is hidden when the subscription script limit is reached (same check as `ScriptListPanel`).
+- **Header** — "Scripts" title + `+ Nouveau` Pill button. Clicking the button reuses the `useCreateScript` + `useFocusScriptStore.setFocusedScriptUuid` flow from `ScriptListPanel`, then navigates to `/agency/scripts` so the user lands directly in the editor. The button is hidden when the subscription script limit is reached (same check as `ScriptListPanel`).
 - **HomeScriptsPanelStatsBar** — 3 colored count labels (`4 idées`, `6 en cours`, `3 terminés`) and a segmented progress bar whose segments flex-grow proportionally to their group counts. Falls back to a flat `bg-light-gray` bar when the total is 0.
-- **HomeScriptsPanelSection** (× 3) — Collapsible sections for `InProgress`, `Idea`, `Done` (in that order). `InProgress` and `Idea` default to open; `Done` defaults to collapsed. Each row is a `HomeScriptRow`. Clicking a row focuses the script via `setFocusedScriptUuid` and navigates to `/scripts`.
+- **HomeScriptsPanelSection** (× 3) — Collapsible sections for `InProgress`, `Idea`, `Done` (in that order). `InProgress` and `Idea` default to open; `Done` defaults to collapsed. Each row is a `HomeScriptRow`. Clicking a row focuses the script via `setFocusedScriptUuid` and navigates to `/agency/scripts`.
 
 The 3 groups are defined in `src/models/enums/ScriptStatusGroup.ts`:
 - **Idées** = `ScriptStatus.Idea`

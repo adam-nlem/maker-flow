@@ -11,7 +11,7 @@ import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import { ScriptStatusGroup } from "~/models/enums/ScriptStatusGroup";
-import { scriptsPath } from "~/routes/routePaths";
+import { agencyScriptsPath } from "~/routes/routePaths";
 import { groupScriptsByStatusGroup, computeScriptGroupCounts } from "~/utils/scriptHelpers";
 import { isScriptLimitReached } from "~/utils/subscriptionHelpers";
 import HomeScriptsPanelStatsBar from "./HomeScriptsPanelStatsBar";
@@ -36,12 +36,12 @@ export default function HomeScriptsPanel({ projectUuid }: HomeScriptsPanelProps)
     const handleNewScript = async () => {
         const newScript = await createScript({ projectUuid, title: t("home:scripts.newScriptTitle") });
         setFocusedScriptUuid(newScript.uuid);
-        navigate(scriptsPath);
+        navigate(agencyScriptsPath);
     };
 
     const handleTileClick = (script: Script) => {
         setFocusedScriptUuid(script.uuid);
-        navigate(scriptsPath);
+        navigate(agencyScriptsPath);
     };
 
     return (

@@ -1,5 +1,5 @@
 import { useNavigate } from "react-router-dom";
-import { scriptsPath } from "~/routes/routePaths";
+import { agencyScriptsPath } from "~/routes/routePaths";
 import type { Script } from "~/models/Script";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import ModalOverlay from "~/components/ui/ModalOverlay";
@@ -19,7 +19,7 @@ export default function ScriptDetailModal({ script, projectUuid, onClose }: Scri
 
     const handleOpenEditor = () => {
         setFocusedScriptUuid(script.uuid);
-        navigate(scriptsPath);
+        navigate(agencyScriptsPath);
         onClose();
     };
 

@@ -1,3 +1,6 @@
+import { Agency } from "./Agency"
+import { UserRole } from "./enums/UserRole"
+
 interface UserJSON {
     uuid: string;
     firstName: string | null;
@@ -6,6 +9,9 @@ interface UserJSON {
     createdAt: string;
     verifiedAt: string | null;
     referralCode: string | null;
+    role: string | null;
+    clientProjectUuid: string | null;
+    agency: ReturnType<Agency["toJSON"]> | null;
 }
 
 export class User {
@@ -17,6 +23,9 @@ export class User {
         public readonly createdAt: Date,
         public readonly verifiedAt: Date | null,
         public readonly referralCode: string | null,
+        public readonly role: UserRole | null,
+        public readonly clientProjectUuid: string | null,
+        public readonly agency: Agency | null,
     ) { }
 
     static fromJSON(json: UserJSON): User {
@@ -28,6 +37,9 @@ export class User {
             new Date(json.createdAt),
             json.verifiedAt ? new Date(json.verifiedAt) : null,
             json.referralCode ?? null,
+            json.role ? (json.role as UserRole) : null,
+            json.clientProjectUuid ?? null,
+            json.agency ? Agency.fromJSON(json.agency) : null,
         );
     }
 
@@ -40,6 +52,9 @@ export class User {
             createdAt: this.createdAt.toISOString(),
             verifiedAt: this.verifiedAt?.toISOString() ?? null,
             referralCode: this.referralCode,
+            role: this.role,
+            clientProjectUuid: this.clientProjectUuid,
+            agency: this.agency?.toJSON() ?? null,
         };
     }
 
@@ -53,5 +68,9 @@ export class User {
 
     get isPrelaunchSubscriber(): boolean {
         return this.referralCode !== null;
+    }
+
+    get isClient(): boolean {
+        return this.role === UserRole.Client;
     }
 }
