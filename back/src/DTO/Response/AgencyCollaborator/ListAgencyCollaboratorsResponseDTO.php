@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DTO\Response\Agency;
+namespace App\DTO\Response\AgencyCollaborator;
 
 use App\DTO\Response\ResponseDTOInterface;
 
-class ListCollaboratorsResponseDTO implements ResponseDTOInterface
+class ListAgencyCollaboratorsResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
         private readonly iterable $collaborators,

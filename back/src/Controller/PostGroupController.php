@@ -6,6 +6,7 @@ use App\DTO\QueryParam\PostGroup\ListPostGroupsQueryParamDTO;
 use App\DTO\QueryParam\PostGroup\RankPostGroupsQueryParamDTO;
 use App\DTO\Request\PostGroup\CreatePostGroupRequestDTO;
 use App\DTO\Request\PostGroup\UpdatePostGroupRequestDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\PostGroup;
 use App\Entity\User;
 use App\Exception\Agency\MissingAgencyException;
@@ -32,7 +33,7 @@ final class PostGroupController extends AbstractController
     public function __construct(private PostGroupService $service) {}
 
     #[Route('', name: 'api_post_groups_list', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function list(
         ListPostGroupsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
@@ -61,7 +62,7 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('/{postGroupUuid}', name: 'api_post_groups_show', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function show(string $postGroupUuid, PostGroupRepository $postGroupRepository): JsonResponse
     {
         /** @var User $user */
@@ -81,7 +82,7 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('/rank', name: 'api_post_groups_rank', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function rank(
         RankPostGroupsQueryParamDTO $queryParamDto,
         AgencyRepository $agencyRepository,
@@ -117,7 +118,7 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('', name: 'api_post_groups_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreatePostGroupRequestDTO $dto,
         ProjectRepository $projectRepository,
@@ -156,7 +157,7 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('/{postGroupUuid}', name: 'api_post_groups_update', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $postGroupUuid,
         UpdatePostGroupRequestDTO $dto,
@@ -226,7 +227,7 @@ final class PostGroupController extends AbstractController
     }
 
     #[Route('/{postGroupUuid}', name: 'api_post_groups_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(
         string $postGroupUuid,
         PostGroupRepository $postGroupRepository,

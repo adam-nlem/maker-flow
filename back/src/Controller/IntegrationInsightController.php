@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\DTO\QueryParam\IntegrationInsight\ListIntegrationInsightsQueryParamDTO;
 use App\DTO\QueryParam\IntegrationInsight\ShowIntegrationDetailQueryParamDTO;
@@ -20,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class IntegrationInsightController extends AbstractController
 {
     #[Route('', name: 'api_integration_insights_list', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function list(
         ListIntegrationInsightsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,

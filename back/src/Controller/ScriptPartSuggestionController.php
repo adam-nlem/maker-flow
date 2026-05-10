@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\ScriptPartSuggestion\ListScriptPartSuggestionsQueryParamDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\Script\ScriptNotFoundException;
 use App\Exception\ScriptPartSuggestion\ScriptPartSuggestionNotFoundException;
@@ -20,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ScriptPartSuggestionController extends AbstractController
 {
     #[Route('', name: 'api_script_part_suggestions_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListScriptPartSuggestionsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -48,7 +49,7 @@ final class ScriptPartSuggestionController extends AbstractController
     }
 
     #[Route('/{suggestionUuid}/accept', name: 'api_script_part_suggestions_accept', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function accept(
         string $suggestionUuid,
         ScriptPartSuggestionRepository $scriptPartSuggestionRepository,
@@ -73,7 +74,7 @@ final class ScriptPartSuggestionController extends AbstractController
     }
 
     #[Route('/{suggestionUuid}/reject', name: 'api_script_part_suggestions_reject', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function reject(
         string $suggestionUuid,
         ScriptPartSuggestionRepository $scriptPartSuggestionRepository,

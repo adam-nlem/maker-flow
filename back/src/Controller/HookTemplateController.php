@@ -25,7 +25,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class HookTemplateController extends AbstractController
 {
     #[Route('', name: 'api_hook_templates_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListHookTemplatesQueryParamDTO $queryParamDto,
         AgencyRepository $agencyRepository,
@@ -57,7 +57,7 @@ final class HookTemplateController extends AbstractController
     }
 
     #[Route('/placeholders', name: 'api_hook_templates_placeholders', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function placeholders(): JsonResponse
     {
         $placeholders = array_map(
@@ -69,7 +69,7 @@ final class HookTemplateController extends AbstractController
     }
 
     #[Route('', name: 'api_hook_templates_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateHookTemplateRequestDTO $dto,
         AgencyRepository $agencyRepository,
@@ -101,7 +101,7 @@ final class HookTemplateController extends AbstractController
     }
 
     #[Route('/{hookTemplateUuid}', name: 'api_hook_templates_update', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $hookTemplateUuid,
         UpdateHookTemplateRequestDTO $dto,
@@ -142,7 +142,7 @@ final class HookTemplateController extends AbstractController
     }
 
     #[Route('/{hookTemplateUuid}', name: 'api_hook_templates_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(
         string $hookTemplateUuid,
         HookTemplateRepository $hookTemplateRepository,

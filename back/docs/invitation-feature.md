@@ -69,56 +69,76 @@ Both extend `AbstractEmailTemplate` and reuse the existing `SendEmailMessage` / 
 | 29003 | `InvitationAlreadyUsedException` | 422 | `usedAt` is already set |
 | 29004 | `EmailAlreadyUsedException` | 409 | A `User` with that email already exists |
 | 29005 | `InvalidInvitationRoleException` | 422 | Role is not `ROLE_EDITOR` or `ROLE_VIEWER` |
+| 29006 | `InvalidInvitationTypeException` | 422 | `type` is missing or not one of `collaborator` / `client` |
+| 29007 | `InvalidInvitationProjectException` | 422 | `type=client` but `projectUuid` is missing |
 
 `InvitationException` (abstract) returns `DomainCode::Invitation = 29`.
 
-### Request DTOs (`DTO/Request/Invitation/`)
+### Request DTOs
 
-- `CreateCollaboratorInvitationRequestDTO` — fields: `firstName`, `lastName`, `email`, `role` (string `ROLE_EDITOR` or `ROLE_VIEWER`)
-- `CreateClientInvitationRequestDTO` — fields: `firstName`, `lastName`, `email`
-- `CompleteInvitationRequestDTO` — field: `password`
+- `App\DTO\Request\Invitation\CreateInvitationRequestDTO` — fields: `type` (`?InvitationType` via `tryFrom`), `email` (`Assert\NotBlank` + `Assert\Email`), `firstName`, `lastName` (both `Assert\NotBlank`), `role` (`?UserRole` via `tryFrom`, required for `type=collaborator`), `projectUuid` (`?string` with `Assert\Uuid` when present, required for `type=client`).
+- `App\DTO\Request\Invitation\CompleteInvitationRequestDTO` — field: `password`.
+
+### Query-param DTOs
+
+- `App\DTO\QueryParam\ProjectClient\ListProjectClientsQueryParamDTO` — single field `projectUuid` (`Assert\NotBlank` + `Assert\Uuid`). Drives `GET /api/projects/clients`.
+
+### Response DTOs
+
+- `App\DTO\Response\AgencyCollaborator\ListAgencyCollaboratorsResponseDTO` — wraps `{collaborators, pendingInvitations}` for `GET /api/agencies/collaborators`.
+- `App\DTO\Response\ProjectClient\ListProjectClientsResponseDTO` — wraps `{clients, pendingInvitations}` for `GET /api/projects/clients`.
 
 ### Serialization groups
 
 Responses are produced by Symfony's serializer using groups declared on the entities — no per-shape response DTO. The relevant groups:
 
 - `api_invitation_show` — used by the public summary endpoint (`GET /api/invitations/{token}`). Tagged on `Invitation` (uuid, type, email, firstName, lastName, role, expiresAt, createdAt, agency, project, createdBy), `Agency.name` + `Agency.brandColor`, `Project.name`, `User.firstName` + `User.lastName` (so the `createdBy` sub-object only exposes a display name).
-- `api_invitation_create` — used by the create-invitation responses (`POST /api/agencies/collaborators` and `POST /api/projects/{projectUuid}/clients`). Tagged on the same properties as `api_invitation_show` so the response shape matches.
+- `api_invitation_create` — used by the create-invitation responses (`POST /api/agencies/collaborators` and `POST /api/projects/clients`). Tagged on the same properties as `api_invitation_show` so the response shape matches.
 - `api_invitations_list` — used by the listing endpoints for pending rows. Tagged on `Invitation` (uuid, email, firstName, lastName, role, expiresAt, createdAt). Relations are intentionally not tagged so listings stay flat.
 - `api_collaborators_list` — tagged on `User` (uuid, firstName, lastName, email, roles).
 - `api_clients_list` — tagged on `User` (uuid, firstName, lastName, email). No role since clients are uniformly `ROLE_CLIENT`.
 
 ## API Endpoints
 
-### Public — `InvitationController` (`/api/invitations`)
+### `InvitationController` (`/api/invitations`)
 
 | Endpoint | Method | Route Name | Auth | Description |
 |----------|--------|------------|------|-------------|
+| `/api/invitations` | POST | `api_invitations_create` | `ROLE_USER` (per-type checks below) | Unified create endpoint. Body: `CreateInvitationRequestDTO`. Branches on `type`: `collaborator` requires `ROLE_ADMIN` and the inviter's agency, `client` requires `ROLE_EDITOR` + `ProjectVoter::MANAGE_CLIENT` on `projectUuid`. Returns 201 + invitation (`api_invitation_create`). |
 | `/api/invitations/{token}` | GET | `api_invitations_show` | Public | Returns the invitation serialized with `api_invitation_show` |
 | `/api/invitations/{token}/complete` | POST | `api_invitations_complete` | Public | Completes setup, creates the user, returns user JSON (`api_user_me`) + sets `X-API-TOKEN` cookie |
 
-Both routes are listed in `TokenAuthenticator::EXCLUDED_ROUTES` and whitelisted by `^/api/invitations/` in `security.yaml`'s `access_control`.
+Public routes (`show`, `complete`) are listed in `TokenAuthenticator::EXCLUDED_ROUTES` and whitelisted by `^/api/invitations/` in `security.yaml`'s `access_control`. The `create` action is authenticated and goes through `TokenAuthenticator` like every other authenticated endpoint.
 
-### Agency-scoped — `AgencyController` (`/api/agencies`)
+### Agency creation — `AgencyController` (`/api/agencies`)
 
 | Endpoint | Method | Route Name | Auth | Description |
 |----------|--------|------------|------|-------------|
 | `/api/agencies` | POST | `api_agencies_create` | `ROLE_ADMIN` | Onboarding step: admin creates their agency. Body: `{name, brandColor?, contactEmail?, website?}`. 409 `27002` if the user already has one. |
-| `/api/agencies/collaborators` | GET | `api_agencies_collaborators_list` | `ROLE_VIEWER` | `{collaborators: [...], pendingInvitations: [...]}` (groups: `api_collaborators_list`, `api_invitations_list`) |
-| `/api/agencies/collaborators` | POST | `api_agencies_collaborators_invite` | `ROLE_ADMIN` | Invite a new collaborator |
-| `/api/agencies/collaborators/{userUuid}` | DELETE | `api_agencies_collaborators_remove` | `ROLE_ADMIN` | Soft-unlink + revoke tokens |
 
-`ROLE_ADMIN` is granted to every newly-registered user (`UserController::register` calls `$user->setRole(UserRole::Admin)`), so the registration flow naturally feeds the agency-creation step. Collaborators / clients arrive via invitations and never get `ROLE_ADMIN`. The agency is resolved with `AgencyRepository::getByCollaborator($user)` and throws `MissingAgencyException` (27001) if the user is not attached to one.
+`ROLE_ADMIN` is granted to every newly-registered user (`UserController::register` calls `$user->setRole(UserRole::Admin)`), so the registration flow naturally feeds the agency-creation step. Collaborators / clients arrive via invitations and never get `ROLE_ADMIN`.
 
-### Project-scoped — `ProjectController` (`/api/projects`)
+### Agency collaborators — `AgencyCollaboratorController` (`/api/agencies/collaborators`)
+
+| Endpoint | Method | Route Name | Auth | Description |
+|----------|--------|------------|------|-------------|
+| `/api/agencies/collaborators` | GET | `api_agencies_collaborators_list` | `ROLE_VIEWER` | `{collaborators: [...], pendingInvitations: [...]}` via `ListAgencyCollaboratorsResponseDTO` (groups: `api_collaborators_list`, `api_invitations_list`) |
+| `/api/agencies/collaborators/{userUuid}` | DELETE | `api_agencies_collaborators_remove` | `ROLE_ADMIN` | Soft-unlink + revoke tokens. 404 `31001` (`AgencyCollaboratorNotFoundException`) if the user isn't a collaborator of the current agency. |
+
+Inviting a collaborator now lives on `POST /api/invitations` with `type=collaborator` (see the `InvitationController` section above).
+
+The agency is resolved with `AgencyRepository::getByCollaborator($user)` and throws `MissingAgencyException` (27001) if the user is not attached to one.
+
+### Project clients — `ProjectClientController` (`/api/projects/clients`)
 
 | Endpoint | Method | Route Name | Auth | Voter | Description |
 |----------|--------|------------|------|-------|-------------|
-| `/api/projects/{projectUuid}/clients` | GET | `api_projects_clients_list` | `ROLE_VIEWER` | `ProjectVoter::VIEW` | `{clients: [...], pendingInvitations: [...]}` (groups: `api_clients_list`, `api_invitations_list`) |
-| `/api/projects/{projectUuid}/clients` | POST | `api_projects_clients_invite` | `ROLE_EDITOR` | `ProjectVoter::MANAGE_CLIENT` | Invite a client |
-| `/api/projects/{projectUuid}/clients/{clientUserUuid}` | DELETE | `api_projects_clients_remove` | `ROLE_EDITOR` | `ProjectVoter::MANAGE_CLIENT` | Soft-unlink + revoke tokens. 404 `17006` if the user is not a client of this project. |
+| `/api/projects/clients?projectUuid={uuid}` | GET | `api_projects_clients_list` | `ROLE_VIEWER` | `ProjectVoter::VIEW` | Driven by `ListProjectClientsQueryParamDTO`. Returns `{clients, pendingInvitations}` via `ListProjectClientsResponseDTO` (groups: `api_clients_list`, `api_invitations_list`). |
+| `/api/projects/clients/{clientUserUuid}` | DELETE | `api_projects_clients_remove` | `ROLE_EDITOR` | `ProjectVoter::MANAGE_CLIENT` | Soft-unlink + revoke tokens. 404 `30001` (`ProjectClientNotFoundException`) if the user has no project. The voter on `target.project` enforces cross-agency access. |
 
-`ROLE_VIEWER` excludes `ROLE_CLIENT` per the role hierarchy (`ROLE_CLIENT` only inherits `ROLE_USER`), so clients cannot list members.
+Inviting a client now lives on `POST /api/invitations` with `type=client` (see the `InvitationController` section above).
+
+`ROLE_VIEWER` excludes `ROLE_CLIENT` per the role hierarchy (`ROLE_CLIENT` only inherits `ROLE_USER`), so clients cannot list members. Path / body / query-string layout follows the codebase convention: parent UUIDs are passed in the body or query string, never in the path; only the resource being acted on (DELETE target) is identified by a path-param UUID.
 
 ## End-to-end Flow
 
@@ -128,21 +148,21 @@ Both routes are listed in `TokenAuthenticator::EXCLUDED_ROUTES` and whitelisted 
 3. `POST /api/agencies` `{name, brandColor?, contactEmail?, website?}` → agency persisted, user linked, welcome credits granted, returned via `api_agency_create`.
 
 ### Collaborator
-1. Admin: `POST /api/agencies/collaborators` `{firstName, lastName, email, role: 'ROLE_EDITOR'}` → 201 + invitation entity (`api_invitation_create`)
+1. Admin: `POST /api/invitations` `{type: 'collaborator', firstName, lastName, email, role: 'ROLE_EDITOR'}` → 201 + invitation entity (`api_invitation_create`)
 2. `SendEmailMessage` is dispatched, the worker emails `{FRONTEND_URL}/invite/{token}`
 3. Public: `GET /api/invitations/{token}` → 200 with the invitation serialized via `api_invitation_show`
 4. Public: `POST /api/invitations/{token}/complete` `{password}` → 200 with `User`, `Set-Cookie: X-API-TOKEN`
 5. Resulting `User` has `roles` containing `ROLE_EDITOR`, `agency_id` set, `verified_at` populated; `Invitation.used_at` populated
 
 ### Client
-1. Editor: `POST /api/projects/{projectUuid}/clients` `{firstName, lastName, email}` → 201 + invitation
+1. Editor: `POST /api/invitations` `{type: 'client', firstName, lastName, email, projectUuid}` → 201 + invitation
 2. Email goes out with the agency's `brandColor` accent
 3. Same public flow → resulting `User` has `project_id` set, `roles` contains `ROLE_CLIENT`, `agency_id` is `NULL`
 
 ### Removal
 - `DELETE /api/agencies/collaborators/{uuid}` → `agency_id = NULL` for the target, all their `Token` rows are deleted (next request fails `TokenAuthenticator`)
-- `DELETE /api/projects/{projectUuid}/clients/{uuid}` → `project_id = NULL`, tokens deleted
+- `DELETE /api/projects/clients/{uuid}` → `project_id = NULL`, tokens deleted
 
 ## Migration
 
-`Version20260509142707` creates the `invitation` table (UUID, token unique index, FK to agency/project/user). No data migration — there are no pre-existing invitations.
+`Version20260510091238` creates the `invitation` table (UUID, token unique index, FK to agency/project/user). No data migration — there are no pre-existing invitations.

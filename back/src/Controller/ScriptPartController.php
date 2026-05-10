@@ -6,6 +6,7 @@ use App\DTO\QueryParam\ScriptPart\ListScriptPartsQueryParamDTO;
 use App\DTO\Request\ScriptPart\CreateScriptPartRequestDTO;
 use App\DTO\Request\ScriptPart\ReorderScriptPartsRequestDTO;
 use App\DTO\Request\ScriptPart\UpdateScriptPartRequestDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\Script\ScriptNotFoundException;
 use App\Exception\ScriptPart\ScriptPartNotFoundException;
@@ -23,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ScriptPartController extends AbstractController
 {
     #[Route('', name: 'api_script_parts_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListScriptPartsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -48,7 +49,7 @@ final class ScriptPartController extends AbstractController
     }
 
     #[Route('', name: 'api_script_parts_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateScriptPartRequestDTO $dto,
         ScriptRepository $scriptRepository,
@@ -79,7 +80,7 @@ final class ScriptPartController extends AbstractController
     }
 
     #[Route('/reorder', name: 'api_script_parts_reorder', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function reorder(
         ReorderScriptPartsRequestDTO $dto,
         ScriptRepository $scriptRepository,
@@ -114,7 +115,7 @@ final class ScriptPartController extends AbstractController
     }
 
     #[Route('/{partUuid}', name: 'api_script_parts_update', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $partUuid,
         UpdateScriptPartRequestDTO $dto,
@@ -145,7 +146,7 @@ final class ScriptPartController extends AbstractController
     }
 
     #[Route('/{partUuid}', name: 'api_script_parts_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(
         string $partUuid,
         ScriptPartRepository $scriptPartRepository,

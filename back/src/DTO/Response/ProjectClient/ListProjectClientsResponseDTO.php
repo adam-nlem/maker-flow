@@ -1,10 +1,10 @@
 <?php
 
-namespace App\DTO\Response\Project;
+namespace App\DTO\Response\ProjectClient;
 
 use App\DTO\Response\ResponseDTOInterface;
 
-class ListClientsResponseDTO implements ResponseDTOInterface
+class ListProjectClientsResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
         private readonly iterable $clients,

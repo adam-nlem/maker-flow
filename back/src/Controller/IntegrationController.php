@@ -12,6 +12,7 @@ use App\Entity\Enum\Platform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Enum\OAuthCallbackStatus;
 use App\Entity\Enum\OAuthErrorCode;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\Integration\IntegrationAlreadyExistsException;
 use App\Exception\Integration\IntegrationNotFoundException;
@@ -40,7 +41,7 @@ final class IntegrationController extends AbstractController
     }
 
     #[Route('', name: 'api_integrations_list', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function list(
         ListIntegrationsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
@@ -200,7 +201,7 @@ final class IntegrationController extends AbstractController
     }
 
     #[Route('/{integrationUuid}', name: 'api_integrations_show', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function show(string $integrationUuid, IntegrationRepository $integrationRepository): JsonResponse
     {
         /** @var User $user */

@@ -8,3 +8,4 @@
 - Before doing a front-end change, always check the front/docs/ui-style-guidelines.md file.
 - When you complete a task, always generate/keep up-to-date the relevant documentation files in front/docs for frontend and back/docs for backend and create the file if it doesn't exist and update the README.md file if needed. And update the back/docs/makerflow-api.postman_collection.json when you made changes on the API
 - Commands should be executed in docker containers like this "dce back [command]"
+- Everytime you finish generating some code you have to give me a commit message that describes all the pending modifications. don't commit the code, just give me the message in the chat 

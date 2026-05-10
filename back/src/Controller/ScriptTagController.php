@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\DTO\QueryParam\ScriptTag\ListScriptTagsQueryParamDTO;
 use App\DTO\Request\ScriptTag\CreateScriptTagRequestDTO;
 use App\DTO\Request\ScriptTag\UpdateScriptTagRequestDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\ScriptTag;
 use App\Entity\User;
 use App\Exception\Project\ProjectNotFoundException;
@@ -23,7 +24,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ScriptTagController extends AbstractController
 {
     #[Route('', name: 'api_scripts_tags_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListScriptTagsQueryParamDTO $queryParamDto,
         ScriptTagRepository $tagRepository,
@@ -52,7 +53,7 @@ final class ScriptTagController extends AbstractController
     }
 
     #[Route('', name: 'api_scripts_tags_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateScriptTagRequestDTO $dto,
         ProjectRepository $projectRepository,
@@ -84,7 +85,7 @@ final class ScriptTagController extends AbstractController
     }
 
     #[Route('/{tagUuid}', name: 'api_scripts_tags_update', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $tagUuid,
         UpdateScriptTagRequestDTO $dto,
@@ -117,7 +118,7 @@ final class ScriptTagController extends AbstractController
     }
 
     #[Route('/{tagUuid}', name: 'api_scripts_tags_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(string $tagUuid, ScriptTagRepository $tagRepository): JsonResponse
     {
         /** @var User $user */

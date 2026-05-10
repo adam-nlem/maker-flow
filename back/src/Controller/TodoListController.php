@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\DTO\QueryParam\TodoList\ListTodoListsQueryParamDTO;
 use App\DTO\Request\TodoList\CreateTodoListRequestDTO;
@@ -23,7 +24,7 @@ class TodoListController extends AbstractController
 {
 
     #[Route('', name: 'api_todo_lists_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListTodoListsQueryParamDTO $queryParamDto,
         TodoListRepository $todoListRepository,
@@ -48,7 +49,7 @@ class TodoListController extends AbstractController
     }
 
     #[Route('', name: 'api_todo_lists_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateTodoListRequestDTO $dto,
         ProjectRepository $projectRepository,
@@ -80,7 +81,7 @@ class TodoListController extends AbstractController
     }
 
     #[Route('/{todoListUuid}', name: 'api_todo_lists_update', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $todoListUuid,
         UpdateTodoListRequestDTO $dto,
@@ -109,7 +110,7 @@ class TodoListController extends AbstractController
     }
 
     #[Route('/{todoListUuid}', name: 'api_todo_lists_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(
         string $todoListUuid,
         TodoListRepository $todoListRepository,

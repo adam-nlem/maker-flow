@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\DTO\QueryParam\TodoListTag\ListTodoListTagsQueryParamDTO;
 use App\DTO\Request\TodoListTag\CreateTodoListTagRequestDTO;
@@ -24,7 +25,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class TodoListTagController extends AbstractController
 {
     #[Route('', name: 'api_todo_lists_tags_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListTodoListTagsQueryParamDTO $queryParamDto,
         TodoListTagRepository $tagRepository,
@@ -54,7 +55,7 @@ class TodoListTagController extends AbstractController
     }
 
     #[Route('', name: 'api_todo_lists_tags_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateTodoListTagRequestDTO $dto,
         TodoListRepository $todoListRepository,
@@ -86,7 +87,7 @@ class TodoListTagController extends AbstractController
     }
 
     #[Route('/{tagUuid}', name: 'api_todo_lists_tags_update', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $tagUuid,
         UpdateTodoListTagRequestDTO $dto,
@@ -120,7 +121,7 @@ class TodoListTagController extends AbstractController
     }
 
     #[Route('/{tagUuid}', name: 'api_todo_lists_tags_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(string $tagUuid, TodoListTagRepository $tagRepository)
     {
         /** @var User $user */

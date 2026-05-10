@@ -278,45 +278,20 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/projects/{{projectUuid}}/clients",
+              "raw": "{{baseUrl}}/api/projects/clients?projectUuid={{projectUuid}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "projects",
-                "{{projectUuid}}",
                 "clients"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Invite Project Client",
-          "id": "projects-clients-invite-0001-000000000002",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Casey\",\n  \"lastName\": \"Client\",\n  \"email\": \"client@example.com\"\n}"
-            },
-            "url": {
-              "raw": "{{baseUrl}}/api/projects/{{projectUuid}}/clients",
-              "host": [
-                "{{baseUrl}}"
               ],
-              "path": [
-                "api",
-                "projects",
-                "{{projectUuid}}",
-                "clients"
+              "query": [
+                {
+                  "key": "projectUuid",
+                  "value": "{{projectUuid}}"
+                }
               ]
             }
           },
@@ -329,14 +304,13 @@
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/projects/{{projectUuid}}/clients/{{clientUserUuid}}",
+              "raw": "{{baseUrl}}/api/projects/clients/{{clientUserUuid}}",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "api",
                 "projects",
-                "{{projectUuid}}",
                 "clients",
                 "{{clientUserUuid}}"
               ]
@@ -2973,6 +2947,62 @@
       "name": "Invitations",
       "item": [
         {
+          "name": "Create Collaborator Invitation",
+          "id": "invitations-create-collaborator-0001-000000000003",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"collaborator\",\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Doe\",\n  \"email\": \"alex@example.com\",\n  \"role\": \"ROLE_EDITOR\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/invitations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invitations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Client Invitation",
+          "id": "invitations-create-client-0001-000000000004",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"client\",\n  \"firstName\": \"Casey\",\n  \"lastName\": \"Client\",\n  \"email\": \"client@example.com\",\n  \"projectUuid\": \"{{projectUuid}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/invitations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invitations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Show Invitation (public)",
           "id": "invitations-show-0001-000000000001",
           "request": {
@@ -3062,35 +3092,6 @@
           "request": {
             "method": "GET",
             "header": [],
-            "url": {
-              "raw": "{{baseUrl}}/api/agencies/collaborators",
-              "host": [
-                "{{baseUrl}}"
-              ],
-              "path": [
-                "api",
-                "agencies",
-                "collaborators"
-              ]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Invite Collaborator",
-          "id": "agency-collaborators-invite-0001-000000000002",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Doe\",\n  \"email\": \"alex@example.com\",\n  \"role\": \"ROLE_EDITOR\"\n}"
-            },
             "url": {
               "raw": "{{baseUrl}}/api/agencies/collaborators",
               "host": [

@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\DTO\QueryParam\PostInsight\ShowPostInsightDetailQueryParamDTO;
 use App\Exception\Agency\MissingAgencyException;
@@ -22,7 +23,7 @@ final class PostInsightController extends AbstractController
 {
 
     #[Route('/detail', name: 'api_post_insights_detail', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function detail(
         ShowPostInsightDetailQueryParamDTO $queryParamDto,
         AgencyRepository $agencyRepository,

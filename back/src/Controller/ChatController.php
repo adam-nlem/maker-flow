@@ -6,6 +6,7 @@ use App\DTO\QueryParam\Chat\ListChatsQueryParamDTO;
 use App\DTO\Request\Chat\CreateChatRequestDTO;
 use App\DTO\Request\Chat\UpdateChatRequestDTO;
 use App\Entity\Chat;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\Chat\ChatNotFoundException;
 use App\Exception\Script\ScriptNotFoundException;
@@ -22,7 +23,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ChatController extends AbstractController
 {
     #[Route('', name: 'api_chats_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateChatRequestDTO $dto,
         ScriptRepository $scriptRepository,
@@ -54,7 +55,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('', name: 'api_chats_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListChatsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -83,7 +84,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('/{chatUuid}', name: 'api_chats_show', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function show(
         string $chatUuid,
         ChatRepository $chatRepository,
@@ -105,7 +106,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('/{chatUuid}', name: 'api_chats_update', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $chatUuid,
         UpdateChatRequestDTO $dto,
@@ -134,7 +135,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('/{chatUuid}', name: 'api_chats_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(
         string $chatUuid,
         ChatRepository $chatRepository,

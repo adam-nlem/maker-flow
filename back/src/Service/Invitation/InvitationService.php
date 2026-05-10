@@ -2,22 +2,27 @@
 
 namespace App\Service\Invitation;
 
-use App\Entity\Agency;
+use App\DTO\Request\Invitation\CreateInvitationRequestDTO;
 use App\Entity\Enum\InvitationType;
 use App\Entity\Enum\UserRole;
 use App\Entity\Invitation;
-use App\Entity\Project;
 use App\Entity\User;
+use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Invitation\EmailAlreadyUsedException;
+use App\Exception\Invitation\InvalidInvitationProjectException;
 use App\Exception\Invitation\InvalidInvitationRoleException;
+use App\Exception\Invitation\InvalidInvitationTypeException;
 use App\Exception\Invitation\InvitationAlreadyUsedException;
 use App\Exception\Invitation\InvitationExpiredException;
 use App\Exception\Invitation\InvitationNotFoundException;
+use App\Exception\Project\ProjectNotFoundException;
 use App\Exception\User\InvalidPasswordException;
 use App\Helper\DateHelper;
 use App\Helper\PasswordHelper;
 use App\Message\SendEmailMessage;
+use App\Repository\AgencyRepository;
 use App\Repository\InvitationRepository;
+use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Service\Mailing\Template\ClientWelcomeEmailTemplate;
 use App\Service\Mailing\Template\CollaboratorWelcomeEmailTemplate;
@@ -31,96 +36,20 @@ final class InvitationService
     public function __construct(
         private readonly InvitationRepository $invitationRepository,
         private readonly UserRepository $userRepository,
+        private readonly AgencyRepository $agencyRepository,
+        private readonly ProjectRepository $projectRepository,
         private readonly MessageBusInterface $messageBus,
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly string $frontendUrl,
     ) {}
 
-    public function createForCollaborator(
-        Agency $agency,
-        User $createdBy,
-        string $email,
-        string $firstName,
-        string $lastName,
-        UserRole $role,
-    ): Invitation {
-        if ($role !== UserRole::Editor && $role !== UserRole::Viewer) {
-            throw new InvalidInvitationRoleException();
-        }
-
-        if ($this->userRepository->getByEmail($email) !== null) {
-            throw new EmailAlreadyUsedException();
-        }
-
-        $this->invitationRepository->invalidatePendingForCollaborator($email, $agency);
-
-        $invitation = (new Invitation())
-            ->setType(InvitationType::Collaborator)
-            ->setToken($this->generateUniqueToken())
-            ->setEmail($email)
-            ->setFirstName($firstName)
-            ->setLastName($lastName)
-            ->setRole($role)
-            ->setAgency($agency)
-            ->setCreatedBy($createdBy)
-            ->setExpiresAt(DateHelper::createUtcDateTimeImmutable()->modify('+' . self::EXPIRATION_DAYS . ' days'));
-
-        $this->invitationRepository->save($invitation, true);
-
-        $template = new CollaboratorWelcomeEmailTemplate(
-            $email,
-            $firstName,
-            $agency->getName(),
-            trim(($createdBy->getFirstName() ?? '') . ' ' . ($createdBy->getLastName() ?? '')),
-            $this->getRoleLabel($role),
-            $this->buildSetupUrl($invitation->getToken()),
-        );
-
-        $this->messageBus->dispatch(new SendEmailMessage($template));
-
-        return $invitation;
-    }
-
-    public function createForClient(
-        Project $project,
-        User $createdBy,
-        string $email,
-        string $firstName,
-        string $lastName,
-    ): Invitation {
-        if ($this->userRepository->getByEmail($email) !== null) {
-            throw new EmailAlreadyUsedException();
-        }
-
-        $this->invitationRepository->invalidatePendingForClient($email, $project);
-
-        $agency = $project->getAgency();
-
-        $invitation = (new Invitation())
-            ->setType(InvitationType::Client)
-            ->setToken($this->generateUniqueToken())
-            ->setEmail($email)
-            ->setFirstName($firstName)
-            ->setLastName($lastName)
-            ->setAgency($agency)
-            ->setProject($project)
-            ->setCreatedBy($createdBy)
-            ->setExpiresAt(DateHelper::createUtcDateTimeImmutable()->modify('+' . self::EXPIRATION_DAYS . ' days'));
-
-        $this->invitationRepository->save($invitation, true);
-
-        $template = new ClientWelcomeEmailTemplate(
-            $email,
-            $firstName,
-            $agency->getName(),
-            $agency->getBrandColor(),
-            $agency->getContactEmail(),
-            $this->buildSetupUrl($invitation->getToken()),
-        );
-
-        $this->messageBus->dispatch(new SendEmailMessage($template));
-
-        return $invitation;
+    public function createInvitation(User $createdBy, CreateInvitationRequestDTO $dto): Invitation
+    {
+        return match ($dto->getType()) {
+            InvitationType::Collaborator => $this->createForCollaborator($createdBy, $dto),
+            InvitationType::Client => $this->createForClient($createdBy, $dto),
+            null => throw new InvalidInvitationTypeException(),
+        };
     }
 
     /**
@@ -188,6 +117,100 @@ final class InvitationService
         $this->invitationRepository->save($invitation, true);
 
         return $user;
+    }
+
+    private function createForCollaborator(User $createdBy, CreateInvitationRequestDTO $dto): Invitation
+    {
+        $agency = $this->agencyRepository->getByCollaborator($createdBy);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        $role = $dto->getRole();
+
+        if ($role !== UserRole::Editor && $role !== UserRole::Viewer) {
+            throw new InvalidInvitationRoleException();
+        }
+
+        if ($this->userRepository->getByEmail($dto->getEmail()) !== null) {
+            throw new EmailAlreadyUsedException();
+        }
+
+        $this->invitationRepository->invalidatePendingForCollaborator($dto->getEmail(), $agency);
+
+        $invitation = (new Invitation())
+            ->setType(InvitationType::Collaborator)
+            ->setToken($this->generateUniqueToken())
+            ->setEmail($dto->getEmail())
+            ->setFirstName($dto->getFirstName())
+            ->setLastName($dto->getLastName())
+            ->setRole($role)
+            ->setAgency($agency)
+            ->setCreatedBy($createdBy)
+            ->setExpiresAt(DateHelper::createUtcDateTimeImmutable()->modify('+' . self::EXPIRATION_DAYS . ' days'));
+
+        $this->invitationRepository->save($invitation, true);
+
+        $template = new CollaboratorWelcomeEmailTemplate(
+            $dto->getEmail(),
+            $dto->getFirstName(),
+            $agency->getName(),
+            trim(($createdBy->getFirstName() ?? '') . ' ' . ($createdBy->getLastName() ?? '')),
+            $this->getRoleLabel($role),
+            $this->buildSetupUrl($invitation->getToken()),
+        );
+
+        $this->messageBus->dispatch(new SendEmailMessage($template));
+
+        return $invitation;
+    }
+
+    private function createForClient(User $createdBy, CreateInvitationRequestDTO $dto): Invitation
+    {
+        if ($dto->getProjectUuid() === null) {
+            throw new InvalidInvitationProjectException();
+        }
+
+        $project = $this->projectRepository->getAccessibleByUuidForUser($dto->getProjectUuid(), $createdBy);
+
+        if ($project === null) {
+            throw new ProjectNotFoundException();
+        }
+
+        if ($this->userRepository->getByEmail($dto->getEmail()) !== null) {
+            throw new EmailAlreadyUsedException();
+        }
+
+        $this->invitationRepository->invalidatePendingForClient($dto->getEmail(), $project);
+
+        $agency = $project->getAgency();
+
+        $invitation = (new Invitation())
+            ->setType(InvitationType::Client)
+            ->setToken($this->generateUniqueToken())
+            ->setEmail($dto->getEmail())
+            ->setFirstName($dto->getFirstName())
+            ->setLastName($dto->getLastName())
+            ->setAgency($agency)
+            ->setProject($project)
+            ->setCreatedBy($createdBy)
+            ->setExpiresAt(DateHelper::createUtcDateTimeImmutable()->modify('+' . self::EXPIRATION_DAYS . ' days'));
+
+        $this->invitationRepository->save($invitation, true);
+
+        $template = new ClientWelcomeEmailTemplate(
+            $dto->getEmail(),
+            $dto->getFirstName(),
+            $agency->getName(),
+            $agency->getBrandColor(),
+            $agency->getContactEmail(),
+            $this->buildSetupUrl($invitation->getToken()),
+        );
+
+        $this->messageBus->dispatch(new SendEmailMessage($template));
+
+        return $invitation;
     }
 
     private function generateUniqueToken(): string

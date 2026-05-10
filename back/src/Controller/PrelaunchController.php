@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\Request\Prelaunch\AuthenticatePrelaunchRequestDTO;
 use App\DTO\Response\Prelaunch\AuthenticatePrelaunchResponseDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\Prelaunch\PrelaunchNotEnabledException;
 use App\Service\Prelaunch\PrelaunchService;
@@ -50,7 +51,7 @@ final class PrelaunchController extends AbstractController
     }
 
     #[Route('/status', name: 'api_prelaunch_status', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function status(
         PrelaunchService $prelaunchService,
     ): JsonResponse {

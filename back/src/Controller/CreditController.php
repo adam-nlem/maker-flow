@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\QueryParam\Credit\ListCreditTransactionsQueryParamDTO;
 use App\DTO\Response\Credit\CreateRefillCheckoutResponseDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\Agency\MissingAgencyException;
 use App\Repository\AgencyRepository;
@@ -20,7 +21,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class CreditController extends AbstractController
 {
     #[Route('/refill/checkout', name: 'api_credits_refill_checkout', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(UserRole::Admin->value)]
     public function refillCheckout(
         AgencyRepository $agencyRepository,
         StripeCheckoutService $stripeCheckoutService,
@@ -42,7 +43,7 @@ final class CreditController extends AbstractController
     }
 
     #[Route('/balance', name: 'api_credits_balance', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function balance(
         AgencyRepository $agencyRepository,
         CreditService $creditService,
@@ -62,7 +63,7 @@ final class CreditController extends AbstractController
     }
 
     #[Route('/transactions', name: 'api_credits_transactions', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function transactions(
         ListCreditTransactionsQueryParamDTO $queryParamDto,
         AgencyRepository $agencyRepository,

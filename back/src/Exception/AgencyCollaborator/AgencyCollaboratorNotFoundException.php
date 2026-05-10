@@ -1,17 +1,17 @@
 <?php
 
-namespace App\Exception\Project;
+namespace App\Exception\AgencyCollaborator;
 
 use Symfony\Component\HttpFoundation\Response;
 
-final class ClientNotFoundException extends ProjectException
+final class AgencyCollaboratorNotFoundException extends AgencyCollaboratorException
 {
-    public const CODE = 6;
+    public const CODE = 1;
 
     public function __construct()
     {
         parent::__construct(
-            'No such client in this project.',
+            'No such collaborator in this agency.',
             self::CODE,
             Response::HTTP_NOT_FOUND,
         );

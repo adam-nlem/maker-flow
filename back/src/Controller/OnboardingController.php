@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\DTO\Request\Onboarding\CompleteOnboardingStepRequestDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Service\OnboardingService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -15,7 +16,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class OnboardingController extends AbstractController
 {
     #[Route('', name: 'api_onboarding_show', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function show(OnboardingService $onboardingService): JsonResponse
     {
         /** @var User $user */
@@ -27,7 +28,7 @@ final class OnboardingController extends AbstractController
     }
 
     #[Route('/complete-step', name: 'api_onboarding_complete_step', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function completeStep(CompleteOnboardingStepRequestDTO $dto, OnboardingService $onboardingService): JsonResponse
     {
         /** @var User $user */
@@ -40,7 +41,7 @@ final class OnboardingController extends AbstractController
     }
 
     #[Route('/dismiss', name: 'api_onboarding_dismiss', methods: ['POST'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function dismiss(OnboardingService $onboardingService): JsonResponse
     {
         /** @var User $user */

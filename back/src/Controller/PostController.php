@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\DTO\QueryParam\Post\ListPostsQueryParamDTO;
 use App\DTO\QueryParam\Post\RankPostsQueryParamDTO;
@@ -30,7 +31,7 @@ final class PostController extends AbstractController
     public function __construct(private PostService $postService) {}
 
     #[Route('', name: 'api_posts_list', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function list(
         ListPostsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
@@ -60,7 +61,7 @@ final class PostController extends AbstractController
     }
 
     #[Route('/{postUuid}', name: 'api_posts_show', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function show(string $postUuid, PostRepository $postRepository): JsonResponse
     {
         /** @var User $user */
@@ -80,7 +81,7 @@ final class PostController extends AbstractController
     }
 
     #[Route('/rank', name: 'api_posts_rank', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function rank(
         RankPostsQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
@@ -108,7 +109,7 @@ final class PostController extends AbstractController
     }
 
     #[Route('/{postUuid}/thumbnail', name: 'api_posts_thumbnail', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function getThumbnail(
         string $postUuid,
         PostRepository $postRepository,

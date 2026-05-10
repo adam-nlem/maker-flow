@@ -7,6 +7,7 @@ use App\DTO\QueryParam\Script\ListScriptsQueryParamDTO;
 use App\DTO\Response\Script\ListScriptsGroupedByDayResponseDTO;
 use App\DTO\Request\Script\CreateScriptRequestDTO;
 use App\DTO\Request\Script\UpdateScriptRequestDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\Script;
 use App\Entity\User;
 use App\Exception\Project\ProjectNotFoundException;
@@ -29,7 +30,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ScriptController extends AbstractController
 {
     #[Route('', name: 'api_scripts_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListScriptsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -54,7 +55,7 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('/calendar', name: 'api_scripts_calendar', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function calendar(
         ListCalendarScriptsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -91,7 +92,7 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('', name: 'api_scripts_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateScriptRequestDTO $dto,
         ProjectRepository $projectRepository,
@@ -148,7 +149,7 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('/{scriptUuid}', name: 'api_scripts_show', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function show(
         string $scriptUuid,
         ScriptRepository $scriptRepository,
@@ -170,7 +171,7 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('/{scriptUuid}', name: 'api_scripts_update', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $scriptUuid,
         UpdateScriptRequestDTO $dto,
@@ -237,7 +238,7 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('/{scriptUuid}', name: 'api_scripts_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(
         string $scriptUuid,
         ScriptRepository $scriptRepository,

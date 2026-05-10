@@ -29,7 +29,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class UserController extends AbstractController
 {
     #[Route('/logout', name: 'api_user_logout', methods: ["GET"])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function logout(
         Request $request,
         CookieService $cookieService,
@@ -79,7 +79,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('/me', name: 'api_user_me', methods: ["GET"])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function me(): Response
     {
         /** @var User $user */
@@ -89,7 +89,7 @@ final class UserController extends AbstractController
     }
 
     #[Route('', name: 'api_user_update', methods: ["PATCH"])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function updateMe(
         UpdateUserRequestDTO $dto,
         UserRepository $userRepository,

@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\QueryParam\ChatMessage\ListChatMessagesQueryParamDTO;
 use App\DTO\Request\ChatMessage\CreateChatMessageRequestDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\Message;
 use App\Entity\User;
 use App\Exception\Agency\MissingAgencyException;
@@ -26,7 +27,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ChatMessageController extends AbstractController
 {
     #[Route('', name: 'api_chat_messages_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateChatMessageRequestDTO $dto,
         AgencyRepository $agencyRepository,
@@ -81,7 +82,7 @@ final class ChatMessageController extends AbstractController
     }
 
     #[Route('', name: 'api_chat_messages_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListChatMessagesQueryParamDTO $queryParamDto,
         ChatRepository $chatRepository,

@@ -61,6 +61,8 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | Agency | 27 | `DomainCode::Agency` |
 | HookTemplate | 28 | `DomainCode::HookTemplate` |
 | Invitation | 29 | `DomainCode::Invitation` |
+| ProjectClient | 30 | `DomainCode::ProjectClient` |
+| AgencyCollaborator | 31 | `DomainCode::AgencyCollaborator` |
 
 ## Exception Inventory
 
@@ -135,7 +137,6 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | **Agency (27xxx)** |
 | 27001 | `MissingAgencyException` | 403 | — | `src/Exception/Agency/` |
 | 27002 | `UserAlreadyHasAgencyException` | 409 | — | `src/Exception/Agency/` |
-| 27003 | `CollaboratorNotFoundException` | 404 | — | `src/Exception/Agency/` |
 | **HookTemplate (28xxx)** |
 | 28001 | `HookTemplateNotFoundException` | 404 | — | `src/Exception/HookTemplate/` |
 | 28002 | `HookTemplateModificationForbiddenException` | 403 | — | `src/Exception/HookTemplate/` |
@@ -145,6 +146,10 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 29003 | `InvitationAlreadyUsedException` | 422 | — | `src/Exception/Invitation/` |
 | 29004 | `EmailAlreadyUsedException` | 409 | — | `src/Exception/Invitation/` |
 | 29005 | `InvalidInvitationRoleException` | 422 | — | `src/Exception/Invitation/` |
+| **ProjectClient (30xxx)** |
+| 30001 | `ProjectClientNotFoundException` | 404 | — | `src/Exception/ProjectClient/` |
+| **AgencyCollaborator (31xxx)** |
+| 31001 | `AgencyCollaboratorNotFoundException` | 404 | — | `src/Exception/AgencyCollaborator/` |
 
 ## Controller Pattern
 

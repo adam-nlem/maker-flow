@@ -3,14 +3,12 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\Project\ListProjectsQueryParamDTO;
-use App\DTO\Request\Invitation\CreateClientInvitationRequestDTO;
 use App\DTO\Request\Project\CreateProjectRequestDTO;
 use App\DTO\Request\Project\UpdateProjectRequestDTO;
-use App\DTO\Response\Project\ListClientsResponseDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\Project;
 use App\Entity\User;
 use App\Exception\Agency\MissingAgencyException;
-use App\Exception\Project\ClientNotFoundException;
 use App\Exception\Project\ProjectAlreadyFinishedException;
 use App\Exception\Project\ProjectAlreadyOpenException;
 use App\Exception\Project\ProjectLimitReachedException;
@@ -18,15 +16,9 @@ use App\Exception\Project\ProjectNameConflictException;
 use App\Exception\Project\ProjectNotFoundException;
 use App\Helper\DateHelper;
 use App\Repository\AgencyRepository;
-use App\Repository\InvitationRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\SubscriptionRepository;
-use App\Repository\TokenRepository;
-use App\Repository\UserRepository;
-use App\Security\Voter\ProjectVoter;
-use App\Service\Invitation\InvitationService;
 use App\Service\Stripe\StripePlanService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -38,7 +30,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class ProjectController extends AbstractController
 {
     #[Route('', name: 'api_projects_create', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateProjectRequestDTO $dto,
         AgencyRepository $agencyRepository,
@@ -73,7 +65,7 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}', name: 'api_projects_update', methods: ['PATCH'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(string $projectUuid, UpdateProjectRequestDTO $dto, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
@@ -107,7 +99,7 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}', name: 'api_projects_show', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function show(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
@@ -123,7 +115,7 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}/finish', name: 'api_projects_finish', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function finish(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
@@ -147,7 +139,7 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}/reopen', name: 'api_projects_reopen', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function reopen(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
     {
         /** @var User $user */
@@ -171,7 +163,7 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('', name: 'api_projects_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListProjectsQueryParamDTO $queryParamDto,
         AgencyRepository $agencyRepository,
@@ -192,7 +184,7 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/{projectUuid}', name: 'api_projects_delete', methods: ['DELETE'])]
-    #[IsGranted('ROLE_EDITOR')]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(
         string $projectUuid,
         ProjectRepository $projectRepository,
@@ -211,105 +203,4 @@ final class ProjectController extends AbstractController
         return $this->json(data: ["message" => "Project deleted successfully"], status: Response::HTTP_OK);
     }
 
-    #[Route('/{projectUuid}/clients', name: 'api_projects_clients_list', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
-    public function listClients(
-        string $projectUuid,
-        ProjectRepository $projectRepository,
-        InvitationRepository $invitationRepository,
-    ): JsonResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $project = $projectRepository->getAccessibleByUuidForUser($projectUuid, $user);
-
-        if ($project === null) {
-            throw new ProjectNotFoundException();
-        }
-
-        $this->denyAccessUnlessGranted(ProjectVoter::VIEW, $project);
-
-        $responseDto = new ListClientsResponseDTO(
-            $project->getClientUsers(),
-            $invitationRepository->findPendingForProject($project),
-        );
-
-        return $this->json(
-            data: $responseDto->getData(),
-            status: Response::HTTP_OK,
-            context: ['groups' => ['api_clients_list', 'api_invitations_list']],
-        );
-    }
-
-    #[Route('/{projectUuid}/clients', name: 'api_projects_clients_invite', methods: ['POST'])]
-    #[IsGranted('ROLE_EDITOR')]
-    public function inviteClient(
-        string $projectUuid,
-        CreateClientInvitationRequestDTO $dto,
-        ProjectRepository $projectRepository,
-        InvitationService $invitationService,
-    ): JsonResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $project = $projectRepository->getAccessibleByUuidForUser($projectUuid, $user);
-
-        if ($project === null) {
-            throw new ProjectNotFoundException();
-        }
-
-        $this->denyAccessUnlessGranted(ProjectVoter::MANAGE_CLIENT, $project);
-
-        $invitation = $invitationService->createForClient(
-            $project,
-            $user,
-            $dto->getEmail(),
-            $dto->getFirstName(),
-            $dto->getLastName(),
-        );
-
-        return $this->json(
-            data: $invitation,
-            status: Response::HTTP_CREATED,
-            context: ['groups' => ['api_invitation_create']],
-        );
-    }
-
-    #[Route('/{projectUuid}/clients/{clientUserUuid}', name: 'api_projects_clients_remove', methods: ['DELETE'], requirements: ['projectUuid' => Requirement::UUID, 'clientUserUuid' => Requirement::UUID])]
-    #[IsGranted('ROLE_EDITOR')]
-    public function removeClient(
-        string $projectUuid,
-        string $clientUserUuid,
-        ProjectRepository $projectRepository,
-        UserRepository $userRepository,
-        TokenRepository $tokenRepository,
-        EntityManagerInterface $em,
-    ): JsonResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $project = $projectRepository->getAccessibleByUuidForUser($projectUuid, $user);
-
-        if ($project === null) {
-            throw new ProjectNotFoundException();
-        }
-
-        $this->denyAccessUnlessGranted(ProjectVoter::MANAGE_CLIENT, $project);
-
-        $target = $userRepository->getByUuid($clientUserUuid);
-
-        if ($target === null || $target->getProject()?->getId() !== $project->getId()) {
-            throw new ClientNotFoundException();
-        }
-
-        $target->setProject(null);
-
-        foreach ($target->getTokens() as $token) {
-            $tokenRepository->remove($token, false);
-        }
-
-        $em->flush();
-
-        return $this->json(data: null, status: Response::HTTP_NO_CONTENT);
-    }
 }

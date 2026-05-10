@@ -6,6 +6,7 @@ use App\DTO\Request\Subscription\ChangePlanRequestDTO;
 use App\DTO\Request\Subscription\CreateSubscriptionCheckoutRequestDTO;
 use App\DTO\Response\Subscription\CreateSubscriptionCheckoutResponseDTO;
 use App\DTO\Response\Subscription\ListPlansResponseDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Stripe\SubscriptionNotFoundException;
@@ -24,7 +25,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class SubscriptionController extends AbstractController
 {
     #[Route('/plans', name: 'api_subscriptions_plans_list', methods: ['GET'])]
-    #[IsGranted('ROLE_USER')]
+    #[IsGranted(UserRole::User->value)]
     public function plans(StripePlanService $stripePlanService): JsonResponse
     {
         $plans = $stripePlanService->getPlanConfigs();
@@ -39,7 +40,7 @@ final class SubscriptionController extends AbstractController
     }
 
     #[Route('/checkout', name: 'api_subscriptions_checkout', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(UserRole::Admin->value)]
     public function checkout(
         CreateSubscriptionCheckoutRequestDTO $dto,
         AgencyRepository $agencyRepository,
@@ -64,7 +65,7 @@ final class SubscriptionController extends AbstractController
     }
 
     #[Route('/current', name: 'api_subscriptions_current', methods: ['GET'])]
-    #[IsGranted('ROLE_VIEWER')]
+    #[IsGranted(UserRole::Viewer->value)]
     public function current(
         AgencyRepository $agencyRepository,
         SubscriptionRepository $subscriptionRepository,
@@ -84,7 +85,7 @@ final class SubscriptionController extends AbstractController
     }
 
     #[Route('/cancel', name: 'api_subscriptions_cancel', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(UserRole::Admin->value)]
     public function cancel(
         AgencyRepository $agencyRepository,
         SubscriptionRepository $subscriptionRepository,
@@ -111,7 +112,7 @@ final class SubscriptionController extends AbstractController
     }
 
     #[Route('/resume', name: 'api_subscriptions_resume', methods: ['POST'])]
-    #[IsGranted('ROLE_ADMIN')]
+    #[IsGranted(UserRole::Admin->value)]
     public function resume(
         AgencyRepository $agencyRepository,
         SubscriptionRepository $subscriptionRepository,
