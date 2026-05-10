@@ -154,6 +154,10 @@ services:
         arguments:
             $frontendUrl: "%app.frontend_url%"
 
+    App\Service\Invitation\InvitationService:
+        arguments:
+            $frontendUrl: "%app.frontend_url%"
+
     App\Service\Prelaunch\PrelaunchService:
         arguments:
             $prelaunchEnabled: "%app.prelaunch.enabled%"

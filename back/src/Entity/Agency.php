@@ -22,36 +22,36 @@ class Agency
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_agency_show', 'api_agency_update', 'api_user_me'])]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_user_me'])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_agency_show', 'api_agency_update', 'api_user_me'])]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_user_me', 'api_invitation_show', 'api_invitation_create'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 7, nullable: true)]
     #[Assert\Regex(pattern: '/^#[0-9A-Fa-f]{6}$/', message: 'Brand color must be a 6-digit hex code (e.g. #1F2937)')]
-    #[Groups(['api_agency_show', 'api_agency_update', 'api_user_me'])]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_user_me', 'api_invitation_show', 'api_invitation_create'])]
     private ?string $brandColor = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Email]
-    #[Groups(['api_agency_show', 'api_agency_update', 'api_user_me'])]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_user_me'])]
     private ?string $contactEmail = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_agency_show', 'api_agency_update', 'api_user_me'])]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_user_me'])]
     private ?string $website = null;
 
     #[ORM\Column(length: 255, unique: true, nullable: true)]
     private ?string $stripeCustomerId = null;
 
     #[ORM\Column]
-    #[Groups(['api_agency_show', 'api_agency_update'])]
+    #[Groups(['api_agency_create', 'api_agency_update'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    #[Groups(['api_agency_show', 'api_agency_update'])]
+    #[Groups(['api_agency_create', 'api_agency_update'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**

@@ -41,7 +41,9 @@ class Project
         'api_projects_get_paginated',
         'api_project_get_by_uuid',
         'api_project_finish',
-        'api_project_reopen'
+        'api_project_reopen',
+        'api_invitation_show',
+        'api_invitation_create',
     ])]
     private ?string $name = null;
 

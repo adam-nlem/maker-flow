@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\DTO\Request\User\RegisterUserRequestDTO;
 use App\DTO\Request\User\UpdateUserRequestDTO;
 use App\DTO\Response\User\RegisterResponseDTO;
-use App\Entity\Agency;
 use App\Entity\Enum\OtpType;
 use App\Entity\Enum\UserRole;
 use App\Entity\User;
@@ -14,13 +13,10 @@ use App\Exception\User\InvalidPasswordException;
 use App\Exception\User\MissingPasswordFieldsException;
 use App\Exception\User\PasswordMismatchException;
 use App\Helper\PasswordHelper;
-use App\Repository\AgencyRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Service\Cookie\CookieService;
-use App\Service\Credit\CreditService;
 use App\Service\Otp\OtpService;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -55,10 +51,7 @@ final class UserController extends AbstractController
     public function register(
         RegisterUserRequestDTO $dto,
         UserRepository $userRepository,
-        AgencyRepository $agencyRepository,
-        EntityManagerInterface $entityManager,
         OtpService $otpService,
-        CreditService $creditService,
     ): Response {
         if (!PasswordHelper::isValid($dto->getPlainPassword())) {
             throw new InvalidPasswordException();
@@ -71,23 +64,9 @@ final class UserController extends AbstractController
 
         /** @var User $user */
         $user = $dto->build();
+        $user->setRole(UserRole::Admin);
 
-        $agency = $this->buildAgencyForUser($user);
-
-        $entityManager->beginTransaction();
-        try {
-            $agencyRepository->save($agency);
-
-            $user->setAgency($agency)->setRole(UserRole::Admin);
-            $userRepository->save($user, true);
-
-            $entityManager->commit();
-        } catch (\Throwable $e) {
-            $entityManager->rollback();
-            throw $e;
-        }
-
-        $creditService->addWelcomeCredits($agency, 3, $user);
+        $userRepository->save($user, true);
 
         $otp = $otpService->createAndSend($user, OtpType::EmailVerification);
 
@@ -150,17 +129,5 @@ final class UserController extends AbstractController
         $userRepository->save($user, true);
 
         return $this->json(data: $user, status: Response::HTTP_OK, context: ['groups' => ['api_user_update']]);
-    }
-
-    private function buildAgencyForUser(User $user): Agency
-    {
-        $firstName = $user->getFirstName();
-        $emailLocalPart = explode('@', $user->getEmail() ?? '', 2)[0] ?? '';
-        $ownerLabel = $firstName !== null && trim($firstName) !== '' ? $firstName : $emailLocalPart;
-
-        $agency = new Agency();
-        $agency->setName(sprintf("%s's Agency", $ownerLabel));
-
-        return $agency;
     }
 }

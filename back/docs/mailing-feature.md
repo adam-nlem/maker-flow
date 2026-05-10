@@ -76,7 +76,9 @@ src/Service/Mailing/
 │   ├── LoginOtpEmailTemplate.php
 │   ├── EmailVerificationOtpEmailTemplate.php
 │   ├── PrelaunchVerificationEmailTemplate.php
-│   └── IntegrationTokenExpiredEmailTemplate.php
+│   ├── IntegrationTokenExpiredEmailTemplate.php
+│   ├── CollaboratorWelcomeEmailTemplate.php
+│   └── ClientWelcomeEmailTemplate.php
 └── Exception/
     ├── MailingServiceException.php       # Abstract base exception (code 140200)
     └── MailingRetryableException.php     # Thrown on retryable Resend errors (429, 5xx)
