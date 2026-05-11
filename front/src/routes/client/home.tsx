@@ -12,7 +12,7 @@ export default function ClientHomePage() {
     const accent = user?.agency?.brandColor ?? undefined
 
     return (
-        <div className="bg-clear bg-dot-pattern min-h-screen flex items-center justify-center px-4">
+        <div className="bg-clear bg-dot-pattern h-full flex items-center justify-center px-4">
             <div className="bg-white border border-light-gray rounded-2xl shadow-sm max-w-md w-full p-8 flex flex-col items-center gap-4">
                 {user?.agency && (
                     <span

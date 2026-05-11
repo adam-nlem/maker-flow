@@ -1,5 +1,28 @@
 {
     "delete": {
         "confirm": "Cancel the invitation sent to {{target}}? The link will become invalid."
+    },
+    "setup": {
+        "loading": {
+            "title": "Loading your invitation…"
+        },
+        "client": {
+            "title": "Welcome to your {{agencyName}} portal",
+            "subtitle": "Set up your password to access your dedicated workspace."
+        },
+        "collaborator": {
+            "title": "Join {{agencyName}} on MakerFlow",
+            "subtitle": "You've been invited as a {{role}}. Set up your password to get started."
+        },
+        "invitedBy": "Invited by {{name}}",
+        "submit": "Set my password",
+        "error": {
+            "title": "Invitation unavailable"
+        },
+        "alreadyLoggedIn": {
+            "title": "You're already signed in",
+            "subtitle": "You're connected as {{email}}. Sign out first to accept this invitation.",
+            "logout": "Sign out"
+        }
     }
 }

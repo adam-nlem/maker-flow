@@ -7,7 +7,11 @@ import IconWithTextTile from "~/components/ui/IconWithTextTile";
 import { SettingsSection, getSettingsSectionsForRoles, settingsSectionTranslationKeys, settingsSectionToIcon, settingsSectionToPath } from "~/models/enums/SettingsSection";
 import { agencySettingsPath } from "~/routes/routePaths";
 
-export default function SettingsPageView() {
+interface SettingsPageViewProps {
+    basePath?: string;
+}
+
+export default function SettingsPageView({ basePath = agencySettingsPath }: SettingsPageViewProps) {
     const { t } = useTranslation();
     const location = useLocation();
     const navigate = useNavigate();
@@ -17,7 +21,7 @@ export default function SettingsPageView() {
     const visibleSections = getSettingsSectionsForRoles(user?.roles ?? []);
 
     const activeSection = visibleSections.find(
-        (section) => location.pathname === `${agencySettingsPath}/${settingsSectionToPath[section]}`
+        (section) => location.pathname === `${basePath}/${settingsSectionToPath[section]}`
     ) ?? SettingsSection.General;
 
     return (
@@ -31,7 +35,7 @@ export default function SettingsPageView() {
                             label={t(settingsSectionTranslationKeys[section])}
                             isSelected={activeSection === section}
                             className="shrink-0"
-                            onClick={() => navigate(`${agencySettingsPath}/${settingsSectionToPath[section]}`)}
+                            onClick={() => navigate(`${basePath}/${settingsSectionToPath[section]}`)}
                         />
                     ))}
                 </div>
@@ -46,7 +50,7 @@ export default function SettingsPageView() {
                                 icon={settingsSectionToIcon[section]}
                                 label={t(settingsSectionTranslationKeys[section])}
                                 isSelected={activeSection === section}
-                                onClick={() => navigate(`${agencySettingsPath}/${settingsSectionToPath[section]}`)}
+                                onClick={() => navigate(`${basePath}/${settingsSectionToPath[section]}`)}
                             />
                         ))}
                     </div>

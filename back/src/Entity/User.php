@@ -35,6 +35,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_otp_verify_prelaunch',
         'api_collaborators_list',
         'api_clients_list',
+        'api_invitation_show',
+        'api_invitation_create',
     ])]
     private ?string $uuid = null;
 
@@ -79,6 +81,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_otp_verify_prelaunch',
         'api_collaborators_list',
         'api_clients_list',
+        'api_invitation_show',
+        'api_invitation_create',
     ])]
     private ?string $email = null;
 
@@ -92,7 +96,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_user_update',
         'api_otp_verify_login',
         'api_otp_verify_email',
-        'api_otp_verify_prelaunch'
+        'api_otp_verify_prelaunch',
+        'api_invitation_show',
+        'api_invitation_create',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 

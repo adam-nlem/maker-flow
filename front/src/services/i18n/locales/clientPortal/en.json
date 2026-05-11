@@ -4,5 +4,8 @@
         "greeting": "Hi {{name}}",
         "subtitle": "Your dedicated workspace is on its way. You'll soon be able to track your brand's analytics and contents here.",
         "logout": "Log out"
+    },
+    "sidebar": {
+        "greeting": "Hi {{name}}"
     }
 }

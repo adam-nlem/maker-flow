@@ -176,7 +176,8 @@
                 "projects",
                 "{{projectUuid}}"
               ]
-            }
+            },
+            "description": "Returns the project with its parent agency nested under `agency` (`uuid`, `name`, `brandColor`, `contactEmail`, `website`). Used by the client portal to read branding for the sidebar."
           },
           "response": []
         },

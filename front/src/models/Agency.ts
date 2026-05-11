@@ -1,4 +1,4 @@
-interface AgencyJSON {
+export interface AgencyJSON {
     uuid: string;
     name: string;
     brandColor: string | null;

@@ -92,5 +92,14 @@
         "notFound": "Modèle d'accroche introuvable.",
         "modificationForbidden": "Seul le créateur d'origine ou un admin de l'agence peut modifier ce modèle."
     },
+    "invitation": {
+        "notFound": "Cette invitation n'existe plus.",
+        "expired": "Cette invitation a expiré. Demandez à votre interlocuteur de vous en renvoyer une.",
+        "alreadyUsed": "Cette invitation a déjà été utilisée.",
+        "emailAlreadyUsed": "Un compte existe déjà avec cet email. Veuillez vous connecter.",
+        "invalidRole": "Le rôle de cette invitation est invalide.",
+        "invalidType": "Le type d'invitation est manquant ou invalide.",
+        "invalidProject": "Un projet est requis pour inviter un client."
+    },
     "fallback": "Une erreur est survenue"
 }

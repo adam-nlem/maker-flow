@@ -4,5 +4,8 @@
         "greeting": "Bonjour {{name}}",
         "subtitle": "Votre espace dédié arrive très prochainement. Vous pourrez bientôt y consulter les statistiques et contenus de votre marque.",
         "logout": "Se déconnecter"
+    },
+    "sidebar": {
+        "greeting": "Bonjour {{name}}"
     }
 }

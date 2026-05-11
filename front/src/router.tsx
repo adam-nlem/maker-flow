@@ -15,6 +15,8 @@ import {
   agencyCalendarPath,
   agencySettingsPath,
   clientHomePath,
+  clientSettingsPath,
+  inviteRouteMatcher,
 } from "./routes/routePaths";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PrelaunchPage from "./routes/prelaunch";
@@ -26,6 +28,7 @@ import OnboardingPage from "./routes/onboarding";
 import LoginPage from "./routes/login";
 import RegisterPage from "./routes/register";
 import IntegrationsCallback from "./routes/integrations.callback";
+import InviteTokenPage from "./routes/invite.token";
 import ProtectedLayout from "./routes/protected";
 import RootRedirect from "./components/auth/RootRedirect";
 import AgencyShellLayout from "./components/agency/AgencyShellLayout";
@@ -39,6 +42,9 @@ import AgencySettingsLayout from "./routes/agency/settings";
 import AgencySettingsIndex from "./routes/agency/settings.index";
 import AgencySettingsSectionRoute from "./routes/agency/settings.section";
 import ClientHomePage from "./routes/client/home";
+import ClientSettingsLayout from "./routes/client/settings";
+import ClientSettingsIndex from "./routes/client/settings.index";
+import ClientSettingsSectionRoute from "./routes/client/settings.section";
 
 export const router = createBrowserRouter(
   [
@@ -57,6 +63,7 @@ export const router = createBrowserRouter(
         { path: loginPath, element: <LoginPage /> },
         { path: registerPath, element: <RegisterPage /> },
         { path: integrationCallbackPath, element: <IntegrationsCallback /> },
+        { path: inviteRouteMatcher, element: <InviteTokenPage /> },
 
         // Protected routes (auth + onboarding)
         {
@@ -91,6 +98,14 @@ export const router = createBrowserRouter(
               element: <ClientShellLayout />,
               children: [
                 { path: clientHomePath, element: <ClientHomePage /> },
+                {
+                  path: clientSettingsPath,
+                  element: <ClientSettingsLayout />,
+                  children: [
+                    { index: true, element: <ClientSettingsIndex /> },
+                    { path: ":section", element: <ClientSettingsSectionRoute /> },
+                  ],
+                },
               ],
             },
           ],

@@ -1,5 +1,29 @@
 {
     "delete": {
         "confirm": "Annuler l'invitation envoyée à {{target}} ? Le lien deviendra invalide."
+    },
+    "setup": {
+        "loading": {
+            "title": "Chargement de votre invitation…"
+        },
+        "client": {
+            "title": "Bienvenue sur votre portail {{agencyName}}",
+            "subtitle": "Définissez votre mot de passe pour accéder à votre espace dédié."
+        },
+        "collaborator": {
+            "title": "Rejoignez {{agencyName}} sur MakerFlow",
+            "subtitle": "Vous avez été invité en tant que {{role}}. Définissez votre mot de passe pour commencer.",
+            "noRoleSubtitle": "Définissez votre mot de passe pour rejoindre l'agence."
+        },
+        "invitedBy": "Invité par {{name}}",
+        "submit": "Définir mon mot de passe",
+        "error": {
+            "title": "Invitation indisponible"
+        },
+        "alreadyLoggedIn": {
+            "title": "Vous êtes déjà connecté",
+            "subtitle": "Vous êtes connecté en tant que {{email}}. Déconnectez-vous d'abord pour accepter cette invitation.",
+            "logout": "Se déconnecter"
+        }
     }
 }

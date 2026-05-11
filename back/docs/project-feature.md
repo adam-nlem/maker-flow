@@ -22,7 +22,7 @@ The Project feature allows users to create, manage, and organize their projects.
 | `createdAt` | `DateTimeImmutable` | Creation timestamp (UTC) |
 | `updatedAt` | `DateTimeImmutable` | Last update timestamp (UTC, auto-updated) |
 | `finishedAt` | `DateTimeImmutable` | Completion timestamp (nullable) |
-| `user` | `User` | Owner of the project (ManyToOne) |
+| `agency` | `Agency` | Owning agency (ManyToOne, NOT NULL) — also serialized under `api_project_get_by_uuid` |
 
 **Constraints:**
 - Unique constraint on `(name, user)` combination
@@ -142,6 +142,8 @@ The Project feature allows users to create, manage, and organize their projects.
 - **Response:** `200 OK` with project details
 - **Serialization Group:** `api_project_get_by_uuid`
 - **Error:** `404 Not Found` if project doesn't exist
+- **Access:** Agency members on any project of their agency (`ProjectVoter::VIEW`), and the client user(s) linked to the project. The client portal uses this endpoint to read the parent agency for sidebar branding.
+- **Response shape includes nested `agency`:** `uuid`, `name`, `description`, `types`, `createdAt`, `updatedAt`, `finishedAt`, and `agency: { uuid, name, brandColor, contactEmail, website }`. List endpoints (`api_projects_get_paginated`) do **not** include the agency — only this get-by-uuid response does.
 
 #### List Projects (Paginated)
 - **Route:** `GET /api/projects`
@@ -178,14 +180,14 @@ The Project feature allows users to create, manage, and organize their projects.
 
 ## Serialization Groups
 
-| Group | Used In |
-|-------|---------|
-| `api_project_create` | Create endpoint response |
-| `api_project_update` | Update endpoint response |
-| `api_projects_get_paginated` | List endpoint response |
-| `api_project_get_by_uuid` | Show endpoint response |
-| `api_project_finish` | Finish endpoint response |
-| `api_project_reopen` | Reopen endpoint response |
+| Group | Used In | Notes |
+|-------|---------|-------|
+| `api_project_create` | Create endpoint response | |
+| `api_project_update` | Update endpoint response | |
+| `api_projects_get_paginated` | List endpoint response | No agency field |
+| `api_project_get_by_uuid` | Show endpoint response | **Includes nested `agency` (uuid, name, brandColor, contactEmail, website)** so the client portal can branding without a separate request |
+| `api_project_finish` | Finish endpoint response | |
+| `api_project_reopen` | Reopen endpoint response | |
 
 ---
 

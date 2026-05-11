@@ -28,3 +28,10 @@ export const agencySettingsSubscriptionPath = `${agencySettingsPath}/subscriptio
 // Client shell
 export const clientAreaPrefix = '/client'
 export const clientHomePath = clientAreaPrefix
+export const clientSettingsPath = `${clientAreaPrefix}/settings`
+export const clientSettingsGeneralPath = `${clientSettingsPath}/general`
+
+// Invitations (public, tokenized link from welcome emails)
+export const inviteAreaPrefix = '/invite'
+export const inviteRouteMatcher = `${inviteAreaPrefix}/:token`
+export const invitePath = (token: string) => `${inviteAreaPrefix}/${token}`

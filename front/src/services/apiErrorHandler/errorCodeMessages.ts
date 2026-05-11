@@ -96,6 +96,15 @@ export const errorCodeKeys: Record<number, string> = {
   // HookTemplate (28xxx)
   28001: 'errors:hookTemplate.notFound',
   28002: 'errors:hookTemplate.modificationForbidden',
+
+  // Invitation (29xxx)
+  29001: 'errors:invitation.notFound',
+  29002: 'errors:invitation.expired',
+  29003: 'errors:invitation.alreadyUsed',
+  29004: 'errors:invitation.emailAlreadyUsed',
+  29005: 'errors:invitation.invalidRole',
+  29006: 'errors:invitation.invalidType',
+  29007: 'errors:invitation.invalidProject',
 }
 
 export function resolveErrorMessage(error: unknown): string {

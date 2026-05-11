@@ -2,7 +2,9 @@
 
 ## Overview
 
-The sidebar is rendered via the `AgencyShellLayout` route component that wraps the agency subtree (`/agency/*`). On desktop (≥768px / `md` breakpoint), the sidebar is visible as a fixed left panel. On mobile (<768px), it is replaced by a burger menu that opens a left-sliding drawer overlay. The client subtree (`/client/*`) uses a separate `ClientShellLayout` and does **not** render this sidebar yet — Phase 6 will give the client a dedicated shell.
+The app ships **two** sidebars (agency and client), each rendered by its own shell layout. To avoid duplicating the chrome, both sidebars sit on top of a shared `SidebarShell` (desktop) and `MobileSidebarShell` (mobile drawer). The shells own the outer container, padding, bottom divider, legal footer, and — for the mobile shell — burger button + drawer overlay + ESC/scroll-lock/auto-close behavior. Each domain sidebar (`DesktopSidebar` for agency, `ClientDesktopSidebar` for client) only provides its content: the top section, the bottom nav, and an optional CTA.
+
+On desktop (≥768px / `md` breakpoint), the active shell's sidebar is visible as a fixed left panel. On mobile (<768px), it is replaced by a burger menu that opens a left-sliding drawer overlay.
 
 ## Architecture
 
@@ -11,10 +13,12 @@ ProtectedLayout (auth + onboarding gate)
   ├── /            → RootRedirect (Navigate by role)
   ├── /agency/*    → AgencyShellLayout (asserts non-client)
   │                    ├── MobileSidebar (mobile-only: header bar + drawer overlay)
-  │                    ├── DesktopSidebar (desktop-only: hidden md:block)
+  │                    ├── DesktopSidebar (desktop-only)
   │                    └── <Outlet /> (agency page content)
-  └── /client/*    → ClientShellLayout (asserts client; passthrough today)
-                       └── <Outlet />
+  └── /client/*    → ClientShellLayout (asserts client)
+                       ├── ClientMobileSidebar (mobile-only: header bar + drawer overlay)
+                       ├── ClientDesktopSidebar (desktop-only)
+                       └── <Outlet /> (client page content)
 ```
 
 ## Key Files
@@ -24,8 +28,12 @@ ProtectedLayout (auth + onboarding gate)
 | `components/agency/AgencyShellLayout.tsx` | Layout route component — wraps `/agency/*` pages with sidebar + mobile menu; asserts `!user.isClient` |
 | `components/client-portal/ClientShellLayout.tsx` | Layout route component — wraps `/client/*` pages; asserts `user.isClient` |
 | `components/auth/RootRedirect.tsx` | Index of `ProtectedLayout` — `Navigate` to `/agency` or `/client` based on `user.isClient` |
-| `components/sidebar/DesktopSidebar.tsx` | The sidebar content (project selector, nav, platforms, settings, premium CTA) |
-| `components/sidebar/MobileSidebar.tsx` | Self-contained mobile component: fixed header bar (app name + page label) with burger icon + portal-based drawer overlay rendering `DesktopSidebar` |
+| `components/sidebar/SidebarShell.tsx` | **Shared** desktop chrome — outer container, top-section padding, bottom nav slot, divider, optional CTA slot, legal footer. Both `DesktopSidebar` and `ClientDesktopSidebar` render their content through it. |
+| `components/sidebar/MobileSidebarShell.tsx` | **Shared** mobile chrome — burger header bar, drawer portal, backdrop, ESC + body-scroll-lock + auto-close-on-route-change. Takes a `desktop` ReactNode and a `getPageLabelKey(pathname)` resolver. |
+| `components/sidebar/DesktopSidebar.tsx` | Agency sidebar content (project selector, nav, platforms, settings, premium CTA) — composed inside `SidebarShell` |
+| `components/sidebar/MobileSidebar.tsx` | Thin wrapper: `<MobileSidebarShell desktop={<DesktopSidebar />} getPageLabelKey={getCurrentPageLabelKey} />` |
+| `components/client-portal/sidebar/ClientDesktopSidebar.tsx` | Client sidebar content — agency-branded header (name tinted with `agency.brandColor`), Home + Settings nav. Fetches the agency via `useShowProject(user.clientProjectUuid)`. Composed inside `SidebarShell`. |
+| `components/client-portal/sidebar/ClientMobileSidebar.tsx` | Thin wrapper: `<MobileSidebarShell desktop={<ClientDesktopSidebar />} getPageLabelKey={...} />` with a client-specific label resolver. |
 | `stores/sidebar/mobileSidebarStore.ts` | Zustand store for mobile drawer open/close state (`isOpen`, `setIsOpen`, `toggle`) |
 | `models/enums/NavigationItem.ts` | Enum with mapping records: French translations, paths (now `agency*Path`), outline/solid icons, sidebar group constants (`sidebarMainNavigationItems`, `sidebarBottomNavigationItems`) |
 | `utils/navigationHelpers.ts` | Pure helper functions: `getCurrentNavigationItem`, `getCurrentPageLabel`, `isNavigationItemSelected` (Home item is matched exactly so nested `/agency/*` routes don't keep Home selected) |
@@ -78,8 +86,12 @@ export const useMobileSidebarStore = create<State & Action>((set) => ({
 
 ## Shell split
 
-The old `SidebarLayout` was renamed to **`AgencyShellLayout`** ([components/agency/AgencyShellLayout.tsx](../src/components/agency/AgencyShellLayout.tsx)) and now lives next to the rest of the agency-only UI. It still composes `DesktopSidebar` and `MobileSidebar` (which stay in `components/sidebar/` as sidebar primitives) and additionally asserts the user is a non-client — clients hitting an `/agency/*` URL are redirected to `/client`.
+The old `SidebarLayout` was renamed to **`AgencyShellLayout`** ([components/agency/AgencyShellLayout.tsx](../src/components/agency/AgencyShellLayout.tsx)) and now lives next to the rest of the agency-only UI. It composes `DesktopSidebar` and `MobileSidebar` (which stay in `components/sidebar/` as sidebar primitives) and asserts the user is a non-client — clients hitting an `/agency/*` URL are redirected to `/client`.
 
-The client subtree is wrapped by a sibling **`ClientShellLayout`** ([components/client-portal/ClientShellLayout.tsx](../src/components/client-portal/ClientShellLayout.tsx)) which today is a passthrough plus a role assertion. Phase 6 fills it with a client-styled sidebar.
+The client subtree is wrapped by a sibling **`ClientShellLayout`** ([components/client-portal/ClientShellLayout.tsx](../src/components/client-portal/ClientShellLayout.tsx)) which composes `ClientDesktopSidebar` and `ClientMobileSidebar` and asserts `user.isClient` (non-clients hitting `/client/*` get redirected to `/agency`).
+
+### Why a shell + per-domain content components
+
+The original phasing plan called for a single role-conditioned sidebar. The agency sidebar grew organically around project picking, integration tiles, and a premium CTA — none of which apply to clients. Folding those into a role-aware `if` ladder inside one component would have made it hard to read. Instead we extracted the *chrome* (`SidebarShell`, `MobileSidebarShell`) — outer container, padding, divider, legal footer, mobile drawer — and let each domain own its *content* (top section, bottom nav, optional CTA). This keeps the duplication to zero on the layout side, lets each domain sidebar stay focused on what's specific to it, and makes future shells (e.g. an admin tool) trivial to add.
 
 Smart `/` redirect lives in `<RootRedirect />` ([components/auth/RootRedirect.tsx](../src/components/auth/RootRedirect.tsx)), used as the index route inside `ProtectedLayout`.

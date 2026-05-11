@@ -92,5 +92,14 @@
         "notFound": "Hook template not found.",
         "modificationForbidden": "Only the original creator or an agency admin can modify this template."
     },
+    "invitation": {
+        "notFound": "This invitation no longer exists.",
+        "expired": "This invitation has expired. Please ask your inviter to send a new one.",
+        "alreadyUsed": "This invitation has already been used.",
+        "emailAlreadyUsed": "An account with this email already exists. Please log in instead.",
+        "invalidRole": "The role on this invitation is invalid.",
+        "invalidType": "The invitation type is missing or invalid.",
+        "invalidProject": "A project is required for a client invitation."
+    },
     "fallback": "An error occurred"
 }

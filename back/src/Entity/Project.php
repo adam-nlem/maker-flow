@@ -30,7 +30,9 @@ class Project
         'api_projects_get_paginated',
         'api_project_get_by_uuid',
         'api_project_finish',
-        'api_project_reopen'
+        'api_project_reopen',
+        'api_invitation_show',
+        'api_invitation_create',
     ])]
     private ?string $uuid = null;
 
@@ -54,7 +56,9 @@ class Project
         'api_projects_get_paginated',
         'api_project_get_by_uuid',
         'api_project_finish',
-        'api_project_reopen'
+        'api_project_reopen',
+        'api_invitation_show',
+        'api_invitation_create',
     ])]
     private ?string $description = null;
 
@@ -65,7 +69,9 @@ class Project
         'api_projects_get_paginated',
         'api_project_get_by_uuid',
         'api_project_finish',
-        'api_project_reopen'
+        'api_project_reopen',
+        'api_invitation_show',
+        'api_invitation_create',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
@@ -98,12 +104,15 @@ class Project
         'api_projects_get_paginated',
         'api_project_get_by_uuid',
         'api_project_finish',
-        'api_project_reopen'
+        'api_project_reopen',
+        'api_invitation_show',
+        'api_invitation_create',
     ])]
     private array $types = [];
 
     #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'projects')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
+    #[Groups(['api_project_get_by_uuid'])]
     private ?Agency $agency = null;
 
     /**
