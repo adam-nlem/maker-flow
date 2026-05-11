@@ -86,7 +86,8 @@
         "notPending": "Cette suggestion n'est plus en attente."
     },
     "agency": {
-        "missing": "Vous n'êtes rattaché à aucune agence."
+        "missing": "Vous n'êtes rattaché à aucune agence.",
+        "subscriptionInactive": "L'abonnement de votre agence n'est plus actif."
     },
     "hookTemplate": {
         "notFound": "Modèle d'accroche introuvable.",

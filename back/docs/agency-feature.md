@@ -57,8 +57,14 @@ role_hierarchy:
 ## Agency-scoped resources
 
 - **Projects** — `Project.agency` (NOT NULL, CASCADE). Clients reach a project via `User.project`.
-- **Subscription / CreditBalance** — `*.agency` (NOT NULL, CASCADE). Resolution today via `AgencyRepository::getByCollaborator($user)` (collaborators only). Phase 7 will introduce a `getByUser()` fallback that walks `User.project.agency` for clients.
+- **Subscription / CreditBalance** — `*.agency` (NOT NULL, CASCADE). Resolution today via `AgencyRepository::getByCollaborator($user)` (collaborators only).
 - **Integration** — owned by `Project.agency`. `Integration.createdBy` is kept only for audit.
+
+## Client-portal subscription gate (Phase 7)
+
+`ProjectController::show` throws `AgencySubscriptionInactiveException` (code `27003`, HTTP 403) when the requester is a `ROLE_CLIENT` user whose parent agency has no active subscription. The active-subscription check reuses `SubscriptionRepository::getLatestActiveByAgency($agency)` (returns `null` when no row matches `status === Active AND currentPeriodEnd >= now`) — no helper was added to the `Agency` entity, the predicate stays at the data layer.
+
+The client SPA reads this error in `ClientShellLayout` and renders a full-screen "access suspended" card instead of the outlet. Agency members are never gated, so they can always reach their billing settings to re-subscribe.
 
 ## Agency profile endpoints (Phase 5)
 

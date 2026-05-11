@@ -177,7 +177,7 @@
                 "{{projectUuid}}"
               ]
             },
-            "description": "Returns the project with its parent agency nested under `agency` (`uuid`, `name`, `brandColor`, `contactEmail`, `website`). Used by the client portal to read branding for the sidebar."
+            "description": "Returns the project with its parent agency nested under `agency` (`uuid`, `name`, `brandColor`, `contactEmail`, `website`). Used by the client portal to read branding for the sidebar.\n\nErrors:\n- `403` with `{ \"code\": 27003 }` (`AgencySubscriptionInactiveException`) when the requester is a `ROLE_CLIENT` user whose parent agency has no active subscription. Agency members are never gated."
           },
           "response": []
         },

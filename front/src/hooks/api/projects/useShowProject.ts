@@ -11,6 +11,7 @@ export function useShowProject(projectUuid: string | null | undefined) {
             return Project.fromJSON(res.data)
         },
         enabled: Boolean(projectUuid),
+        retry: false,
     })
 
     return {

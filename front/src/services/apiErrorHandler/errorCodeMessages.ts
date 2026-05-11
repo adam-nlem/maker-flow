@@ -92,6 +92,7 @@ export const errorCodeKeys: Record<number, string> = {
 
   // Agency (27xxx)
   27001: 'errors:agency.missing',
+  27003: 'errors:agency.subscriptionInactive',
 
   // HookTemplate (28xxx)
   28001: 'errors:hookTemplate.notFound',

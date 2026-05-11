@@ -3,9 +3,18 @@
         "title": "Welcome to your portal",
         "greeting": "Hi {{name}}",
         "subtitle": "Your dedicated workspace is on its way. You'll soon be able to track your brand's analytics and contents here.",
-        "logout": "Log out"
+        "logout": "Log out",
+        "empty": {
+            "title": "Your dashboard is being prepared",
+            "body": "Your agency hasn't connected any data sources yet. Once they do, you'll see your brand's analytics here."
+        }
     },
     "sidebar": {
         "greeting": "Hi {{name}}"
+    },
+    "locked": {
+        "title": "Access suspended",
+        "body": "Your agency's subscription is no longer active. Please contact them to restore your access.",
+        "logout": "Log out"
     }
 }

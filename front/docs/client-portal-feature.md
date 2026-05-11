@@ -6,7 +6,7 @@ The frontend exposes two role-distinct shells over the same authentication: an *
 
 A public `/invite/:token` page sits outside both shells and turns an emailed invitation link into a logged-in client or collaborator session.
 
-The actual client dashboard is still Phase 7 work — `/client` keeps a placeholder body inside the new shell.
+The client dashboard (Phase 7) lives at `/client` and renders the same analytics widgets as the agency home, scoped to the client's single project.
 
 ## Role-based routing
 
@@ -80,6 +80,28 @@ Both the agency and the client sidebars sit on top of a shared `SidebarShell` (`
 
 `ClientMobileSidebar.tsx` is a thin wrapper over the shared `MobileSidebarShell`: it passes `<ClientDesktopSidebar />` as the drawer content and a client-specific `getPageLabelKey` for the mobile header label. All burger / portal / ESC / scroll-lock / auto-close behavior lives in the shell.
 
+## Client dashboard
+
+`/client` is rendered by `ClientHomePage` ([routes/client/home.tsx](../src/routes/client/home.tsx)). It is **view-only** in Phase 7 — connecting integrations from the client side is deferred to Phase 8.
+
+The page reuses the agency-home analytics components verbatim:
+- `HomeOverviewCards` (4 KPI tiles)
+- `IntegrationDetailCardRow` (per-integration metric cards)
+- `HomeViewsEvolutionChart` (multi-line per-platform views)
+- `HomeEngagementChart` (horizontal bar per-platform engagement)
+
+`projectUuid` comes from `useCurrentUser().user?.clientProjectUuid` — no project picker, no `useFocusProjectStore`. Data is fed by `useListIntegrations` + `useListIntegrationInsights` with that UUID, and the time-period selector reuses the shared `useHomePeriodStore`. Layout is a single column (no `HomeScriptsPanel`, no right pane).
+
+When the agency hasn't connected any integrations yet, the page renders an inline placeholder (`clientPortal:home.empty.*`) explaining the dashboard is being prepared. The agency-side `ConnectIntegrationPlaceholder` is intentionally **not** reused, because its CTA opens an agency-only login modal.
+
+## Subscription gate
+
+When a client's agency has no active subscription, every `/client/*` route is replaced by a "Access suspended — contact your agency" full-screen card (`ClientPortalLockedView`) that exposes only a Logout button.
+
+The gate is enforced **on the backend**, not via a serialized boolean: `GET /api/projects/:uuid` throws `AgencySubscriptionInactiveException` (code `27003`, HTTP 403) when the requester is a `ROLE_CLIENT` user whose agency has no active subscription. `ClientShellLayout` calls `useShowProject(user.clientProjectUuid)` on every render (the client sidebar already does, so React Query dedupes), and when the error carries code `27003` it short-circuits to `ClientPortalLockedView` before rendering any sidebar or outlet. Agency members are never gated, so they can still reach their billing settings to re-subscribe.
+
+`useShowProject` sets `retry: false` so the lock screen renders immediately on the 403 instead of waiting for React Query's default exponential backoff.
+
 ## Client settings
 
 `/client/settings/:section` reuses the same `SettingsPageView` component as the agency side — the view accepts a `basePath` prop so it builds nav links into the right shell. `SettingsPageView` already filters sections via `getSettingsSectionsForRoles(user.roles)`, which returns `[General]` for `ROLE_CLIENT`. Anything other than `:section === 'general'` redirects back to `clientSettingsGeneralPath`. The General section's `GeneralSettings` component (profile + password change) is reused unchanged.
@@ -101,7 +123,7 @@ Both the agency and the client sidebars sit on top of a shared `SidebarShell` (`
 
 | Hook | Endpoint | Notes |
 |---|---|---|
-| `useShowProject(projectUuid)` ([hooks/api/projects/useShowProject.ts](../src/hooks/api/projects/useShowProject.ts)) | `GET /api/projects/:uuid` | Self-disabled when `projectUuid` is falsy. Returns `{ project, isLoading, error }` with `project.agency` populated thanks to the `api_project_get_by_uuid` group. |
+| `useShowProject(projectUuid)` ([hooks/api/projects/useShowProject.ts](../src/hooks/api/projects/useShowProject.ts)) | `GET /api/projects/:uuid` | Self-disabled when `projectUuid` is falsy. Returns `{ project, isLoading, error }` with `project.agency` populated thanks to the `api_project_get_by_uuid` group. `retry: false` so the subscription gate (HTTP 403 / code 27003) surfaces immediately to `ClientShellLayout`. |
 | `useShowInvitation(token)` ([hooks/api/invitations/useShowInvitation.ts](../src/hooks/api/invitations/useShowInvitation.ts)) | `GET /api/invitations/:token` | Public — no auth header needed. `retry: false` so 404/410-class responses don't get retried. |
 | `useCompleteInvitation()` ([hooks/api/invitations/useCompleteInvitation.ts](../src/hooks/api/invitations/useCompleteInvitation.ts)) | `POST /api/invitations/:token/complete` | Mutation. On success, seeds `userQueryKeys.me` with the new user then invalidates so dependent queries refetch. |
 
@@ -114,6 +136,6 @@ Both the agency and the client sidebars sit on top of a shared `SidebarShell` (`
 
 ## Out of scope (this phase)
 
-- Real client dashboard widgets (analytics, contents, integrations) → Phase 7
-- `/client/contents` → Phase 8
+- Connecting integrations from the client portal → Phase 8 (today the dashboard is view-only).
+- `/client/contents` → Phase 8.
 - Per-role onboarding flows → Phase 9. In the meantime, `OnboardingCreateAgencyStep` (the first onboarding step) auto-advances on mount when `user.role === ROLE_CLIENT`, so clients never see an agency-creation prompt.

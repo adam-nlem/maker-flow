@@ -8,6 +8,7 @@ use App\DTO\Request\Project\UpdateProjectRequestDTO;
 use App\Entity\Enum\UserRole;
 use App\Entity\Project;
 use App\Entity\User;
+use App\Exception\Agency\AgencySubscriptionInactiveException;
 use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Project\ProjectAlreadyFinishedException;
 use App\Exception\Project\ProjectAlreadyOpenException;
@@ -100,8 +101,11 @@ final class ProjectController extends AbstractController
 
     #[Route('/{projectUuid}', name: 'api_projects_show', methods: ['GET'])]
     #[IsGranted(UserRole::User->value)]
-    public function show(string $projectUuid, ProjectRepository $projectRepository): JsonResponse
-    {
+    public function show(
+        string $projectUuid,
+        ProjectRepository $projectRepository,
+        SubscriptionRepository $subscriptionRepository,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
@@ -109,6 +113,13 @@ final class ProjectController extends AbstractController
 
         if ($project === null) {
             throw new ProjectNotFoundException();
+        }
+
+        if (
+            $user->hasRole(UserRole::Client)
+            && $subscriptionRepository->getLatestActiveByAgency($project->getAgency()) === null
+        ) {
+            throw new AgencySubscriptionInactiveException();
         }
 
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_get_by_uuid']]);

@@ -141,7 +141,9 @@ The Project feature allows users to create, manage, and organize their projects.
 - **Name:** `api_projects_show`
 - **Response:** `200 OK` with project details
 - **Serialization Group:** `api_project_get_by_uuid`
-- **Error:** `404 Not Found` if project doesn't exist
+- **Errors:**
+  - `404 Not Found` if project doesn't exist
+  - `403 Forbidden` with code `27003` (`AgencySubscriptionInactiveException`) when the requester is a `ROLE_CLIENT` user whose parent agency has no active subscription. Agency members are never gated by this check. The client portal relies on this error to render its "access suspended" lock screen.
 - **Access:** Agency members on any project of their agency (`ProjectVoter::VIEW`), and the client user(s) linked to the project. The client portal uses this endpoint to read the parent agency for sidebar branding.
 - **Response shape includes nested `agency`:** `uuid`, `name`, `description`, `types`, `createdAt`, `updatedAt`, `finishedAt`, and `agency: { uuid, name, brandColor, contactEmail, website }`. List endpoints (`api_projects_get_paginated`) do **not** include the agency — only this get-by-uuid response does.
 

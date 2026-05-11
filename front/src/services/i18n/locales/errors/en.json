@@ -86,7 +86,8 @@
         "notPending": "This suggestion is no longer pending."
     },
     "agency": {
-        "missing": "You're not attached to any agency."
+        "missing": "You're not attached to any agency.",
+        "subscriptionInactive": "Your agency's subscription is no longer active."
     },
     "hookTemplate": {
         "notFound": "Hook template not found.",
