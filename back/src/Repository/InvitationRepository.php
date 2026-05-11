@@ -98,7 +98,8 @@ class InvitationRepository extends ServiceEntityRepository
             ->setParameter('now', DateHelper::createUtcDateTimeImmutable())
             ->orderBy('i.createdAt', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     /**
@@ -116,6 +117,22 @@ class InvitationRepository extends ServiceEntityRepository
             ->setParameter('now', DateHelper::createUtcDateTimeImmutable())
             ->orderBy('i.createdAt', 'DESC')
             ->getQuery()
-            ->getResult();
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function hasPendingByEmail(string $email): bool
+    {
+        $count = (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->where('i.email = :email')
+            ->andWhere('i.usedAt IS NULL')
+            ->andWhere('i.expiresAt > :now')
+            ->setParameter('email', $email)
+            ->setParameter('now', DateHelper::createUtcDateTimeImmutable())
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $count > 0;
     }
 }

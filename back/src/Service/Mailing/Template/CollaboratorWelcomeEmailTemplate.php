@@ -33,6 +33,10 @@ class CollaboratorWelcomeEmailTemplate extends AbstractEmailTemplate
             <p>Bonjour {$this->to->getName()},</p>
             <p><strong>{$this->inviterName}</strong> vous a invité(e) à rejoindre l'agence <strong>{$this->agencyName}</strong> en tant que <strong>{$this->roleLabel}</strong>.</p>
             <p>Pour activer votre compte, définissez votre mot de passe en cliquant sur le bouton ci-dessous.</p>
+            <p style="background-color: #FFF7E6; border-left: 4px solid #F59E0B; padding: 12px 16px; margin: 16px 0; color: #141115;">
+                <strong>Important :</strong> vous devez utiliser ce lien pour rejoindre l'agence <strong>{$this->agencyName}</strong>.
+                Toute autre tentative d'inscription via le formulaire public créerait un compte séparé non rattaché à l'agence.
+            </p>
             <div style="text-align: center; margin: 32px 0;">
                 <a href="{$this->setupUrl}" style="display: inline-block; background-color: #141115; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Définir mon mot de passe</a>
             </div>

@@ -13,6 +13,7 @@ use App\Exception\User\InvalidPasswordException;
 use App\Exception\User\MissingPasswordFieldsException;
 use App\Exception\User\PasswordMismatchException;
 use App\Helper\PasswordHelper;
+use App\Repository\InvitationRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Service\Cookie\CookieService;
@@ -51,13 +52,17 @@ final class UserController extends AbstractController
     public function register(
         RegisterUserRequestDTO $dto,
         UserRepository $userRepository,
+        InvitationRepository $invitationRepository,
         OtpService $otpService,
     ): Response {
         if (!PasswordHelper::isValid($dto->getPlainPassword())) {
             throw new InvalidPasswordException();
         }
 
-        if ($userRepository->getByEmail($dto->getEmail())) {
+        if (
+            $userRepository->getByEmail($dto->getEmail()) ||
+            $invitationRepository->hasPendingByEmail($dto->getEmail())
+        ) {
             $responseDto = new RegisterResponseDTO(true, bin2hex(random_bytes(32)), $dto->getEmail());
             return $this->json(data: $responseDto->getData(), status: Response::HTTP_OK);
         }
