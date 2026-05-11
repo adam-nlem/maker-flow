@@ -1,4 +1,29 @@
 {
+    "createAgency": {
+        "name": {
+            "label": "Agency name",
+            "placeholder": "My agency"
+        },
+        "brandColor": {
+            "label": "Brand color (optional)",
+            "placeholder": "#141115"
+        },
+        "contactEmail": {
+            "label": "Contact email (optional)",
+            "placeholder": "hello@my-agency.com"
+        },
+        "website": {
+            "label": "Website (optional)",
+            "placeholder": "https://my-agency.com"
+        },
+        "submit": "Create my agency",
+        "validation": {
+            "nameRequired": "Please enter an agency name.",
+            "brandColorFormat": "Brand color must be a 6-digit hex value (e.g. #1F2937).",
+            "contactEmailFormat": "Please enter a valid contact email.",
+            "websiteFormat": "Website must start with http:// or https://."
+        }
+    },
     "generating": {
         "messages": {
             "analysis": "Analyzing the topic...",

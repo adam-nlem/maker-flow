@@ -60,6 +60,11 @@ The service imports `posthog` directly from `posthog-js` (same singleton as the 
 | `OnboardingStepCompleted` | `step: OnboardingStep` | `useCompleteOnboardingStep` |
 | `OnboardingDismissed` | — | `useDismissOnboarding` |
 
+### Agency
+| Event | Properties | Location |
+|---|---|---|
+| `AgencyCreated` | — | `useCreateAgency` |
+
 ### Projects
 | Event | Properties | Location |
 |---|---|---|

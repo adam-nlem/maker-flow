@@ -3,7 +3,7 @@ import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import DesktopSidebar from "../sidebar/DesktopSidebar";
 import MobileSidebar from "../sidebar/MobileSidebar";
-import { clientHomePath } from "~/routes/routePaths";
+import { clientHomePath, onboardingPath } from "~/routes/routePaths";
 
 export default function AgencyShellLayout() {
     const isDesktop = useIsDesktop();
@@ -11,6 +11,10 @@ export default function AgencyShellLayout() {
 
     if (user?.isClient) {
         return <Navigate to={clientHomePath} replace />;
+    }
+
+    if (user && user.agency === null) {
+        return <Navigate to={onboardingPath} replace />;
     }
 
     return (

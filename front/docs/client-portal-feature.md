@@ -60,5 +60,5 @@ ProtectedLayout (auth + onboarding only)
 
 - Client-styled sidebar inside `ClientShellLayout` → Phase 6
 - Real client dashboard widgets (analytics, contents, integrations) → Phase 7
-- Per-role onboarding flows → Phase 9
+- Per-role onboarding flows → Phase 9 — in the meantime, `OnboardingCreateAgencyStep` (the first onboarding step) auto-advances on mount when `user.role === ROLE_CLIENT`, so clients never see an agency-creation prompt.
 - `/invite/{token}` setup page → Phase 6

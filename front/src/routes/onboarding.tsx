@@ -2,6 +2,7 @@ import type { ReactNode } from "react"
 
 import WelcomeFeatureStep from "~/components/welcome/WelcomeFeatureStep"
 import WelcomeHowItWorksStep from "~/components/welcome/WelcomeHowItWorksStep"
+import OnboardingCreateAgencyStep from "~/components/onboarding/OnboardingCreateAgencyStep"
 import OnboardingCreateProjectStep from "~/components/onboarding/OnboardingCreateProjectStep"
 import OnboardingConnectIntegrationStep from "~/components/onboarding/OnboardingConnectIntegrationStep"
 import OnboardingCreateScriptStep from "~/components/onboarding/OnboardingCreateScriptStep"
@@ -17,6 +18,7 @@ const welcomeNodes: Record<WelcomeStep, ReactNode> = {
 }
 
 const onboardingNodes: Record<OnboardingStep, ReactNode> = {
+    [OnboardingStep.CreateAgency]: <OnboardingCreateAgencyStep />,
     [OnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
     [OnboardingStep.ConnectIntegration]: <OnboardingConnectIntegrationStep />,
     [OnboardingStep.CreateFirstScript]: <OnboardingCreateScriptStep />,

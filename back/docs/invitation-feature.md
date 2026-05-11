@@ -163,6 +163,16 @@ Inviting a client now lives on `POST /api/invitations` with `type=client` (see t
 - `DELETE /api/agencies/collaborators/{uuid}` → `agency_id = NULL` for the target, all their `Token` rows are deleted (next request fails `TokenAuthenticator`)
 - `DELETE /api/projects/clients/{uuid}` → `project_id = NULL`, tokens deleted
 
+## /register guard (functionally-silent)
+
+`UserController::register` ([back/src/Controller/UserController.php](../src/Controller/UserController.php)) checks `InvitationRepository::hasPendingByEmail()` alongside the existing "email already in use" branch. When the email matches a pending unused/unexpired invitation:
+
+- No `User` is persisted, no `Otp` is created, no exception is thrown.
+- A success-shaped `RegisterResponseDTO` is returned so the response is indistinguishable from a normal register from the caller's perspective — avoiding an email-enumeration leak.
+- The invitee's only path forward is the magic link from their original welcome email.
+
+Both welcome email templates (`CollaboratorWelcomeEmailTemplate`, `ClientWelcomeEmailTemplate`) carry an emphatic "Important" warning block reminding invitees that registering through the public form would create a separate, unrelated account — so the email copy itself enforces the desired flow.
+
 ## Migration
 
 `Version20260510091238` creates the `invitation` table (UUID, token unique index, FK to agency/project/user). No data migration — there are no pre-existing invitations.

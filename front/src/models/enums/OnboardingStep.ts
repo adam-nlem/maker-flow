@@ -1,7 +1,8 @@
-import { FolderPlusIcon, LinkIcon, DocumentPlusIcon, SparklesIcon } from "@heroicons/react/24/outline"
+import { BuildingOffice2Icon, FolderPlusIcon, LinkIcon, DocumentPlusIcon, SparklesIcon } from "@heroicons/react/24/outline"
 import type { ComponentType, SVGProps } from "react"
 
 export enum OnboardingStep {
+    CreateAgency = 'create_agency',
     CreateFirstProject = 'create_first_project',
     ConnectIntegration = 'connect_integration',
     CreateFirstScript = 'create_first_script',
@@ -12,6 +13,7 @@ export enum OnboardingStep {
 export const onboardingStepOptions = Object.values(OnboardingStep);
 
 export const ONBOARDING_STEP_ORDER = [
+    OnboardingStep.CreateAgency,
     OnboardingStep.CreateFirstProject,
     OnboardingStep.ConnectIntegration,
     OnboardingStep.CreateFirstScript,
@@ -20,6 +22,7 @@ export const ONBOARDING_STEP_ORDER = [
 ]
 
 export const onboardingStepTranslationKeys: Record<OnboardingStep, string> = {
+    [OnboardingStep.CreateAgency]: "enums:onboardingStep.titles.createAgency",
     [OnboardingStep.CreateFirstProject]: "enums:onboardingStep.titles.createFirstProject",
     [OnboardingStep.ConnectIntegration]: "enums:onboardingStep.titles.connectIntegration",
     [OnboardingStep.CreateFirstScript]: "enums:onboardingStep.titles.createFirstScript",
@@ -28,6 +31,7 @@ export const onboardingStepTranslationKeys: Record<OnboardingStep, string> = {
 }
 
 export const onboardingStepDescriptionKeys: Record<OnboardingStep, string> = {
+    [OnboardingStep.CreateAgency]: "enums:onboardingStep.descriptions.createAgency",
     [OnboardingStep.CreateFirstProject]: "enums:onboardingStep.descriptions.createFirstProject",
     [OnboardingStep.ConnectIntegration]: "enums:onboardingStep.descriptions.connectIntegration",
     [OnboardingStep.CreateFirstScript]: "enums:onboardingStep.descriptions.createFirstScript",
@@ -36,6 +40,7 @@ export const onboardingStepDescriptionKeys: Record<OnboardingStep, string> = {
 }
 
 export const onboardingStepToIcon: Record<OnboardingStep, ComponentType<SVGProps<SVGSVGElement>>> = {
+    [OnboardingStep.CreateAgency]: BuildingOffice2Icon,
     [OnboardingStep.CreateFirstProject]: FolderPlusIcon,
     [OnboardingStep.ConnectIntegration]: LinkIcon,
     [OnboardingStep.CreateFirstScript]: DocumentPlusIcon,
@@ -44,6 +49,7 @@ export const onboardingStepToIcon: Record<OnboardingStep, ComponentType<SVGProps
 }
 
 export const onboardingStepShortLabelKeys: Record<OnboardingStep, string> = {
+    [OnboardingStep.CreateAgency]: "enums:onboardingStep.shortLabels.createAgency",
     [OnboardingStep.CreateFirstProject]: "enums:onboardingStep.shortLabels.createFirstProject",
     [OnboardingStep.ConnectIntegration]: "enums:onboardingStep.shortLabels.connectIntegration",
     [OnboardingStep.CreateFirstScript]: "enums:onboardingStep.shortLabels.createFirstScript",

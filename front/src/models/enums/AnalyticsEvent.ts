@@ -5,6 +5,7 @@ export enum AnalyticsEvent {
     UserLoggedIn = 'user_logged_in',
     OnboardingStepCompleted = 'onboarding_step_completed',
     OnboardingDismissed = 'onboarding_dismissed',
+    AgencyCreated = 'agency_created',
     ProjectCreated = 'project_created',
     ProjectDeleted = 'project_deleted',
     ScriptCreated = 'script_created',

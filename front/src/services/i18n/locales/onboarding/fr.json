@@ -1,4 +1,29 @@
 {
+    "createAgency": {
+        "name": {
+            "label": "Nom de l'agence",
+            "placeholder": "Mon agence"
+        },
+        "brandColor": {
+            "label": "Couleur de marque (optionnel)",
+            "placeholder": "#141115"
+        },
+        "contactEmail": {
+            "label": "Email de contact (optionnel)",
+            "placeholder": "hello@mon-agence.com"
+        },
+        "website": {
+            "label": "Site web (optionnel)",
+            "placeholder": "https://mon-agence.com"
+        },
+        "submit": "Créer mon agence",
+        "validation": {
+            "nameRequired": "Veuillez saisir un nom d'agence.",
+            "brandColorFormat": "La couleur doit être un code hexadécimal à 6 caractères (ex. #1F2937).",
+            "contactEmailFormat": "Veuillez saisir un email de contact valide.",
+            "websiteFormat": "Le site web doit commencer par http:// ou https://."
+        }
+    },
     "generating": {
         "messages": {
             "analysis": "Analyse du sujet...",

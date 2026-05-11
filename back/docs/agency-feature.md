@@ -60,6 +60,10 @@ role_hierarchy:
 - **Subscription / CreditBalance** — `*.agency` (NOT NULL, CASCADE). Resolution today via `AgencyRepository::getByCollaborator($user)` (collaborators only). Phase 7 will introduce a `getByUser()` fallback that walks `User.project.agency` for clients.
 - **Integration** — owned by `Project.agency`. `Integration.createdBy` is kept only for audit.
 
+## Agency creation in onboarding
+
+Agency provisioning is its own onboarding step — it is **not** auto-bundled into `POST /api/users/register`. A freshly-registered admin lands on the frontend's `OnboardingCreateAgencyStep`, which submits to `POST /api/agencies`. The `AgencyShellLayout` redirects to `/onboarding` for any non-client user whose `agency` is still `null`, so the agency shell never renders against a null agency. See [onboarding-feature.md](onboarding-feature.md) for the `CreateAgency` step entry.
+
 ## Related docs
 
 - [invitation-feature.md](invitation-feature.md) — how new agency members and clients are onboarded.

@@ -26,12 +26,15 @@ The onboarding system tracks new user progress through key app features. It stor
 
 | Case | Value |
 |------|-------|
+| CreateAgency | `create_agency` |
 | CreateFirstProject | `create_first_project` |
 | ConnectIntegration | `connect_integration` |
 | CreateCreatorProfile | `create_creator_profile` |
 | CreateFirstScript | `create_first_script` |
 | GenerateFirstScript | `generate_first_script` |
 | ShowSubscriptions | `show_subscriptions` |
+
+`CreateAgency` is the first step in `ONBOARDING_STEP_ORDER` (frontend) — it drives a newly-registered admin to `POST /api/agencies` before they can reach the agency shell. The frontend `OnboardingCreateAgencyStep` auto-advances on mount for users who already have an agency or are `ROLE_CLIENT`, so the step doesn't block existing accounts.
 
 To add a new step: add a case here and update the frontend `OnboardingStep` enum const maps.
 

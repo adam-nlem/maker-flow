@@ -67,7 +67,7 @@ Values: `features`, `how_it_works`. Exports `WELCOME_STEP_ORDER` array and metad
 
 **File:** `app/models/enums/OnboardingStep.ts`
 
-Values: `create_first_project`, `connect_integration`, `create_creator_profile`, `create_first_script`, `generate_first_script`, `show_subscriptions`
+Values: `create_agency`, `create_first_project`, `connect_integration`, `create_creator_profile`, `create_first_script`, `generate_first_script`, `show_subscriptions`
 
 Step metadata defined as const maps: `onboardingStepToFrenchTranslation`, `onboardingStepToDescription`, `onboardingStepToIcon`, `onboardingStepToActionLabel`, `onboardingStepToNavigateTo`.
 
@@ -84,12 +84,15 @@ After HowItWorks, the user is redirected to `/register` (standalone route). Afte
 
 | Step | Enum | Component | Required | Description |
 |------|------|-----------|----------|-------------|
-| 0 | `CreateFirstProject` | `OnboardingCreateProjectStep` | Yes | Reuses `CreateProjectForm`, sets `focusedProjectUuid` in store |
-| 1 | `ConnectIntegration` | `OnboardingConnectIntegrationStep` | No (skippable) | Reuses `IntegrationSettingCard` components |
-| 2 | `CreateCreatorProfile` | `OnboardingCreatorProfileStep` | No (skippable) | Reuses `CreatorProfileForm` with `variant="onboarding"` |
-| 3 | `CreateFirstScript` | `OnboardingCreateScriptStep` | No (skippable) | Creates a script with title + platforms, sets `focusedScriptUuid` in store |
-| 4 | `GenerateFirstScript` | `OnboardingGenerateScriptStep` | No (skippable) | 3-phase: brief form → AI generation → preview |
-| 5 | `ShowSubscriptions` | `OnboardingSubscriptionStep` | No | Uses shared `SubscriptionOverview` with `successUrl="/onboarding?checkout=success"` and a custom `subscribedView` (success confirmation with CheckCircleIcon + plan name). |
+| 0 | `CreateAgency` | `OnboardingCreateAgencyStep` | Yes | Submits `POST /api/agencies` (name + optional brand color, contact email, website). Auto-advances on mount when `user.agency !== null` or `user.role === ROLE_CLIENT`, so existing agencies / clients skip it. Form validation lives in `app/utils/agencyValidation.ts` (mirrors `registerValidation.ts`). |
+| 1 | `CreateFirstProject` | `OnboardingCreateProjectStep` | Yes | Reuses `CreateProjectForm`, sets `focusedProjectUuid` in store |
+| 2 | `ConnectIntegration` | `OnboardingConnectIntegrationStep` | No (skippable) | Reuses `IntegrationSettingCard` components |
+| 3 | `CreateCreatorProfile` | `OnboardingCreatorProfileStep` | No (skippable) | Reuses `CreatorProfileForm` with `variant="onboarding"` |
+| 4 | `CreateFirstScript` | `OnboardingCreateScriptStep` | No (skippable) | Creates a script with title + platforms, sets `focusedScriptUuid` in store |
+| 5 | `GenerateFirstScript` | `OnboardingGenerateScriptStep` | No (skippable) | 3-phase: brief form → AI generation → preview |
+| 6 | `ShowSubscriptions` | `OnboardingSubscriptionStep` | No | Uses shared `SubscriptionOverview` with `successUrl="/onboarding?checkout=success"` and a custom `subscribedView` (success confirmation with CheckCircleIcon + plan name). |
+
+`AgencyShellLayout` redirects users with `user.agency === null && !user.isClient` to `/onboarding` so the agency shell never renders against a null agency.
 
 All post-auth components read `projectUuid` from `useFocusProjectStore` and advance via `useAdvanceOnboardingStep().advanceStep()`.
 
@@ -232,6 +235,10 @@ Returns: `{ phase, script, isPending, isFailed, messageIndex, handleBriefSubmit 
 - `app/components/onboarding/OnboardingStepHeader.tsx`
 - `app/components/auth/AuthStepLayout.tsx`
 - `app/components/auth/LoginForm.tsx`
+- `app/components/onboarding/OnboardingCreateAgencyStep.tsx`
+- `app/utils/agencyValidation.ts`
+- `app/hooks/api/agency/useCreateAgency.ts`
+- `app/hooks/api/agency/agencyQueryKeys.ts`
 - `app/components/onboarding/OnboardingCreateProjectStep.tsx`
 - `app/components/onboarding/OnboardingConnectIntegrationStep.tsx`
 - `app/components/onboarding/OnboardingCreatorProfileStep.tsx`

@@ -97,6 +97,7 @@
     },
     "onboardingStep": {
         "titles": {
+            "createAgency": "Create your agency",
             "createFirstProject": "Create your first project",
             "connectIntegration": "Connect your social accounts",
             "createFirstScript": "Create your first script",
@@ -104,6 +105,7 @@
             "showSubscriptions": "Discover our plans"
         },
         "descriptions": {
+            "createAgency": "Set up your agency workspace — its name, brand color and contact details.",
             "createFirstProject": "Projects let you group together your content and social accounts.",
             "connectIntegration": "Connect your accounts to analyze your performance and centralize your content.",
             "createFirstScript": "Here's your first video script. You'll be able to edit it later.",
@@ -111,6 +113,7 @@
             "showSubscriptions": "Choose the subscription that fits your needs to unlock every feature."
         },
         "shortLabels": {
+            "createAgency": "Agency",
             "createFirstProject": "Project",
             "connectIntegration": "Social account",
             "createFirstScript": "Script",
