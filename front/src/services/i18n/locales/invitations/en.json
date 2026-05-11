@@ -1,0 +1,5 @@
+{
+    "delete": {
+        "confirm": "Cancel the invitation sent to {{target}}? The link will become invalid."
+    }
+}

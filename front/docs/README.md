@@ -6,6 +6,7 @@ Index of all available documentation for the frontend codebase (React, TypeScrip
 
 | File | Description | Scope |
 |------|-------------|-------|
+| [agency-feature.md](agency-feature.md) | Agency settings + collaborators + per-project clients UI (Phase 5) | `useCurrentAgency` + `useUpdateAgency` hooks, `AgencySettings` form, `CollaboratorsSettings` DataTable + invite/remove/cancel modals, per-project Clients subsection inside `ProjectSettingsCard`, `InviteClientModal`, shared `DeleteInvitationModal`, `getSettingsSectionsForRole` role filter for the settings sidebar, role-aware deep-link redirect in `settings.section.tsx`, new analytics events, `Invitation` model + `InvitationType` enum |
 | [client-portal-feature.md](client-portal-feature.md) | Role-based routing + client portal shell | `UserRole` enum, extended `User` model (`role`, `agency`, `clientProjectUuid`, `isClient`), `Agency` model, role dispatch folded into `ProtectedLayout` (path-based via `clientAreaPrefix`), `clientHomePath` (`/client/home`), `ClientHomePage` stub (no sidebar), `clientPortal` i18n namespace, login/OTP routing handled transparently |
 | [coding-style.md](coding-style.md) | Coding standards and conventions |
 | [exception-system.md](exception-system.md) | Structured numeric exception system (frontend) | Project structure, naming conventions, component patterns, models, DTOs, enums, API hooks (React Query), Zustand stores, HTTP client, routes, styling, form handling, global API error handling (MutationCache, toast store), best practices |

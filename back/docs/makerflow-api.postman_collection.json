@@ -3051,6 +3051,26 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Delete Invitation",
+          "id": "invitations-delete-0001-000000000005",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invitations/{{invitationUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invitations",
+                "{{invitationUuid}}"
+              ]
+            }
+          },
+          "response": []
         }
       ],
       "id": "invitations-folder-0001-000000000000"
@@ -3072,6 +3092,54 @@
             "body": {
               "mode": "raw",
               "raw": "{\n  \"name\": \"My Agency\",\n  \"brandColor\": \"#1F2937\",\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Current Agency",
+          "id": "agency-current-0001-000000000004",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/current",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "current"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Current Agency",
+          "id": "agency-update-0001-000000000005",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"My Agency Renamed\",\n  \"brandColor\": \"#43CEA9\",\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/agencies",

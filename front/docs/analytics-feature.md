@@ -64,6 +64,24 @@ The service imports `posthog` directly from `posthog-js` (same singleton as the 
 | Event | Properties | Location |
 |---|---|---|
 | `AgencyCreated` | — | `useCreateAgency` |
+| `AgencySettingsUpdated` | — | `useUpdateAgency` |
+
+### Collaborators
+| Event | Properties | Location |
+|---|---|---|
+| `CollaboratorInvited` | `role: UserRole` | `useInviteCollaborator` |
+| `CollaboratorRemoved` | — | `useRemoveCollaborator` |
+
+### Project Clients
+| Event | Properties | Location |
+|---|---|---|
+| `ClientInvited` | `project_uuid: string` | `useInviteClient` |
+| `ClientRemoved` | `project_uuid: string` | `useRemoveClient` |
+
+### Invitations
+| Event | Properties | Location |
+|---|---|---|
+| `InvitationDeleted` | — | `useDeleteInvitation` |
 
 ### Projects
 | Event | Properties | Location |

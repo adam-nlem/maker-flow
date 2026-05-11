@@ -9,6 +9,7 @@ import type { VideoDuration } from "~/models/enums/VideoDuration";
 import type { AiModel } from "~/models/enums/AiModel";
 import type { Platform } from "~/models/enums/Platform";
 import type { SubscriptionPlan } from "~/models/enums/SubscriptionPlan";
+import type { UserRole } from "~/models/enums/UserRole";
 
 export interface EventProperties {}
 
@@ -54,4 +55,16 @@ export interface SubscriptionCheckoutStartedEvent extends EventProperties {
 
 export interface SubscriptionPurchasedEvent extends EventProperties {
     plan: SubscriptionPlan;
+}
+
+export interface CollaboratorInvitedEvent extends EventProperties {
+    role: UserRole;
+}
+
+export interface ClientInvitedEvent extends EventProperties {
+    project_uuid: string;
+}
+
+export interface ClientRemovedEvent extends EventProperties {
+    project_uuid: string;
 }

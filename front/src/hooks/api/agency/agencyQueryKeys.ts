@@ -1,4 +1,4 @@
 export const agencyQueryKeys = {
     all: ['agency'] as const,
-    me: ['agency', 'me'] as const,
+    current: () => [...agencyQueryKeys.all, 'current'] as const,
 }

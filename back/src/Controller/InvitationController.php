@@ -8,9 +8,14 @@ use App\Entity\Enum\InvitationType;
 use App\Entity\Enum\UserRole;
 use App\Entity\Token;
 use App\Entity\User;
+use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Invitation\InvalidInvitationProjectException;
 use App\Exception\Invitation\InvalidInvitationTypeException;
+use App\Exception\Invitation\InvitationAlreadyUsedException;
+use App\Exception\Invitation\InvitationNotFoundException;
 use App\Exception\Project\ProjectNotFoundException;
+use App\Repository\AgencyRepository;
+use App\Repository\InvitationRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\TokenRepository;
 use App\Security\Voter\ProjectVoter;
@@ -21,6 +26,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/invitations')]
@@ -61,6 +67,53 @@ final class InvitationController extends AbstractController
             status: Response::HTTP_CREATED,
             context: ['groups' => ['api_invitation_create']],
         );
+    }
+
+    #[Route('/{uuid}', name: 'api_invitations_delete', methods: ['DELETE'], requirements: ['uuid' => Requirement::UUID])]
+    #[IsGranted(UserRole::Editor->value)]
+    public function delete(
+        string $uuid,
+        InvitationRepository $invitationRepository,
+        AgencyRepository $agencyRepository,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $invitation = $invitationRepository->getByUuid($uuid);
+
+        if ($invitation === null) {
+            throw new InvitationNotFoundException();
+        }
+
+        if ($invitation->isUsed()) {
+            throw new InvitationAlreadyUsedException();
+        }
+
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        if ($invitation->getAgency()?->getId() !== $agency->getId()) {
+            throw new InvitationNotFoundException();
+        }
+
+        if ($invitation->getType() === InvitationType::Collaborator) {
+            $this->denyAccessUnlessGranted(UserRole::Admin->value);
+        } else {
+            $project = $invitation->getProject();
+
+            if ($project === null) {
+                throw new InvitationNotFoundException();
+            }
+
+            $this->denyAccessUnlessGranted(ProjectVoter::MANAGE_CLIENT, $project);
+        }
+
+        $invitationRepository->remove($invitation, true);
+
+        return $this->json(data: null, status: Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/{token}', name: 'api_invitations_show', methods: ['GET'])]

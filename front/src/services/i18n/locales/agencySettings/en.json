@@ -1,0 +1,16 @@
+{
+    "subtitle": "Customize your agency identity.",
+    "fields": {
+        "name": "Agency name",
+        "brandColor": "Brand color",
+        "brandColorHint": "6-digit hex code (e.g. #43CEA9). Leave empty to use the default color.",
+        "contactEmail": "Contact email",
+        "website": "Website"
+    },
+    "validation": {
+        "nameRequired": "Agency name is required.",
+        "brandColorFormat": "The brand color must be a 6-digit hex code (e.g. #43CEA9).",
+        "contactEmailFormat": "The contact email is invalid.",
+        "websiteFormat": "The website URL must start with http:// or https://."
+    }
+}

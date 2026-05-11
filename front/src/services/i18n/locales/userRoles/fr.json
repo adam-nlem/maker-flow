@@ -1,0 +1,7 @@
+{
+    "user": "Membre",
+    "admin": "Administrateur",
+    "editor": "Éditeur",
+    "viewer": "Lecteur",
+    "client": "Client"
+}

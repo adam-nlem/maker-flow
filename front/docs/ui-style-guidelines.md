@@ -640,6 +640,31 @@ Compact inline row of PostInsightType-based metrics. Each metric renders as an i
 
 ---
 
+### Tag
+
+**Location:** `front/src/components/ui/Tag.tsx`
+
+Non-interactive label for status, role, or category indicators. Distinct from `Pill` (toggleable) and `Badge` (icon + label with actions): `Tag` has no icon, no click handler, no hover state.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `label` | `string` | — | Tag text |
+| `color` | `'primary' \| 'gray' \| 'yellow' \| 'danger'` | `'gray'` | Color tone (background tint + matching text) |
+| `className` | `string` | `""` | Extra utility classes (e.g. `shrink-0` inside flex rows) |
+
+**Styling:** `inline-flex items-center px-2 py-0.5 rounded-md text-body-xs` with a tone derived from `color` — `bg-{token}/10 text-{token}` for `primary`/`yellow`/`danger`, `bg-light-gray text-gray` for `gray`. Uses design tokens only.
+
+**Examples:**
+```tsx
+<Tag color="primary" label="Active" />
+<Tag color="yellow" label="Pending" />
+<Tag color="gray" label="Archived" className="shrink-0" />
+```
+
+**Used in:** `CollaboratorsSettings` (role + status columns), `ProjectSettingsCard` (client status row pills).
+
+---
+
 ### Shimmer
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/Shimmer.tsx`

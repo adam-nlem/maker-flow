@@ -49,6 +49,16 @@ class InvitationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
+    public function getByUuid(string $uuid): ?Invitation
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.uuid = :uuid')
+            ->setParameter('uuid', $uuid)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
     public function invalidatePendingForCollaborator(string $email, Agency $agency): void
     {
         $this->createQueryBuilder('i')

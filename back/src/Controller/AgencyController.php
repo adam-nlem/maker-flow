@@ -3,12 +3,15 @@
 namespace App\Controller;
 
 use App\DTO\Request\Agency\CreateAgencyRequestDTO;
+use App\DTO\Request\Agency\UpdateAgencyRequestDTO;
 use App\Entity\Agency;
 use App\Entity\Enum\UserRole;
 use App\Entity\User;
+use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Agency\UserAlreadyHasAgencyException;
 use App\Repository\AgencyRepository;
 use App\Repository\UserRepository;
+use App\Security\Voter\AgencyVoter;
 use App\Service\Credit\CreditService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -50,6 +53,71 @@ final class AgencyController extends AbstractController
             data: $agency,
             status: Response::HTTP_CREATED,
             context: ['groups' => ['api_agency_create']],
+        );
+    }
+
+    #[Route('/current', name: 'api_agencies_current', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
+    public function current(AgencyRepository $agencyRepository): JsonResponse
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        return $this->json(
+            data: $agency,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_agency_current']],
+        );
+    }
+
+    #[Route('', name: 'api_agencies_update', methods: ['PATCH'])]
+    #[IsGranted(UserRole::Admin->value)]
+    public function update(
+        UpdateAgencyRequestDTO $dto,
+        AgencyRepository $agencyRepository,
+    ): JsonResponse {
+        $agencyUuid = $dto->getAgencyUuid();
+
+        if ($agencyUuid === null) {
+            throw new MissingAgencyException();
+        }
+
+        $agency = $agencyRepository->getByUuid($agencyUuid);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        $this->denyAccessUnlessGranted(AgencyVoter::MANAGE_SETTINGS, $agency);
+
+        if ($dto->getName() !== null && $dto->getName() !== $agency->getName()) {
+            $agency->setName($dto->getName());
+        }
+
+        if ($dto->getBrandColor() !== null && $dto->getBrandColor() !== $agency->getBrandColor()) {
+            $agency->setBrandColor($dto->getBrandColor());
+        }
+
+        if ($dto->getContactEmail() !== null && $dto->getContactEmail() !== $agency->getContactEmail()) {
+            $agency->setContactEmail($dto->getContactEmail());
+        }
+
+        if ($dto->getWebsite() !== null && $dto->getWebsite() !== $agency->getWebsite()) {
+            $agency->setWebsite($dto->getWebsite());
+        }
+
+        $agencyRepository->save($agency, true);
+
+        return $this->json(
+            data: $agency,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_agency_update']],
         );
     }
 }

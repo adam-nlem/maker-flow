@@ -4,7 +4,7 @@
 
 The `Agency` is the multi-tenant root of the workspace model. Every project, subscription, credit balance, and integration belongs to an Agency; users either *collaborate* on an Agency (`User.agency`, with one of `ROLE_ADMIN` / `ROLE_EDITOR` / `ROLE_VIEWER`) or are *clients* of a specific Project within an Agency (`User.project`, role `ROLE_CLIENT`).
 
-Phases 1 & 2 introduced the entity, role enum, voters, and migration; Phase 3 finalises the user-identity payload so the frontend can route by role.
+Phases 1 & 2 introduced the entity, role enum, voters, and migration; Phase 3 finalises the user-identity payload so the frontend can route by role. Phase 5 exposes the agency profile via `GET /api/agencies/current` and `PATCH /api/agencies` (the update endpoint requires `agencyUuid` in the body so the caller targets the agency explicitly, and is then authorized via `AgencyVoter::MANAGE_SETTINGS`).
 
 ## Role hierarchy
 
@@ -33,7 +33,7 @@ role_hierarchy:
   "createdAt": "…",
   "verifiedAt": "…",
   "referralCode": null,
-  "role": "ROLE_ADMIN",
+  "roles": ["ROLE_USER", "ROLE_ADMIN"],
   "clientProjectUuid": null,
   "agency": {
     "uuid": "…",
@@ -45,7 +45,7 @@ role_hierarchy:
 }
 ```
 
-- `role` is a derived getter on `User` (`getRole()`) returning the highest-precedence non-`ROLE_USER` role, or `null`. Precedence order: `ROLE_ADMIN > ROLE_EDITOR > ROLE_VIEWER > ROLE_CLIENT`.
+- `roles` is the raw Symfony role array stored on `User.roles`. Every user has `ROLE_USER` as a baseline, plus exactly one of `ROLE_ADMIN` / `ROLE_EDITOR` / `ROLE_VIEWER` / `ROLE_CLIENT`. Role-tier checks on the backend go through `User::hasRole(UserRole)`; the frontend mirrors the same model and exposes `User.hasRole(UserRole)` + an `isClient` getter.
 - `clientProjectUuid` is a derived getter (`getClientProjectUuid()`) that exposes `User.project.uuid` for clients (`null` for collaborators).
 - `agency` is the nested `User.agency` relation. For collaborators it is the agency they belong to. **For clients it is `null`** today — the relation `User.agency` is unset on `ROLE_CLIENT` users; the agency they ultimately belong to is reachable via `clientProjectUuid → Project.agency`. (Phase 7 will surface that to the client portal when the dashboard needs branding.)
 
@@ -59,6 +59,20 @@ role_hierarchy:
 - **Projects** — `Project.agency` (NOT NULL, CASCADE). Clients reach a project via `User.project`.
 - **Subscription / CreditBalance** — `*.agency` (NOT NULL, CASCADE). Resolution today via `AgencyRepository::getByCollaborator($user)` (collaborators only). Phase 7 will introduce a `getByUser()` fallback that walks `User.project.agency` for clients.
 - **Integration** — owned by `Project.agency`. `Integration.createdBy` is kept only for audit.
+
+## Agency profile endpoints (Phase 5)
+
+| Method | Route | Auth | Group |
+| --- | --- | --- | --- |
+| `GET` | `/api/agencies/current` | `ROLE_VIEWER+` (any agency member) | `api_agency_current` |
+| `PATCH` | `/api/agencies` | `ROLE_ADMIN` baseline + `AgencyVoter::MANAGE_SETTINGS` defence-in-depth | `api_agency_update` |
+| `POST` | `/api/agencies` | `ROLE_ADMIN`, only when user has no agency yet | `api_agency_create` |
+
+Both `GET` and `PATCH` resolve the current agency through `AgencyRepository::getByCollaborator($user)` and throw `MissingAgencyException` when the caller has no agency (e.g. clients).
+
+`UpdateAgencyRequestDTO` uses sparse-update semantics: only fields present in the JSON payload are applied to the entity. Validation constraints (e.g. `Assert\Regex` on `brandColor`, `Assert\Email`, `Assert\Url`) live on the entity itself and run via `AbstractRequestDTO::build()`.
+
+The new dedicated `api_agency_current` serialization group exposes the readable fields (`uuid`, `name`, `brandColor`, `contactEmail`, `website`). It is independent from `api_agency_create` and `api_agency_update`.
 
 ## Agency creation in onboarding
 

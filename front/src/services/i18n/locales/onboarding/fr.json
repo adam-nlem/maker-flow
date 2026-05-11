@@ -16,13 +16,7 @@
             "label": "Site web (optionnel)",
             "placeholder": "https://mon-agence.com"
         },
-        "submit": "Créer mon agence",
-        "validation": {
-            "nameRequired": "Veuillez saisir un nom d'agence.",
-            "brandColorFormat": "La couleur doit être un code hexadécimal à 6 caractères (ex. #1F2937).",
-            "contactEmailFormat": "Veuillez saisir un email de contact valide.",
-            "websiteFormat": "Le site web doit commencer par http:// ou https://."
-        }
+        "submit": "Créer mon agence"
     },
     "generating": {
         "messages": {

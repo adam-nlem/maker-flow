@@ -97,7 +97,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::JSON)]
-    #[Groups(['api_collaborators_list'])]
+    #[Groups([
+        'api_user_me',
+        'api_otp_verify_login',
+        'api_otp_verify_email',
+        'api_otp_verify_prelaunch',
+        'api_collaborators_list',
+    ])]
     private array $roles = [];
 
     #[ORM\Column(nullable: true)]
@@ -288,22 +294,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function hasRole(UserRole $role): bool
     {
         return in_array($role->value, $this->roles, true);
-    }
-
-    #[Groups([
-        'api_user_me',
-        'api_otp_verify_login',
-        'api_otp_verify_email',
-    ])]
-    public function getRole(): ?string
-    {
-        foreach ([UserRole::Admin, UserRole::Editor, UserRole::Viewer, UserRole::Client] as $candidate) {
-            if (in_array($candidate->value, $this->roles, true)) {
-                return $candidate->value;
-            }
-        }
-
-        return null;
     }
 
     #[Groups([

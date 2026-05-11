@@ -41,7 +41,7 @@ export default function GeneralSettings() {
 
     const errorMessage = error ? resolveErrorMessage(error) : null;
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (hasPasswordChanges && (!currentPassword || !newPassword || !confirmNewPassword)) {
             setValidationError(t("settings:general.validation.passwordFieldsRequired"));

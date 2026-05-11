@@ -105,6 +105,7 @@ Responses are produced by Symfony's serializer using groups declared on the enti
 | Endpoint | Method | Route Name | Auth | Description |
 |----------|--------|------------|------|-------------|
 | `/api/invitations` | POST | `api_invitations_create` | `ROLE_USER` (per-type checks below) | Unified create endpoint. Body: `CreateInvitationRequestDTO`. Branches on `type`: `collaborator` requires `ROLE_ADMIN` and the inviter's agency, `client` requires `ROLE_EDITOR` + `ProjectVoter::MANAGE_CLIENT` on `projectUuid`. Returns 201 + invitation (`api_invitation_create`). |
+| `/api/invitations/{uuid}` | DELETE | `api_invitations_delete` | `ROLE_EDITOR` baseline + per-type check | Delete a pending invitation (UX label: "Cancel invitation"). The route requires a UUID (`Requirement::UUID`) so it cannot collide with the public token routes. Branches on `type`: `collaborator` requires `ROLE_ADMIN`, `client` requires `ProjectVoter::MANAGE_CLIENT` on the invitation's project. Throws `InvitationAlreadyUsedException` if the invitation has already been redeemed. Cross-agency access is denied with `InvitationNotFoundException`. Returns 204. |
 | `/api/invitations/{token}` | GET | `api_invitations_show` | Public | Returns the invitation serialized with `api_invitation_show` |
 | `/api/invitations/{token}/complete` | POST | `api_invitations_complete` | Public | Completes setup, creates the user, returns user JSON (`api_user_me`) + sets `X-API-TOKEN` cookie |
 
@@ -162,6 +163,9 @@ Inviting a client now lives on `POST /api/invitations` with `type=client` (see t
 ### Removal
 - `DELETE /api/agencies/collaborators/{uuid}` → `agency_id = NULL` for the target, all their `Token` rows are deleted (next request fails `TokenAuthenticator`)
 - `DELETE /api/projects/clients/{uuid}` → `project_id = NULL`, tokens deleted
+
+### Delete pending invitation
+- `DELETE /api/invitations/{uuid}` → row deleted. The original welcome email's setup link becomes invalid (`InvitationNotFoundException`). Surfaced in the UI as a "Cancel" affordance on every pending row in both the Collaborators settings page and the per-project Clients subsection of `ProjectSettingsCard`.
 
 ## /register guard (functionally-silent)
 

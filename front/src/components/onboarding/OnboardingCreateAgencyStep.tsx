@@ -8,9 +8,8 @@ import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser"
 import { useCreateAgency } from "~/hooks/api/agency/useCreateAgency"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
-import { UserRole } from "~/models/enums/UserRole"
 import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages"
-import { HEX_COLOR_PATTERN, validateCreateAgencyForm } from "~/utils/agencyValidation"
+import { HEX_COLOR_PATTERN, validateAgencyForm } from "~/utils/agencyValidation"
 
 export default function OnboardingCreateAgencyStep() {
     const { t } = useTranslation()
@@ -26,14 +25,14 @@ export default function OnboardingCreateAgencyStep() {
 
     useEffect(() => {
         if (!user) return
-        if (user.agency !== null || user.role === UserRole.Client) {
+        if (user.agency !== null || user.isClient) {
             void advanceStep()
         }
     }, [user, advanceStep])
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        const errorKey = validateCreateAgencyForm({ name, brandColor, contactEmail, website })
+        const errorKey = validateAgencyForm({ name, brandColor, contactEmail, website })
         if (errorKey) {
             setValidationErrorKey(errorKey)
             return

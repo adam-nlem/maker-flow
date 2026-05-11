@@ -1,7 +1,7 @@
 import { Agency } from "./Agency"
-import { UserRole } from "./enums/UserRole"
+import { UserRole, userRolePrecedence } from "./enums/UserRole"
 
-interface UserJSON {
+export interface UserJSON {
     uuid: string;
     firstName: string | null;
     lastName: string | null;
@@ -9,7 +9,7 @@ interface UserJSON {
     createdAt: string;
     verifiedAt: string | null;
     referralCode: string | null;
-    role: string | null;
+    roles: string[];
     clientProjectUuid: string | null;
     agency: ReturnType<Agency["toJSON"]> | null;
 }
@@ -23,7 +23,7 @@ export class User {
         public readonly createdAt: Date,
         public readonly verifiedAt: Date | null,
         public readonly referralCode: string | null,
-        public readonly role: UserRole | null,
+        public readonly roles: UserRole[],
         public readonly clientProjectUuid: string | null,
         public readonly agency: Agency | null,
     ) { }
@@ -37,7 +37,7 @@ export class User {
             new Date(json.createdAt),
             json.verifiedAt ? new Date(json.verifiedAt) : null,
             json.referralCode ?? null,
-            json.role ? (json.role as UserRole) : null,
+            (json.roles ?? []).map((r) => r as UserRole),
             json.clientProjectUuid ?? null,
             json.agency ? Agency.fromJSON(json.agency) : null,
         );
@@ -52,7 +52,7 @@ export class User {
             createdAt: this.createdAt.toISOString(),
             verifiedAt: this.verifiedAt?.toISOString() ?? null,
             referralCode: this.referralCode,
-            role: this.role,
+            roles: this.roles,
             clientProjectUuid: this.clientProjectUuid,
             agency: this.agency?.toJSON() ?? null,
         };
@@ -71,6 +71,14 @@ export class User {
     }
 
     get isClient(): boolean {
-        return this.role === UserRole.Client;
+        return this.hasRole(UserRole.Client);
+    }
+
+    get displayRole(): UserRole | null {
+        return userRolePrecedence.find((role) => this.roles.includes(role)) ?? null;
+    }
+
+    hasRole(role: UserRole): boolean {
+        return this.roles.includes(role);
     }
 }

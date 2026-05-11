@@ -1,0 +1,39 @@
+{
+    "subtitle": "Invite team members to join your agency.",
+    "empty": "No collaborators yet.",
+    "self": "You",
+    "columns": {
+        "name": "Name",
+        "email": "Email",
+        "role": "Role",
+        "status": "Status",
+        "actions": "Actions"
+    },
+    "status": {
+        "active": "Active",
+        "pending": "Pending"
+    },
+    "invite": {
+        "button": "Invite collaborator",
+        "modalTitle": "Invite a collaborator",
+        "modalDescription": "The invitee will receive an email to join your agency.",
+        "submit": "Send invitation",
+        "fields": {
+            "firstName": "First name",
+            "lastName": "Last name",
+            "email": "Email",
+            "role": "Role"
+        },
+        "role": {
+            "editor": "Editor",
+            "viewer": "Viewer"
+        }
+    },
+    "remove": {
+        "button": "Remove",
+        "confirm": "Remove {{target}} from the agency? Their session will be revoked."
+    },
+    "cancel": {
+        "button": "Cancel invitation"
+    }
+}
