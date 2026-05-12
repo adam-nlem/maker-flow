@@ -65,7 +65,7 @@ export default function AgencyHomePage() {
   if (integrations.length === 0) {
     return (
       <div className="h-full overflow-y-auto p-3 md:p-5">
-        <ConnectIntegrationPlaceholder />
+        <ConnectIntegrationPlaceholder projectUuid={focusedProjectUuid} />
       </div>
     );
   }

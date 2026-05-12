@@ -5,9 +5,10 @@ import ContentPostDetailPanel from "./ContentPostDetailPanel"
 
 interface ContentsPageViewProps {
     projectUuid: string
+    isReadOnly?: boolean
 }
 
-export default function ContentsPageView({ projectUuid }: ContentsPageViewProps) {
+export default function ContentsPageView({ projectUuid, isReadOnly = false }: ContentsPageViewProps) {
     const selectedGroupUuid = useContentsStore((s) => s.selectedGroupUuid)
     const selectedPostUuid = useContentsStore((s) => s.selectedPostUuid)
 
@@ -15,6 +16,7 @@ export default function ContentsPageView({ projectUuid }: ContentsPageViewProps)
         <>
             <ContentGroupDetailPanel
                 groupUuid={selectedGroupUuid}
+                isReadOnly={isReadOnly}
             />
             <ContentPostDetailPanel
                 postUuid={selectedPostUuid}
@@ -24,7 +26,7 @@ export default function ContentsPageView({ projectUuid }: ContentsPageViewProps)
 
     return (
         <div className="flex flex-row h-full overflow-hidden">
-            <ContentListPanel projectUuid={projectUuid} />
+            <ContentListPanel projectUuid={projectUuid} isReadOnly={isReadOnly} />
             {rightPanels}
         </div>
     )

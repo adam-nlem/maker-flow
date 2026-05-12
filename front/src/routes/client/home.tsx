@@ -1,8 +1,9 @@
-import { ChevronUpDownIcon, ChartBarIcon } from "@heroicons/react/24/outline";
+import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import HomeEngagementChart from "~/components/home/HomeEngagementChart";
 import HomeOverviewCards from "~/components/home/HomeOverviewCards";
 import HomeViewsEvolutionChart from "~/components/home/HomeViewsEvolutionChart";
+import ConnectIntegrationPlaceholder from "~/components/integrations/ConnectIntegrationPlaceholder";
 import IntegrationDetailCardRow from "~/components/integrations/IntegrationDetailCardRow";
 import Pill from "~/components/ui/Pill";
 import SelectDropdown from "~/components/ui/SelectDropdown";
@@ -45,13 +46,7 @@ export default function ClientHomePage() {
     if (integrations.length === 0) {
         return (
             <div className="h-full overflow-y-auto p-3 md:p-5">
-                <div className="flex flex-col items-center justify-center py-20">
-                    <ChartBarIcon className="size-6 text-gray mb-2" />
-                    <h2 className="text-heading-md mb-1">{t("clientPortal:home.empty.title")}</h2>
-                    <p className="text-body-sm text-gray mb-3 text-center max-w-xs">
-                        {t("clientPortal:home.empty.body")}
-                    </p>
-                </div>
+                <ConnectIntegrationPlaceholder projectUuid={projectUuid} />
             </div>
         );
     }

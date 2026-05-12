@@ -13,9 +13,10 @@ import ContentPostList from "./ContentPostList"
 
 interface ContentListPanelProps {
   projectUuid: string
+  isReadOnly?: boolean
 }
 
-export default function ContentListPanel({ projectUuid }: ContentListPanelProps) {
+export default function ContentListPanel({ projectUuid, isReadOnly = false }: ContentListPanelProps) {
   const { t } = useTranslation()
   const activeTab = useContentsStore((s) => s.activeTab)
   const setActiveTab = useContentsStore((s) => s.setActiveTab)
@@ -33,16 +34,18 @@ export default function ContentListPanel({ projectUuid }: ContentListPanelProps)
       {/* Header */}
       <div className="flex flex-row items-center justify-between px-6 py-4 border-b border-light-gray">
         <h1 className="text-heading-xl">{t("contents:pageTitle")}</h1>
-        <Button
-          style="primary"
-          width="w-fit"
-          onClick={() => setIsCreateGroupModalOpen(true)}
-        >
-          <div className="flex flex-row items-center gap-2">
-            <PlusIcon className="size-4" strokeWidth={2} />
-            <p className="text-sm">{t("contents:newGroup")}</p>
-          </div>
-        </Button>
+        {!isReadOnly && (
+          <Button
+            style="primary"
+            width="w-fit"
+            onClick={() => setIsCreateGroupModalOpen(true)}
+          >
+            <div className="flex flex-row items-center gap-2">
+              <PlusIcon className="size-4" strokeWidth={2} />
+              <p className="text-sm">{t("contents:newGroup")}</p>
+            </div>
+          </Button>
+        )}
       </div>
 
       {/* Tab bar */}
@@ -75,11 +78,13 @@ export default function ContentListPanel({ projectUuid }: ContentListPanelProps)
 
       {isGroupTab ? <ContentGroupList projectUuid={projectUuid} /> : <ContentPostList projectUuid={projectUuid} />}
 
-      <CreateGroupModal
-        isOpen={isCreateGroupModalOpen}
-        onClose={() => setIsCreateGroupModalOpen(false)}
-        projectUuid={projectUuid}
-      />
+      {!isReadOnly && (
+        <CreateGroupModal
+          isOpen={isCreateGroupModalOpen}
+          onClose={() => setIsCreateGroupModalOpen(false)}
+          projectUuid={projectUuid}
+        />
+      )}
     </div>
   )
 }

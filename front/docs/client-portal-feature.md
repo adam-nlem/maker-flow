@@ -6,7 +6,7 @@ The frontend exposes two role-distinct shells over the same authentication: an *
 
 A public `/invite/:token` page sits outside both shells and turns an emailed invitation link into a logged-in client or collaborator session.
 
-The client dashboard (Phase 7) lives at `/client` and renders the same analytics widgets as the agency home, scoped to the client's single project.
+The client dashboard (Phase 7) lives at `/client` and renders the same analytics widgets as the agency home, scoped to the client's single project. Phase 8 adds `/client/contents` (a read-only view of the agency-side Contents page) and exposes OAuth integration management to clients (Connect CTA on `/client` home + sidebar "Integrations" tile).
 
 ## Role-based routing
 
@@ -32,6 +32,7 @@ export const agencyTasksPath = `${agencyAreaPrefix}/tasks`
 // ...
 export const clientAreaPrefix = '/client'
 export const clientHomePath = clientAreaPrefix
+export const clientContentsPath = `${clientAreaPrefix}/contents`
 export const clientSettingsPath = `${clientAreaPrefix}/settings`
 export const clientSettingsGeneralPath = `${clientSettingsPath}/general`
 
@@ -57,6 +58,7 @@ PrelaunchGuardLayout
     │   └── /agency/settings/...  → AgencySettingsLayout
     └── /client/*    → ClientShellLayout
         ├── /client                → ClientHomePage
+        ├── /client/contents       → ClientContentsPage (read-only)
         └── /client/settings/...   → ClientSettingsLayout
 ```
 
@@ -74,15 +76,17 @@ Both the agency and the client sidebars sit on top of a shared `SidebarShell` (`
 
 `components/client-portal/sidebar/ClientDesktopSidebar.tsx` feeds `SidebarShell` with:
 
-- Top section: agency name (tinted with `project.agency.brandColor` when set), greeting line with the user's first name. Shimmer while the project query is loading. Then a single Home tile pointing at `clientHomePath`.
+- Top section: agency name (tinted with `project.agency.brandColor` when set), greeting line with the user's first name. Shimmer while the project query is loading. Then two nav tiles: **Home** (`clientHomePath`) and **Contents** (`clientContentsPath`). Below the nav, a **PLATEFORMES** section renders one `IntegrationTile` per platform (Instagram, YouTube, TikTok) — identical to the agency sidebar. Clicking a tile calls `useIntegrationLoginModalStore().openForProject(clientProjectUuid, platform)`, which the single `IntegrationLoginModal` mount picks up.
 - Bottom nav: Settings tile pointing at `clientSettingsGeneralPath`.
-- No CTA prop (so the shell renders nothing between the divider and the footer) — clients have no project picker, no integration tiles, and no premium CTA.
+- No CTA prop (so the shell renders nothing between the divider and the footer) — clients have no project picker and no premium CTA.
+
+The sidebar mounts `IntegrationLoginModal` once for the whole client shell (same pattern as the agency `DesktopSidebar`).
 
 `ClientMobileSidebar.tsx` is a thin wrapper over the shared `MobileSidebarShell`: it passes `<ClientDesktopSidebar />` as the drawer content and a client-specific `getPageLabelKey` for the mobile header label. All burger / portal / ESC / scroll-lock / auto-close behavior lives in the shell.
 
 ## Client dashboard
 
-`/client` is rendered by `ClientHomePage` ([routes/client/home.tsx](../src/routes/client/home.tsx)). It is **view-only** in Phase 7 — connecting integrations from the client side is deferred to Phase 8.
+`/client` is rendered by `ClientHomePage` ([routes/client/home.tsx](../src/routes/client/home.tsx)). It is **analytics-only** — clients view their dashboard and can connect new social integrations from here, but cannot edit or delete existing ones (agency members manage those from the agency UI).
 
 The page reuses the agency-home analytics components verbatim:
 - `HomeOverviewCards` (4 KPI tiles)
@@ -92,7 +96,13 @@ The page reuses the agency-home analytics components verbatim:
 
 `projectUuid` comes from `useCurrentUser().user?.clientProjectUuid` — no project picker, no `useFocusProjectStore`. Data is fed by `useListIntegrations` + `useListIntegrationInsights` with that UUID, and the time-period selector reuses the shared `useHomePeriodStore`. Layout is a single column (no `HomeScriptsPanel`, no right pane).
 
-When the agency hasn't connected any integrations yet, the page renders an inline placeholder (`clientPortal:home.empty.*`) explaining the dashboard is being prepared. The agency-side `ConnectIntegrationPlaceholder` is intentionally **not** reused, because its CTA opens an agency-only login modal.
+**Empty state — Connect CTA** (Phase 8): when `integrations.length === 0`, the page reuses the shared `ConnectIntegrationPlaceholder` with an explicit `projectUuid={clientProjectUuid}` prop. The placeholder now accepts an optional `projectUuid` and dispatches `openForProject(projectUuid, Platform.Instagram)` when set (falling back to the agency-side `setSelectedPlatform` when omitted). This keeps a single Connect component used by both agency and client. In the populated state the page does not render its own Connect button — clients connect via the sidebar's platform tiles, matching the agency home (which also has no Connect button when integrations exist).
+
+## Client contents page
+
+`/client/contents` is rendered by `ClientContentsPage` ([routes/client/contents.tsx](../src/routes/client/contents.tsx)) — a thin adapter that reads `user.clientProjectUuid` and renders the shared `ContentsPageView` with `isReadOnly` set. No new page-level component was introduced; the agency-side route at [routes/agency/contents.tsx](../src/routes/agency/contents.tsx) mounts the same `ContentsPageView` without the flag.
+
+`isReadOnly` is propagated by `ContentsPageView` into `ContentListPanel` (hides the "New Group" button + skips the `CreateGroupModal` mount) and `ContentGroupDetailPanel` (hides the trash icon, "Unlink script" button, add-post `+` button, per-post remove buttons, and skips the `ConfirmDeleteDialog` / `PostPickerModal` mounts). `ContentPostDetailPanel` has no write surfaces so it stays untouched. Backend voters reject all writes regardless — the read-only flag is purely UX.
 
 ## Subscription gate
 
@@ -136,6 +146,5 @@ The gate is enforced **on the backend**, not via a serialized boolean: `GET /api
 
 ## Out of scope (this phase)
 
-- Connecting integrations from the client portal → Phase 8 (today the dashboard is view-only).
-- `/client/contents` → Phase 8.
 - Per-role onboarding flows → Phase 9. In the meantime, `OnboardingCreateAgencyStep` (the first onboarding step) auto-advances on mount when `user.role === ROLE_CLIENT`, so clients never see an agency-creation prompt.
+- Disconnecting integrations from the client portal — only agency members can revoke integrations from the agency UI (the role matrix grants clients connect-only access).

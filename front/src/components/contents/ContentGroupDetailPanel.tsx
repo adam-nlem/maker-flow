@@ -19,9 +19,10 @@ import PostTile from "./PostTile"
 
 interface ContentGroupDetailPanelProps {
     groupUuid: string | null
+    isReadOnly?: boolean
 }
 
-export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetailPanelProps) {
+export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false }: ContentGroupDetailPanelProps) {
     const { t } = useTranslation()
     const closePanel = useContentsStore((s) => s.closePanel)
     const selectPost = useContentsStore((s) => s.selectPost)
@@ -93,13 +94,15 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                 isOpen={isOpen}
                 onClose={handleClose}
                 headerActions={
-                    <button
-                        onClick={() => setShowDeleteConfirmation(true)}
-                        disabled={isDeleting}
-                        className="text-gray hover:text-danger transition-colors cursor-pointer disabled:opacity-50"
-                    >
-                        <TrashIcon className="size-4" strokeWidth={2} />
-                    </button>
+                    isReadOnly ? null : (
+                        <button
+                            onClick={() => setShowDeleteConfirmation(true)}
+                            disabled={isDeleting}
+                            className="text-gray hover:text-danger transition-colors cursor-pointer disabled:opacity-50"
+                        >
+                            <TrashIcon className="size-4" strokeWidth={2} />
+                        </button>
+                    )
                 }
             >
                 {isLoading && (
@@ -246,13 +249,15 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                                         <DocumentTextIcon className="size-3.5 text-primary shrink-0" strokeWidth={2} />
                                         <span className="text-body-xs text-primary truncate">{group.script.title}</span>
                                     </div>
-                                    <button
-                                        onClick={handleUnlinkScript}
-                                        disabled={isUpdating}
-                                        className="text-gray hover:text-danger transition-colors cursor-pointer text-body-xs whitespace-nowrap disabled:opacity-50"
-                                    >
-                                        {t("contents:group.unlinkScript")}
-                                    </button>
+                                    {!isReadOnly && (
+                                        <button
+                                            onClick={handleUnlinkScript}
+                                            disabled={isUpdating}
+                                            className="text-gray hover:text-danger transition-colors cursor-pointer text-body-xs whitespace-nowrap disabled:opacity-50"
+                                        >
+                                            {t("contents:group.unlinkScript")}
+                                        </button>
+                                    )}
                                 </div>
                             ) : (
                                 <p className="text-body-xs text-gray">{t("contents:group.noScript")}</p>
@@ -265,12 +270,14 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                                 <h3 className="text-heading-xs text-gray uppercase">
                                     {t("contents:group.postsHeader", { count: group.postGroup.posts.length })}
                                 </h3>
-                                <button
-                                    onClick={() => setIsPostPickerOpen(true)}
-                                    className="text-primary hover:text-primary/80 transition-colors cursor-pointer"
-                                >
-                                    <PlusIcon className="size-4" strokeWidth={2} />
-                                </button>
+                                {!isReadOnly && (
+                                    <button
+                                        onClick={() => setIsPostPickerOpen(true)}
+                                        className="text-primary hover:text-primary/80 transition-colors cursor-pointer"
+                                    >
+                                        <PlusIcon className="size-4" strokeWidth={2} />
+                                    </button>
+                                )}
                             </div>
 
                             <div className="flex flex-col gap-1">
@@ -278,7 +285,7 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                                     <PostTile
                                         key={post.uuid}
                                         post={post}
-                                        onRemove={() => handleRemovePost(post.uuid)}
+                                        onRemove={isReadOnly ? undefined : () => handleRemovePost(post.uuid)}
                                         isRemoving={isUpdating}
                                         onSelect={() => {
                                             selectPost(post.uuid)
@@ -295,26 +302,30 @@ export default function ContentGroupDetailPanel({ groupUuid }: ContentGroupDetai
                 )}
             </SidePanel>
 
-            <ConfirmDeleteDialog
-                isOpen={showDeleteConfirmation}
-                onClose={() => setShowDeleteConfirmation(false)}
-                onConfirm={async () => {
-                    if (!groupUuid) return
-                    await deletePostGroup(groupUuid)
-                    handleClose()
-                }}
-                isPending={isDeleting}
-                message={t("contents:group.deleteConfirm")}
-            />
+            {!isReadOnly && (
+                <>
+                    <ConfirmDeleteDialog
+                        isOpen={showDeleteConfirmation}
+                        onClose={() => setShowDeleteConfirmation(false)}
+                        onConfirm={async () => {
+                            if (!groupUuid) return
+                            await deletePostGroup(groupUuid)
+                            handleClose()
+                        }}
+                        isPending={isDeleting}
+                        message={t("contents:group.deleteConfirm")}
+                    />
 
-            <PostPickerModal
-                isOpen={isPostPickerOpen}
-                onClose={() => setIsPostPickerOpen(false)}
-                onConfirm={handleAddPosts}
-                projectUuid={focusedProjectUuid!}
-                excludeUuids={existingPostUuids}
-                isConfirming={isUpdating}
-            />
+                    <PostPickerModal
+                        isOpen={isPostPickerOpen}
+                        onClose={() => setIsPostPickerOpen(false)}
+                        onConfirm={handleAddPosts}
+                        projectUuid={focusedProjectUuid!}
+                        excludeUuids={existingPostUuids}
+                        isConfirming={isUpdating}
+                    />
+                </>
+            )}
         </>
     )
 }

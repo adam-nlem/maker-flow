@@ -6,8 +6,10 @@ The Contents page (`/contents`) is the unified view for browsing post groups, in
 
 ## Route
 
-- **Path:** `/contents`
-- Replaces the previous `/insights` route
+- **Agency path:** `/agency/contents` ([routes/agency/contents.tsx](../src/routes/agency/contents.tsx)) — full write access
+- **Client path:** `/client/contents` ([routes/client/contents.tsx](../src/routes/client/contents.tsx)) — read-only (Phase 8). Mounts the same `ContentsPageView` with `isReadOnly` set.
+
+Both routes are thin adapters that resolve their project UUID differently (agency uses `useSelectFocusedProject`; client uses `user.clientProjectUuid`) and pass it to the shared `ContentsPageView`.
 
 ## Layout
 
@@ -24,6 +26,12 @@ The Contents page (`/contents`) is the unified view for browsing post groups, in
 **File:** `app/components/contents/ContentsPageView.tsx`
 
 Main page component. Reads from `useContentsStore` for active tab, platform filter, and panel state. Renders the platform filter, tab switcher, `ContentsList`, and the appropriate `SidePanel`.
+
+**Props:**
+- `projectUuid: string` — the scope for posts/groups queries
+- `isReadOnly?: boolean` — when `true`, hides every write surface (New Group, Delete group, Unlink script, Add/Remove posts) and skips mounting their dialogs. Used by `/client/contents`. Defaults to `false` so the agency route's behavior is unchanged.
+
+The flag is forwarded into `ContentListPanel` and `ContentGroupDetailPanel`. `ContentPostDetailPanel` has no write surfaces and is unaffected. Backend voters block writes regardless — `isReadOnly` is purely UX.
 
 ### ContentsList
 

@@ -47,7 +47,7 @@ export default function DesktopSidebar() {
   const setUpdatingProjectUuid = useUpdateProjectStore((state) => state.setUpdatingProjectUuid)
 
   const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid })
-  const setSelectedPlatform = useIntegrationLoginModalStore((state) => state.setSelectedPlatform)
+  const openIntegrationLoginModal = useIntegrationLoginModalStore((state) => state.open)
 
   const topSection = (
     <>
@@ -140,7 +140,7 @@ export default function DesktopSidebar() {
             key={platform}
             platform={platform}
             status={integrations.find((i) => i.platform === platform)?.status}
-            onClick={() => setSelectedPlatform(platform)}
+            onClick={() => focusedProjectUuid && openIntegrationLoginModal(focusedProjectUuid, platform)}
           />
         ))}
       </div>
