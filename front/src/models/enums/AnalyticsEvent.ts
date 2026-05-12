@@ -11,6 +11,8 @@ export enum AnalyticsEvent {
     CollaboratorRemoved = 'collaborator_removed',
     ClientInvited = 'client_invited',
     ClientRemoved = 'client_removed',
+    CollaboratorSetupCompleted = 'collaborator_setup_completed',
+    ClientSetupCompleted = 'client_setup_completed',
     InvitationDeleted = 'invitation_deleted',
     ProjectCreated = 'project_created',
     ProjectDeleted = 'project_deleted',

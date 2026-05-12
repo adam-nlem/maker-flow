@@ -2,9 +2,11 @@
 
 ## Overview
 
-The credit system manages user credits with two separate buckets: **subscription credits** (granted by plan renewals) and **refill credits** (purchased separately). A `CreditBalance` entity is the single source of truth, and every mutation is recorded as an immutable `CreditTransaction` for full auditability.
+The credit system manages **agency-level** credits with two separate buckets: **subscription credits** (granted by plan renewals) and **refill credits** (purchased separately). A `CreditBalance` entity is the single source of truth per agency, and every mutation is recorded as an immutable `CreditTransaction` for full auditability.
 
 Stripe Checkout handles the payment flow: the backend creates Checkout Sessions and returns URLs for the frontend to redirect users to Stripe-hosted payment pages. Plan identification is driven by **Stripe Product metadata** (`product.metadata.plan`), making the system fully metadata-driven — adding or modifying plans only requires changes in the Stripe dashboard.
+
+> **Phase 1 reminder:** Billing was migrated from `User` to `Agency` so that all collaborators of an agency share the same subscription, credits, and Stripe customer. Clients (`ROLE_CLIENT`) never own a subscription — they read the parent agency's subscription via their `clientProject.agency` to determine whether the client portal is unlocked. See `back/docs/agency-feature.md` for the role hierarchy and voter rules, and `back/docs/client-portal-feature.md` for the client-side subscription gate.
 
 ---
 
@@ -12,7 +14,7 @@ Stripe Checkout handles the payment flow: the backend creates Checkout Sessions 
 
 ### CreditBalance
 
-Single source of truth for a user's available credits. OneToOne with User.
+Single source of truth for an agency's available credits. OneToOne with Agency.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -20,7 +22,7 @@ Single source of truth for a user's available credits. OneToOne with User.
 | `uuid` | GUID | Public identifier |
 | `subscriptionCredits` | int | Credits from subscription renewals |
 | `refillCredits` | int | Credits from refill purchases |
-| `user` | OneToOne(User) | Owner (owning side, CASCADE delete) |
+| `agency` | OneToOne(Agency) | Owner (owning side, CASCADE delete on agency removal) |
 | `createdAt` | DateTimeImmutable | UTC timestamp |
 | `updatedAt` | DateTimeImmutable | UTC timestamp, auto-updated |
 
@@ -43,8 +45,8 @@ Immutable audit log. Every credit change produces a row here.
 | `stripePaymentIntentId` | ?string | Stripe PI reference |
 | `stripeInvoiceId` | ?string | Stripe invoice reference |
 | `description` | ?text | Human-readable audit note |
-| `user` | ManyToOne(User) | Owner |
-| `creditBalance` | ManyToOne(CreditBalance) | Parent balance |
+| `createdBy` | ?ManyToOne(User) | Audit-only: which user triggered the transaction (nullable, `SET NULL` on user removal). Ownership flows through `creditBalance.agency`. |
+| `creditBalance` | ManyToOne(CreditBalance) | Parent balance (CASCADE) — resolves to the owning agency |
 | `createdAt` | DateTimeImmutable | UTC timestamp |
 
 No `updatedAt` -- transactions are immutable.
@@ -53,7 +55,7 @@ Serialization groups: `api_credit_transactions_list`
 
 ### Subscription
 
-Local mirror of Stripe subscription state. ManyToOne with User (a user can have multiple subscriptions over time for history). Use `SubscriptionRepository::getLatestActiveByUser()` to get the current active subscription, or `getLatestByUser()` for the most recent regardless of status.
+Local mirror of Stripe subscription state. ManyToOne with Agency (an agency can have multiple subscriptions over time for history). Use `SubscriptionRepository::getLatestActiveByAgency()` to get the current active subscription, or `getLatestByAgency()` for the most recent regardless of status.
 
 | Field | Type | Description |
 |-------|------|-------------|
@@ -65,7 +67,7 @@ Local mirror of Stripe subscription state. ManyToOne with User (a user can have 
 | `currentPeriodStart` | DateTimeImmutable | Billing period start |
 | `currentPeriodEnd` | DateTimeImmutable | Billing period end |
 | `cancelAtPeriodEnd` | bool | Whether cancellation is scheduled |
-| `user` | OneToOne(User) | Owner (owning side, CASCADE delete) |
+| `agency` | ManyToOne(Agency) | Owner (owning side, CASCADE delete on agency removal) |
 | `createdAt` | DateTimeImmutable | UTC timestamp |
 | `updatedAt` | DateTimeImmutable | UTC timestamp, auto-updated |
 
@@ -155,36 +157,39 @@ Core business logic for credit operations. Uses pessimistic locking and DB trans
 
 ### Public Methods
 
-#### `getOrCreateBalance(User $user): CreditBalance`
-Lazily creates a zero-balance if the user doesn't have one yet.
+#### `getOrCreateBalance(Agency $agency): CreditBalance`
+Lazily creates a zero-balance if the agency doesn't have one yet.
 
-#### `addRefillCredits(User $user, int $amount, ?string $stripePaymentIntentId, ?string $stripeInvoiceId): CreditTransaction`
-Adds credits to the refill bucket. Wrapped in a DB transaction for atomicity (balance update + transaction insert).
+#### `addRefillCredits(Agency $agency, int $amount, ?string $stripePaymentIntentId, ?string $stripeInvoiceId, ?User $performedBy = null): CreditTransaction`
+Adds credits to the refill bucket. Wrapped in a DB transaction for atomicity (balance update + transaction insert). The optional `performedBy` user is recorded on the transaction's `createdBy` field for audit.
 
-#### `renewSubscriptionCredits(User $user, int $planCredits, ?string $stripeInvoiceId): CreditTransaction`
+#### `renewSubscriptionCredits(Agency $agency, int $planCredits, ?string $stripeInvoiceId): CreditTransaction`
 Resets `subscriptionCredits` to the plan amount (not additive). Calculates the delta (`planCredits - currentSubscriptionCredits`) and records a CreditTransaction with `type = SubscriptionRenewal`. Called at each subscription renewal.
 
-#### `debitCredits(User $user, int $amount, CreditTransactionType $type): CreditTransaction[]`
+#### `debitCredits(Agency $agency, int $amount, CreditTransactionType $type, ?User $performedBy = null): CreditTransaction[]`
 Debits credits following the **subscription-first** rule:
-1. Acquires a `PESSIMISTIC_WRITE` lock on the CreditBalance row
+1. Acquires a `PESSIMISTIC_WRITE` lock on the CreditBalance row (via `getByAgencyWithLock`)
 2. Validates sufficient credits, throws `InsufficientCreditsException` if not
 3. Deducts from `subscriptionCredits` first, then `refillCredits`
-4. Creates 1-2 CreditTransaction records (one per bucket used)
+4. Creates 1-2 CreditTransaction records (one per bucket used), tagging `performedBy` if provided
 5. Each transaction's `balanceAfter` reflects the running total after that specific debit
 
-#### `getTotalCredits(User $user): int`
+#### `addWelcomeCredits(Agency $agency, int $amount, ?User $performedBy = null): CreditTransaction`
+Grants the one-time welcome credits to a newly-provisioned agency. Called by the agency provisioning service after registration.
+
+#### `getTotalCredits(Agency $agency): int`
 Returns the sum of subscription + refill credits.
 
 ### Debit Transaction Flow
 
 ```
 1. BEGIN TRANSACTION
-2. SELECT ... FROM credit_balance WHERE user_id = ? FOR UPDATE
+2. SELECT ... FROM credit_balance WHERE agency_id = ? FOR UPDATE
 3. Validate: totalCredits >= amount (else ROLLBACK + throw)
 4. fromSubscription = min(subscriptionCredits, amount)
    fromRefill = amount - fromSubscription
 5. Update balance buckets
-6. INSERT CreditTransaction(s) per non-zero bucket
+6. INSERT CreditTransaction(s) per non-zero bucket, recording `createdBy` if provided
 7. FLUSH + COMMIT (releases lock)
 ```
 
@@ -302,20 +307,20 @@ Handles Stripe Checkout Session creation for subscriptions and refill purchases.
 
 - `string $stripeSecretKey` -- Stripe API key (injected via `services.yaml`)
 - `string $frontendUrl` -- for building success/cancel redirect URLs
-- `UserRepository`
+- `AgencyRepository`
 - `StripePlanService` -- for resolving plan price IDs
 - `StripeRefillService` -- for resolving refill price ID
 
 ### Public Methods
 
-#### `getOrCreateStripeCustomer(User $user): string`
-Returns the user's Stripe customer ID. If none exists, creates a Stripe customer and persists the ID to the User entity.
+#### `getOrCreateStripeCustomer(Agency $agency): string`
+Returns the agency's Stripe customer ID. If none exists, creates a Stripe customer (using the agency's `contactEmail` and `name`) and persists the ID to the Agency entity.
 
-#### `createSubscriptionCheckoutSession(User $user, SubscriptionPlan $plan, string $checkoutRedirectPath = '/settings/subscription'): string`
-Creates a Stripe Checkout Session in `subscription` mode. Resolves the price ID via `StripePlanService::getPriceIdForPlan()`. Returns the checkout URL. `$checkoutRedirectPath` is the base path for both success and cancel redirects — the backend appends `?checkout=success` or `?checkout=cancel` automatically. Defaults to `/settings/subscription`.
+#### `createSubscriptionCheckoutSession(Agency $agency, SubscriptionPlan $plan, string $checkoutRedirectPath = '/settings/subscription'): string`
+Creates a Stripe Checkout Session in `subscription` mode for the agency. Resolves the price ID via `StripePlanService::getPriceIdForPlan()`. Returns the checkout URL. `$checkoutRedirectPath` is the base path for both success and cancel redirects — the backend appends `?checkout=success` or `?checkout=cancel` automatically. Defaults to `/settings/subscription`.
 
-#### `createRefillCheckoutSession(User $user): string`
-Creates a Stripe Checkout Session in `payment` mode using the single refill price. Returns the checkout URL.
+#### `createRefillCheckoutSession(Agency $agency): string`
+Creates a Stripe Checkout Session in `payment` mode using the single refill price, charged to the agency's Stripe customer. Returns the checkout URL.
 
 ### Checkout Flow
 
@@ -480,35 +485,41 @@ Thrown when a subscription management action fails (cancel, resume, or plan chan
 ## Repositories
 
 ### CreditBalanceRepository
-- `getByUser(User $user): ?CreditBalance` -- standard lookup
-- `getByUserWithLock(User $user): ?CreditBalance` -- with `PESSIMISTIC_WRITE` lock (must be called within a DB transaction)
+- `getByAgency(Agency $agency): ?CreditBalance` -- standard lookup
+- `getByAgencyWithLock(Agency $agency): ?CreditBalance` -- with `PESSIMISTIC_WRITE` lock (must be called within a DB transaction)
 
 ### CreditTransactionRepository
-- `getByUserPaginated(User $user, int $page, int $limit): array` -- paginated transaction history
+- `getByAgencyPaginated(Agency $agency, int $page, int $limit): array` -- paginated transaction history for the agency
 
 ### SubscriptionRepository
-- `getLatestActiveByUser(User $user): ?Subscription` -- returns the latest subscription with status `Active` AND `currentPeriodEnd >= now`
-- `getLatestByUser(User $user): ?Subscription` -- returns the most recent subscription regardless of status
+- `getLatestActiveByAgency(Agency $agency): ?Subscription` -- returns the latest subscription with status `Active` AND `currentPeriodEnd >= now`
+- `getLatestByAgency(Agency $agency): ?Subscription` -- returns the most recent subscription regardless of status
 - `getByStripeSubscriptionId(string $stripeSubscriptionId): ?Subscription`
 
 ### StripeWebhookEventRepository
 - `existsByStripeEventId(string $stripeEventId): bool` -- idempotency check
 
-### UserRepository (additions)
-- `getByStripeCustomerId(string $stripeCustomerId): ?User`
+### AgencyRepository (Stripe-related additions)
+- `getByStripeCustomerId(string $stripeCustomerId): ?Agency` -- used by `StripeWebhookService` to resolve the owning agency from a webhook payload
 
 ---
 
-## User Entity
+## Agency Entity
 
-OneToOne relationships (inverse side, mapped by User, cascade remove):
-- `creditBalance` -- `?CreditBalance`
-
-OneToMany relationships (inverse side, mapped by User, cascade remove):
-- `subscriptions` -- `Collection<Subscription>` (history of all subscriptions)
+The agency owns all billing state. Inverse relationships (mapped by Agency):
+- `creditBalance` -- `?CreditBalance` (OneToOne, cascade remove)
+- `subscriptions` -- `Collection<Subscription>` (OneToMany, cascade remove — full history)
 
 Stripe field:
-- `stripeCustomerId` -- `?string`, nullable, serialized in `api_user_me` group
+- `stripeCustomerId` -- `?string`, nullable (one Stripe customer per agency, lazily created on first checkout)
+
+### Subscription resolution per request
+
+The controllers never resolve a subscription from the authenticated `User` directly. They go through the agency:
+- **Agency members** (Admin / Editor / Viewer): `user.agency` is the agency.
+- **Clients** (`ROLE_CLIENT`): `user.agency` is `null`. The agency is `user.clientProject.agency`.
+
+This branching is encapsulated in helper logic shared by `SubscriptionController` and `CreditController` (see `back/docs/agency-feature.md` for the role hierarchy). Clients can read subscription / balance state of their parent agency to know whether the portal is unlocked but cannot mutate it: `AgencyVoter::MANAGE_BILLING` only resolves true for `ROLE_ADMIN`. When a client's parent agency has no active subscription, project endpoints return `AgencySubscriptionInactiveException` (code `27003`) — see `back/docs/client-portal-feature.md`.
 
 ---
 
@@ -529,7 +540,7 @@ Plan limits (maxProjects, maxScriptsPerProject) are stored in Stripe product met
 
 ### Subscription Resolution
 
-Controllers use `SubscriptionRepository::getLatestActiveByUser($user)` to get the subscription. This method validates both status (`Active`) and expiry (`currentPeriodEnd >= now`). If it returns `null`, the user is treated as free.
+Controllers use `SubscriptionRepository::getLatestActiveByAgency($agency)` to get the subscription. The agency is resolved from the authenticated user (`user.agency` for agency members, `user.clientProject.agency` for clients). This method validates both status (`Active`) and expiry (`currentPeriodEnd >= now`). If it returns `null`, the agency (and therefore the user) is treated as free.
 
 ### Plan Limits (from Stripe metadata)
 
@@ -542,10 +553,11 @@ Limits are configured in Stripe product metadata and read via `StripePlanService
 Limits are checked in controllers before calling services using `StripePlanService`:
 
 ```php
-$plan = $subscriptionRepository->getActiveByUser($user)?->getPlan();
+$agency = $user->getAgency() ?? $user->getClientProject()?->getAgency();
+$plan = $subscriptionRepository->getLatestActiveByAgency($agency)?->getPlan();
 $maxX = $plan !== null ? $stripePlanService->getPlanConfig($plan)?->getMaxX() : 1;
 
-if ($maxX !== null && $repository->countBy...($user) >= $maxX) {
+if ($maxX !== null && $repository->countBy...($agency) >= $maxX) {
     return $this->json(
         data: ["message" => "You have reached the X limit for your plan."],
         status: Response::HTTP_PAYMENT_REQUIRED // 402
@@ -559,8 +571,8 @@ Premium detail endpoints return **402 Payment Required** directly from controlle
 
 | Endpoint | Controller | Behavior |
 |----------|-----------|----------|
-| `GET /api/post-insights/detail` | `PostInsightController::detail()` | Returns 402 if `getLatestActiveByUser()` is null |
-| `GET /api/integration-insights/detail` | `IntegrationInsightController::detail()` | Returns 402 if `getLatestActiveByUser()` is null |
+| `GET /api/post-insights/detail` | `PostInsightController::detail()` | Returns 402 if `getLatestActiveByAgency()` is null for the resolved agency |
+| `GET /api/integration-insights/detail` | `IntegrationInsightController::detail()` | Returns 402 if `getLatestActiveByAgency()` is null for the resolved agency |
 
 Services that receive an `isSubscribed` parameter skip premium computations for free users:
 
@@ -595,7 +607,7 @@ Services that receive an `isSubscribed` parameter skip premium computations for 
 5. **Race condition safety**: Pessimistic locking prevents concurrent debits from over-spending
 6. **Webhook idempotency**: `StripeWebhookEvent.stripeEventId` unique constraint prevents duplicate processing
 7. **Metadata-driven plans**: Plan identity, features, and limits live in Stripe product metadata — no hardcoded price IDs for plan resolution
-8. **Stripe customer linkage**: `stripeCustomerId` on User entity (not Subscription) -- one customer per user across all Stripe interactions
+8. **Stripe customer linkage**: `stripeCustomerId` on Agency entity (not Subscription, not User) — one Stripe customer per agency, shared by all its collaborators across all Stripe interactions
 
 ---
 

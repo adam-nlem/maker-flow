@@ -46,7 +46,7 @@ This document describes the backend OAuth integration system used in MakerFlow f
 ### Backend Step-by-Step Flow
 
 1. **Frontend requests integration creation** - `POST /api/integrations` with `projectUuid` and `platform`
-2. **Validate project** - Check project exists and belongs to user
+2. **Validate project + permission** - Resolve the project via `ProjectRepository::getAccessibleByUuidForUser` and assert `ProjectVoter::MANAGE_INTEGRATIONS`. Agency members of the project's agency pass; clients also pass on their own `User.project`. Anyone else gets 403.
 3. **Check existing Active integration** - Return 409 Conflict if project already has an **Active** integration for this platform (revoked integrations are ignored, enabling re-auth)
 4. **Generate state** - Random token `bin2hex(random_bytes(16))`
 5. **Store state in Redis** - Key: `INTEGRATION/STATE/{state}`, Value: JSON with userUuid, projectUuid, platform, TTL: 5 min
@@ -63,6 +63,8 @@ This document describes the backend OAuth integration system used in MakerFlow f
 
 - **One Active integration per platform per project** - A project can only have one Active integration for each platform (e.g., one Instagram account per project). Revoked integrations don't block creating a new one (re-auth flow).
 - **Same integration can be linked to multiple projects** - The same Instagram account can be used in different projects
+- **Ownership via project, not user** - Access control derives entirely from `integration.project.agency` through `ProjectVoter`. The `Integration.createdBy` field (formerly `Integration.user`, renamed in Phase 1) is **audit only**: it tells you which agency-member or client triggered the OAuth — not who can see or manage it.
+- **Client portal can initiate OAuth** - Clients (`ROLE_CLIENT`) are granted `MANAGE_INTEGRATIONS` on their own `User.project`, so the same `POST /api/integrations` endpoint and OAuth popup work from `/client/...` exactly as they do from the agency shell. The resulting `Integration.createdBy` is the client user; all agency members of the project's agency see the integration immediately via the standard list endpoint.
 
 ---
 
@@ -146,13 +148,13 @@ The `Integration` entity stores connected external accounts and their OAuth toke
 | `expiresAt` | `DateTimeImmutable` | Yes | Token expiration timestamp |
 | `refreshTokenExpiresAt` | `DateTimeImmutable` | Yes | Refresh token expiration (YouTube) |
 | `lastSyncedAt` | `DateTimeImmutable` | No | Last data sync timestamp |
-| `user` | `User` | No | Owner of the integration |
+| `createdBy` | `?User` | Yes | Audit-only: the user (agency member or client) who initiated the OAuth flow. Renamed from `user` in Phase 1. |
 | `status` | `IntegrationStatus` | No | Active, Expired, Revoked |
 
 ### Relationships
 
-- **User** - `ManyToOne` - Each integration belongs to one user
-- **Projects** - `ManyToMany` - Integration can be linked to multiple projects
+- **CreatedBy (User)** - `ManyToOne` - Audit-only pointer to the user who initiated OAuth. Access control does **not** flow through this field.
+- **Projects** - `ManyToMany` - Integration can be linked to multiple projects. Access control flows through `project.agency` via `ProjectVoter`.
 
 ### Usage in Insights Feature
 

@@ -176,6 +176,24 @@ Shared across home and insights pages. Used by `HomeTopPosts` for platform selec
 - `integrationInsightQueryKeys.list(projectUuid, timePeriod)` — `["integrationInsights", "list", projectUuid, timePeriod]`
 - `postQueryKeys.rank(integrationUuid)` — `["posts", "rank", integrationUuid]`
 
+## Reuse by the client portal
+
+The client portal's home page (`/client`, rendered by [`ClientHomePage`](../src/routes/client/home.tsx)) is a slimmer flavour of this page built entirely from the same hooks and components — no client-specific dashboard components exist.
+
+Reused verbatim:
+- `HomeOverviewCards` — KPIs (followers / views / engagement / reach).
+- `HomeViewsEvolutionChart` — daily views per platform.
+- `HomeEngagementChart` — horizontal bar chart per platform.
+- `IntegrationDetailCardRow` (the same per-integration cards used at the top of the agency page) — renders one card per connected integration.
+- `ConnectIntegrationPlaceholder` — empty state when no integration is connected. The "Connect" CTA invokes the same `POST /api/integrations` flow, but `ProjectVoter::MANAGE_INTEGRATIONS` allows clients to run it on their own project (see `back/docs/integration-oauth-feature.md`).
+- Stores: `useFocusProjectStore` (seeded by `useSyncFocusedProject` for the client's single accessible project) and `useHomePeriodStore` (the time-period selector is shared).
+
+What's intentionally **not** in the client home:
+- Right-column `HomeScriptsPanel` — the scripts UI is an agency-side concern.
+- `HomeTopPosts` / `RankedPostsList` — ranking views live in the contents page; for the client portal first launch we kept the dashboard read-only and simple.
+- `HomeHeader` — replaced by `IntegrationDetailCardRow` for a denser, simpler single row.
+- The two-column layout — the client page is a single column.
+
 ## Shared Components
 
 ### IntegrationPillRow

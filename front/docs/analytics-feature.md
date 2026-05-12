@@ -33,8 +33,8 @@ Standard string-backed enum with PascalCase keys and snake_case values. All even
 
 Exports three functions:
 - `track(event, properties?)` — type-safe wrapper around `posthog.capture()`. Uses `AnalyticsEventPropertiesMap` to enforce correct properties per `AnalyticsEvent` value.
-- `identifyUser({ uuid, email })` — calls `posthog.identify()` to link events to a user
-- `resetUser()` — calls `posthog.reset()` to clear identity on logout
+- `identifyUser({ uuid, role })` — calls `posthog.identify()` to link events to a user, then `posthog.register({ user_role: role })` to attach the role as a super property to every subsequent event. If `role` is `null` (e.g., during legacy migrations), the super property is skipped.
+- `resetUser()` — calls `posthog.reset()` to clear identity **and super properties** on logout
 
 The service imports `posthog` directly from `posthog-js` (same singleton as the Provider), which allows usage in mutation hook callbacks (plain functions, not React components).
 
@@ -82,6 +82,8 @@ The service imports `posthog` directly from `posthog-js` (same singleton as the 
 | Event | Properties | Location |
 |---|---|---|
 | `InvitationDeleted` | — | `useDeleteInvitation` |
+| `CollaboratorSetupCompleted` | — | `useCompleteInvitation` (fired when a non-client invitee finishes password setup) |
+| `ClientSetupCompleted` | — | `useCompleteInvitation` (fired when a client invitee finishes password setup) |
 
 ### Projects
 | Event | Properties | Location |
@@ -136,6 +138,7 @@ The service imports `posthog` directly from `posthog-js` (same singleton as the 
 - **Direct `posthog-js` import** — all tracking is in mutation `onSuccess` callbacks (plain functions), not component bodies
 - **AnalyticsEvent enum** — type-safe event names following the project's enum conventions
 - **Event property interfaces** — all event interfaces in a single `analyticsEventProperties.ts` file, each extending the base `EventProperties` template
+- **`user_role` super property** — set via `posthog.register({ user_role })` inside `identifyUser`. Auto-attached to every subsequent `capture()` call so PostHog dashboards can segment by `ROLE_ADMIN` / `ROLE_EDITOR` / `ROLE_VIEWER` / `ROLE_CLIENT` without touching individual `track()` calls or per-event interfaces. Cleared on logout by `posthog.reset()`. `useCompleteInvitation` calls `identifyUser` directly so an auto-authenticated invitee carries the right role from their very first event.
 - **Script parts collapsed** — single `ScriptPartAdded` event with `part_type` discriminator instead of 8 separate events
 - **No manual page views** — PostHog autocapture via `PostHogProvider` handles this
 - **No script part update/delete tracking** — high-frequency editor micro-actions with low analytics value
