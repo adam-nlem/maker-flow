@@ -1,4 +1,44 @@
 {
+    "welcomeTour": {
+        "admin": {
+            "greeting": "Bonjour {{firstName}}, prêt à mettre en place votre agence ?",
+            "bullets": [
+                "Configurez votre profil d'agence",
+                "Créez votre premier projet client",
+                "Invitez votre client et connectez ses comptes",
+                "Choisissez votre abonnement"
+            ],
+            "cta": "Commencer"
+        },
+        "collaborator": {
+            "greeting": "Bonjour {{firstName}}, bienvenue dans l'équipe de {{agencyName}}.",
+            "bullets": [
+                "Parcourez les projets de l'agence",
+                "Consultez les contenus en cours",
+                "Suivez les performances des réseaux sociaux"
+            ],
+            "cta": "Commencer la visite"
+        },
+        "client": {
+            "greeting": "Bonjour {{firstName}}, bienvenue sur votre portail {{agencyName}}.",
+            "bullets": [
+                "Visualisez les performances de vos réseaux",
+                "Retrouvez vos contenus en un seul endroit",
+                "Connectez vos comptes pour partager vos données"
+            ],
+            "cta": "Découvrir mon portail"
+        }
+    },
+    "exploreProjects": {
+        "body": "Tous les projets de l'agence sont accessibles depuis le menu de gauche. Sélectionnez un projet pour voir ses réseaux et ses contenus.",
+        "cta": "Voir les projets",
+        "skip": "Plus tard"
+    },
+    "exploreContents": {
+        "body": "Retrouvez ici tous les contenus organisés par groupe. Cliquez sur un contenu pour voir ses détails.",
+        "cta": "Voir les contenus",
+        "skip": "Plus tard"
+    },
     "createAgency": {
         "name": {
             "label": "Nom de l'agence",

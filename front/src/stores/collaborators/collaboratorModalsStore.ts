@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createResettableStore } from '~/stores/createResettableStore'
 
 type CollaboratorModalsState = {
     isInviteOpen: boolean
@@ -14,7 +14,7 @@ type CollaboratorModalsAction = {
     closeDeleteInvitation: () => void
 }
 
-export const useCollaboratorModalsStore = create<CollaboratorModalsState & CollaboratorModalsAction>((set) => ({
+export const useCollaboratorModalsStore = createResettableStore<CollaboratorModalsState & CollaboratorModalsAction>()((set) => ({
     isInviteOpen: false,
     removingUserUuid: null,
     deletingInvitationUuid: null,

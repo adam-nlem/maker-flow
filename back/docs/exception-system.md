@@ -63,6 +63,7 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | Invitation | 29 | `DomainCode::Invitation` |
 | ProjectClient | 30 | `DomainCode::ProjectClient` |
 | AgencyCollaborator | 31 | `DomainCode::AgencyCollaborator` |
+| Onboarding | 32 | `DomainCode::Onboarding` |
 
 ## Exception Inventory
 
@@ -150,6 +151,8 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 30001 | `ProjectClientNotFoundException` | 404 | — | `src/Exception/ProjectClient/` |
 | **AgencyCollaborator (31xxx)** |
 | 31001 | `AgencyCollaboratorNotFoundException` | 404 | — | `src/Exception/AgencyCollaborator/` |
+| **Onboarding (32xxx)** |
+| 32001 | `InvalidOnboardingStepException` | 400 | — | `src/Exception/Onboarding/` |
 
 ## Controller Pattern
 

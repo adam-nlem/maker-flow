@@ -10,7 +10,6 @@ export interface UserJSON {
     verifiedAt: string | null;
     referralCode: string | null;
     roles: string[];
-    clientProjectUuid: string | null;
     agency: ReturnType<Agency["toJSON"]> | null;
 }
 
@@ -24,7 +23,6 @@ export class User {
         public readonly verifiedAt: Date | null,
         public readonly referralCode: string | null,
         public readonly roles: UserRole[],
-        public readonly clientProjectUuid: string | null,
         public readonly agency: Agency | null,
     ) { }
 
@@ -38,7 +36,6 @@ export class User {
             json.verifiedAt ? new Date(json.verifiedAt) : null,
             json.referralCode ?? null,
             (json.roles ?? []).map((r) => r as UserRole),
-            json.clientProjectUuid ?? null,
             json.agency ? Agency.fromJSON(json.agency) : null,
         );
     }
@@ -53,7 +50,6 @@ export class User {
             verifiedAt: this.verifiedAt?.toISOString() ?? null,
             referralCode: this.referralCode,
             roles: this.roles,
-            clientProjectUuid: this.clientProjectUuid,
             agency: this.agency?.toJSON() ?? null,
         };
     }

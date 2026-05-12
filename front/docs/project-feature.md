@@ -164,6 +164,16 @@ Manages the currently focused/selected project.
 
 ---
 
+### `useSyncFocusedProject`
+
+**Location:** `front/src/hooks/api/projects/useSyncFocusedProject.ts`
+
+Combines `useListPaginatedProjects` and `useSelectFocusedProject` into a single hook called once in [`routes/protected.tsx`](../src/routes/protected.tsx). Guarantees the focused project store is seeded for every authenticated route — agency members and clients alike — before any page-level component reads from it.
+
+For clients this matters because `GET /api/projects` returns the client's single accessible project (server-side voter-driven), the auto-select logic in `useSelectFocusedProject` picks it, and downstream client UI reads `focusedProjectUuid` without ever knowing about a client-specific code path.
+
+---
+
 ### Query Keys
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/hooks/api/projects/projectQueryKeys.ts`

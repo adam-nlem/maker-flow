@@ -302,16 +302,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return in_array($role->value, $this->roles, true);
     }
 
-    #[Groups([
-        'api_user_me',
-        'api_otp_verify_login',
-        'api_otp_verify_email',
-    ])]
-    public function getClientProjectUuid(): ?string
-    {
-        return $this->project?->getUuid();
-    }
-
     public function getVerifiedAt(): ?\DateTimeImmutable
     {
         return $this->verifiedAt;

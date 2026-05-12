@@ -1,10 +1,10 @@
-import { useEffect } from "react"
+import { useEffect, useMemo } from "react"
 import { useNavigate } from "react-router-dom"
 
-import { homePath } from "~/routes/routePaths"
+import { agencyHomePath, clientHomePath } from "~/routes/routePaths"
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser"
 import { useShowOnboarding } from "~/hooks/api/onboarding/useShowOnboarding"
-import { ONBOARDING_STEP_ORDER } from "~/models/enums/OnboardingStep"
+import { getOnboardingFlowConfig, type OnboardingStepValue } from "~/models/enums/onboardingFlow"
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
 import { WELCOME_STEP_ORDER } from "~/models/enums/WelcomeStep"
 
@@ -15,24 +15,27 @@ export function useOnboardingFlow() {
 
     const welcomeStep = useOnboardingStore((s) => s.welcomeStep)
 
+    const flowConfig = useMemo(() => getOnboardingFlowConfig(user?.displayRole ?? null), [user?.displayRole])
+
+    const dismissedRedirectPath = user?.isClient ? clientHomePath : agencyHomePath
+
     useEffect(() => {
         if (!isAuthLoading && user && !isOnboardingLoading && onboarding?.isDismissed) {
-            navigate(homePath, { replace: true })
+            navigate(dismissedRedirectPath, { replace: true })
         }
-    }, [user, isAuthLoading, onboarding, isOnboardingLoading, navigate])
+    }, [user, isAuthLoading, onboarding, isOnboardingLoading, navigate, dismissedRedirectPath])
 
     const isAuthenticated = !!user
 
-    const currentOnboardingStep = onboarding
-        ? ONBOARDING_STEP_ORDER.find((s) => !onboarding.isStepCompleted(s)) ?? ONBOARDING_STEP_ORDER[ONBOARDING_STEP_ORDER.length - 1]
-        : ONBOARDING_STEP_ORDER[0]
+    const lastStep = flowConfig.order[flowConfig.order.length - 1]
+    const currentOnboardingStep: OnboardingStepValue = onboarding
+        ? flowConfig.order.find((s) => !onboarding.isStepCompleted(s)) ?? lastStep
+        : flowConfig.order[0]
 
     const welcomeStepIndex = WELCOME_STEP_ORDER.indexOf(welcomeStep)
 
-    const totalSteps = isAuthenticated ? ONBOARDING_STEP_ORDER.length : WELCOME_STEP_ORDER.length
-    const currentStep = isAuthenticated ? ONBOARDING_STEP_ORDER.indexOf(currentOnboardingStep) : welcomeStepIndex
-
-    const currentWelcomeStep = welcomeStep
+    const totalSteps = isAuthenticated ? flowConfig.order.length : WELCOME_STEP_ORDER.length
+    const currentStep = isAuthenticated ? flowConfig.order.indexOf(currentOnboardingStep) : welcomeStepIndex
 
     return {
         isAuthLoading,
@@ -41,6 +44,7 @@ export function useOnboardingFlow() {
         currentStep,
         totalSteps,
         currentOnboardingStep,
-        currentWelcomeStep,
+        currentWelcomeStep: welcomeStep,
+        flowConfig,
     }
 }

@@ -2,9 +2,13 @@
 
 namespace App\Service;
 
-use App\Entity\Enum\OnboardingStep;
+use App\Entity\Enum\AgencyAdminOnboardingStep;
+use App\Entity\Enum\AgencyCollaboratorOnboardingStep;
+use App\Entity\Enum\ClientOnboardingStep;
+use App\Entity\Enum\UserRole;
 use App\Entity\Onboarding;
 use App\Entity\User;
+use App\Exception\Onboarding\InvalidOnboardingStepException;
 use App\Helper\DateHelper;
 use App\Repository\OnboardingRepository;
 
@@ -27,15 +31,21 @@ class OnboardingService
         return $onboarding;
     }
 
-    public function completeStep(Onboarding $onboarding, OnboardingStep $step): Onboarding
+    public function completeStep(Onboarding $onboarding, string $stepValue, User $user): Onboarding
     {
-        if ($onboarding->isStepCompleted($step)) {
+        $applicableStepValues = $this->getApplicableStepValues($user);
+
+        if (!in_array($stepValue, $applicableStepValues, true)) {
+            throw new InvalidOnboardingStepException();
+        }
+
+        if ($onboarding->isStepCompleted($stepValue)) {
             return $onboarding;
         }
 
-        $onboarding->addCompletedStep($step);
+        $onboarding->addCompletedStep($stepValue);
 
-        if ($this->areAllStepsCompleted($onboarding)) {
+        if ($this->areAllStepsCompleted($onboarding, $user)) {
             $onboarding->setDismissedAt(DateHelper::createUtcDateTimeImmutable());
         }
 
@@ -52,10 +62,30 @@ class OnboardingService
         return $onboarding;
     }
 
-    private function areAllStepsCompleted(Onboarding $onboarding): bool
+    /**
+     * @return string[]
+     */
+    public function getApplicableStepValues(User $user): array
     {
-        foreach (OnboardingStep::cases() as $step) {
-            if (!$onboarding->isStepCompleted($step)) {
+        if ($user->hasRole(UserRole::Client)) {
+            return array_map(fn (ClientOnboardingStep $step) => $step->value, ClientOnboardingStep::cases());
+        }
+
+        if ($user->hasRole(UserRole::Admin)) {
+            return array_map(fn (AgencyAdminOnboardingStep $step) => $step->value, AgencyAdminOnboardingStep::cases());
+        }
+
+        if ($user->hasRole(UserRole::Editor) || $user->hasRole(UserRole::Viewer)) {
+            return array_map(fn (AgencyCollaboratorOnboardingStep $step) => $step->value, AgencyCollaboratorOnboardingStep::cases());
+        }
+
+        return array_map(fn (AgencyAdminOnboardingStep $step) => $step->value, AgencyAdminOnboardingStep::cases());
+    }
+
+    private function areAllStepsCompleted(Onboarding $onboarding, User $user): bool
+    {
+        foreach ($this->getApplicableStepValues($user) as $stepValue) {
+            if (!$onboarding->isStepCompleted($stepValue)) {
                 return false;
             }
         }

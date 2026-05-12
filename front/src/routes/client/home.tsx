@@ -10,14 +10,13 @@ import SelectDropdown from "~/components/ui/SelectDropdown";
 import Shimmer from "~/components/ui/Shimmer";
 import { useListIntegrationInsights } from "~/hooks/api/integrationInsights/useListIntegrationInsights";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
-import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { timePeriodOptions, timePeriodTranslationKeys } from "~/models/enums/TimePeriod";
+import { useFocusProjectStore } from "~/stores/project/focusProjectStore";
 import { useHomePeriodStore } from "~/stores/home/homePeriodStore";
 
 export default function ClientHomePage() {
     const { t } = useTranslation();
-    const { user } = useCurrentUser();
-    const projectUuid = user?.clientProjectUuid ?? null;
+    const projectUuid = useFocusProjectStore((state) => state.focusedProjectUuid);
 
     const timePeriod = useHomePeriodStore((state) => state.timePeriod);
     const setTimePeriod = useHomePeriodStore((state) => state.setTimePeriod);

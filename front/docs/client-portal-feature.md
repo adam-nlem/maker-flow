@@ -64,9 +64,9 @@ PrelaunchGuardLayout
 
 ## Models
 
-`models/User.ts` carries `roles` (string[]), `clientProjectUuid` (string | null), `agency` (Agency | null, populated only for collaborators), `isClient` and `hasRole(role)` getters.
+`models/User.ts` carries `roles` (string[]), `agency` (Agency | null, populated only for collaborators), `isClient` and `hasRole(role)` getters. **No `clientProjectUuid` field** — clients obtain their project the same way agency members do: `GET /api/projects` returns the client's single project for `ROLE_CLIENT`, and `useFocusProjectStore` is seeded with that UUID by `useSyncFocusedProject()` in [`routes/protected.tsx`](../src/routes/protected.tsx). The backend column `user.project_id` stays as the source of truth for `ProjectVoter`, but is no longer serialized.
 
-`models/Project.ts` gained an optional `agency` field (nullable). The backend serializes it only under the `api_project_get_by_uuid` group, so list responses are unchanged. The client sidebar fetches the project via `useShowProject(user.clientProjectUuid)` and renders branding from `project.agency`.
+`models/Project.ts` gained an optional `agency` field (nullable). The backend serializes it only under the `api_project_get_by_uuid` group, so list responses are unchanged. The client sidebar fetches the project via `useShowProject(focusedProjectUuid)` and renders branding from `project.agency`.
 
 `models/Invitation.ts` was extended for the public setup page: `type` (InvitationType), `agency` (`{ name, brandColor }`), `project` (`{ name } | null`), and `createdBy` (`{ firstName, lastName } | null`). All new fields are optional in JSON parsing so existing list endpoints (which use `api_invitations_list`) keep working.
 
@@ -76,7 +76,7 @@ Both the agency and the client sidebars sit on top of a shared `SidebarShell` (`
 
 `components/client-portal/sidebar/ClientDesktopSidebar.tsx` feeds `SidebarShell` with:
 
-- Top section: agency name (tinted with `project.agency.brandColor` when set), greeting line with the user's first name. Shimmer while the project query is loading. Then two nav tiles: **Home** (`clientHomePath`) and **Contents** (`clientContentsPath`). Below the nav, a **PLATEFORMES** section renders one `IntegrationTile` per platform (Instagram, YouTube, TikTok) — identical to the agency sidebar. Clicking a tile calls `useIntegrationLoginModalStore().openForProject(clientProjectUuid, platform)`, which the single `IntegrationLoginModal` mount picks up.
+- Top section: agency name (tinted with `project.agency.brandColor` when set), greeting line with the user's first name. Shimmer while the project query is loading. Then two nav tiles: **Home** (`clientHomePath`) and **Contents** (`clientContentsPath`). Below the nav, a **PLATEFORMES** section renders one `IntegrationTile` per platform (Instagram, YouTube, TikTok) — identical to the agency sidebar. Clicking a tile calls `useIntegrationLoginModalStore().openForProject(focusedProjectUuid, platform)`, which the single `IntegrationLoginModal` mount picks up.
 - Bottom nav: Settings tile pointing at `clientSettingsGeneralPath`.
 - No CTA prop (so the shell renders nothing between the divider and the footer) — clients have no project picker and no premium CTA.
 
@@ -94,13 +94,13 @@ The page reuses the agency-home analytics components verbatim:
 - `HomeViewsEvolutionChart` (multi-line per-platform views)
 - `HomeEngagementChart` (horizontal bar per-platform engagement)
 
-`projectUuid` comes from `useCurrentUser().user?.clientProjectUuid` — no project picker, no `useFocusProjectStore`. Data is fed by `useListIntegrations` + `useListIntegrationInsights` with that UUID, and the time-period selector reuses the shared `useHomePeriodStore`. Layout is a single column (no `HomeScriptsPanel`, no right pane).
+`projectUuid` comes from `useFocusProjectStore` — the same store agency members use, seeded by `useSyncFocusedProject()` in `protected.tsx` from `GET /api/projects`. No project picker is rendered (clients only ever have one project). Data is fed by `useListIntegrations` + `useListIntegrationInsights`, and the time-period selector reuses the shared `useHomePeriodStore`. Layout is a single column (no `HomeScriptsPanel`, no right pane).
 
-**Empty state — Connect CTA** (Phase 8): when `integrations.length === 0`, the page reuses the shared `ConnectIntegrationPlaceholder` with an explicit `projectUuid={clientProjectUuid}` prop. The placeholder now accepts an optional `projectUuid` and dispatches `openForProject(projectUuid, Platform.Instagram)` when set (falling back to the agency-side `setSelectedPlatform` when omitted). This keeps a single Connect component used by both agency and client. In the populated state the page does not render its own Connect button — clients connect via the sidebar's platform tiles, matching the agency home (which also has no Connect button when integrations exist).
+**Empty state — Connect CTA** (Phase 8): when `integrations.length === 0`, the page reuses the shared `ConnectIntegrationPlaceholder` with an explicit `projectUuid={focusedProjectUuid}` prop. The placeholder now accepts an optional `projectUuid` and dispatches `openForProject(projectUuid, Platform.Instagram)` when set (falling back to the agency-side `setSelectedPlatform` when omitted). This keeps a single Connect component used by both agency and client. In the populated state the page does not render its own Connect button — clients connect via the sidebar's platform tiles, matching the agency home (which also has no Connect button when integrations exist).
 
 ## Client contents page
 
-`/client/contents` is rendered by `ClientContentsPage` ([routes/client/contents.tsx](../src/routes/client/contents.tsx)) — a thin adapter that reads `user.clientProjectUuid` and renders the shared `ContentsPageView` with `isReadOnly` set. No new page-level component was introduced; the agency-side route at [routes/agency/contents.tsx](../src/routes/agency/contents.tsx) mounts the same `ContentsPageView` without the flag.
+`/client/contents` is rendered by `ClientContentsPage` ([routes/client/contents.tsx](../src/routes/client/contents.tsx)) — a thin adapter that reads `focusedProjectUuid` from `useFocusProjectStore` and renders the shared `ContentsPageView` with `isReadOnly` set. No new page-level component was introduced; the agency-side route at [routes/agency/contents.tsx](../src/routes/agency/contents.tsx) mounts the same `ContentsPageView` without the flag.
 
 `isReadOnly` is propagated by `ContentsPageView` into `ContentListPanel` (hides the "New Group" button + skips the `CreateGroupModal` mount) and `ContentGroupDetailPanel` (hides the trash icon, "Unlink script" button, add-post `+` button, per-post remove buttons, and skips the `ConfirmDeleteDialog` / `PostPickerModal` mounts). `ContentPostDetailPanel` has no write surfaces so it stays untouched. Backend voters reject all writes regardless — the read-only flag is purely UX.
 
@@ -108,7 +108,7 @@ The page reuses the agency-home analytics components verbatim:
 
 When a client's agency has no active subscription, every `/client/*` route is replaced by a "Access suspended — contact your agency" full-screen card (`ClientPortalLockedView`) that exposes only a Logout button.
 
-The gate is enforced **on the backend**, not via a serialized boolean: `GET /api/projects/:uuid` throws `AgencySubscriptionInactiveException` (code `27003`, HTTP 403) when the requester is a `ROLE_CLIENT` user whose agency has no active subscription. `ClientShellLayout` calls `useShowProject(user.clientProjectUuid)` on every render (the client sidebar already does, so React Query dedupes), and when the error carries code `27003` it short-circuits to `ClientPortalLockedView` before rendering any sidebar or outlet. Agency members are never gated, so they can still reach their billing settings to re-subscribe.
+The gate is enforced **on the backend**, not via a serialized boolean: `GET /api/projects/:uuid` throws `AgencySubscriptionInactiveException` (code `27003`, HTTP 403) when the requester is a `ROLE_CLIENT` user whose agency has no active subscription. `ClientShellLayout` calls `useShowProject(focusedProjectUuid)` on every render (the client sidebar already does, so React Query dedupes), and when the error carries code `27003` it short-circuits to `ClientPortalLockedView` before rendering any sidebar or outlet. Agency members are never gated, so they can still reach their billing settings to re-subscribe.
 
 `useShowProject` sets `retry: false` so the lock screen renders immediately on the 403 instead of waiting for React Query's default exponential backoff.
 

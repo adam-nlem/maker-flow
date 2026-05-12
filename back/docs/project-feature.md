@@ -153,6 +153,11 @@ The Project feature allows users to create, manage, and organize their projects.
 - **Query Params:** `page`, `limit`
 - **Response:** `200 OK` with array of projects
 - **Serialization Group:** `api_projects_get_paginated`
+- **Role-aware result** (resolved in `ProjectRepository::getAccessibleByUserPaginated($user, $page, $limit)`):
+  - **Agency members** (Admin / Editor / Viewer): returns the agency's projects, paginated by `createdAt DESC`.
+  - **Clients** (`ROLE_CLIENT`): runs the same paginated DQL filtered by `p = :clientProject`, which naturally returns one row on page 1 and an empty array on subsequent pages — no special-case wrapper logic.
+
+  The endpoint is intentionally the same for both roles. `IsGranted(UserRole::User->value)` allows every authenticated user; access control is enforced inside the repository query.
 
 #### Delete Project
 - **Route:** `DELETE /api/projects/{projectUuid}`

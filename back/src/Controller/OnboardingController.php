@@ -35,7 +35,7 @@ final class OnboardingController extends AbstractController
         $user = $this->getUser();
 
         $onboarding = $onboardingService->getOrCreateOnboarding($user);
-        $onboarding = $onboardingService->completeStep($onboarding, $dto->getStep());
+        $onboarding = $onboardingService->completeStep($onboarding, $dto->getStep(), $user);
 
         return $this->json(data: $onboarding, status: Response::HTTP_OK, context: ['groups' => ['api_onboarding_complete_step']]);
     }

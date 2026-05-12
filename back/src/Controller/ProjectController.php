@@ -174,22 +174,15 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('', name: 'api_projects_list', methods: ['GET'])]
-    #[IsGranted(UserRole::Viewer->value)]
+    #[IsGranted(UserRole::User->value)]
     public function list(
         ListProjectsQueryParamDTO $queryParamDto,
-        AgencyRepository $agencyRepository,
         ProjectRepository $projectRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $agency = $agencyRepository->getByCollaborator($user);
-
-        if ($agency === null) {
-            return $this->json(data: [], status: Response::HTTP_OK);
-        }
-
-        $projects = $projectRepository->getByAgencyPaginated($agency, $queryParamDto->getPage(), $queryParamDto->getLimit());
+        $projects = $projectRepository->getAccessibleByUserPaginated($user, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
         return $this->json(data: $projects, status: Response::HTTP_OK, context: ['groups' => ['api_projects_get_paginated']]);
     }

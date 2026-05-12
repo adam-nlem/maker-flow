@@ -2,14 +2,20 @@ import type { ReactNode } from "react"
 
 import WelcomeFeatureStep from "~/components/welcome/WelcomeFeatureStep"
 import WelcomeHowItWorksStep from "~/components/welcome/WelcomeHowItWorksStep"
+import OnboardingWelcomeTourStep from "~/components/onboarding/OnboardingWelcomeTourStep"
 import OnboardingCreateAgencyStep from "~/components/onboarding/OnboardingCreateAgencyStep"
 import OnboardingCreateProjectStep from "~/components/onboarding/OnboardingCreateProjectStep"
+import OnboardingInviteFirstClientStep from "~/components/onboarding/OnboardingInviteFirstClientStep"
 import OnboardingConnectIntegrationStep from "~/components/onboarding/OnboardingConnectIntegrationStep"
-import OnboardingCreateScriptStep from "~/components/onboarding/OnboardingCreateScriptStep"
-import OnboardingGenerateScriptStep from "~/components/onboarding/OnboardingGenerateScriptStep"
 import OnboardingSubscriptionStep from "~/components/onboarding/OnboardingSubscriptionStep"
+import OnboardingExploreProjectsStep from "~/components/onboarding/OnboardingExploreProjectsStep"
+import OnboardingExploreContentsStep from "~/components/onboarding/OnboardingExploreContentsStep"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
-import { OnboardingStep } from "~/models/enums/OnboardingStep"
+import { useCurrentUser } from "~/hooks/api/users/useCurrentUser"
+import { AgencyAdminOnboardingStep } from "~/models/enums/AgencyAdminOnboardingStep"
+import { AgencyCollaboratorOnboardingStep } from "~/models/enums/AgencyCollaboratorOnboardingStep"
+import { ClientOnboardingStep } from "~/models/enums/ClientOnboardingStep"
+import { UserRole } from "~/models/enums/UserRole"
 import { WelcomeStep } from "~/models/enums/WelcomeStep"
 
 const welcomeNodes: Record<WelcomeStep, ReactNode> = {
@@ -17,22 +23,40 @@ const welcomeNodes: Record<WelcomeStep, ReactNode> = {
     [WelcomeStep.HowItWorks]: <WelcomeHowItWorksStep />,
 }
 
-const onboardingNodes: Record<OnboardingStep, ReactNode> = {
-    [OnboardingStep.CreateAgency]: <OnboardingCreateAgencyStep />,
-    [OnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
-    [OnboardingStep.ConnectIntegration]: <OnboardingConnectIntegrationStep />,
-    [OnboardingStep.CreateFirstScript]: <OnboardingCreateScriptStep />,
-    [OnboardingStep.GenerateFirstScript]: <OnboardingGenerateScriptStep />,
-    [OnboardingStep.ShowSubscriptions]: <OnboardingSubscriptionStep />,
+const adminNodes: Record<AgencyAdminOnboardingStep, ReactNode> = {
+    [AgencyAdminOnboardingStep.WelcomeTour]: <OnboardingWelcomeTourStep />,
+    [AgencyAdminOnboardingStep.CreateAgency]: <OnboardingCreateAgencyStep />,
+    [AgencyAdminOnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
+    [AgencyAdminOnboardingStep.InviteFirstClient]: <OnboardingInviteFirstClientStep />,
+    [AgencyAdminOnboardingStep.ConnectFirstIntegration]: <OnboardingConnectIntegrationStep />,
+    [AgencyAdminOnboardingStep.ShowSubscriptions]: <OnboardingSubscriptionStep />,
+}
+
+const collaboratorNodes: Record<AgencyCollaboratorOnboardingStep, ReactNode> = {
+    [AgencyCollaboratorOnboardingStep.WelcomeTour]: <OnboardingWelcomeTourStep />,
+    [AgencyCollaboratorOnboardingStep.ExploreProjects]: <OnboardingExploreProjectsStep />,
+    [AgencyCollaboratorOnboardingStep.ExploreContents]: <OnboardingExploreContentsStep />,
+}
+
+const clientNodes: Record<ClientOnboardingStep, ReactNode> = {
+    [ClientOnboardingStep.WelcomeTour]: <OnboardingWelcomeTourStep />,
+    [ClientOnboardingStep.ConnectFirstIntegration]: <OnboardingConnectIntegrationStep />,
+    [ClientOnboardingStep.ExploreContents]: <OnboardingExploreContentsStep />,
+}
+
+function resolveStepNode(role: UserRole | null, step: string): ReactNode {
+    if (role === UserRole.Client) {
+        return clientNodes[step as ClientOnboardingStep] ?? null
+    }
+    if (role === UserRole.Editor || role === UserRole.Viewer) {
+        return collaboratorNodes[step as AgencyCollaboratorOnboardingStep] ?? null
+    }
+    return adminNodes[step as AgencyAdminOnboardingStep] ?? null
 }
 
 export default function OnboardingPage() {
-    const {
-        isAuthLoading,
-        isAuthenticated,
-        currentOnboardingStep,
-        currentWelcomeStep,
-    } = useOnboardingFlow()
+    const { isAuthLoading, isAuthenticated, currentOnboardingStep, currentWelcomeStep } = useOnboardingFlow()
+    const { user } = useCurrentUser()
 
     if (isAuthLoading) {
         return (
@@ -45,7 +69,7 @@ export default function OnboardingPage() {
     return (
         <div className="bg-clear bg-dot-pattern h-screen relative overflow-y-auto">
             {isAuthenticated
-                ? onboardingNodes[currentOnboardingStep]
+                ? resolveStepNode(user?.displayRole ?? null, currentOnboardingStep)
                 : welcomeNodes[currentWelcomeStep]}
         </div>
     )

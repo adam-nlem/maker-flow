@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createResettableStore } from '~/stores/createResettableStore'
 import { ContentsTab } from '~/models/enums/ContentsTab'
 import type { Platform } from '~/models/enums/Platform'
 
@@ -22,7 +22,7 @@ type ContentsAction = {
     closePanel: () => void
 }
 
-export const useContentsStore = create<ContentsState & ContentsAction>()(
+export const useContentsStore = createResettableStore<ContentsState & ContentsAction>()(
     persist(
         (set) => ({
             activeTab: ContentsTab.Groups,

@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createResettableStore } from '~/stores/createResettableStore'
 
 type CreateProjectModalState = {
     isCreateModalOpen: boolean
@@ -8,7 +8,7 @@ type CreateProjectModalAction = {
     setIsCreateModalOpen: (isOpen: boolean) => void
 }
 
-export const useCreateProjectModalStore = create<CreateProjectModalState & CreateProjectModalAction>((set) => ({
+export const useCreateProjectModalStore = createResettableStore<CreateProjectModalState & CreateProjectModalAction>()((set) => ({
     isCreateModalOpen: false,
     setIsCreateModalOpen: (isOpen) => set({ isCreateModalOpen: isOpen })
 }))

@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createResettableStore } from '~/stores/createResettableStore'
 import type { Platform } from '~/models/enums/Platform'
 
 type IntegrationLoginModalState = {
@@ -11,7 +11,7 @@ type IntegrationLoginModalAction = {
     close: () => void
 }
 
-export const useIntegrationLoginModalStore = create<IntegrationLoginModalState & IntegrationLoginModalAction>((set) => ({
+export const useIntegrationLoginModalStore = createResettableStore<IntegrationLoginModalState & IntegrationLoginModalAction>()((set) => ({
     projectUuid: null,
     selectedPlatform: null,
     open: (projectUuid, platform) => set({ projectUuid, selectedPlatform: platform }),

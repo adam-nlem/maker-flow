@@ -96,29 +96,65 @@
         "unknown": "An error occurred, please try again"
     },
     "onboardingStep": {
-        "titles": {
-            "createAgency": "Create your agency",
-            "createFirstProject": "Create your first project",
-            "connectIntegration": "Connect your social accounts",
-            "createFirstScript": "Create your first script",
-            "generateFirstScript": "Improve your script with AI",
-            "showSubscriptions": "Discover our plans"
+        "admin": {
+            "titles": {
+                "welcomeTour": "Welcome to MakerFlow",
+                "createAgency": "Create your agency",
+                "createFirstProject": "Create your first project",
+                "inviteFirstClient": "Invite your first client",
+                "connectFirstIntegration": "Connect your social accounts",
+                "showSubscriptions": "Discover our plans"
+            },
+            "descriptions": {
+                "welcomeTour": "A few quick steps to prepare your agency workspace.",
+                "createAgency": "Set the agency name, brand color and contact details.",
+                "createFirstProject": "A project represents a client or brand whose content you manage.",
+                "inviteFirstClient": "Give your client read-only access to their own dashboard.",
+                "connectFirstIntegration": "Connect the project's social accounts to track performance.",
+                "showSubscriptions": "Pick the subscription that fits your needs to unlock every feature."
+            },
+            "shortLabels": {
+                "welcomeTour": "Welcome",
+                "createAgency": "Agency",
+                "createFirstProject": "Project",
+                "inviteFirstClient": "Client",
+                "connectFirstIntegration": "Social account",
+                "showSubscriptions": "Subscription"
+            }
         },
-        "descriptions": {
-            "createAgency": "Set up your agency workspace — its name, brand color and contact details.",
-            "createFirstProject": "Projects let you group together your content and social accounts.",
-            "connectIntegration": "Connect your accounts to analyze your performance and centralize your content.",
-            "createFirstScript": "Here's your first video script. You'll be able to edit it later.",
-            "generateFirstScript": "AI will create a complete video script based on your guidance.",
-            "showSubscriptions": "Choose the subscription that fits your needs to unlock every feature."
+        "collaborator": {
+            "titles": {
+                "welcomeTour": "Welcome to the team",
+                "exploreProjects": "Discover the projects",
+                "exploreContents": "Discover the contents"
+            },
+            "descriptions": {
+                "welcomeTour": "A quick tour to get you familiar with your new workspace.",
+                "exploreProjects": "Browse every project of the agency and their social accounts.",
+                "exploreContents": "Centralize and organize the content of each project."
+            },
+            "shortLabels": {
+                "welcomeTour": "Welcome",
+                "exploreProjects": "Projects",
+                "exploreContents": "Contents"
+            }
         },
-        "shortLabels": {
-            "createAgency": "Agency",
-            "createFirstProject": "Project",
-            "connectIntegration": "Social account",
-            "createFirstScript": "Script",
-            "generateFirstScript": "Generation",
-            "showSubscriptions": "Subscriptions"
+        "client": {
+            "titles": {
+                "welcomeTour": "Welcome to your portal",
+                "connectFirstIntegration": "Connect your accounts",
+                "exploreContents": "Your contents"
+            },
+            "descriptions": {
+                "welcomeTour": "Your agency prepared a dedicated space for your performance.",
+                "connectFirstIntegration": "Connect your accounts so your agency can track performance.",
+                "exploreContents": "Find all the contents your agency has shared with you."
+            },
+            "shortLabels": {
+                "welcomeTour": "Welcome",
+                "connectFirstIntegration": "Accounts",
+                "exploreContents": "Contents"
+            }
         }
     },
     "openingStyle": {

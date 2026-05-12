@@ -96,4 +96,23 @@ class ProjectRepository extends ServiceEntityRepository
         $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
         return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
+
+    public function getAccessibleByUserPaginated(User $user, int $page, int $limit): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->orderBy('p.createdAt', 'DESC');
+
+        $agency = $user->getAgency();
+        if ($agency !== null) {
+            $qb->where('p.agency = :agency')->setParameter('agency', $agency);
+        } else {
+            $qb->where('p = :clientProject')->setParameter('clientProject', $user->getProject());
+        }
+
+        $query = $qb->getQuery();
+        $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
+        return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
 }

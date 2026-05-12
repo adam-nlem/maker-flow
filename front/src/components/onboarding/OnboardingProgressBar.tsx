@@ -2,23 +2,22 @@ import { ChevronRightIcon } from "@heroicons/react/24/solid"
 import { useTranslation } from "react-i18next"
 import { useIsDesktop } from "~/hooks/useIsDesktop"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
-import { type OnboardingStep, ONBOARDING_STEP_ORDER, onboardingStepToIcon, onboardingStepShortLabelKeys } from "~/models/enums/OnboardingStep"
 import { WELCOME_STEP_ORDER, welcomeStepToIcon, welcomeStepShortLabelKeys } from "~/models/enums/WelcomeStep"
 
 export default function OnboardingProgressBar() {
     const { t } = useTranslation()
-    const { isAuthenticated, onboarding, currentOnboardingStep, currentWelcomeStep, currentStep, totalSteps } = useOnboardingFlow()
+    const { isAuthenticated, onboarding, currentOnboardingStep, currentWelcomeStep, currentStep, totalSteps, flowConfig } = useOnboardingFlow()
     const isDesktop = useIsDesktop()
 
-    const steps = isAuthenticated ? ONBOARDING_STEP_ORDER : WELCOME_STEP_ORDER
-    const iconMap = isAuthenticated ? onboardingStepToIcon : welcomeStepToIcon
-    const labelMap = isAuthenticated ? onboardingStepShortLabelKeys : welcomeStepShortLabelKeys
+    const steps: string[] = isAuthenticated ? flowConfig.order : WELCOME_STEP_ORDER
+    const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = isAuthenticated ? flowConfig.icons : welcomeStepToIcon
+    const labelMap: Record<string, string> = isAuthenticated ? flowConfig.shortLabelKeys : welcomeStepShortLabelKeys
 
     const currentWelcomeIndex = WELCOME_STEP_ORDER.indexOf(currentWelcomeStep)
 
     const isCompleted = (step: string, index: number) =>
         isAuthenticated
-            ? onboarding?.isStepCompleted(step as OnboardingStep) ?? false
+            ? onboarding?.isStepCompleted(step) ?? false
             : index < currentWelcomeIndex
 
     const isCurrent = (step: string) =>
@@ -41,7 +40,7 @@ export default function OnboardingProgressBar() {
                     </span>
                 </div>
                 <span className="text-body-sm text-dark font-semibold">
-                    {t(labelMap[currentStepKey as keyof typeof labelMap])}
+                    {t(labelMap[currentStepKey])}
                 </span>
                 <div className="h-1.5 w-full bg-light-gray rounded-full">
                     <div
@@ -58,7 +57,7 @@ export default function OnboardingProgressBar() {
             {steps.map((step, index) => {
                 const completed = isCompleted(step, index)
                 const current = isCurrent(step)
-                const Icon = iconMap[step as keyof typeof iconMap] as React.ComponentType<React.SVGProps<SVGSVGElement>>
+                const Icon = iconMap[step]
 
                 return (
                     <div key={step} className="flex items-center gap-2">
@@ -70,7 +69,7 @@ export default function OnboardingProgressBar() {
                             <div className="flex items-center gap-1.5 shrink-0">
                                 <Icon className={`size-5 shrink-0 ${completed ? 'text-primary' : 'text-gray'}`} />
                                 <span className={`text-body-xs whitespace-nowrap ${current ? 'text-dark' : completed ? 'text-dark' : 'text-gray'}`}>
-                                    {t(labelMap[step as keyof typeof labelMap])}
+                                    {t(labelMap[step])}
                                 </span>
                             </div>
                         </div>

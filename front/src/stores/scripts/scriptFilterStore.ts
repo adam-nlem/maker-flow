@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createResettableStore } from '~/stores/createResettableStore'
 import { ScriptStatus } from '~/models/enums/ScriptStatus'
 
 type ScriptFilterState = {
@@ -10,7 +10,7 @@ type ScriptFilterAction = {
     setFocusedScriptStatus: (focusedScriptStatus: ScriptStatus) => void
 }
 
-export const useScriptFilterStore = create<ScriptFilterState & ScriptFilterAction>()(
+export const useScriptFilterStore = createResettableStore<ScriptFilterState & ScriptFilterAction>()(
     persist(
         (set) => ({
             focusedScriptStatus: ScriptStatus.Idea,

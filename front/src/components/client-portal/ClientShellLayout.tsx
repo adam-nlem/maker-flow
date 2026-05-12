@@ -6,6 +6,7 @@ import { HttpException } from "~/services/httpClient/HttpException";
 import ClientDesktopSidebar from "./sidebar/ClientDesktopSidebar";
 import ClientMobileSidebar from "./sidebar/ClientMobileSidebar";
 import ClientPortalLockedView from "./ClientPortalLockedView";
+import { useFocusProjectStore } from "~/stores/project/focusProjectStore";
 import { agencyHomePath } from "~/routes/routePaths";
 
 const AGENCY_SUBSCRIPTION_INACTIVE_CODE = 27003;
@@ -13,7 +14,8 @@ const AGENCY_SUBSCRIPTION_INACTIVE_CODE = 27003;
 export default function ClientShellLayout() {
     const isDesktop = useIsDesktop();
     const { user } = useCurrentUser();
-    const { error: projectError } = useShowProject(user?.clientProjectUuid);
+    const projectUuid = useFocusProjectStore((state) => state.focusedProjectUuid);
+    const { error: projectError } = useShowProject(projectUuid);
 
     if (user && !user.isClient) {
         return <Navigate to={agencyHomePath} replace />;

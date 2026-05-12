@@ -4,7 +4,14 @@ import { Project } from "~/models/Project";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { projectQueryKeys } from "./projectQueryKeys";
 
-export function useListPaginatedProjects(limit: number = 10) {
+interface UseListPaginatedProjectsOptions {
+    limit?: number;
+    enabled?: boolean;
+}
+
+export function useListPaginatedProjects(options: UseListPaginatedProjectsOptions | number = {}) {
+    const { limit = 10, enabled = true } = typeof options === "number" ? { limit: options } : options;
+
     const query = useInfiniteQuery({
         queryKey: projectQueryKeys.list(limit),
         queryFn: async ({ pageParam }) => {
@@ -19,6 +26,7 @@ export function useListPaginatedProjects(limit: number = 10) {
         initialPageParam: 1,
         getNextPageParam: (lastPage, _, lastPageParam) =>
             lastPage.length === limit ? lastPageParam + 1 : undefined,
+        enabled,
     });
 
     const projects = useMemo(() => query.data?.pages.flat() ?? [], [query.data]);

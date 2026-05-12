@@ -1,6 +1,5 @@
 import type { WelcomeStep } from "~/models/enums/WelcomeStep";
 import type { OtpType } from "~/models/enums/OtpType";
-import type { OnboardingStep } from "~/models/enums/OnboardingStep";
 import type { ProjectType } from "~/models/enums/ProjectType";
 import type { ScriptPartType } from "~/models/enums/ScriptPartType";
 import type { ScriptGoal } from "~/models/enums/ScriptGoal";
@@ -22,7 +21,7 @@ export interface UserLoggedInEvent extends EventProperties {
 }
 
 export interface OnboardingStepCompletedEvent extends EventProperties {
-    step: OnboardingStep;
+    step: string;
 }
 
 export interface ProjectCreatedEvent extends EventProperties {

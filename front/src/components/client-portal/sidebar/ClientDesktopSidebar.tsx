@@ -13,6 +13,7 @@ import {
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useShowProject } from "~/hooks/api/projects/useShowProject";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
+import { useFocusProjectStore } from "~/stores/project/focusProjectStore";
 import { useIntegrationLoginModalStore } from "~/stores/integrations/integrationLoginModalStore";
 import { platformOptions } from "~/models/enums/Platform";
 import IconWithTextTile from "~/components/ui/IconWithTextTile";
@@ -32,7 +33,7 @@ export default function ClientDesktopSidebar() {
     const location = useLocation();
     const { t } = useTranslation();
     const { user } = useCurrentUser();
-    const projectUuid = user?.clientProjectUuid ?? null;
+    const projectUuid = useFocusProjectStore((state) => state.focusedProjectUuid);
     const { project, isLoading: isLoadingProject } = useShowProject(projectUuid);
     const { integrations } = useListIntegrations({ projectUuid });
     const openIntegrationLoginModal = useIntegrationLoginModalStore((state) => state.open);

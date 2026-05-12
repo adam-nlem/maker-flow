@@ -1,9 +1,8 @@
-import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import ContentsPageView from "~/components/contents/ContentsPageView";
+import { useFocusProjectStore } from "~/stores/project/focusProjectStore";
 
 export default function ClientContentsPage() {
-  const { user } = useCurrentUser();
-  const projectUuid = user?.clientProjectUuid ?? null;
+  const projectUuid = useFocusProjectStore((state) => state.focusedProjectUuid);
 
   if (!projectUuid) return null;
 
