@@ -21,6 +21,7 @@ import IntegrationTile from "~/components/integrations/IntegrationTile";
 import IntegrationLoginModal from "~/components/integrations/IntegrationLoginModal";
 import Shimmer from "~/components/ui/Shimmer";
 import SidebarShell from "~/components/sidebar/SidebarShell";
+import IdentityTile from "~/components/sidebar/IdentityTile";
 import {
     clientHomePath,
     clientContentsPath,
@@ -43,27 +44,23 @@ export default function ClientDesktopSidebar() {
     const isContentsSelected = location.pathname === clientContentsPath;
     const isSettingsSelected = location.pathname.startsWith(clientSettingsPath);
 
+    const identityTile = isLoadingProject ? (
+        <div className="p-2">
+            <Shimmer width="w-32" height="h-5" />
+        </div>
+    ) : agency ? (
+        <IdentityTile agency={agency} />
+    ) : null;
+
     const topSection = (
         <>
-            <div className="flex flex-col gap-1 px-2 py-3">
-                {isLoadingProject ? (
-                    <Shimmer width="w-32" height="h-5" />
-                ) : agency ? (
-                    <span
-                        className="text-heading-sm font-semibold whitespace-nowrap truncate"
-                        style={agency.brandColor ? { color: agency.brandColor } : undefined}
-                    >
-                        {agency.name}
-                    </span>
-                ) : null}
-                {user?.firstName && (
-                    <span className="text-body-xs text-gray whitespace-nowrap truncate">
-                        {t("clientPortal:sidebar.greeting", { name: user.firstName })}
-                    </span>
-                )}
-            </div>
+            {user?.firstName && (
+                <span className="text-body-xs text-gray whitespace-nowrap truncate block px-2 pb-4">
+                    {t("clientPortal:sidebar.greeting", { name: user.firstName })}
+                </span>
+            )}
 
-            <div className="mt-6 flex flex-col gap-1">
+            <div className="flex flex-col gap-1">
                 <IconWithTextTile
                     icon={isHomeSelected ? HomeIconSolid : HomeIcon}
                     label={t("navigation:items.home")}
@@ -106,7 +103,7 @@ export default function ClientDesktopSidebar() {
 
     return (
         <>
-            <SidebarShell topSection={topSection} bottomNav={bottomNav} />
+            <SidebarShell topSection={topSection} bottomNav={bottomNav} identityTile={identityTile} />
             <IntegrationLoginModal />
         </>
     );

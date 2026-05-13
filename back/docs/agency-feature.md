@@ -80,6 +80,31 @@ Both `GET` and `PATCH` resolve the current agency through `AgencyRepository::get
 
 The new dedicated `api_agency_current` serialization group exposes the readable fields (`uuid`, `name`, `brandColor`, `contactEmail`, `website`). It is independent from `api_agency_create` and `api_agency_update`.
 
+## Agency logo
+
+Agency logos live on disk by UUID — same convention as post thumbnails — so the `Agency` entity stays untouched (no `logoPath` column). Every logo is stored at the deterministic path `private/uploads/agency/logo/{agencyUuid}.png`.
+
+| Method | Route | Auth | Body | Response |
+| --- | --- | --- | --- | --- |
+| `POST` | `/api/agencies/logo` | `ROLE_ADMIN` + `AgencyVoter::MANAGE_SETTINGS` | `multipart/form-data` with a `logo` file part | `204 No Content` |
+| `GET` | `/api/agencies/{agencyUuid}/logo` | `ROLE_USER` baseline + ownership (user belongs to the agency as collaborator **or** through `User.project.agency`) | — | `200 OK` with the PNG (`Content-Type: image/png`, `inline` disposition) when a logo exists, **`204 No Content`** when it doesn't. |
+
+There is no server-side placeholder: empty agencies return `204` and the frontend renders its own fallback (brand-color block with the agency's initial, or a drop zone in editable contexts).
+
+Validation on upload (`AgencyLogoService::upload`):
+- MIME type must be `image/png`.
+- File size ≤ 5 MB.
+
+Any failure raises `AgencyLogoInvalidException` (code `27004`, HTTP 400) with a `reason` meta key (`file_too_large`, `invalid_mime_type`, `missing_file`). The destination filename is fixed (`{uuid}.png`), so subsequent uploads naturally overwrite the previous logo — no manual cleanup needed.
+
+Path is configured in `config/services.yaml`:
+
+```yaml
+app.agency.logo.directory: "%kernel.project_dir%/private/uploads/agency/logo"
+```
+
+…and injected into `App\Service\Agency\AgencyLogoService` as `$logoDirectory`. User-uploaded logos under `private/uploads/agency/logo/*` are gitignored.
+
 ## Agency creation in onboarding
 
 Agency provisioning is its own onboarding step — it is **not** auto-bundled into `POST /api/users/register`. A freshly-registered admin lands on the frontend's `OnboardingCreateAgencyStep`, which submits to `POST /api/agencies`. The `AgencyShellLayout` redirects to `/onboarding` for any non-client user whose `agency` is still `null`, so the agency shell never renders against a null agency. See [onboarding-feature.md](onboarding-feature.md) for the `CreateAgency` step entry.

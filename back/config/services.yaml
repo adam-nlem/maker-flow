@@ -50,6 +50,8 @@ parameters:
     app.mailing.from_name: "%env(string:MAILING_FROM_NAME)%"
 
     app.prelaunch.enabled: "%env(bool:PRELAUNCH_ENABLED)%"
+
+    app.agency.logo.directory: "%kernel.project_dir%/private/uploads/agency/logo"
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -157,6 +159,10 @@ services:
     App\Service\Invitation\InvitationService:
         arguments:
             $frontendUrl: "%app.frontend_url%"
+
+    App\Service\Agency\AgencyLogoService:
+        arguments:
+            $logoDirectory: "%app.agency.logo.directory%"
 
     App\Service\Prelaunch\PrelaunchService:
         arguments:

@@ -4,8 +4,7 @@
 
 Phase 5 of the Client Portal + Agency Workspace rollout. Adds the UI an admin needs to operate their agency:
 
-- **Agency settings** — edit the agency profile (name, brand color, contact email, website).
-- **Collaborators settings** — list active members + pending invitations; invite, remove, cancel.
+- **Agency settings** — edit the agency profile (name, brand color, contact email, website) and manage agency collaborators (active members + pending invitations) in a single section.
 - **Per-project Clients** — embedded inside each `ProjectSettingsCard`; same actions scoped to a project.
 - **Role-aware settings sidebar** — every section list is filtered by the current user's role via `getSettingsSectionsForRoles(roles)`.
 
@@ -13,14 +12,13 @@ No new top-level navigation entries are introduced — client management lives w
 
 ## Routes
 
-All three new section URLs are children of the existing `/agency/settings/:section` route registered in [src/routes/agency/settings.section.tsx](../src/routes/agency/settings.section.tsx). New constants in [src/routes/routePaths.ts](../src/routes/routePaths.ts):
+All new section URLs are children of the existing `/agency/settings/:section` route registered in [src/routes/agency/settings.section.tsx](../src/routes/agency/settings.section.tsx). New constants in [src/routes/routePaths.ts](../src/routes/routePaths.ts):
 
 | Constant | Path |
 | --- | --- |
 | `agencySettingsAgencyPath` | `/agency/settings/agency` |
-| `agencySettingsCollaboratorsPath` | `/agency/settings/collaborators` |
 
-The existing `agencySettingsGeneralPath`, `agencySettingsProjectsPath`, `agencySettingsSubscriptionPath` are unchanged.
+The agency profile and collaborators management live together under `agencySettingsAgencyPath`. The existing `agencySettingsGeneralPath`, `agencySettingsProjectsPath`, `agencySettingsSubscriptionPath` are unchanged.
 
 ## Role-aware section list
 
@@ -28,7 +26,7 @@ The existing `agencySettingsGeneralPath`, `agencySettingsProjectsPath`, `agencyS
 
 | Role | Visible sections |
 | --- | --- |
-| `ROLE_ADMIN` | General, Agency, Collaborators, Projects, Subscription |
+| `ROLE_ADMIN` | General, Agency, Projects, Subscription |
 | `ROLE_EDITOR` | General, Projects |
 | `ROLE_VIEWER` | General, Projects (read-only inside) |
 | `ROLE_CLIENT` | General |
@@ -42,24 +40,48 @@ Two places consume the helper:
 
 ### Agency settings — [src/components/settings/agency/AgencySettings.tsx](../src/components/settings/agency/AgencySettings.tsx)
 
-Form section mirroring the structural shell of `GeneralSettings` (sticky header, scrollable body, sticky save footer that only appears when `hasChanges`).
+Orchestrator component for the merged Agency section. Sticky page header (`Agency` + subtitle) sits above a single scrollable body that stacks two blocks:
 
-Fields: `name` (required), `brandColor` (hex regex `^#[0-9A-Fa-f]{6}$` with a swatch preview), `contactEmail`, `website`. Validation regex mirrors the backend `Assert\Regex` on `Agency.brandColor`.
+1. [`AgencySettingsForm`](../src/components/settings/agency/AgencySettingsForm.tsx) — card-style profile form (color-picker cover area, overlapping `AgencyLogo`, inline-edit Name / Email / Website inputs, in-card right-aligned Save button visible only when `hasChanges`). Form state lives in [`useAgencySettingsForm`](../src/hooks/useAgencySettingsForm.ts). Brand color validation regex `^#[0-9A-Fa-f]{6}$` mirrors the backend `Assert\Regex` on `Agency.brandColor`.
+2. [`CollaboratorsSection`](../src/components/settings/agency/CollaboratorsSection.tsx) — flat block separated by a `border-t` divider. Header row with an `h3 "Collaborators"` and an "Invite collaborator" button, followed by the `DataTable<CollaboratorRow>` showing active collaborators then pending invitations.
+
+The three collaborator modals (`InviteCollaboratorModal`, `RemoveCollaboratorModal`, `DeleteInvitationModal`) are rendered at the `AgencySettings` root and driven by [`collaboratorModalsStore`](../src/stores/collaborators/collaboratorModalsStore.ts).
 
 Data:
 - [`useCurrentAgency`](../src/hooks/api/agency/useCurrentAgency.ts) — `GET /agencies/current`. Mirrors the `useCurrentUser` naming for "the current user's [resource]".
 - [`useUpdateAgency`](../src/hooks/api/agency/useUpdateAgency.ts) — `PATCH /agencies` (empty segment, matches the backend route shape). Mirrors `useUpdateUser`.
+- [`useListCollaborators`](../src/hooks/api/collaborators/useListCollaborators.ts) — drives both the table rows and the modal "removing user" lookup.
 
-### Collaborators settings — [src/components/settings/collaborators/CollaboratorsSettings.tsx](../src/components/settings/collaborators/CollaboratorsSettings.tsx)
+### Agency logo — [src/components/agency/AgencyLogo.tsx](../src/components/agency/AgencyLogo.tsx)
 
-`DataTable<CollaboratorRow>` listing active collaborators followed by pending invitations. Columns: Name, Email, Role pill, Status pill, Actions. The current user's own row shows a "You" indicator instead of action buttons.
+Self-contained component covering both display and upload. Props: `{ agency: Agency; editable?: boolean; className?: string }`. The backend returns `204 No Content` when an agency has no logo, so the component owns the empty state.
 
-Three modals open from row actions:
+Rendering matrix:
+
+| `editable` | logo state | What renders |
+| --- | --- | --- |
+| any | loading | `Shimmer` |
+| any | uploaded | `<img>` with the blob URL (object-cover) |
+| `false` | missing | `AgencyLogoInitial` — colored block with the agency's first letter, tinted with `agency.brandColor` when it matches `HEX_COLOR_PATTERN`, otherwise a neutral `bg-light-gray` |
+| `true` | missing | `AgencyLogoDropzone` — wraps the generic [`FileUpload`](../src/components/ui/FileUpload.tsx) with `accept="image/png"`, the `PhotoIcon`, and the `agencySettings:logo.*` translation keys. Click-to-browse and drag-and-drop are handled by `FileUpload` itself; this wrapper just bridges the agency hook with the generic UI. |
+
+Client-side validation lives inside [`useUploadAgencyLogo`](../src/hooks/api/agency/useUploadAgencyLogo.ts) alongside the mutation — the component stays presentational. Checks (`file.type === "image/png"`, `file.size ≤ 5 MB`) mirror the backend and surface as `agencySettings:validation.logoMimeType` / `logoTooLarge` rendered below the drop zone. After a successful upload, the mutation invalidates `agencyQueryKeys.logo(uuid)` and the `<img>` renders automatically.
+
+Call sites:
+- [AgencySettings](../src/components/settings/agency/AgencySettings.tsx) — `editable` variant, `w-full max-w-md`.
+- [DesktopSidebar](../src/components/sidebar/DesktopSidebar.tsx) — read-only, `size-8 rounded-md` next to the agency name above the project selector. Mobile sidebar inherits via `MobileSidebarShell`.
+- [ClientDesktopSidebar](../src/components/client-portal/sidebar/ClientDesktopSidebar.tsx) — read-only, `size-8 rounded-md` next to the agency name. Mobile inherits the same way. Clients never see the drop zone (call sites enforce this, not the component).
+
+### Collaborators section — [src/components/settings/agency/CollaboratorsSection.tsx](../src/components/settings/agency/CollaboratorsSection.tsx)
+
+Embedded block rendered inside `AgencySettings`. `DataTable<CollaboratorRow>` listing active collaborators followed by pending invitations. Columns: Name, Email, Role pill, Status pill, Actions. The current user's own row shows a "You" indicator instead of action buttons.
+
+Three modals open from row actions (rendered by the parent `AgencySettings`):
 - `InviteCollaboratorModal` + `InviteCollaboratorForm` — fields: firstName, lastName, email, role (Editor / Viewer via Pill toggle). Calls `useInviteCollaborator`.
 - `RemoveCollaboratorModal` — `ConfirmDeleteDialog` wrapper, calls `useRemoveCollaborator`.
 - `DeleteInvitationModal` — shared with the per-project view, calls `useDeleteInvitation`.
 
-Open/close state is held in [`collaboratorModalsStore`](../src/stores/collaborators/collaboratorModalsStore.ts) (Zustand) mirroring `createProjectModalStore`.
+Open/close state is held in [`collaboratorModalsStore`](../src/stores/collaborators/collaboratorModalsStore.ts) (Zustand) mirroring `createProjectModalStore`. The section component dispatches `setIsInviteOpen` / `setRemovingUserUuid` / `openDeleteInvitation`; the parent reads the open state to render the modals.
 
 ### Per-project Clients — [src/components/settings/project/ProjectSettingsCard.tsx](../src/components/settings/project/ProjectSettingsCard.tsx)
 
@@ -78,7 +100,7 @@ Thin `ConfirmDeleteDialog` wrapper used by both the Collaborators table and each
 
 | Folder | Hooks |
 | --- | --- |
-| `src/hooks/api/agency/` | `useCurrentAgency`, `useUpdateAgency` (+ existing `useCreateAgency`) |
+| `src/hooks/api/agency/` | `useCurrentAgency`, `useUpdateAgency`, `useShowAgencyLogo`, `useUploadAgencyLogo` (+ existing `useCreateAgency`) |
 | `src/hooks/api/collaborators/` | `useListCollaborators`, `useInviteCollaborator`, `useRemoveCollaborator` |
 | `src/hooks/api/projectClients/` | `useListProjectClients`, `useInviteClient`, `useRemoveClient` |
 | `src/hooks/api/invitations/` | `useDeleteInvitation` |
@@ -95,7 +117,7 @@ Both invite endpoints go through the polymorphic backend route `POST /api/invita
 
 ## Analytics
 
-[`AnalyticsEvent`](../src/models/enums/AnalyticsEvent.ts) gains: `AgencySettingsUpdated`, `CollaboratorInvited`, `CollaboratorRemoved`, `ClientInvited`, `ClientRemoved`, `InvitationDeleted`. Each is emitted from the corresponding mutation hook's `onSuccess` callback.
+[`AnalyticsEvent`](../src/models/enums/AnalyticsEvent.ts) gains: `AgencySettingsUpdated`, `AgencyLogoUpdated`, `CollaboratorInvited`, `CollaboratorRemoved`, `ClientInvited`, `ClientRemoved`, `InvitationDeleted`. Each is emitted from the corresponding mutation hook's `onSuccess` callback.
 
 ## i18n
 
@@ -107,7 +129,7 @@ New namespaces under [src/services/i18n/locales/](../src/services/i18n/locales/)
 - `invitations/{fr,en}.json` — Cancel-confirmation copy.
 
 Extended namespaces:
-- `settings/{fr,en}.json` — adds `sections.agency`, `sections.collaborators`, and the per-project `projects.card.clients.*` subtree.
+- `settings/{fr,en}.json` — adds `sections.agency` and the per-project `projects.card.clients.*` subtree. `sections.collaborators` is reused as the `h3` label inside the merged Agency section.
 
 ## Related docs
 

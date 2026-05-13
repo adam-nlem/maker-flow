@@ -7,6 +7,7 @@ export enum AnalyticsEvent {
     OnboardingDismissed = 'onboarding_dismissed',
     AgencyCreated = 'agency_created',
     AgencySettingsUpdated = 'agency_settings_updated',
+    AgencyLogoUpdated = 'agency_logo_updated',
     CollaboratorInvited = 'collaborator_invited',
     CollaboratorRemoved = 'collaborator_removed',
     ClientInvited = 'client_invited',

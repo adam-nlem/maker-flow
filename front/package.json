@@ -23,6 +23,7 @@
     "luxon": "^3.7.2",
     "posthog-js": "^1.364.6",
     "react": "^19.1.1",
+    "react-color": "^2.19.3",
     "react-dom": "^19.1.1",
     "react-i18next": "^17.0.6",
     "react-is": "^19.1.1",

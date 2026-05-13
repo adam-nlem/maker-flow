@@ -7,10 +7,10 @@ import { privacyPolicyPath, termsOfServicePath } from "~/routes/routePaths";
 interface SidebarShellProps {
     topSection: ReactNode;
     bottomNav: ReactNode;
-    cta?: ReactNode;
+    identityTile?: ReactNode;
 }
 
-export default function SidebarShell({ topSection, bottomNav, cta }: SidebarShellProps) {
+export default function SidebarShell({ topSection, bottomNav, identityTile }: SidebarShellProps) {
     const navigate = useNavigate();
     const { t } = useTranslation();
 
@@ -27,13 +27,9 @@ export default function SidebarShell({ topSection, bottomNav, cta }: SidebarShel
 
                 <div className="border-t border-light-gray rounded w-full"></div>
 
-                {cta && (
-                    <div className="p-3">
-                        {cta}
-                    </div>
-                )}
+                {identityTile}
 
-                <div className="px-3 pb-3 flex gap-2 justify-center items-center">
+                <div className="px-3 pb-3 flex gap-2 justify-center items-center text-body-xs">
                     <SimpleTextButton onClick={() => navigate(privacyPolicyPath)}>
                         {t("legal.privacyPolicy")}
                     </SimpleTextButton>

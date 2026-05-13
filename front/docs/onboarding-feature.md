@@ -22,7 +22,7 @@ The active step order is resolved by [`getOnboardingFlowConfig(role)`](../src/mo
 | 4 | `connect_first_integration` | `OnboardingConnectIntegrationStep` | OAuth tiles for the focused project. Skippable. |
 | 5 | `show_subscriptions` | `OnboardingSubscriptionStep` | `SubscriptionOverview` checkout. |
 
-Collaborator invitation is **not** part of onboarding — seat count depends on the subscription tier picked at the last step. Collaborator invites live exclusively in `/agency/settings/collaborators`.
+Collaborator invitation is **not** part of onboarding — seat count depends on the subscription tier picked at the last step. Collaborator invites live exclusively in the Collaborators block of `/agency/settings/agency`.
 
 ### Collaborator (Editor / Viewer) — `AgencyCollaboratorOnboardingStep` (3 steps)
 | Order | Value | Component |

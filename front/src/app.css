@@ -30,6 +30,7 @@ body {
   --color-gray-400: #6b7280;
   --color-purple: #715AFF;
 
+  /* Default brand color. Overridden at runtime per agency via useApplyAgencyBrandColor. */
   --color-primary: #43CEA9;
   --color-dark: #F0F0F0;
   --color-clear: #141115;
@@ -42,7 +43,7 @@ body {
   --color-purple: #5346B6;
 
   --color-pastel-green: #BCD5AA;
-  --color-surface-hover: rgba(67, 206, 169, 0.05);
+  --color-surface-hover: color-mix(in srgb, var(--color-primary) 5%, transparent);
 
   /* Custom text sizes with appropriate fonts */
   --font-size-xs: 0.75rem;

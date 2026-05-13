@@ -1,16 +1,20 @@
 {
     "subtitle": "Customize your agency identity.",
+    "brandColorPicker": "Pick a brand color",
     "fields": {
-        "name": "Agency name",
-        "brandColor": "Brand color",
-        "brandColorHint": "6-digit hex code (e.g. #43CEA9). Leave empty to use the default color.",
-        "contactEmail": "Contact email",
-        "website": "Website"
+        "namePlaceholder": "Your agency name",
+        "contactEmailPlaceholder": "hello@your-agency.com",
+        "websitePlaceholder": "https://your-agency.com"
+    },
+    "logo": {
+        "hint": "PNG. 5 MB max."
     },
     "validation": {
         "nameRequired": "Agency name is required.",
         "brandColorFormat": "The brand color must be a 6-digit hex code (e.g. #43CEA9).",
         "contactEmailFormat": "The contact email is invalid.",
-        "websiteFormat": "The website URL must start with http:// or https://."
+        "websiteFormat": "The website URL must start with http:// or https://.",
+        "logoMimeType": "The logo must be a PNG image.",
+        "logoTooLarge": "The logo must be 5 MB or smaller."
     }
 }

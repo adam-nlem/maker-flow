@@ -1,16 +1,20 @@
 {
     "subtitle": "Personnalisez l'identité de votre agence.",
+    "brandColorPicker": "Choisir une couleur de marque",
     "fields": {
-        "name": "Nom de l'agence",
-        "brandColor": "Couleur de marque",
-        "brandColorHint": "Format hexadécimal sur 6 caractères (ex. #43CEA9). Laisser vide pour utiliser la couleur par défaut.",
-        "contactEmail": "Email de contact",
-        "website": "Site web"
+        "namePlaceholder": "Nom de votre agence",
+        "contactEmailPlaceholder": "contact@votre-agence.com",
+        "websitePlaceholder": "https://votre-agence.com"
+    },
+    "logo": {
+        "hint": "PNG. 5 Mo max."
     },
     "validation": {
         "nameRequired": "Le nom de l'agence est obligatoire.",
         "brandColorFormat": "La couleur de marque doit être un code hexadécimal sur 6 caractères (ex. #43CEA9).",
         "contactEmailFormat": "L'email de contact n'est pas valide.",
-        "websiteFormat": "L'URL du site web doit commencer par http:// ou https://."
+        "websiteFormat": "L'URL du site web doit commencer par http:// ou https://.",
+        "logoMimeType": "Le logo doit être une image PNG.",
+        "logoTooLarge": "Le logo doit faire 5 Mo ou moins."
     }
 }

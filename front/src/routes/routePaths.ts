@@ -21,7 +21,6 @@ export const agencyCalendarPath = `${agencyAreaPrefix}/calendar`
 export const agencySettingsPath = `${agencyAreaPrefix}/settings`
 export const agencySettingsGeneralPath = `${agencySettingsPath}/general`
 export const agencySettingsAgencyPath = `${agencySettingsPath}/agency`
-export const agencySettingsCollaboratorsPath = `${agencySettingsPath}/collaborators`
 export const agencySettingsProjectsPath = `${agencySettingsPath}/projects`
 export const agencySettingsSubscriptionPath = `${agencySettingsPath}/subscription`
 

@@ -3156,6 +3156,59 @@
           "response": []
         },
         {
+          "name": "Upload Agency Logo",
+          "id": "agency-logo-upload-0001-000000000006",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/logo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "logo"
+              ]
+            },
+            "description": "Uploads or replaces the current agency's logo. Accepts `image/png` up to 5 MB. The logo is always stored at `private/uploads/agency/logo/{agencyUuid}.png`, so a subsequent upload overwrites the previous one. Auth: `ROLE_ADMIN` + `AgencyVoter::MANAGE_SETTINGS`. Returns `204 No Content`.\n\nErrors:\n- `400` with `{ \"code\": 27004, \"meta\": { \"reason\": \"...\" } }` (`AgencyLogoInvalidException`) when the file is missing, oversized, or not a PNG."
+          },
+          "response": []
+        },
+        {
+          "name": "Show Agency Logo",
+          "id": "agency-logo-show-0001-000000000007",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/{{agencyUuid}}/logo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "{{agencyUuid}}",
+                "logo"
+              ]
+            },
+            "description": "Returns the agency logo as a binary image (inline disposition). `200 OK` with the PNG when a logo exists, `204 No Content` when none has been uploaded yet — the frontend handles the empty state. Access: any authenticated user that belongs to the agency, either as collaborator (`User.agency`) or via their client project (`User.project.agency`)."
+          },
+          "response": []
+        },
+        {
           "name": "List Collaborators",
           "id": "agency-collaborators-list-0001-000000000001",
           "request": {

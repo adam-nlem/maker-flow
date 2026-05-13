@@ -661,7 +661,7 @@ Non-interactive label for status, role, or category indicators. Distinct from `P
 <Tag color="gray" label="Archived" className="shrink-0" />
 ```
 
-**Used in:** `CollaboratorsSettings` (role + status columns), `ProjectSettingsCard` (client status row pills).
+**Used in:** `CollaboratorsSection` (role + status columns inside the merged Agency settings page), `ProjectSettingsCard` (client status row pills).
 
 ---
 
@@ -676,6 +676,63 @@ Loading placeholder with shimmer animation.
 | `width` | `string` | `'w-full'` | Width class |
 | `height` | `string` | `'h-4'` | Height class |
 | `radius` | `string` | `'rounded-md'` | Border radius class |
+
+---
+
+### FileUpload
+
+**Location:** `front/src/components/ui/FileUpload.tsx`
+
+Generic drop zone for picking a single file. Supports click-to-browse (via a hidden `<input type="file">`) and drag-and-drop. Presentational only — it forwards the selected file to the caller via `onFileSelected` and renders an optional error message; validation and the actual upload live in the caller's hook.
+
+Two rendering modes: the default dashed-border + icon + hint variant, or a custom render-prop variant where the caller controls the entire inner UI (e.g. an existing image with a hover overlay). When `children` is provided, the dashed-border / icon / hint styling is dropped — only the click/drag plumbing and the `group` class are kept on the underlying `<button>` so children can react to hover via `group-hover:*`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `accept` | `string` | — | MIME types / extensions for the `<input>`'s `accept` attribute (e.g. `"image/png"`, `"application/pdf,video/mp4"`). |
+| `onFileSelected` | `(file: File) => void \| Promise<void>` | — | Called with the picked or dropped file. The caller is responsible for MIME / size validation, since the `accept` attribute only filters the picker — not drag-and-drop. |
+| `hint` | `string` | — | Default rendering only. Translated hint shown under the icon (e.g. "PNG. 5 MB max."). |
+| `errorMessage` | `string \| null` | — | Optional error rendered below the drop zone in `text-danger`. Usually a translated validation key from the caller's mutation hook. |
+| `icon` | `ComponentType<SVGProps<SVGSVGElement>>` | `ArrowUpTrayIcon` | Default rendering only. Heroicon centred in the drop zone — override per file kind (`PhotoIcon`, `DocumentIcon`, `VideoCameraIcon`, …). |
+| `isPending` | `boolean` | `false` | Disables the drop zone and dims it while the caller's upload mutation is in flight. |
+| `className` | `string` | `""` | Sizing class applied to the outer wrapper. |
+| `children` | `(state: { isDragActive: boolean }) => ReactNode` | — | Optional render prop. When provided, replaces the dashed-border default UI; the function receives `isDragActive` so children can react to drag-over (e.g. force a hover overlay visible). |
+
+**Default rendering (agency logo empty state, see `AgencyLogoDropzone` in `front/src/components/agency/AgencyLogo.tsx`):**
+
+```tsx
+<FileUpload
+    accept="image/png"
+    icon={PhotoIcon}
+    hint={t("agencySettings:logo.hint")}
+    errorMessage={validationErrorKey ? t(validationErrorKey) : null}
+    isPending={isPending}
+    onFileSelected={(file) => uploadLogo({ agencyUuid: agency.uuid, file })}
+    className={className}
+/>
+```
+
+**Custom rendering (agency logo with an existing image, see `AgencyLogoEditableImage` in the same file):**
+
+```tsx
+<FileUpload
+    accept="image/png"
+    isPending={isPending}
+    onFileSelected={(file) => uploadLogo({ agencyUuid: agency.uuid, file })}
+    className={className}
+>
+    {({ isDragActive }) => (
+        <div className="relative w-full h-full overflow-hidden rounded-md">
+            <img src={logoUrl} alt="" className="w-full h-full object-cover" />
+            <div className={`absolute inset-0 flex items-center justify-center bg-dark/50 transition-opacity ${isDragActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+                <PencilIcon className="size-5 text-clear" strokeWidth={1.8} />
+            </div>
+        </div>
+    )}
+</FileUpload>
+```
+
+For other file kinds (PDF, video, …): swap `accept`, `icon`, and the i18n keys, and point `onFileSelected` at the corresponding upload mutation hook.
 
 ---
 

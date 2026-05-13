@@ -30,6 +30,7 @@ class Agency
     private ?string $name = null;
 
     #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Length(max: 7, maxMessage: 'Brand color must be a 7-character hex code (e.g. #1F2937)')]
     #[Assert\Regex(pattern: '/^#[0-9A-Fa-f]{6}$/', message: 'Brand color must be a 6-digit hex code (e.g. #1F2937)')]
     #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid'])]
     private ?string $brandColor = null;

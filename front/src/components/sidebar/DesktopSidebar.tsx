@@ -1,14 +1,15 @@
-import { ChevronUpDownIcon, PencilSquareIcon, PlusIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { ChevronUpDownIcon, PencilSquareIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
+import { useCurrentAgency } from "~/hooks/api/agency/useCurrentAgency";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { Button } from "../ui/Button";
 import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
 import IconWithTextTile from "../ui/IconWithTextTile";
+import IdentityTile from "./IdentityTile";
 import { useLocation, useNavigate } from "react-router-dom";
-import { agencySettingsSubscriptionPath } from "~/routes/routePaths";
 import Shimmer from "../ui/Shimmer";
 import SelectDropdown from "../ui/SelectDropdown"
 import type { Project } from "~/models/Project"
@@ -30,6 +31,7 @@ export default function DesktopSidebar() {
   const location = useLocation();
   const { t } = useTranslation();
 
+  const { agency } = useCurrentAgency()
   const { projects, isLoading: isLoadingProjects } = useListPaginatedProjects()
   const { subscription } = useShowCurrentSubscription()
   const { plans } = useListPlans()
@@ -165,22 +167,11 @@ export default function DesktopSidebar() {
     </>
   );
 
-  const cta = (
-    <Button
-      type="button"
-      style="primary"
-      onClick={() => navigate(agencySettingsSubscriptionPath)}
-    >
-      <div className="flex flex-row justify-center items-center gap-3">
-        <SparklesIcon className="size-4" strokeWidth={2} />
-        <p className="text-sm">{t("sidebar:premiumCta")}</p>
-      </div>
-    </Button>
-  );
+  const identityTile = agency ? <IdentityTile agency={agency} /> : null;
 
   return (
     <>
-      <SidebarShell topSection={topSection} bottomNav={bottomNav} cta={cta} />
+      <SidebarShell topSection={topSection} bottomNav={bottomNav} identityTile={identityTile} />
 
       <CreateProjectModal
         showModal={isCreateProjectModalOpen}
