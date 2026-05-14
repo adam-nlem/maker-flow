@@ -98,6 +98,22 @@ Use these classes for body text. All use the **Outfit** font family with gray co
 | **Purple** | `--color-purple` | `#5346B6` | Special highlights |
 | **Pastel Green** | `--color-pastel-green` | `#BCD5AA` | Soft success backgrounds |
 
+### Agency-overridable tokens
+
+Seven CSS variables can be overridden per agency at runtime via [`useApplyAgencyTheme`](../src/hooks/useApplyAgencyTheme.ts). When the corresponding agency field is empty, the default declared above applies.
+
+| Variable | Agency field | Slot |
+|----------|--------------|------|
+| `--color-primary` | `accentColor` | Accent / CTA |
+| `--color-clear` | `backgroundColor` | Background primary |
+| `--color-light-gray` | `backgroundSecondaryColor` | Background secondary |
+| `--color-dark` | `textColor` | Text primary |
+| `--color-gray` | `textSecondaryColor` | Text secondary |
+| `--font-family-display` | `headingFont` | Heading typography |
+| `--font-family-sans` | `bodyFont` | Body typography |
+
+All other tokens (`--color-danger`, `--color-gray-400`, `--color-gray-900`, accent colors, `--color-surface-hover`, font sizes) are fixed and not part of the white-label surface — use them when a value must stay stable regardless of the active agency theme. Font choices are limited to the curated whitelist in [`models/enums/BrandFont.ts`](../src/models/enums/BrandFont.ts), preloaded once at app start.
+
 ---
 
 ## Common Patterns

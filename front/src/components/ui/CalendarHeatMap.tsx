@@ -93,7 +93,7 @@ function buildWeeksGrid(data: ChartDataPoint[], daysToDisplay: number): HeatMapC
 }
 
 function getColor(count: number) {
-    if (count === 0) return "bg-zinc-200";
+    if (count === 0) return "bg-light-gray";
     if (count < 1000) return "bg-primary/20";
     if (count < 5000) return "bg-primary/40";
     if (count < 10000) return "bg-primary/60";

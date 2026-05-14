@@ -32,7 +32,7 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
             >
                 <div
                     className="h-20 w-full bg-light-gray"
-                    style={agency.brandColor ? { backgroundColor: agency.brandColor } : undefined}
+                    style={agency.accentColor ? { backgroundColor: agency.accentColor } : undefined}
                 />
 
                 <div className="px-5 -mt-10">
@@ -45,7 +45,7 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
                     <div className="flex flex-col gap-2 min-w-0">
                         <span
                             className="text-heading-md font-semibold truncate"
-                            style={agency.brandColor ? { color: agency.brandColor } : undefined}
+                            style={agency.accentColor ? { color: agency.accentColor } : undefined}
                         >
                             {agency.name}
                         </span>

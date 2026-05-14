@@ -44,8 +44,8 @@
             "label": "Nom de l'agence",
             "placeholder": "Mon agence"
         },
-        "brandColor": {
-            "label": "Couleur de marque (optionnel)",
+        "accentColor": {
+            "label": "Couleur d'accentuation (optionnel)",
             "placeholder": "#141115"
         },
         "contactEmail": {

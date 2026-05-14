@@ -12,6 +12,7 @@ import OnboardingExploreProjectsStep from "~/components/onboarding/OnboardingExp
 import OnboardingExploreContentsStep from "~/components/onboarding/OnboardingExploreContentsStep"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser"
+import { useApplyAgencyTheme } from "~/hooks/useApplyAgencyTheme"
 import { AgencyAdminOnboardingStep } from "~/models/enums/AgencyAdminOnboardingStep"
 import { AgencyCollaboratorOnboardingStep } from "~/models/enums/AgencyCollaboratorOnboardingStep"
 import { ClientOnboardingStep } from "~/models/enums/ClientOnboardingStep"
@@ -57,6 +58,8 @@ function resolveStepNode(role: UserRole | null, step: string): ReactNode {
 export default function OnboardingPage() {
     const { isAuthLoading, isAuthenticated, currentOnboardingStep, currentWelcomeStep } = useOnboardingFlow()
     const { user } = useCurrentUser()
+
+    useApplyAgencyTheme(user?.agency)
 
     if (isAuthLoading) {
         return (

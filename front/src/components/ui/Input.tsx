@@ -32,7 +32,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     }
 
     const inputElement = <input ref={ref} autoComplete={autoComplete} className={`
-      block bg-transparent placeholder-gray-400 ${textStyle}
+      block bg-transparent placeholder-gray ${textStyle}
       ${!simple ? `rounded-xl border border-light-gray shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary ${spacingClasses}` : `border-0 shadow-none outline-none focus:outline-none focus:ring-0 ${spacingClasses}`}
       ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
       w-full

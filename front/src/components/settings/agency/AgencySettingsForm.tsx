@@ -9,35 +9,34 @@ import AgencyLogo from "~/components/agency/AgencyLogo";
 import { Agency } from "~/models/Agency";
 import { useAgencySettingsForm } from "~/hooks/useAgencySettingsForm";
 import { HEX_COLOR_PATTERN } from "~/utils/agencyValidation";
+import ColorField from "./ColorField";
+import FontField from "./FontField";
 
 interface AgencySettingsFormProps {
     agency: Agency;
 }
 
+const BACKGROUND_DEFAULT = "#141115";
+const BACKGROUND_SECONDARY_DEFAULT = "#2d2d44";
+const TEXT_DEFAULT = "#F0F0F0";
+const TEXT_SECONDARY_DEFAULT = "#9ca3af";
+const ACCENT_DEFAULT = "#43CEA9";
+const HEADING_FONT_DEFAULT_LABEL = "Outfit";
+const HEADING_FONT_DEFAULT_STACK = "Outfit, ui-sans-serif, system-ui, sans-serif";
+const BODY_FONT_DEFAULT_LABEL = "Roboto";
+const BODY_FONT_DEFAULT_STACK = "Roboto, ui-sans-serif, system-ui, sans-serif";
+
 export default function AgencySettingsForm({ agency }: AgencySettingsFormProps) {
     const { t } = useTranslation();
-    const {
-        name,
-        setName,
-        brandColor,
-        setBrandColor,
-        contactEmail,
-        setContactEmail,
-        website,
-        setWebsite,
-        validationErrorKey,
-        hasChanges,
-        isPending,
-        submit,
-    } = useAgencySettingsForm(agency);
-    const [isPickerOpen, setIsPickerOpen] = useState(false);
+    const form = useAgencySettingsForm(agency);
+    const [isAccentPickerOpen, setIsAccentPickerOpen] = useState(false);
 
-    const trimmedBrandColor = brandColor.trim();
-    const hasValidBrandColor = HEX_COLOR_PATTERN.test(trimmedBrandColor);
+    const trimmedAccentColor = form.accentColor.trim();
+    const hasValidAccentColor = HEX_COLOR_PATTERN.test(trimmedAccentColor);
 
     const { refs, floatingStyles, context } = useFloating({
-        open: isPickerOpen,
-        onOpenChange: setIsPickerOpen,
+        open: isAccentPickerOpen,
+        onOpenChange: setIsAccentPickerOpen,
         placement: "bottom",
         middleware: [offset(8), flip(), shift({ padding: 8 })],
         whileElementsMounted: autoUpdate,
@@ -50,25 +49,25 @@ export default function AgencySettingsForm({ agency }: AgencySettingsFormProps) 
         <form
             onSubmit={(e) => {
                 e.preventDefault();
-                void submit();
+                void form.submit();
             }}
         >
             <div className="w-full mx-auto bg-clear overflow-hidden shadow-sm">
                 <button
                     ref={refs.setReference}
                     type="button"
-                    aria-label={t("agencySettings:brandColorPicker")}
-                    onClick={() => setIsPickerOpen((open) => !open)}
+                    aria-label={t("agencySettings:colorPickerAriaLabel")}
+                    onClick={() => setIsAccentPickerOpen((open) => !open)}
                     {...getReferenceProps()}
-                    className={`group relative h-30 w-full cursor-pointer ${hasValidBrandColor ? "" : "bg-light-gray"}`}
-                    style={hasValidBrandColor ? { backgroundColor: trimmedBrandColor } : undefined}
+                    className={`group relative h-30 w-full cursor-pointer ${hasValidAccentColor ? "" : "bg-light-gray"}`}
+                    style={hasValidAccentColor ? { backgroundColor: trimmedAccentColor } : undefined}
                 >
-                    <div className={`absolute inset-0 flex items-center justify-center bg-dark/20 transition-opacity ${isPickerOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+                    <div className={`absolute inset-0 flex items-center justify-center bg-dark/20 transition-opacity ${isAccentPickerOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                         <PencilIcon className="size-5 text-clear" strokeWidth={1.8} />
                     </div>
                 </button>
 
-                {isPickerOpen && (
+                {isAccentPickerOpen && (
                     <FloatingPortal>
                         <div
                             ref={refs.setFloating}
@@ -77,8 +76,8 @@ export default function AgencySettingsForm({ agency }: AgencySettingsFormProps) 
                             {...getFloatingProps()}
                         >
                             <BlockPicker
-                                color={hasValidBrandColor ? trimmedBrandColor : "#ffffff"}
-                                onChangeComplete={(color) => setBrandColor(color.hex)}
+                                color={hasValidAccentColor ? trimmedAccentColor : ACCENT_DEFAULT}
+                                onChangeComplete={(color) => form.setAccentColor(color.hex)}
                             />
                         </div>
                     </FloatingPortal>
@@ -90,43 +89,99 @@ export default function AgencySettingsForm({ agency }: AgencySettingsFormProps) 
                     </div>
                 </div>
 
-                <div className="px-7 pt-4 pb-6 flex flex-col gap-4">
-                    <Input
-                        value={name}
-                        onChange={(e) => setName(e.target.value)}
-                        simple
-                        required
-                        textStyle="text-heading-md"
-                        placeholder={t("agencySettings:fields.namePlaceholder")}
-                    />
+                <div className="px-7 pt-4 pb-6 flex flex-col gap-8">
+                    <section className="flex flex-col gap-4">
+                        <h3 className="text-body-xs text-gray uppercase tracking-wide">{t("agencySettings:sections.identity")}</h3>
 
-                    <Input
-                        type="email"
-                        value={contactEmail}
-                        onChange={(e) => setContactEmail(e.target.value)}
-                        simple
-                        textStyle="text-body-sm"
-                        icon={<EnvelopeIcon className="size-4 text-dark" strokeWidth={1.8} />}
-                        placeholder={t("agencySettings:fields.contactEmailPlaceholder")}
-                    />
+                        <Input
+                            value={form.name}
+                            onChange={(e) => form.setName(e.target.value)}
+                            simple
+                            required
+                            textStyle="text-heading-md"
+                            placeholder={t("agencySettings:fields.namePlaceholder")}
+                        />
 
-                    <Input
-                        type="url"
-                        value={website}
-                        onChange={(e) => setWebsite(e.target.value)}
-                        simple
-                        textStyle="text-body-sm"
-                        icon={<GlobeAltIcon className="size-4 text-dark" strokeWidth={1.8} />}
-                        placeholder={t("agencySettings:fields.websitePlaceholder")}
-                    />
+                        <Input
+                            type="email"
+                            value={form.contactEmail}
+                            onChange={(e) => form.setContactEmail(e.target.value)}
+                            simple
+                            textStyle="text-body-sm"
+                            icon={<EnvelopeIcon className="size-4 text-dark" strokeWidth={1.8} />}
+                            placeholder={t("agencySettings:fields.contactEmailPlaceholder")}
+                        />
 
-                    {validationErrorKey && (
-                        <p className="text-body-sm text-danger">{t(validationErrorKey)}</p>
+                        <Input
+                            type="url"
+                            value={form.website}
+                            onChange={(e) => form.setWebsite(e.target.value)}
+                            simple
+                            textStyle="text-body-sm"
+                            icon={<GlobeAltIcon className="size-4 text-dark" strokeWidth={1.8} />}
+                            placeholder={t("agencySettings:fields.websitePlaceholder")}
+                        />
+                    </section>
+
+                    <section className="flex flex-col gap-4">
+                        <h3 className="text-body-xs text-gray uppercase tracking-wide">{t("agencySettings:sections.colors")}</h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <ColorField
+                                label={t("agencySettings:fields.backgroundColor")}
+                                value={form.backgroundColor}
+                                defaultColor={BACKGROUND_DEFAULT}
+                                onChange={form.setBackgroundColor}
+                            />
+                            <ColorField
+                                label={t("agencySettings:fields.backgroundSecondaryColor")}
+                                value={form.backgroundSecondaryColor}
+                                defaultColor={BACKGROUND_SECONDARY_DEFAULT}
+                                onChange={form.setBackgroundSecondaryColor}
+                            />
+                            <ColorField
+                                label={t("agencySettings:fields.textColor")}
+                                value={form.textColor}
+                                defaultColor={TEXT_DEFAULT}
+                                onChange={form.setTextColor}
+                            />
+                            <ColorField
+                                label={t("agencySettings:fields.textSecondaryColor")}
+                                value={form.textSecondaryColor}
+                                defaultColor={TEXT_SECONDARY_DEFAULT}
+                                onChange={form.setTextSecondaryColor}
+                            />
+                        </div>
+                    </section>
+
+                    <section className="flex flex-col gap-4">
+                        <h3 className="text-body-xs text-gray uppercase tracking-wide">{t("agencySettings:sections.typography")}</h3>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <FontField
+                                label={t("agencySettings:fields.headingFont")}
+                                value={form.headingFont}
+                                defaultLabel={HEADING_FONT_DEFAULT_LABEL}
+                                defaultCssStack={HEADING_FONT_DEFAULT_STACK}
+                                onChange={form.setHeadingFont}
+                            />
+                            <FontField
+                                label={t("agencySettings:fields.bodyFont")}
+                                value={form.bodyFont}
+                                defaultLabel={BODY_FONT_DEFAULT_LABEL}
+                                defaultCssStack={BODY_FONT_DEFAULT_STACK}
+                                onChange={form.setBodyFont}
+                            />
+                        </div>
+                    </section>
+
+                    {form.validationErrorKey && (
+                        <p className="text-body-sm text-danger">{t(form.validationErrorKey)}</p>
                     )}
 
-                    {hasChanges && (
-                        <div className="flex justify-end pt-2">
-                            <Button type="submit" style="primary" isLoading={isPending} disabled={isPending}>
+                    {form.hasChanges && (
+                        <div className="flex justify-end">
+                            <Button type="submit" style="primary" isLoading={form.isPending} disabled={form.isPending}>
                                 <p className="text-sm">{t("actions.save")}</p>
                             </Button>
                         </div>

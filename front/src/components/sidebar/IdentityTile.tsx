@@ -33,7 +33,7 @@ export default function IdentityTile({ agency }: IdentityTileProps) {
                 <AgencyLogo agency={agency} className="size-9 shrink-0" />
                 <span
                     className="text-heading-sm font-semibold whitespace-nowrap truncate text-left"
-                    style={agency.brandColor ? { color: agency.brandColor } : undefined}
+                    style={agency.accentColor ? { color: agency.accentColor } : undefined}
                 >
                     {agency.name}
                 </span>

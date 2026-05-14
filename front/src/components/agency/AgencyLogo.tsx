@@ -50,12 +50,12 @@ export default function AgencyLogo({ agency, editable = false, className = "" }:
 
 function AgencyLogoInitial({ agency, className }: AgencyLogoVariantProps) {
     const initial = agency.name.trim().charAt(0).toUpperCase();
-    const hasBrandColor = !!agency.brandColor && HEX_COLOR_PATTERN.test(agency.brandColor);
+    const hasAccentColor = !!agency.accentColor && HEX_COLOR_PATTERN.test(agency.accentColor);
 
     return (
         <div
-            className={`flex items-center justify-center rounded-md ${hasBrandColor ? "text-clear" : "bg-light-gray text-gray"} ${className}`}
-            style={hasBrandColor ? { backgroundColor: agency.brandColor ?? undefined } : undefined}
+            className={`flex items-center justify-center rounded-md ${hasAccentColor ? "text-clear" : "bg-light-gray text-gray"} ${className}`}
+            style={hasAccentColor ? { backgroundColor: agency.accentColor ?? undefined } : undefined}
         >
             <span className="text-heading-sm font-semibold leading-none">{initial}</span>
         </div>

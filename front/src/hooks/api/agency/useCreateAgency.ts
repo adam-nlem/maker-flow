@@ -8,7 +8,7 @@ import { agencyQueryKeys } from "./agencyQueryKeys";
 
 interface CreateAgencyData {
     name: string;
-    brandColor: string | null;
+    accentColor: string | null;
     contactEmail: string | null;
     website: string | null;
 }
@@ -20,7 +20,7 @@ export function useCreateAgency() {
         mutationFn: async (data: CreateAgencyData) => {
             const res = await httpClient.post('/agencies', {
                 "name": data.name,
-                "brandColor": data.brandColor,
+                "accentColor": data.accentColor,
                 "contactEmail": data.contactEmail,
                 "website": data.website,
             })

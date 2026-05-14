@@ -10,7 +10,13 @@ class UpdateAgencyRequestDTO extends AbstractRequestDTO
 {
     private ?string $agencyUuid;
     private ?string $name;
-    private ?string $brandColor;
+    private ?string $accentColor;
+    private ?string $backgroundColor;
+    private ?string $backgroundSecondaryColor;
+    private ?string $textColor;
+    private ?string $textSecondaryColor;
+    private ?string $headingFont;
+    private ?string $bodyFont;
     private ?string $contactEmail;
     private ?string $website;
 
@@ -25,7 +31,13 @@ class UpdateAgencyRequestDTO extends AbstractRequestDTO
     {
         $this->agencyUuid = $payload['agencyUuid'] ?? null;
         $this->name = $payload['name'] ?? null;
-        $this->brandColor = $payload['brandColor'] ?? null;
+        $this->accentColor = $payload['accentColor'] ?? null;
+        $this->backgroundColor = $payload['backgroundColor'] ?? null;
+        $this->backgroundSecondaryColor = $payload['backgroundSecondaryColor'] ?? null;
+        $this->textColor = $payload['textColor'] ?? null;
+        $this->textSecondaryColor = $payload['textSecondaryColor'] ?? null;
+        $this->headingFont = $payload['headingFont'] ?? null;
+        $this->bodyFont = $payload['bodyFont'] ?? null;
         $this->contactEmail = $payload['contactEmail'] ?? null;
         $this->website = $payload['website'] ?? null;
     }
@@ -35,7 +47,13 @@ class UpdateAgencyRequestDTO extends AbstractRequestDTO
         return [
             'agencyUuid' => $this->getAgencyUuid(),
             'name' => $this->getName(),
-            'brandColor' => $this->getBrandColor(),
+            'accentColor' => $this->getAccentColor(),
+            'backgroundColor' => $this->getBackgroundColor(),
+            'backgroundSecondaryColor' => $this->getBackgroundSecondaryColor(),
+            'textColor' => $this->getTextColor(),
+            'textSecondaryColor' => $this->getTextSecondaryColor(),
+            'headingFont' => $this->getHeadingFont(),
+            'bodyFont' => $this->getBodyFont(),
             'contactEmail' => $this->getContactEmail(),
             'website' => $this->getWebsite(),
         ];
@@ -51,9 +69,39 @@ class UpdateAgencyRequestDTO extends AbstractRequestDTO
         return $this->name;
     }
 
-    public function getBrandColor(): ?string
+    public function getAccentColor(): ?string
     {
-        return $this->brandColor;
+        return $this->accentColor;
+    }
+
+    public function getBackgroundColor(): ?string
+    {
+        return $this->backgroundColor;
+    }
+
+    public function getBackgroundSecondaryColor(): ?string
+    {
+        return $this->backgroundSecondaryColor;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
+    }
+
+    public function getTextSecondaryColor(): ?string
+    {
+        return $this->textSecondaryColor;
+    }
+
+    public function getHeadingFont(): ?string
+    {
+        return $this->headingFont;
+    }
+
+    public function getBodyFont(): ?string
+    {
+        return $this->bodyFont;
     }
 
     public function getContactEmail(): ?string

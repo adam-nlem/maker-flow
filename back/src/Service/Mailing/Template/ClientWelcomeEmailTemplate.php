@@ -8,7 +8,7 @@ class ClientWelcomeEmailTemplate extends AbstractEmailTemplate
         string $recipientEmail,
         string $recipientName,
         private readonly string $agencyName,
-        private readonly ?string $brandColor,
+        private readonly ?string $accentColor,
         private readonly ?string $contactEmail,
         private readonly string $setupUrl,
     ) {
@@ -22,7 +22,7 @@ class ClientWelcomeEmailTemplate extends AbstractEmailTemplate
 
     protected function getHtmlBody(): string
     {
-        $accentColor = $this->brandColor ?? '#141115';
+        $accentColor = $this->accentColor ?? '#141115';
         $contactLine = $this->contactEmail !== null
             ? sprintf('<p style="color: #666; font-size: 14px;">Pour toute question, vous pouvez contacter votre agence à <a href="mailto:%1$s" style="color: %2$s;">%1$s</a>.</p>', htmlspecialchars($this->contactEmail), $accentColor)
             : '';

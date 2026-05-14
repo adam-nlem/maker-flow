@@ -9,7 +9,13 @@ import { agencyQueryKeys } from "./agencyQueryKeys"
 interface UpdateAgencyData {
     agencyUuid: string;
     name?: string;
-    brandColor?: string;
+    accentColor?: string;
+    backgroundColor?: string;
+    backgroundSecondaryColor?: string;
+    textColor?: string;
+    textSecondaryColor?: string;
+    headingFont?: string;
+    bodyFont?: string;
     contactEmail?: string;
     website?: string;
 }
@@ -22,7 +28,13 @@ export function useUpdateAgency() {
             const res = await httpClient.patch('/agencies', {
                 agencyUuid: data.agencyUuid,
                 name: data.name,
-                brandColor: data.brandColor,
+                accentColor: data.accentColor,
+                backgroundColor: data.backgroundColor,
+                backgroundSecondaryColor: data.backgroundSecondaryColor,
+                textColor: data.textColor,
+                textSecondaryColor: data.textSecondaryColor,
+                headingFont: data.headingFont,
+                bodyFont: data.bodyFont,
                 contactEmail: data.contactEmail,
                 website: data.website,
             })

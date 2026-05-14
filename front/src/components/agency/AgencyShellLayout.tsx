@@ -1,7 +1,7 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
-import { useApplyAgencyBrandColor } from "~/hooks/useApplyAgencyBrandColor";
+import { useApplyAgencyTheme } from "~/hooks/useApplyAgencyTheme";
 import DesktopSidebar from "../sidebar/DesktopSidebar";
 import MobileSidebar from "../sidebar/MobileSidebar";
 import { clientHomePath, onboardingPath } from "~/routes/routePaths";
@@ -10,7 +10,7 @@ export default function AgencyShellLayout() {
     const isDesktop = useIsDesktop();
     const { user } = useCurrentUser();
 
-    useApplyAgencyBrandColor(user?.agency?.brandColor);
+    useApplyAgencyTheme(user?.agency);
 
     if (user?.isClient) {
         return <Navigate to={clientHomePath} replace />;

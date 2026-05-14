@@ -38,7 +38,13 @@ role_hierarchy:
   "agency": {
     "uuid": "…",
     "name": "Acme Studio",
-    "brandColor": "#1F2937",
+    "accentColor": "#1F2937",
+    "backgroundColor": null,
+    "backgroundSecondaryColor": null,
+    "textColor": null,
+    "textSecondaryColor": null,
+    "headingFont": null,
+    "bodyFont": null,
     "contactEmail": "hello@acme.studio",
     "website": "https://acme.studio"
   }
@@ -76,9 +82,25 @@ The client SPA reads this error in `ClientShellLayout` and renders a full-screen
 
 Both `GET` and `PATCH` resolve the current agency through `AgencyRepository::getByCollaborator($user)` and throw `MissingAgencyException` when the caller has no agency (e.g. clients).
 
-`UpdateAgencyRequestDTO` uses sparse-update semantics: only fields present in the JSON payload are applied to the entity. Validation constraints (e.g. `Assert\Regex` on `brandColor`, `Assert\Email`, `Assert\Url`) live on the entity itself and run via `AbstractRequestDTO::build()`.
+`UpdateAgencyRequestDTO` uses sparse-update semantics: only fields present in the JSON payload are applied to the entity. Validation constraints (e.g. `Assert\Regex` on hex colors, `Assert\Choice` on font fields, `Assert\Email`, `Assert\Url`) live on the entity itself and run via `AbstractRequestDTO::build()`.
 
-The new dedicated `api_agency_current` serialization group exposes the readable fields (`uuid`, `name`, `brandColor`, `contactEmail`, `website`). It is independent from `api_agency_create` and `api_agency_update`.
+The dedicated `api_agency_current` serialization group exposes the readable fields (`uuid`, `name`, theming fields, `contactEmail`, `website`). It is independent from `api_agency_create` and `api_agency_update`.
+
+## Theming
+
+The agency profile carries the white-label theme applied at runtime in the agency workspace, the client portal, and the invitation acceptance page. All fields are nullable; an unset value means the MakerFlow default applies.
+
+| Field | Type | Validation | Default token |
+| --- | --- | --- | --- |
+| `accentColor` | `VARCHAR(7)` hex | `^#[0-9A-Fa-f]{6}$` | `--color-primary` (`#43CEA9`) |
+| `backgroundColor` | `VARCHAR(7)` hex | same regex | `--color-clear` (`#141115`) |
+| `backgroundSecondaryColor` | `VARCHAR(7)` hex | same regex | `--color-light-gray` (`#2d2d44`) |
+| `textColor` | `VARCHAR(7)` hex | same regex | `--color-dark` (`#F0F0F0`) |
+| `textSecondaryColor` | `VARCHAR(7)` hex | same regex | `--color-gray` (`#9ca3af`) |
+| `headingFont` | `VARCHAR(64)` | `Assert\Choice` against `BrandFont::values()` | `--font-family-display` (`Outfit`) |
+| `bodyFont` | `VARCHAR(64)` | `Assert\Choice` against `BrandFont::values()` | `--font-family-sans` (`Roboto`) |
+
+`accentColor` replaces the legacy `brandColor` field; the migration `Version20260513120000` renames the column (`brand_color → accent_color`) and adds the six new columns. `App\Entity\Enum\BrandFont` is the curated whitelist (`Inter`, `Roboto`, `Open Sans`, `Lato`, `Montserrat`, `Poppins`, `Outfit`, `Nunito`).
 
 ## Agency logo
 

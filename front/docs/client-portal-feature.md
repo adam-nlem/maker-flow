@@ -68,7 +68,7 @@ PrelaunchGuardLayout
 
 `models/Project.ts` gained an optional `agency` field (nullable). The backend serializes it only under the `api_project_get_by_uuid` group, so list responses are unchanged. The client sidebar fetches the project via `useShowProject(focusedProjectUuid)` and renders branding from `project.agency`.
 
-`models/Invitation.ts` was extended for the public setup page: `type` (InvitationType), `agency` (`{ name, brandColor }`), `project` (`{ name } | null`), and `createdBy` (`{ firstName, lastName } | null`). All new fields are optional in JSON parsing so existing list endpoints (which use `api_invitations_list`) keep working.
+`models/Invitation.ts` was extended for the public setup page: `type` (InvitationType), `agency` (full theming payload including `accentColor`), `project` (`{ name } | null`), and `createdBy` (`{ firstName, lastName } | null`). All new fields are optional in JSON parsing so existing list endpoints (which use `api_invitations_list`) keep working.
 
 ## Client sidebar
 
@@ -76,7 +76,7 @@ Both the agency and the client sidebars sit on top of a shared `SidebarShell` (`
 
 `components/client-portal/sidebar/ClientDesktopSidebar.tsx` feeds `SidebarShell` with:
 
-- Top section: agency name (tinted with `project.agency.brandColor` when set), greeting line with the user's first name. Shimmer while the project query is loading. Then two nav tiles: **Home** (`clientHomePath`) and **Contents** (`clientContentsPath`). Below the nav, a **PLATEFORMES** section renders one `IntegrationTile` per platform (Instagram, YouTube, TikTok) — identical to the agency sidebar. Clicking a tile calls `useIntegrationLoginModalStore().openForProject(focusedProjectUuid, platform)`, which the single `IntegrationLoginModal` mount picks up.
+- Top section: agency name (tinted with `project.agency.accentColor` when set), greeting line with the user's first name. Shimmer while the project query is loading. Then two nav tiles: **Home** (`clientHomePath`) and **Contents** (`clientContentsPath`). Below the nav, a **PLATEFORMES** section renders one `IntegrationTile` per platform (Instagram, YouTube, TikTok) — identical to the agency sidebar. Clicking a tile calls `useIntegrationLoginModalStore().openForProject(focusedProjectUuid, platform)`, which the single `IntegrationLoginModal` mount picks up.
 - Bottom nav: Settings tile pointing at `clientSettingsGeneralPath`.
 - No CTA prop (so the shell renders nothing between the divider and the footer) — clients have no project picker and no premium CTA.
 
@@ -123,7 +123,7 @@ The gate is enforced **on the backend**, not via a serialized boolean: `GET /api
 1. If a session already exists (`useCurrentUser` returns a user), the page refuses to render the setup form and instead shows a *"You're already signed in as `{email}` — sign out first"* screen with a Logout button (`useLogout`). This avoids overwriting an existing identity mid-flow.
 2. Otherwise, `useShowInvitation(token)` fetches the invitation summary via the public `GET /api/invitations/:token` endpoint. Errors (29001 not found, 29002 expired, 29003 already used) are rendered inline through the same exception-code → translation map (`services/apiErrorHandler/errorCodeMessages.ts`) used everywhere else.
 3. The header copy branches on `invitation.type`:
-   - Client: *"Welcome to your `{agencyName}` portal"* with the heading + envelope icon tinted by `agency.brandColor`.
+   - Client: *"Welcome to your `{agencyName}` portal"* with the heading + envelope icon tinted by `agency.accentColor`. The whole page is themed via `useApplyAgencyTheme(invitation.agency)` so background, text, and fonts also reflect the inviting agency.
    - Collaborator: *"Join `{agencyName}` on MakerFlow"* with the user role from `userRoleTranslationKeys` interpolated into the subtitle.
 4. Pre-filled (read-only) email + first/last name, password + confirm fields with the same [PasswordRules](password-validation-feature.md) checklist used on `/register`.
 5. On submit, `useCompleteInvitation` calls `POST /api/invitations/:token/complete` with `{ password }`. The backend returns the new user (serialized with `api_user_me`) and sets the `X-API-TOKEN` cookie. The hook seeds `userQueryKeys.me` and invalidates so the rest of the app picks up the new session instantly.

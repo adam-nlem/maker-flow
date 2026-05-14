@@ -177,7 +177,7 @@
                 "{{projectUuid}}"
               ]
             },
-            "description": "Returns the project with its parent agency nested under `agency` (`uuid`, `name`, `brandColor`, `contactEmail`, `website`). Used by the client portal to read branding for the sidebar.\n\nErrors:\n- `403` with `{ \"code\": 27003 }` (`AgencySubscriptionInactiveException`) when the requester is a `ROLE_CLIENT` user whose parent agency has no active subscription. Agency members are never gated."
+            "description": "Returns the project with its parent agency nested under `agency` (`uuid`, `name`, theming fields — `accentColor`, `backgroundColor`, `backgroundSecondaryColor`, `textColor`, `textSecondaryColor`, `headingFont`, `bodyFont` — `contactEmail`, `website`). Used by the client portal to read branding for the sidebar.\n\nErrors:\n- `403` with `{ \"code\": 27003 }` (`AgencySubscriptionInactiveException`) when the requester is a `ROLE_CLIENT` user whose parent agency has no active subscription. Agency members are never gated."
           },
           "response": []
         },
@@ -3092,7 +3092,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"My Agency\",\n  \"brandColor\": \"#1F2937\",\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
+              "raw": "{\n  \"name\": \"My Agency\",\n  \"accentColor\": \"#1F2937\",\n  \"backgroundColor\": null,\n  \"backgroundSecondaryColor\": null,\n  \"textColor\": null,\n  \"textSecondaryColor\": null,\n  \"headingFont\": null,\n  \"bodyFont\": null,\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/agencies",
@@ -3140,7 +3140,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"My Agency Renamed\",\n  \"brandColor\": \"#43CEA9\",\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
+              "raw": "{\n  \"agencyUuid\": \"{{agencyUuid}}\",\n  \"name\": \"My Agency Renamed\",\n  \"accentColor\": \"#43CEA9\",\n  \"backgroundColor\": \"#141115\",\n  \"backgroundSecondaryColor\": \"#2d2d44\",\n  \"textColor\": \"#F0F0F0\",\n  \"textSecondaryColor\": \"#9ca3af\",\n  \"headingFont\": \"Outfit\",\n  \"bodyFont\": \"Roboto\",\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/agencies",

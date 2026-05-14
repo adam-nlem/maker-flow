@@ -56,7 +56,7 @@ Both flows share the same `Invitation` entity and the same public token endpoint
 ### Email Templates (`Service/Mailing/Template/`)
 
 - `CollaboratorWelcomeEmailTemplate` — subject `Rejoignez l'agence {agencyName} sur MakerFlow`, body mentions inviter name + role + 7-day expiry
-- `ClientWelcomeEmailTemplate` — subject `Bienvenue sur votre portail {agencyName}`, body tints heading and CTA with `agency.brandColor` (fallback `#141115`); includes the agency's `contactEmail` when present
+- `ClientWelcomeEmailTemplate` — subject `Bienvenue sur votre portail {agencyName}`, body tints heading and CTA with `agency.accentColor` (fallback `#141115`); includes the agency's `contactEmail` when present
 
 Both extend `AbstractEmailTemplate` and reuse the existing `SendEmailMessage` / `SendEmailHandler` pipeline (Resend over RabbitMQ).
 
@@ -92,7 +92,7 @@ Both extend `AbstractEmailTemplate` and reuse the existing `SendEmailMessage` / 
 
 Responses are produced by Symfony's serializer using groups declared on the entities — no per-shape response DTO. The relevant groups:
 
-- `api_invitation_show` — used by the public summary endpoint (`GET /api/invitations/{token}`). Tagged on `Invitation` (uuid, type, email, firstName, lastName, role, expiresAt, createdAt, agency, project, createdBy), `Agency.name` + `Agency.brandColor`, `Project.name`, `User.firstName` + `User.lastName` (so the `createdBy` sub-object only exposes a display name).
+- `api_invitation_show` — used by the public summary endpoint (`GET /api/invitations/{token}`). Tagged on `Invitation` (uuid, type, email, firstName, lastName, role, expiresAt, createdAt, agency, project, createdBy), `Agency.name` + the full theming payload (`accentColor`, `backgroundColor`, `backgroundSecondaryColor`, `textColor`, `textSecondaryColor`, `headingFont`, `bodyFont`), `Project.name`, `User.firstName` + `User.lastName` (so the `createdBy` sub-object only exposes a display name).
 - `api_invitation_create` — used by the create-invitation responses (`POST /api/agencies/collaborators` and `POST /api/projects/clients`). Tagged on the same properties as `api_invitation_show` so the response shape matches.
 - `api_invitations_list` — used by the listing endpoints for pending rows. Tagged on `Invitation` (uuid, email, firstName, lastName, role, expiresAt, createdAt). Relations are intentionally not tagged so listings stay flat.
 - `api_collaborators_list` — tagged on `User` (uuid, firstName, lastName, email, roles).
@@ -115,7 +115,7 @@ Public routes (`show`, `complete`) are listed in `TokenAuthenticator::EXCLUDED_R
 
 | Endpoint | Method | Route Name | Auth | Description |
 |----------|--------|------------|------|-------------|
-| `/api/agencies` | POST | `api_agencies_create` | `ROLE_ADMIN` | Onboarding step: admin creates their agency. Body: `{name, brandColor?, contactEmail?, website?}`. 409 `27002` if the user already has one. |
+| `/api/agencies` | POST | `api_agencies_create` | `ROLE_ADMIN` | Onboarding step: admin creates their agency. Body: `{name, accentColor?, backgroundColor?, backgroundSecondaryColor?, textColor?, textSecondaryColor?, headingFont?, bodyFont?, contactEmail?, website?}`. 409 `27002` if the user already has one. |
 
 `ROLE_ADMIN` is granted to every newly-registered user (`UserController::register` calls `$user->setRole(UserRole::Admin)`), so the registration flow naturally feeds the agency-creation step. Collaborators / clients arrive via invitations and never get `ROLE_ADMIN`.
 
@@ -146,7 +146,7 @@ Inviting a client now lives on `POST /api/invitations` with `type=client` (see t
 ### Agency owner onboarding
 1. `POST /api/users/register` `{firstName, lastName, email, password}` → user created with `roles: ["ROLE_USER", "ROLE_ADMIN"]` and no agency.
 2. Email-verification OTP → cookie set.
-3. `POST /api/agencies` `{name, brandColor?, contactEmail?, website?}` → agency persisted, user linked, welcome credits granted, returned via `api_agency_create`.
+3. `POST /api/agencies` `{name, accentColor?, ...other theme fields?, contactEmail?, website?}` → agency persisted, user linked, welcome credits granted, returned via `api_agency_create`.
 
 ### Collaborator
 1. Admin: `POST /api/invitations` `{type: 'collaborator', firstName, lastName, email, role: 'ROLE_EDITOR'}` → 201 + invitation entity (`api_invitation_create`)
@@ -157,7 +157,7 @@ Inviting a client now lives on `POST /api/invitations` with `type=client` (see t
 
 ### Client
 1. Editor: `POST /api/invitations` `{type: 'client', firstName, lastName, email, projectUuid}` → 201 + invitation
-2. Email goes out with the agency's `brandColor` accent
+2. Email goes out with the agency's `accentColor` accent
 3. Same public flow → resulting `User` has `project_id` set, `roles` contains `ROLE_CLIENT`, `agency_id` is `NULL`
 
 ### Removal

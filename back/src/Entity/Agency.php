@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\BrandFont;
 use App\Helper\DateHelper;
 use App\Repository\AgencyRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -30,10 +31,44 @@ class Agency
     private ?string $name = null;
 
     #[ORM\Column(length: 7, nullable: true)]
-    #[Assert\Length(max: 7, maxMessage: 'Brand color must be a 7-character hex code (e.g. #1F2937)')]
-    #[Assert\Regex(pattern: '/^#[0-9A-Fa-f]{6}$/', message: 'Brand color must be a 6-digit hex code (e.g. #1F2937)')]
+    #[Assert\Length(max: 7, maxMessage: 'Accent color must be a 7-character hex code (e.g. #1F2937)')]
+    #[Assert\Regex(pattern: '/^#[0-9A-Fa-f]{6}$/', message: 'Accent color must be a 6-digit hex code (e.g. #1F2937)')]
     #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid'])]
-    private ?string $brandColor = null;
+    private ?string $accentColor = null;
+
+    #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Length(max: 7, maxMessage: 'Background color must be a 7-character hex code (e.g. #1F2937)')]
+    #[Assert\Regex(pattern: '/^#[0-9A-Fa-f]{6}$/', message: 'Background color must be a 6-digit hex code (e.g. #1F2937)')]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid'])]
+    private ?string $backgroundColor = null;
+
+    #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Length(max: 7, maxMessage: 'Secondary background color must be a 7-character hex code (e.g. #1F2937)')]
+    #[Assert\Regex(pattern: '/^#[0-9A-Fa-f]{6}$/', message: 'Secondary background color must be a 6-digit hex code (e.g. #1F2937)')]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid'])]
+    private ?string $backgroundSecondaryColor = null;
+
+    #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Length(max: 7, maxMessage: 'Text color must be a 7-character hex code (e.g. #1F2937)')]
+    #[Assert\Regex(pattern: '/^#[0-9A-Fa-f]{6}$/', message: 'Text color must be a 6-digit hex code (e.g. #1F2937)')]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid'])]
+    private ?string $textColor = null;
+
+    #[ORM\Column(length: 7, nullable: true)]
+    #[Assert\Length(max: 7, maxMessage: 'Secondary text color must be a 7-character hex code (e.g. #1F2937)')]
+    #[Assert\Regex(pattern: '/^#[0-9A-Fa-f]{6}$/', message: 'Secondary text color must be a 6-digit hex code (e.g. #1F2937)')]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid'])]
+    private ?string $textSecondaryColor = null;
+
+    #[ORM\Column(length: 64, nullable: true)]
+    #[Assert\Choice(callback: [BrandFont::class, 'values'], message: 'Heading font is not in the allowed list')]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid'])]
+    private ?string $headingFont = null;
+
+    #[ORM\Column(length: 64, nullable: true)]
+    #[Assert\Choice(callback: [BrandFont::class, 'values'], message: 'Body font is not in the allowed list')]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid'])]
+    private ?string $bodyFont = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Email]
@@ -130,14 +165,86 @@ class Agency
         return $this;
     }
 
-    public function getBrandColor(): ?string
+    public function getAccentColor(): ?string
     {
-        return $this->brandColor;
+        return $this->accentColor;
     }
 
-    public function setBrandColor(?string $brandColor): static
+    public function setAccentColor(?string $accentColor): static
     {
-        $this->brandColor = $brandColor;
+        $this->accentColor = $accentColor;
+
+        return $this;
+    }
+
+    public function getBackgroundColor(): ?string
+    {
+        return $this->backgroundColor;
+    }
+
+    public function setBackgroundColor(?string $backgroundColor): static
+    {
+        $this->backgroundColor = $backgroundColor;
+
+        return $this;
+    }
+
+    public function getBackgroundSecondaryColor(): ?string
+    {
+        return $this->backgroundSecondaryColor;
+    }
+
+    public function setBackgroundSecondaryColor(?string $backgroundSecondaryColor): static
+    {
+        $this->backgroundSecondaryColor = $backgroundSecondaryColor;
+
+        return $this;
+    }
+
+    public function getTextColor(): ?string
+    {
+        return $this->textColor;
+    }
+
+    public function setTextColor(?string $textColor): static
+    {
+        $this->textColor = $textColor;
+
+        return $this;
+    }
+
+    public function getTextSecondaryColor(): ?string
+    {
+        return $this->textSecondaryColor;
+    }
+
+    public function setTextSecondaryColor(?string $textSecondaryColor): static
+    {
+        $this->textSecondaryColor = $textSecondaryColor;
+
+        return $this;
+    }
+
+    public function getHeadingFont(): ?string
+    {
+        return $this->headingFont;
+    }
+
+    public function setHeadingFont(?string $headingFont): static
+    {
+        $this->headingFont = $headingFont;
+
+        return $this;
+    }
+
+    public function getBodyFont(): ?string
+    {
+        return $this->bodyFont;
+    }
+
+    public function setBodyFont(?string $bodyFont): static
+    {
+        $this->bodyFont = $bodyFont;
 
         return $this;
     }

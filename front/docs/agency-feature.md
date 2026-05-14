@@ -4,7 +4,7 @@
 
 Phase 5 of the Client Portal + Agency Workspace rollout. Adds the UI an admin needs to operate their agency:
 
-- **Agency settings** — edit the agency profile (name, brand color, contact email, website) and manage agency collaborators (active members + pending invitations) in a single section.
+- **Agency settings** — edit the agency profile (name, contact email, website) and the agency white-label theme (accent color, background + secondary background, text + secondary text, heading font, body font), plus manage agency collaborators (active members + pending invitations) in a single section.
 - **Per-project Clients** — embedded inside each `ProjectSettingsCard`; same actions scoped to a project.
 - **Role-aware settings sidebar** — every section list is filtered by the current user's role via `getSettingsSectionsForRoles(roles)`.
 
@@ -42,7 +42,11 @@ Two places consume the helper:
 
 Orchestrator component for the merged Agency section. Sticky page header (`Agency` + subtitle) sits above a single scrollable body that stacks two blocks:
 
-1. [`AgencySettingsForm`](../src/components/settings/agency/AgencySettingsForm.tsx) — card-style profile form (color-picker cover area, overlapping `AgencyLogo`, inline-edit Name / Email / Website inputs, in-card right-aligned Save button visible only when `hasChanges`). Form state lives in [`useAgencySettingsForm`](../src/hooks/useAgencySettingsForm.ts). Brand color validation regex `^#[0-9A-Fa-f]{6}$` mirrors the backend `Assert\Regex` on `Agency.brandColor`.
+1. [`AgencySettingsForm`](../src/components/settings/agency/AgencySettingsForm.tsx) — card-style form split into three sections:
+   - **Brand identity** — accent-color cover area (the hero strip uses the agency's `accentColor` as the background, click-to-pick via `BlockPicker` from `react-color`), overlapping `AgencyLogo`, then inline-edit Name / Email / Website inputs.
+   - **Colors** — 4 [`ColorField`](../src/components/settings/agency/ColorField.tsx) swatches (background primary, background secondary, text primary, text secondary). Each wraps `BlockPicker` in a floating-UI popover and falls back to the MakerFlow default hex when unset.
+   - **Typography** — 2 [`FontField`](../src/components/settings/agency/FontField.tsx) dropdowns (heading + body) backed by the curated `BRAND_FONT_OPTIONS` list in [`models/enums/BrandFont.ts`](../src/models/enums/BrandFont.ts). Each dropdown option renders its label in its own family for a live preview.
+   - In-card right-aligned Save button visible only when `hasChanges`. Form state lives in [`useAgencySettingsForm`](../src/hooks/useAgencySettingsForm.ts). Color regex `^#[0-9A-Fa-f]{6}$` mirrors the backend `Assert\Regex`; font validation mirrors the backend `Assert\Choice` against `App\Entity\Enum\BrandFont`.
 2. [`CollaboratorsSection`](../src/components/settings/agency/CollaboratorsSection.tsx) — flat block separated by a `border-t` divider. Header row with an `h3 "Collaborators"` and an "Invite collaborator" button, followed by the `DataTable<CollaboratorRow>` showing active collaborators then pending invitations.
 
 The three collaborator modals (`InviteCollaboratorModal`, `RemoveCollaboratorModal`, `DeleteInvitationModal`) are rendered at the `AgencySettings` root and driven by [`collaboratorModalsStore`](../src/stores/collaborators/collaboratorModalsStore.ts).
@@ -62,7 +66,7 @@ Rendering matrix:
 | --- | --- | --- |
 | any | loading | `Shimmer` |
 | any | uploaded | `<img>` with the blob URL (object-cover) |
-| `false` | missing | `AgencyLogoInitial` — colored block with the agency's first letter, tinted with `agency.brandColor` when it matches `HEX_COLOR_PATTERN`, otherwise a neutral `bg-light-gray` |
+| `false` | missing | `AgencyLogoInitial` — colored block with the agency's first letter, tinted with `agency.accentColor` when it matches `HEX_COLOR_PATTERN`, otherwise a neutral `bg-light-gray` |
 | `true` | missing | `AgencyLogoDropzone` — wraps the generic [`FileUpload`](../src/components/ui/FileUpload.tsx) with `accept="image/png"`, the `PhotoIcon`, and the `agencySettings:logo.*` translation keys. Click-to-browse and drag-and-drop are handled by `FileUpload` itself; this wrapper just bridges the agency hook with the generic UI. |
 
 Client-side validation lives inside [`useUploadAgencyLogo`](../src/hooks/api/agency/useUploadAgencyLogo.ts) alongside the mutation — the component stays presentational. Checks (`file.type === "image/png"`, `file.size ≤ 5 MB`) mirror the backend and surface as `agencySettings:validation.logoMimeType` / `logoTooLarge` rendered below the drop zone. After a successful upload, the mutation invalidates `agencyQueryKeys.logo(uuid)` and the `<img>` renders automatically.
@@ -130,6 +134,40 @@ New namespaces under [src/services/i18n/locales/](../src/services/i18n/locales/)
 
 Extended namespaces:
 - `settings/{fr,en}.json` — adds `sections.agency` and the per-project `projects.card.clients.*` subtree. `sections.collaborators` is reused as the `h3` label inside the merged Agency section.
+
+## Runtime theming
+
+The agency white-label theme is applied at runtime by [`useApplyAgencyTheme(agency)`](../src/hooks/useApplyAgencyTheme.ts). The hook writes CSS custom properties on `document.documentElement` so the entire UI re-renders with the agency's palette and fonts:
+
+| Agency field | CSS variable | Default (`app.css`) |
+| --- | --- | --- |
+| `accentColor` | `--color-primary` | `#43CEA9` |
+| `backgroundColor` | `--color-clear` | `#141115` |
+| `backgroundSecondaryColor` | `--color-light-gray` | `#2d2d44` |
+| `textColor` | `--color-dark` | `#F0F0F0` |
+| `textSecondaryColor` | `--color-gray` | `#9ca3af` |
+| `headingFont` | `--font-family-display` | Outfit stack |
+| `bodyFont` | `--font-family-sans` | Roboto stack |
+
+The mapping lives in [`utils/agencyTheme.ts`](../src/utils/agencyTheme.ts). Invalid / empty values leave the variable unset so the default declared in [`app.css`](../src/app.css) (`@theme` block) applies — clearing one field falls back, not all of them.
+
+All whitelist Google Fonts (Inter, Roboto, Open Sans, Lato, Montserrat, Poppins, Outfit, Nunito) are preloaded once via a single `@import` in [`app.css`](../src/app.css), so switching fonts at runtime is just a CSS-variable swap with no extra network request.
+
+Call sites:
+- [`AgencyShellLayout`](../src/components/agency/AgencyShellLayout.tsx) — applies the current user's `agency`.
+- [`ClientShellLayout`](../src/components/client-portal/ClientShellLayout.tsx) — applies the focused project's `agency` so a client sees their agency's theme inside the portal.
+- [`InviteSetupPageView`](../src/components/invitations/InviteSetupPageView.tsx) — applies the inviting agency's theme once the invitation has loaded, so the public invite-accept page is also branded.
+- [`OnboardingPage`](../src/routes/onboarding.tsx) — applies `user.agency` so collaborators (who arrive with a populated agency via invitation) and admins (who get a populated agency after the create-agency step) see their branding through the rest of the onboarding flow. Clients in onboarding briefly fall back to defaults until they reach the portal shell.
+
+Other public pages (login, register, terms, privacy) keep the MakerFlow defaults because no agency context is available.
+
+### Typography correctness
+
+`app.css` exposes two overridable family variables: `--font-family-display` (heading) and `--font-family-sans` (body). The shared typography utility classes route each accordingly:
+- `.text-heading-*`, `.text-4xl`/`.text-3xl`/`.text-2xl`/`.text-xl`/`.text-lg` → `--font-family-display`
+- `.text-body-*`, `.text-md`, `.text-sm` → `--font-family-sans`
+
+This is what makes the agency's "Body font" selection actually take effect — earlier the body classes used the display variable, which silently no-op'd the body-font setting.
 
 ## Related docs
 

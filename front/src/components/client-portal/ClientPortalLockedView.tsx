@@ -9,14 +9,14 @@ export default function ClientPortalLockedView() {
 
     return (
         <div className="bg-clear bg-dot-pattern h-screen w-full flex items-center justify-center px-4">
-            <div className="bg-white border border-light-gray rounded-2xl shadow-sm max-w-md w-full p-8 flex flex-col items-center gap-4">
-                <div className="size-12 rounded-full bg-light-gray flex items-center justify-center">
+            <div className="bg-light-gray border border-light-gray rounded-2xl shadow-sm max-w-md w-full p-8 flex flex-col items-center gap-4">
+                <div className="size-12 rounded-full bg-clear flex items-center justify-center">
                     <LockClosedIcon className="size-6 text-gray" />
                 </div>
                 <h1 className="text-heading-lg font-semibold text-dark text-center">
                     {t("clientPortal:locked.title")}
                 </h1>
-                <p className="text-body text-dark/70 text-center">
+                <p className="text-body-base text-dark/70 text-center">
                     {t("clientPortal:locked.body")}
                 </p>
                 <Button
