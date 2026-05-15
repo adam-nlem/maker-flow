@@ -3,6 +3,7 @@
         "home": "Home",
         "scripts": "Script",
         "calendar": "Calendar",
+        "drafts": "Drafts",
         "contents": "Content",
         "tasks": "Tasks",
         "settings": "Settings"

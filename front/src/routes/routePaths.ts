@@ -15,6 +15,7 @@ export const integrationCallbackPath = '/integrations/callback'
 export const agencyAreaPrefix = '/agency'
 export const agencyHomePath = agencyAreaPrefix
 export const agencyTasksPath = `${agencyAreaPrefix}/tasks`
+export const agencyDraftsPath = `${agencyAreaPrefix}/drafts`
 export const agencyContentsPath = `${agencyAreaPrefix}/contents`
 export const agencyScriptsPath = `${agencyAreaPrefix}/scripts`
 export const agencyCalendarPath = `${agencyAreaPrefix}/calendar`

@@ -10,6 +10,7 @@ import {
   integrationCallbackPath,
   agencyHomePath,
   agencyTasksPath,
+  agencyDraftsPath,
   agencyContentsPath,
   agencyScriptsPath,
   agencyCalendarPath,
@@ -37,6 +38,7 @@ import ClientShellLayout from "./components/client-portal/ClientShellLayout";
 import AgencyHomePage from "./routes/agency/home";
 import AgencyTasksPage from "./routes/agency/tasks";
 import AgencyContentsPage from "./routes/agency/contents";
+import AgencyDraftsPage from "./routes/agency/drafts";
 import AgencyScriptsPage from "./routes/agency/scripts";
 import AgencyCalendarPage from "./routes/agency/calendar";
 import AgencySettingsLayout from "./routes/agency/settings";
@@ -82,6 +84,7 @@ export const router = createBrowserRouter(
                 { path: agencyHomePath, element: <AgencyHomePage /> },
                 { path: agencyTasksPath, element: <AgencyTasksPage /> },
                 { path: agencyContentsPath, element: <AgencyContentsPage /> },
+                { path: agencyDraftsPath, element: <AgencyDraftsPage /> },
                 { path: agencyScriptsPath, element: <AgencyScriptsPage /> },
                 { path: agencyCalendarPath, element: <AgencyCalendarPage /> },
                 {
