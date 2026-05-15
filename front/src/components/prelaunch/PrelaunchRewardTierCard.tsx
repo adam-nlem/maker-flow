@@ -22,7 +22,7 @@ export default function PrelaunchRewardTierCard({ tier, isUnlocked }: PrelaunchR
     const description = t(prelaunchRewardTierDescriptionKeys[tier])
     const threshold = prelaunchRewardTierToThreshold[tier]
     const textClass = isUnlocked ? prelaunchRewardTierToTextClass[tier] : ""
-    const borderClass = isUnlocked ? prelaunchRewardTierToBorderClass[tier] : "border-light-gray"
+    const borderClass = isUnlocked ? prelaunchRewardTierToBorderClass[tier] : "border-pale-gray"
     const bgClass = isUnlocked ? prelaunchRewardTierToBgClass[tier] : "bg-clear"
 
     return (
@@ -33,7 +33,7 @@ export default function PrelaunchRewardTierCard({ tier, isUnlocked }: PrelaunchR
                 {isUnlocked ? (
                     <CheckCircleIcon className={`h-6 w-6 ${prelaunchRewardTierToTextClass[tier]}`} />
                 ) : (
-                    <LockClosedIcon className="h-6 w-6 text-gray" />
+                    <LockClosedIcon className="h-6 w-6 text-muted-2" />
                 )}
             </div>
             <div className="flex flex-col items-start w-full">

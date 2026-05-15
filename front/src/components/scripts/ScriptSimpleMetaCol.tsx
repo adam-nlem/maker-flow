@@ -40,7 +40,7 @@ export default function ScriptSimpleMetaColumn({ script }: ScriptSimpleMetaColum
             )}
 
             {script.publishedAt && (
-                <p className="text-body-xs text-gray">
+                <p className="text-body-xs text-muted-2">
                     {script.publishedAt.toLocaleDateString("fr-FR", { day: "numeric", month: "short", year: "numeric" })}
                 </p>
             )}

@@ -39,7 +39,7 @@ export default function RankedPostGroupsList({ projectUuid }: RankedPostGroupsLi
   }
 
   if (postGroups.length === 0) {
-    return <p className="text-body-sm text-gray">{t("home:noPostGroups")}</p>
+    return <p className="text-body-sm text-muted-2">{t("home:noPostGroups")}</p>
   }
 
   return (

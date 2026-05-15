@@ -50,7 +50,7 @@ export default function CreateGroupModal({ isOpen, onClose, projectUuid }: Creat
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
-                    <h3 className="text-heading-xs text-gray">{t("contents:create.postsHeader")}</h3>
+                    <h3 className="text-heading-xs text-muted-2">{t("contents:create.postsHeader")}</h3>
                 </div>
 
                 {/* Growable post picker */}
@@ -61,7 +61,7 @@ export default function CreateGroupModal({ isOpen, onClose, projectUuid }: Creat
                         onSelectionChange={setSelectedPostUuids}
                     />
                     {selectedPostUuids.length > 0 && (
-                        <p className="text-body-xs text-gray shrink-0">
+                        <p className="text-body-xs text-muted-2 shrink-0">
                             {t("contents:selectedCount", { count: selectedPostUuids.length })}
                         </p>
                     )}

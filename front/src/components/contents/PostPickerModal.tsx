@@ -42,7 +42,7 @@ export default function PostPickerModal({ isOpen, onClose, onConfirm, projectUui
                         excludeUuids={excludeUuids}
                     />
                     {selectedUuids.length > 0 && (
-                        <p className="text-body-xs text-gray shrink-0">
+                        <p className="text-body-xs text-muted-2 shrink-0">
                             {t("contents:selectedCount", { count: selectedUuids.length })}
                         </p>
                     )}

@@ -14,7 +14,7 @@ interface BadgeProps {
     onRemoveClick?: () => void;
 }
 
-export function Badge({ icon: Icon, label, textColor = "text-gray", bgColor, onClick, onOptionClick, onRemoveClick }: BadgeProps) {
+export function Badge({ icon: Icon, label, textColor = "text-muted-2", bgColor, onClick, onOptionClick, onRemoveClick }: BadgeProps) {
     return (
         <div className="group flex flex-row justify-between">
             <div
@@ -25,7 +25,7 @@ export function Badge({ icon: Icon, label, textColor = "text-gray", bgColor, onC
             </div>
             {(onOptionClick || onRemoveClick) && (
                 <div className="flex flex-row gap-1 min-w-fit ml-3 items-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    {onOptionClick && <EllipsisHorizontalIcon className="size-4 cursor-pointer text-gray hover:text-dark" strokeWidth={2} onClick={onOptionClick} />}
+                    {onOptionClick && <EllipsisHorizontalIcon className="size-4 cursor-pointer text-muted-2 hover:text-dark" strokeWidth={2} onClick={onOptionClick} />}
                     {onRemoveClick && <XMarkIcon className="size-3.5 text-danger hover:text-dark cursor-pointer" strokeWidth={2} onClick={onRemoveClick} />}
                 </div>
             )}

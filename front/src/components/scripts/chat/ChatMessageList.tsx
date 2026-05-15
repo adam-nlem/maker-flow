@@ -45,7 +45,7 @@ export default function ChatMessageList({ chatUuid, scriptUuid }: ChatMessageLis
   if (!chatUuid) {
     return (
       <div className="p-4">
-        <p className="text-body-sm text-gray">
+        <p className="text-body-sm text-muted-2">
           {t("scripts:chat.messages.intro")}
         </p>
       </div>
@@ -67,7 +67,7 @@ export default function ChatMessageList({ chatUuid, scriptUuid }: ChatMessageLis
   if (messages.length === 0) {
     return (
       <div className="p-4">
-        <p className="text-body-sm text-gray">
+        <p className="text-body-sm text-muted-2">
           {t("scripts:chat.messages.intro")}
         </p>
       </div>

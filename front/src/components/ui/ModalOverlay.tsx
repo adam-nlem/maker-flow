@@ -39,7 +39,7 @@ export default function ModalOverlay({ isOpen, onClose, children, width = "w-200
             <div className="w-full h-full flex bg-black/40 pointer-events-auto justify-center items-center">
                 {/* Modal container */}
                 <div
-                    className={`${width} ${height} border rounded-xl border-light-gray shadow-lg bg-clear flex flex-col overflow-y-auto`}
+                    className={`${width} ${height} border rounded-xl border-pale-gray shadow-lg bg-clear flex flex-col overflow-y-auto`}
                     onClick={(e) => e.stopPropagation()}
                 >
                     {children}

@@ -44,7 +44,7 @@ export default function CollaboratorsSection() {
     ];
 
     return (
-        <div className="px-4 md:px-6 py-4 md:py-5 border-t border-light-gray">
+        <div className="px-4 md:px-6 py-4 md:py-5 border-t border-pale-gray">
             <div className="flex flex-row justify-between items-center gap-3 mb-4">
                 <h3 className="text-heading-sm">{t("settings:sections.collaborators")}</h3>
                 <Button type="button" style="primary" width="w-auto" onClick={() => setIsInviteOpen(true)}>
@@ -61,7 +61,7 @@ export default function CollaboratorsSection() {
                     <Shimmer width="w-full" height="h-12" radius="rounded-lg" />
                 </div>
             ) : rows.length === 0 ? (
-                <p className="text-body-sm text-gray text-center py-10">{t("collaborators:empty")}</p>
+                <p className="text-body-sm text-muted-2 text-center py-10">{t("collaborators:empty")}</p>
             ) : (
                 <CollaboratorsTable rows={rows} />
             )}

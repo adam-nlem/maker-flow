@@ -23,7 +23,7 @@ export default function CreateProjectModal({ showModal, showStepHeader = false, 
                     <div className="flex flex-row items-center gap-3">
                         <StepBadge label={t("projects:create.introductionStep")} completed={true} />
 
-                        <ChevronRightIcon className="size-4 text-gray" strokeWidth={2} />
+                        <ChevronRightIcon className="size-4 text-muted-2" strokeWidth={2} />
 
                         <StepBadge label={t("projects:create.projectStep")} completed={false} />
                     </div>

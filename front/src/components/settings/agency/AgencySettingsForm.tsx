@@ -16,11 +16,11 @@ interface AgencySettingsFormProps {
     agency: Agency;
 }
 
-const BACKGROUND_DEFAULT = "#141115";
-const BACKGROUND_SECONDARY_DEFAULT = "#2d2d44";
-const TEXT_DEFAULT = "#F0F0F0";
-const TEXT_SECONDARY_DEFAULT = "#9ca3af";
-const ACCENT_DEFAULT = "#43CEA9";
+const BACKGROUND_DEFAULT = "#FFFFFF";
+const BACKGROUND_SECONDARY_DEFAULT = "#F6F8F7";
+const TEXT_DEFAULT = "#14111A";
+const TEXT_SECONDARY_DEFAULT = "#9DA3A5";
+const ACCENT_DEFAULT = "#6FCDB1";
 const HEADING_FONT_DEFAULT_LABEL = "Outfit";
 const HEADING_FONT_DEFAULT_STACK = "Outfit, ui-sans-serif, system-ui, sans-serif";
 const BODY_FONT_DEFAULT_LABEL = "Roboto";
@@ -59,7 +59,7 @@ export default function AgencySettingsForm({ agency }: AgencySettingsFormProps) 
                     aria-label={t("agencySettings:colorPickerAriaLabel")}
                     onClick={() => setIsAccentPickerOpen((open) => !open)}
                     {...getReferenceProps()}
-                    className={`group relative h-30 w-full cursor-pointer ${hasValidAccentColor ? "" : "bg-light-gray"}`}
+                    className={`group relative h-30 w-full cursor-pointer ${hasValidAccentColor ? "" : "bg-pale-gray-2"}`}
                     style={hasValidAccentColor ? { backgroundColor: trimmedAccentColor } : undefined}
                 >
                     <div className={`absolute inset-0 flex items-center justify-center bg-dark/20 transition-opacity ${isAccentPickerOpen ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
@@ -91,7 +91,7 @@ export default function AgencySettingsForm({ agency }: AgencySettingsFormProps) 
 
                 <div className="px-7 pt-4 pb-6 flex flex-col gap-8">
                     <section className="flex flex-col gap-4">
-                        <h3 className="text-body-xs text-gray uppercase tracking-wide">{t("agencySettings:sections.identity")}</h3>
+                        <h3 className="text-body-xs text-muted-2 uppercase tracking-wide">{t("agencySettings:sections.identity")}</h3>
 
                         <Input
                             value={form.name}
@@ -124,7 +124,7 @@ export default function AgencySettingsForm({ agency }: AgencySettingsFormProps) 
                     </section>
 
                     <section className="flex flex-col gap-4">
-                        <h3 className="text-body-xs text-gray uppercase tracking-wide">{t("agencySettings:sections.colors")}</h3>
+                        <h3 className="text-body-xs text-muted-2 uppercase tracking-wide">{t("agencySettings:sections.colors")}</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <ColorField
@@ -155,7 +155,7 @@ export default function AgencySettingsForm({ agency }: AgencySettingsFormProps) 
                     </section>
 
                     <section className="flex flex-col gap-4">
-                        <h3 className="text-body-xs text-gray uppercase tracking-wide">{t("agencySettings:sections.typography")}</h3>
+                        <h3 className="text-body-xs text-muted-2 uppercase tracking-wide">{t("agencySettings:sections.typography")}</h3>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <FontField

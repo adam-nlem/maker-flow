@@ -31,17 +31,17 @@ export default function ColorField({ label, value, defaultColor, onChange }: Col
 
     return (
         <div className="flex flex-col gap-2">
-            <label className="text-body-xs text-gray uppercase tracking-wide">{label}</label>
+            <label className="text-body-xs text-muted-2 uppercase tracking-wide">{label}</label>
             <button
                 ref={refs.setReference}
                 type="button"
                 aria-label={t("agencySettings:colorPickerAriaLabel")}
                 onClick={() => setIsOpen((open) => !open)}
                 {...getReferenceProps()}
-                className="flex flex-row items-center gap-3 rounded-lg border border-light-gray bg-clear px-3 py-2 hover:bg-surface-hover transition-colors"
+                className="flex flex-row items-center gap-3 rounded-lg border border-pale-gray bg-clear px-3 py-2 hover:bg-surface-hover transition-colors"
             >
                 <span
-                    className="h-6 w-6 rounded-md border border-light-gray shrink-0"
+                    className="h-6 w-6 rounded-md border border-pale-gray shrink-0"
                     style={{ backgroundColor: swatchColor }}
                     aria-hidden="true"
                 />

@@ -55,7 +55,7 @@ export default function ClientDesktopSidebar() {
     const topSection = (
         <>
             {user?.firstName && (
-                <span className="text-body-xs text-gray whitespace-nowrap truncate block px-2 pb-4">
+                <span className="text-body-xs text-muted-2 whitespace-nowrap truncate block px-2 pb-4">
                     {t("clientPortal:sidebar.greeting", { name: user.firstName })}
                 </span>
             )}

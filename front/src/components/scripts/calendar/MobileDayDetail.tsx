@@ -24,7 +24,7 @@ export default function MobileDayDetail({ day, date, isToday, scripts, onScriptC
     return (
         <div
             ref={setNodeRef}
-            className={`flex flex-col flex-1 min-h-0 rounded-xl border border-light-gray p-3 transition-colors ${isOver ? "bg-primary/5" : ""}`}
+            className={`flex flex-col flex-1 min-h-0 rounded-xl border border-pale-gray p-3 transition-colors ${isOver ? "bg-primary/5" : ""}`}
         >
             {/* Header */}
             <div className="flex flex-row items-center justify-between mb-3">
@@ -39,7 +39,7 @@ export default function MobileDayDetail({ day, date, isToday, scripts, onScriptC
 
                 <button
                     onClick={onCreateScript}
-                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-gray hover:text-primary hover:bg-light-gray transition-colors cursor-pointer"
+                    className="flex items-center gap-1 px-2 py-1 rounded-lg text-muted-2 hover:text-primary hover:bg-pale-gray-2 transition-colors cursor-pointer"
                 >
                     <PlusIcon className="size-4" strokeWidth={2} />
                     <span className="text-body-xs">{t("home:scripts.newScript")}</span>
@@ -49,7 +49,7 @@ export default function MobileDayDetail({ day, date, isToday, scripts, onScriptC
             {/* Scripts list */}
             <div className="flex flex-col gap-1.5 overflow-y-auto scrollbar-none flex-1 min-h-0">
                 {scripts.length === 0 ? (
-                    <p className="text-body-sm text-gray text-center py-6">{t("scripts:noScripts")}</p>
+                    <p className="text-body-sm text-muted-2 text-center py-6">{t("scripts:noScripts")}</p>
                 ) : (
                     scripts.map((script) => (
                         <ScriptTile

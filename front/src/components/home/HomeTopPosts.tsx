@@ -22,7 +22,7 @@ export default function HomeTopPosts({ integrations }: HomeTopPostsProps) {
 
     return (
         <div className="flex flex-col gap-3">
-            <h2 className="text-body-xs text-gray uppercase tracking-wider">Meilleurs posts du mois</h2>
+            <h2 className="text-body-xs text-muted-2 uppercase tracking-wider">Meilleurs posts du mois</h2>
             <IntegrationPillRow integrations={integrations} showAllOption={false} />
             {focusedIntegrationUuid && (
                 <RankedPostsList integrationUuid={focusedIntegrationUuid} />

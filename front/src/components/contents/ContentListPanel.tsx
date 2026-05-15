@@ -32,7 +32,7 @@ export default function ContentListPanel({ projectUuid, isReadOnly = false }: Co
   return (
     <div className="flex-1 h-full flex flex-col overflow-hidden">
       {/* Header */}
-      <div className="flex flex-row items-center justify-between px-6 py-4 border-b border-light-gray">
+      <div className="flex flex-row items-center justify-between px-6 py-4 border-b border-pale-gray">
         <h1 className="text-heading-xl">{t("contents:pageTitle")}</h1>
         {!isReadOnly && (
           <Button
@@ -49,7 +49,7 @@ export default function ContentListPanel({ projectUuid, isReadOnly = false }: Co
       </div>
 
       {/* Tab bar */}
-      <div className="flex flex-row items-center gap-2 px-6 py-3 border-b border-light-gray">
+      <div className="flex flex-row items-center gap-2 px-6 py-3 border-b border-pale-gray">
         {contentsTabOptions.map((tab) => (
           <Pill
             key={tab}

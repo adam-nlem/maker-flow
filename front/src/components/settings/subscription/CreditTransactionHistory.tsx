@@ -16,7 +16,7 @@ export default function CreditTransactionHistory() {
 
     if (isLoading) {
         return (
-            <div className="border border-light-gray rounded-xl p-5 flex flex-col gap-3">
+            <div className="border border-pale-gray rounded-xl p-5 flex flex-col gap-3">
                 <Shimmer width="w-40" height="h-5" />
                 <Shimmer width="w-full" height="h-10" />
                 <Shimmer width="w-full" height="h-10" />
@@ -28,20 +28,20 @@ export default function CreditTransactionHistory() {
     if (transactions.length === 0 && page === 1) return null;
 
     return (
-        <div className="border border-light-gray rounded-xl p-5">
+        <div className="border border-pale-gray rounded-xl p-5">
             <div className="flex flex-row items-center gap-2 mb-4">
-                <ClockIcon className="size-5 text-gray" strokeWidth={1.5} />
+                <ClockIcon className="size-5 text-muted-2" strokeWidth={1.5} />
                 <h3 className="text-heading-md">{t("settings:subscription.history.title")}</h3>
             </div>
 
-            <div className="flex flex-col divide-y divide-light-gray">
+            <div className="flex flex-col divide-y divide-pale-gray">
                 {transactions.map((transaction) => (
                     <div key={transaction.uuid} className="flex flex-row items-center justify-between py-3 first:pt-0 last:pb-0">
                         <div className="flex flex-col gap-0.5">
                             <p className="text-body-sm">
                                 {t(creditTransactionTypeTranslationKeys[transaction.type])}
                             </p>
-                            <p className="text-body-xs text-gray">
+                            <p className="text-body-xs text-muted-2">
                                 {formatToFrenchDateShort(transaction.createdAt)}
                                 {transaction.description && ` — ${transaction.description}`}
                             </p>
@@ -65,7 +65,7 @@ export default function CreditTransactionHistory() {
                     {t("settings:subscription.history.previous")}
                 </Button>
 
-                <p className="text-body-xs text-gray">{t("settings:subscription.history.page", { page })}</p>
+                <p className="text-body-xs text-muted-2">{t("settings:subscription.history.page", { page })}</p>
 
                 <Button
                     style="secondary"

@@ -49,7 +49,7 @@ export default function SelectDropdown<T>({
             ref={refs.setFloating}
             style={floatingStyles}
             {...getFloatingProps()}
-            className="z-70 border rounded-xl border-light-gray w-fit max-h-64 flex flex-col gap-3 p-3 shadow-lg bg-clear overflow-y-auto scrollbar-none"
+            className="z-70 border rounded-xl border-pale-gray w-fit max-h-64 flex flex-col gap-3 p-3 shadow-lg bg-clear overflow-y-auto scrollbar-none"
           >
             {items.map((item) => {
               const itemId = getItemId(item)

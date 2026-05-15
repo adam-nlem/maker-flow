@@ -95,7 +95,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                             <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />
                         ) : (
                             <div className="w-full h-full flex items-center justify-center">
-                                <span className="text-body-xs text-gray">{t("contents:post.noThumbnail")}</span>
+                                <span className="text-body-xs text-muted-2">{t("contents:post.noThumbnail")}</span>
                             </div>
                         )}
                     </div>
@@ -103,7 +103,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                     {/* Platform + date */}
                     <div className="flex flex-row items-center justify-between">
                         <PlatformPill platform={postData.platform} />
-                        <span className="text-body-xs text-gray">
+                        <span className="text-body-xs text-muted-2">
                             {formatToFrenchDateShort(postData.post.publishedAt)}
                         </span>
                     </div>
@@ -113,7 +113,7 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
 
                     {(overviewMetrics.length > 0 || postData.engagementByViews !== null) && (
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.overview")}</h3>
+                            <h3 className="text-heading-xs text-muted-2 uppercase">{t("contents:post.overview")}</h3>
                             <div className="grid grid-cols-3 gap-1">
                                 {overviewMetrics.map((insight) => (
                                     <ContentMetricBox
@@ -134,13 +134,13 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
 
                     {engagementMetrics.length > 0 && (
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.engagementDistribution")}</h3>
+                            <h3 className="text-heading-xs text-muted-2 uppercase">{t("contents:post.engagementDistribution")}</h3>
                             <div className="flex flex-row items-center gap-4">
                                 <DonutChart
                                     data={engagementMetrics.map((m) => ({
                                         label: t(postInsightTypeTranslationKeys[m.type]),
                                         value: m.value,
-                                        color: postInsightTypeToEngagementColor[m.type] ?? "var(--color-gray)",
+                                        color: postInsightTypeToEngagementColor[m.type] ?? "var(--color-muted-2)",
                                     }))}
                                     size={120}
                                     centerLabel={formatCompactNumber(totalEngagement)}
@@ -154,12 +154,12 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                                         return (
                                             <div key={metric.type} className="flex flex-row items-center justify-between">
                                                 <div className="flex flex-row items-center gap-2">
-                                                    <div className={`size-2.5 rounded-sm ${postInsightTypeToEngagementBgClass[metric.type] ?? "bg-gray"}`} />
+                                                    <div className={`size-2.5 rounded-sm ${postInsightTypeToEngagementBgClass[metric.type] ?? "bg-muted-2"}`} />
                                                     <span className="text-body-xs">{t(postInsightTypeTranslationKeys[metric.type])}</span>
                                                 </div>
                                                 <div className="flex flex-row items-center gap-2">
                                                     <span className="text-heading-xs">{formatCompactNumber(metric.value)}</span>
-                                                    <span className="text-body-xs text-gray">{pct}%</span>
+                                                    <span className="text-body-xs text-muted-2">{pct}%</span>
                                                 </div>
                                             </div>
                                         )
@@ -172,25 +172,25 @@ export default function ContentPostDetailPanel({ postUuid }: ContentPostDetailPa
                     {likesValue !== null && dislikesValue !== null && (
                         <div className="flex flex-col gap-1.5">
                             <div className="flex flex-row items-center justify-between">
-                                <span className="text-body-xs text-gray">{t("contents:post.likeRatio")}</span>
+                                <span className="text-body-xs text-muted-2">{t("contents:post.likeRatio")}</span>
                                 <span className="text-heading-xs">{likePercentage.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}%</span>
                             </div>
-                            <div className="w-full h-2 bg-light-gray rounded-full">
+                            <div className="w-full h-2 bg-pale-gray-2 rounded-full">
                                 <div
                                     className="h-full bg-primary rounded-full"
                                     style={{ width: `${likePercentage}%` }}
                                 />
                             </div>
                             <div className="flex flex-row justify-between">
-                                <span className="text-body-xs text-gray">{t("contents:post.likesPositive", { count: likesValue })}</span>
-                                <span className="text-body-xs text-gray">{t("contents:post.dislikesNegative", { count: dislikesValue })}</span>
+                                <span className="text-body-xs text-muted-2">{t("contents:post.likesPositive", { count: likesValue })}</span>
+                                <span className="text-body-xs text-muted-2">{t("contents:post.dislikesNegative", { count: dislikesValue })}</span>
                             </div>
                         </div>
                     )}
 
                     {followerMetrics.length > 0 && (
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.followers")}</h3>
+                            <h3 className="text-heading-xs text-muted-2 uppercase">{t("contents:post.followers")}</h3>
                             <div className="grid grid-cols-3 gap-1">
                                 {gainedInsight && (
                                     <ContentMetricBox

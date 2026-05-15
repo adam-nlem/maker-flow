@@ -27,9 +27,9 @@ export default function AgencySettings() {
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
-            <div className="px-4 md:px-6 py-4 md:py-5 border-b border-light-gray flex flex-col gap-1">
+            <div className="px-4 md:px-6 py-4 md:py-5 border-b border-pale-gray flex flex-col gap-1">
                 <h2 className="text-heading-xl">{t(settingsSectionTranslationKeys[SettingsSection.Agency])}</h2>
-                <p className="text-body-sm text-gray">{t("agencySettings:subtitle")}</p>
+                <p className="text-body-sm text-muted-2">{t("agencySettings:subtitle")}</p>
             </div>
 
             <div className="flex-1 overflow-y-auto scrollbar-none">

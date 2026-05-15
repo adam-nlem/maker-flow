@@ -92,7 +92,7 @@ export default function OnboardingCreateAgencyStep() {
                         onChange={(e) => setAccentColor(e.target.value)}
                     />
                     <div
-                        className={`h-9 w-9 rounded-lg border border-light-gray shrink-0 ${isValidAccentColor ? "" : "bg-primary"}`}
+                        className={`h-9 w-9 rounded-lg border border-pale-gray shrink-0 ${isValidAccentColor ? "" : "bg-primary"}`}
                         style={isValidAccentColor ? { backgroundColor: accentColor } : undefined}
                         aria-hidden="true"
                     />

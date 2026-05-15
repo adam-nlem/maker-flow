@@ -73,7 +73,7 @@ export default function TodoListDashboardContent({
                             todoList={item}
                             isSelected={isSelected}
                             showCreatedAt={true}
-                            onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} onClick={(e) => {
+                            onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-muted-2 -mb-0.5" strokeWidth={2} onClick={(e) => {
                                 e.stopPropagation()
                                 setUpdatingTodoListUuid(item.uuid)
                             }} />}

@@ -26,7 +26,7 @@ export default function PlanSelector({ checkoutRedirectPath, disabledPlan }: Pla
         return (
             <div className="w-full">
                 <h3 className="text-heading-md mb-4">{t("settings:subscription.plans.title")}</h3>
-                <p className="text-body-sm text-gray">{t("settings:subscription.plans.loadError")}</p>
+                <p className="text-body-sm text-muted-2">{t("settings:subscription.plans.loadError")}</p>
             </div>
         );
     }

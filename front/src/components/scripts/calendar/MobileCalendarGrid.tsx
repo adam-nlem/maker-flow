@@ -19,7 +19,7 @@ export default function MobileCalendarGrid({ currentYear, currentMonth, selected
             {/* Day headers */}
             <div className="grid grid-cols-7 gap-0.5">
                 {DAYS_FR_SHORT.map((dayName, i) => (
-                    <div key={i} className="text-center text-body-xs text-gray py-1">
+                    <div key={i} className="text-center text-body-xs text-muted-2 py-1">
                         {dayName}
                     </div>
                 ))}

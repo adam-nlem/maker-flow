@@ -21,7 +21,7 @@ export function CircularProgress({
         cy={size / 2}
         r={radius}
         strokeWidth={stroke}
-        className="text-light-gray"
+        className="text-muted-2"
         stroke="currentColor"
         fill="none"
       />

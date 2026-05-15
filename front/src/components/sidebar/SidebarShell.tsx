@@ -15,7 +15,7 @@ export default function SidebarShell({ topSection, bottomNav, identityTile }: Si
     const { t } = useTranslation();
 
     return (
-        <div className="w-50 shrink-0 h-screen border-r border-light-gray bg-clear flex flex-col justify-between overflow-hidden">
+        <div className="w-50 shrink-0 h-screen border-r border-pale-gray bg-clear flex flex-col justify-between overflow-hidden">
             <div className="p-3">
                 {topSection}
             </div>
@@ -25,7 +25,7 @@ export default function SidebarShell({ topSection, bottomNav, identityTile }: Si
                     {bottomNav}
                 </div>
 
-                <div className="border-t border-light-gray rounded w-full"></div>
+                <div className="border-t border-pale-gray rounded w-full"></div>
 
                 {identityTile}
 
@@ -33,7 +33,7 @@ export default function SidebarShell({ topSection, bottomNav, identityTile }: Si
                     <SimpleTextButton onClick={() => navigate(privacyPolicyPath)}>
                         {t("legal.privacyPolicy")}
                     </SimpleTextButton>
-                    <span className="text-xs text-gray">·</span>
+                    <span className="text-xs text-muted-2">·</span>
                     <SimpleTextButton onClick={() => navigate(termsOfServicePath)}>
                         {t("legal.termsOfService")}
                     </SimpleTextButton>

@@ -57,7 +57,7 @@ export default function UpdateScriptTagDropdown({ anchorRef, tag, onClose, onTag
                     ref={refs.setFloating}
                     style={floatingStyles}
                     {...getFloatingProps()}
-                    className="z-70 flex flex-col items-center gap-3 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2"
+                    className="z-70 flex flex-col items-center gap-3 bg-clear border border-pale-gray rounded-lg shadow-md min-w-max p-2"
                 >
                     <Input
                         ref={inputRef}
@@ -76,7 +76,7 @@ export default function UpdateScriptTagDropdown({ anchorRef, tag, onClose, onTag
                             <div
                                 key={c}
                                 onClick={() => setColor(c)}
-                                className={`size-5 rounded cursor-pointer ${colorToBgClass[c]} ${color === c ? 'ring-2 ring-offset-1 ring-gray' : ''}`}
+                                className={`size-5 rounded cursor-pointer ${colorToBgClass[c]} ${color === c ? 'ring-2 ring-offset-1 ring-muted-2' : ''}`}
                             />
                         ))}
                     </div>

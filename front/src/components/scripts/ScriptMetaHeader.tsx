@@ -53,10 +53,10 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
     };
 
     return (
-        <div className="px-6 py-5 border-b border-light-gray flex flex-col gap-4">
+        <div className="px-6 py-5 border-b border-pale-gray flex flex-col gap-4">
             <div className="flex flex-row items-center gap-2">
                 {onBack && !isDesktop && (
-                    <button onClick={onBack} className="shrink-0 text-gray hover:text-dark transition-colors cursor-pointer">
+                    <button onClick={onBack} className="shrink-0 text-muted-2 hover:text-dark transition-colors cursor-pointer">
                         <ArrowLeftIcon className="size-5" strokeWidth={2} />
                     </button>
                 )}
@@ -89,7 +89,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                         </button>
                     </>
                 ) : null}
-                <button onClick={toggle} className="shrink-0 text-gray hover:text-dark transition-colors cursor-pointer">
+                <button onClick={toggle} className="shrink-0 text-muted-2 hover:text-dark transition-colors cursor-pointer">
                     {isExpanded
                         ? <ChevronUpIcon className="size-5" strokeWidth={2} />
                         : <ChevronDownIcon className="size-5" strokeWidth={2} />
@@ -156,7 +156,7 @@ export default function ScriptMetaHeader({ script, projectUuid, onOpenGenerateMo
                                 )
                                 : t("scripts:meta.noPublishDate")}
                             isSelected={!!script.publishedAt}
-                            borderColorClassName="border-light-gray"
+                            borderColorClassName="border-pale-gray"
                             suffixIcon={!isReadOnly && script.publishedAt ? XMarkIcon : undefined}
                             onSuffixClick={() => {
                                 updateScript({ scriptUuid: script.uuid, data: { publishedAt: null } });

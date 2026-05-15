@@ -42,7 +42,7 @@ export default function PrelaunchDashboard({ referralCode }: PrelaunchDashboardP
           <Shimmer width="w-3/4" height="h-8" radius="rounded-lg" />
           <Shimmer width="w-full" height="h-5" />
 
-          <div className="rounded-xl border border-light-gray p-4 space-y-3">
+          <div className="rounded-xl border border-pale-gray p-4 space-y-3">
             <Shimmer width="w-1/3" height="h-4" />
             <Shimmer width="w-full" height="h-10" radius="rounded-lg" />
             <div className="flex gap-3">
@@ -51,7 +51,7 @@ export default function PrelaunchDashboard({ referralCode }: PrelaunchDashboardP
             </div>
           </div>
 
-          <div className="rounded-xl border border-light-gray p-4 space-y-2">
+          <div className="rounded-xl border border-pale-gray p-4 space-y-2">
             <Shimmer width="w-1/3" height="h-4" />
             <Shimmer width="w-1/4" height="h-8" />
           </div>
@@ -75,7 +75,7 @@ export default function PrelaunchDashboard({ referralCode }: PrelaunchDashboardP
           {t("prelaunch:dashboard.subtitle")}
         </p>
 
-        <div className="rounded-xl border border-light-gray bg-clear p-4 mb-6">
+        <div className="rounded-xl border border-pale-gray bg-clear p-4 mb-6">
           <p className="text-heading-xs mb-2">{t("prelaunch:dashboard.linkLabel")}</p>
 
           <div className="flex-1 min-w-0 rounded-lg bg-dark/5 px-3 py-2 mb-5">
@@ -99,7 +99,7 @@ export default function PrelaunchDashboard({ referralCode }: PrelaunchDashboardP
           </div>
         </div>
 
-        <div className="rounded-xl border border-light-gray bg-clear p-4 mb-6 text-center">
+        <div className="rounded-xl border border-pale-gray bg-clear p-4 mb-6 text-center">
           <p className="text-body-sm mb-1">{t("prelaunch:dashboard.verifiedReferrals")}</p>
           <p className="text-heading-2xl text-primary">{status.referralCount}</p>
         </div>

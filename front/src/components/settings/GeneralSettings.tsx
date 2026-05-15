@@ -71,7 +71,7 @@ export default function GeneralSettings() {
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
-            <div className="px-4 md:px-6 py-4 md:py-5 border-b border-light-gray">
+            <div className="px-4 md:px-6 py-4 md:py-5 border-b border-pale-gray">
                 <h2 className="text-heading-xl">{t(settingsSectionTranslationKeys[SettingsSection.General])}</h2>
             </div>
 
@@ -95,7 +95,7 @@ export default function GeneralSettings() {
                             label={t("settings:general.fields.email")}
                             value={user.email}
                             readOnly
-                            className="text-gray cursor-not-allowed"
+                            className="text-muted-2 cursor-not-allowed"
                         />
 
                         <h3 className="text-heading-sm mt-5">{t("settings:general.preferences")}</h3>
@@ -138,7 +138,7 @@ export default function GeneralSettings() {
                 </div>
 
                 {hasChanges && (
-                    <div className="px-4 md:px-6 py-3 md:py-4 border-t border-light-gray">
+                    <div className="px-4 md:px-6 py-3 md:py-4 border-t border-pale-gray">
                         <Button type="submit" style="primary" isLoading={isPending} disabled={isPending}>
                             <p className="text-sm">{t("actions.save")}</p>
                         </Button>

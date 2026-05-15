@@ -36,7 +36,7 @@ export default function ProjectTile({
   return (
 
     <div
-      className="flex flex-row justify-between gap-3 items-center hover:bg-light-gray cursor-pointer rounded-md p-2"
+      className="flex flex-row justify-between gap-3 items-center hover:bg-pale-gray-2 cursor-pointer rounded-md p-2"
       onClick={onClick}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -47,7 +47,7 @@ export default function ProjectTile({
         <div className="flex flex-col">
           <h1 className="text-heading-sm whitespace-nowrap">{project.name}</h1>
           {showCreatedAt && (
-            <p className="text-body-xs text-gray whitespace-nowrap">{t("projects:tile.createdAt", { date: formatToFrenchDateShort(project.createdAt) })}</p>
+            <p className="text-body-xs text-muted-2 whitespace-nowrap">{t("projects:tile.createdAt", { date: formatToFrenchDateShort(project.createdAt) })}</p>
           )}
         </div>
       </div>

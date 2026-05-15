@@ -34,13 +34,13 @@ export default function WelcomeFeatureStep() {
                 {featureKeys.map((feature) => (
                     <div
                         key={feature.key}
-                        className="border bg-clear border-light-gray rounded-xl p-5 flex flex-col gap-3"
+                        className="border bg-clear border-pale-gray rounded-xl p-5 flex flex-col gap-3"
                     >
                         <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
                             <feature.icon className="w-5 h-5 text-primary" />
                         </div>
                         <h3 className="text-heading-sm text-dark">{t(`welcome:features.${feature.key}.title`)}</h3>
-                        <p className="text-body-sm text-gray">{t(`welcome:features.${feature.key}.description`)}</p>
+                        <p className="text-body-sm text-muted-2">{t(`welcome:features.${feature.key}.description`)}</p>
                     </div>
                 ))}
             </div>

@@ -36,7 +36,7 @@ export const scriptPartTypeToIcon: Record<ScriptPartType, ComponentType<SVGProps
 
 export const scriptPartTypeToBgClass: Record<ScriptPartType, string> = {
     [ScriptPartType.Hook]: "bg-red/10",
-    [ScriptPartType.Text]: "bg-gray/10",
+    [ScriptPartType.Text]: "bg-muted-2/10",
     [ScriptPartType.Chapter]: "bg-blue/10",
     [ScriptPartType.VoiceOver]: "bg-yellow/10",
     [ScriptPartType.Dialogue]: "bg-purple/10",
@@ -47,7 +47,7 @@ export const scriptPartTypeToBgClass: Record<ScriptPartType, string> = {
 
 export const scriptPartTypeToBorderClass: Record<ScriptPartType, string> = {
     [ScriptPartType.Hook]: "border border-red/30",
-    [ScriptPartType.Text]: "border border-gray/30",
+    [ScriptPartType.Text]: "border border-muted-2/30",
     [ScriptPartType.Chapter]: "border border-blue/30",
     [ScriptPartType.VoiceOver]: "border border-yellow/30",
     [ScriptPartType.Dialogue]: "border border-purple/30",
@@ -58,7 +58,7 @@ export const scriptPartTypeToBorderClass: Record<ScriptPartType, string> = {
 
 export const scriptPartTypeToTextClass: Record<ScriptPartType, string> = {
     [ScriptPartType.Hook]: "text-red",
-    [ScriptPartType.Text]: "text-gray",
+    [ScriptPartType.Text]: "text-muted-2",
     [ScriptPartType.Chapter]: "text-blue",
     [ScriptPartType.VoiceOver]: "text-yellow",
     [ScriptPartType.Dialogue]: "text-purple",

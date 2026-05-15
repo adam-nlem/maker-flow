@@ -26,7 +26,7 @@ export default function HomeEngagementChart({ groups }: HomeEngagementChartProps
     if (data.length === 0) return null;
 
     return (
-        <div className="border border-light-gray rounded-lg p-3">
+        <div className="border border-pale-gray rounded-lg p-3">
             <h2 className="text-heading-sm mb-3">{t("home:engagementByPlatform")}</h2>
             <HorizontalBarChart data={data} />
         </div>

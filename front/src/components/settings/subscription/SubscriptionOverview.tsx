@@ -36,7 +36,7 @@ export default function SubscriptionOverview({ checkoutRedirectPath, subscribedV
 
     if (isLoading) {
         return loadingView ?? (
-            <div className="border border-light-gray rounded-xl p-5 flex flex-col gap-3">
+            <div className="border border-pale-gray rounded-xl p-5 flex flex-col gap-3">
                 <Shimmer width="w-40" height="h-5" />
                 <Shimmer width="w-24" height="h-8" radius="rounded-md" />
                 <Shimmer width="w-64" height="h-4" />

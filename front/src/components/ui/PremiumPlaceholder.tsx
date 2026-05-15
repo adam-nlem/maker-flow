@@ -31,9 +31,9 @@ export default function PremiumPlaceholder({
                 {children}
             </div>
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-clear/60 z-10 rounded-xl">
-                <LockClosedIcon className="size-6 text-gray mb-2" />
+                <LockClosedIcon className="size-6 text-muted-2 mb-2" />
                 <h2 className="text-heading-md mb-1">{resolvedTitle}</h2>
-                <p className="text-body-sm text-gray mb-3 text-center max-w-xs">{resolvedDescription}</p>
+                <p className="text-body-sm text-muted-2 mb-3 text-center max-w-xs">{resolvedDescription}</p>
                 <Button style="primary" width="w-fit" onClick={() => navigate(agencySettingsSubscriptionPath)}>
                     {t("premium.upgradeAction")}
                 </Button>

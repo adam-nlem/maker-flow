@@ -71,7 +71,7 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
                 {focusedScript ? (
                     <ScriptEditorPanel key={focusedScript.uuid} script={focusedScript} projectUuid={projectUuid} />
                 ) : (
-                    <div className="flex flex-col items-center justify-center h-full text-gray">
+                    <div className="flex flex-col items-center justify-center h-full text-muted-2">
                         <p className="text-body-md">{t("scripts:selectOrCreate")}</p>
                     </div>
                 )}

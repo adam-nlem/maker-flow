@@ -66,7 +66,7 @@ export default function ClientHomePage() {
                             label={t(timePeriodTranslationKeys[timePeriod])}
                             isSelected
                             onClick={onClick}
-                            borderColorClassName="border-light-gray"
+                            borderColorClassName="border-pale-gray"
                         />
                     )}
                     renderItem={({ item, isSelected, onSelect }) =>
@@ -75,7 +75,7 @@ export default function ClientHomePage() {
                                 label={t(timePeriodTranslationKeys[item])}
                                 isSelected
                                 onClick={onSelect}
-                                borderColorClassName="border-light-gray"
+                                borderColorClassName="border-pale-gray"
                             />
                         ) : null
                     }

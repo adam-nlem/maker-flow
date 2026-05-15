@@ -25,7 +25,7 @@ export default function ApplyHookTemplateModal({ isOpen, template, onConfirm, on
 
                 <div className="flex flex-col gap-1">
                     <span className="text-heading-sm">{template.title}</span>
-                    <span className="text-body-xs text-gray line-clamp-2 flex flex-wrap items-center gap-1">
+                    <span className="text-body-xs text-muted-2 line-clamp-2 flex flex-wrap items-center gap-1">
                         {parts.map((part, index) =>
                             part.type === 'placeholder' ? (
                                 <Pill key={index} label={part.label} isSelected bgColorClassName="bg-purple/10" borderColorClassName="border-primary/30" textColorClassName="text-primary" />
@@ -36,7 +36,7 @@ export default function ApplyHookTemplateModal({ isOpen, template, onConfirm, on
                     </span>
                 </div>
 
-                <p className="text-body-xs text-gray">
+                <p className="text-body-xs text-muted-2">
                     {t("scripts:hooks.applyHint")}
                 </p>
 

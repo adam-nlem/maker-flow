@@ -13,7 +13,7 @@ interface ContentPostCardProps {
 export default function ContentPostCard({ postDTO, onClick }: ContentPostCardProps) {
 
     return (
-        <div className=" w-35 flex flex-col gap-1 cursor-pointer bg-light-gray/30 rounded-lg border border-light-gray"
+        <div className=" w-35 flex flex-col gap-1 cursor-pointer bg-pale-gray-2/30 rounded-lg border border-pale-gray"
             onClick={onClick}>
             <div className="relative">
                 <div className="absolute top-1 left-1 z-10">
@@ -24,7 +24,7 @@ export default function ContentPostCard({ postDTO, onClick }: ContentPostCardPro
 
             <div className="p-1 flex flex-col gap-3">
 
-                <p className="text-body-xs text-gray whitespace-nowrap">
+                <p className="text-body-xs text-muted-2 whitespace-nowrap">
                     {formatToFrenchDateShort(postDTO.publishedAt)}
                 </p>
 

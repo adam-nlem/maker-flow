@@ -99,7 +99,7 @@ export default function ScriptPartsList({ parts, script, isReadOnly }: ScriptPar
           </div>
 
           {!isReadOnly && localParts.length === 0 && (
-            <div className="flex flex-col items-center justify-center text-gray py-8">
+            <div className="flex flex-col items-center justify-center text-muted-2 py-8">
               <p className="text-body-sm text-center">{t("scripts:parts.emptyTitle")}</p>
               <p className="text-body-sm text-center">{t("scripts:parts.emptyHint")}</p>
             </div>
@@ -116,7 +116,7 @@ export default function ScriptPartsList({ parts, script, isReadOnly }: ScriptPar
       </div>
 
       {!isReadOnly && (
-        <div className="min-h-0 px-6 py-4 border-t border-light-gray bg-clear">
+        <div className="min-h-0 px-6 py-4 border-t border-pale-gray bg-clear">
           <Button onClick={handleAddPart} isLoading={isCreating}>{t("scripts:parts.addPart")}</Button>
         </div>
       )}

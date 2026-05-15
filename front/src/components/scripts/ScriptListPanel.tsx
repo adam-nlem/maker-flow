@@ -51,7 +51,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
             <button
                 onClick={handleNewScript}
                 disabled={isPending || isLimitReached}
-                className="text-gray hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
+                className="text-muted-2 hover:text-dark transition-colors disabled:opacity-50 cursor-pointer"
                 title={t("scripts:newScriptTitle")}
             >
                 <PlusIcon className="size-4" strokeWidth={2} />
@@ -61,7 +61,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
     const listContent = (
         <div className="p-3 flex flex-col gap-1">
             {scripts.length === 0 ? (
-                <div className="flex flex-col items-center justify-center py-12 text-gray">
+                <div className="flex flex-col items-center justify-center py-12 text-muted-2">
                     <p className="text-body-sm text-center">{t("scripts:noScripts")}</p>
                     <p className="text-body-xs text-center mt-1">{t("scripts:newScriptHint")}</p>
                 </div>
@@ -91,7 +91,7 @@ export default function ScriptListPanel({ scripts, projectUuid, hasMore, isLoadi
 
     return (
         <div className="flex flex-col h-full">
-            <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
+            <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-pale-gray">
                 <h2 className="text-heading-md">{t("scripts:header")}</h2>
                 {createButton}
             </div>

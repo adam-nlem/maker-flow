@@ -64,7 +64,7 @@ export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) 
               <Shimmer height="h-14" width="w-full" />
             </>
           ) : chats.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-12 text-gray">
+            <div className="flex flex-col items-center justify-center py-12 text-muted-2">
               <p className="text-body-sm text-center">{t("scripts:chat.history.empty")}</p>
             </div>
           ) : (
@@ -88,7 +88,7 @@ export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) 
                     <p className="text-body-sm text-dark truncate">
                       {chat.title ?? t("scripts:chat.history.untitledChat")}
                     </p>
-                    <p className="text-body-xs text-gray">
+                    <p className="text-body-xs text-muted-2">
                       {t(aiModelTranslationKeys[chat.aiModel])} · {formatToFrenchRelative(chat.createdAt)}
                     </p>
                   </div>
@@ -97,7 +97,7 @@ export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) 
                       e.stopPropagation();
                       setPendingDeleteUuid(chat.uuid);
                     }}
-                    className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-gray hover:text-danger cursor-pointer"
+                    className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity text-muted-2 hover:text-danger cursor-pointer"
                     title={t("scripts:chat.history.deleteTitle")}
                   >
                     <TrashIcon className="size-4" strokeWidth={2} />

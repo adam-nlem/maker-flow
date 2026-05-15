@@ -32,7 +32,7 @@ export default function IntegrationLoginCard({ projectUuid, platform, integratio
     };
 
     return (
-        <div className="border border-light-gray max-h-fit rounded-xl bg-clear p-5">
+        <div className="border border-pale-gray max-h-fit rounded-xl bg-clear p-5">
             {/* Header: platform name + status badge */}
             <div className="flex flex-row items-center justify-between gap-20 mb-4">
                 <div className="flex flex-row items-center gap-3">
@@ -60,18 +60,18 @@ export default function IntegrationLoginCard({ projectUuid, platform, integratio
                         )}
                         <div className="flex flex-col">
                             {integration.name && <p className="text-heading-sm">{integration.name}</p>}
-                            <p className="text-body-sm text-gray">@{integration.userName}</p>
+                            <p className="text-body-sm text-muted-2">@{integration.userName}</p>
                         </div>
                     </div>
                     <div className="flex flex-row items-center gap-2">
-                        <ArrowPathIcon className="size-4 text-gray shrink-0" strokeWidth={1.5} />
-                        <p className="text-body-xs text-gray">
+                        <ArrowPathIcon className="size-4 text-muted-2 shrink-0" strokeWidth={1.5} />
+                        <p className="text-body-xs text-muted-2">
                             {t("integrations:lastSync", { when: formatToFrenchRelative(integration.lastSyncedAt) })}
                         </p>
                     </div>
                 </div>
             ) : (
-                <p className="text-body-sm text-gray">{t("integrations:noAccount")}</p>
+                <p className="text-body-sm text-muted-2">{t("integrations:noAccount")}</p>
             )}
 
             {/* Actions */}

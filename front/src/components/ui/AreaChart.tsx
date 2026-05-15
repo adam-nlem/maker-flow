@@ -26,9 +26,9 @@ function CustomTooltip({ active, payload }: CustomTooltipProps) {
     const dataPoint = payload[0].payload;
 
     return (
-        <div className="bg-clear border border-light-gray rounded-md p-2 shadow-sm">
+        <div className="bg-clear border border-pale-gray rounded-md p-2 shadow-sm">
             <p className="text-heading-xs">{dataPoint.value.toLocaleString("fr-FR")}</p>
-            <p className="text-xs text-gray">{formatToFrenchDateLong(dataPoint.date)}</p>
+            <p className="text-xs text-muted-2">{formatToFrenchDateLong(dataPoint.date)}</p>
         </div>
     );
 }

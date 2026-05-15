@@ -17,7 +17,7 @@ export default function PlanCard({ config, isPending, disabled = false, onSelect
     const label = actionLabel ?? t("settings:subscription.plans.choose");
 
     return (
-        <div className={`flex flex-col border rounded-xl p-5 ${config.isHighlighted ? 'border-primary' : 'border-light-gray'}`}>
+        <div className={`flex flex-col border rounded-xl p-5 ${config.isHighlighted ? 'border-primary' : 'border-pale-gray'}`}>
             {config.isHighlighted && (
                 <span className="text-body-xs text-primary mb-2">{t("settings:subscription.plans.recommended")}</span>
             )}
@@ -26,10 +26,10 @@ export default function PlanCard({ config, isPending, disabled = false, onSelect
 
             <div className="flex flex-row items-baseline gap-1 mt-2">
                 <span className="text-heading-2xl">{formatPriceEur(config.monthlyPrice)}</span>
-                <span className="text-body-sm text-gray">{t("settings:subscription.plans.perMonth")}</span>
+                <span className="text-body-sm text-muted-2">{t("settings:subscription.plans.perMonth")}</span>
             </div>
 
-            <p className="text-body-sm text-gray mt-1">
+            <p className="text-body-sm text-muted-2 mt-1">
                 {t("settings:subscription.plans.creditsPerMonth", { count: config.creditsPerMonth })}
             </p>
 

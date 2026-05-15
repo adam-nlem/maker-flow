@@ -70,7 +70,7 @@ export default function DesktopSidebar() {
               <ProjectTile
                 project={focusedProject}
                 rightIcon={
-                  <ChevronUpDownIcon className="size-5 text-gray -mb-0.5" strokeWidth={2} />
+                  <ChevronUpDownIcon className="size-5 text-muted-2 -mb-0.5" strokeWidth={2} />
                 }
                 onClick={onClick}
               />
@@ -80,7 +80,7 @@ export default function DesktopSidebar() {
                 project={item}
                 isSelected={isSelected}
                 showCreatedAt={true}
-                onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-gray -mb-0.5" strokeWidth={2} onClick={(e) => {
+                onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-muted-2 -mb-0.5" strokeWidth={2} onClick={(e) => {
                   e.stopPropagation()
                   setUpdatingProjectUuid(item.uuid)
                 }} />}
@@ -97,7 +97,7 @@ export default function DesktopSidebar() {
                   <PlusIcon className="size-4" strokeWidth={2} />
                 </div>
               </Button>
-              <p className="text-body-xs text-gray text-center">{t("sidebar:projectLimitReached")}</p>
+              <p className="text-body-xs text-muted-2 text-center">{t("sidebar:projectLimitReached")}</p>
             </div>
           ) : (
             <Button

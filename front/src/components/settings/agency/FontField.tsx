@@ -17,7 +17,7 @@ export default function FontField({ label, value, defaultLabel, defaultCssStack,
 
     return (
         <div className="flex flex-col gap-2">
-            <label className="text-body-xs text-gray uppercase tracking-wide">{label}</label>
+            <label className="text-body-xs text-muted-2 uppercase tracking-wide">{label}</label>
             <SelectDropdown<BrandFontOption | null>
                 items={[null, ...BRAND_FONT_OPTIONS]}
                 selectedItemId={selected?.value ?? "default"}
@@ -27,7 +27,7 @@ export default function FontField({ label, value, defaultLabel, defaultCssStack,
                     <button
                         type="button"
                         onClick={onClick}
-                        className="w-full flex flex-row items-center justify-between gap-3 rounded-lg border border-light-gray bg-clear px-3 py-2 hover:bg-surface-hover transition-colors"
+                        className="w-full flex flex-row items-center justify-between gap-3 rounded-lg border border-pale-gray bg-clear px-3 py-2 hover:bg-surface-hover transition-colors"
                     >
                         <span
                             className="text-body-sm text-dark truncate"
@@ -35,7 +35,7 @@ export default function FontField({ label, value, defaultLabel, defaultCssStack,
                         >
                             {selected?.label ?? defaultLabel}
                         </span>
-                        <ChevronUpDownIcon className="size-4 text-gray shrink-0" strokeWidth={1.8} />
+                        <ChevronUpDownIcon className="size-4 text-muted-2 shrink-0" strokeWidth={1.8} />
                     </button>
                 )}
                 renderItem={({ item, onSelect }) => (

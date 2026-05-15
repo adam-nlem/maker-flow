@@ -31,7 +31,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
         <>
             {/* Platforms */}
             <div className="flex flex-col gap-2">
-                <span className="text-heading-xs text-gray">{t("scripts:calendar.filters.platforms")}</span>
+                <span className="text-heading-xs text-muted-2">{t("scripts:calendar.filters.platforms")}</span>
                 <div className="flex flex-row flex-wrap gap-2">
                     {platformOptions.map((platform) => (
                         <PlatformPill
@@ -46,7 +46,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
 
             {/* Statuses */}
             <div className="flex flex-col gap-2">
-                <span className="text-heading-xs text-gray">{t("scripts:calendar.filters.statuses")}</span>
+                <span className="text-heading-xs text-muted-2">{t("scripts:calendar.filters.statuses")}</span>
                 <div className="flex flex-row flex-wrap gap-2">
                     {scriptStatusOptions.map((status) => (
                         <Pill
@@ -66,7 +66,7 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
             {/* Tags */}
             {scriptTags.length > 0 && (
                 <div className="flex flex-col gap-2">
-                    <span className="text-heading-xs text-gray">{t("scripts:calendar.filters.tags")}</span>
+                    <span className="text-heading-xs text-muted-2">{t("scripts:calendar.filters.tags")}</span>
                     <div className="flex flex-row flex-wrap gap-2">
                         {scriptTags.map((tag) => (
                             <Pill
@@ -90,10 +90,10 @@ export default function CalendarFilterPanel({ projectUuid }: CalendarFilterPanel
             <div className="shrink-0">
                 <button
                     onClick={() => setIsExpanded(!isExpanded)}
-                    className="flex flex-row items-center gap-2 px-3 py-2 border border-light-gray rounded-xl hover:bg-surface-hover transition-colors cursor-pointer"
+                    className="flex flex-row items-center gap-2 px-3 py-2 border border-pale-gray rounded-xl hover:bg-surface-hover transition-colors cursor-pointer"
                 >
-                    <AdjustmentsHorizontalIcon className="size-4 text-gray" />
-                    <span className="text-heading-xs text-gray">{t("scripts:calendar.filters.title")}</span>
+                    <AdjustmentsHorizontalIcon className="size-4 text-muted-2" />
+                    <span className="text-heading-xs text-muted-2">{t("scripts:calendar.filters.title")}</span>
                     {activeFilterCount > 0 && (
                         <span className="flex items-center justify-center size-5 rounded-full bg-primary/10 text-primary text-body-xs font-semibold">
                             {activeFilterCount}

@@ -14,9 +14,9 @@ export default function ConnectIntegrationPlaceholder({ projectUuid }: ConnectIn
 
     return (
         <div className="flex flex-col items-center justify-center py-20">
-            <LinkIcon className="size-6 text-gray mb-2" />
+            <LinkIcon className="size-6 text-muted-2 mb-2" />
             <h2 className="text-heading-md mb-1">{t("integrations:placeholder.title")}</h2>
-            <p className="text-body-sm text-gray mb-3 text-center max-w-xs">
+            <p className="text-body-sm text-muted-2 mb-3 text-center max-w-xs">
                 {t("integrations:placeholder.description")}
             </p>
             <Button

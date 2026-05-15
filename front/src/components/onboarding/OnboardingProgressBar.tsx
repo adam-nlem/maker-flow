@@ -32,17 +32,17 @@ export default function OnboardingProgressBar() {
         return (
             <div className="flex flex-col gap-1 w-full">
                 <div className="flex items-center justify-between">
-                    <span className="text-body-xs text-gray uppercase">
+                    <span className="text-body-xs text-muted-2 uppercase">
                         {t("onboarding:progress.stepCount", { current: currentStep + 1, total: totalSteps })}
                     </span>
-                    <span className="text-body-xs text-gray">
+                    <span className="text-body-xs text-muted-2">
                         {percentage}%
                     </span>
                 </div>
                 <span className="text-body-sm text-dark font-semibold">
                     {t(labelMap[currentStepKey])}
                 </span>
-                <div className="h-1.5 w-full bg-light-gray rounded-full">
+                <div className="h-1.5 w-full bg-pale-gray-2 rounded-full">
                     <div
                         className="h-full bg-primary rounded-full transition-all duration-300"
                         style={{ width: `${percentage}%` }}
@@ -62,13 +62,13 @@ export default function OnboardingProgressBar() {
                 return (
                     <div key={step} className="flex items-center gap-2">
                         {index > 0 && (
-                            <ChevronRightIcon className="size-4 text-gray shrink-0" />
+                            <ChevronRightIcon className="size-4 text-muted-2 shrink-0" />
                         )}
                         <div className="flex flex-col gap-1">
 
                             <div className="flex items-center gap-1.5 shrink-0">
-                                <Icon className={`size-5 shrink-0 ${completed ? 'text-primary' : 'text-gray'}`} />
-                                <span className={`text-body-xs whitespace-nowrap ${current ? 'text-dark' : completed ? 'text-dark' : 'text-gray'}`}>
+                                <Icon className={`size-5 shrink-0 ${completed ? 'text-primary' : 'text-muted-2'}`} />
+                                <span className={`text-body-xs whitespace-nowrap ${current ? 'text-dark' : completed ? 'text-dark' : 'text-muted-2'}`}>
                                     {t(labelMap[step])}
                                 </span>
                             </div>

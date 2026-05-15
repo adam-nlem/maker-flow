@@ -39,7 +39,7 @@ export default function ChatInput({ onSend, isPending, lockedAiModel, placeholde
   };
 
   return (
-    <div className="flex flex-col items-end gap-2 border border-light-gray rounded-lg p-3 bg-clear">
+    <div className="flex flex-col items-end gap-2 border border-pale-gray rounded-lg p-3 bg-clear">
       <TextArea
         simple
         value={text}

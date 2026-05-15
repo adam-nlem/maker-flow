@@ -218,7 +218,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                                     <Badge
                                         icon={CalendarDateRangeIcon}
                                         label={dueDate.toLocaleDateString('fr-FR')}
-                                        textColor="text-gray"
+                                        textColor="text-muted-2"
                                         onRemoveClick={() => setDueDate(undefined)}
                                         onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}
                                     />
@@ -241,7 +241,7 @@ export default function DetailTodoListTaskModal({ todoListUuid, task, showModal,
                         </div>
                     </div>
 
-                    <div className="border-t border-light-gray rounded w-full my-5"></div>
+                    <div className="border-t border-pale-gray rounded w-full my-5"></div>
 
                     <TextArea
                         placeholder={t("tasks:task.detail.contentPlaceholder")}

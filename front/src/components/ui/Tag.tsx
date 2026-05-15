@@ -8,7 +8,7 @@ interface TagProps {
 
 const tagColorClasses: Record<TagColor, string> = {
     primary: 'bg-primary/10 text-primary',
-    gray: 'bg-light-gray text-gray',
+    gray: 'bg-pale-gray-2 text-muted-2',
     yellow: 'bg-yellow/10 text-yellow',
     danger: 'bg-danger/10 text-danger',
 };

@@ -13,7 +13,7 @@ export default function ChatMessageBubble({ message, scriptUuid, chatUuid }: Cha
     return (
         <div className={`flex ${message.type === MessageType.User ? "justify-end" : "justify-start"} `}>
             <div className="max-w-[80%]">
-                <div className={`p-2 rounded-xl border ${message.type === MessageType.User ? "bg-primary/10 border-primary/30" : "bg-light-gray/10 border-light-gray"} text-sm select-text whitespace-pre-wrap`}>
+                <div className={`p-2 rounded-xl border ${message.type === MessageType.User ? "bg-primary/10 border-primary/30" : "bg-pale-gray-2/10 border-pale-gray"} text-sm select-text whitespace-pre-wrap`}>
                     {message.content}
                 </div>
 
@@ -25,7 +25,7 @@ export default function ChatMessageBubble({ message, scriptUuid, chatUuid }: Cha
                     />
                 )}
 
-                <p className="text-body-xs text-gray mt-1">{formatToFrenchRelative(message.createdAt)}</p>
+                <p className="text-body-xs text-muted-2 mt-1">{formatToFrenchRelative(message.createdAt)}</p>
             </div>
         </div>
     );

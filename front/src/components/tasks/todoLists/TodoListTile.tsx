@@ -25,7 +25,7 @@ export default function TodoListTile({
     return (
 
         <div
-            className="flex flex-row justify-between gap-3 items-center hover:bg-light-gray cursor-pointer rounded-md p-2"
+            className="flex flex-row justify-between gap-3 items-center hover:bg-pale-gray-2 cursor-pointer rounded-md p-2"
             onClick={onClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
@@ -36,7 +36,7 @@ export default function TodoListTile({
                 <div className="flex flex-col">
                     <h1 className="text-heading-sm whitespace-nowrap">{todoList.title}</h1>
                     {showCreatedAt && (
-                        <p className="text-body-xs text-gray whitespace-nowrap">{t("tasks:todoList.tile.createdAt", { date: formatToFrenchDateShort(todoList.createdAt) })}</p>
+                        <p className="text-body-xs text-muted-2 whitespace-nowrap">{t("tasks:todoList.tile.createdAt", { date: formatToFrenchDateShort(todoList.createdAt) })}</p>
                     )}
                 </div>
             </div>

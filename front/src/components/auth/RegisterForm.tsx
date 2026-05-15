@@ -1,5 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { ArrowRightIcon, EnvelopeIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
@@ -12,10 +13,9 @@ import { validateRegisterForm } from "~/utils/registerValidation"
 interface RegisterFormProps {
     onRegistered: (data: { pendingOtpToken: string; email: string }) => void
     initialEmail?: string
-    formSpacing?: string
 }
 
-export default function RegisterForm({ onRegistered, initialEmail = "", formSpacing = "space-y-4" }: RegisterFormProps) {
+export default function RegisterForm({ onRegistered, initialEmail = "" }: RegisterFormProps) {
     const { t } = useTranslation()
     const setStoredEmail = useAuthPrefillStore((s) => s.setEmail)
 
@@ -24,6 +24,8 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
     const [email, setEmail] = useState(initialEmail)
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [validationErrorKey, setValidationErrorKey] = useState<string | null>(null)
 
     const { register, isPending, error } = useRegister()
@@ -45,36 +47,57 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
 
     const errorMessage = (validationErrorKey ? t(validationErrorKey) : null) || (error?.message ?? null)
 
+    const passwordTrailing = (
+        <button
+            type="button"
+            onClick={() => setShowPassword((v) => !v)}
+            className="text-muted-2 hover:text-dark transition-colors"
+        >
+            {showPassword ? <EyeSlashIcon className="size-4" /> : <EyeIcon className="size-4" />}
+        </button>
+    )
+    const confirmTrailing = (
+        <button
+            type="button"
+            onClick={() => setShowConfirmPassword((v) => !v)}
+            className="text-muted-2 hover:text-dark transition-colors"
+        >
+            {showConfirmPassword ? <EyeSlashIcon className="size-4" /> : <EyeIcon className="size-4" />}
+        </button>
+    )
+
     return (
         <>
             {errorMessage && (
-                <div className="mb-4 rounded-md bg-danger/10 p-4">
-                    <div className="text-body-sm text-danger">{errorMessage}</div>
+                <div className="mb-4 rounded-md bg-danger/10 p-3">
+                    <p className="text-body-sm text-danger">{errorMessage}</p>
                 </div>
             )}
 
-            <form className={formSpacing} onSubmit={handleSubmit}>
-                <Input
-                    label={t("auth:fields.firstName")}
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    autoComplete="given-name"
-                    required
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                />
+            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+                <div className="grid grid-cols-2 gap-3">
+                    <Input
+                        label={t("auth:fields.firstName")}
+                        id="firstName"
+                        name="firstName"
+                        type="text"
+                        autoComplete="given-name"
+                        required
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                    />
 
-                <Input
-                    label={t("auth:fields.lastName")}
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    autoComplete="family-name"
-                    required
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                />
+                    <Input
+                        label={t("auth:fields.lastName")}
+                        id="lastName"
+                        name="lastName"
+                        type="text"
+                        autoComplete="family-name"
+                        required
+                        value={lastName}
+                        onChange={(e) => setLastName(e.target.value)}
+                    />
+                </div>
 
                 <Input
                     label={t("auth:fields.email")}
@@ -85,17 +108,19 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
+                    icon={<EnvelopeIcon className="size-4 text-muted-2" />}
                 />
 
                 <Input
                     label={t("auth:fields.password")}
                     id="password"
                     name="password"
-                    type="password"
+                    type={showPassword ? "text" : "password"}
                     autoComplete="new-password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    trailingIcon={passwordTrailing}
                 />
                 {password.length > 0 && (
                     <PasswordRules rules={getPasswordRules(password)} />
@@ -105,20 +130,24 @@ export default function RegisterForm({ onRegistered, initialEmail = "", formSpac
                     label={t("auth:fields.confirmPassword")}
                     id="confirmPassword"
                     name="confirmPassword"
-                    type="password"
+                    type={showConfirmPassword ? "text" : "password"}
                     autoComplete="new-password"
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
+                    trailingIcon={confirmTrailing}
                 />
 
                 <Button
                     type="submit"
                     style="primary"
+                    width="w-full"
+                    height="h-11"
                     isLoading={isPending}
                     disabled={isPending}
                 >
-                    {t("auth:register.submit")}
+                    <span>{t("auth:register.submit")}</span>
+                    <ArrowRightIcon className="size-4" />
                 </Button>
             </form>
         </>

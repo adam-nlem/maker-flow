@@ -21,7 +21,7 @@ export default function ScriptCard({ script, isSelected, onClick }: ScriptCardPr
         <>
             <div
                 onClick={onClick}
-                className={`group relative flex flex-col gap-1.5 p-3 rounded-md cursor-pointer transition-colors ${isSelected ? "bg-primary/10 border border-primary/30" : "hover:bg-surface-hover border border-light-gray"}`}
+                className={`group relative flex flex-col gap-1.5 p-3 rounded-md cursor-pointer transition-colors ${isSelected ? "bg-primary/10 border border-primary/30" : "hover:bg-surface-hover border border-pale-gray"}`}
             >
                 <p className={`text-heading-sm truncate ${isSelected ? "text-primary" : ""}`}>{script.title}</p>
 
@@ -30,7 +30,7 @@ export default function ScriptCard({ script, isSelected, onClick }: ScriptCardPr
                 <button
                     onClick={(e) => { e.stopPropagation(); setShowConfirm(true); }}
                     disabled={isDeleting}
-                    className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity text-gray hover:text-danger cursor-pointer"
+                    className="absolute right-2 opacity-0 group-hover:opacity-100 transition-opacity text-muted-2 hover:text-danger cursor-pointer"
                 >
                     <XMarkIcon className="size-4" strokeWidth={2} />
                 </button>

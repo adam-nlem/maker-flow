@@ -73,7 +73,7 @@ function renderBody(suggestion: ScriptPartSuggestion, t: (key: string, options?:
       );
     case ScriptPartSuggestionAction.Reorder:
       return (
-        <div className="text-gray text-body-xs">
+        <div className="text-muted-2 text-body-xs">
           {t("scripts:parts.diff.reorderDescription", { position: suggestion.proposedPosition })}
         </div>
       );

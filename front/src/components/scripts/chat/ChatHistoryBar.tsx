@@ -80,7 +80,7 @@ export default function ChatHistoryBar({ scriptUuid }: ChatHistoryBarProps) {
                                 label={t(aiModelTranslationKeys[model])}
                                 onClick={() => handleCreateChat(model)}
                                 isSelected={isCreatingChat}
-                                borderColorClassName="border-light-gray"
+                                borderColorClassName="border-pale-gray"
                             />
                         ))}
                         <SimpleTextButton onClick={() => setIsCreatingChat(false)}>

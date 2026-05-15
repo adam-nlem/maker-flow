@@ -13,7 +13,7 @@ export default function OnboardingStepHeader() {
             <h2 className="text-heading-3xl text-dark mb-2 text-center">
                 {t(flowConfig.translationKeys[currentOnboardingStep])}
             </h2>
-            <p className="text-body-sm text-gray text-center">
+            <p className="text-body-sm text-muted-2 text-center">
                 {t(flowConfig.descriptionKeys[currentOnboardingStep])}
             </p>
         </div>

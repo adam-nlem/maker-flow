@@ -14,7 +14,7 @@ interface FileUploadProps {
 }
 
 const DEFAULT_BUTTON_CLASSES = "flex flex-col items-center justify-center gap-2 p-3 rounded-lg border-2 border-dashed transition-colors";
-const DEFAULT_BUTTON_IDLE = "border-light-gray bg-clear hover:bg-light-gray/30";
+const DEFAULT_BUTTON_IDLE = "border-pale-gray bg-clear hover:bg-pale-gray-2/30";
 const DEFAULT_BUTTON_DRAGGING = "border-primary bg-primary/10";
 
 export default function FileUpload({
@@ -79,8 +79,8 @@ export default function FileUpload({
                     {...buttonProps}
                     className={`${baseButtonClasses} ${DEFAULT_BUTTON_CLASSES} ${isDragActive ? DEFAULT_BUTTON_DRAGGING : DEFAULT_BUTTON_IDLE}`}
                 >
-                    <Icon className="size-10 text-gray" strokeWidth={1.2} />
-                    {hint && <p className="text-body-xs text-gray">{hint}</p>}
+                    <Icon className="size-10 text-muted-2" strokeWidth={1.2} />
+                    {hint && <p className="text-body-xs text-muted-2">{hint}</p>}
                 </button>
             )}
             <input

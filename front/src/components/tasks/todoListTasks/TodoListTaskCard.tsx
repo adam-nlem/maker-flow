@@ -28,7 +28,7 @@ export default function TodoListTaskCard({ task, onClick, isDragDisabled = false
 
     return (
         <div
-            className={`border bg-clear border-light-gray rounded-lg p-2 flex flex-col gap-3 min-w-0 cursor-pointer ${isDragging ? 'opacity-50' : ''}`}
+            className={`border bg-clear border-pale-gray rounded-lg p-2 flex flex-col gap-3 min-w-0 cursor-pointer ${isDragging ? 'opacity-50' : ''}`}
             ref={setNodeRef}
             {...listeners}
             {...attributes}

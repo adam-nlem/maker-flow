@@ -11,7 +11,7 @@ export default function LanguageSwitcher() {
 
     return (
         <div className="flex flex-col gap-2">
-            <label className="text-body-sm text-gray">{t("language.label")}</label>
+            <label className="text-body-sm text-muted-2">{t("language.label")}</label>
             <SelectDropdown
                 items={languageOptions}
                 selectedItemId={currentLanguage}

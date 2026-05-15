@@ -35,7 +35,7 @@ export default function IntegrationDetailCardRow({ groups }: IntegrationDetailCa
                     const { integration, insights } = group;
                     const engagementRate = computeEngagementRate(insights);
                     return (
-                        <div key={integration.uuid} className={`border border-light-gray rounded-lg p-3 flex flex-col gap-3 w-50`}>
+                        <div key={integration.uuid} className={`border border-pale-gray rounded-lg p-3 flex flex-col gap-3 w-50`}>
                             <div className={`h-1 w-full rounded ${platformToBgFullClass[integration.platform]}`}></div>
                             <IntegrationProfileInfo integration={integration} />
 

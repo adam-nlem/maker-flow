@@ -30,13 +30,13 @@ export default function CollaboratorsTable({ rows }: CollaboratorsTableProps) {
         },
         {
             header: t("collaborators:columns.email"),
-            render: (row) => <span className="text-gray">{row.email}</span>,
+            render: (row) => <span className="text-muted-2">{row.email}</span>,
         },
         {
             header: t("collaborators:columns.role"),
             render: (row) => row.role
                 ? <Tag color="primary" label={t(userRoleTranslationKeys[row.role])} />
-                : <span className="text-gray">—</span>,
+                : <span className="text-muted-2">—</span>,
         },
         {
             header: t("collaborators:columns.status"),
@@ -58,14 +58,14 @@ function CollaboratorRowAction({ row }: { row: CollaboratorRow }) {
     const { t } = useTranslation();
 
     if (row.isSelf) {
-        return <span className="text-body-xs text-gray">{t("collaborators:self")}</span>;
+        return <span className="text-body-xs text-muted-2">{t("collaborators:self")}</span>;
     }
     if (!row.onDelete) return null;
 
     const Icon = row.status === 'active' ? TrashIcon : XMarkIcon;
     return (
         <Icon
-            className="size-4 text-gray hover:text-danger cursor-pointer transition-colors"
+            className="size-4 text-muted-2 hover:text-danger cursor-pointer transition-colors"
             strokeWidth={2}
             onClick={row.onDelete}
         />

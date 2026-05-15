@@ -27,7 +27,7 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
 
     return (
         <div className="flex flex-col gap-4">
-            <div className="border border-light-gray rounded-xl p-5">
+            <div className="border border-pale-gray rounded-xl p-5">
                 <div className="flex flex-row items-center justify-between mb-4">
                     <h3 className="text-heading-md">{t("settings:subscription.current.title")}</h3>
                     <span className={`text-body-xs px-3 py-1 rounded-full ${subscription.isActive ? 'bg-primary/10 text-primary' : 'bg-yellow/10 text-yellow'}`}>
@@ -41,8 +41,8 @@ export default function CurrentSubscriptionCard({ subscription }: CurrentSubscri
 
                 <div className="flex flex-col gap-2 mt-4">
                     <div className="flex flex-row items-center gap-2">
-                        <CheckBadgeIcon className="size-4 text-gray" strokeWidth={1.5} />
-                        <p className="text-body-sm text-gray">
+                        <CheckBadgeIcon className="size-4 text-muted-2" strokeWidth={1.5} />
+                        <p className="text-body-sm text-muted-2">
                             {t("settings:subscription.current.period", {
                                 start: formatToFrenchDateLong(subscription.currentPeriodStart),
                                 end: formatToFrenchDateLong(subscription.currentPeriodEnd),

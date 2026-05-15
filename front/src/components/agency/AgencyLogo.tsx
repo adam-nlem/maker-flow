@@ -54,7 +54,7 @@ function AgencyLogoInitial({ agency, className }: AgencyLogoVariantProps) {
 
     return (
         <div
-            className={`flex items-center justify-center rounded-md ${hasAccentColor ? "text-clear" : "bg-light-gray text-gray"} ${className}`}
+            className={`flex items-center justify-center rounded-md ${hasAccentColor ? "text-clear" : "bg-pale-gray-2 text-muted-2"} ${className}`}
             style={hasAccentColor ? { backgroundColor: agency.accentColor ?? undefined } : undefined}
         >
             <span className="text-heading-sm font-semibold leading-none">{initial}</span>
@@ -80,7 +80,7 @@ function AgencyLogoUploader({ agency, logoUrl, className }: AgencyLogoUploaderPr
                 ? ({ isDragActive }) => (
                     <div className="relative w-full h-full overflow-hidden rounded-md">
                         <img src={logoUrl} alt="" className="w-full h-full object-cover" />
-                        <div className={`absolute inset-0 flex items-center justify-center bg-light-gray/50 transition-opacity ${isDragActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+                        <div className={`absolute inset-0 flex items-center justify-center bg-pale-gray-2/50 transition-opacity ${isDragActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
                             <PencilIcon className="size-5 text-dark" strokeWidth={1.8} />
                         </div>
                     </div>

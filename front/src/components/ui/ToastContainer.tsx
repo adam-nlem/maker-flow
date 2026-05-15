@@ -35,7 +35,7 @@ function ToastItem({ toast }: { toast: Toast }) {
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
-              className="inline-flex cursor-pointer rounded-md bg-clear text-gray hover:text-dark"
+              className="inline-flex cursor-pointer rounded-md bg-clear text-muted-2 hover:text-dark"
             >
               <span className="sr-only">{t("actions.close")}</span>
               <XMarkIcon aria-hidden="true" className="size-5" />

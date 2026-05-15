@@ -27,7 +27,7 @@ export default function SearchBar({ setDebouncedSearchTerm, width = "w-full" }: 
       placeholder={t("searchBar.defaultPlaceholder")}
       value={searchTerm}
       onChange={(e) => setSearchTerm(e.target.value)}
-      icon={<MagnifyingGlassIcon className="size-4 text-gray" strokeWidth={2} />}
+      icon={<MagnifyingGlassIcon className="size-4 text-muted-2" strokeWidth={2} />}
       width={width}
     />
   )

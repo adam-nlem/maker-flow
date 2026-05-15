@@ -24,7 +24,7 @@ export const callToActionTypeToBgClass: Record<CallToActionType, string> = {
     [CallToActionType.Comment]: "bg-blue/10",
     [CallToActionType.Share]: "bg-primary/10",
     [CallToActionType.Link]: "bg-purple/10",
-    [CallToActionType.Custom]: "bg-gray/10",
+    [CallToActionType.Custom]: "bg-muted-2/10",
 }
 
 export const callToActionTypeToBorderClass: Record<CallToActionType, string> = {
@@ -33,7 +33,7 @@ export const callToActionTypeToBorderClass: Record<CallToActionType, string> = {
     [CallToActionType.Comment]: "border border-blue/30",
     [CallToActionType.Share]: "border border-primary/30",
     [CallToActionType.Link]: "border border-purple/30",
-    [CallToActionType.Custom]: "border border-gray/30",
+    [CallToActionType.Custom]: "border border-muted-2/30",
 }
 
 export const callToActionTypeToTextClass: Record<CallToActionType, string> = {
@@ -42,5 +42,5 @@ export const callToActionTypeToTextClass: Record<CallToActionType, string> = {
     [CallToActionType.Comment]: "text-blue",
     [CallToActionType.Share]: "text-primary",
     [CallToActionType.Link]: "text-purple",
-    [CallToActionType.Custom]: "text-gray",
+    [CallToActionType.Custom]: "text-muted-2",
 }

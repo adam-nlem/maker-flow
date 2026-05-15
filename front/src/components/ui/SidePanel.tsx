@@ -51,9 +51,9 @@ function PanelContent({
     children: ReactNode;
 }) {
     return (
-        <div className={`shrink-0 ${borderClass} border-light-gray h-full flex flex-col bg-clear ${className}`}>
+        <div className={`shrink-0 ${borderClass} border-pale-gray h-full flex flex-col bg-clear ${className}`}>
             {header ?? (
-                <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
+                <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-pale-gray">
                     <div className="flex flex-row items-center gap-2">
                         {Icon && <Icon className="size-5 text-primary" strokeWidth={2} />}
                         <h2 className="text-heading-md">{title}</h2>
@@ -64,7 +64,7 @@ function PanelContent({
                             {onClose && (
                                 <button
                                     onClick={onClose}
-                                    className="text-gray hover:text-dark transition-colors cursor-pointer"
+                                    className="text-muted-2 hover:text-dark transition-colors cursor-pointer"
                                 >
                                     <XMarkIcon className="size-4" strokeWidth={2} />
                                 </button>
@@ -83,7 +83,7 @@ function PanelContent({
 
             {/* Sticky footer */}
             {footer && (
-                <div className="px-4 py-3 border-t border-light-gray">
+                <div className="px-4 py-3 border-t border-pale-gray">
                     {footer}
                 </div>
             )}

@@ -27,13 +27,13 @@ export default function IntegrationProfileInfo({ integration }: IntegrationProfi
                             className="size-7 rounded-full object-cover"
                         />
                     ) : (
-                        <div className="size-7 rounded-full bg-light-gray flex items-center justify-center">
-                            <UserIcon className="size-4 text-gray" />
+                        <div className="size-7 rounded-full bg-pale-gray-2 flex items-center justify-center">
+                            <UserIcon className="size-4 text-muted-2" />
                         </div>
                     )}
                     <div className="flex flex-col">
                         <h1 className="text-heading-xs">{integration.name}</h1>
-                        <p className="text-body-xs text-gray">{integration.userName}</p>
+                        <p className="text-body-xs text-muted-2">{integration.userName}</p>
                     </div>
                 </div>
                 <img

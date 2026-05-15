@@ -61,24 +61,24 @@ export default function HookTemplatePanel() {
                 headerActions={
                     <button
                         onClick={() => setShowCreateModal(true)}
-                        className="text-gray hover:text-dark transition-colors cursor-pointer"
+                        className="text-muted-2 hover:text-dark transition-colors cursor-pointer"
                     >
                         <PlusIcon className="size-4" strokeWidth={2} />
                     </button>
                 }
                 toolbar={
                     <>
-                        <div className="px-4 py-3 border-b border-light-gray">
+                        <div className="px-4 py-3 border-b border-pale-gray">
                             <Input
                                 simple
                                 value={searchInput}
                                 onChange={(e) => setSearchInput(e.target.value)}
                                 placeholder={t("scripts:hooks.searchPlaceholder")}
                                 textStyle="text-body-sm"
-                                icon={<MagnifyingGlassIcon className="size-4 text-gray" strokeWidth={2} />}
+                                icon={<MagnifyingGlassIcon className="size-4 text-muted-2" strokeWidth={2} />}
                             />
                         </div>
-                        <div className="flex flex-row flex-wrap gap-2 px-4 py-3 border-b border-light-gray">
+                        <div className="flex flex-row flex-wrap gap-2 px-4 py-3 border-b border-pale-gray">
                             {hookTemplateCategoryOptions.map((category) => (
                                 <ToggleChip
                                     key={category}
@@ -93,7 +93,7 @@ export default function HookTemplatePanel() {
             >
                 <div className="p-3 flex flex-col gap-2">
                     {filteredTemplates.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 text-gray">
+                        <div className="flex flex-col items-center justify-center py-12 text-muted-2">
                             <p className="text-body-sm text-center">{t("scripts:hooks.empty")}</p>
                         </div>
                     ) : (

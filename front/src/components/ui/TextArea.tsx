@@ -34,8 +34,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           ref={internalRef}
           placeholder={props.placeholder}
           className={`
-              block bg-transparent placeholder-gray ${textStyle} resize-none scrollbar-none
-              ${!simple ? 'rounded-xl border border-light-gray px-3 py-1.5 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary' : 'border-0 shadow-none outline-none focus:outline-none focus:ring-0 p-0'}
+              block bg-transparent placeholder-muted-2 ${textStyle} resize-none scrollbar-none
+              ${!simple ? 'rounded-xl border border-pale-gray px-3 py-1.5 shadow-sm focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary' : 'border-0 shadow-none outline-none focus:outline-none focus:ring-0 p-0'}
               ${error ? 'border-danger focus:border-danger focus:ring-danger' : ''}
               ${width}
               ${className}

@@ -74,7 +74,7 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
 
     return (
         <>
-            <form onSubmit={handleSubmit} className="border border-light-gray rounded-xl overflow-hidden">
+            <form onSubmit={handleSubmit} className="border border-pale-gray rounded-xl overflow-hidden">
                 <div className="px-5 py-4 flex flex-col gap-3">
 
                     <div className="flex flex-row gap-3 items-center">
@@ -89,10 +89,10 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                                 textStyle="text-heading-sm"
                                 required
                             />
-                            <p className="text-body-xs text-gray">{t("settings:projects.card.createdAt", { date: formatToNumericDate(project.createdAt) })}</p>
+                            <p className="text-body-xs text-muted-2">{t("settings:projects.card.createdAt", { date: formatToNumericDate(project.createdAt) })}</p>
                         </div>
                         <TrashIcon
-                            className="ml-auto size-4 text-gray hover:text-danger cursor-pointer transition-colors shrink-0"
+                            className="ml-auto size-4 text-muted-2 hover:text-danger cursor-pointer transition-colors shrink-0"
                             strokeWidth={2}
                             onClick={() => setShowDeleteConfirm(true)}
                         />
@@ -140,19 +140,19 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                             <Shimmer width="w-full" height="h-8" radius="rounded-md" />
                         </div>
                     ) : clients.length === 0 && pendingInvitations.length === 0 ? (
-                        <p className="text-body-xs text-gray">{t("settings:projects.card.clients.empty")}</p>
+                        <p className="text-body-xs text-muted-2">{t("settings:projects.card.clients.empty")}</p>
                     ) : (
                         <ul className="flex flex-col gap-1.5">
                             {clients.map((client) => (
-                                <li key={`client-${client.uuid}`} className="flex flex-row items-center gap-3 py-1.5 px-2 rounded-md border border-light-gray">
+                                <li key={`client-${client.uuid}`} className="flex flex-row items-center gap-3 py-1.5 px-2 rounded-md border border-pale-gray">
                                     <div className="flex flex-col flex-1 min-w-0">
                                         <span className="text-body-sm truncate">{client.fullName}</span>
-                                        <span className="text-body-xs text-gray truncate">{client.email}</span>
+                                        <span className="text-body-xs text-muted-2 truncate">{client.email}</span>
                                     </div>
                                     <Tag color="primary" label={t("settings:projects.card.clients.status.active")} className="shrink-0" />
                                     {canManageClients && (
                                         <TrashIcon
-                                            className="size-4 text-gray hover:text-danger cursor-pointer transition-colors shrink-0"
+                                            className="size-4 text-muted-2 hover:text-danger cursor-pointer transition-colors shrink-0"
                                             strokeWidth={2}
                                             onClick={(e) => { e.preventDefault(); setRemovingClient(client); }}
                                         />
@@ -160,15 +160,15 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                                 </li>
                             ))}
                             {pendingInvitations.map((invitation) => (
-                                <li key={`invitation-${invitation.uuid}`} className="flex flex-row items-center gap-3 py-1.5 px-2 rounded-md border border-light-gray">
+                                <li key={`invitation-${invitation.uuid}`} className="flex flex-row items-center gap-3 py-1.5 px-2 rounded-md border border-pale-gray">
                                     <div className="flex flex-col flex-1 min-w-0">
                                         <span className="text-body-sm truncate">{invitation.fullName}</span>
-                                        <span className="text-body-xs text-gray truncate">{invitation.email}</span>
+                                        <span className="text-body-xs text-muted-2 truncate">{invitation.email}</span>
                                     </div>
                                     <Tag color="yellow" label={t("settings:projects.card.clients.status.pending")} className="shrink-0" />
                                     {canManageClients && (
                                         <XMarkIcon
-                                            className="size-4 text-gray hover:text-danger cursor-pointer transition-colors shrink-0"
+                                            className="size-4 text-muted-2 hover:text-danger cursor-pointer transition-colors shrink-0"
                                             strokeWidth={2}
                                             onClick={(e) => { e.preventDefault(); setDeletingInvitation(invitation); }}
                                         />
@@ -182,7 +182,7 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                 </div>
 
                 {hasChanges && (
-                    <div className="border-t border-light-gray px-5 py-3">
+                    <div className="border-t border-pale-gray px-5 py-3">
                         <Button type="submit" style="primary" isLoading={isUpdating} disabled={isUpdating}>
                             <p className="text-sm">{t("actions.save")}</p>
                         </Button>

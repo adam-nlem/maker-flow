@@ -28,10 +28,10 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
                 ref={floatingRef}
                 style={floatingStyles}
                 {...getFloatingProps()}
-                className="z-50 w-90 rounded-xl border border-light-gray shadow-lg bg-clear overflow-hidden"
+                className="z-50 w-90 rounded-xl border border-pale-gray shadow-lg bg-clear overflow-hidden"
             >
                 <div
-                    className="h-20 w-full bg-light-gray"
+                    className="h-20 w-full bg-pale-gray-2"
                     style={agency.accentColor ? { backgroundColor: agency.accentColor } : undefined}
                 />
 
@@ -50,13 +50,13 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
                             {agency.name}
                         </span>
                         {agency.contactEmail && (
-                            <div className="flex flex-row items-center gap-2 text-body-sm text-gray min-w-0">
+                            <div className="flex flex-row items-center gap-2 text-body-sm text-muted-2 min-w-0">
                                 <EnvelopeIcon className="size-4 shrink-0" strokeWidth={1.8} />
                                 <span className="truncate">{agency.contactEmail}</span>
                             </div>
                         )}
                         {agency.website && (
-                            <div className="flex flex-row items-center gap-2 text-body-sm text-gray min-w-0">
+                            <div className="flex flex-row items-center gap-2 text-body-sm text-muted-2 min-w-0">
                                 <GlobeAltIcon className="size-4 shrink-0" strokeWidth={1.8} />
                                 <span className="truncate">{agency.website}</span>
                             </div>
@@ -64,10 +64,10 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
                     </div>
 
                     {user && (
-                        <div className="flex flex-col gap-2 border-t border-light-gray pt-4">
-                            <h3 className="text-body-xs text-gray uppercase">{t("identityModal:sections.account")}</h3>
+                        <div className="flex flex-col gap-2 border-t border-pale-gray pt-4">
+                            <h3 className="text-body-xs text-muted-2 uppercase">{t("identityModal:sections.account")}</h3>
                             <span className="text-heading-sm font-semibold truncate">{user.fullName}</span>
-                            <span className="text-body-sm text-gray truncate">{user.email}</span>
+                            <span className="text-body-sm text-muted-2 truncate">{user.email}</span>
                             {user.displayRole && (
                                 <Tag color="primary" label={t(userRoleTranslationKeys[user.displayRole])} className="self-start" />
                             )}

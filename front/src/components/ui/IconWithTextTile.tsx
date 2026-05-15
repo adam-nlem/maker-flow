@@ -29,10 +29,10 @@ export default function IconWithTextTile({
             onClick={onClick}
         >
             <Icon
-                className={`size-5 shrink-0 ${isSelected ? 'text-dark' : 'text-gray'}`}
+                className={`size-5 shrink-0 ${isSelected ? 'text-dark' : 'text-muted-2'}`}
                 strokeWidth={isBold ? 2 : 1}
             />
-            <h1 className={`${isBold ? 'text-heading-sm' : 'text-body-sm'} whitespace-nowrap ${isSelected ? 'text-dark' : 'text-gray'}`}>
+            <h1 className={`${isBold ? 'text-heading-sm' : 'text-body-sm'} whitespace-nowrap ${isSelected ? 'text-dark' : 'text-muted-2'}`}>
                 {label}
             </h1>
         </div>

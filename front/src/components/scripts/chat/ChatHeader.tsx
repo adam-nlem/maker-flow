@@ -18,12 +18,12 @@ export function ChatHeader({ title, onClose }: ChatHeaderProps) {
   const handleCreateChat = () => setActiveChatUuid(null);
 
   return (
-    <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-light-gray">
+    <div className="flex flex-row items-center justify-between px-4 py-4 border-b border-pale-gray">
       <div className="flex flex-row items-center gap-2">
         <ChatBubbleLeftRightIcon className="size-5 text-primary" strokeWidth={2} />
         <h2 className="text-heading-md">{title}</h2>
       </div>
-      <div className="flex flex-row items-center gap-3 text-gray">
+      <div className="flex flex-row items-center gap-3 text-muted-2">
         <button onClick={handleOpenHistory} className="shrink-0 hover:text-dark transition-colors cursor-pointer" title={t("scripts:chat.header.openHistory")}>
           <ClockIcon className="size-4" strokeWidth={2} />
         </button>

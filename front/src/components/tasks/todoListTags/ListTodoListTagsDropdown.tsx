@@ -101,7 +101,7 @@ export default function ListTodoListTagsDropdown({ anchorRef, todoListUuid, sele
                         <div
                             key={c}
                             onClick={() => setColor(c)}
-                            className={`size-5 rounded cursor-pointer ${colorToBgClass[c]} ${color === c ? 'ring-2 ring-offset-1 ring-gray' : ''}`}
+                            className={`size-5 rounded cursor-pointer ${colorToBgClass[c]} ${color === c ? 'ring-2 ring-offset-1 ring-muted-2' : ''}`}
                         />
                     ))}
                 </div>
@@ -126,7 +126,7 @@ export default function ListTodoListTagsDropdown({ anchorRef, todoListUuid, sele
                 ref={refs.setFloating}
                 style={floatingStyles}
                 {...getFloatingProps()}
-                className="z-70 bg-clear border border-light-gray rounded-lg shadow-md min-w-max p-2 text-center"
+                className="z-70 bg-clear border border-pale-gray rounded-lg shadow-md min-w-max p-2 text-center"
             >
                 <Input
                     ref={inputRef}

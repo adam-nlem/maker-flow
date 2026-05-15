@@ -47,7 +47,7 @@ export default function AgencyHomePage() {
           </div>
           <div className="flex flex-row flex-wrap gap-3">
             {[...Array(3)].map((_, i) => (
-              <div key={i} className="flex flex-row gap-2 border border-light-gray rounded-lg px-3 py-2 items-center">
+              <div key={i} className="flex flex-row gap-2 border border-pale-gray rounded-lg px-3 py-2 items-center">
                 <Shimmer width="w-5" height="h-5" radius="rounded-md" />
                 <Shimmer width="w-7" height="h-7" radius="rounded-full" />
                 <Shimmer width="w-20" height="h-3" />
@@ -97,7 +97,7 @@ export default function AgencyHomePage() {
                 label={t(timePeriodTranslationKeys[timePeriod])}
                 isSelected
                 onClick={onClick}
-                borderColorClassName="border-light-gray"
+                borderColorClassName="border-pale-gray"
               />
             )}
             renderItem={({ item, isSelected, onSelect }) => {
@@ -105,7 +105,7 @@ export default function AgencyHomePage() {
                 label={t(timePeriodTranslationKeys[item])}
                 isSelected
                 onClick={onSelect}
-                borderColorClassName="border-light-gray"
+                borderColorClassName="border-pale-gray"
               /> : null
             }}
           />

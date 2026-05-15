@@ -27,7 +27,7 @@ export default function SettingsPageView({ basePath = agencySettingsPath }: Sett
     return (
         <div className={`flex h-full ${isDesktop ? 'flex-row overflow-hidden' : 'flex-col'}`}>
             {!isDesktop && (
-                <div className="flex flex-row gap-2 overflow-x-auto scrollbar-none px-3 py-3 border-b border-light-gray shrink-0">
+                <div className="flex flex-row gap-2 overflow-x-auto scrollbar-none px-3 py-3 border-b border-pale-gray shrink-0">
                     {visibleSections.map((section) => (
                         <IconWithTextTile
                             key={section}

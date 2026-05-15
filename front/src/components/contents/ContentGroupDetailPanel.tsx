@@ -98,7 +98,7 @@ export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false 
                         <button
                             onClick={() => setShowDeleteConfirmation(true)}
                             disabled={isDeleting}
-                            className="text-gray hover:text-danger transition-colors cursor-pointer disabled:opacity-50"
+                            className="text-muted-2 hover:text-danger transition-colors cursor-pointer disabled:opacity-50"
                         >
                             <TrashIcon className="size-4" strokeWidth={2} />
                         </button>
@@ -136,7 +136,7 @@ export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false 
                         {/* Vue d'ensemble */}
                         {(overviewMetrics.length > 0 || group.engagementByViews !== null) && (
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.overview")}</h3>
+                                <h3 className="text-heading-xs text-muted-2 uppercase">{t("contents:post.overview")}</h3>
                                 <div className="grid grid-cols-3 gap-1">
                                     {overviewMetrics.map((insight) => (
                                         <ContentMetricBox
@@ -158,13 +158,13 @@ export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false 
                         {/* Répartition de l'engagement */}
                         {engagementMetrics.length > 0 && (
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.engagementDistribution")}</h3>
+                                <h3 className="text-heading-xs text-muted-2 uppercase">{t("contents:post.engagementDistribution")}</h3>
                                 <div className="flex flex-row items-center gap-4">
                                     <DonutChart
                                         data={engagementMetrics.map((m) => ({
                                             label: t(postInsightTypeTranslationKeys[m.type]),
                                             value: m.value,
-                                            color: postInsightTypeToEngagementColor[m.type] ?? "var(--color-gray)",
+                                            color: postInsightTypeToEngagementColor[m.type] ?? "var(--color-muted-2)",
                                         }))}
                                         size={120}
                                         centerLabel={formatCompactNumber(totalEngagement)}
@@ -178,12 +178,12 @@ export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false 
                                             return (
                                                 <div key={metric.type} className="flex flex-row items-center justify-between">
                                                     <div className="flex flex-row items-center gap-2">
-                                                        <div className={`size-2.5 rounded-sm ${postInsightTypeToEngagementBgClass[metric.type] ?? "bg-gray"}`} />
+                                                        <div className={`size-2.5 rounded-sm ${postInsightTypeToEngagementBgClass[metric.type] ?? "bg-muted-2"}`} />
                                                         <span className="text-body-xs">{t(postInsightTypeTranslationKeys[metric.type])}</span>
                                                     </div>
                                                     <div className="flex flex-row items-center gap-2">
                                                         <span className="text-heading-xs">{formatCompactNumber(metric.value)}</span>
-                                                        <span className="text-body-xs text-gray">{pct}%</span>
+                                                        <span className="text-body-xs text-muted-2">{pct}%</span>
                                                     </div>
                                                 </div>
                                             )
@@ -197,18 +197,18 @@ export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false 
                         {likesValue !== null && dislikesValue !== null && (
                             <div className="flex flex-col gap-1.5">
                                 <div className="flex flex-row items-center justify-between">
-                                    <span className="text-body-xs text-gray">{t("contents:post.likeRatio")}</span>
+                                    <span className="text-body-xs text-muted-2">{t("contents:post.likeRatio")}</span>
                                     <span className="text-heading-xs">{likePercentage.toLocaleString("fr-FR", { maximumFractionDigits: 1 })}%</span>
                                 </div>
-                                <div className="w-full h-2 bg-light-gray rounded-full">
+                                <div className="w-full h-2 bg-pale-gray-2 rounded-full">
                                     <div
                                         className="h-full bg-primary rounded-full"
                                         style={{ width: `${likePercentage}%` }}
                                     />
                                 </div>
                                 <div className="flex flex-row justify-between">
-                                    <span className="text-body-xs text-gray">{t("contents:post.likesPositive", { count: likesValue })}</span>
-                                    <span className="text-body-xs text-gray">{t("contents:post.dislikesNegative", { count: dislikesValue })}</span>
+                                    <span className="text-body-xs text-muted-2">{t("contents:post.likesPositive", { count: likesValue })}</span>
+                                    <span className="text-body-xs text-muted-2">{t("contents:post.dislikesNegative", { count: dislikesValue })}</span>
                                 </div>
                             </div>
                         )}
@@ -216,7 +216,7 @@ export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false 
                         {/* Abonnés */}
                         {followerMetrics.length > 0 && (
                             <div className="flex flex-col gap-2">
-                                <h3 className="text-heading-xs text-gray uppercase">{t("contents:post.followers")}</h3>
+                                <h3 className="text-heading-xs text-muted-2 uppercase">{t("contents:post.followers")}</h3>
                                 <div className="grid grid-cols-3 gap-1">
                                     {gainedInsight && (
                                         <ContentMetricBox
@@ -242,9 +242,9 @@ export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false 
 
                         {/* Script section */}
                         <div className="flex flex-col gap-2">
-                            <h3 className="text-heading-xs text-gray uppercase">{t("contents:group.scriptHeader")}</h3>
+                            <h3 className="text-heading-xs text-muted-2 uppercase">{t("contents:group.scriptHeader")}</h3>
                             {group.script ? (
-                                <div className="flex flex-row items-center justify-between gap-2 border border-light-gray rounded-md p-2">
+                                <div className="flex flex-row items-center justify-between gap-2 border border-pale-gray rounded-md p-2">
                                     <div className="flex flex-row items-center gap-1.5 min-w-0">
                                         <DocumentTextIcon className="size-3.5 text-primary shrink-0" strokeWidth={2} />
                                         <span className="text-body-xs text-primary truncate">{group.script.title}</span>
@@ -253,21 +253,21 @@ export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false 
                                         <button
                                             onClick={handleUnlinkScript}
                                             disabled={isUpdating}
-                                            className="text-gray hover:text-danger transition-colors cursor-pointer text-body-xs whitespace-nowrap disabled:opacity-50"
+                                            className="text-muted-2 hover:text-danger transition-colors cursor-pointer text-body-xs whitespace-nowrap disabled:opacity-50"
                                         >
                                             {t("contents:group.unlinkScript")}
                                         </button>
                                     )}
                                 </div>
                             ) : (
-                                <p className="text-body-xs text-gray">{t("contents:group.noScript")}</p>
+                                <p className="text-body-xs text-muted-2">{t("contents:group.noScript")}</p>
                             )}
                         </div>
 
                         {/* Posts list */}
                         <div className="flex flex-col gap-2">
                             <div className="flex flex-row items-center justify-between">
-                                <h3 className="text-heading-xs text-gray uppercase">
+                                <h3 className="text-heading-xs text-muted-2 uppercase">
                                     {t("contents:group.postsHeader", { count: group.postGroup.posts.length })}
                                 </h3>
                                 {!isReadOnly && (
@@ -294,7 +294,7 @@ export default function ContentGroupDetailPanel({ groupUuid, isReadOnly = false 
                                     />
                                 ))}
                                 {group.postGroup.posts.length === 0 && (
-                                    <p className="text-body-xs text-gray">{t("contents:group.noPostsInGroup")}</p>
+                                    <p className="text-body-xs text-muted-2">{t("contents:group.noPostsInGroup")}</p>
                                 )}
                             </div>
                         </div>

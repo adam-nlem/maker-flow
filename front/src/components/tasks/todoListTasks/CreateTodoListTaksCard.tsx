@@ -44,7 +44,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
     };
 
     return (
-        <div className="border border-light-gray rounded-lg p-2 flex flex-col gap-3">
+        <div className="border border-pale-gray rounded-lg p-2 flex flex-col gap-3">
             <Input
                 placeholder={t("tasks:task.titlePlaceholder")}
                 id="title"
@@ -123,7 +123,7 @@ export default function CreateTodoListTaskCard({ todoListUuid, onTaskCreated }: 
                     <Badge
                         icon={CalendarDateRangeIcon}
                         label={dueDate.toLocaleDateString('fr-FR')}
-                        textColor="text-gray"
+                        textColor="text-muted-2"
                         onRemoveClick={() => setDueDate(undefined)}
                         onClick={() => setShowDueDateDropdown(!showDueDateDropdown)}
                     />

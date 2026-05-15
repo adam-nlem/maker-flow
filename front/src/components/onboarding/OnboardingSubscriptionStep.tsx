@@ -26,7 +26,7 @@ export default function OnboardingSubscriptionStep() {
                         <h3 className="text-heading-xl text-dark mb-2">
                             {t("onboarding:subscriptionStep.activatedTitle", { plan: t(subscriptionPlanTranslationKeys[subscription.plan]) })}
                         </h3>
-                        <p className="text-body-sm text-gray">
+                        <p className="text-body-sm text-muted-2">
                             {t("onboarding:subscriptionStep.activatedSubtitle")}
                         </p>
 

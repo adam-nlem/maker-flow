@@ -15,7 +15,7 @@ export default function ContentGroupCard({ postGroupDTO, onClick }: ContentGroup
     const extraCount = postGroupDTO.postUuids.length - 3
 
     return (
-        <div className="w-55 flex flex-col gap-1 cursor-pointer bg-light-gray/30 rounded-lg border border-light-gray"
+        <div className="w-55 flex flex-col gap-1 cursor-pointer bg-pale-gray-2/30 rounded-lg border border-pale-gray"
             onClick={onClick}>
             <div className="grid grid-cols-2 grid-rows-2 gap-0.5 h-50 rounded-t-lg overflow-hidden">
                 <PostThumbnail postUuid={displayUuids[0]} className="row-span-2" />
@@ -33,7 +33,7 @@ export default function ContentGroupCard({ postGroupDTO, onClick }: ContentGroup
             </div>
 
             <div className="p-1 flex flex-col gap-1">
-                <p className="text-body-xs text-gray whitespace-nowrap">
+                <p className="text-body-xs text-muted-2 whitespace-nowrap">
                     {formatToFrenchDateShort(postGroupDTO.createdAt)}
                 </p>
 

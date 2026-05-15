@@ -53,16 +53,16 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
                 <div className="flex flex-row items-center gap-1">
                     <button
                         onClick={goToPrevMonth}
-                        className="p-1.5 hover:bg-light-gray rounded-md transition-colors cursor-pointer"
+                        className="p-1.5 hover:bg-pale-gray-2 rounded-md transition-colors cursor-pointer"
                     >
-                        <ChevronLeftIcon className="size-5 text-gray" />
+                        <ChevronLeftIcon className="size-5 text-muted-2" />
                     </button>
                     <Pill label={t("scripts:calendar.today")} isSelected={isCurrentMonth} onClick={goToToday} textColorClassName="text-primary" bgColorClassName="bg-primary/10" borderColorClassName="border border-primary/30" />
                     <button
                         onClick={goToNextMonth}
-                        className="p-1.5 hover:bg-light-gray rounded-md transition-colors cursor-pointer"
+                        className="p-1.5 hover:bg-pale-gray-2 rounded-md transition-colors cursor-pointer"
                     >
-                        <ChevronRightIcon className="size-5 text-gray" />
+                        <ChevronRightIcon className="size-5 text-muted-2" />
                     </button>
                 </div>
             </div>
@@ -88,19 +88,19 @@ export default function ScriptCalendar({ projectUuid }: ScriptCalendarProps) {
             ) : (
                 <div className="flex flex-col flex-1 min-h-0">
                     {/* Day headers */}
-                    <div className="grid grid-cols-7 border-t border-l border-light-gray">
+                    <div className="grid grid-cols-7 border-t border-l border-pale-gray">
                         {DAYS_FR.map((dayName) => (
-                            <div key={dayName} className="text-center text-heading-xs text-gray py-2 border-b border-r border-light-gray">
+                            <div key={dayName} className="text-center text-heading-xs text-muted-2 py-2 border-b border-r border-pale-gray">
                                 {dayName}
                             </div>
                         ))}
                     </div>
 
                     {/* Day grid */}
-                    <div className="grid grid-cols-7 auto-rows-fr flex-1 min-h-0 border-l border-light-gray">
+                    <div className="grid grid-cols-7 auto-rows-fr flex-1 min-h-0 border-l border-pale-gray">
                         {days.map((day, index) => {
                             if (day === null) {
-                                return <div key={`empty-${index}`} className="border-b border-r border-light-gray" />;
+                                return <div key={`empty-${index}`} className="border-b border-r border-pale-gray" />;
                             }
 
                             const date = new Date(currentYear, currentMonth, day);

@@ -21,7 +21,7 @@ export default function HomeViewsEvolutionChart({ viewsTimeline }: HomeViewsEvol
         }));
 
     return (
-        <div className="border border-light-gray rounded-lg p-3">
+        <div className="border border-pale-gray rounded-lg p-3">
             <h2 className="text-heading-sm mb-3">{t("home:viewsEvolution.title")}</h2>
             <MultiLineChart series={series} />
         </div>

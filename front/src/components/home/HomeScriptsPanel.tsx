@@ -45,10 +45,10 @@ export default function HomeScriptsPanel({ projectUuid }: HomeScriptsPanelProps)
     };
 
     return (
-        <div className="w-full md:w-1/2 shrink-0 flex flex-col border border-light-gray rounded-lg bg-clear overflow-hidden">
-            <div className="flex flex-row items-center justify-between px-4 py-3 border-b border-light-gray">
+        <div className="w-full md:w-1/2 shrink-0 flex flex-col border border-pale-gray rounded-lg bg-clear overflow-hidden">
+            <div className="flex flex-row items-center justify-between px-4 py-3 border-b border-pale-gray">
                 <div className="flex flex-row items-center gap-2">
-                    <DocumentTextIcon className="size-5 text-gray" strokeWidth={2} />
+                    <DocumentTextIcon className="size-5 text-muted-2" strokeWidth={2} />
                     <h2 className="text-heading-md">{t("home:scripts.header")}</h2>
                 </div>
                 {!isLimitReached && (
@@ -82,7 +82,7 @@ export default function HomeScriptsPanel({ projectUuid }: HomeScriptsPanelProps)
                 <>
                     <HomeScriptsPanelStatsBar counts={counts} />
                     {scripts.length === 0 ? (
-                        <div className="flex flex-col items-center justify-center py-12 px-4 text-gray">
+                        <div className="flex flex-col items-center justify-center py-12 px-4 text-muted-2">
                             <p className="text-body-sm text-center">{t("home:scripts.noScripts")}</p>
                             <p className="text-body-xs text-center mt-1">{t("home:scripts.newScriptHint")}</p>
                         </div>

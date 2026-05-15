@@ -12,7 +12,7 @@ export function ToggleChip({ label, isSelected, onToggle }: ToggleChipProps) {
             onClick={onToggle}
             className={`px-3 py-1 border ${isSelected
                 ? 'bg-primary text-white text-heading-xs'
-                : 'text-body-xs border-light-gray hover:bg-light-gray'
+                : 'text-body-xs border-pale-gray hover:bg-pale-gray-2'
                 }  rounded-full cursor-pointer whitespace-nowrap transition-colors
                 flex flex-row gap-1
                 `}

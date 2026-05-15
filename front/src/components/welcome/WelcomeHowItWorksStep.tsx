@@ -47,7 +47,7 @@ export default function WelcomeHowItWorksStep() {
                                 {step.number}
                             </div>
                             <h3 className="text-heading-sm text-dark mb-1">{t(`welcome:howItWorks.${step.key}.title`)}</h3>
-                            <p className="text-body-sm text-gray">{t(`welcome:howItWorks.${step.key}.description`)}</p>
+                            <p className="text-body-sm text-muted-2">{t(`welcome:howItWorks.${step.key}.description`)}</p>
                         </div>
                     </Fragment>
                 ))}

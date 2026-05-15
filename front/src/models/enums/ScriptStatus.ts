@@ -22,7 +22,7 @@ export const scriptStatusTranslationKeys: Record<ScriptStatus, string> = {
 }
 
 export const scriptStatusToBgClass: Record<ScriptStatus, string> = {
-    [ScriptStatus.Idea]: "bg-gray/10",
+    [ScriptStatus.Idea]: "bg-muted-2/10",
     [ScriptStatus.Scripting]: "bg-purple/10",
     [ScriptStatus.Shooting]: "bg-blue/10",
     [ScriptStatus.Editing]: "bg-yellow/10",
@@ -31,7 +31,7 @@ export const scriptStatusToBgClass: Record<ScriptStatus, string> = {
 }
 
 export const scriptStatusToBorderClass: Record<ScriptStatus, string> = {
-    [ScriptStatus.Idea]: "border border-gray/30",
+    [ScriptStatus.Idea]: "border border-muted-2/30",
     [ScriptStatus.Scripting]: "border border-purple/30",
     [ScriptStatus.Shooting]: "border border-blue/30",
     [ScriptStatus.Editing]: "border border-yellow/30",
@@ -40,7 +40,7 @@ export const scriptStatusToBorderClass: Record<ScriptStatus, string> = {
 }
 
 export const scriptStatusToTextClass: Record<ScriptStatus, string> = {
-    [ScriptStatus.Idea]: "text-gray",
+    [ScriptStatus.Idea]: "text-muted-2",
     [ScriptStatus.Scripting]: "text-purple",
     [ScriptStatus.Shooting]: "text-blue",
     [ScriptStatus.Editing]: "text-yellow",

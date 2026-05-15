@@ -1,7 +1,9 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
+import { ArrowRightIcon, EnvelopeIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
+import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { useLogin } from "~/hooks/api/users/useLogin"
 import { OtpType } from "~/models/enums/OtpType"
 import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore"
@@ -9,15 +11,17 @@ import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore"
 interface LoginFormProps {
     onLoginSuccess: () => void
     onOtpRequired: (data: { pendingOtpToken: string; otpType: OtpType; email: string }) => void
+    onForgotPassword?: () => void
     initialEmail?: string
 }
 
-export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail = "" }: LoginFormProps) {
+export default function LoginForm({ onLoginSuccess, onOtpRequired, onForgotPassword, initialEmail = "" }: LoginFormProps) {
     const { t } = useTranslation()
     const setStoredEmail = useAuthPrefillStore((s) => s.setEmail)
 
     const [email, setEmail] = useState(initialEmail)
     const [password, setPassword] = useState("")
+    const [showPassword, setShowPassword] = useState(false)
 
     const { login, isPending } = useLogin()
 
@@ -44,39 +48,57 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, initialEmail 
     }
 
     return (
-        <>
-            <form className="space-y-4" onSubmit={handleSubmit}>
-                <Input
-                    label={t("auth:fields.email")}
-                    id="email"
-                    name="email"
-                    type="email"
-                    autoComplete="email"
-                    required
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                />
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+            <Input
+                label={t("auth:fields.email")}
+                id="email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                icon={<EnvelopeIcon className="size-4 text-muted-2" />}
+            />
 
-                <Input
-                    label={t("auth:fields.password")}
-                    id="password"
-                    name="password"
-                    type="password"
-                    autoComplete="current-password"
-                    required
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+            <Input
+                label={t("auth:fields.password")}
+                labelRight={onForgotPassword && (
+                    <SimpleTextButton onClick={onForgotPassword} color="text-muted" hoverColor="hover:text-dark">
+                        <span className="text-body-xs">{t("auth:login.forgotPassword")}</span>
+                    </SimpleTextButton>
+                )}
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                trailingIcon={
+                    <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="text-muted-2 hover:text-dark transition-colors"
+                    >
+                        {showPassword
+                            ? <EyeSlashIcon className="size-4" />
+                            : <EyeIcon className="size-4" />}
+                    </button>
+                }
+            />
 
-                <Button
-                    type="submit"
-                    style="primary"
-                    isLoading={isPending}
-                    disabled={isPending}
-                >
-                    {t("auth:login.submit")}
-                </Button>
-            </form>
-        </>
+            <Button
+                type="submit"
+                style="primary"
+                width="w-full"
+                height="h-11"
+                isLoading={isPending}
+                disabled={isPending}
+            >
+                <span>{t("auth:login.submit")}</span>
+                <ArrowRightIcon className="size-4" />
+            </Button>
+        </form>
     )
 }

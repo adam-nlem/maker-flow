@@ -14,14 +14,14 @@ export default function TermsOfServicePage() {
             <div className="max-w-3xl mx-auto px-6 py-12">
                 <button
                     onClick={() => navigate(homePath)}
-                    className="flex items-center gap-2 text-gray hover:text-dark transition-colors mb-8 cursor-pointer"
+                    className="flex items-center gap-2 text-muted-2 hover:text-dark transition-colors mb-8 cursor-pointer"
                 >
                     <ArrowLeftIcon className="size-4" />
                     <span className="text-body-sm">{t("common:actions.back")}</span>
                 </button>
 
                 <h1 className="text-heading-3xl text-dark mb-2">{t("terms:title")}</h1>
-                <p className="text-body-sm text-gray mb-10">
+                <p className="text-body-sm text-muted-2 mb-10">
                     {t("terms:lastUpdated", { date: t("terms:lastUpdatedDate") })}
                 </p>
 
@@ -115,7 +115,7 @@ export default function TermsOfServicePage() {
                     </Section>
                 </div>
 
-                <div className="mt-12 pt-6 border-t border-light-gray">
+                <div className="mt-12 pt-6 border-t border-pale-gray">
                     <Button
                         style="outline"
                         width="w-auto"
@@ -133,7 +133,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     return (
         <section className="flex flex-col gap-3">
             <h2 className="text-heading-xl text-dark">{title}</h2>
-            <div className="flex flex-col gap-3 text-body-base text-gray [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-1.5">
+            <div className="flex flex-col gap-3 text-body-base text-muted-2 [&_ul]:list-disc [&_ul]:pl-5 [&_ul]:flex [&_ul]:flex-col [&_ul]:gap-1.5">
                 {children}
             </div>
         </section>

@@ -53,30 +53,30 @@ export function DatePicker({ selectedDate, onDateSelected, minDate }: DatePicker
     }
 
     return (
-        <div className="bg-clear border border-light-gray rounded-lg shadow-md p-3 min-w-[280px]">
+        <div className="bg-clear border border-pale-gray rounded-lg shadow-md p-3 min-w-[280px]">
             {/* Header */}
             <div className="flex items-center justify-between mb-3">
                 <button
                     onClick={handlePrevMonth}
-                    className="p-1 hover:bg-light-gray rounded-md transition-colors"
+                    className="p-1 hover:bg-pale-gray-2 rounded-md transition-colors"
                 >
-                    <ChevronLeftIcon className="size-4 text-gray" />
+                    <ChevronLeftIcon className="size-4 text-muted-2" />
                 </button>
                 <span className="text-sm font-medium text-dark">
                     {MONTHS_FR[currentMonth]} {currentYear}
                 </span>
                 <button
                     onClick={handleNextMonth}
-                    className="p-1 hover:bg-light-gray rounded-md transition-colors"
+                    className="p-1 hover:bg-pale-gray-2 rounded-md transition-colors"
                 >
-                    <ChevronRightIcon className="size-4 text-gray" />
+                    <ChevronRightIcon className="size-4 text-muted-2" />
                 </button>
             </div>
 
             {/* Day names */}
             <div className="grid grid-cols-7 gap-1 mb-2">
                 {DAYS_FR.map((day) => (
-                    <div key={day} className="text-center text-xs text-gray font-medium py-1">
+                    <div key={day} className="text-center text-xs text-muted-2 font-medium py-1">
                         {day}
                     </div>
                 ))}
@@ -101,7 +101,7 @@ export function DatePicker({ selectedDate, onDateSelected, minDate }: DatePicker
                             disabled={isPast}
                             className={`
                                 w-8 h-8 text-xs rounded-md transition-colors
-                                ${isPast ? 'text-light-gray cursor-not-allowed' : 'hover:bg-light-gray cursor-pointer'}
+                                ${isPast ? 'text-muted-2 cursor-not-allowed' : 'hover:bg-pale-gray-2 cursor-pointer'}
                                 ${isToday && !isSelected ? 'text-primary font-semibold' : ''}
                                 ${isSelected ? 'bg-primary text-white' : 'text-dark'}
                             `}
