@@ -6,7 +6,7 @@ import { privacyPolicyPath, termsOfServicePath } from "~/routes/routePaths";
 
 interface SidebarShellProps {
     topSection: ReactNode;
-    bottomNav: ReactNode;
+    bottomNav?: ReactNode;
     identityTile?: ReactNode;
 }
 
@@ -21,9 +21,11 @@ export default function SidebarShell({ topSection, bottomNav, identityTile }: Si
             </div>
 
             <div>
-                <div className="mb-5 flex flex-col p-3">
-                    {bottomNav}
-                </div>
+                {bottomNav && (
+                    <div className="mb-5 flex flex-col p-3">
+                        {bottomNav}
+                    </div>
+                )}
 
                 <div className="border-t border-pale-gray rounded w-full"></div>
 

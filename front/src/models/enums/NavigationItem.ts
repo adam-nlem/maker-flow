@@ -1,7 +1,7 @@
 import type { ComponentType, SVGProps } from "react";
-import { CalendarDaysIcon, ChartBarIcon, ClipboardDocumentCheckIcon, Cog6ToothIcon, DocumentDuplicateIcon, HomeIcon } from "@heroicons/react/24/outline";
-import { CalendarDaysIcon as CalendarDaysIconSolid, ChartBarIcon as ChartBarIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid, Cog6ToothIcon as Cog6ToothIconSolid, DocumentDuplicateIcon as DocumentDuplicateIconSolid, HomeIcon as HomeIconSolid } from "@heroicons/react/24/solid";
-import { agencyHomePath, agencyScriptsPath, agencyCalendarPath, agencyDraftsPath, agencyContentsPath, agencyTasksPath, agencySettingsPath } from "~/routes/routePaths";
+import { CalendarDaysIcon, ChartBarIcon, ClipboardDocumentCheckIcon, DocumentDuplicateIcon, HomeIcon } from "@heroicons/react/24/outline";
+import { CalendarDaysIcon as CalendarDaysIconSolid, ChartBarIcon as ChartBarIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid, DocumentDuplicateIcon as DocumentDuplicateIconSolid, HomeIcon as HomeIconSolid } from "@heroicons/react/24/solid";
+import { agencyHomePath, agencyScriptsPath, agencyCalendarPath, agencyDraftsPath, agencyContentsPath, agencyTasksPath } from "~/routes/routePaths";
 
 export enum NavigationItem {
     Home = 'home',
@@ -10,7 +10,6 @@ export enum NavigationItem {
     Drafts = 'drafts',
     Contents = 'contents',
     Tasks = 'tasks',
-    Settings = 'settings',
 }
 
 export const navigationItemOptions = Object.values(NavigationItem);
@@ -23,10 +22,6 @@ export const sidebarMainNavigationItems: NavigationItem[] = [
     NavigationItem.Contents,
 ];
 
-export const sidebarBottomNavigationItems: NavigationItem[] = [
-    NavigationItem.Settings,
-];
-
 export const navigationItemTranslationKeys: Record<NavigationItem, string> = {
     [NavigationItem.Home]: "navigation:items.home",
     [NavigationItem.Scripts]: "navigation:items.scripts",
@@ -34,7 +29,6 @@ export const navigationItemTranslationKeys: Record<NavigationItem, string> = {
     [NavigationItem.Drafts]: "navigation:items.drafts",
     [NavigationItem.Contents]: "navigation:items.contents",
     [NavigationItem.Tasks]: "navigation:items.tasks",
-    [NavigationItem.Settings]: "navigation:items.settings",
 }
 
 export const navigationItemToPath: Record<NavigationItem, string> = {
@@ -44,7 +38,6 @@ export const navigationItemToPath: Record<NavigationItem, string> = {
     [NavigationItem.Drafts]: agencyDraftsPath,
     [NavigationItem.Contents]: agencyContentsPath,
     [NavigationItem.Tasks]: agencyTasksPath,
-    [NavigationItem.Settings]: agencySettingsPath,
 }
 
 export const navigationItemToIcon: Record<NavigationItem, ComponentType<SVGProps<SVGSVGElement>>> = {
@@ -54,7 +47,6 @@ export const navigationItemToIcon: Record<NavigationItem, ComponentType<SVGProps
     [NavigationItem.Drafts]: DocumentDuplicateIcon,
     [NavigationItem.Contents]: ChartBarIcon,
     [NavigationItem.Tasks]: ClipboardDocumentCheckIcon,
-    [NavigationItem.Settings]: Cog6ToothIcon,
 }
 
 export const navigationItemToIconSolid: Record<NavigationItem, ComponentType<SVGProps<SVGSVGElement>>> = {
@@ -64,5 +56,4 @@ export const navigationItemToIconSolid: Record<NavigationItem, ComponentType<SVG
     [NavigationItem.Drafts]: DocumentDuplicateIconSolid,
     [NavigationItem.Contents]: ChartBarIconSolid,
     [NavigationItem.Tasks]: ClipboardDocumentCheckIconSolid,
-    [NavigationItem.Settings]: Cog6ToothIconSolid,
 }

@@ -2,7 +2,6 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useShowProject } from "~/hooks/api/projects/useShowProject";
-import { useApplyAgencyTheme } from "~/hooks/useApplyAgencyTheme";
 import { HttpException } from "~/services/httpClient/HttpException";
 import ClientDesktopSidebar from "./sidebar/ClientDesktopSidebar";
 import ClientMobileSidebar from "./sidebar/ClientMobileSidebar";
@@ -16,9 +15,7 @@ export default function ClientShellLayout() {
     const isDesktop = useIsDesktop();
     const { user } = useCurrentUser();
     const projectUuid = useFocusProjectStore((state) => state.focusedProjectUuid);
-    const { project, error: projectError } = useShowProject(projectUuid);
-
-    useApplyAgencyTheme(project?.agency);
+    const { error: projectError } = useShowProject(projectUuid);
 
     if (user && !user.isClient) {
         return <Navigate to={agencyHomePath} replace />;

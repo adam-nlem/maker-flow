@@ -2,12 +2,10 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
     HomeIcon,
-    Cog6ToothIcon,
     RectangleStackIcon,
 } from "@heroicons/react/24/outline";
 import {
     HomeIcon as HomeIconSolid,
-    Cog6ToothIcon as Cog6ToothIconSolid,
     RectangleStackIcon as RectangleStackIconSolid,
 } from "@heroicons/react/24/solid";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
@@ -25,8 +23,6 @@ import IdentityTile from "~/components/sidebar/IdentityTile";
 import {
     clientHomePath,
     clientContentsPath,
-    clientSettingsGeneralPath,
-    clientSettingsPath,
 } from "~/routes/routePaths";
 
 export default function ClientDesktopSidebar() {
@@ -42,7 +38,6 @@ export default function ClientDesktopSidebar() {
     const agency = project?.agency ?? null;
     const isHomeSelected = location.pathname === clientHomePath;
     const isContentsSelected = location.pathname === clientContentsPath;
-    const isSettingsSelected = location.pathname.startsWith(clientSettingsPath);
 
     const identityTile = isLoadingProject ? (
         <div className="p-2">
@@ -91,19 +86,9 @@ export default function ClientDesktopSidebar() {
         </>
     );
 
-    const bottomNav = (
-        <IconWithTextTile
-            icon={isSettingsSelected ? Cog6ToothIconSolid : Cog6ToothIcon}
-            label={t("navigation:items.settings")}
-            isBold={false}
-            isSelected={isSettingsSelected}
-            onClick={() => navigate(clientSettingsGeneralPath)}
-        />
-    );
-
     return (
         <>
-            <SidebarShell topSection={topSection} bottomNav={bottomNav} identityTile={identityTile} />
+            <SidebarShell topSection={topSection} identityTile={identityTile} />
             <IntegrationLoginModal />
         </>
     );

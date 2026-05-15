@@ -7,7 +7,6 @@ import Shimmer from "~/components/ui/Shimmer"
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser"
 import { useLogout } from "~/hooks/api/users/useLogout"
 import { useShowInvitation } from "~/hooks/api/invitations/useShowInvitation"
-import { useApplyAgencyTheme } from "~/hooks/useApplyAgencyTheme"
 import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages"
 import { InvitationType } from "~/models/enums/InvitationType"
 import { userRoleTranslationKeys } from "~/models/enums/UserRole"
@@ -26,8 +25,6 @@ export default function InviteSetupPageView({ token }: InviteSetupPageViewProps)
     const { invitation, isLoading: isLoadingInvitation, error: invitationError } = useShowInvitation(
         !isLoadingUser && !isAuthenticated ? token : null,
     )
-
-    useApplyAgencyTheme(invitation?.agency)
 
     if (isLoadingUser || (!isAuthenticated && isLoadingInvitation)) {
         return (

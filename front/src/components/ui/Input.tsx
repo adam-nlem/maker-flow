@@ -35,7 +35,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     } else {
       const left = hasIcon ? 'pl-10' : 'pl-3.5';
       const right = hasTrailingIcon ? 'pr-10' : 'pr-3.5';
-      spacingClasses = `py-2.5 ${left} ${right}`;
+      spacingClasses = `py-1 ${left} ${right}`;
     }
 
     const inputElement = <input ref={ref} autoComplete={autoComplete} className={`

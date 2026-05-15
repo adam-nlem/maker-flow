@@ -1,5 +1,6 @@
 import { useTranslation } from "react-i18next";
-import { EnvelopeIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
+import { useNavigate } from "react-router-dom";
+import { ArrowRightStartOnRectangleIcon, Cog6ToothIcon, EnvelopeIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import { FloatingPortal } from "@floating-ui/react";
 import type { CSSProperties } from "react";
 import { Button } from "~/components/ui/Button";
@@ -8,6 +9,7 @@ import AgencyLogo from "~/components/agency/AgencyLogo";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useLogout } from "~/hooks/api/users/useLogout";
 import { userRoleTranslationKeys } from "~/models/enums/UserRole";
+import { agencySettingsGeneralPath, clientSettingsGeneralPath } from "~/routes/routePaths";
 import type { Agency } from "~/models/Agency";
 
 interface IdentityModalProps {
@@ -19,8 +21,11 @@ interface IdentityModalProps {
 
 export default function IdentityModal({ agency, floatingRef, floatingStyles, getFloatingProps }: IdentityModalProps) {
     const { t } = useTranslation();
+    const navigate = useNavigate();
     const { user } = useCurrentUser();
     const { logout, isPending } = useLogout();
+
+    const settingsPath = user?.isClient ? clientSettingsGeneralPath : agencySettingsGeneralPath;
 
     return (
         <FloatingPortal>
@@ -30,10 +35,7 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
                 {...getFloatingProps()}
                 className="z-50 w-90 rounded-xl border border-pale-gray shadow-lg bg-clear overflow-hidden"
             >
-                <div
-                    className="h-20 w-full bg-pale-gray-2"
-                    style={agency.accentColor ? { backgroundColor: agency.accentColor } : undefined}
-                />
+                <div className="h-20 w-full bg-pale-gray-2" />
 
                 <div className="px-5 -mt-10">
                     <div className="inline-block rounded-md bg-clear p-1">
@@ -43,10 +45,7 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
 
                 <div className="flex flex-col gap-5 p-5 pt-3">
                     <div className="flex flex-col gap-2 min-w-0">
-                        <span
-                            className="text-heading-md font-semibold truncate"
-                            style={agency.accentColor ? { color: agency.accentColor } : undefined}
-                        >
+                        <span className="text-heading-md font-semibold truncate">
                             {agency.name}
                         </span>
                         {agency.contactEmail && (
@@ -74,9 +73,18 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
                         </div>
                     )}
 
-                    <Button type="button" style="danger" onClick={() => { void logout(); }} isLoading={isPending} disabled={isPending}>
-                        <p className="text-sm">{t("identityModal:logout")}</p>
-                    </Button>
+                    <div className="flex flex-col gap-3 mt-5">
+
+
+                        <Button type="button" style="secondary" onClick={() => navigate(settingsPath)}>
+                            <Cog6ToothIcon className="size-4" strokeWidth={1.8} />
+                            <p className="text-sm">{t("identityModal:settings")}</p>
+                        </Button>
+                        <Button type="button" style="danger" onClick={() => { void logout(); }} isLoading={isPending} disabled={isPending}>
+                            <ArrowRightStartOnRectangleIcon className="size-4" strokeWidth={1.8} />
+                            <p className="text-sm">{t("identityModal:logout")}</p>
+                        </Button>
+                    </div>
                 </div>
             </div>
         </FloatingPortal>

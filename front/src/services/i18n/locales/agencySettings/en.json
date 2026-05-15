@@ -1,36 +1,18 @@
 {
     "subtitle": "Customize your agency identity.",
     "sections": {
-        "identity": "Brand identity",
-        "colors": "Colors",
-        "typography": "Typography"
+        "identity": "Brand identity"
     },
     "fields": {
         "namePlaceholder": "Your agency name",
         "contactEmailPlaceholder": "hello@your-agency.com",
-        "websitePlaceholder": "https://your-agency.com",
-        "accentColor": "Accent color",
-        "backgroundColor": "Background color",
-        "backgroundSecondaryColor": "Secondary background",
-        "textColor": "Text color",
-        "textSecondaryColor": "Secondary text",
-        "headingFont": "Heading font",
-        "bodyFont": "Body font",
-        "fontPlaceholder": "Use default"
+        "websitePlaceholder": "https://your-agency.com"
     },
-    "colorPickerAriaLabel": "Pick a color",
     "logo": {
         "hint": "PNG. 5 MB max."
     },
     "validation": {
         "nameRequired": "Agency name is required.",
-        "accentColorFormat": "The accent color must be a 6-digit hex code (e.g. #43CEA9).",
-        "backgroundColorFormat": "The background color must be a 6-digit hex code (e.g. #141115).",
-        "backgroundSecondaryColorFormat": "The secondary background must be a 6-digit hex code.",
-        "textColorFormat": "The text color must be a 6-digit hex code.",
-        "textSecondaryColorFormat": "The secondary text color must be a 6-digit hex code.",
-        "headingFontInvalid": "Heading font is not in the allowed list.",
-        "bodyFontInvalid": "Body font is not in the allowed list.",
         "contactEmailFormat": "The contact email is invalid.",
         "websiteFormat": "The website URL must start with http:// or https://.",
         "logoMimeType": "The logo must be a PNG image.",

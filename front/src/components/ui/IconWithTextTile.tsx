@@ -16,23 +16,20 @@ interface IconWithTextTileProps {
 export default function IconWithTextTile({
     icon: Icon,
     label,
-    isBold = false,
     isSelected = false,
-    activeBgClassName = "bg-primary/10",
-    activeBorderClassName = "border border-primary/30",
     className = "",
     onClick,
 }: IconWithTextTileProps) {
     return (
         <div
-            className={`flex flex-row items-center gap-3 cursor-pointer rounded-lg p-2 ${isSelected ? `${activeBgClassName} ${activeBorderClassName}` : 'hover:bg-surface-hover border border-transparent'} ${className}`}
+            className={`${isSelected ? 'text-primary' : 'text-dark-2'} flex flex-row items-center gap-3 cursor-pointer rounded-lg p-2  hover:bg-surface-hover border border-transparent ${className}`}
             onClick={onClick}
         >
             <Icon
-                className={`size-5 shrink-0 ${isSelected ? 'text-dark' : 'text-muted-2'}`}
-                strokeWidth={isBold ? 2 : 1}
+                className={"size-5 shrink-0"}
+                strokeWidth={1.5}
             />
-            <h1 className={`${isBold ? 'text-heading-sm' : 'text-body-sm'} whitespace-nowrap ${isSelected ? 'text-dark' : 'text-muted-2'}`}>
+            <h1 className={`${isSelected ? 'text-heading-xs' : 'text-body-xs'} whitespace-nowrap `}>
                 {label}
             </h1>
         </div>

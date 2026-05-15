@@ -9,7 +9,7 @@ import { useCurrentUser } from "~/hooks/api/users/useCurrentUser"
 import { useCreateAgency } from "~/hooks/api/agency/useCreateAgency"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages"
-import { HEX_COLOR_PATTERN, validateAgencyForm } from "~/utils/agencyValidation"
+import { validateAgencyForm } from "~/utils/agencyValidation"
 
 export default function OnboardingCreateAgencyStep() {
     const { t } = useTranslation()
@@ -18,7 +18,6 @@ export default function OnboardingCreateAgencyStep() {
     const { advanceStep } = useAdvanceOnboardingStep()
 
     const [name, setName] = useState("")
-    const [accentColor, setAccentColor] = useState("")
     const [contactEmail, setContactEmail] = useState("")
     const [website, setWebsite] = useState("")
     const [validationErrorKey, setValidationErrorKey] = useState<string | null>(null)
@@ -32,18 +31,7 @@ export default function OnboardingCreateAgencyStep() {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault()
-        const errorKey = validateAgencyForm({
-            name,
-            accentColor,
-            backgroundColor: "",
-            backgroundSecondaryColor: "",
-            textColor: "",
-            textSecondaryColor: "",
-            headingFont: "",
-            bodyFont: "",
-            contactEmail,
-            website,
-        })
+        const errorKey = validateAgencyForm({ name, contactEmail, website })
         if (errorKey) {
             setValidationErrorKey(errorKey)
             return
@@ -53,7 +41,6 @@ export default function OnboardingCreateAgencyStep() {
         try {
             await createAgency({
                 name: name.trim(),
-                accentColor: accentColor || null,
                 contactEmail: contactEmail || null,
                 website: website || null,
             })
@@ -64,7 +51,6 @@ export default function OnboardingCreateAgencyStep() {
     }
 
     const errorMessage = (validationErrorKey ? t(validationErrorKey) : null) || (error ? resolveErrorMessage(error) : null)
-    const isValidAccentColor = HEX_COLOR_PATTERN.test(accentColor)
 
     return (
         <OnboardingStepLayout maxWidth="max-w-md">
@@ -79,24 +65,6 @@ export default function OnboardingCreateAgencyStep() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                 />
-
-                <div className="flex flex-row items-end gap-3">
-                    <Input
-                        label={t("onboarding:createAgency.accentColor.label")}
-                        placeholder={t("onboarding:createAgency.accentColor.placeholder")}
-                        id="agency-accent-color"
-                        name="accentColor"
-                        type="text"
-                        maxLength={7}
-                        value={accentColor}
-                        onChange={(e) => setAccentColor(e.target.value)}
-                    />
-                    <div
-                        className={`h-9 w-9 rounded-lg border border-pale-gray shrink-0 ${isValidAccentColor ? "" : "bg-primary"}`}
-                        style={isValidAccentColor ? { backgroundColor: accentColor } : undefined}
-                        aria-hidden="true"
-                    />
-                </div>
 
                 <Input
                     label={t("onboarding:createAgency.contactEmail.label")}

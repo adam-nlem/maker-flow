@@ -44,10 +44,6 @@
             "label": "Agency name",
             "placeholder": "My agency"
         },
-        "accentColor": {
-            "label": "Accent color (optional)",
-            "placeholder": "#141115"
-        },
         "contactEmail": {
             "label": "Contact email (optional)",
             "placeholder": "hello@my-agency.com"

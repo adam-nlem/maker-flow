@@ -22,7 +22,6 @@ export default function RegisterPage() {
                 linkText: t("auth:register.switchToLogin"),
                 onClick: () => navigate(loginPath),
             }}
-            trustFooter
         >
             <RegisterForm
                 initialEmail={prefillEmail ?? ""}

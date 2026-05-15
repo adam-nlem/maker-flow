@@ -42,7 +42,6 @@ export default function VerifyOtpPage() {
                 linkText: t("auth:verify.backToSignIn"),
                 onClick: () => navigate(backPath),
             }}
-            trustFooter
         >
             <VerifyOtpForm
                 pendingOtpToken={state.pendingOtpToken}

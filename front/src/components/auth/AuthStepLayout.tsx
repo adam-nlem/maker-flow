@@ -1,7 +1,6 @@
 import type { ComponentType, ReactNode, SVGProps } from "react"
 import { useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
-import { ShieldCheckIcon } from "@heroicons/react/24/outline"
 import { Button } from "~/components/ui/Button"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import EyebrowLabel from "~/components/ui/EyebrowLabel"

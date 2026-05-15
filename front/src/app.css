@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Montserrat:wght@300;400;500;600;700&family=Nunito:wght@300;400;500;600;700&family=Open+Sans:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&family=Poppins:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Roboto:wght@300;400;500;700&display=swap');
 @import "tailwindcss";
 
 /* Reset th to allow custom typography classes to fully control styling */
@@ -24,9 +24,7 @@ body {
   --font-family-sans: Roboto, ui-sans-serif, system-ui, sans-serif;
   --font-family-display: Outfit, ui-sans-serif, system-ui, sans-serif;
 
-  /* Default accent color. Overridden at runtime per agency via useApplyAgencyTheme,
-     which also overrides background/text colors and heading/body fonts. */
-  --color-primary: #6FCDB1;
+  --color-primary: #5BBDA0;
   --color-dark: #14111A;
   --color-clear: #FFFFFF;
   --color-danger: #D33F49;
@@ -55,7 +53,7 @@ body {
   --color-pale-gray: #ECEFED;
   --color-pale-gray-2: #DADFDC;
 
-  --color-surface-hover: color-mix(in srgb, var(--color-primary) 5%, transparent);
+  --color-surface-hover: color-mix(in srgb, var(--color-primary) 10%, transparent);
 
   /* Custom text sizes with appropriate fonts */
   --font-size-xs: 0.75rem;

@@ -73,19 +73,28 @@ Use these classes for body text. All use the **Outfit** font family with gray co
 
 | Name | Variable | Hex | Usage |
 |------|----------|-----|-------|
-| **Primary** | `--color-primary` | `#43CEA9` | Primary actions, highlights, selection |
-| **Dark** | `--color-dark` | `#141115` | Text, dark backgrounds |
-| **Clear** | `--color-clear` | `#FFFFFF` | White backgrounds, text on dark |
+| **Primary** | `--color-primary` | `#6FCDB1` | Primary actions, highlights, selection (overridable per agency) |
+| **Dark** | `--color-dark` | `#141115` | Headings, primary text, dark backgrounds |
+| **Dark 2** | `--color-dark-2` | `#2E3437` | Body copy, comment text, secondary text on buttons |
+| **Clear** | `--color-clear` | `#FFFFFF` | Primary app surface — background, sidebar, modal body |
+| **Clear 2** | `--color-clear-2` | `#F6F8F7` | Composer body, callout backgrounds, list-item hover, modal footer |
+| **Clear 3** | `--color-clear-3` | `#EEF1EF` | Active list-item, keyboard-shortcut chips, scrollbar tracks, secondary button hover |
+| **Clear 4** | `--color-clear-4` | `#E2E7E4` | Reserved deeper surface (upload thumbnails) |
 | **Danger** | `--color-danger` | `#D33F49` | Error states, destructive actions |
 
-### Gray Scale
+### Muted Text Ramp
 
 | Name | Variable | Hex | Usage |
 |------|----------|-----|-------|
-| **Gray 900** | `--color-gray-900` | `#F0F0F0` | Darkest text |
-| **Gray** | `--color-gray` | `#9ca3af` | Secondary text, icons |
-| **Gray 400** | `--color-gray-400` | `#6b7280` | Placeholder text |
-| **Light Gray** | `--color-light-gray` | `#2d2d44` | Borders, dividers, hover states |
+| **Muted** | `--color-muted` | `#6A7074` | Meta info, eyebrow labels, breadcrumb context, comment timestamps, chart axis strokes |
+| **Muted 2** | `--color-muted-2` | `#9DA3A5` | Placeholders, UPPERCASE eyebrow section labels, low-importance metadata |
+
+### Dividers
+
+| Name | Variable | Hex | Usage |
+|------|----------|-----|-------|
+| **Pale Gray** | `--color-pale-gray` | `#ECEFED` | Default 1px dividers — topbar, sidebar, scene rows, modal sections |
+| **Pale Gray 2** | `--color-pale-gray-2` | `#DADFDC` | Heavier borders — composer outline, button outlines, dashed dropzone |
 
 ### Accent Colors
 
@@ -93,26 +102,12 @@ Use these classes for body text. All use the **Outfit** font family with gray co
 |------|----------|-----|-------|
 | **Red** | `--color-red` | `#E4572E` | Warnings, alerts |
 | **Yellow** | `--color-yellow` | `#E7BC21` | Warnings, pending states |
-| **Green** | `--color-green` | `#A8C686` | Success states |
+| **Green** | `--color-green` | `#6B9477` | Success states, approved status |
 | **Blue** | `--color-blue` | `#669BBC` | Info, links |
 | **Purple** | `--color-purple` | `#5346B6` | Special highlights |
 | **Pastel Green** | `--color-pastel-green` | `#BCD5AA` | Soft success backgrounds |
 
-### Agency-overridable tokens
-
-Seven CSS variables can be overridden per agency at runtime via [`useApplyAgencyTheme`](../src/hooks/useApplyAgencyTheme.ts). When the corresponding agency field is empty, the default declared above applies.
-
-| Variable | Agency field | Slot |
-|----------|--------------|------|
-| `--color-primary` | `accentColor` | Accent / CTA |
-| `--color-clear` | `backgroundColor` | Background primary |
-| `--color-light-gray` | `backgroundSecondaryColor` | Background secondary |
-| `--color-dark` | `textColor` | Text primary |
-| `--color-gray` | `textSecondaryColor` | Text secondary |
-| `--font-family-display` | `headingFont` | Heading typography |
-| `--font-family-sans` | `bodyFont` | Body typography |
-
-All other tokens (`--color-danger`, `--color-gray-400`, `--color-gray-900`, accent colors, `--color-surface-hover`, font sizes) are fixed and not part of the white-label surface — use them when a value must stay stable regardless of the active agency theme. Font choices are limited to the curated whitelist in [`models/enums/BrandFont.ts`](../src/models/enums/BrandFont.ts), preloaded once at app start.
+All design tokens are fixed application-wide — agencies do not customize colors or fonts. The MakerFlow palette and the Outfit / Roboto font stacks apply consistently to every surface.
 
 ---
 

@@ -1,36 +1,18 @@
 {
     "subtitle": "Personnalisez l'identité de votre agence.",
     "sections": {
-        "identity": "Identité de marque",
-        "colors": "Couleurs",
-        "typography": "Typographie"
+        "identity": "Identité de marque"
     },
     "fields": {
         "namePlaceholder": "Nom de votre agence",
         "contactEmailPlaceholder": "contact@votre-agence.com",
-        "websitePlaceholder": "https://votre-agence.com",
-        "accentColor": "Couleur d'accentuation",
-        "backgroundColor": "Couleur d'arrière-plan",
-        "backgroundSecondaryColor": "Arrière-plan secondaire",
-        "textColor": "Couleur du texte",
-        "textSecondaryColor": "Texte secondaire",
-        "headingFont": "Police des titres",
-        "bodyFont": "Police du texte",
-        "fontPlaceholder": "Utiliser la police par défaut"
+        "websitePlaceholder": "https://votre-agence.com"
     },
-    "colorPickerAriaLabel": "Choisir une couleur",
     "logo": {
         "hint": "PNG. 5 Mo max."
     },
     "validation": {
         "nameRequired": "Le nom de l'agence est obligatoire.",
-        "accentColorFormat": "La couleur d'accentuation doit être un code hexadécimal sur 6 caractères (ex. #43CEA9).",
-        "backgroundColorFormat": "La couleur d'arrière-plan doit être un code hexadécimal sur 6 caractères (ex. #141115).",
-        "backgroundSecondaryColorFormat": "L'arrière-plan secondaire doit être un code hexadécimal sur 6 caractères.",
-        "textColorFormat": "La couleur du texte doit être un code hexadécimal sur 6 caractères.",
-        "textSecondaryColorFormat": "La couleur du texte secondaire doit être un code hexadécimal sur 6 caractères.",
-        "headingFontInvalid": "La police des titres ne fait pas partie de la liste autorisée.",
-        "bodyFontInvalid": "La police du texte ne fait pas partie de la liste autorisée.",
         "contactEmailFormat": "L'email de contact n'est pas valide.",
         "websiteFormat": "L'URL du site web doit commencer par http:// ou https://.",
         "logoMimeType": "Le logo doit être une image PNG.",

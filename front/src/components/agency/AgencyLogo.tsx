@@ -3,7 +3,6 @@ import { PencilIcon, PhotoIcon } from "@heroicons/react/24/outline";
 import { useShowAgencyLogo } from "~/hooks/api/agency/useShowAgencyLogo";
 import { useUploadAgencyLogo } from "~/hooks/api/agency/useUploadAgencyLogo";
 import { Agency } from "~/models/Agency";
-import { HEX_COLOR_PATTERN } from "~/utils/agencyValidation";
 import FileUpload from "~/components/ui/FileUpload";
 import Shimmer from "~/components/ui/Shimmer";
 
@@ -50,13 +49,9 @@ export default function AgencyLogo({ agency, editable = false, className = "" }:
 
 function AgencyLogoInitial({ agency, className }: AgencyLogoVariantProps) {
     const initial = agency.name.trim().charAt(0).toUpperCase();
-    const hasAccentColor = !!agency.accentColor && HEX_COLOR_PATTERN.test(agency.accentColor);
 
     return (
-        <div
-            className={`flex items-center justify-center rounded-md ${hasAccentColor ? "text-clear" : "bg-pale-gray-2 text-muted-2"} ${className}`}
-            style={hasAccentColor ? { backgroundColor: agency.accentColor ?? undefined } : undefined}
-        >
+        <div className={`flex items-center justify-center rounded-md bg-pale-gray-2 text-muted-2 ${className}`}>
             <span className="text-heading-sm font-semibold leading-none">{initial}</span>
         </div>
     );

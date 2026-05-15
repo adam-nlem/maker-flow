@@ -17,7 +17,7 @@ import { useCreateProjectModalStore } from "~/stores/project/createProjectModalS
 import UpdateProjectModal from "../projects/UpdateProjectModal";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
 import { platformOptions } from "~/models/enums/Platform";
-import { sidebarMainNavigationItems, sidebarBottomNavigationItems, navigationItemTranslationKeys, navigationItemToIcon, navigationItemToIconSolid, navigationItemToPath } from "~/models/enums/NavigationItem";
+import { sidebarMainNavigationItems, navigationItemTranslationKeys, navigationItemToIcon, navigationItemToIconSolid, navigationItemToPath } from "~/models/enums/NavigationItem";
 import { useTranslation } from "react-i18next";
 import { isNavigationItemSelected } from "~/utils/navigationHelpers";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
@@ -149,29 +149,11 @@ export default function DesktopSidebar() {
     </>
   );
 
-  const bottomNav = (
-    <>
-      {sidebarBottomNavigationItems.map((item) => {
-        const selected = isNavigationItemSelected(item, location.pathname);
-        return (
-          <IconWithTextTile
-            key={item}
-            icon={selected ? navigationItemToIconSolid[item] : navigationItemToIcon[item]}
-            label={t(navigationItemTranslationKeys[item])}
-            isBold={false}
-            isSelected={selected}
-            onClick={() => navigate(navigationItemToPath[item])}
-          />
-        );
-      })}
-    </>
-  );
-
   const identityTile = agency ? <IdentityTile agency={agency} /> : null;
 
   return (
     <>
-      <SidebarShell topSection={topSection} bottomNav={bottomNav} identityTile={identityTile} />
+      <SidebarShell topSection={topSection} identityTile={identityTile} />
 
       <CreateProjectModal
         showModal={isCreateProjectModalOpen}

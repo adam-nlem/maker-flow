@@ -17,7 +17,7 @@ export default function IntegrationTile({ platform, status = IntegrationStatus.R
             onClick={onClick}
         >
             <img src={platformToIcon[platform]} className="size-4 shrink-0" alt={t(platformTranslationKeys[platform])} />
-            <span className="text-body-sm whitespace-nowrap text-muted-2">
+            <span className="text-body-xs whitespace-nowrap">
                 {t(platformTranslationKeys[platform])}
             </span>
             <span className={`size-2 rounded-full ml-auto shrink-0 ${integrationStatusToBgClass[status]} ${integrationStatusToBorderClass[status]}`} />
