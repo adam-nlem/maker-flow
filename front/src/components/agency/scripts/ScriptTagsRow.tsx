@@ -5,7 +5,7 @@ import type { Script } from "~/models/Script";
 import type { ScriptTag } from "~/models/ScriptTag";
 import { colorToBgClass, colorToBorderClass, colorToTextClass } from "~/models/enums/Color";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
-import Pill from "../ui/Pill";
+import Pill from "~/components/ui/Pill";
 import ListScriptTagsDropdown from "./ListScriptTagsDropdown";
 
 interface Props {

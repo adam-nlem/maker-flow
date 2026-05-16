@@ -19,7 +19,7 @@ Phase 1 ships the agency-side surface only. Clients have no visibility yet.
 |---|---|
 | `front/src/models/PostDraft.ts` | Class + `fromJSON` / `toJSON`. Exposes a `latestRevision` getter. The `script` field is a `Script` instance (reuses `front/src/models/Script.ts` — no separate summary type). |
 | `front/src/models/PostDraftRevision.ts` | Class + serializers. |
-| `front/src/models/enums/PostDraftStatus.ts` | `AwaitingReview`, `ChangesRequested`, `Approved`, `Archived` + translation keys. |
+| `front/src/models/enums/PostDraftStatus.ts` | `AwaitingReview`, `ChangesRequested`, `Approved`, `Rejected` + translation keys. |
 | `front/src/models/enums/PostDraftRevisionOptimizationStatus.ts` | `Pending`, `Optimizing`, `Optimized`, `Failed` + translation keys. |
 | `front/src/models/enums/MediaType.ts` | Reused as-is (matches backend `Post.mediaType`). |
 
@@ -46,17 +46,17 @@ Query keys live in `postDraftsQueryKeys.ts`.
 + selectDraft / openCreatePanel / closeCreatePanel / closeAll
 ```
 
-The detail panel and the create panel are mutually exclusive — selecting a draft closes the create panel and vice versa.
+`selectDraft(uuid)` closes the create modal so the modal never sits over a newly-clicked detail. `openCreatePanel()` no longer clears `selectedDraftUuid` — the previously-selected draft stays visible behind the modal backdrop, and dismissing the modal returns the user to where they were.
 
 ## Components (`front/src/components/postDrafts/`)
 
 | Component | Role |
 |---|---|
-| `PostDraftsPageView` | Orchestrator. Renders the list on the left + two side panels (detail, create) on the right, only one open at a time. |
+| `PostDraftsPageView` | Orchestrator. Two-region layout: persistent left list (`w-75` ≈ 300 px, `border-r border-pale-gray`) + scrollable `<main>` that renders `PostDraftDetailPanel` when a draft is selected, otherwise a centered empty state (`emptyState.noSelection.*`). The create flow is rendered above the layout via `PostDraftCreateModal`. |
 | `PostDraftsList` | Header (title + "New draft" CTA) + scrollable list. Empty state with CTA. |
 | `PostDraftListItem` | Single row: thumbnail (first optimized file when ready, or a media-type icon otherwise), title, status badge, mediaType + relative-updated-time, optimization label when in-flight. |
 | `PostDraftDetailPanel` | Media viewer + metadata + inline edit form (title/description/notes/script). Edit is gated to `AwaitingReview`. Delete confirmation via `window.confirm`. |
-| `PostDraftCreateForm` | Title / mediaType radio / files dropzone / description / notes / script selector / submit. Frontend validates file count + size + MIME before posting. Catches HTTP 409 → script-already-has-draft. |
+| `PostDraftCreateModal` | `ModalOverlay` (`w-160`, `max-h-[calc(100vh-80px)]`) hosting the create form inline (title / mediaType radio / files dropzone / description / notes / script selector / submit). Driven by `showModal` / `onClose` props. Frontend validates file count + size + MIME before posting. Catches HTTP 409 → script-already-has-draft. On success calls `selectDraft(uuid)` which auto-closes the panel. |
 | `PostDraftFileDropzone` | Drag-drop area + per-file row with reorder (↑/↓) for carousel. Single-file for video/image. Wraps the design of `front/src/components/ui/FileUpload.tsx` but built inline so the shared `FileUpload` keeps its single-file contract. |
 | `PostDraftMediaViewer` | `<video controls>` for video, single `<img>` for image, 2-column grid of `<img>`s for carousel. Shows a spinner while `optimizationStatus` is `Pending` / `Optimizing` and a danger message on `Failed`. |
 | `PostDraftStatusBadge` | Pill with color tokens per status. |
@@ -76,7 +76,7 @@ The `navigation` namespace also has a `items.drafts` key in both languages.
 | Image | 1 | `image/png`, `image/jpeg`, `image/webp` | 20 MB |
 | Carousel | 2–10 | `image/png`, `image/jpeg`, `image/webp` | 20 MB each |
 
-Pre-flight validation runs in `PostDraftCreateForm.validate()`; backend re-validates and is authoritative.
+Pre-flight validation runs in `PostDraftCreateModal` before submit; backend re-validates and is authoritative.
 
 ## Stream endpoint behavior
 

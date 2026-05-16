@@ -2,9 +2,11 @@
 
 ## Overview
 
-The app ships **two** sidebars (agency and client), each rendered by its own shell layout. To avoid duplicating the chrome, both sidebars sit on top of a shared `SidebarShell` (desktop) and `MobileSidebarShell` (mobile drawer). The shells own the outer container, padding, bottom divider, legal footer, and — for the mobile shell — burger button + drawer overlay + ESC/scroll-lock/auto-close behavior. Each domain sidebar (`DesktopSidebar` for agency, `ClientDesktopSidebar` for client) only provides its content: the top section, the bottom nav, and an optional CTA.
+The app ships **two** sidebars (agency and client), each rendered by its own shell layout under the universal top bar (see [topbar-layout.md](topbar-layout.md)). To avoid duplicating the chrome, both sidebars sit on top of a shared `SidebarShell` (desktop) and `MobileSidebarShell` (mobile drawer). The shells own the outer container, padding, and identity divider; each domain sidebar (`DesktopSidebar` for agency, `ClientDesktopSidebar` for client) only provides its content: the top section and an optional identity tile.
 
-On desktop (≥768px / `md` breakpoint), the active shell's sidebar is visible as a fixed left panel. On mobile (<768px), it is replaced by a burger menu that opens a left-sliding drawer overlay.
+The desktop sidebar is a **thin icon rail** (`w-14`, ~56 px). Each nav button is an icon-only tile with a hover tooltip carrying the label (`IconRailTile`). The project selector, integration tiles and identity tile all render in compact form (each component exposes a `compact` prop). The top bar above the rail carries section/page breadcrumb and per-page actions, so the rail itself stays focused on icon-based navigation.
+
+On desktop (≥768px / `md` breakpoint), the rail is visible inline. On mobile (<768px), it is rendered inside the slide-out drawer, opened by the hamburger in the top bar.
 
 ## Architecture
 
@@ -12,31 +14,35 @@ On desktop (≥768px / `md` breakpoint), the active shell's sidebar is visible a
 ProtectedLayout (auth + onboarding gate)
   ├── /            → RootRedirect (Navigate by role)
   ├── /agency/*    → AgencyShellLayout (asserts non-client)
-  │                    ├── MobileSidebar (mobile-only: header bar + drawer overlay)
-  │                    ├── DesktopSidebar (desktop-only)
-  │                    └── <Outlet /> (agency page content)
+  │                    └── TopBar variant="agency"
+  │                          ├── DesktopSidebar (icon rail, desktop-only)
+  │                          ├── MobileSidebar (drawer overlay, mobile-only)
+  │                          └── <Outlet /> (agency page content)
   └── /client/*    → ClientShellLayout (asserts client)
-                       ├── ClientMobileSidebar (mobile-only: header bar + drawer overlay)
-                       ├── ClientDesktopSidebar (desktop-only)
-                       └── <Outlet /> (client page content)
+                       └── TopBar variant="client"
+                             ├── ClientDesktopSidebar (icon rail, desktop-only)
+                             ├── ClientMobileSidebar (drawer overlay, mobile-only)
+                             └── <Outlet /> (client page content)
 ```
 
 ## Key Files
 
 | File | Description |
 |------|-------------|
-| `components/agency/AgencyShellLayout.tsx` | Layout route component — wraps `/agency/*` pages with sidebar + mobile menu; asserts `!user.isClient` |
-| `components/client-portal/ClientShellLayout.tsx` | Layout route component — wraps `/client/*` pages; asserts `user.isClient` |
+| `components/agency/AgencyShellLayout.tsx` | Layout route component — wraps `/agency/*` pages in `<TopBar variant="agency">` and renders the sidebar + outlet inside it; asserts `!user.isClient` |
+| `components/client/ClientShellLayout.tsx` | Layout route component — wraps `/client/*` pages in `<TopBar variant="client">`; asserts `user.isClient` |
 | `components/auth/RootRedirect.tsx` | Index of `ProtectedLayout` — `Navigate` to `/agency` or `/client` based on `user.isClient` |
-| `components/sidebar/SidebarShell.tsx` | **Shared** desktop chrome — outer container, top-section padding, bottom nav slot, divider, optional CTA slot, legal footer. Both `DesktopSidebar` and `ClientDesktopSidebar` render their content through it. |
-| `components/sidebar/MobileSidebarShell.tsx` | **Shared** mobile chrome — burger header bar, drawer portal, backdrop, ESC + body-scroll-lock + auto-close-on-route-change. Takes a `desktop` ReactNode and a `getPageLabelKey(pathname)` resolver. |
-| `components/sidebar/DesktopSidebar.tsx` | Agency sidebar content (project selector, nav, platforms, settings, premium CTA) — composed inside `SidebarShell` |
-| `components/sidebar/MobileSidebar.tsx` | Thin wrapper: `<MobileSidebarShell desktop={<DesktopSidebar />} getPageLabelKey={getCurrentPageLabelKey} />` |
-| `components/client-portal/sidebar/ClientDesktopSidebar.tsx` | Client sidebar content — agency-branded header (name tinted with `agency.accentColor`), Home + Contents nav, a PLATEFORMES section with per-platform `IntegrationTile` rows (same as the agency sidebar), and Settings at the bottom. Fetches the agency via `useShowProject(user.clientProjectUuid)`. Mounts `IntegrationLoginModal` once for the whole client shell. Composed inside `SidebarShell`. |
-| `components/client-portal/sidebar/ClientMobileSidebar.tsx` | Thin wrapper: `<MobileSidebarShell desktop={<ClientDesktopSidebar />} getPageLabelKey={...} />` with a client-specific label resolver. |
-| `stores/sidebar/mobileSidebarStore.ts` | Zustand store for mobile drawer open/close state (`isOpen`, `setIsOpen`, `toggle`) |
-| `models/enums/NavigationItem.ts` | Enum with mapping records: French translations, paths (now `agency*Path`), outline/solid icons, sidebar group constants (`sidebarMainNavigationItems`, `sidebarBottomNavigationItems`) |
-| `utils/navigationHelpers.ts` | Pure helper functions: `getCurrentNavigationItem`, `getCurrentPageLabel`, `isNavigationItemSelected` (Home item is matched exactly so nested `/agency/*` routes don't keep Home selected) |
+| `components/sidebar/SidebarShell.tsx` | **Shared** desktop chrome — `w-14` outer container, top-section padding, optional bottom-nav and identity slots. Both `DesktopSidebar` and `ClientDesktopSidebar` render their content through it. |
+| `components/sidebar/MobileSidebarShell.tsx` | **Shared** mobile chrome — drawer portal, backdrop, ESC + body-scroll-lock + auto-close-on-route-change. Toggled by the top bar's hamburger via `useMobileSidebarStore`. |
+| `components/sidebar/IconRailTile.tsx` | **Shared** icon-only sidebar button with a Tailwind hover tooltip. Used by both `DesktopSidebar` and `ClientDesktopSidebar`. |
+| `components/sidebar/IdentityTile.tsx` / `IdentityPopover.tsx` | **Shared** bottom-of-rail identity tile (agency logo + user menu). Used by both shells. |
+| `components/agency/sidebar/DesktopSidebar.tsx` | Agency sidebar content — compact project selector, `IconRailTile` rows for the main nav, compact `IntegrationTile` rows for platforms, compact `IdentityTile` at the bottom — composed inside `SidebarShell` |
+| `components/agency/sidebar/MobileSidebar.tsx` | Thin wrapper: `<MobileSidebarShell desktop={<DesktopSidebar />} />` |
+| `components/client/sidebar/ClientDesktopSidebar.tsx` | Client sidebar content — Home + Contents nav (`IconRailTile`), platform icons (compact `IntegrationTile`), compact `IdentityTile`. Composed inside `SidebarShell`. |
+| `components/client/sidebar/ClientMobileSidebar.tsx` | Thin wrapper: `<MobileSidebarShell desktop={<ClientDesktopSidebar />} />` |
+| `stores/sidebar/mobileSidebarStore.ts` | Zustand store for mobile drawer open/close state (`isOpen`, `setIsOpen`, `toggle`) — opened from the top bar's hamburger button on mobile |
+| `models/enums/NavigationItem.ts` | Enum with mapping records: i18n translation keys, paths (`agency*Path`), outline/solid icons, sidebar group constants (`sidebarMainNavigationItems`) |
+| `utils/navigationHelpers.ts` | Pure helper functions: `getCurrentNavigationItem`, `getCurrentPageLabelKey`, `isNavigationItemSelected` (Home item is matched exactly so nested `/agency/*` routes don't keep Home selected) — reused by the top bar to auto-derive its section label |
 
 ## Responsive Behavior
 
@@ -47,13 +53,13 @@ ProtectedLayout (auth + onboarding gate)
 
 ## Mobile Drawer
 
-- Opens via burger icon (`Bars3Icon`) in the fixed header bar
+- Opens via the hamburger button in the top bar (mobile-only)
 - Portal-based overlay (`createPortal` to `document.body`)
 - Backdrop: `bg-black/40`, click-to-close
 - ESC key closes the drawer
 - Body scroll lock while open
 - Auto-closes on route change (watches `location.pathname`)
-- Renders `DesktopSidebar` inside — same content as desktop, zero duplication
+- Renders the same `DesktopSidebar` / `ClientDesktopSidebar` icon rail inside — same content as desktop, zero duplication
 
 ## Page Integration
 
@@ -68,9 +74,9 @@ Pages do **not** import or render the sidebar. `AgencyShellLayout` provides it v
 ]}
 ```
 
-Pages only render their own content. The layout handles `flex-1 min-w-0` and mobile top padding (`pt-12`) for the fixed mobile header.
+Pages only render their own content. The shell handles `flex-1 min-w-0` inside the top bar's content area.
 
-**Important:** Pages must use `h-full` (not `h-screen`) for their root container height. `AgencyShellLayout` constrains the content area to `h-screen` at the layout level. On mobile, `pt-12` reduces the available space by 48px. Using `h-screen` inside a page would cause a 48px overflow.
+**Important:** Pages must use `h-full` (not `h-screen`) for their root container height. The shell already constrains the content area to the viewport via `TopBar`'s outer `h-screen`; using `h-screen` inside a page would overflow because the top-bar header itself takes ~56 px (`h-14`).
 
 ## Store Pattern
 

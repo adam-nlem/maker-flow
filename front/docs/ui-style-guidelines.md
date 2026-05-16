@@ -73,7 +73,7 @@ Use these classes for body text. All use the **Outfit** font family with gray co
 
 | Name | Variable | Hex | Usage |
 |------|----------|-----|-------|
-| **Primary** | `--color-primary` | `#6FCDB1` | Primary actions, highlights, selection (overridable per agency) |
+| **Primary** | `--color-primary` | `#6FCDB1` | Primary actions, highlights, selection |
 | **Dark** | `--color-dark` | `#141115` | Headings, primary text, dark backgrounds |
 | **Dark 2** | `--color-dark-2` | `#2E3437` | Body copy, comment text, secondary text on buttons |
 | **Clear** | `--color-clear` | `#FFFFFF` | Primary app surface — background, sidebar, modal body |

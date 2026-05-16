@@ -1,6 +1,6 @@
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import PostDraftsPageView from "~/components/postDrafts/PostDraftsPageView";
+import PostDraftsPageView from "~/components/agency/postDrafts/PostDraftsPageView";
 
 export default function AgencyDraftsPage() {
   const { projects } = useListPaginatedProjects()

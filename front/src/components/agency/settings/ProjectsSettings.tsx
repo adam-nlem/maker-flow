@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import Shimmer from "~/components/ui/Shimmer";
-import CreateProjectModal from "~/components/projects/CreateProjectModal";
+import CreateProjectModal from "~/components/agency/projects/CreateProjectModal";
 import ProjectSettingsCard from "./project/ProjectSettingsCard";
 
 export default function ProjectsSettings() {

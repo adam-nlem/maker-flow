@@ -4,26 +4,26 @@ import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCur
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import { useCurrentAgency } from "~/hooks/api/agency/useCurrentAgency";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import CreateProjectModal from "../projects/CreateProjectModal";
-import ProjectTile from "../projects/ProjectTile";
-import IconRailTile from "./IconRailTile";
-import IdentityTile from "./IdentityTile";
+import CreateProjectModal from "~/components/agency/projects/CreateProjectModal";
+import ProjectTile from "~/components/agency/projects/ProjectTile";
+import IconRailTile from "~/components/sidebar/IconRailTile";
+import IdentityTile from "~/components/sidebar/IdentityTile";
 import { useLocation, useNavigate } from "react-router-dom";
-import Shimmer from "../ui/Shimmer";
-import SelectDropdown from "../ui/SelectDropdown"
+import Shimmer from "~/components/ui/Shimmer";
+import SelectDropdown from "~/components/ui/SelectDropdown"
 import type { Project } from "~/models/Project"
 import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
-import UpdateProjectModal from "../projects/UpdateProjectModal";
+import UpdateProjectModal from "~/components/agency/projects/UpdateProjectModal";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
 import { platformOptions } from "~/models/enums/Platform";
 import { sidebarMainNavigationItems, navigationItemTranslationKeys, navigationItemToIcon, navigationItemToIconSolid, navigationItemToPath } from "~/models/enums/NavigationItem";
 import { useTranslation } from "react-i18next";
 import { isNavigationItemSelected } from "~/utils/navigationHelpers";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
-import IntegrationTile from "../integrations/IntegrationTile";
-import IntegrationLoginModal from "../integrations/IntegrationLoginModal";
+import IntegrationTile from "~/components/integrations/IntegrationTile";
+import IntegrationLoginModal from "~/components/integrations/IntegrationLoginModal";
 import { useIntegrationLoginModalStore } from "~/stores/integrations/integrationLoginModalStore";
-import SidebarShell from "./SidebarShell";
+import SidebarShell from "~/components/sidebar/SidebarShell";
 
 export default function DesktopSidebar() {
   const navigate = useNavigate();

@@ -1,6 +1,6 @@
 import { useListScriptPartSuggestions } from "~/hooks/api/scriptPartSuggestions/useListScriptPartSuggestions";
 import { ScriptPartSuggestionStatus } from "~/models/enums/ScriptPartSuggestionStatus";
-import ScriptPartDiffBlock from "~/components/scripts/parts/ScriptPartDiffBlock";
+import ScriptPartDiffBlock from "~/components/agency/scripts/parts/ScriptPartDiffBlock";
 
 interface ChatSuggestionsCardProps {
   suggestionUuids: string[];

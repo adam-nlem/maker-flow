@@ -16,7 +16,7 @@ import Pill from "~/components/ui/Pill";
 import SelectDropdown from "~/components/ui/SelectDropdown";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import IntegrationDetailCardRow from "~/components/integrations/IntegrationDetailCardRow";
-import HomeScriptsPanel from "~/components/home/HomeScriptsPanel";
+import HomeScriptsPanel from "~/components/agency/home/HomeScriptsPanel";
 
 export default function AgencyHomePage() {
   const { t } = useTranslation();

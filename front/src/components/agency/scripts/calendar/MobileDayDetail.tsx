@@ -2,7 +2,7 @@ import { useDroppable } from "@dnd-kit/core";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import type { Script } from "~/models/Script";
-import ScriptTile from "~/components/scripts/ScriptTile";
+import ScriptTile from "~/components/agency/scripts/ScriptTile";
 import { DAYS_FR_FULL, getDayOfWeek, MONTHS_FR } from "~/utils/dateHelpers";
 
 interface MobileDayDetailProps {

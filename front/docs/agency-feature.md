@@ -62,7 +62,7 @@ Rendering matrix:
 | --- | --- | --- |
 | any | loading | `Shimmer` |
 | any | uploaded | `<img>` with the blob URL (object-cover) |
-| `false` | missing | `AgencyLogoInitial` — colored block with the agency's first letter, tinted with `agency.accentColor` when it matches `HEX_COLOR_PATTERN`, otherwise a neutral `bg-light-gray` |
+| `false` | missing | `AgencyLogoInitial` — neutral `bg-pale-gray-2` block displaying the agency's first letter in `text-muted-2` |
 | `true` | missing | `AgencyLogoDropzone` — wraps the generic [`FileUpload`](../src/components/ui/FileUpload.tsx) with `accept="image/png"`, the `PhotoIcon`, and the `agencySettings:logo.*` translation keys. Click-to-browse and drag-and-drop are handled by `FileUpload` itself; this wrapper just bridges the agency hook with the generic UI. |
 
 Client-side validation lives inside [`useUploadAgencyLogo`](../src/hooks/api/agency/useUploadAgencyLogo.ts) alongside the mutation — the component stays presentational. Checks (`file.type === "image/png"`, `file.size ≤ 5 MB`) mirror the backend and surface as `agencySettings:validation.logoMimeType` / `logoTooLarge` rendered below the drop zone. After a successful upload, the mutation invalidates `agencyQueryKeys.logo(uuid)` and the `<img>` renders automatically.

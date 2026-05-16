@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
-import DesktopSidebar from "../sidebar/DesktopSidebar";
-import MobileSidebar from "../sidebar/MobileSidebar";
-import AgencyTopBar from "../topbar/AgencyTopBar";
+import DesktopSidebar from "./sidebar/DesktopSidebar";
+import MobileSidebar from "./sidebar/MobileSidebar";
+import AgencyTopBar from "./topbar/AgencyTopBar";
 import { clientHomePath, onboardingPath } from "~/routes/routePaths";
 
 export default function AgencyShellLayout() {

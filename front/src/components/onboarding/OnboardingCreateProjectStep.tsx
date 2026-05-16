@@ -1,5 +1,5 @@
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
-import CreateProjectForm from "~/components/projects/CreateProjectForm"
+import CreateProjectForm from "~/components/agency/projects/CreateProjectForm"
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 

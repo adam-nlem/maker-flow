@@ -3,12 +3,12 @@ import { DndContext, DragOverlay, PointerSensor, TouchSensor, type DragEndEvent,
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 
-import CalendarFilterPanel from "~/components/scripts/calendar/CalendarFilterPanel";
-import ScriptTile from "~/components/scripts/ScriptTile";
+import CalendarFilterPanel from "~/components/agency/scripts/calendar/CalendarFilterPanel";
+import ScriptTile from "~/components/agency/scripts/ScriptTile";
 import type { Script } from "~/models/Script";
 import { useUpdateScript } from "~/hooks/api/scripts/useUpdateScript";
 import { useCalendarStore } from "~/stores/scripts/calendarStore";
-import ScriptCalendar from "~/components/scripts/calendar/ScriptCalendar";
+import ScriptCalendar from "~/components/agency/scripts/calendar/ScriptCalendar";
 
 export default function AgencyCalendarPage() {
   const { projects } = useListPaginatedProjects()

@@ -1,6 +1,6 @@
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import TodoListDashboardView from "~/components/tasks/TodoListDashboardView";
+import TodoListDashboardView from "~/components/agency/tasks/TodoListDashboardView";
 
 export default function AgencyTasksPage() {
   const { projects } = useListPaginatedProjects()

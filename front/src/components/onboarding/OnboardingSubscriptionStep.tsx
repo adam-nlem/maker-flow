@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next"
 
 import { onboardingPath } from "~/routes/routePaths"
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
-import SubscriptionOverview from "~/components/settings/subscription/SubscriptionOverview"
+import SubscriptionOverview from "~/components/agency/settings/subscription/SubscriptionOverview"
 import Shimmer from "~/components/ui/Shimmer"
 import { Button } from "~/components/ui/Button"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"

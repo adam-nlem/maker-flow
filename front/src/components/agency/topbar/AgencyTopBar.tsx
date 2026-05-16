@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom";
 import { agencySettingsPath } from "~/routes/routePaths";
-import TopBarShell from "./TopBarShell";
+import TopBarShell from "~/components/topbar/TopBarShell";
 import { agencyTopBarActions } from "./agencyTopBarActions";
 
 export default function AgencyTopBar() {

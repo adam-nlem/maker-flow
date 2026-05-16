@@ -1,7 +1,7 @@
 import { useTranslation } from "react-i18next"
 
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
-import InviteClientForm from "~/components/settings/project/InviteClientForm"
+import InviteClientForm from "~/components/agency/settings/project/InviteClientForm"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"

@@ -11,15 +11,36 @@ This document describes the coding conventions, patterns, and best practices use
 ```
 front/src/
 ├── components/           # Reusable UI components
-│   ├── agency/           # Agency-shell-only components (e.g. AgencyShellLayout)
-│   ├── auth/             # Auth helpers (RootRedirect, AuthStepLayout, forms)
-│   ├── client-portal/    # Client-shell-only components (e.g. ClientShellLayout)
-│   ├── insights/         # Insights feature components
-│   ├── projects/         # Project feature components
-│   ├── sidebar/          # Sidebar primitives (Desktop/Mobile)
-│   ├── tasks/            # Tasks feature components
-│   └── ui/               # Generic UI components
-├── hooks/                # Custom React hooks
+│   ├── agency/           # Agency-shell-only — everything an agency user sees
+│   │   ├── AgencyShellLayout.tsx
+│   │   ├── AgencyLogo.tsx
+│   │   ├── sidebar/      # DesktopSidebar, MobileSidebar (composed inside the shared shells)
+│   │   ├── topbar/       # AgencyTopBar + agencyTopBarActions registry
+│   │   ├── home/         # Agency-only home widgets (HomeScriptsPanel, HomeScriptTile, …)
+│   │   ├── projects/     # Project feature components
+│   │   ├── scripts/      # Scripts + nested calendar/, chat/, parts/, hookTemplates/
+│   │   ├── postDrafts/   # Post-draft workflow
+│   │   ├── tasks/        # Todo lists / tasks
+│   │   └── settings/     # Agency settings (AgencySettings, SubscriptionSettings, ProjectsSettings + nested agency/, subscription/, project/)
+│   ├── client/           # Client-shell-only — everything a client sees
+│   │   ├── ClientShellLayout.tsx
+│   │   ├── ClientPortalLockedView.tsx
+│   │   ├── sidebar/      # ClientDesktopSidebar, ClientMobileSidebar
+│   │   └── topbar/       # ClientTopBar + clientTopBarActions registry
+│   ├── auth/             # Shared — RootRedirect, AuthStepLayout, login/register/OTP forms
+│   ├── onboarding/       # Shared onboarding steps (both roles flow through)
+│   ├── welcome/          # Shared pre-login welcome steps
+│   ├── prelaunch/        # Shared prelaunch (public)
+│   ├── invitations/      # Shared invite setup (public)
+│   ├── home/             # Shared home widgets (HomeOverviewCards, HomeTopPosts, …)
+│   ├── contents/         # Shared — used by both /agency/contents and /client/contents
+│   ├── integrations/     # Shared integration tiles + login modal
+│   ├── insights/         # Shared insight tiles
+│   ├── settings/         # Shared settings only (SettingsPageView, GeneralSettings, LanguageSwitcher)
+│   ├── sidebar/          # Shared shells + tiles (SidebarShell, MobileSidebarShell, IconRailTile, IdentityTile, IdentityPopover)
+│   ├── topbar/           # Shared shell (TopBarShell)
+│   └── ui/               # Generic UI primitives
+├── hooks/                # Custom React hooks (organized by resource, not role — many hooks are shared)
 │   └── api/              # API-related hooks (React Query)
 ├── models/               # Data models (classes)
 │   ├── dtos/             # DTO interfaces
@@ -31,9 +52,11 @@ front/src/
 │   └── routePaths.ts     # Centralised path constants
 ├── services/             # External services
 │   └── httpClient/       # Axios HTTP client
-├── stores/               # Zustand state stores
+├── stores/               # Zustand state stores (organized by domain, not role)
 └── utils/                # Utility functions
 ```
+
+**Component-folder rule of thumb**: anything imported only by `/agency/*` routes lives under `components/agency/`; anything imported only by `/client/*` routes lives under `components/client/`. Everything else stays at the top level of `components/` (shared by both shells, public/auth routes, or onboarding).
 
 ---
 

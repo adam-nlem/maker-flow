@@ -1,7 +1,7 @@
 import { useDroppable } from "@dnd-kit/core";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import type { Script } from "~/models/Script";
-import ScriptTile from "~/components/scripts/ScriptTile";
+import ScriptTile from "~/components/agency/scripts/ScriptTile";
 
 interface ScriptCalendarDayCellProps {
     droppableId: string;

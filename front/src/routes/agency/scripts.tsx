@@ -1,6 +1,6 @@
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import ScriptPageView from "~/components/scripts/ScriptPageView";
+import ScriptPageView from "~/components/agency/scripts/ScriptPageView";
 
 export default function AgencyScriptsPage() {
   const { projects } = useListPaginatedProjects()

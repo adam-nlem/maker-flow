@@ -34,7 +34,7 @@ import InviteTokenPage from "./routes/invite.token";
 import ProtectedLayout from "./routes/protected";
 import RootRedirect from "./components/auth/RootRedirect";
 import AgencyShellLayout from "./components/agency/AgencyShellLayout";
-import ClientShellLayout from "./components/client-portal/ClientShellLayout";
+import ClientShellLayout from "./components/client/ClientShellLayout";
 import AgencyHomePage from "./routes/agency/home";
 import AgencyTasksPage from "./routes/agency/tasks";
 import AgencyContentsPage from "./routes/agency/contents";

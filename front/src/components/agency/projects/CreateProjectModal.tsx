@@ -2,7 +2,7 @@ import { StepBadge } from "~/components/ui/StepBadge";
 import { ChevronRightIcon } from "@heroicons/react/24/outline";
 import { useTranslation } from "react-i18next";
 import ModalOverlay from "~/components/ui/ModalOverlay";
-import CreateProjectForm from "~/components/projects/CreateProjectForm";
+import CreateProjectForm from "~/components/agency/projects/CreateProjectForm";
 
 interface CreateProjectModalProps {
     showModal: boolean;

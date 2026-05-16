@@ -6,9 +6,9 @@ import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedP
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { SettingsSection, getSettingsSectionsForRoles, settingsSectionToPath } from "~/models/enums/SettingsSection";
 import GeneralSettings from "~/components/settings/GeneralSettings";
-import AgencySettings from "~/components/settings/AgencySettings";
-import ProjectsSettings from "~/components/settings/ProjectsSettings";
-import SubscriptionSettings from "~/components/settings/SubscriptionSettings";
+import AgencySettings from "~/components/agency/settings/AgencySettings";
+import ProjectsSettings from "~/components/agency/settings/ProjectsSettings";
+import SubscriptionSettings from "~/components/agency/settings/SubscriptionSettings";
 
 export default function AgencySettingsSectionRoute() {
     const { section } = useParams();
