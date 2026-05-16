@@ -107,34 +107,6 @@ final class AgencyController extends AbstractController
             $agency->setName($dto->getName());
         }
 
-        if ($dto->getAccentColor() !== null && $dto->getAccentColor() !== $agency->getAccentColor()) {
-            $agency->setAccentColor($dto->getAccentColor());
-        }
-
-        if ($dto->getBackgroundColor() !== null && $dto->getBackgroundColor() !== $agency->getBackgroundColor()) {
-            $agency->setBackgroundColor($dto->getBackgroundColor());
-        }
-
-        if ($dto->getBackgroundSecondaryColor() !== null && $dto->getBackgroundSecondaryColor() !== $agency->getBackgroundSecondaryColor()) {
-            $agency->setBackgroundSecondaryColor($dto->getBackgroundSecondaryColor());
-        }
-
-        if ($dto->getTextColor() !== null && $dto->getTextColor() !== $agency->getTextColor()) {
-            $agency->setTextColor($dto->getTextColor());
-        }
-
-        if ($dto->getTextSecondaryColor() !== null && $dto->getTextSecondaryColor() !== $agency->getTextSecondaryColor()) {
-            $agency->setTextSecondaryColor($dto->getTextSecondaryColor());
-        }
-
-        if ($dto->getHeadingFont() !== null && $dto->getHeadingFont() !== $agency->getHeadingFont()) {
-            $agency->setHeadingFont($dto->getHeadingFont());
-        }
-
-        if ($dto->getBodyFont() !== null && $dto->getBodyFont() !== $agency->getBodyFont()) {
-            $agency->setBodyFont($dto->getBodyFont());
-        }
-
         if ($dto->getContactEmail() !== null && $dto->getContactEmail() !== $agency->getContactEmail()) {
             $agency->setContactEmail($dto->getContactEmail());
         }
