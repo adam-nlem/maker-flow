@@ -50,7 +50,7 @@ class StripeCheckoutService
     /**
      * @throws CheckoutSessionCreationException
      */
-    public function createSubscriptionCheckoutSession(Agency $agency, SubscriptionPlan $plan, string $checkoutRedirectPath = '/settings/subscription'): string
+    public function createSubscriptionCheckoutSession(Agency $agency, SubscriptionPlan $plan, string $checkoutRedirectPath = '/agency/settings/subscription'): string
     {
         $priceId = $this->stripePlanService->getPriceIdForPlan($plan);
 
@@ -105,8 +105,8 @@ class StripeCheckoutService
                         'quantity' => 1,
                     ],
                 ],
-                'success_url' => $this->frontendUrl . '/settings/subscription?checkout=success',
-                'cancel_url' => $this->frontendUrl . '/settings/subscription?checkout=cancel',
+                'success_url' => $this->frontendUrl . '/agency/settings/subscription?checkout=success',
+                'cancel_url' => $this->frontendUrl . '/agency/settings/subscription?checkout=cancel',
                 'metadata' => [
                     'agency_uuid' => $agency->getUuid(),
                 ],
