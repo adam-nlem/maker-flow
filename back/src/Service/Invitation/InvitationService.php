@@ -203,7 +203,6 @@ final class InvitationService
             $dto->getEmail(),
             $dto->getFirstName(),
             $agency->getName(),
-            $agency->getAccentColor(),
             $agency->getContactEmail(),
             $this->buildSetupUrl($invitation->getToken()),
         );

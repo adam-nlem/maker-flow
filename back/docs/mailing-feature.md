@@ -102,7 +102,7 @@ All templates extend `AbstractEmailTemplate` (recipient email/name + Symfony `Ad
 | `PrelaunchVerificationEmailTemplate` | Pre-launch confirmation | Pre-launch flow | `verification URL` |
 | `IntegrationTokenExpiredEmailTemplate` | Token expired notification | `TokenExpiredEventSubscriber` | `platform`, `accountName`, `projectName` |
 | `CollaboratorWelcomeEmailTemplate` | `Rejoignez l'agence {agencyName} sur MakerFlow` | `InvitationService::createForCollaborator` (via `SendEmailMessage`) | `agencyName`, `inviterName`, `roleLabel`, `setupUrl` (`{APP_URL}/invite/{token}`) |
-| `ClientWelcomeEmailTemplate` | `Bienvenue sur votre portail {agencyName}` | `InvitationService::createForClient` (via `SendEmailMessage`) | `agencyName`, `accentColor` (used to tint the heading and CTA), `contactEmail` (optional, rendered as `mailto:` line), `setupUrl` |
+| `ClientWelcomeEmailTemplate` | `Bienvenue sur votre portail {agencyName}` | `InvitationService::createForClient` (via `SendEmailMessage`) | `agencyName`, `contactEmail` (optional, rendered as `mailto:` line), `setupUrl` |
 
 The two welcome templates back the polymorphic Invitation flow described in `back/docs/invitation-feature.md`. Both link to the public `/invite/{token}` page on the frontend; the backend never exposes the password setup form itself.
 

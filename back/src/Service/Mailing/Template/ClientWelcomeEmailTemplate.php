@@ -8,7 +8,6 @@ class ClientWelcomeEmailTemplate extends AbstractEmailTemplate
         string $recipientEmail,
         string $recipientName,
         private readonly string $agencyName,
-        private readonly ?string $accentColor,
         private readonly ?string $contactEmail,
         private readonly string $setupUrl,
     ) {
@@ -22,9 +21,8 @@ class ClientWelcomeEmailTemplate extends AbstractEmailTemplate
 
     protected function getHtmlBody(): string
     {
-        $accentColor = $this->accentColor ?? '#141115';
         $contactLine = $this->contactEmail !== null
-            ? sprintf('<p style="color: #666; font-size: 14px;">Pour toute question, vous pouvez contacter votre agence à <a href="mailto:%1$s" style="color: %2$s;">%1$s</a>.</p>', htmlspecialchars($this->contactEmail), $accentColor)
+            ? sprintf('<p style="color: #666; font-size: 14px;">Pour toute question, vous pouvez contacter votre agence à <a href="mailto:%1$s" style="color: #141115;">%1$s</a>.</p>', htmlspecialchars($this->contactEmail))
             : '';
 
         return <<<HTML
@@ -34,7 +32,7 @@ class ClientWelcomeEmailTemplate extends AbstractEmailTemplate
             <meta charset="utf-8">
         </head>
         <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #141115;">
-            <h2 style="color: {$accentColor}; margin-bottom: 24px;">Bienvenue sur votre portail {$this->agencyName}</h2>
+            <h2 style="color: #141115; margin-bottom: 24px;">Bienvenue sur votre portail {$this->agencyName}</h2>
             <p>Bonjour {$this->to->getName()},</p>
             <p>Votre agence <strong>{$this->agencyName}</strong> a créé un espace dédié dans lequel vous pourrez suivre les performances de votre marque et vos contenus.</p>
             <p>Pour accéder à votre portail, définissez votre mot de passe en cliquant sur le bouton ci-dessous.</p>
@@ -43,7 +41,7 @@ class ClientWelcomeEmailTemplate extends AbstractEmailTemplate
                 Une inscription via le formulaire public créerait un compte séparé sans accès aux contenus de votre marque.
             </p>
             <div style="text-align: center; margin: 32px 0;">
-                <a href="{$this->setupUrl}" style="display: inline-block; background-color: {$accentColor}; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Définir mon mot de passe</a>
+                <a href="{$this->setupUrl}" style="display: inline-block; background-color: #141115; color: #ffffff; padding: 14px 32px; border-radius: 8px; text-decoration: none; font-weight: bold;">Définir mon mot de passe</a>
             </div>
             {$contactLine}
             <p style="color: #666; font-size: 14px;">Ce lien d'invitation expire dans 7 jours.</p>
