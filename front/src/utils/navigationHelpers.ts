@@ -1,4 +1,6 @@
 import { NavigationItem, navigationItemOptions, navigationItemTranslationKeys, navigationItemToPath } from "~/models/enums/NavigationItem";
+import { SettingsSection, settingsSectionTranslationKeys } from "~/models/enums/SettingsSection";
+import { agencySettingsPath, clientSettingsPath } from "~/routes/routePaths";
 
 /**
  * Derives the current NavigationItem from a pathname.
@@ -10,12 +12,29 @@ export function getCurrentNavigationItem(pathname: string): NavigationItem | nul
 }
 
 /**
- * Returns the i18n translation key of the current page based on the pathname.
- * Callers must run it through `t()` to get the localized label.
+ * Returns the ordered list of i18n keys to display in the top-bar breadcrumb for
+ * the current pathname. Most routes resolve to a single key (the nav item label);
+ * settings sub-routes resolve to two keys (Settings + the active section).
+ * Callers must run each key through `t()` to get the localized label.
  */
-export function getCurrentPageLabelKey(pathname: string): string | null {
+export function getCurrentBreadcrumbKeys(pathname: string): string[] {
+    const settingsKeys = getSettingsBreadcrumbKeys(pathname, agencySettingsPath)
+        ?? getSettingsBreadcrumbKeys(pathname, clientSettingsPath);
+    if (settingsKeys) return settingsKeys;
+
     const item = getCurrentNavigationItem(pathname);
-    return item ? navigationItemTranslationKeys[item] : null;
+    return item ? [navigationItemTranslationKeys[item]] : [];
+}
+
+function getSettingsBreadcrumbKeys(pathname: string, basePath: string): string[] | null {
+    if (pathname !== basePath && !pathname.startsWith(basePath + "/")) return null;
+
+    const keys: string[] = ["navigation:items.settings"];
+    const section = pathname.slice(basePath.length).replace(/^\//, "").split("/")[0] as SettingsSection;
+    if (section && settingsSectionTranslationKeys[section]) {
+        keys.push(settingsSectionTranslationKeys[section]);
+    }
+    return keys;
 }
 
 /**

@@ -7,5 +7,7 @@
         "contents": "Content",
         "tasks": "Tasks",
         "settings": "Settings"
-    }
+    },
+    "openSettings": "Open settings",
+    "openSidebar": "Open navigation"
 }

@@ -1,8 +1,8 @@
+import { useEffect, type CSSProperties } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ArrowRightStartOnRectangleIcon, Cog6ToothIcon, EnvelopeIcon, GlobeAltIcon } from "@heroicons/react/24/outline";
 import { FloatingPortal } from "@floating-ui/react";
-import type { CSSProperties } from "react";
 import { Button } from "~/components/ui/Button";
 import { Tag } from "~/components/ui/Tag";
 import AgencyLogo from "~/components/agency/AgencyLogo";
@@ -12,23 +12,31 @@ import { userRoleTranslationKeys } from "~/models/enums/UserRole";
 import { agencySettingsGeneralPath, clientSettingsGeneralPath } from "~/routes/routePaths";
 import type { Agency } from "~/models/Agency";
 
-interface IdentityModalProps {
+interface IdentityPopoverProps {
     agency: Agency;
     floatingRef: (node: HTMLElement | null) => void;
     floatingStyles: CSSProperties;
     getFloatingProps: () => Record<string, unknown>;
+    onClose: () => void;
 }
 
-export default function IdentityModal({ agency, floatingRef, floatingStyles, getFloatingProps }: IdentityModalProps) {
+export default function IdentityPopover({ agency, floatingRef, floatingStyles, getFloatingProps, onClose }: IdentityPopoverProps) {
     const { t } = useTranslation();
     const navigate = useNavigate();
     const { user } = useCurrentUser();
     const { logout, isPending } = useLogout();
 
+    useEffect(() => {
+        document.body.style.overflow = "hidden";
+        return () => { document.body.style.overflow = ""; };
+    }, []);
+
     const settingsPath = user?.isClient ? clientSettingsGeneralPath : agencySettingsGeneralPath;
 
     return (
         <FloatingPortal>
+            <div className="fixed inset-0 z-40 bg-black/40" />
+
             <div
                 ref={floatingRef}
                 style={floatingStyles}
@@ -64,7 +72,7 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
 
                     {user && (
                         <div className="flex flex-col gap-2 border-t border-pale-gray pt-4">
-                            <h3 className="text-body-xs text-muted-2 uppercase">{t("identityModal:sections.account")}</h3>
+                            <h3 className="text-body-xs text-muted-2 uppercase">{t("identityPopover:sections.account")}</h3>
                             <span className="text-heading-sm font-semibold truncate">{user.fullName}</span>
                             <span className="text-body-sm text-muted-2 truncate">{user.email}</span>
                             {user.displayRole && (
@@ -74,15 +82,13 @@ export default function IdentityModal({ agency, floatingRef, floatingStyles, get
                     )}
 
                     <div className="flex flex-col gap-3 mt-5">
-
-
-                        <Button type="button" style="secondary" onClick={() => navigate(settingsPath)}>
+                        <Button type="button" style="secondary" onClick={() => { onClose(); navigate(settingsPath); }}>
                             <Cog6ToothIcon className="size-4" strokeWidth={1.8} />
-                            <p className="text-sm">{t("identityModal:settings")}</p>
+                            <p className="text-sm">{t("identityPopover:settings")}</p>
                         </Button>
-                        <Button type="button" style="danger" onClick={() => { void logout(); }} isLoading={isPending} disabled={isPending}>
+                        <Button type="button" style="danger" onClick={() => { onClose(); void logout(); }} isLoading={isPending} disabled={isPending}>
                             <ArrowRightStartOnRectangleIcon className="size-4" strokeWidth={1.8} />
-                            <p className="text-sm">{t("identityModal:logout")}</p>
+                            <p className="text-sm">{t("identityPopover:logout")}</p>
                         </Button>
                     </div>
                 </div>

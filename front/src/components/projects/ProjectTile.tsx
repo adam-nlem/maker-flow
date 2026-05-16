@@ -12,6 +12,7 @@ interface ProjectTileProps {
   rightIcon?: ReactNode;
   onHoverRightIcon?: ReactNode;
   onClick?: () => void;
+  compact?: boolean;
 }
 
 export default function ProjectTile({
@@ -20,7 +21,8 @@ export default function ProjectTile({
   showCreatedAt = false,
   rightIcon,
   onHoverRightIcon,
-  onClick
+  onClick,
+  compact = false,
 }: ProjectTileProps) {
   const { t } = useTranslation()
   const [isHovered, setIsHovered] = useState(false)
@@ -31,10 +33,25 @@ export default function ProjectTile({
       seed: project.uuid,
       backgroundType: ["gradientLinear"],
     }).toDataUri()
-  }, [])
+  }, [project.uuid])
+
+  if (compact) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        aria-label={project.name}
+        className="relative group size-9 rounded-lg overflow-hidden cursor-pointer hover:ring-2 hover:ring-pale-gray-2 shrink-0"
+      >
+        <img src={avatar} alt="" className="w-full h-full" />
+        <span className="absolute left-full ml-2 px-2 py-1 rounded-md bg-dark text-clear text-body-xs whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
+          {project.name}
+        </span>
+      </button>
+    );
+  }
 
   return (
-
     <div
       className="flex flex-row justify-between gap-3 items-center hover:bg-pale-gray-2 cursor-pointer rounded-md p-2"
       onClick={onClick}
@@ -54,6 +71,5 @@ export default function ProjectTile({
       {isHovered && onHoverRightIcon}
       {rightIcon}
     </div>
-
   );
 }

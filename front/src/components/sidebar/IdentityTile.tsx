@@ -1,14 +1,15 @@
 import { useState } from "react";
 import { autoUpdate, flip, offset, shift, useDismiss, useFloating, useInteractions } from "@floating-ui/react";
 import AgencyLogo from "~/components/agency/AgencyLogo";
-import IdentityModal from "./IdentityModal";
+import IdentityPopover from "./IdentityPopover";
 import type { Agency } from "~/models/Agency";
 
 interface IdentityTileProps {
     agency: Agency;
+    compact?: boolean;
 }
 
-export default function IdentityTile({ agency }: IdentityTileProps) {
+export default function IdentityTile({ agency, compact = false }: IdentityTileProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const { refs, floatingStyles, context } = useFloating({
@@ -28,19 +29,27 @@ export default function IdentityTile({ agency }: IdentityTileProps) {
                 ref={refs.setReference}
                 onClick={() => setIsOpen((open) => !open)}
                 {...getReferenceProps()}
-                className="m-3 flex flex-row items-center gap-3 cursor-pointer rounded-lg p-1 hover:bg-surface-hover border border-transparent min-w-0"
+                className={
+                    compact
+                        ? "m-2 flex items-center justify-center cursor-pointer rounded-lg hover:bg-surface-hover"
+                        : "m-3 flex flex-row items-center gap-3 cursor-pointer rounded-lg p-1 hover:bg-surface-hover border border-transparent min-w-0"
+                }
+                aria-label={agency.name}
             >
                 <AgencyLogo agency={agency} className="size-9 shrink-0" />
-                <span className="text-heading-sm font-semibold whitespace-nowrap truncate text-left">
-                    {agency.name}
-                </span>
+                {!compact && (
+                    <span className="text-heading-sm font-semibold whitespace-nowrap truncate text-left">
+                        {agency.name}
+                    </span>
+                )}
             </div>
             {isOpen && (
-                <IdentityModal
+                <IdentityPopover
                     agency={agency}
                     floatingRef={refs.setFloating}
                     floatingStyles={floatingStyles}
                     getFloatingProps={getFloatingProps}
+                    onClose={() => setIsOpen(false)}
                 />
             )}
         </>

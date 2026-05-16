@@ -4,7 +4,11 @@
     "emptyState": {
         "title": "Aucun brouillon",
         "subtitle": "Créez votre premier brouillon pour lancer la boucle de validation client.",
-        "cta": "Nouveau brouillon"
+        "cta": "Nouveau brouillon",
+        "noSelection": {
+            "title": "Sélectionnez un brouillon",
+            "subtitle": "Choisissez un brouillon dans la liste pour voir ses détails, fichiers et révisions."
+        }
     },
     "actions": {
         "create": "Nouveau brouillon",
@@ -17,7 +21,7 @@
         "awaitingReview": "En attente de validation",
         "changesRequested": "Modifications demandées",
         "approved": "Validé",
-        "archived": "Archivé"
+        "rejected": "Rejeté"
     },
     "optimization": {
         "pending": "Préparation des fichiers…",

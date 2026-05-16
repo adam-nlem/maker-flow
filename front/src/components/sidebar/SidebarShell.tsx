@@ -1,8 +1,4 @@
 import type { ReactNode } from "react";
-import { useNavigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
-import SimpleTextButton from "~/components/ui/SimpleTextButton";
-import { privacyPolicyPath, termsOfServicePath } from "~/routes/routePaths";
 
 interface SidebarShellProps {
     topSection: ReactNode;
@@ -11,35 +7,24 @@ interface SidebarShellProps {
 }
 
 export default function SidebarShell({ topSection, bottomNav, identityTile }: SidebarShellProps) {
-    const navigate = useNavigate();
-    const { t } = useTranslation();
-
     return (
-        <div className="w-50 shrink-0 h-screen border-r border-pale-gray bg-clear flex flex-col justify-between overflow-hidden">
-            <div className="p-3">
+        <div className="w-14 shrink-0 h-full border-r border-pale-gray bg-clear flex flex-col justify-between overflow-visible">
+            <div className="p-2 flex flex-col items-center gap-2">
                 {topSection}
             </div>
 
             <div>
                 {bottomNav && (
-                    <div className="mb-5 flex flex-col p-3">
+                    <div className="mb-2 flex flex-col items-center gap-1 p-2">
                         {bottomNav}
                     </div>
                 )}
 
-                <div className="border-t border-pale-gray rounded w-full"></div>
-
-                {identityTile}
-
-                <div className="px-3 pb-3 flex gap-2 justify-center items-center text-body-xs">
-                    <SimpleTextButton onClick={() => navigate(privacyPolicyPath)}>
-                        {t("legal.privacyPolicy")}
-                    </SimpleTextButton>
-                    <span className="text-xs text-muted-2">·</span>
-                    <SimpleTextButton onClick={() => navigate(termsOfServicePath)}>
-                        {t("legal.termsOfService")}
-                    </SimpleTextButton>
-                </div>
+                {identityTile && (
+                    <div className="border-t border-pale-gray">
+                        {identityTile}
+                    </div>
+                )}
             </div>
         </div>
     );

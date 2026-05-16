@@ -4,7 +4,11 @@
     "emptyState": {
         "title": "No drafts yet",
         "subtitle": "Create your first draft to start a client review loop.",
-        "cta": "New draft"
+        "cta": "New draft",
+        "noSelection": {
+            "title": "Select a draft",
+            "subtitle": "Pick a draft from the list to see its details, files, and revisions."
+        }
     },
     "actions": {
         "create": "New draft",
@@ -17,7 +21,7 @@
         "awaitingReview": "Awaiting review",
         "changesRequested": "Changes requested",
         "approved": "Approved",
-        "archived": "Archived"
+        "rejected": "Rejected"
     },
     "optimization": {
         "pending": "Preparing files…",

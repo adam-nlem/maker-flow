@@ -1,6 +1,4 @@
-import { PlusIcon } from "@heroicons/react/24/outline"
 import { useTranslation } from "react-i18next"
-import { Button } from "~/components/ui/Button"
 import Pill from "~/components/ui/Pill"
 import { ContentsTab, contentsTabOptions, contentsTabTranslationKeys } from "~/models/enums/ContentsTab"
 import { useContentsStore } from "~/stores/contents/contentsStore"
@@ -31,23 +29,6 @@ export default function ContentListPanel({ projectUuid, isReadOnly = false }: Co
 
   return (
     <div className="flex-1 h-full flex flex-col overflow-hidden">
-      {/* Header */}
-      <div className="flex flex-row items-center justify-between px-6 py-4 border-b border-pale-gray">
-        <h1 className="text-heading-xl">{t("contents:pageTitle")}</h1>
-        {!isReadOnly && (
-          <Button
-            style="primary"
-            width="w-fit"
-            onClick={() => setIsCreateGroupModalOpen(true)}
-          >
-            <div className="flex flex-row items-center gap-2">
-              <PlusIcon className="size-4" strokeWidth={2} />
-              <p className="text-sm">{t("contents:newGroup")}</p>
-            </div>
-          </Button>
-        )}
-      </div>
-
       {/* Tab bar */}
       <div className="flex flex-row items-center gap-2 px-6 py-3 border-b border-pale-gray">
         {contentsTabOptions.map((tab) => (

@@ -21,10 +21,7 @@ export const usePostDraftsStore = createResettableStore<PostDraftsState & PostDr
             selectedDraftUuid: uuid,
             isCreatePanelOpen: false,
         }),
-        openCreatePanel: () => set({
-            isCreatePanelOpen: true,
-            selectedDraftUuid: null,
-        }),
+        openCreatePanel: () => set({ isCreatePanelOpen: true }),
         closeCreatePanel: () => set({ isCreatePanelOpen: false }),
         closeAll: () => set({
             selectedDraftUuid: null,

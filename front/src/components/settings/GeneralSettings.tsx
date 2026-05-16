@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages";
-import { SettingsSection, settingsSectionTranslationKeys } from "~/models/enums/SettingsSection";
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
 import PasswordRules from "~/components/ui/PasswordRules";
@@ -71,10 +70,6 @@ export default function GeneralSettings() {
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
-            <div className="px-4 md:px-6 py-4 md:py-5 border-b border-pale-gray">
-                <h2 className="text-heading-xl">{t(settingsSectionTranslationKeys[SettingsSection.General])}</h2>
-            </div>
-
             <form className="flex-1 flex flex-col min-h-0" onSubmit={handleSubmit}>
                 <div className="flex-1 overflow-y-auto scrollbar-none px-4 md:px-6 py-4 md:py-5">
                     <div className="flex flex-col gap-5">

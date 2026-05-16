@@ -1,17 +1,14 @@
-import { useTranslation } from "react-i18next";
-import { SettingsSection, settingsSectionTranslationKeys } from "~/models/enums/SettingsSection";
 import Shimmer from "~/components/ui/Shimmer";
 import { useCurrentAgency } from "~/hooks/api/agency/useCurrentAgency";
 import { useListCollaborators } from "~/hooks/api/collaborators/useListCollaborators";
 import { useCollaboratorModalsStore } from "~/stores/collaborators/collaboratorModalsStore";
-import AgencySettingsForm from "./AgencySettingsForm";
-import CollaboratorsSection from "./CollaboratorsSection";
-import InviteCollaboratorModal from "./InviteCollaboratorModal";
-import RemoveCollaboratorModal from "./RemoveCollaboratorModal";
+import AgencySettingsForm from "./agency/AgencySettingsForm";
+import CollaboratorsSection from "./agency/CollaboratorsSection";
+import InviteCollaboratorModal from "./agency/InviteCollaboratorModal";
+import RemoveCollaboratorModal from "./agency/RemoveCollaboratorModal";
 import DeleteInvitationModal from "~/components/invitations/DeleteInvitationModal";
 
 export default function AgencySettings() {
-    const { t } = useTranslation();
     const { agency, isLoading } = useCurrentAgency();
     const { agencyCollaborators } = useListCollaborators();
 
@@ -27,11 +24,6 @@ export default function AgencySettings() {
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
-            <div className="px-4 md:px-6 py-4 md:py-5 border-b border-pale-gray flex flex-col gap-1">
-                <h2 className="text-heading-xl">{t(settingsSectionTranslationKeys[SettingsSection.Agency])}</h2>
-                <p className="text-body-sm text-muted-2">{t("agencySettings:subtitle")}</p>
-            </div>
-
             <div className="flex-1 overflow-y-auto scrollbar-none">
                 {isLoading || !agency ? (
                     <div className="px-4 md:px-6 py-4 md:py-5 flex flex-col gap-4">

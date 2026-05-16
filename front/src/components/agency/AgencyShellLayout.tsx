@@ -3,6 +3,7 @@ import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import DesktopSidebar from "../sidebar/DesktopSidebar";
 import MobileSidebar from "../sidebar/MobileSidebar";
+import AgencyTopBar from "../topbar/AgencyTopBar";
 import { clientHomePath, onboardingPath } from "~/routes/routePaths";
 
 export default function AgencyShellLayout() {
@@ -18,16 +19,17 @@ export default function AgencyShellLayout() {
     }
 
     return (
-        <>
+        <div className="flex flex-row w-full h-screen">
+            {isDesktop && <DesktopSidebar />}
             {!isDesktop && <MobileSidebar />}
 
-            <div className="flex w-full h-screen">
-                {isDesktop && <DesktopSidebar />}
+            <div className="flex-1 min-w-0 h-full flex flex-col">
+                <AgencyTopBar />
 
-                <div className={`flex-1 min-w-0 h-full ${isDesktop ? '' : 'pt-12'}`}>
+                <div className="flex-1 min-h-0 overflow-hidden">
                     <Outlet />
                 </div>
             </div>
-        </>
+        </div>
     );
 }

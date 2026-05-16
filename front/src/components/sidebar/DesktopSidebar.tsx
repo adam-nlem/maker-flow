@@ -1,13 +1,12 @@
-import { ChevronUpDownIcon, PencilSquareIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { PencilSquareIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import { useCurrentAgency } from "~/hooks/api/agency/useCurrentAgency";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
-import { Button } from "../ui/Button";
 import CreateProjectModal from "../projects/CreateProjectModal";
 import ProjectTile from "../projects/ProjectTile";
-import IconWithTextTile from "../ui/IconWithTextTile";
+import IconRailTile from "./IconRailTile";
 import IdentityTile from "./IdentityTile";
 import { useLocation, useNavigate } from "react-router-dom";
 import Shimmer from "../ui/Shimmer";
@@ -54,74 +53,50 @@ export default function DesktopSidebar() {
   const topSection = (
     <>
       {/* PROJECT SELECTOR */}
-      {isLoadingProjects ? <Shimmer width="w-10" height="h-10" /> : <div>
+      {isLoadingProjects ? (
+        <Shimmer width="w-9" height="h-9" radius="rounded-lg" />
+      ) : focusedProject ? (
+        <SelectDropdown<Project>
+          items={projects}
+          selectedItemId={focusedProject.uuid}
+          getItemId={(project) => project.uuid}
+          onSelect={(project) => setFocusedProjectUuid(project.uuid)}
+          onClickCreateButton={isAtProjectLimit ? undefined : () => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
+          createButtonLabel={t("sidebar:createProject")}
+          renderTrigger={({ onClick }) => (
+            <ProjectTile project={focusedProject} onClick={onClick} compact />
+          )}
+          renderItem={({ item, isSelected, onSelect }) => (
+            <ProjectTile
+              project={item}
+              isSelected={isSelected}
+              showCreatedAt={true}
+              onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-muted-2 -mb-0.5" strokeWidth={2} onClick={(e) => {
+                e.stopPropagation()
+                setUpdatingProjectUuid(item.uuid)
+              }} />}
+              onClick={onSelect}
+            />
+          )}
+        />
+      ) : (
+        <button
+          type="button"
+          onClick={() => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
+          disabled={isAtProjectLimit}
+          aria-label={t("sidebar:createProject")}
+          className="size-9 flex items-center justify-center rounded-lg bg-clear-3 text-dark-2 hover:bg-surface-hover disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <PlusIcon className="size-5" strokeWidth={2} />
+        </button>
+      )}
 
-        {focusedProject ?
-          <SelectDropdown<Project>
-            items={projects}
-            selectedItemId={focusedProject?.uuid}
-            getItemId={(project) => project.uuid}
-            onSelect={(project) => {
-              setFocusedProjectUuid(project.uuid)
-            }}
-            onClickCreateButton={isAtProjectLimit ? undefined : () => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
-            createButtonLabel={t("sidebar:createProject")}
-            renderTrigger={({ onClick }) => (
-              <ProjectTile
-                project={focusedProject}
-                rightIcon={
-                  <ChevronUpDownIcon className="size-5 text-muted-2 -mb-0.5" strokeWidth={2} />
-                }
-                onClick={onClick}
-              />
-            )}
-            renderItem={({ item, isSelected, onSelect }) => (
-              <ProjectTile
-                project={item}
-                isSelected={isSelected}
-                showCreatedAt={true}
-                onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-muted-2 -mb-0.5" strokeWidth={2} onClick={(e) => {
-                  e.stopPropagation()
-                  setUpdatingProjectUuid(item.uuid)
-                }} />}
-                onClick={onSelect}
-              />
-            )}
-          />
-          :
-          isAtProjectLimit ? (
-            <div className="flex flex-col items-center gap-1">
-              <Button type="button" disabled>
-                <div className="flex flex-row justify-center items-center gap-3 shrink-0">
-                  <p className="text-sm">{t("sidebar:createProject")}</p>
-                  <PlusIcon className="size-4" strokeWidth={2} />
-                </div>
-              </Button>
-              <p className="text-body-xs text-muted-2 text-center">{t("sidebar:projectLimitReached")}</p>
-            </div>
-          ) : (
-            <Button
-              type="button"
-              onClick={() => {
-                setIsCreateProjectModalOpen(!isCreateProjectModalOpen)
-              }}
-            >
-              <div className="flex flex-row justify-center items-center gap-3 shrink-0">
-                <p className="text-sm">{t("sidebar:createProject")}</p>
-                <PlusIcon className="size-4" strokeWidth={2} />
-              </div>
-            </Button>
-          )
-        }
-
-      </div>}
-
-      {/* NAVIGATION SECTION */}
-      <div className="mt-10 flex flex-col gap-1">
+      {/* NAVIGATION */}
+      <div className="mt-4 flex flex-col items-center gap-1">
         {sidebarMainNavigationItems.map((item) => {
           const selected = isNavigationItemSelected(item, location.pathname);
           return (
-            <IconWithTextTile
+            <IconRailTile
               key={item}
               icon={selected ? navigationItemToIconSolid[item] : navigationItemToIcon[item]}
               label={t(navigationItemTranslationKeys[item])}
@@ -132,24 +107,22 @@ export default function DesktopSidebar() {
         })}
       </div>
 
-      {/* INTEGRATION SECTION */}
-      <div className="mt-10 flex flex-col gap-1">
-        <h1 className="text-body-xs whitespace-nowrap px-2">
-          {t("sidebar:platformsHeader")}
-        </h1>
+      {/* INTEGRATIONS */}
+      <div className="mt-4 flex flex-col items-center gap-1">
         {platformOptions.map((platform) => (
           <IntegrationTile
             key={platform}
             platform={platform}
             status={integrations.find((i) => i.platform === platform)?.status}
             onClick={() => focusedProjectUuid && openIntegrationLoginModal(focusedProjectUuid, platform)}
+            compact
           />
         ))}
       </div>
     </>
   );
 
-  const identityTile = agency ? <IdentityTile agency={agency} /> : null;
+  const identityTile = agency ? <IdentityTile agency={agency} compact /> : null;
 
   return (
     <>
@@ -160,7 +133,7 @@ export default function DesktopSidebar() {
         onProjectCreated={() => setIsCreateProjectModalOpen(false)}
         onClose={() => setIsCreateProjectModalOpen(false)}
       />
-
+  
       {updatingProjectUuid && <UpdateProjectModal
         project={projects.find((project) => project.uuid === updatingProjectUuid)}
         showModal

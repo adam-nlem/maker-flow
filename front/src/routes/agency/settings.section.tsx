@@ -6,7 +6,7 @@ import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedP
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { SettingsSection, getSettingsSectionsForRoles, settingsSectionToPath } from "~/models/enums/SettingsSection";
 import GeneralSettings from "~/components/settings/GeneralSettings";
-import AgencySettings from "~/components/settings/agency/AgencySettings";
+import AgencySettings from "~/components/settings/AgencySettings";
 import ProjectsSettings from "~/components/settings/ProjectsSettings";
 import SubscriptionSettings from "~/components/settings/SubscriptionSettings";
 

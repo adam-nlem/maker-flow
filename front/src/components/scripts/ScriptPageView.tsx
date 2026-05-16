@@ -24,7 +24,6 @@ export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
     const listPanel = (
         <ScriptListPanel
             scripts={scripts}
-            projectUuid={projectUuid}
             hasMore={hasMore}
             isLoadingMore={isLoadingMore}
             listMore={listMore}

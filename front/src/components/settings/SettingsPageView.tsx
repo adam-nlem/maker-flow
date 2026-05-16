@@ -42,8 +42,7 @@ export default function SettingsPageView({ basePath = agencySettingsPath }: Sett
             )}
 
             {isDesktop && (
-                <SidePanel title={t("settings:title")} side="left">
-                    <div className="p-3 flex flex-col gap-1">
+                    <div className="p-3 flex flex-col align-center gap-1 w-50 border-r border-pale-gray">
                         {visibleSections.map((section) => (
                             <IconWithTextTile
                                 key={section}
@@ -54,7 +53,7 @@ export default function SettingsPageView({ basePath = agencySettingsPath }: Sett
                             />
                         ))}
                     </div>
-                </SidePanel>
+
             )}
 
             <div className={`flex-1 min-h-0 ${isDesktop ? 'overflow-hidden' : ''}`}>

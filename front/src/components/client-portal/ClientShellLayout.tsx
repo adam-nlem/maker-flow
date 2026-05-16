@@ -6,6 +6,7 @@ import { HttpException } from "~/services/httpClient/HttpException";
 import ClientDesktopSidebar from "./sidebar/ClientDesktopSidebar";
 import ClientMobileSidebar from "./sidebar/ClientMobileSidebar";
 import ClientPortalLockedView from "./ClientPortalLockedView";
+import ClientTopBar from "./topbar/ClientTopBar";
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore";
 import { agencyHomePath } from "~/routes/routePaths";
 
@@ -26,16 +27,17 @@ export default function ClientShellLayout() {
     }
 
     return (
-        <>
+        <div className="flex flex-row w-full h-screen">
+            {isDesktop && <ClientDesktopSidebar />}
             {!isDesktop && <ClientMobileSidebar />}
 
-            <div className="flex w-full h-screen">
-                {isDesktop && <ClientDesktopSidebar />}
+            <div className="flex-1 min-w-0 h-full flex flex-col">
+                <ClientTopBar />
 
-                <div className={`flex-1 min-w-0 h-full ${isDesktop ? '' : 'pt-12'}`}>
+                <div className="flex-1 min-h-0 overflow-hidden">
                     <Outlet />
                 </div>
             </div>
-        </>
+        </div>
     );
 }
