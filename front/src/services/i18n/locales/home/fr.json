@@ -3,6 +3,7 @@
     "noPostGroups": "Aucun groupe de posts trouvé.",
     "rankingPostGroups": "Classement des groupes de posts",
     "rankingPosts": "Classement des posts",
+    "engagementByPlatform": "Engagement par plateforme",
     "postsCount_one": "{{count}} post",
     "postsCount_other": "{{count}} posts",
     "overview": {

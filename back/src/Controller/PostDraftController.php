@@ -58,6 +58,8 @@ final class PostDraftController extends AbstractController
             $project,
             $queryParamDto->getPage(),
             $queryParamDto->getLimit(),
+            $queryParamDto->getStatus(),
+            $queryParamDto->getSearchTerm(),
         );
 
         return $this->json(

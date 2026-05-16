@@ -23,7 +23,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
     icon,
     trailingIcon,
     autoComplete = 'off',
-    textStyle = 'text-sm',
+    textStyle = 'text-xs',
     ...props },
     ref) => {
 

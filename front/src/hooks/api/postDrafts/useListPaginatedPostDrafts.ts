@@ -2,19 +2,28 @@ import { useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { httpClient } from '~/services/httpClient/httpClient';
 import { PostDraft } from '~/models/PostDraft';
+import type { PostDraftStatus } from '~/models/enums/PostDraftStatus';
 import { postDraftsQueryKeys } from './postDraftsQueryKeys';
 
 interface UseListPaginatedPostDraftsOptions {
     projectUuid: string | null;
     limit?: number;
+    status?: PostDraftStatus;
+    searchTerm?: string;
 }
 
-export function useListPaginatedPostDrafts({ projectUuid, limit = 20 }: UseListPaginatedPostDraftsOptions) {
+export function useListPaginatedPostDrafts({ projectUuid, limit = 20, status, searchTerm }: UseListPaginatedPostDraftsOptions) {
     const query = useInfiniteQuery({
-        queryKey: postDraftsQueryKeys.list(projectUuid ?? '', limit),
+        queryKey: postDraftsQueryKeys.list(projectUuid ?? '', status, searchTerm),
         queryFn: async ({ pageParam }) => {
             const res = await httpClient.get('/post-drafts', {
-                params: { projectUuid, page: pageParam, limit },
+                params: {
+                    projectUuid,
+                    page: pageParam,
+                    limit,
+                    ...(status && { status }),
+                    ...(searchTerm && { searchTerm }),
+                },
             });
             return res.data.map((json: any) => PostDraft.fromJSON(json));
         },

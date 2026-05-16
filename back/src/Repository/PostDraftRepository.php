@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Enum\PostDraftStatus;
 use App\Entity\PostDraft;
 use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -61,14 +62,31 @@ class PostDraftRepository extends ServiceEntityRepository
     /**
      * @return PostDraft[]
      */
-    public function getByProjectPaginated(Project $project, int $page, int $limit): array
-    {
-        return $this->createQueryBuilder('pd')
+    public function getByProjectPaginated(
+        Project $project,
+        int $page,
+        int $limit,
+        ?PostDraftStatus $status = null,
+        ?string $searchTerm = null,
+    ): array {
+        $qb = $this->createQueryBuilder('pd')
             ->where('pd.project = :project')
             ->setParameter('project', $project)
             ->orderBy('pd.updatedAt', 'DESC')
             ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
+            ->setMaxResults($limit);
+
+        if ($status !== null) {
+            $qb->andWhere('pd.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        if ($searchTerm !== null) {
+            $qb->andWhere('LOWER(pd.title) LIKE LOWER(:searchTerm)')
+                ->setParameter('searchTerm', '%' . $searchTerm . '%');
+        }
+
+        return $qb
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);

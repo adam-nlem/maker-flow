@@ -3,6 +3,7 @@
     "noPostGroups": "No post groups found.",
     "rankingPostGroups": "Top post groups",
     "rankingPosts": "Top posts",
+    "engagementByPlatform": "Engagement by platform",
     "postsCount_one": "{{count}} post",
     "postsCount_other": "{{count}} posts",
     "overview": {

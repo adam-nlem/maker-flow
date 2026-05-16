@@ -156,6 +156,34 @@ transition-colors    /* Color transitions */
 transition-all duration-300 ease-in-out  /* Panel animations */
 ```
 
+### List items
+
+Pattern used for sidebar / left-panel list cards (Scripts, PostDrafts).
+
+```html
+<button class="w-full text-left flex gap-2.5 p-2.5 rounded-xl border transition-colors cursor-pointer
+               border-transparent hover:bg-clear-2">          <!-- default -->
+<button class="w-full text-left flex gap-2.5 p-2.5 rounded-xl border transition-colors cursor-pointer
+               bg-clear-2 border-pale-gray shadow-sm">         <!-- active / selected -->
+```
+
+The active state is intentionally neutral (no `bg-primary/10` mint tint) so the page reads as white-dominant with the status pill carrying the color cue.
+
+### Status filter chips
+
+Compact dark-inverted chips for left-panel filter rows (e.g. `All / Awaiting / Changes / Approved / Rejected` on `/agency/drafts`).
+
+```html
+<!-- unselected -->
+<button class="inline-flex items-center h-6 px-2.5 rounded-full border text-body-xs
+               border-pale-gray text-muted hover:bg-clear-2">
+<!-- selected -->
+<button class="inline-flex items-center h-6 px-2.5 rounded-full border text-body-xs
+               bg-dark text-clear border-dark">
+```
+
+This is distinct from `ToggleChip`, which uses a `bg-primary text-clear` selected state. Use the dark-inverted chip when the chip row sits next to colored status pills and should not compete for color.
+
 ---
 
 ## UI Components

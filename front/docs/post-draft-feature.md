@@ -29,7 +29,7 @@ The list endpoint returns a per-row shape with `latestRevision` (single, summary
 
 | Hook | Endpoint | Notes |
 |---|---|---|
-| `useListPostDrafts({ projectUuid, page, limit })` | `GET /post-drafts` | Returns `{ items, total, page, limit }`. Disabled when `projectUuid` is null. |
+| `useListPaginatedPostDrafts({ projectUuid, limit, status?, searchTerm? })` | `GET /post-drafts` | `useInfiniteQuery` over pages of `limit` (default 20). Optional `status` and `searchTerm` are forwarded to the API only when truthy; the query key tracks them so React Query refetches when filters change. Disabled when `projectUuid` is null. |
 | `useShowPostDraft({ uuid })` | `GET /post-drafts/{uuid}` | Polls every 4 s while any revision is `Pending` or `Optimizing`. |
 | `useCreatePostDraft()` | `POST /post-drafts` | Builds `FormData` with one `files[]` entry per file. Invalidates the list. |
 | `useUpdatePostDraft()` | `PATCH /post-drafts/{uuid}` | Invalidates list + detail. |
@@ -39,7 +39,9 @@ Query keys live in `postDraftsQueryKeys.ts`.
 
 ## State
 
-`front/src/stores/postDrafts/postDraftsStore.ts` — Zustand (resettable, not persisted):
+Two stores under `front/src/stores/postDrafts/`:
+
+`postDraftsStore.ts` — Zustand (resettable, not persisted):
 
 ```ts
 { selectedDraftUuid: string | null, isCreatePanelOpen: boolean }
@@ -48,13 +50,22 @@ Query keys live in `postDraftsQueryKeys.ts`.
 
 `selectDraft(uuid)` closes the create modal so the modal never sits over a newly-clicked detail. `openCreatePanel()` no longer clears `selectedDraftUuid` — the previously-selected draft stays visible behind the modal backdrop, and dismissing the modal returns the user to where they were.
 
-## Components (`front/src/components/postDrafts/`)
+`postDraftFilterStore.ts` — Zustand (resettable, persisted with `persist` middleware under key `app:postDrafts:filter`, partialized to **`selectedStatus` only** — search term is intentionally session-scoped):
+
+```ts
+{ selectedStatus: PostDraftStatus | null, searchTerm: string }
++ setSelectedStatus / setSearchTerm
+```
+
+`selectedStatus === null` means "All" — the chip filter omits the `status` query param so the API returns every status. Mirrors `useScriptFilterStore`.
+
+## Components (`front/src/components/agency/postDrafts/`)
 
 | Component | Role |
 |---|---|
 | `PostDraftsPageView` | Orchestrator. Two-region layout: persistent left list (`w-75` ≈ 300 px, `border-r border-pale-gray`) + scrollable `<main>` that renders `PostDraftDetailPanel` when a draft is selected, otherwise a centered empty state (`emptyState.noSelection.*`). The create flow is rendered above the layout via `PostDraftCreateModal`. |
-| `PostDraftsList` | Header (title + "New draft" CTA) + scrollable list. Empty state with CTA. |
-| `PostDraftListItem` | Single row: thumbnail (first optimized file when ready, or a media-type icon otherwise), title, status badge, mediaType + relative-updated-time, optimization label when in-flight. |
+| `PostDraftsList` | Fixed toolbar (SearchBar with Cmd/Ctrl+F focus shortcut + row of status filter chips: `All / Awaiting / Changes / Approved / Rejected`) + scrollable list with infinite scroll. Empty state differentiates "no drafts yet" (with "New draft" CTA) from "no matches" (when a search/status filter is active). Filtering is server-side via the extended `useListPaginatedPostDrafts`. |
+| `PostDraftListItem` | Single row: thumbnail (first optimized file when ready, plain surface otherwise) with always-on type-icon overlay (bottom-right) + carousel `1/N` slide-count badge (top-right). Title, mediaType · relative-updated-time meta row, status pill, optimization label when in-flight. Active state uses the neutral `bg-clear-2 border-pale-gray shadow-sm` (no mint tint). |
 | `PostDraftDetailPanel` | Media viewer + metadata + inline edit form (title/description/notes/script). Edit is gated to `AwaitingReview`. Delete confirmation via `window.confirm`. |
 | `PostDraftCreateModal` | `ModalOverlay` (`w-160`, `max-h-[calc(100vh-80px)]`) hosting the create form inline (title / mediaType radio / files dropzone / description / notes / script selector / submit). Driven by `showModal` / `onClose` props. Frontend validates file count + size + MIME before posting. Catches HTTP 409 → script-already-has-draft. On success calls `selectDraft(uuid)` which auto-closes the panel. |
 | `PostDraftFileDropzone` | Drag-drop area + per-file row with reorder (↑/↓) for carousel. Single-file for video/image. Wraps the design of `front/src/components/ui/FileUpload.tsx` but built inline so the shared `FileUpload` keeps its single-file contract. |

@@ -12,7 +12,8 @@
         },
         "collaborator": {
             "title": "Join {{agencyName}} on MakerFlow",
-            "subtitle": "You've been invited as a {{role}}. Set up your password to get started."
+            "subtitle": "You've been invited as a {{role}}. Set up your password to get started.",
+            "noRoleSubtitle": "Set up your password to join the agency."
         },
         "invitedBy": "Invited by {{name}}",
         "submit": "Set my password",

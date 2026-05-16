@@ -8,7 +8,21 @@
         "noSelection": {
             "title": "Select a draft",
             "subtitle": "Pick a draft from the list to see its details, files, and revisions."
+        },
+        "noResults": {
+            "title": "No matches",
+            "subtitle": "Adjust your search or filter to see other drafts."
         }
+    },
+    "search": {
+        "placeholder": "Search drafts…"
+    },
+    "filters": {
+        "all": "All",
+        "awaitingReview": "Awaiting",
+        "changesRequested": "Changes",
+        "approved": "Approved",
+        "rejected": "Rejected"
     },
     "actions": {
         "create": "New draft",

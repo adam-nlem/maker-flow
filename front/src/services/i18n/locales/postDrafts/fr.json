@@ -8,7 +8,21 @@
         "noSelection": {
             "title": "Sélectionnez un brouillon",
             "subtitle": "Choisissez un brouillon dans la liste pour voir ses détails, fichiers et révisions."
+        },
+        "noResults": {
+            "title": "Aucun résultat",
+            "subtitle": "Ajustez votre recherche ou votre filtre pour voir d'autres brouillons."
         }
+    },
+    "search": {
+        "placeholder": "Rechercher…"
+    },
+    "filters": {
+        "all": "Tous",
+        "awaitingReview": "En attente",
+        "changesRequested": "À modifier",
+        "approved": "Validés",
+        "rejected": "Rejetés"
     },
     "actions": {
         "create": "Nouveau brouillon",
