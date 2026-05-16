@@ -66,7 +66,7 @@ class ScriptRepository extends ServiceEntityRepository
     /**
      * @return Script[]
      */
-    public function getByProjectPaginated(Project $project, int $page, int $limit, ?ScriptStatus $status = null): array
+    public function getByProjectPaginated(Project $project, int $page, int $limit, ?ScriptStatus $status = null, ?string $searchTerm = null): array
     {
         $qb = $this->createQueryBuilder('s')
             ->where('s.project = :project')
@@ -78,6 +78,11 @@ class ScriptRepository extends ServiceEntityRepository
         if ($status !== null) {
             $qb->andWhere('s.status = :status')
                 ->setParameter('status', $status);
+        }
+
+        if ($searchTerm !== null) {
+            $qb->andWhere('LOWER(s.title) LIKE LOWER(:searchTerm)')
+                ->setParameter('searchTerm', '%' . $searchTerm . '%');
         }
 
         return $qb

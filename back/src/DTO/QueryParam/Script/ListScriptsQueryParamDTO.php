@@ -23,6 +23,8 @@ class ListScriptsQueryParamDTO extends AbstractQueryParamDTO
 
     private ?ScriptStatus $status;
 
+    private ?string $searchTerm;
+
     public function __construct(
         protected RequestStack $requestStack,
         protected ValidatorInterface $validator,
@@ -36,6 +38,8 @@ class ListScriptsQueryParamDTO extends AbstractQueryParamDTO
         $this->page = $queryParams["page"];
         $this->limit = $queryParams["limit"];
         $this->status = ScriptStatus::tryFrom($queryParams["status"] ?? "");
+        $searchTerm = trim((string) ($queryParams["searchTerm"] ?? ""));
+        $this->searchTerm = $searchTerm === "" ? null : $searchTerm;
     }
 
     public function getProjectUuid(): string
@@ -56,5 +60,10 @@ class ListScriptsQueryParamDTO extends AbstractQueryParamDTO
     public function getStatus(): ?ScriptStatus
     {
         return $this->status;
+    }
+
+    public function getSearchTerm(): ?string
+    {
+        return $this->searchTerm;
     }
 }

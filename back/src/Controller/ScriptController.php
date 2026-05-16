@@ -45,7 +45,13 @@ final class ScriptController extends AbstractController
             throw new ProjectNotFoundException();
         }
 
-        $scripts = $scriptRepository->getByProjectPaginated($project, $queryParamDto->getPage(), $queryParamDto->getLimit(), $queryParamDto->getStatus());
+        $scripts = $scriptRepository->getByProjectPaginated(
+            $project,
+            $queryParamDto->getPage(),
+            $queryParamDto->getLimit(),
+            $queryParamDto->getStatus(),
+            $queryParamDto->getSearchTerm(),
+        );
 
         return $this->json(
             data: $scripts,

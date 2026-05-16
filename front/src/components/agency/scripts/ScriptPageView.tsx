@@ -1,6 +1,7 @@
 import { useTranslation } from "react-i18next";
 import { useListPaginatedScripts } from "~/hooks/api/scripts/useListPaginatedScripts";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
+import { useScriptFilterStore } from "~/stores/scripts/scriptFilterStore";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import ScriptListPanel from "./ScriptListPanel";
 import ScriptEditorPanel from "./ScriptEditorPanel";
@@ -14,7 +15,11 @@ interface ScriptPageViewProps {
 
 export default function ScriptPageView({ projectUuid }: ScriptPageViewProps) {
     const { t } = useTranslation();
-    const { scripts, hasMore, isLoadingMore, listMore } = useListPaginatedScripts({ projectUuid });
+    const searchTerm = useScriptFilterStore((s) => s.searchTerm);
+    const { scripts, hasMore, isLoadingMore, listMore } = useListPaginatedScripts({
+        projectUuid,
+        searchTerm: searchTerm || undefined,
+    });
     const focusedScriptUuid = useFocusScriptStore((s) => s.focusedScriptUuid);
     const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid);
     const isDesktop = useIsDesktop();

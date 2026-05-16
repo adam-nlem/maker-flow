@@ -2,6 +2,7 @@
     "header": "Scripts",
     "noScripts": "Aucun script.",
     "newScriptHint": "Cliquez sur + pour en créer un.",
+    "searchPlaceholder": "Rechercher un script...",
     "newScriptTitle": "Nouveau script",
     "limitReached": "Votre abonnement ne vous permet plus de générer de script",
     "selectOrCreate": "Sélectionnez ou créez un script.",
