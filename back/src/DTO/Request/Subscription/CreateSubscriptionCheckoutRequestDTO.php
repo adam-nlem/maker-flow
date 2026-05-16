@@ -10,7 +10,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CreateSubscriptionCheckoutRequestDTO extends AbstractRequestDTO
 {
     private SubscriptionPlan $plan;
-    private string $checkoutRedirectPath = '/settings/subscription';
+    private string $checkoutRedirectPath = '/agency/settings/subscription';
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -22,7 +22,7 @@ class CreateSubscriptionCheckoutRequestDTO extends AbstractRequestDTO
     public function fromPayload(array $payload)
     {
         $this->plan = SubscriptionPlan::tryFrom($payload["plan"]);
-        $this->checkoutRedirectPath = $payload["checkoutRedirectPath"] ?? '/settings/subscription';
+        $this->checkoutRedirectPath = $payload["checkoutRedirectPath"] ?? '/agency/settings/subscription';
     }
 
     public function buildObject(): mixed
