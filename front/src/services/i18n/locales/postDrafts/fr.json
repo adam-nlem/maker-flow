@@ -94,6 +94,15 @@
             "uploaded": "Uploadé",
             "updated": "Mis à jour"
         },
+        "mediaLabel": {
+            "video": "Vidéo"
+        },
+        "carousel": {
+            "slideCounter": "{{current}}/{{total}}",
+            "previousSlide": "Diapositive précédente",
+            "nextSlide": "Diapositive suivante",
+            "goToSlide": "Aller à la diapositive {{index}}"
+        },
         "filesPending": "Préparation des fichiers en cours. Cette page se mettra à jour automatiquement.",
         "filesFailed": "L'optimisation a échoué. Veuillez réessayer ou contacter le support."
     },

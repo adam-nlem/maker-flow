@@ -28,3 +28,14 @@ export function formatDurationToFrench(totalSeconds: number, maxUnits: number = 
 
     return parts.length > 0 ? parts.join(' ') : '0s';
 }
+
+/**
+ * Formats a duration in seconds into a clock-style `m:ss` label (e.g. for a video player footer).
+ * Examples: 5 → "0:05", 42 → "0:42", 135 → "2:15".
+ */
+export function formatDurationToClock(totalSeconds: number): string {
+    const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+    const minutes = Math.floor(safeSeconds / 60);
+    const seconds = safeSeconds % 60;
+    return `${minutes}:${seconds.toString().padStart(2, '0')}`;
+}

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Banner } from "~/components/ui/Banner";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
-import PostDraftMediaViewer from "./PostDraftMediaViewer";
+import PostDraftMediaViewer from "~/components/postDrafts/PostDraftMediaViewer";
 import PostDraftDetailHeader from "./PostDraftDetailHeader";
 import PostDraftDetailBody from "./PostDraftDetailBody";
 import PostDraftDetailSideCard from "./PostDraftDetailSideCard";

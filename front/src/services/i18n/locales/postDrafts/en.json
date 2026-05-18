@@ -94,6 +94,15 @@
             "uploaded": "Uploaded",
             "updated": "Updated"
         },
+        "mediaLabel": {
+            "video": "Video"
+        },
+        "carousel": {
+            "slideCounter": "{{current}}/{{total}}",
+            "previousSlide": "Previous slide",
+            "nextSlide": "Next slide",
+            "goToSlide": "Go to slide {{index}}"
+        },
         "filesPending": "Files are being prepared. This panel will update automatically.",
         "filesFailed": "Optimization failed. Please try uploading again or contact support."
     },
