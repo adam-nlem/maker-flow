@@ -6,6 +6,26 @@
     "newScriptTitle": "New script",
     "limitReached": "Your subscription doesn't allow generating more scripts.",
     "selectOrCreate": "Select or create a script.",
+    "picker": {
+        "linkedField": {
+            "label": "Linked script",
+            "linkAction": "Link a script",
+            "changeAction": "Change",
+            "unlinkAction": "Unlink"
+        },
+        "modalTitle": "Pick a script",
+        "searchPlaceholder": "Search scripts…",
+        "statusAll": "All",
+        "confirm": "Select",
+        "empty": {
+            "title": "No scripts yet",
+            "subtitle": "Create a script first to link it here."
+        },
+        "noResults": {
+            "title": "No matches",
+            "subtitle": "Adjust your search or status filter."
+        }
+    },
     "card": {
         "deleteConfirm": "Are you sure you want to delete this script? This action is irreversible."
     },

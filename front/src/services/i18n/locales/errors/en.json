@@ -87,7 +87,24 @@
     },
     "agency": {
         "missing": "You're not attached to any agency.",
-        "subscriptionInactive": "Your agency's subscription is no longer active."
+        "alreadyExists": "You already belong to an agency.",
+        "subscriptionInactive": "Your agency's subscription is no longer active.",
+        "logoInvalid": "The provided agency logo is invalid."
+    },
+    "agencyCollaborator": {
+        "notFound": "Collaborator not found in this agency."
+    },
+    "projectClient": {
+        "notFound": "Client not found in this project."
+    },
+    "onboarding": {
+        "invalidStep": "This onboarding step is not applicable."
+    },
+    "postDraft": {
+        "fileInvalid": "The provided file(s) are invalid.",
+        "notFound": "Post draft not found.",
+        "scriptAlreadyHasDraft": "This script already has a draft.",
+        "locked": "This draft cannot be modified in its current status."
     },
     "hookTemplate": {
         "notFound": "Hook template not found.",

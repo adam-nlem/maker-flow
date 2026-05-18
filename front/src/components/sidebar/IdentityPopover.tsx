@@ -76,7 +76,7 @@ export default function IdentityPopover({ agency, floatingRef, floatingStyles, g
                             <span className="text-heading-sm font-semibold truncate">{user.fullName}</span>
                             <span className="text-body-sm text-muted-2 truncate">{user.email}</span>
                             {user.displayRole && (
-                                <Tag color="primary" label={t(userRoleTranslationKeys[user.displayRole])} className="self-start" />
+                                <Tag bgClassName="bg-primary/10" textClassName="text-primary" label={t(userRoleTranslationKeys[user.displayRole])} className="self-start" />
                             )}
                         </div>
                     )}

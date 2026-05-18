@@ -10,7 +10,7 @@ import { useDeleteChat } from "~/hooks/api/chats/useDeleteChat";
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { useChatStore } from "~/stores/scripts/chatStore";
 import { type AiModel, aiModelOptions, aiModelTranslationKeys, aiModelToIcon } from "~/models/enums/AiModel";
-import { formatToFrenchRelative } from "~/utils/dateFormatters";
+import { formatToRelative } from "~/utils/dateFormatters";
 
 interface ChatHistoryBarProps {
     scriptUuid: string;
@@ -60,7 +60,7 @@ export default function ChatHistoryBar({ scriptUuid }: ChatHistoryBarProps) {
                         <Pill
                             key={chat.uuid}
                             imageUrl={aiModelToIcon[chat.aiModel]}
-                            label={`${t(aiModelTranslationKeys[chat.aiModel])} - ${formatToFrenchRelative(chat.createdAt)}`}
+                            label={`${t(aiModelTranslationKeys[chat.aiModel])} - ${formatToRelative(chat.createdAt)}`}
                             isSelected={activeChatUuid === chat.uuid}
                             bgColorClassName="bg-primary/10"
                             borderColorClassName="border border-primary/30"

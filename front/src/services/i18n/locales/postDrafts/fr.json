@@ -20,9 +20,9 @@
     "filters": {
         "all": "Tous",
         "awaitingReview": "En attente",
-        "changesRequested": "À modifier",
-        "approved": "Validés",
-        "rejected": "Rejetés"
+        "changesRequested": "Modifications",
+        "approved": "Validé",
+        "rejected": "Rejeté"
     },
     "actions": {
         "create": "Nouveau brouillon",
@@ -37,6 +37,24 @@
         "approved": "Validé",
         "rejected": "Rejeté"
     },
+    "banner": {
+        "awaitingReview": {
+            "title": "Brouillon en attente de validation",
+            "subtitle": "Le client n'a pas encore consulté ce brouillon."
+        },
+        "changesRequested": {
+            "title": "Modifications demandées",
+            "subtitle": "Le client a demandé des révisions sur ce brouillon."
+        },
+        "approved": {
+            "title": "Brouillon validé",
+            "subtitle": "Le client a donné son accord — vous pouvez publier."
+        },
+        "rejected": {
+            "title": "Brouillon rejeté",
+            "subtitle": "Le client a refusé ce brouillon."
+        }
+    },
     "optimization": {
         "pending": "Préparation des fichiers…",
         "optimizing": "Optimisation…",
@@ -45,7 +63,7 @@
     },
     "form": {
         "title": "Titre",
-        "titlePlaceholder": "Donnez un nom court à ce brouillon",
+        "titlePlaceholder": "Donnez un titre à ce brouillon",
         "description": "Description",
         "descriptionPlaceholder": "Légende ou contexte optionnel pour la publication",
         "notes": "Notes pour le client",
@@ -54,20 +72,28 @@
         "mediaTypeVideo": "Vidéo",
         "mediaTypeImage": "Image",
         "mediaTypeCarousel": "Carrousel",
-        "script": "Script associé (optionnel)",
-        "scriptNone": "Aucun script",
         "files": "Fichiers",
         "dropHint": "Déposez un fichier ici, ou cliquez pour choisir",
         "dropHintCarousel": "Déposez 2 à 10 images ici, ou cliquez pour choisir",
         "submit": "Créer le brouillon"
     },
     "detail": {
-        "noSelection": "Sélectionnez un brouillon pour voir ses détails.",
-        "linkedScript": "Script associé",
-        "createdAt": "Créé le",
-        "updatedAt": "Mis à jour",
-        "revisions": "Révisions",
-        "latestRevision": "Dernière révision",
+        "eyebrow": {
+            "video": "Brouillon vidéo",
+            "image": "Brouillon image",
+            "carousel": "Brouillon carrousel"
+        },
+        "fromScript": "Depuis le script · {{title}}",
+        "descriptionLabel": "Description",
+        "notesLabel": "Notes pour le client",
+        "notesHint": "Partagé avec le client pendant la revue.",
+        "sideCard": {
+            "type": "Type",
+            "status": "Statut",
+            "linkedScript": "Script associé",
+            "uploaded": "Uploadé",
+            "updated": "Mis à jour"
+        },
         "filesPending": "Préparation des fichiers en cours. Cette page se mettra à jour automatiquement.",
         "filesFailed": "L'optimisation a échoué. Veuillez réessayer ou contacter le support."
     },

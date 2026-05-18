@@ -9,7 +9,7 @@ import {
     scriptStatusToIcon,
     scriptStatusToTextClass,
 } from "~/models/enums/ScriptStatus";
-import { formatToFrenchRelative } from "~/utils/dateFormatters";
+import { formatToRelative } from "~/utils/dateFormatters";
 
 interface HomeScriptTileProps {
     script: Script;
@@ -32,7 +32,7 @@ export default function HomeScriptTile({ script, onClick }: HomeScriptTileProps)
             </div>
             <div className="flex flex-col min-w-0 flex-1">
                 <p className="text-heading-sm truncate">{script.title}</p>
-                <p className="text-body-xs text-muted-2 truncate">{statusLabel} {script.updatedAt && `· ${t("home:scripts.modifiedRelative", { when: formatToFrenchRelative(script.updatedAt) })}`}</p>
+                <p className="text-body-xs text-muted-2 truncate">{statusLabel} {script.updatedAt && `· ${t("home:scripts.modifiedRelative", { when: formatToRelative(script.updatedAt) })}`}</p>
             </div>
             <Pill
                 label={statusLabel}

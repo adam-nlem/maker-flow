@@ -683,24 +683,67 @@ Compact inline row of PostInsightType-based metrics. Each metric renders as an i
 
 **Location:** `front/src/components/ui/Tag.tsx`
 
-Non-interactive label for status, role, or category indicators. Distinct from `Pill` (toggleable) and `Badge` (icon + label with actions): `Tag` has no icon, no click handler, no hover state.
+Non-interactive label for status, role, or category indicators with optional leading icon. Distinct from `Pill` (toggleable) and `Badge` (icon + label with actions): `Tag` has no click handler and no hover state. Color is driven by raw Tailwind class strings — the caller owns the design token choice, consistent with `Pill` and `Banner`.
 
 | Prop | Type | Default | Description |
 |------|------|---------|-------------|
 | `label` | `string` | — | Tag text |
-| `color` | `'primary' \| 'gray' \| 'yellow' \| 'danger'` | `'gray'` | Color tone (background tint + matching text) |
+| `icon` | `ComponentType<SVGProps<SVGSVGElement>>` | — | Optional leading icon (Heroicons) |
+| `bgClassName` | `string` | `"bg-pale-gray-2"` | Background utility class (e.g. `bg-primary/10`) |
+| `textClassName` | `string` | `"text-muted-2"` | Text color utility class (e.g. `text-primary`) |
 | `className` | `string` | `""` | Extra utility classes (e.g. `shrink-0` inside flex rows) |
 
-**Styling:** `inline-flex items-center px-2 py-0.5 rounded-md text-body-xs` with a tone derived from `color` — `bg-{token}/10 text-{token}` for `primary`/`yellow`/`danger`, `bg-light-gray text-gray` for `gray`. Uses design tokens only.
+**Styling:** `inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-body-xs` plus the supplied `bgClassName` + `textClassName`. Icon renders at `size-3.5` with `strokeWidth={2}`.
 
 **Examples:**
 ```tsx
-<Tag color="primary" label="Active" />
-<Tag color="yellow" label="Pending" />
-<Tag color="gray" label="Archived" className="shrink-0" />
+<Tag bgClassName="bg-primary/10" textClassName="text-primary" label="Active" />
+<Tag bgClassName="bg-yellow/10" textClassName="text-yellow" label="Pending" />
+<Tag label="Archived" className="shrink-0" />
+<Tag
+    icon={ClockIcon}
+    label={t(postDraftStatusTranslationKeys[status])}
+    bgClassName={postDraftStatusToBgClass[status]}
+    textClassName={postDraftStatusToTextClass[status]}
+/>
 ```
 
-**Used in:** `CollaboratorsSection` (role + status columns inside the merged Agency settings page), `ProjectSettingsCard` (client status row pills).
+**Used in:** `IdentityPopover` (role), `CollaboratorsTable` (role + status columns), `ProjectSettingsCard` (client status row pills), `PostDraftListItem` / `PostDraftDetailPanel` (status pill driven by `PostDraftStatus` maps).
+
+---
+
+### Banner
+
+**Location:** `front/src/components/ui/Banner.tsx`
+
+Hero-style status callout: a circular icon chip on the left, a title and optional subtitle on the right, wrapped in a rounded box. Pure presentational — color and border are driven by raw Tailwind class strings supplied by the caller (consistent with `Pill` and `Tag`).
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `icon` | `ComponentType<SVGProps<SVGSVGElement>>` | — | Required leading icon (Heroicons) |
+| `title` | `string` | — | Banner title (`text-heading-sm text-dark`) |
+| `subtitle` | `string` | — | Optional secondary line (`text-body-sm text-muted`) |
+| `bgClassName` | `string` | `""` | Background utility class applied to the banner and the icon chip (e.g. `bg-primary/10`) |
+| `textClassName` | `string` | `"text-dark"` | Icon color utility class (e.g. `text-primary`) |
+| `borderClassName` | `string` | `""` | Border utility classes (e.g. `border border-primary/30`) |
+| `className` | `string` | `""` | Extra utility classes (e.g. `mb-6` for spacing) |
+
+**Styling:** `flex items-center gap-3.5 px-4 py-3.5 rounded-xl` plus the supplied background / border. The icon chip is `size-9 rounded-full` with the same background; the icon renders at `size-5`.
+
+**Example:**
+```tsx
+<Banner
+    className="mb-6"
+    icon={postDraftStatusToIcon[postDraft.status]}
+    title={t(postDraftStatusToBannerTitleKey[postDraft.status])}
+    subtitle={t(postDraftStatusToBannerSubtitleKey[postDraft.status])}
+    bgClassName={postDraftStatusToBgClass[postDraft.status]}
+    textClassName={postDraftStatusToTextClass[postDraft.status]}
+    borderClassName={postDraftStatusToBorderClass[postDraft.status]}
+/>
+```
+
+**Used in:** `PostDraftDetailPanel` (status banner driven by `PostDraftStatus` maps).
 
 ---
 

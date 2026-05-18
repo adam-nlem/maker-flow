@@ -1,6 +1,6 @@
 import type { ChatMessage } from "~/models/ChatMessage";
 import { MessageType } from "~/models/enums/MessageType";
-import { formatToFrenchRelative } from "~/utils/dateFormatters";
+import { formatToRelative } from "~/utils/dateFormatters";
 import ChatSuggestionsCard from "./ChatSuggestionsCard";
 
 interface ChatMessageBubbleProps {
@@ -25,7 +25,7 @@ export default function ChatMessageBubble({ message, scriptUuid, chatUuid }: Cha
                     />
                 )}
 
-                <p className="text-body-xs text-muted-2 mt-1">{formatToFrenchRelative(message.createdAt)}</p>
+                <p className="text-body-xs text-muted-2 mt-1">{formatToRelative(message.createdAt)}</p>
             </div>
         </div>
     );

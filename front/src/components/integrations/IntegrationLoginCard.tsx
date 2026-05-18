@@ -9,7 +9,7 @@ import { useCreateIntegration } from "~/hooks/api/integrations/useAuthorizeInsta
 import { useRevokeIntegration } from "~/hooks/api/integrations/useRevokeIntegration";
 import { Button } from "~/components/ui/Button";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
-import { formatToFrenchRelative } from "~/utils/dateFormatters";
+import { formatToRelative } from "~/utils/dateFormatters";
 import Pill from "~/components/ui/Pill";
 
 interface IntegrationLoginCardProps {
@@ -66,7 +66,7 @@ export default function IntegrationLoginCard({ projectUuid, platform, integratio
                     <div className="flex flex-row items-center gap-2">
                         <ArrowPathIcon className="size-4 text-muted-2 shrink-0" strokeWidth={1.5} />
                         <p className="text-body-xs text-muted-2">
-                            {t("integrations:lastSync", { when: formatToFrenchRelative(integration.lastSyncedAt) })}
+                            {t("integrations:lastSync", { when: formatToRelative(integration.lastSyncedAt) })}
                         </p>
                     </div>
                 </div>

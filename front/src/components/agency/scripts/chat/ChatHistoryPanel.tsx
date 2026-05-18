@@ -11,7 +11,7 @@ import { useListPaginatedChats } from "~/hooks/api/chats/useListPaginatedChats";
 import { useDeleteChat } from "~/hooks/api/chats/useDeleteChat";
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll";
 import { aiModelTranslationKeys, aiModelToIcon } from "~/models/enums/AiModel";
-import { formatToFrenchRelative } from "~/utils/dateFormatters";
+import { formatToRelative } from "~/utils/dateFormatters";
 
 interface ChatHistoryPanelProps {
   scriptUuid: string;
@@ -89,7 +89,7 @@ export default function ChatHistoryPanel({ scriptUuid }: ChatHistoryPanelProps) 
                       {chat.title ?? t("scripts:chat.history.untitledChat")}
                     </p>
                     <p className="text-body-xs text-muted-2">
-                      {t(aiModelTranslationKeys[chat.aiModel])} · {formatToFrenchRelative(chat.createdAt)}
+                      {t(aiModelTranslationKeys[chat.aiModel])} · {formatToRelative(chat.createdAt)}
                     </p>
                   </div>
                   <button

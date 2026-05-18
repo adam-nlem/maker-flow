@@ -37,6 +37,24 @@
         "approved": "Approved",
         "rejected": "Rejected"
     },
+    "banner": {
+        "awaitingReview": {
+            "title": "Draft awaiting review",
+            "subtitle": "The client hasn't looked at this draft yet."
+        },
+        "changesRequested": {
+            "title": "Changes requested",
+            "subtitle": "The client asked for revisions on this draft."
+        },
+        "approved": {
+            "title": "Draft approved",
+            "subtitle": "The client signed off — you're clear to publish."
+        },
+        "rejected": {
+            "title": "Draft rejected",
+            "subtitle": "The client declined this draft."
+        }
+    },
     "optimization": {
         "pending": "Preparing files…",
         "optimizing": "Optimizing…",
@@ -45,7 +63,7 @@
     },
     "form": {
         "title": "Title",
-        "titlePlaceholder": "Give this draft a short name",
+        "titlePlaceholder": "Give this draft a title",
         "description": "Description",
         "descriptionPlaceholder": "Optional caption or context for the post",
         "notes": "Notes for the client",
@@ -54,20 +72,28 @@
         "mediaTypeVideo": "Video",
         "mediaTypeImage": "Image",
         "mediaTypeCarousel": "Carousel",
-        "script": "Linked script (optional)",
-        "scriptNone": "No script",
         "files": "Files",
         "dropHint": "Drop a file here, or click to choose",
         "dropHintCarousel": "Drop 2 to 10 images here, or click to choose",
         "submit": "Create draft"
     },
     "detail": {
-        "noSelection": "Select a draft to see its details.",
-        "linkedScript": "Linked script",
-        "createdAt": "Created",
-        "updatedAt": "Last updated",
-        "revisions": "Revisions",
-        "latestRevision": "Latest revision",
+        "eyebrow": {
+            "video": "Video draft",
+            "image": "Image draft",
+            "carousel": "Carousel draft"
+        },
+        "fromScript": "From script · {{title}}",
+        "descriptionLabel": "Description",
+        "notesLabel": "Notes for the client",
+        "notesHint": "Shared with the client during review.",
+        "sideCard": {
+            "type": "Type",
+            "status": "Status",
+            "linkedScript": "Linked script",
+            "uploaded": "Uploaded",
+            "updated": "Updated"
+        },
         "filesPending": "Files are being prepared. This panel will update automatically.",
         "filesFailed": "Optimization failed. Please try uploading again or contact support."
     },

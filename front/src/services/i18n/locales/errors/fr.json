@@ -87,7 +87,24 @@
     },
     "agency": {
         "missing": "Vous n'êtes rattaché à aucune agence.",
-        "subscriptionInactive": "L'abonnement de votre agence n'est plus actif."
+        "alreadyExists": "Vous appartenez déjà à une agence.",
+        "subscriptionInactive": "L'abonnement de votre agence n'est plus actif.",
+        "logoInvalid": "Le logo d'agence fourni est invalide."
+    },
+    "agencyCollaborator": {
+        "notFound": "Collaborateur introuvable dans cette agence."
+    },
+    "projectClient": {
+        "notFound": "Client introuvable dans ce projet."
+    },
+    "onboarding": {
+        "invalidStep": "Cette étape d'onboarding n'est pas applicable."
+    },
+    "postDraft": {
+        "fileInvalid": "Le ou les fichiers fournis sont invalides.",
+        "notFound": "Brouillon introuvable.",
+        "scriptAlreadyHasDraft": "Ce script a déjà un brouillon.",
+        "locked": "Ce brouillon ne peut pas être modifié dans son statut actuel."
     },
     "hookTemplate": {
         "notFound": "Modèle d'accroche introuvable.",

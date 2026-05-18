@@ -157,39 +157,16 @@ body {
 }
 
 /* Override default Tailwind text classes to use appropriate fonts */
-.text-4xl {
-  font-family: var(--font-family-display);
-  font-weight: 700;
-}
-
-.text-3xl {
-  font-family: var(--font-family-display);
-  font-weight: 600;
-}
-
-.text-2xl {
-  font-family: var(--font-family-display);
-  font-weight: 600;
-}
-
-.text-xl {
-  font-family: var(--font-family-display);
-  font-weight: 600;
-}
-
-.text-lg {
-  font-family: var(--font-family-display);
-  font-weight: 500;
-}
-
-.text-md {
+.text-4xl,
+.text-3xl,
+.text-2xl,
+.text-xl,
+.text-lg,
+.text-md,
+.text-sm,
+.text-xs {
   font-family: var(--font-family-sans);
-  font-size: var(--font-size-md);
-}
-
-.text-sm {
-  font-family: var(--font-family-sans);
-  font-size: var(--font-size-sm);
+  font-weight: normal;
 }
 
 .bg-dot-pattern {

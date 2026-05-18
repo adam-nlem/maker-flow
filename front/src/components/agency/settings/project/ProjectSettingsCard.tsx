@@ -149,7 +149,7 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                                         <span className="text-body-sm truncate">{client.fullName}</span>
                                         <span className="text-body-xs text-muted-2 truncate">{client.email}</span>
                                     </div>
-                                    <Tag color="primary" label={t("settings:projects.card.clients.status.active")} className="shrink-0" />
+                                    <Tag bgClassName="bg-primary/10" textClassName="text-primary" label={t("settings:projects.card.clients.status.active")} className="shrink-0" />
                                     {canManageClients && (
                                         <TrashIcon
                                             className="size-4 text-muted-2 hover:text-danger cursor-pointer transition-colors shrink-0"
@@ -165,7 +165,7 @@ export default function ProjectSettingsCard({ project }: ProjectSettingsCardProp
                                         <span className="text-body-sm truncate">{invitation.fullName}</span>
                                         <span className="text-body-xs text-muted-2 truncate">{invitation.email}</span>
                                     </div>
-                                    <Tag color="yellow" label={t("settings:projects.card.clients.status.pending")} className="shrink-0" />
+                                    <Tag bgClassName="bg-yellow/10" textClassName="text-yellow" label={t("settings:projects.card.clients.status.pending")} className="shrink-0" />
                                     {canManageClients && (
                                         <XMarkIcon
                                             className="size-4 text-muted-2 hover:text-danger cursor-pointer transition-colors shrink-0"

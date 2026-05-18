@@ -92,7 +92,9 @@ export const errorCodeKeys: Record<number, string> = {
 
   // Agency (27xxx)
   27001: 'errors:agency.missing',
+  27002: 'errors:agency.alreadyExists',
   27003: 'errors:agency.subscriptionInactive',
+  27004: 'errors:agency.logoInvalid',
 
   // HookTemplate (28xxx)
   28001: 'errors:hookTemplate.notFound',
@@ -106,6 +108,21 @@ export const errorCodeKeys: Record<number, string> = {
   29005: 'errors:invitation.invalidRole',
   29006: 'errors:invitation.invalidType',
   29007: 'errors:invitation.invalidProject',
+
+  // ProjectClient (30xxx)
+  30001: 'errors:projectClient.notFound',
+
+  // AgencyCollaborator (31xxx)
+  31001: 'errors:agencyCollaborator.notFound',
+
+  // Onboarding (32xxx)
+  32001: 'errors:onboarding.invalidStep',
+
+  // PostDraft (33xxx)
+  33001: 'errors:postDraft.fileInvalid',
+  33002: 'errors:postDraft.notFound',
+  33003: 'errors:postDraft.scriptAlreadyHasDraft',
+  33004: 'errors:postDraft.locked',
 }
 
 export function resolveErrorMessage(error: unknown): string {

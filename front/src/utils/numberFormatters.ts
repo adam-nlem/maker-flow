@@ -8,3 +8,12 @@ export function formatCompactNumber(value: number): string {
         maximumFractionDigits: 1,
     }).format(value);
 }
+
+/**
+ * Formats a byte count as a short human-readable string: 856 → "856 B", 12000 → "11.7 KB", 5000000 → "4.8 MB".
+ */
+export function formatFileSize(bytes: number): string {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}

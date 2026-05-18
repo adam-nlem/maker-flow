@@ -35,14 +35,14 @@ export default function CollaboratorsTable({ rows }: CollaboratorsTableProps) {
         {
             header: t("collaborators:columns.role"),
             render: (row) => row.role
-                ? <Tag color="primary" label={t(userRoleTranslationKeys[row.role])} />
+                ? <Tag bgClassName="bg-primary/10" textClassName="text-primary" label={t(userRoleTranslationKeys[row.role])} />
                 : <span className="text-muted-2">—</span>,
         },
         {
             header: t("collaborators:columns.status"),
             render: (row) => row.status === 'active'
-                ? <Tag color="primary" label={t("collaborators:status.active")} />
-                : <Tag color="yellow" label={t("collaborators:status.pending")} />,
+                ? <Tag bgClassName="bg-primary/10" textClassName="text-primary" label={t("collaborators:status.active")} />
+                : <Tag bgClassName="bg-yellow/10" textClassName="text-yellow" label={t("collaborators:status.pending")} />,
         },
         {
             header: t("collaborators:columns.actions"),

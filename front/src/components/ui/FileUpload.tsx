@@ -2,9 +2,8 @@ import { useRef, useState } from "react";
 import type { ComponentType, ReactNode, SVGProps } from "react";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 
-interface FileUploadProps {
+interface FileUploadBaseProps {
     accept: string;
-    onFileSelected: (file: File) => void | Promise<void>;
     hint?: string;
     errorMessage?: string | null;
     icon?: ComponentType<SVGProps<SVGSVGElement>>;
@@ -13,31 +12,45 @@ interface FileUploadProps {
     children?: (state: { isDragActive: boolean }) => ReactNode;
 }
 
+type FileUploadProps = FileUploadBaseProps & (
+    | { multiple?: false; onFileSelected: (file: File) => void | Promise<void>; onFilesSelected?: never }
+    | { multiple: true; onFilesSelected: (files: File[]) => void | Promise<void>; onFileSelected?: never }
+);
+
 const DEFAULT_BUTTON_CLASSES = "flex flex-col items-center justify-center gap-2 p-3 rounded-lg border-2 border-dashed transition-colors";
 const DEFAULT_BUTTON_IDLE = "border-pale-gray bg-clear hover:bg-pale-gray-2/30";
 const DEFAULT_BUTTON_DRAGGING = "border-primary bg-primary/10";
 
-export default function FileUpload({
-    accept,
-    onFileSelected,
-    hint,
-    errorMessage,
-    icon: Icon = ArrowUpTrayIcon,
-    isPending = false,
-    className = "",
-    children,
-}: FileUploadProps) {
+export default function FileUpload(props: FileUploadProps) {
+    const {
+        accept,
+        hint,
+        errorMessage,
+        icon: Icon = ArrowUpTrayIcon,
+        isPending = false,
+        className = "",
+        children,
+    } = props;
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [isDragActive, setIsDragActive] = useState(false);
+
+    const emit = async (fileList: FileList | null) => {
+        if (!fileList || fileList.length === 0) return;
+        if (props.multiple) {
+            await props.onFilesSelected(Array.from(fileList));
+        } else {
+            await props.onFileSelected(fileList[0]);
+        }
+    };
 
     const handlePick = () => {
         fileInputRef.current?.click();
     };
 
     const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        e.target.value = "";
-        if (file) await onFileSelected(file);
+        const target = e.target;
+        await emit(target.files);
+        target.value = "";
     };
 
     const handleDragOver = (e: React.DragEvent<HTMLButtonElement>) => {
@@ -53,8 +66,7 @@ export default function FileUpload({
     const handleDrop = async (e: React.DragEvent<HTMLButtonElement>) => {
         e.preventDefault();
         setIsDragActive(false);
-        const file = e.dataTransfer.files?.[0];
-        if (file) await onFileSelected(file);
+        await emit(e.dataTransfer.files);
     };
 
     const buttonProps = {
@@ -87,6 +99,7 @@ export default function FileUpload({
                 ref={fileInputRef}
                 type="file"
                 accept={accept}
+                multiple={props.multiple ?? false}
                 onChange={handleChange}
                 className="hidden"
             />
