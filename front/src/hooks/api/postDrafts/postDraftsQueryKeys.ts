@@ -9,4 +9,6 @@ export const postDraftsQueryKeys = {
     detail: (uuid: string) => [...postDraftsQueryKeys.all, 'detail', uuid] as const,
     mediaVersionFile: (mediaVersionUuid: string, index: number) =>
         [...postDraftsQueryKeys.all, 'mediaVersionFile', mediaVersionUuid, index] as const,
+    mediaVersionStream: (mediaVersionUuid: string, path: string) =>
+        [...postDraftsQueryKeys.all, 'mediaVersionStream', mediaVersionUuid, path] as const,
 }

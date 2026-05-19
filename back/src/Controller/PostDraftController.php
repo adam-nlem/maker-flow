@@ -5,8 +5,10 @@ namespace App\Controller;
 use App\DTO\QueryParam\PostDraft\ListPostDraftsQueryParamDTO;
 use App\DTO\Request\PostDraft\CreatePostDraftRequestDTO;
 use App\DTO\Request\PostDraft\UpdatePostDraftRequestDTO;
+use App\Entity\Enum\MediaType;
 use App\Entity\Enum\PostDraftStatus;
 use App\Entity\Enum\UserRole;
+use App\Entity\Enum\VideoStreamingStatus;
 use App\Entity\PostDraft;
 use App\Entity\PostDraftMediaVersion;
 use App\Entity\User;
@@ -14,6 +16,7 @@ use App\Exception\PostDraft\MissingPostDraftException;
 use App\Exception\PostDraft\PostDraftLockedException;
 use App\Exception\PostDraft\ScriptAlreadyHasPostDraftException;
 use App\Exception\Project\ProjectNotFoundException;
+use App\Message\ProcessPostDraftVideoMessage;
 use App\Repository\PostDraftMediaVersionRepository;
 use App\Repository\PostDraftRepository;
 use App\Repository\ProjectRepository;
@@ -27,6 +30,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -97,6 +101,7 @@ final class PostDraftController extends AbstractController
         PostDraftMediaVersionRepository $postDraftMediaVersionRepository,
         PostDraftFileService $postDraftFileService,
         EntityManagerInterface $entityManager,
+        MessageBusInterface $messageBus,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -129,6 +134,11 @@ final class PostDraftController extends AbstractController
         $mediaVersion = new PostDraftMediaVersion();
         $mediaVersion->setPostDraft($postDraft);
         $mediaVersion->setFileCount(count($files));
+
+        if ($postDraft->getMediaType() === MediaType::Video) {
+            $mediaVersion->setVideoStreamingStatus(VideoStreamingStatus::Pending);
+        }
+
         $postDraft->addMediaVersion($mediaVersion);
 
         $postDraftRepository->save($postDraft);
@@ -141,6 +151,10 @@ final class PostDraftController extends AbstractController
         } catch (UniqueConstraintViolationException) {
             $postDraftFileService->deleteMediaVersion($mediaVersion);
             throw new ScriptAlreadyHasPostDraftException();
+        }
+
+        if ($postDraft->getMediaType() === MediaType::Video) {
+            $messageBus->dispatch(new ProcessPostDraftVideoMessage($mediaVersion->getId()));
         }
 
         return $this->json(

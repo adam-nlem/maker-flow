@@ -72,6 +72,27 @@ class PostDraftFileService
         return new File($matches[0], false);
     }
 
+    public function getStreamFile(PostDraftMediaVersion $mediaVersion, string $relativePath): ?File
+    {
+        $streamRoot = realpath(sprintf('%s/stream', $this->getMediaVersionDirectory($mediaVersion)));
+
+        if ($streamRoot === false) {
+            return null;
+        }
+
+        $candidate = realpath(sprintf('%s/%s', $streamRoot, $relativePath));
+
+        if ($candidate === false || !str_starts_with($candidate, $streamRoot . DIRECTORY_SEPARATOR)) {
+            return null;
+        }
+
+        if (!is_file($candidate)) {
+            return null;
+        }
+
+        return new File($candidate, false);
+    }
+
     public function deleteMediaVersion(PostDraftMediaVersion $mediaVersion): void
     {
         $directory = $this->getMediaVersionDirectory($mediaVersion);

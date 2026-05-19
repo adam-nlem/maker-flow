@@ -3596,9 +3596,31 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/post-draft-media-versions/{{postDraftMediaVersionUuid}}/files/1",
+              "raw": "{{baseUrl}}/api/post-draft-media-versions/files?mediaVersionUuid={{postDraftMediaVersionUuid}}&index=1",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-draft-media-versions", "{{postDraftMediaVersionUuid}}", "files", "1"]
+              "path": ["api", "post-draft-media-versions", "files"],
+              "query": [
+                { "key": "mediaVersionUuid", "value": "{{postDraftMediaVersionUuid}}" },
+                { "key": "index", "value": "1", "description": "1-based file index (image / carousel / original video before transcoding)" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stream Post Draft Media Version HLS Master Playlist",
+          "id": "post-drafts-stream-hls-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/post-draft-media-versions/stream?mediaVersionUuid={{postDraftMediaVersionUuid}}&path=master.m3u8",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-draft-media-versions", "stream"],
+              "query": [
+                { "key": "mediaVersionUuid", "value": "{{postDraftMediaVersionUuid}}" },
+                { "key": "path", "value": "master.m3u8", "description": "Relative path under the media version's stream/ dir (master.m3u8, 1080p/index.m3u8, 720p/segment_001.ts, …). Only .m3u8 / .ts accepted." }
+              ]
             }
           },
           "response": []

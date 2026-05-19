@@ -41,6 +41,8 @@ Phase 1 ships only the agency-side surface: create, list, show, update, delete. 
 | `uuid` | GUID | Public identifier — used in stream URL |
 | `postDraft` | ManyToOne (`inversedBy: 'mediaVersions'`) | NOT NULL, cascade delete |
 | `fileCount` | smallint | Set at upload time, lets the API expose carousel size without scanning disk |
+| `videoStreamingStatus` | `App\Entity\Enum\VideoStreamingStatus`, nullable | `pending`/`processing`/`ready`/`failed`. Set to `pending` on create when `mediaType === Video`. Stays `null` for image / carousel media versions and for legacy pre-2026-05-19 rows. |
+| `videoStreamingFailureReason` | `App\Entity\Enum\VideoStreamingFailureReason`, nullable | Populated by `PostDraftVideoProcessingFailedSubscriber` when status flips to `failed`. Values: `invalid_source`, `processing_error`. |
 | `createdAt` | DateTimeImmutable | |
 
 No `MediaFile` entity. Files live on disk only — see [Storage layout](#storage-layout).
@@ -56,13 +58,18 @@ private/uploads/agency/
         │     └── {agencyUuid}.png
         └── post-drafts/
               └── {mediaVersionUuid}/
-                    ├── 1.{ext}
-                    ├── 2.{ext}
-                    └── …
+                    ├── 1.{ext}              # original upload — deleted after a video is successfully transcoded
+                    ├── 2.{ext}              # carousel uploads only
+                    └── stream/              # video uploads only, populated by the HLS transcoder
+                          ├── master.m3u8
+                          ├── 1080p/index.m3u8 + segment_NNN.ts
+                          ├── 720p/index.m3u8  + segment_NNN.ts
+                          └── 480p/index.m3u8  + segment_NNN.ts
 ```
 
 - Filenames are **1-based integers** in the order they arrived in the multipart request. Carousel ordering is the integer in the filename — no DB row, no JSON, no index column.
-- Files are stored as-is with their original extension; nothing is transcoded server-side.
+- Image and carousel files are stored as-is with their original extension; nothing is transcoded server-side.
+- Video uploads are stored as-is **temporarily**, then the worker generates the `stream/` subtree (see [Async video streaming](#async-video-streaming)) and **the original `1.{ext}` is removed** so a single video doesn't keep 4 copies of itself on disk.
 - Both `AgencyLogoService` and `PostDraftFileService` are wired with the same container parameter `app.uploads.agency_root` (`%kernel.project_dir%/private/uploads/agency`) and derive their per-agency sub-paths from it. The post-draft service walks `mediaVersion → postDraft → project → agency` to resolve the agency UUID at runtime.
 - **Breaking change (2026-05-14):** agency logos previously lived at `private/uploads/agency/logo/{agencyUuid}.png`. They now sit under the agency-rooted layout above. Pre-existing files need to be re-uploaded or moved manually.
 
@@ -77,7 +84,8 @@ Base path: `/api/post-drafts`. All routes require an authenticated user. Object-
 | `POST /api/post-drafts` | `Editor` | `PROJECT_EDIT` | **Multipart**. Form fields: `projectUuid`, `title`, `mediaType` (`video`/`image`/`carousel`), optional `description`, `notes`, `scriptUuid`. Files in `files[]` (1 for video/image, 2–10 for carousel). |
 | `PATCH /api/post-drafts/{uuid}` | `Editor` | `PROJECT_EDIT` | JSON. Updatable fields: `title`, `description`, `notes`, `scriptUuid` (any can be set to `null`). Allowed only when status is `AwaitingReview`. |
 | `DELETE /api/post-drafts/{uuid}` | `Editor` | `PROJECT_EDIT` | Returns `200` + `{"message": "Post draft deleted successfully"}`. Doctrine cascade removes media versions; a `PostDraftMediaVersionDiskCleanupListener` (`preRemove`) handles on-disk cleanup automatically. |
-| `GET /api/post-draft-media-versions/{mediaVersionUuid}/files/{index}` | `Viewer` | `PROJECT_VIEW` on the media version's draft's project | Lives in **`PostDraftMediaVersionController`** (separate from `PostDraftController`). Streams a single stored file (`BinaryFileResponse`, `DISPOSITION_INLINE`). Range requests handled automatically. Returns 404 when the index is out of range or the file is missing on disk. |
+| `GET /api/post-draft-media-versions/files?mediaVersionUuid=&index=` | `Viewer` | `PROJECT_VIEW` on the media version's draft's project | Lives in **`PostDraftMediaVersionController`** (separate from `PostDraftController`). Both params travel via the query string (`StreamFileQueryParamDTO`: `mediaVersionUuid` UUID + `index` positive int). Streams the corresponding stored file — extension globbed at runtime. Returns `BinaryFileResponse` with `DISPOSITION_INLINE`; range requests handled automatically. Used for image / carousel files and (pre-transcode) the original video. Returns 404 when the index is out of range or the file is missing on disk. For videos with `videoStreamingStatus === ready` this endpoint 404s — the original has been deleted; use the `/stream` endpoint instead. |
+| `GET /api/post-draft-media-versions/stream?mediaVersionUuid=&path=` | `Viewer` | `PROJECT_VIEW` on the media version's draft's project | `mediaVersionUuid` + `path` via query string (`StreamHlsQueryParamDTO`). Serves any HLS artifact (master playlist, variant playlist, `.ts` segment) under the media version's `stream/` directory. Only `.m3u8` and `.ts` are accepted — anything else 404s. `realpath`-based path-traversal guard. `Content-Type` is set explicitly (`application/vnd.apple.mpegurl` / `video/mp2t`). |
 
 ### Response shape
 
@@ -111,12 +119,59 @@ Violations throw `PostDraftFileInvalidException` (HTTP 400) carrying a `FileInva
 
 | Exception | HTTP | Code suffix | Trigger |
 |---|---|---|---|
-| `MissingPostDraftException` | 404 | 2 | Draft UUID not found, or `streamFile` couldn't locate the requested file on disk |
+| `MissingPostDraftException` | 404 | 2 | Draft UUID not found, or `streamFile`/`streamHls` couldn't locate the requested file on disk |
 | `ScriptAlreadyHasPostDraftException` | 409 | 3 | Unique constraint on `post_draft.script_id` violated. On create, the on-disk media version directory is wiped before the exception is rethrown. |
 | `PostDraftLockedException` | 409 | 4 | Update attempted while status ≠ `AwaitingReview` |
 | `UnresolvableMediaVersionAgencyException` | 500 | 5 | A `PostDraftMediaVersion` cannot resolve its owning agency through the `postDraft → project → agency` chain (data-integrity failure). |
+| `VideoSourceNotFoundException` | 500 | 6 | The HLS worker started processing but the source `1.{ext}` is missing on disk. Surfaces `videoStreamingFailureReason = invalid_source` once retries exhaust. |
+| `VideoProcessingFailedException` | 500 | 7 | ffmpeg exited non-zero, an expected HLS artifact is missing, or the original file could not be removed. Surfaces `videoStreamingFailureReason = processing_error`. |
 
-All exceptions extend `PostDraftException` → `DomainCode::PostDraft` (33). Full codes are `33001`–`33005`.
+All exceptions extend `PostDraftException` → `DomainCode::PostDraft` (33). Full codes are `33001`–`33007`.
+
+## Async video streaming
+
+Video uploads get a second pass after the synchronous `POST /api/post-drafts` succeeds:
+
+1. `PostDraftController::create` sets `videoStreamingStatus = pending` on the new `PostDraftMediaVersion`, flushes, then dispatches `ProcessPostDraftVideoMessage($mediaVersion->getId())` on the `messages` transport (the existing single RabbitMQ-backed transport — see [rabbitmq-messenger-feature.md](rabbitmq-messenger-feature.md)).
+2. `ProcessPostDraftVideoHandler` loads the entity, flips status to `processing`, then calls `PostDraftVideoStreamingService::generateHls()`.
+3. `PostDraftVideoStreamingService` shells out to `ffmpeg` (via `Symfony\Component\Process\Process`) with a single command that writes three HLS renditions and the master playlist into the media version's `stream/` subdirectory in one pass:
+
+   | Variant | Height | Video bitrate | Audio bitrate |
+   |---|---|---|---|
+   | `1080p` | 1080 | 5000 kbps | 128 kbps |
+   | `720p`  | 720  | 2800 kbps | 128 kbps |
+   | `480p`  | 480  | 1400 kbps | 96 kbps  |
+
+   All variants are always generated regardless of source resolution (deliberate — keeps the player ladder predictable). Segments are 4 s VOD. Audio mapping is optional (`0:a:0?`) so videos without an audio track still produce valid output.
+4. After ffmpeg returns, the service asserts `master.m3u8` and every per-variant `index.m3u8` exist, then `unlink()`s the original `1.{ext}` source file.
+5. Handler flips status to `ready` and flushes.
+
+### Retry & failure
+
+- The handler catches any `\Throwable` from `generateHls()`, reports it to Sentry via `captureException`, and writes `videoStreamingStatus = failed` plus a `videoStreamingFailureReason` (`invalid_source` if the throwable is a `VideoSourceNotFoundException`, otherwise `processing_error`). It then `return`s normally — no exception escapes, so Messenger does **not** retry.
+- Rationale: ffmpeg failures are almost always deterministic (bad input, missing binary, no disk space). Retrying 3× in seven seconds wouldn't help and would just churn the worker. Users can re-upload to retry.
+- On failure the original `1.{ext}` is **kept on disk** (we never reached the delete step). The frontend keeps using the existing `/files/{index}` endpoint as a fallback.
+
+### Idempotency
+
+If the same `mediaVersionId` is processed twice (e.g. a worker restart re-queues the message), the handler is a no-op when `videoStreamingStatus === ready`. Otherwise it wipes any partial `stream/` directory and starts fresh.
+
+### Frontend consumption
+
+`videoStreamingStatus` and `videoStreamingFailureReason` are exposed in both `api_post_drafts_list` and `api_post_drafts_show` groups. Recommended client behavior:
+
+| Status | UI hint |
+|---|---|
+| `null` (image / carousel / legacy video) | Use `/files?mediaVersionUuid=&index=N` |
+| `pending` / `processing` | Show "video is being prepared", optionally fall back to `/files?mediaVersionUuid=&index=1` for an immediate preview |
+| `ready` | Use HLS: `GET /api/post-draft-media-versions/stream?mediaVersionUuid=&path=master.m3u8` (hls.js on Chromium/Firefox, native on Safari/iOS) |
+| `failed` | Show failure UX based on `videoStreamingFailureReason`; the original is still available via `/files?mediaVersionUuid=&index=1` |
+
+### Operational notes
+
+- ffmpeg ships with both `back/.docker/build/Dockerfile` (dev) and `back/.docker/build/Dockerfile.prod` (runtime stage).
+- No `php-ffmpeg/php-ffmpeg` composer dependency — the CLI binary is enough.
+- `Process::setTimeout(null)` is intentional; the messenger worker's own `--time-limit` is the practical ceiling.
 
 ## Infra
 
@@ -124,7 +179,8 @@ All exceptions extend `PostDraftException` → `DomainCode::PostDraft` (33). Ful
 
 ## Migration
 
-`back/migrations/Version20260514120000.php` — creates `post_draft` and `post_draft_media_version`, the unique index on `post_draft.script_id`, and the supporting indexes `(project_id, status)` and `(post_draft_id, created_at)`. No optimization column — files are stored as-is.
+- `back/migrations/Version20260514120000.php` — creates `post_draft` and `post_draft_media_version`, the unique index on `post_draft.script_id`, and the supporting indexes `(project_id, status)` and `(post_draft_id, created_at)`. No optimization column — files are stored as-is.
+- `back/migrations/Version20260519120000.php` — adds nullable `video_streaming_status` and `video_streaming_failure_reason` (`VARCHAR(32)`) columns to `post_draft_media_version`. Existing rows stay `NULL` (treated as "legacy — use raw file" by the frontend); no backfill.
 
 ## Out of scope (next phases)
 

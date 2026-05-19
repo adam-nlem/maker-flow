@@ -12,7 +12,8 @@ RUN composer install --no-dev --optimize-autoloader --no-scripts --no-interactio
 
 FROM php:8.2-apache
 
-# Install PHP extensions and clean up dev libs in one layer
+# Install PHP extensions and clean up dev libs in one layer.
+# ffmpeg stays installed at runtime — used by PostDraftVideoStreamingService for HLS transcoding.
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libsodium-dev \
     libicu-dev \
@@ -22,6 +23,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libpng-dev \
     libonig-dev \
     libzip-dev \
+    ffmpeg \
     && docker-php-ext-install pdo pdo_mysql sodium intl curl fileinfo gd zip opcache \
     && pecl install amqp && docker-php-ext-enable amqp \
     && apt-get purge -y \

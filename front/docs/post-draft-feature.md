@@ -77,7 +77,8 @@ Two stores under `front/src/stores/postDrafts/`:
 | `PostDraftVideoViewer` *(shared)* | `rounded-2xl bg-dark` framed video. Native `<video controls preload="metadata">` capped at `max-h-[70vh]`, plus a `bg-clear-3` footer showing the media-type label and the duration (read client-side via `loadedmetadata`, formatted `m:ss`). Owns its own data fetching via `useShowPostDraftMediaVersionFile(mediaVersionUuid, 1)` — renders a small spinner inside the dark frame while the blob downloads. |
 | `PostDraftImageViewer` *(shared)* | `rounded-2xl bg-dark` framed single image with `object-contain` (preserves native aspect, capped at `max-h-[70vh]`). Owns its own data fetching via `useShowPostDraftMediaVersionFile(mediaVersionUuid, 1)`. |
 | `PostDraftCarouselViewer` *(shared)* | Stateful active-slide viewer inside the `rounded-2xl bg-dark` frame: left/right arrow buttons (disabled at the ends), top-right slide counter, dot indicators, and a `bg-clear-3` thumbnail strip (thumbs use `object-cover`, active thumb has a `border-dark` ring). Renders one private `CarouselSlideImage` per slide for both the active frame and each thumb — React Query dedupes via the `mediaVersionFile` query key so each file is fetched once. |
-| `useShowPostDraftMediaVersionFile(mediaVersionUuid, index)` | React Query hook that fetches a media-version file as a blob via `httpClient` and exposes a `fileUrl` (an `URL.createObjectURL` blob URL, revoked on unmount). Same pattern as `useShowPostThumbnail` / `useShowAgencyLogo`. Backing query key: `postDraftsQueryKeys.mediaVersionFile(mediaVersionUuid, index)`. |
+| `useShowPostDraftMediaVersionFile(mediaVersionUuid, index)` | React Query hook that fetches a stored upload as a blob via `httpClient` (`GET /post-draft-media-versions/files?mediaVersionUuid=&index=`) and exposes a `fileUrl` (an `URL.createObjectURL` blob URL, revoked on unmount). Same pattern as `useShowPostThumbnail` / `useShowAgencyLogo`. Backing query key: `postDraftsQueryKeys.mediaVersionFile(mediaVersionUuid, index)`. |
+| `useShowPostDraftMediaVersionStream(mediaVersionUuid, path)` | Sibling hook that fetches a single HLS artifact as a blob (`GET /post-draft-media-versions/stream?mediaVersionUuid=&path=`). Same blob-URL contract. Backing query key: `postDraftsQueryKeys.mediaVersionStream(mediaVersionUuid, path)`. |
 
 ## i18n
 
@@ -99,9 +100,12 @@ Pre-flight validation runs in `PostDraftCreateModal` before submit; backend re-v
 
 ## Stream endpoint behavior
 
-`GET /api/post-draft-media-versions/{mediaVersionUuid}/files/{index}` returns:
-- `200` + the stored file (Range requests work — useful for scrubbing in the `<video>` player).
-- `404` when the index is out of range or the file is missing on disk (maps to `MissingPostDraftException`).
+Two flat top-level routes on the backend, both driven by query-param DTOs — see `back/docs/post-draft-feature.md` for the full contract:
+
+- `GET /api/post-draft-media-versions/files?mediaVersionUuid=&index=N` — returns the stored upload at `{index}.{ext}` (extension globbed). Used by `useShowPostDraftMediaVersionFile` (axios `params: { mediaVersionUuid, index }`) for image / carousel / pre-transcode video. Range requests work — useful for scrubbing in the `<video>` player.
+- `GET /api/post-draft-media-versions/stream?mediaVersionUuid=&path=…` — HLS artifacts under the media version's `stream/` directory. `path` is `master.m3u8`, `1080p/index.m3u8`, `720p/segment_001.ts`, etc. Only `.m3u8` and `.ts` accepted. Used by `useShowPostDraftMediaVersionStream` (same shape as the file hook, blob-returning) once `videoStreamingStatus === ready`. Full HLS player wiring (hls.js for Chromium/Firefox, native for Safari) is a follow-up task — the current video viewer still hits the file hook with `index=1`, which 404s after transcoding succeeds.
+
+Both routes return `404` when the file is missing (maps to `MissingPostDraftException`).
 
 ## Out of scope (Phase 1)
 

@@ -3,19 +3,19 @@ import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { postDraftsQueryKeys } from "./postDraftsQueryKeys";
 
-export function useShowPostDraftMediaVersionFile(mediaVersionUuid?: string, index?: number) {
+export function useShowPostDraftMediaVersionStream(mediaVersionUuid?: string, path?: string) {
     const [fileUrl, setFileUrl] = useState<string | null>(null);
 
     const query = useQuery({
-        queryKey: postDraftsQueryKeys.mediaVersionFile(mediaVersionUuid ?? '', index ?? 0),
+        queryKey: postDraftsQueryKeys.mediaVersionStream(mediaVersionUuid ?? '', path ?? ''),
         queryFn: async () => {
-            const res = await httpClient.get(`/post-draft-media-versions/files`, {
-                params: { mediaVersionUuid, index },
+            const res = await httpClient.get(`/post-draft-media-versions/stream`, {
+                params: { mediaVersionUuid, path },
                 responseType: 'blob',
             });
             return res.data as Blob;
         },
-        enabled: !!mediaVersionUuid && index !== undefined,
+        enabled: !!mediaVersionUuid && !!path,
         staleTime: Infinity,
     });
 

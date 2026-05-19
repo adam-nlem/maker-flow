@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Entity\Enum\VideoStreamingFailureReason;
+use App\Entity\Enum\VideoStreamingStatus;
 use App\Helper\DateHelper;
 use App\Repository\PostDraftMediaVersionRepository;
 use Doctrine\DBAL\Types\Types;
@@ -28,6 +30,14 @@ class PostDraftMediaVersion
     #[ORM\Column(type: Types::SMALLINT)]
     #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
     private int $fileCount = 1;
+
+    #[ORM\Column(type: 'string', length: 32, nullable: true, enumType: VideoStreamingStatus::class)]
+    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
+    private ?VideoStreamingStatus $videoStreamingStatus = null;
+
+    #[ORM\Column(type: 'string', length: 32, nullable: true, enumType: VideoStreamingFailureReason::class)]
+    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
+    private ?VideoStreamingFailureReason $videoStreamingFailureReason = null;
 
     #[ORM\Column]
     #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
@@ -81,6 +91,30 @@ class PostDraftMediaVersion
     public function setFileCount(int $fileCount): static
     {
         $this->fileCount = $fileCount;
+
+        return $this;
+    }
+
+    public function getVideoStreamingStatus(): ?VideoStreamingStatus
+    {
+        return $this->videoStreamingStatus;
+    }
+
+    public function setVideoStreamingStatus(?VideoStreamingStatus $videoStreamingStatus): static
+    {
+        $this->videoStreamingStatus = $videoStreamingStatus;
+
+        return $this;
+    }
+
+    public function getVideoStreamingFailureReason(): ?VideoStreamingFailureReason
+    {
+        return $this->videoStreamingFailureReason;
+    }
+
+    public function setVideoStreamingFailureReason(?VideoStreamingFailureReason $videoStreamingFailureReason): static
+    {
+        $this->videoStreamingFailureReason = $videoStreamingFailureReason;
 
         return $this;
     }
