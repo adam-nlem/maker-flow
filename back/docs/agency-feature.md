@@ -38,13 +38,6 @@ role_hierarchy:
   "agency": {
     "uuid": "…",
     "name": "Acme Studio",
-    "accentColor": "#1F2937",
-    "backgroundColor": null,
-    "backgroundSecondaryColor": null,
-    "textColor": null,
-    "textSecondaryColor": null,
-    "headingFont": null,
-    "bodyFont": null,
     "contactEmail": "hello@acme.studio",
     "website": "https://acme.studio"
   }
@@ -82,25 +75,9 @@ The client SPA reads this error in `ClientShellLayout` and renders a full-screen
 
 Both `GET` and `PATCH` resolve the current agency through `AgencyRepository::getByCollaborator($user)` and throw `MissingAgencyException` when the caller has no agency (e.g. clients).
 
-`UpdateAgencyRequestDTO` uses sparse-update semantics: only fields present in the JSON payload are applied to the entity. Validation constraints (e.g. `Assert\Regex` on hex colors, `Assert\Choice` on font fields, `Assert\Email`, `Assert\Url`) live on the entity itself and run via `AbstractRequestDTO::build()`.
+`UpdateAgencyRequestDTO` uses sparse-update semantics: only fields present in the JSON payload are applied to the entity. Validation constraints (`Assert\Email`, `Assert\Url`) live on the entity itself and run via `AbstractRequestDTO::build()`.
 
-The dedicated `api_agency_current` serialization group exposes the readable fields (`uuid`, `name`, theming fields, `contactEmail`, `website`). It is independent from `api_agency_create` and `api_agency_update`.
-
-## Theming
-
-The agency profile carries the white-label theme applied at runtime in the agency workspace, the client portal, and the invitation acceptance page. All fields are nullable; an unset value means the MakerFlow default applies.
-
-| Field | Type | Validation | Default token |
-| --- | --- | --- | --- |
-| `accentColor` | `VARCHAR(7)` hex | `^#[0-9A-Fa-f]{6}$` | `--color-primary` (`#43CEA9`) |
-| `backgroundColor` | `VARCHAR(7)` hex | same regex | `--color-clear` (`#141115`) |
-| `backgroundSecondaryColor` | `VARCHAR(7)` hex | same regex | `--color-light-gray` (`#2d2d44`) |
-| `textColor` | `VARCHAR(7)` hex | same regex | `--color-dark` (`#F0F0F0`) |
-| `textSecondaryColor` | `VARCHAR(7)` hex | same regex | `--color-gray` (`#9ca3af`) |
-| `headingFont` | `VARCHAR(64)` | `Assert\Choice` against `BrandFont::values()` | `--font-family-display` (`Outfit`) |
-| `bodyFont` | `VARCHAR(64)` | `Assert\Choice` against `BrandFont::values()` | `--font-family-sans` (`Roboto`) |
-
-`accentColor` replaces the legacy `brandColor` field; the migration `Version20260513120000` renames the column (`brand_color → accent_color`) and adds the six new columns. `App\Entity\Enum\BrandFont` is the curated whitelist (`Inter`, `Roboto`, `Open Sans`, `Lato`, `Montserrat`, `Poppins`, `Outfit`, `Nunito`).
+The dedicated `api_agency_current` serialization group exposes the readable fields (`uuid`, `name`, `contactEmail`, `website`). It is independent from `api_agency_create` and `api_agency_update`.
 
 ## Agency logo
 
@@ -117,15 +94,17 @@ Validation on upload (`AgencyLogoService::upload`):
 - MIME type must be `image/png`.
 - File size ≤ 5 MB.
 
-Any failure raises `AgencyLogoInvalidException` (code `27004`, HTTP 400) with a `reason` meta key (`file_too_large`, `invalid_mime_type`, `missing_file`). The destination filename is fixed (`{uuid}.png`), so subsequent uploads naturally overwrite the previous logo — no manual cleanup needed.
+Any failure raises `AgencyLogoInvalidException` (code `27004`, HTTP 400) carrying a `FileInvalidReason` enum value in `meta.reason` (`file_too_large`, `invalid_mime_type`, `missing_file`). `FileInvalidReason` is the shared enum used by every file-upload validation exception across the app (also consumed by `PostDraftFileInvalidException`). The destination filename is fixed (`{uuid}.png`), so subsequent uploads naturally overwrite the previous logo — no manual cleanup needed.
 
 Path is configured in `config/services.yaml`:
 
 ```yaml
-app.agency.logo.directory: "%kernel.project_dir%/private/uploads/agency/logo"
+app.uploads.agency_root: "%kernel.project_dir%/private/uploads/agency"
 ```
 
-…and injected into `App\Service\Agency\AgencyLogoService` as `$logoDirectory`. User-uploaded logos under `private/uploads/agency/logo/*` are gitignored.
+…and injected into `App\Service\Agency\AgencyLogoService` as `$agencyUploadsRoot`. The service writes each logo to `{root}/{agencyUuid}/logo/{agencyUuid}.png`, keeping every agency's assets (logo + post drafts — see [post-draft-feature.md](post-draft-feature.md)) under a single per-tenant directory. User-uploaded files under `private/uploads/agency/*` are gitignored.
+
+**Breaking change (2026-05-14):** the previous path was `private/uploads/agency/logo/{agencyUuid}.png`. Existing logos must be moved into the new agency-scoped layout (`private/uploads/agency/{agencyUuid}/logo/{agencyUuid}.png`) or re-uploaded.
 
 ## Agency creation in onboarding
 

@@ -7,7 +7,7 @@ import { Input } from "~/components/ui/Input";
 import { TextArea } from "~/components/ui/TextArea";
 import LinkedScriptField from "~/components/agency/scripts/LinkedScriptField";
 import type { Script } from "~/models/Script";
-import { MediaType, mediaTypeToIcon } from "~/models/enums/MediaType";
+import { MediaType, mediaTypeToIcon, mediaTypeTranslationKeys, mediaTypeUploadHintTranslationKeys } from "~/models/enums/MediaType";
 import { useCreatePostDraft } from "~/hooks/api/postDrafts/useCreatePostDraft";
 import { usePostDraftsStore } from "~/stores/postDrafts/postDraftsStore";
 import { HttpException } from "~/services/httpClient/HttpException";
@@ -72,88 +72,102 @@ export default function CreatePostDraftModal({ projectUuid, showModal, onClose }
             isOpen={showModal}
             onClose={handleClose}
             width="w-160"
-            height="h-160"
+            height="max-h-[calc(100vh-80px)]"
             align={isPickerOpen ? ModalAlign.LeftOfCenter : ModalAlign.Center}
         >
-            <form className="flex flex-col gap-4 p-4" onSubmit={handleSubmit}>
-                <Input
-                    label={t("postDrafts:form.title")}
-                    placeholder={t("postDrafts:form.titlePlaceholder")}
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                />
+            <form className="flex flex-col h-full" onSubmit={handleSubmit}>
+                <div className="px-5 pt-5 pb-3 border-b border-pale-gray">
+                    <h2 className="text-heading-lg">{t("postDrafts:form.modalTitle")}</h2>
+                    <p className="text-body-sm text-muted">{t("postDrafts:form.modalSubtitle")}</p>
+                </div>
 
-                <div className="flex flex-col gap-1.5">
-                    <label className="block text-heading-sm">{t("postDrafts:form.mediaType")}</label>
-                    <div className="flex flex-row gap-2">
-                        {Object.values(MediaType).map((value) => {
-                            const Icon = mediaTypeToIcon[value];
-                            return <button
-                                key={value}
-                                type="button"
-                                onClick={() => handleMediaTypeChange(value)}
-                                className={`flex-1 px-3 py-2 rounded-xl border text-body-xs cursor-pointer transition-colors ${mediaType === value ? "bg-primary/10 border-primary text-primary" : "bg-clear border-pale-gray text-dark hover:bg-pale-gray-2/30"}`}
-                            >
-                                <div className="flex flex-row gap-3 justify-center items-center">
+                <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4">
+                    <div className="flex flex-col gap-1.5">
+                        <label className="block text-heading-sm">{t("postDrafts:form.mediaType")}</label>
+                        <div className="flex flex-row gap-2">
+                            {Object.values(MediaType).map((value) => {
+                                const Icon = mediaTypeToIcon[value];
+                                const isSelected = mediaType === value;
+                                return (
+                                    <button
+                                        key={value}
+                                        type="button"
+                                        onClick={() => handleMediaTypeChange(value)}
+                                        className={`flex-1 min-w-30 p-2.5 rounded-lg border text-left cursor-pointer transition-colors ${isSelected ? "bg-clear border-dark shadow-sm" : "bg-clear-2 border-pale-gray hover:border-pale-gray-2"}`}
+                                    >
+                                        <div className="flex flex-row gap-2 items-center">
+                                            <Icon
+                                                className={`size-4 shrink-0 ${isSelected ? "text-primary" : "text-dark-2"}`}
+                                                strokeWidth={1.5}
+                                            />
+                                            <p className="text-heading-sm">
+                                                {t(mediaTypeTranslationKeys[value])}
+                                            </p>
+                                        </div>
+                                        <p className="text-body-xs text-muted-2 mt-1">
+                                            {t(mediaTypeUploadHintTranslationKeys[value])}
+                                        </p>
+                                    </button>
+                                );
+                            })}
+                        </div>
+                    </div>
 
-                                    <Icon
-                                        className={`size-4 shrink-0 ${mediaType === value ? 'text-primary' : 'text-dark-2'}`}
-                                        strokeWidth={1.5}
-                                    />
-                                    <p>
-                                        {t(`postDrafts:form.mediaType${value.charAt(0).toUpperCase()}${value.slice(1)}`)}
-                                    </p>
-                                </div>
-                            </button>
-                        })}
+                    <div className="flex flex-col gap-1.5">
+                        <label className="block text-heading-sm">{t("postDrafts:form.files")}</label>
+                        <PostDraftFileDropzone
+                            mediaType={mediaType}
+                            files={files}
+                            onChange={setFiles}
+                        />
+                    </div>
+
+                    <Input
+                        label={t("postDrafts:form.title")}
+                        placeholder={t("postDrafts:form.titlePlaceholder")}
+                        value={title}
+                        onChange={(e) => setTitle(e.target.value)}
+                    />
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="block text-heading-sm">{t("postDrafts:form.description")}</label>
+                        <TextArea
+                            value={description}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder={t("postDrafts:form.descriptionPlaceholder")}
+                            rows={3}
+                        />
+                        <p className="text-body-xs text-muted-2">{t("postDrafts:form.descriptionHint")}</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="block text-heading-sm">{t("postDrafts:form.notes")}</label>
+                        <TextArea
+                            value={notes}
+                            onChange={(e) => setNotes(e.target.value)}
+                            placeholder={t("postDrafts:form.notesPlaceholder")}
+                            rows={3}
+                        />
+                        <p className="text-body-xs text-muted-2">{t("postDrafts:form.notesHint")}</p>
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                        <label className="block text-heading-sm">{t("scripts:picker.linkedField.label")}</label>
+                        <LinkedScriptField
+                            projectUuid={projectUuid}
+                            value={linkedScript}
+                            onChange={setLinkedScript}
+                            pickerAlign={ModalAlign.RightOfCenter}
+                            onPickerOpenChange={setIsPickerOpen}
+                        />
                     </div>
                 </div>
 
-                <div className="flex flex-col gap-1.5">
-                    <label className="block text-heading-sm">{t("postDrafts:form.files")}</label>
-                    <PostDraftFileDropzone
-                        mediaType={mediaType}
-                        files={files}
-                        onChange={setFiles}
-                    />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                    <label className="block text-heading-sm">{t("postDrafts:form.description")}</label>
-                    <TextArea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder={t("postDrafts:form.descriptionPlaceholder")}
-                        rows={3}
-                    />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                    <label className="block text-heading-sm">{t("postDrafts:form.notes")}</label>
-                    <TextArea
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder={t("postDrafts:form.notesPlaceholder")}
-                        rows={3}
-                    />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                    <label className="block text-heading-sm">{t("scripts:picker.linkedField.label")}</label>
-                    <LinkedScriptField
-                        projectUuid={projectUuid}
-                        value={linkedScript}
-                        onChange={setLinkedScript}
-                        pickerAlign={ModalAlign.RightOfCenter}
-                        onPickerOpenChange={setIsPickerOpen}
-                    />
-                </div>
-
                 {submitErrorKey && (
-                    <p className="text-body-sm text-danger">{t(submitErrorKey)}</p>
+                    <p className="text-body-sm text-danger px-5 pb-2">{t(submitErrorKey)}</p>
                 )}
 
-                <div className="flex flex-row gap-2 pt-2">
+                <div className="px-5 py-3.5 bg-clear-2 border-t border-pale-gray flex flex-row gap-2 justify-end">
                     <Button type="button" style="outline" onClick={onClose} disabled={isPending}>
                         {t("postDrafts:actions.cancel")}
                     </Button>

@@ -184,6 +184,21 @@ Compact dark-inverted chips for left-panel filter rows (e.g. `All / Awaiting / C
 
 This is distinct from `ToggleChip`, which uses a `bg-primary text-clear` selected state. Use the dark-inverted chip when the chip row sits next to colored status pills and should not compete for color.
 
+### Dropzone surface
+
+Large drop-target surface inside a form (e.g. the create-draft modal). Built on top of [`FileUpload`](../src/components/ui/FileUpload.tsx)'s `children` render-prop so each consumer can supply its own visual without affecting other dropzones.
+
+```html
+<!-- idle -->
+<div class="flex flex-col items-center justify-center gap-2 p-8 rounded-xl border-2 border-dashed transition-colors
+            border-pale-gray bg-clear-2 text-muted-2 hover:border-primary hover:bg-primary/5 hover:text-primary">
+<!-- drag-active -->
+<div class="flex flex-col items-center justify-center gap-2 p-8 rounded-xl border-2 border-dashed transition-colors
+            border-primary bg-primary/5 text-primary">
+```
+
+Canonical example: [`PostDraftFileDropzone`](../src/components/agency/postDrafts/PostDraftFileDropzone.tsx) — passes a `DropzoneSurface` component to `FileUpload`'s `children` render-prop, which receives `{ isDragActive }` so the surface can flip into the primary-tinted state during drag. Use this pattern when you need a wide form-friendly dropzone; for compact pickers, stick with `FileUpload`'s default rendering (smaller dashed box).
+
 ---
 
 ## UI Components

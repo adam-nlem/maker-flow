@@ -8,15 +8,14 @@ use App\DTO\Request\PostDraft\UpdatePostDraftRequestDTO;
 use App\Entity\Enum\PostDraftStatus;
 use App\Entity\Enum\UserRole;
 use App\Entity\PostDraft;
-use App\Entity\PostDraftRevision;
+use App\Entity\PostDraftMediaVersion;
 use App\Entity\User;
 use App\Exception\PostDraft\MissingPostDraftException;
 use App\Exception\PostDraft\PostDraftLockedException;
 use App\Exception\PostDraft\ScriptAlreadyHasPostDraftException;
 use App\Exception\Project\ProjectNotFoundException;
-use App\Message\OptimizePostDraftRevisionMessage;
+use App\Repository\PostDraftMediaVersionRepository;
 use App\Repository\PostDraftRepository;
-use App\Repository\PostDraftRevisionRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\ScriptRepository;
 use App\Security\Voter\ProjectVoter;
@@ -28,7 +27,6 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -96,10 +94,9 @@ final class PostDraftController extends AbstractController
         ProjectRepository $projectRepository,
         ScriptRepository $scriptRepository,
         PostDraftRepository $postDraftRepository,
-        PostDraftRevisionRepository $postDraftRevisionRepository,
+        PostDraftMediaVersionRepository $postDraftMediaVersionRepository,
         PostDraftFileService $postDraftFileService,
         EntityManagerInterface $entityManager,
-        MessageBusInterface $messageBus,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -129,24 +126,22 @@ final class PostDraftController extends AbstractController
         $postDraft->setScript($script);
         $postDraft->setCreatedBy($user);
 
-        $revision = new PostDraftRevision();
-        $revision->setPostDraft($postDraft);
-        $revision->setFileCount(count($files));
-        $postDraft->addRevision($revision);
+        $mediaVersion = new PostDraftMediaVersion();
+        $mediaVersion->setPostDraft($postDraft);
+        $mediaVersion->setFileCount(count($files));
+        $postDraft->addMediaVersion($mediaVersion);
 
         $postDraftRepository->save($postDraft);
-        $postDraftRevisionRepository->save($revision);
+        $postDraftMediaVersionRepository->save($mediaVersion);
 
-        $postDraftFileService->storeUploadedFiles($revision, $files);
+        $postDraftFileService->storeUploadedFiles($mediaVersion, $files);
 
         try {
             $entityManager->flush();
         } catch (UniqueConstraintViolationException) {
-            $postDraftFileService->deleteRevision($revision);
+            $postDraftFileService->deleteMediaVersion($mediaVersion);
             throw new ScriptAlreadyHasPostDraftException();
         }
-
-        $messageBus->dispatch(new OptimizePostDraftRevisionMessage($revision->getId()));
 
         return $this->json(
             data: $postDraft,

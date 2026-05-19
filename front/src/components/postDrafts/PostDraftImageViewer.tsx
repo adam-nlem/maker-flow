@@ -1,11 +1,11 @@
-import { useShowPostDraftRevisionFile } from "~/hooks/api/postDrafts/useShowPostDraftRevisionFile";
+import { useShowPostDraftMediaVersionFile } from "~/hooks/api/postDrafts/useShowPostDraftMediaVersionFile";
 
 interface PostDraftImageViewerProps {
-    revisionUuid: string;
+    mediaVersionUuid: string;
 }
 
-export default function PostDraftImageViewer({ revisionUuid }: PostDraftImageViewerProps) {
-    const { fileUrl } = useShowPostDraftRevisionFile(revisionUuid, 1);
+export default function PostDraftImageViewer({ mediaVersionUuid }: PostDraftImageViewerProps) {
+    const { fileUrl } = useShowPostDraftMediaVersionFile(mediaVersionUuid, 1);
 
     return (
         <div className="rounded-2xl overflow-hidden bg-dark shadow-md mb-4">

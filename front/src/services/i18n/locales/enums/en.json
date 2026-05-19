@@ -84,7 +84,12 @@
     "mediaType": {
         "image": "Image",
         "video": "Video",
-        "carousel": "Carousel"
+        "carousel": "Carousel",
+        "uploadHint": {
+            "image": "PNG, JPEG or WebP up to 20 MB.",
+            "video": "Single MP4, MOV or WebM up to 500 MB.",
+            "carousel": "2 to 10 images, up to 20 MB each."
+        }
     },
     "oAuthErrorCode": {
         "invalidState": "Session expired, please try again",
@@ -94,6 +99,14 @@
         "platformError": "Authentication platform error",
         "popupBlocked": "The popup window was blocked by your browser",
         "unknown": "An error occurred, please try again"
+    },
+    "fileInvalidReason": {
+        "missingFile": "Please add a file.",
+        "tooManyFiles": "Too many files were selected.",
+        "tooFewFiles": "Not enough files were selected.",
+        "fileTooLarge": "The file exceeds the maximum size.",
+        "invalidMimeType": "Unsupported file type.",
+        "invalidPayload": "The request data is invalid."
     },
     "onboardingStep": {
         "admin": {

@@ -26,7 +26,7 @@ Already documented in `back/docs/agency-feature.md`. For clients specifically, t
 - `agency: null`
 - `clientProjectUuid` — the UUID of `User.project` (used by the frontend to fetch the project and its branding).
 
-The frontend resolves the agency branding for the client shell through `GET /api/projects/{clientProjectUuid}` (group `api_project_get_by_uuid`), which nests `agency: { uuid, name, accentColor, backgroundColor, backgroundSecondaryColor, textColor, textSecondaryColor, headingFont, bodyFont, contactEmail, website }`. No dedicated `/api/agencies/current` is exposed to clients — they read agency metadata through the project endpoint instead.
+The frontend resolves the agency identity for the client shell through `GET /api/projects/{clientProjectUuid}` (group `api_project_get_by_uuid`), which nests `agency: { uuid, name, contactEmail, website }`. No dedicated `/api/agencies/current` is exposed to clients — they read agency metadata through the project endpoint instead.
 
 ## Endpoints reachable from the client portal
 

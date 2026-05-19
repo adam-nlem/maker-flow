@@ -27,4 +27,5 @@ enum DomainCode: int
     case ProjectClient = 30;
     case AgencyCollaborator = 31;
     case Onboarding = 32;
+    case PostDraft = 33;
 }

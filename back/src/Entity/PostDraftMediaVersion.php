@@ -2,16 +2,15 @@
 
 namespace App\Entity;
 
-use App\Entity\Enum\PostDraftRevisionOptimizationStatus;
 use App\Helper\DateHelper;
-use App\Repository\PostDraftRevisionRepository;
+use App\Repository\PostDraftMediaVersionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Uid\Uuid;
 
-#[ORM\Entity(repositoryClass: PostDraftRevisionRepository::class)]
-class PostDraftRevision
+#[ORM\Entity(repositoryClass: PostDraftMediaVersionRepository::class)]
+class PostDraftMediaVersion
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,13 +21,9 @@ class PostDraftRevision
     #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
     private ?string $uuid = null;
 
-    #[ORM\ManyToOne(inversedBy: 'revisions')]
+    #[ORM\ManyToOne(inversedBy: 'mediaVersions')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?PostDraft $postDraft = null;
-
-    #[ORM\Column(length: 32, enumType: PostDraftRevisionOptimizationStatus::class)]
-    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
-    private PostDraftRevisionOptimizationStatus $optimizationStatus = PostDraftRevisionOptimizationStatus::Pending;
 
     #[ORM\Column(type: Types::SMALLINT)]
     #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
@@ -74,18 +69,6 @@ class PostDraftRevision
     public function setPostDraft(?PostDraft $postDraft): static
     {
         $this->postDraft = $postDraft;
-
-        return $this;
-    }
-
-    public function getOptimizationStatus(): PostDraftRevisionOptimizationStatus
-    {
-        return $this->optimizationStatus;
-    }
-
-    public function setOptimizationStatus(PostDraftRevisionOptimizationStatus $status): static
-    {
-        $this->optimizationStatus = $status;
 
         return $this;
     }

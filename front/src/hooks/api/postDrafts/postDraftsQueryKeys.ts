@@ -7,6 +7,6 @@ export const postDraftsQueryKeys = {
     listAll: (projectUuid: string) =>
         [...postDraftsQueryKeys.all, 'list', projectUuid] as const,
     detail: (uuid: string) => [...postDraftsQueryKeys.all, 'detail', uuid] as const,
-    revisionFile: (revisionUuid: string, index: number) =>
-        [...postDraftsQueryKeys.all, 'revisionFile', revisionUuid, index] as const,
+    mediaVersionFile: (mediaVersionUuid: string, index: number) =>
+        [...postDraftsQueryKeys.all, 'mediaVersionFile', mediaVersionUuid, index] as const,
 }

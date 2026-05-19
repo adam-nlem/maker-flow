@@ -13,6 +13,12 @@ export const mediaTypeTranslationKeys: Record<MediaType, string> = {
     [MediaType.Carousel]: "enums:mediaType.carousel",
 };
 
+export const mediaTypeUploadHintTranslationKeys: Record<MediaType, string> = {
+    [MediaType.Image]: "enums:mediaType.uploadHint.image",
+    [MediaType.Video]: "enums:mediaType.uploadHint.video",
+    [MediaType.Carousel]: "enums:mediaType.uploadHint.carousel",
+};
+
 export const mediaTypeToIcon: Record<MediaType, ComponentType<SVGProps<SVGSVGElement>>> = {
     [MediaType.Video]: FilmIcon,
     [MediaType.Image]: PhotoIcon,

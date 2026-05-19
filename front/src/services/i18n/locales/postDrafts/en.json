@@ -55,23 +55,18 @@
             "subtitle": "The client declined this draft."
         }
     },
-    "optimization": {
-        "pending": "Preparing files…",
-        "optimizing": "Optimizing…",
-        "optimized": "Ready",
-        "failed": "Optimization failed"
-    },
     "form": {
+        "modalTitle": "New draft",
+        "modalSubtitle": "Upload content for the client to review.",
         "title": "Title",
         "titlePlaceholder": "Give this draft a title",
         "description": "Description",
         "descriptionPlaceholder": "Optional caption or context for the post",
+        "descriptionHint": "Caption or context shared with the client.",
         "notes": "Notes for the client",
         "notesPlaceholder": "Optional context shown to the client during review",
+        "notesHint": "Shared with the client during review.",
         "mediaType": "Media type",
-        "mediaTypeVideo": "Video",
-        "mediaTypeImage": "Image",
-        "mediaTypeCarousel": "Carousel",
         "files": "Files",
         "dropHint": "Drop a file here, or click to choose",
         "dropHintCarousel": "Drop 2 to 10 images here, or click to choose",
@@ -102,9 +97,7 @@
             "previousSlide": "Previous slide",
             "nextSlide": "Next slide",
             "goToSlide": "Go to slide {{index}}"
-        },
-        "filesPending": "Files are being prepared. This panel will update automatically.",
-        "filesFailed": "Optimization failed. Please try uploading again or contact support."
+        }
     },
     "validation": {
         "titleRequired": "Title is required.",

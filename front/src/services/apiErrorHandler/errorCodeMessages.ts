@@ -1,9 +1,20 @@
 import i18n from '~/services/i18n/i18n'
 import { HttpException } from '~/services/httpClient/HttpException'
+import { FileInvalidReason, fileInvalidReasonTranslationKeys } from '~/models/enums/FileInvalidReason'
 
 const FALLBACK_KEY = 'errors:fallback'
 
-export const errorCodeKeys: Record<number, string> = {
+type ErrorMessageResolver = (meta: Record<string, unknown>) => string
+
+function resolveFileInvalidReason(meta: Record<string, unknown>, fallbackKey: string): string {
+  const reason = typeof meta.reason === 'string' ? meta.reason : null
+  const enumValue = (Object.values(FileInvalidReason) as string[]).includes(reason ?? '')
+    ? (reason as FileInvalidReason)
+    : null
+  return enumValue ? fileInvalidReasonTranslationKeys[enumValue] : fallbackKey
+}
+
+export const errorCodeKeys: Record<number, string | ErrorMessageResolver> = {
   // Integration (10xxx)
   10001: 'errors:integration.expired',
   10002: 'errors:integration.notFound',
@@ -94,7 +105,7 @@ export const errorCodeKeys: Record<number, string> = {
   27001: 'errors:agency.missing',
   27002: 'errors:agency.alreadyExists',
   27003: 'errors:agency.subscriptionInactive',
-  27004: 'errors:agency.logoInvalid',
+  27004: (meta) => resolveFileInvalidReason(meta, 'errors:agency.logoInvalid'),
 
   // HookTemplate (28xxx)
   28001: 'errors:hookTemplate.notFound',
@@ -119,15 +130,18 @@ export const errorCodeKeys: Record<number, string> = {
   32001: 'errors:onboarding.invalidStep',
 
   // PostDraft (33xxx)
-  33001: 'errors:postDraft.fileInvalid',
+  33001: (meta) => resolveFileInvalidReason(meta, 'errors:postDraft.fileInvalid'),
   33002: 'errors:postDraft.notFound',
   33003: 'errors:postDraft.scriptAlreadyHasDraft',
   33004: 'errors:postDraft.locked',
+  33005: 'errors:postDraft.unresolvableAgency',
 }
 
 export function resolveErrorMessage(error: unknown): string {
   if (error instanceof HttpException) {
-    return i18n.t(errorCodeKeys[error.response.code] ?? FALLBACK_KEY)
+    const entry = errorCodeKeys[error.response.code]
+    const key = typeof entry === 'function' ? entry(error.response.meta) : entry ?? FALLBACK_KEY
+    return i18n.t(key)
   }
   return i18n.t(FALLBACK_KEY)
 }

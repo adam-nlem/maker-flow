@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\DTO\Request\Agency\CreateAgencyRequestDTO;
 use App\DTO\Request\Agency\UpdateAgencyRequestDTO;
 use App\Entity\Agency;
+use App\Entity\Enum\FileInvalidReason;
 use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\Agency\AgencyLogoInvalidException;
@@ -145,7 +146,7 @@ final class AgencyController extends AbstractController
         $file = $request->files->get('logo');
 
         if (!$file instanceof UploadedFile) {
-            throw new AgencyLogoInvalidException(['reason' => 'missing_file']);
+            throw new AgencyLogoInvalidException(FileInvalidReason::MissingFile);
         }
 
         $agencyLogoService->upload($agency, $file);

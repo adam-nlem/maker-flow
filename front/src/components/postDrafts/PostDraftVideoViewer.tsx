@@ -1,15 +1,15 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { useShowPostDraftRevisionFile } from "~/hooks/api/postDrafts/useShowPostDraftRevisionFile";
+import { useShowPostDraftMediaVersionFile } from "~/hooks/api/postDrafts/useShowPostDraftMediaVersionFile";
 import { formatDurationToClock } from "~/utils/durationFormatters";
 
 interface PostDraftVideoViewerProps {
-    revisionUuid: string;
+    mediaVersionUuid: string;
 }
 
-export default function PostDraftVideoViewer({ revisionUuid }: PostDraftVideoViewerProps) {
+export default function PostDraftVideoViewer({ mediaVersionUuid }: PostDraftVideoViewerProps) {
     const { t } = useTranslation();
-    const { fileUrl } = useShowPostDraftRevisionFile(revisionUuid, 1);
+    const { fileUrl } = useShowPostDraftMediaVersionFile(mediaVersionUuid, 1);
     const [duration, setDuration] = useState<number | null>(null);
 
     const handleLoadedMetadata = (event: React.SyntheticEvent<HTMLVideoElement>) => {

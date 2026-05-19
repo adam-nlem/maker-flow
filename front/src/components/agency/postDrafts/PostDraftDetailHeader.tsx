@@ -32,7 +32,7 @@ export default function PostDraftDetailHeader({
                     <MediaTypeIcon className="size-3.5" />
                     <span>{typeLabel}</span>
                     <span aria-hidden className="text-pale-gray-2">·</span>
-                    <span>v{postDraft.revisions.length} · {relativeCreatedAt}</span>
+                    <span>v{postDraft.mediaVersions.length} · {relativeCreatedAt}</span>
                     {postDraft.script && !form.canEdit && (
                         <>
                             <span aria-hidden className="text-pale-gray-2">·</span>

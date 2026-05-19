@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
-import { useShowPostDraftRevisionFile } from "~/hooks/api/postDrafts/useShowPostDraftRevisionFile";
+import { useShowPostDraftMediaVersionFile } from "~/hooks/api/postDrafts/useShowPostDraftMediaVersionFile";
 
 interface PostDraftCarouselViewerProps {
-    revisionUuid: string;
+    mediaVersionUuid: string;
     fileCount: number;
 }
 
-export default function PostDraftCarouselViewer({ revisionUuid, fileCount }: PostDraftCarouselViewerProps) {
+export default function PostDraftCarouselViewer({ mediaVersionUuid, fileCount }: PostDraftCarouselViewerProps) {
     const { t } = useTranslation();
     const [activeIndex, setActiveIndex] = useState(0);
 
@@ -23,7 +23,7 @@ export default function PostDraftCarouselViewer({ revisionUuid, fileCount }: Pos
         <div className="rounded-2xl overflow-hidden bg-dark shadow-md mb-4">
             <div className="relative w-full bg-dark flex items-center justify-center min-h-80">
                 <CarouselSlideImage
-                    revisionUuid={revisionUuid}
+                    mediaVersionUuid={mediaVersionUuid}
                     fileIndex={slides[activeIndex]}
                     className="max-h-[70vh] w-auto max-w-full object-contain"
                 />
@@ -73,7 +73,7 @@ export default function PostDraftCarouselViewer({ revisionUuid, fileCount }: Pos
                         onClick={() => setActiveIndex(i)}
                         className={`size-14 rounded-md overflow-hidden border-2 shrink-0 transition-colors ${i === activeIndex ? "border-dark" : "border-transparent hover:border-pale-gray-2"}`}
                     >
-                        <CarouselSlideImage revisionUuid={revisionUuid} fileIndex={fileIndex} className="w-full h-full object-cover" />
+                        <CarouselSlideImage mediaVersionUuid={mediaVersionUuid} fileIndex={fileIndex} className="w-full h-full object-cover" />
                     </button>
                 ))}
             </div>
@@ -82,13 +82,13 @@ export default function PostDraftCarouselViewer({ revisionUuid, fileCount }: Pos
 }
 
 interface CarouselSlideImageProps {
-    revisionUuid: string;
+    mediaVersionUuid: string;
     fileIndex: number;
     className: string;
 }
 
-function CarouselSlideImage({ revisionUuid, fileIndex, className }: CarouselSlideImageProps) {
-    const { fileUrl } = useShowPostDraftRevisionFile(revisionUuid, fileIndex);
+function CarouselSlideImage({ mediaVersionUuid, fileIndex, className }: CarouselSlideImageProps) {
+    const { fileUrl } = useShowPostDraftMediaVersionFile(mediaVersionUuid, fileIndex);
 
     if (!fileUrl) {
         return <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />;

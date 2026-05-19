@@ -3,6 +3,7 @@
 namespace App\Service\Agency;
 
 use App\Entity\Agency;
+use App\Entity\Enum\FileInvalidReason;
 use App\Exception\Agency\AgencyLogoInvalidException;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\File\File;
@@ -16,7 +17,7 @@ class AgencyLogoService
 
     public function __construct(
         private readonly Filesystem $filesystem,
-        private readonly string $logoDirectory,
+        private readonly string $agencyUploadsRoot,
     ) {}
 
     /**
@@ -25,18 +26,20 @@ class AgencyLogoService
     public function upload(Agency $agency, UploadedFile $file): string
     {
         if ($file->getSize() > self::MAX_FILE_SIZE) {
-            throw new AgencyLogoInvalidException(['reason' => 'file_too_large']);
+            throw new AgencyLogoInvalidException(FileInvalidReason::FileTooLarge);
         }
 
         if ($file->getMimeType() !== self::ALLOWED_MIME_TYPE) {
-            throw new AgencyLogoInvalidException(['reason' => 'invalid_mime_type']);
+            throw new AgencyLogoInvalidException(FileInvalidReason::InvalidMimeType);
         }
 
-        if (!$this->filesystem->exists($this->logoDirectory)) {
-            $this->filesystem->mkdir($this->logoDirectory);
+        $directory = $this->getDirectory($agency);
+
+        if (!$this->filesystem->exists($directory)) {
+            $this->filesystem->mkdir($directory);
         }
 
-        $file->move($this->logoDirectory, $this->getFilename($agency));
+        $file->move($directory, $this->getFilename($agency));
 
         return $this->getPath($agency);
     }
@@ -46,7 +49,7 @@ class AgencyLogoService
      */
     public function getPath(Agency $agency): string
     {
-        return sprintf('%s/%s', $this->logoDirectory, $this->getFilename($agency));
+        return sprintf('%s/%s', $this->getDirectory($agency), $this->getFilename($agency));
     }
 
     /**
@@ -61,6 +64,11 @@ class AgencyLogoService
         }
 
         return new File($path, false);
+    }
+
+    private function getDirectory(Agency $agency): string
+    {
+        return sprintf('%s/%s/logo', $this->agencyUploadsRoot, $agency->getUuid());
     }
 
     private function getFilename(Agency $agency): string

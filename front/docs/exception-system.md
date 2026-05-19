@@ -106,6 +106,17 @@ The numeric code is computed by the backend as `DomainCode.value * 1000 + codeSu
 3. Add the message under that key in both `services/i18n/locales/errors/en.json` and `…/fr.json`.
 4. The global handler (`handleMutationError`) will automatically show the correct toast.
 
+#### Meta-driven resolution
+
+When the same error code can carry several user-facing reasons (e.g. `PostDraftFileInvalidException` / `AgencyLogoInvalidException` with `meta.reason`), mirror the backend enum under `models/enums/` along with a translation key map (see `FileInvalidReason.ts` / `OAuthErrorCode.ts`), then pass a resolver function instead of a string in `errorCodeMessages.ts`:
+
+```ts
+27004: (meta) => resolveFileInvalidReason(meta, 'errors:agency.logoInvalid'),
+33001: (meta) => resolveFileInvalidReason(meta, 'errors:postDraft.fileInvalid'),
+```
+
+The local `resolveFileInvalidReason(meta, fallbackKey)` helper looks up `meta.reason` in `FileInvalidReason` and falls back to the supplied key if the reason is missing or unknown. Add a similar helper if you introduce another shared meta enum.
+
 ## How It Works
 
 ### Global handling (automatic)

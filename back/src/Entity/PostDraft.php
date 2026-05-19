@@ -68,12 +68,12 @@ class PostDraft
     private ?User $createdBy = null;
 
     /**
-     * @var Collection<int, PostDraftRevision>
+     * @var Collection<int, PostDraftMediaVersion>
      */
-    #[ORM\OneToMany(targetEntity: PostDraftRevision::class, mappedBy: 'postDraft', cascade: ['remove'], orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: PostDraftMediaVersion::class, mappedBy: 'postDraft', cascade: ['remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'ASC'])]
     #[Groups(['api_post_drafts_show'])]
-    private Collection $revisions;
+    private Collection $mediaVersions;
 
     public function __construct()
     {
@@ -89,7 +89,7 @@ class PostDraft
             $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
 
-        $this->revisions = new ArrayCollection();
+        $this->mediaVersions = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -236,32 +236,32 @@ class PostDraft
     }
 
     /**
-     * @return Collection<int, PostDraftRevision>
+     * @return Collection<int, PostDraftMediaVersion>
      */
-    public function getRevisions(): Collection
+    public function getMediaVersions(): Collection
     {
-        return $this->revisions;
+        return $this->mediaVersions;
     }
 
-    public function addRevision(PostDraftRevision $revision): static
+    public function addMediaVersion(PostDraftMediaVersion $mediaVersion): static
     {
-        if (!$this->revisions->contains($revision)) {
-            $this->revisions->add($revision);
-            $revision->setPostDraft($this);
+        if (!$this->mediaVersions->contains($mediaVersion)) {
+            $this->mediaVersions->add($mediaVersion);
+            $mediaVersion->setPostDraft($this);
         }
 
         return $this;
     }
 
     #[Groups(['api_post_drafts_list'])]
-    public function getLatestRevision(): ?PostDraftRevision
+    public function getLatestMediaVersion(): ?PostDraftMediaVersion
     {
-        if ($this->revisions->isEmpty()) {
+        if ($this->mediaVersions->isEmpty()) {
             return null;
         }
 
-        $sorted = $this->revisions->toArray();
-        usort($sorted, fn(PostDraftRevision $a, PostDraftRevision $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
+        $sorted = $this->mediaVersions->toArray();
+        usort($sorted, fn(PostDraftMediaVersion $a, PostDraftMediaVersion $b) => $b->getCreatedAt() <=> $a->getCreatedAt());
 
         return $sorted[0];
     }

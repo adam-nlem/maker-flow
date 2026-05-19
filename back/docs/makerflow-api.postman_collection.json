@@ -177,7 +177,7 @@
                 "{{projectUuid}}"
               ]
             },
-            "description": "Returns the project with its parent agency nested under `agency` (`uuid`, `name`, theming fields — `accentColor`, `backgroundColor`, `backgroundSecondaryColor`, `textColor`, `textSecondaryColor`, `headingFont`, `bodyFont` — `contactEmail`, `website`). Used by the client portal to read branding for the sidebar.\n\nErrors:\n- `403` with `{ \"code\": 27003 }` (`AgencySubscriptionInactiveException`) when the requester is a `ROLE_CLIENT` user whose parent agency has no active subscription. Agency members are never gated."
+            "description": "Returns the project with its parent agency nested under `agency` (`uuid`, `name`, `contactEmail`, `website`). Used by the client portal to read agency identity for the sidebar.\n\nErrors:\n- `403` with `{ \"code\": 27003 }` (`AgencySubscriptionInactiveException`) when the requester is a `ROLE_CLIENT` user whose parent agency has no active subscription. Agency members are never gated."
           },
           "response": []
         },
@@ -1039,6 +1039,12 @@
                   "key": "status",
                   "value": "idea",
                   "description": "Optional filter by ScriptStatus (idea, scripting, shooting, editing, scheduled, published)",
+                  "disabled": true
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "description": "Optional. Case-insensitive LIKE filter on script title.",
                   "disabled": true
                 }
               ]
@@ -3092,7 +3098,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"name\": \"My Agency\",\n  \"accentColor\": \"#1F2937\",\n  \"backgroundColor\": null,\n  \"backgroundSecondaryColor\": null,\n  \"textColor\": null,\n  \"textSecondaryColor\": null,\n  \"headingFont\": null,\n  \"bodyFont\": null,\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
+              "raw": "{\n  \"name\": \"My Agency\",\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/agencies",
@@ -3140,7 +3146,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"agencyUuid\": \"{{agencyUuid}}\",\n  \"name\": \"My Agency Renamed\",\n  \"accentColor\": \"#43CEA9\",\n  \"backgroundColor\": \"#141115\",\n  \"backgroundSecondaryColor\": \"#2d2d44\",\n  \"textColor\": \"#F0F0F0\",\n  \"textSecondaryColor\": \"#9ca3af\",\n  \"headingFont\": \"Outfit\",\n  \"bodyFont\": \"Roboto\",\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
+              "raw": "{\n  \"agencyUuid\": \"{{agencyUuid}}\",\n  \"name\": \"My Agency Renamed\",\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/agencies",
@@ -3484,6 +3490,121 @@
         }
       ],
       "id": "script-versions-folder-0001-00000"
+    },
+    {
+      "name": "Post Drafts",
+      "item": [
+        {
+          "name": "List Post Drafts",
+          "id": "post-drafts-list-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/post-drafts?projectUuid={{projectUuid}}&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-drafts"],
+              "query": [
+                { "key": "projectUuid", "value": "{{projectUuid}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "status", "value": "awaiting_review", "description": "Optional: awaiting_review | changes_requested | approved | rejected", "disabled": true },
+                { "key": "searchTerm", "value": "", "description": "Optional: case-insensitive LIKE on title", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Post Draft",
+          "id": "post-drafts-show-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/post-drafts/{{postDraftUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-drafts", "{{postDraftUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Post Draft (multipart)",
+          "id": "post-drafts-create-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "projectUuid", "value": "{{projectUuid}}", "type": "text" },
+                { "key": "title", "value": "My new draft", "type": "text" },
+                { "key": "mediaType", "value": "video", "type": "text" },
+                { "key": "description", "value": "Optional caption", "type": "text" },
+                { "key": "notes", "value": "Optional context for the client", "type": "text" },
+                { "key": "scriptUuid", "value": "", "type": "text" },
+                { "key": "files[]", "type": "file", "src": [] }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/post-drafts",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-drafts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Post Draft",
+          "id": "post-drafts-update-0001-000000000000",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated title\",\n  \"description\": null,\n  \"notes\": \"Context for the client\",\n  \"scriptUuid\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/post-drafts/{{postDraftUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-drafts", "{{postDraftUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Post Draft",
+          "id": "post-drafts-delete-0001-000000000000",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/post-drafts/{{postDraftUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-drafts", "{{postDraftUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stream Post Draft Media Version File",
+          "id": "post-drafts-stream-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/post-draft-media-versions/{{postDraftMediaVersionUuid}}/files/1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-draft-media-versions", "{{postDraftMediaVersionUuid}}", "files", "1"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "post-drafts-folder-0001-000000000000"
     }
   ],
   "event": [
@@ -3626,6 +3747,16 @@
     {
       "id": "d4e5f6a7-b8c9-0123-cdef-aaaaaaaa1234",
       "key": "clientUserUuid",
+      "value": ""
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-cdef-bbbbbbbb0001",
+      "key": "postDraftUuid",
+      "value": ""
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-cdef-bbbbbbbb0002",
+      "key": "postDraftMediaVersionUuid",
       "value": ""
     }
   ]

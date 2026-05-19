@@ -104,7 +104,8 @@
         "fileInvalid": "The provided file(s) are invalid.",
         "notFound": "Post draft not found.",
         "scriptAlreadyHasDraft": "This script already has a draft.",
-        "locked": "This draft cannot be modified in its current status."
+        "locked": "This draft cannot be modified in its current status.",
+        "unresolvableAgency": "Cannot resolve the agency for this draft."
     },
     "hookTemplate": {
         "notFound": "Hook template not found.",

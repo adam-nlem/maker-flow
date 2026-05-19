@@ -64,6 +64,7 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | ProjectClient | 30 | `DomainCode::ProjectClient` |
 | AgencyCollaborator | 31 | `DomainCode::AgencyCollaborator` |
 | Onboarding | 32 | `DomainCode::Onboarding` |
+| PostDraft | 33 | `DomainCode::PostDraft` |
 
 ## Exception Inventory
 
@@ -106,12 +107,8 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | **Script (18xxx)** |
 | 18001 | `ScriptNotFoundException` | 404 | — | `src/Exception/Script/` |
 | 18002 | `ScriptLimitReachedException` | 402 | — | `src/Exception/Script/` |
-| 18003 | `ScriptGenerationNotFoundException` | 404 | — | `src/Exception/Script/` |
-| 18004 | `ScriptShotNotFoundException` | 404 | — | `src/Exception/Script/` |
 | 18005 | `ScriptTagNotFoundException` | 404 | — | `src/Exception/Script/` |
 | 18006 | `ScriptTagTitleConflictException` | 409 | — | `src/Exception/Script/` |
-| 18007 | `ScriptGenerationAlreadyActiveException` | 409 | — | `src/Exception/Script/` |
-| 18008 | `ScriptGenerationDeletionNotAllowedException` | 409 | — | `src/Exception/Script/` |
 | **TodoList (19xxx)** |
 | 19001 | `TodoListNotFoundException` | 404 | — | `src/Exception/TodoList/` |
 | 19002 | `TodoListTaskNotFoundException` | 404 | — | `src/Exception/TodoList/` |
@@ -135,9 +132,18 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 23004 | `TokenExpiredException` | 401 | — | `src/Exception/Auth/` |
 | 23005 | `InvalidTokenException` | 401 | — | `src/Exception/Auth/` |
 | 23006 | `EmailNotVerifiedException` | 403 | — | `src/Exception/Auth/` |
+| **Chat (24xxx)** |
+| 24001 | `ChatNotFoundException` | 404 | — | `src/Exception/Chat/` |
+| **ScriptPart (25xxx)** |
+| 25001 | `ScriptPartNotFoundException` | 404 | — | `src/Exception/ScriptPart/` |
+| **ScriptPartSuggestion (26xxx)** |
+| 26001 | `ScriptPartSuggestionNotFoundException` | 404 | — | `src/Exception/ScriptPartSuggestion/` |
+| 26002 | `ScriptPartSuggestionNotPendingException` | 409 | — | `src/Exception/ScriptPartSuggestion/` |
 | **Agency (27xxx)** |
 | 27001 | `MissingAgencyException` | 403 | — | `src/Exception/Agency/` |
 | 27002 | `UserAlreadyHasAgencyException` | 409 | — | `src/Exception/Agency/` |
+| 27003 | `AgencySubscriptionInactiveException` | 403 | — | `src/Exception/Agency/` |
+| 27004 | `AgencyLogoInvalidException` | 400 | `reason` (`FileInvalidReason`) | `src/Exception/Agency/` |
 | **HookTemplate (28xxx)** |
 | 28001 | `HookTemplateNotFoundException` | 404 | — | `src/Exception/HookTemplate/` |
 | 28002 | `HookTemplateModificationForbiddenException` | 403 | — | `src/Exception/HookTemplate/` |
@@ -147,12 +153,20 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 29003 | `InvitationAlreadyUsedException` | 422 | — | `src/Exception/Invitation/` |
 | 29004 | `EmailAlreadyUsedException` | 409 | — | `src/Exception/Invitation/` |
 | 29005 | `InvalidInvitationRoleException` | 422 | — | `src/Exception/Invitation/` |
+| 29006 | `InvalidInvitationTypeException` | 422 | — | `src/Exception/Invitation/` |
+| 29007 | `InvalidInvitationProjectException` | 422 | — | `src/Exception/Invitation/` |
 | **ProjectClient (30xxx)** |
 | 30001 | `ProjectClientNotFoundException` | 404 | — | `src/Exception/ProjectClient/` |
 | **AgencyCollaborator (31xxx)** |
 | 31001 | `AgencyCollaboratorNotFoundException` | 404 | — | `src/Exception/AgencyCollaborator/` |
 | **Onboarding (32xxx)** |
 | 32001 | `InvalidOnboardingStepException` | 400 | — | `src/Exception/Onboarding/` |
+| **PostDraft (33xxx)** |
+| 33001 | `PostDraftFileInvalidException` | 400 | `reason` (`FileInvalidReason`) | `src/Exception/PostDraft/` |
+| 33002 | `MissingPostDraftException` | 404 | `meta` | `src/Exception/PostDraft/` |
+| 33003 | `ScriptAlreadyHasPostDraftException` | 409 | `meta` | `src/Exception/PostDraft/` |
+| 33004 | `PostDraftLockedException` | 409 | `meta` | `src/Exception/PostDraft/` |
+| 33005 | `UnresolvableMediaVersionAgencyException` | 500 | `mediaVersionUuid` | `src/Exception/PostDraft/` |
 
 ## Controller Pattern
 
@@ -187,5 +201,5 @@ Message handlers still catch `AppException` subclasses for retry logic. The `Api
    - Define `CODE` constant (unique within domain, sequential)
    - Call `parent::__construct(message, CODE, httpStatus, meta)`
    - Add convenience getters for meta fields if needed
-3. Add the error code to the frontend mapping (`front/src/services/apiErrorHandler/errorCodeMessages.ts`)
+3. Add the resolved numeric code → i18n key entry to the frontend mapping (`front/src/services/apiErrorHandler/errorCodeMessages.ts`), and the message under that key in `front/src/services/i18n/locales/errors/{en,fr}.json`
 4. Update this doc's Exception Inventory table

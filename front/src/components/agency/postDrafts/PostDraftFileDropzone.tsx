@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { ChevronDownIcon, ChevronUpIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { ArrowUpTrayIcon, ChevronDownIcon, ChevronUpIcon, TrashIcon } from "@heroicons/react/24/outline";
 import FileUpload from "~/components/ui/FileUpload";
 import { MediaType } from "~/models/enums/MediaType";
 import { formatFileSize } from "~/utils/numberFormatters";
@@ -15,6 +15,25 @@ interface PostDraftFileDropzoneProps {
     files: File[];
     onChange: (files: File[]) => void;
     errorMessage?: string | null;
+}
+
+interface DropzoneSurfaceProps {
+    isDragActive: boolean;
+    hint: string;
+}
+
+function DropzoneSurface({ isDragActive, hint }: DropzoneSurfaceProps) {
+    const baseClasses = "flex flex-col items-center justify-center gap-2 p-8 rounded-xl border-2 border-dashed transition-colors";
+    const stateClasses = isDragActive
+        ? "border-primary bg-primary/5 text-primary"
+        : "border-pale-gray bg-clear-2 text-muted-2 hover:border-primary hover:bg-primary/5 hover:text-primary";
+
+    return (
+        <div className={`${baseClasses} ${stateClasses}`}>
+            <ArrowUpTrayIcon className="size-8" strokeWidth={1.5} />
+            <p className="text-body-sm">{hint}</p>
+        </div>
+    );
 }
 
 export default function PostDraftFileDropzone({ mediaType, files, onChange, errorMessage }: PostDraftFileDropzoneProps) {
@@ -39,17 +58,19 @@ export default function PostDraftFileDropzone({ mediaType, files, onChange, erro
                 <FileUpload
                     multiple
                     accept={accept}
-                    hint={hint}
                     errorMessage={errorMessage}
                     onFilesSelected={(incoming) => onChange([...files, ...incoming].slice(0, CAROUSEL_MAX_FILES))}
-                />
+                >
+                    {({ isDragActive }) => <DropzoneSurface isDragActive={isDragActive} hint={hint} />}
+                </FileUpload>
             ) : (
                 <FileUpload
                     accept={accept}
-                    hint={hint}
                     errorMessage={errorMessage}
                     onFileSelected={(file) => onChange([file])}
-                />
+                >
+                    {({ isDragActive }) => <DropzoneSurface isDragActive={isDragActive} hint={hint} />}
+                </FileUpload>
             )}
 
             {files.length > 0 && (

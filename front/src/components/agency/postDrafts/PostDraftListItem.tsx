@@ -15,7 +15,7 @@ interface PostDraftListItemProps {
 
 export default function PostDraftListItem({ postDraft, isSelected, onSelect }: PostDraftListItemProps) {
     const { t } = useTranslation();
-    const latest = postDraft.latestRevision;
+    const latest = postDraft.latestMediaVersion;
     const Icon = mediaTypeToIcon[postDraft.mediaType];
 
 

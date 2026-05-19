@@ -92,8 +92,8 @@ function LoadedPostDraftDetailPanel({ postDraft, projectUuid }: LoadedPostDraftD
                 onDeleteClick={() => setIsDeleteDialogOpen(true)}
             />
 
-            {postDraft.latestRevision && (
-                <PostDraftMediaViewer revision={postDraft.latestRevision} mediaType={postDraft.mediaType} />
+            {postDraft.latestMediaVersion && (
+                <PostDraftMediaViewer mediaVersion={postDraft.latestMediaVersion} mediaType={postDraft.mediaType} />
             )}
 
             <div className="flex flex-row gap-3 mt-3.5">

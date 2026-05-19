@@ -83,8 +83,13 @@
     },
     "mediaType": {
         "image": "Image",
-        "video": "Video",
-        "carousel": "Carousel"
+        "video": "Vidéo",
+        "carousel": "Carrousel",
+        "uploadHint": {
+            "image": "PNG, JPEG ou WebP jusqu'à 20 Mo.",
+            "video": "Une vidéo MP4, MOV ou WebM jusqu'à 500 Mo.",
+            "carousel": "2 à 10 images, jusqu'à 20 Mo chacune."
+        }
     },
     "oAuthErrorCode": {
         "invalidState": "Session expirée, veuillez réessayer",
@@ -94,6 +99,14 @@
         "platformError": "Erreur de la plateforme d'authentification",
         "popupBlocked": "La fenêtre popup a été bloquée par votre navigateur",
         "unknown": "Une erreur est survenue, veuillez réessayer"
+    },
+    "fileInvalidReason": {
+        "missingFile": "Veuillez ajouter un fichier.",
+        "tooManyFiles": "Trop de fichiers sélectionnés.",
+        "tooFewFiles": "Pas assez de fichiers sélectionnés.",
+        "fileTooLarge": "Le fichier dépasse la taille maximale.",
+        "invalidMimeType": "Type de fichier non supporté.",
+        "invalidPayload": "Les données de la requête sont invalides."
     },
     "onboardingStep": {
         "admin": {

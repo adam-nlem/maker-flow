@@ -31,6 +31,8 @@ class Script
         'api_scripts_show',
         'api_post_groups_list',
         'api_post_groups_show',
+        'api_post_drafts_list',
+        'api_post_drafts_show',
     ])]
     private ?string $uuid = null;
 
@@ -43,6 +45,8 @@ class Script
         'api_scripts_show',
         'api_post_groups_list',
         'api_post_groups_show',
+        'api_post_drafts_list',
+        'api_post_drafts_show',
     ])]
     private ?string $title = null;
 
@@ -126,6 +130,9 @@ class Script
         'api_scripts_show',
     ])]
     private ?PostGroup $postGroup = null;
+
+    #[ORM\OneToOne(mappedBy: 'script', targetEntity: PostDraft::class)]
+    private ?PostDraft $postDraft = null;
 
     /**
      * @var Collection<int, ScriptTag>
@@ -319,6 +326,11 @@ class Script
         $this->postGroup = $postGroup;
 
         return $this;
+    }
+
+    public function getPostDraft(): ?PostDraft
+    {
+        return $this->postDraft;
     }
 
     /**

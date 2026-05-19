@@ -3,18 +3,18 @@ import { useQuery } from "@tanstack/react-query";
 import { httpClient } from "~/services/httpClient/httpClient";
 import { postDraftsQueryKeys } from "./postDraftsQueryKeys";
 
-export function useShowPostDraftRevisionFile(revisionUuid?: string, index?: number) {
+export function useShowPostDraftMediaVersionFile(mediaVersionUuid?: string, index?: number) {
     const [fileUrl, setFileUrl] = useState<string | null>(null);
 
     const query = useQuery({
-        queryKey: postDraftsQueryKeys.revisionFile(revisionUuid ?? '', index ?? 0),
+        queryKey: postDraftsQueryKeys.mediaVersionFile(mediaVersionUuid ?? '', index ?? 0),
         queryFn: async () => {
-            const res = await httpClient.get(`/post-draft-revisions/${revisionUuid}/files/${index}`, {
+            const res = await httpClient.get(`/post-draft-media-versions/${mediaVersionUuid}/files/${index}`, {
                 responseType: 'blob'
             });
             return res.data as Blob;
         },
-        enabled: !!revisionUuid && index !== undefined,
+        enabled: !!mediaVersionUuid && index !== undefined,
         staleTime: Infinity,
     });
 

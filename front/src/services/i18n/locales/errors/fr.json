@@ -104,7 +104,8 @@
         "fileInvalid": "Le ou les fichiers fournis sont invalides.",
         "notFound": "Brouillon introuvable.",
         "scriptAlreadyHasDraft": "Ce script a déjà un brouillon.",
-        "locked": "Ce brouillon ne peut pas être modifié dans son statut actuel."
+        "locked": "Ce brouillon ne peut pas être modifié dans son statut actuel.",
+        "unresolvableAgency": "Impossible de résoudre l'agence pour ce brouillon."
     },
     "hookTemplate": {
         "notFound": "Modèle d'accroche introuvable.",

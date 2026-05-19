@@ -55,23 +55,18 @@
             "subtitle": "Le client a refusé ce brouillon."
         }
     },
-    "optimization": {
-        "pending": "Préparation des fichiers…",
-        "optimizing": "Optimisation…",
-        "optimized": "Prêt",
-        "failed": "Échec de l'optimisation"
-    },
     "form": {
+        "modalTitle": "Nouveau brouillon",
+        "modalSubtitle": "Uploadez du contenu à faire valider par le client.",
         "title": "Titre",
         "titlePlaceholder": "Donnez un titre à ce brouillon",
         "description": "Description",
         "descriptionPlaceholder": "Légende ou contexte optionnel pour la publication",
+        "descriptionHint": "Légende ou contexte partagé avec le client.",
         "notes": "Notes pour le client",
         "notesPlaceholder": "Contexte optionnel affiché au client pendant la revue",
+        "notesHint": "Partagé avec le client pendant la revue.",
         "mediaType": "Type de média",
-        "mediaTypeVideo": "Vidéo",
-        "mediaTypeImage": "Image",
-        "mediaTypeCarousel": "Carrousel",
         "files": "Fichiers",
         "dropHint": "Déposez un fichier ici, ou cliquez pour choisir",
         "dropHintCarousel": "Déposez 2 à 10 images ici, ou cliquez pour choisir",
@@ -102,9 +97,7 @@
             "previousSlide": "Diapositive précédente",
             "nextSlide": "Diapositive suivante",
             "goToSlide": "Aller à la diapositive {{index}}"
-        },
-        "filesPending": "Préparation des fichiers en cours. Cette page se mettra à jour automatiquement.",
-        "filesFailed": "L'optimisation a échoué. Veuillez réessayer ou contacter le support."
+        }
     },
     "validation": {
         "titleRequired": "Le titre est requis.",

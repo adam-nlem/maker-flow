@@ -1,7 +1,6 @@
 import { MediaType } from "./enums/MediaType";
-import { PostDraftRevisionOptimizationStatus } from "./enums/PostDraftRevisionOptimizationStatus";
 import { PostDraftStatus } from "./enums/PostDraftStatus";
-import { PostDraftRevision, type PostDraftRevisionJSON } from "./PostDraftRevision";
+import { PostDraftMediaVersion, type PostDraftMediaVersionJSON } from "./PostDraftMediaVersion";
 import { Script, type ScriptJSON } from "./Script";
 
 export interface PostDraftJSON {
@@ -14,8 +13,8 @@ export interface PostDraftJSON {
     createdAt: string;
     updatedAt: string;
     script: ScriptJSON | null;
-    revisions?: PostDraftRevisionJSON[];
-    latestRevision?: PostDraftRevisionJSON | null;
+    mediaVersions?: PostDraftMediaVersionJSON[];
+    latestMediaVersion?: PostDraftMediaVersionJSON | null;
 }
 
 export class PostDraft {
@@ -29,11 +28,11 @@ export class PostDraft {
         public createdAt: string,
         public updatedAt: string,
         public script: Script | null,
-        public revisions: PostDraftRevision[],
+        public mediaVersions: PostDraftMediaVersion[],
     ) { }
 
     static fromJSON(json: PostDraftJSON): PostDraft {
-        const revisionsJson = json.revisions ?? (json.latestRevision ? [json.latestRevision] : []);
+        const mediaVersionsJson = json.mediaVersions ?? (json.latestMediaVersion ? [json.latestMediaVersion] : []);
 
         return new PostDraft(
             json.uuid,
@@ -45,7 +44,7 @@ export class PostDraft {
             json.createdAt,
             json.updatedAt,
             json.script ? Script.fromJSON(json.script) : null,
-            revisionsJson.map(PostDraftRevision.fromJSON),
+            mediaVersionsJson.map(PostDraftMediaVersion.fromJSON),
         );
     }
 
@@ -60,20 +59,13 @@ export class PostDraft {
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             script: this.script ? this.script.toJSON() : null,
-            revisions: this.revisions.map(r => r.toJSON()),
+            mediaVersions: this.mediaVersions.map(v => v.toJSON()),
         };
     }
 
-    get latestRevision(): PostDraftRevision | null {
-        if (this.revisions.length === 0) return null;
-        const sorted = [...this.revisions].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    get latestMediaVersion(): PostDraftMediaVersion | null {
+        if (this.mediaVersions.length === 0) return null;
+        const sorted = [...this.mediaVersions].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
         return sorted[0];
-    }
-
-    get isOptimizing(): boolean {
-        return this.revisions.some(r =>
-            r.optimizationStatus === PostDraftRevisionOptimizationStatus.Pending
-            || r.optimizationStatus === PostDraftRevisionOptimizationStatus.Optimizing
-        );
     }
 }

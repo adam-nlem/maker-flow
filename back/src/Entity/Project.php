@@ -145,6 +145,12 @@ class Project
     #[ORM\OneToMany(targetEntity: ScriptTag::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
     private Collection $scriptTags;
 
+    /**
+     * @var Collection<int, PostDraft>
+     */
+    #[ORM\OneToMany(targetEntity: PostDraft::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $postDrafts;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -163,6 +169,7 @@ class Project
         $this->integrations = new ArrayCollection();
         $this->scripts = new ArrayCollection();
         $this->scriptTags = new ArrayCollection();
+        $this->postDrafts = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -313,5 +320,13 @@ class Project
     public function getScriptTags(): Collection
     {
         return $this->scriptTags;
+    }
+
+    /**
+     * @return Collection<int, PostDraft>
+     */
+    public function getPostDrafts(): Collection
+    {
+        return $this->postDrafts;
     }
 }

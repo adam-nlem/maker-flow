@@ -3,6 +3,7 @@
 namespace App\DTO\Request\PostDraft;
 
 use App\DTO\Request\AbstractRequestDTO;
+use App\Entity\Enum\FileInvalidReason;
 use App\Entity\Enum\MediaType;
 use App\Entity\Enum\PostDraftStatus;
 use App\Entity\PostDraft;
@@ -31,13 +32,13 @@ class CreatePostDraftRequestDTO extends AbstractRequestDTO
     protected function fromPayload(array $payload)
     {
         if (empty($payload["projectUuid"]) || empty($payload["title"]) || empty($payload["mediaType"])) {
-            throw new PostDraftFileInvalidException(['reason' => 'invalid_payload']);
+            throw new PostDraftFileInvalidException(FileInvalidReason::InvalidPayload);
         }
 
         $mediaType = MediaType::tryFrom($payload["mediaType"]);
 
         if ($mediaType === null) {
-            throw new PostDraftFileInvalidException(['reason' => 'invalid_payload']);
+            throw new PostDraftFileInvalidException(FileInvalidReason::InvalidPayload);
         }
 
         $this->projectUuid = $payload["projectUuid"];
