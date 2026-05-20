@@ -100,14 +100,14 @@
     "onboarding": {
         "invalidStep": "Cette étape d'onboarding n'est pas applicable."
     },
-    "postDraft": {
+    "review": {
         "fileInvalid": "Le ou les fichiers fournis sont invalides.",
-        "notFound": "Brouillon introuvable.",
-        "scriptAlreadyHasDraft": "Ce script a déjà un brouillon.",
-        "locked": "Ce brouillon ne peut pas être modifié dans son statut actuel.",
-        "unresolvableAgency": "Impossible de résoudre l'agence pour ce brouillon.",
-        "notAwaitingReview": "Ce brouillon n'est plus en attente de validation.",
-        "notAwaitingReviewOrApproved": "Cette action n'est pas autorisée dans l'état actuel.",
+        "notFound": "Review introuvable.",
+        "scriptAlreadyHasReview": "Ce script a déjà une review.",
+        "locked": "Cette review ne peut pas être modifiée dans son statut actuel.",
+        "unresolvableAgency": "Impossible de résoudre l'agence pour cette review.",
+        "notPending": "Cette version de review n'est plus en attente.",
+        "notPendingOrApproved": "Cette action n'est pas autorisée dans l'état actuel.",
         "notLatestVersion": "Cette version n'est plus la plus récente — actualisez puis réessayez.",
         "commentEmpty": "Veuillez saisir un commentaire avant d'envoyer.",
         "commentTooLong": "Votre commentaire est trop long — veuillez le raccourcir.",

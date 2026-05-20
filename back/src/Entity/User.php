@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_clients_list',
         'api_invitations_show',
         'api_invitations_create',
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?string $uuid = null;
 
@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_clients_list',
         'api_invitations_show',
         'api_invitations_create',
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?string $firstName = null;
 
@@ -69,7 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_clients_list',
         'api_invitations_show',
         'api_invitations_create',
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?string $lastName = null;
 
@@ -86,7 +86,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_clients_list',
         'api_invitations_show',
         'api_invitations_create',
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?string $email = null;
 
@@ -154,14 +154,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_users_me',
         'api_otp_verify_login',
         'api_otp_verify_email',
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?Agency $agency = null;
 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'clientUsers')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups([
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?Project $project = null;
 

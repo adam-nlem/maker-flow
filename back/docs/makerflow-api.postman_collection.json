@@ -3492,18 +3492,18 @@
       "id": "script-versions-folder-0001-00000"
     },
     {
-      "name": "Post Drafts",
+      "name": "Reviews",
       "item": [
         {
-          "name": "List Post Drafts",
-          "id": "post-drafts-list-0001-000000000000",
+          "name": "List Reviews",
+          "id": "reviews-list-0001-000000000000",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/post-drafts?projectUuid={{projectUuid}}&page=1&limit=20",
+              "raw": "{{baseUrl}}/api/reviews?projectUuid={{projectUuid}}&page=1&limit=20",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-drafts"],
+              "path": ["api", "reviews"],
               "query": [
                 { "key": "projectUuid", "value": "{{projectUuid}}" },
                 { "key": "page", "value": "1" },
@@ -3516,22 +3516,22 @@
           "response": []
         },
         {
-          "name": "Show Post Draft",
-          "id": "post-drafts-show-0001-000000000000",
+          "name": "Show Review",
+          "id": "reviews-show-0001-000000000000",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/post-drafts/{{postDraftUuid}}",
+              "raw": "{{baseUrl}}/api/reviews/{{reviewUuid}}",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-drafts", "{{postDraftUuid}}"]
+              "path": ["api", "reviews", "{{reviewUuid}}"]
             }
           },
           "response": []
         },
         {
-          "name": "Create Post Draft (multipart)",
-          "id": "post-drafts-create-0001-000000000000",
+          "name": "Create Review (multipart)",
+          "id": "reviews-create-0001-000000000000",
           "request": {
             "method": "POST",
             "header": [],
@@ -3548,16 +3548,16 @@
               ]
             },
             "url": {
-              "raw": "{{baseUrl}}/api/post-drafts",
+              "raw": "{{baseUrl}}/api/reviews",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-drafts"]
+              "path": ["api", "reviews"]
             }
           },
           "response": []
         },
         {
-          "name": "Update Post Draft",
-          "id": "post-drafts-update-0001-000000000000",
+          "name": "Update Review",
+          "id": "reviews-update-0001-000000000000",
           "request": {
             "method": "PATCH",
             "header": [
@@ -3568,39 +3568,39 @@
               "raw": "{\n  \"title\": \"Updated title\",\n  \"description\": null,\n  \"notes\": \"Context for the client\",\n  \"scriptUuid\": null\n}"
             },
             "url": {
-              "raw": "{{baseUrl}}/api/post-drafts/{{postDraftUuid}}",
+              "raw": "{{baseUrl}}/api/reviews/{{reviewUuid}}",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-drafts", "{{postDraftUuid}}"]
+              "path": ["api", "reviews", "{{reviewUuid}}"]
             }
           },
           "response": []
         },
         {
-          "name": "Delete Post Draft",
-          "id": "post-drafts-delete-0001-000000000000",
+          "name": "Delete Review",
+          "id": "reviews-delete-0001-000000000000",
           "request": {
             "method": "DELETE",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/post-drafts/{{postDraftUuid}}",
+              "raw": "{{baseUrl}}/api/reviews/{{reviewUuid}}",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-drafts", "{{postDraftUuid}}"]
+              "path": ["api", "reviews", "{{reviewUuid}}"]
             }
           },
           "response": []
         },
         {
-          "name": "Stream Post Draft Media Version File",
-          "id": "post-drafts-stream-0001-000000000000",
+          "name": "Stream Review Media Version File",
+          "id": "reviews-stream-0001-000000000000",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/post-draft-media-versions/files?mediaVersionUuid={{postDraftMediaVersionUuid}}&index=1",
+              "raw": "{{baseUrl}}/api/review-versions/files?reviewVersionUuid={{reviewVersionUuid}}&index=1",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-draft-media-versions", "files"],
+              "path": ["api", "review-versions", "files"],
               "query": [
-                { "key": "mediaVersionUuid", "value": "{{postDraftMediaVersionUuid}}" },
+                { "key": "reviewVersionUuid", "value": "{{reviewVersionUuid}}" },
                 { "key": "index", "value": "1", "description": "1-based file index (image / carousel / original video before transcoding)" }
               ]
             }
@@ -3608,17 +3608,17 @@
           "response": []
         },
         {
-          "name": "Stream Post Draft Media Version HLS Master Playlist",
-          "id": "post-drafts-stream-hls-0001-000000000000",
+          "name": "Stream Review Media Version HLS Master Playlist",
+          "id": "reviews-stream-hls-0001-000000000000",
           "request": {
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/api/post-draft-media-versions/stream?mediaVersionUuid={{postDraftMediaVersionUuid}}&path=master.m3u8",
+              "raw": "{{baseUrl}}/api/review-versions/stream?reviewVersionUuid={{reviewVersionUuid}}&path=master.m3u8",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-draft-media-versions", "stream"],
+              "path": ["api", "review-versions", "stream"],
               "query": [
-                { "key": "mediaVersionUuid", "value": "{{postDraftMediaVersionUuid}}" },
+                { "key": "reviewVersionUuid", "value": "{{reviewVersionUuid}}" },
                 { "key": "path", "value": "master.m3u8", "description": "Relative path under the media version's stream/ dir (master.m3u8, 1080p/index.m3u8, 720p/segment_001.ts, …). Only .m3u8 / .ts accepted." }
               ]
             }
@@ -3626,24 +3626,24 @@
           "response": []
         },
         {
-          "name": "Approve Post Draft Media Version (client)",
-          "id": "post-drafts-approve-0001-000000000000",
+          "name": "Approve Review Media Version (client)",
+          "id": "reviews-approve-0001-000000000000",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": { "mode": "raw", "raw": "{}" },
-            "description": "ROLE_CLIENT only. Empty body. Transitions latestMediaVersion.status from AwaitingReview → Approved. 409 (code 33008) if the version is not the latest (reason: not_latest_version) or not in AwaitingReview (reason: not_awaiting_review). Returns the parent post draft serialized with api_post_draft_media_versions_approve.",
+            "description": "ROLE_CLIENT only. Empty body. Transitions latestVersion.status from Pending → Approved. 409 (code 33008) if the version is not the latest (reason: not_latest_version) or not in Pending (reason: not_pending). Returns the parent review serialized with api_review_versions_approve.",
             "url": {
-              "raw": "{{baseUrl}}/api/post-draft-media-versions/{{postDraftMediaVersionUuid}}/approve",
+              "raw": "{{baseUrl}}/api/review-versions/{{reviewVersionUuid}}/approve",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-draft-media-versions", "{{postDraftMediaVersionUuid}}", "approve"]
+              "path": ["api", "review-versions", "{{reviewVersionUuid}}", "approve"]
             }
           },
           "response": []
         },
         {
-          "name": "Request Changes on Post Draft Media Version (client)",
-          "id": "post-drafts-request-changes-0001-000000000000",
+          "name": "Request Changes on Review Media Version (client)",
+          "id": "reviews-request-changes-0001-000000000000",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -3651,56 +3651,56 @@
               "mode": "raw",
               "raw": "{\n    \"comment\": \"Please tighten the intro and add a CTA at 0:25.\"\n}"
             },
-            "description": "ROLE_CLIENT only. JSON body { \"comment\": string } — trimmed, non-empty, max 5000 chars (PostDraftCommentEmptyException = 33011, TooLong = 33012, PayloadInvalid = 33013). Creates a PostDraftMediaVersionComment on the latest version (author = current user) and transitions latestMediaVersion.status to ChangesRequested. Allowed from AwaitingReview or Approved (else 409 PostDraftMediaVersionNotAwaitingReviewOrApprovedException = 33009). 409 PostDraftMediaVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent post draft serialized with api_post_draft_media_versions_request_changes.",
+            "description": "ROLE_CLIENT only. JSON body { \"comment\": string } — trimmed, non-empty, max 5000 chars (ReviewCommentEmptyException = 33011, TooLong = 33012, PayloadInvalid = 33013). Creates a ReviewComment on the latest version (author = current user) and transitions latestVersion.status to ChangesRequested. Allowed from Pending or Approved (else 409 ReviewVersionNotPendingOrApprovedException = 33009). 409 ReviewVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent review serialized with api_review_versions_request_changes.",
             "url": {
-              "raw": "{{baseUrl}}/api/post-draft-media-versions/{{postDraftMediaVersionUuid}}/request-changes",
+              "raw": "{{baseUrl}}/api/review-versions/{{reviewVersionUuid}}/request-changes",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-draft-media-versions", "{{postDraftMediaVersionUuid}}", "request-changes"]
+              "path": ["api", "review-versions", "{{reviewVersionUuid}}", "request-changes"]
             }
           },
           "response": []
         },
         {
-          "name": "Comment on Post Draft Media Version (agency or client)",
-          "id": "post-drafts-comment-0001-000000000000",
+          "name": "Comment on Review Media Version (agency or client)",
+          "id": "reviews-comment-0001-000000000000",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"mediaVersionUuid\": \"{{postDraftMediaVersionUuid}}\",\n    \"body\": \"Good point — we'll tighten the intro in the next version.\",\n    \"videoTimecodeSeconds\": 12.34\n}"
+              "raw": "{\n    \"reviewVersionUuid\": \"{{reviewVersionUuid}}\",\n    \"body\": \"Good point — we'll tighten the intro in the next version.\",\n    \"videoTimecodeSeconds\": 12.34\n}"
             },
-            "description": "Open to any authenticated user with PROJECT_VIEW (agency or client). Lives in PostDraftMediaVersionCommentController (separate from PostDraftMediaVersionController because the comment is a distinct entity). Flat resource URL — mediaVersionUuid is carried in the JSON body, matching the POST /api/post-drafts create convention. Body: { mediaVersionUuid, body, parentCommentUuid?, videoTimecodeSeconds? } — body trimmed, non-empty, max 5000 chars; videoTimecodeSeconds is a non-negative float (seconds), top-level + video only; parentCommentUuid turns the new comment into a reply. Validation is declarative on the DTO via #[Assert\\NotBlank] / #[Assert\\Length(max: 5000)] / #[Assert\\Uuid] / #[Assert\\Type('numeric')] / #[Assert\\PositiveOrZero]. Creates a PostDraftMediaVersionComment on the latest version (author = current user). Does NOT change status. The thread is bidirectional — used both by clients leaving follow-up feedback and the agency replying to client requests. Replies + timecode together → 400 PostDraftCommentReplyCannotHaveTimecodeException (33015). Unknown / cross-version parent UUID → 404 PostDraftCommentParentNotFoundException (33014). 409 PostDraftMediaVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent post draft serialized with api_post_draft_media_version_comments_create.",
+            "description": "Open to any authenticated user with PROJECT_VIEW (agency or client). Lives in ReviewCommentController (separate from ReviewVersionController because the comment is a distinct entity). Flat resource URL — reviewVersionUuid is carried in the JSON body, matching the POST /api/reviews create convention. Body: { reviewVersionUuid, body, parentCommentUuid?, videoTimecodeSeconds? } — body trimmed, non-empty, max 5000 chars; videoTimecodeSeconds is a non-negative float (seconds), top-level + video only; parentCommentUuid turns the new comment into a reply. Validation is declarative on the DTO via #[Assert\\NotBlank] / #[Assert\\Length(max: 5000)] / #[Assert\\Uuid] / #[Assert\\Type('numeric')] / #[Assert\\PositiveOrZero]. Creates a ReviewComment on the latest version (author = current user). Does NOT change status. The thread is bidirectional — used both by clients leaving follow-up feedback and the agency replying to client requests. Replies + timecode together → 400 ReviewCommentReplyCannotHaveTimecodeException (33015). Unknown / cross-version parent UUID → 404 ReviewCommentParentNotFoundException (33014). 409 ReviewVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent review serialized with api_review_comments_create.",
             "url": {
-              "raw": "{{baseUrl}}/api/post-draft-media-version-comments",
+              "raw": "{{baseUrl}}/api/review-comments",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-draft-media-version-comments"]
+              "path": ["api", "review-comments"]
             }
           },
           "response": []
         },
         {
-          "name": "Reply to a Post Draft Media Version Comment (agency or client)",
-          "id": "post-drafts-comment-0002-000000000000",
+          "name": "Reply to a Review Media Version Comment (agency or client)",
+          "id": "reviews-comment-0002-000000000000",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"mediaVersionUuid\": \"{{postDraftMediaVersionUuid}}\",\n    \"parentCommentUuid\": \"{{postDraftMediaVersionCommentUuid}}\",\n    \"body\": \"Got it — we'll re-cut the intro.\"\n}"
+              "raw": "{\n    \"reviewVersionUuid\": \"{{reviewVersionUuid}}\",\n    \"parentCommentUuid\": \"{{reviewCommentUuid}}\",\n    \"body\": \"Got it — we'll re-cut the intro.\"\n}"
             },
-            "description": "Convenience example for the reply flow. Same endpoint as the comment create; setting parentCommentUuid makes the new row a reply (fully threaded — replies can themselves be replied to). Replies must NOT carry a videoTimecodeSeconds (400 PostDraftCommentReplyCannotHaveTimecodeException 33015 otherwise). The parent must belong to the same media version (404 PostDraftCommentParentNotFoundException 33014 otherwise).",
+            "description": "Convenience example for the reply flow. Same endpoint as the comment create; setting parentCommentUuid makes the new row a reply (fully threaded — replies can themselves be replied to). Replies must NOT carry a videoTimecodeSeconds (400 ReviewCommentReplyCannotHaveTimecodeException 33015 otherwise). The parent must belong to the same media version (404 ReviewCommentParentNotFoundException 33014 otherwise).",
             "url": {
-              "raw": "{{baseUrl}}/api/post-draft-media-version-comments",
+              "raw": "{{baseUrl}}/api/review-comments",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-draft-media-version-comments"]
+              "path": ["api", "review-comments"]
             }
           },
           "response": []
         },
         {
-          "name": "Update a Post Draft Media Version Comment",
-          "id": "post-drafts-comment-0003-000000000000",
+          "name": "Update a Review Media Version Comment",
+          "id": "reviews-comment-0003-000000000000",
           "request": {
             "method": "PATCH",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -3708,17 +3708,17 @@
               "mode": "raw",
               "raw": "{\n    \"status\": \"resolved\"\n}"
             },
-            "description": "Partial update on an existing comment. Body keys are all optional (presentFields tracking): { body?, status?, videoTimecodeSeconds? }. Threading (parentComment) is immutable and not exposed here. Per-field permissions: body + videoTimecodeSeconds require the caller to be the comment AUTHOR (403 PostDraftCommentEditForbiddenException 33019 otherwise). status requires AGENCY editor on the project (PROJECT_EDIT voter). status / videoTimecodeSeconds on a reply both 409 (PostDraftCommentStatusOnReplyForbiddenException 33018, PostDraftCommentTimecodeOnReplyForbiddenException 33020). Pass videoTimecodeSeconds: null to clear a pin. Empty body → 400 PostDraftCommentEmptyException (33011). Invalid status value → 400 PostDraftCommentStatusInvalidException (33017). Unknown UUID → 404 PostDraftCommentNotFoundException (33016). Returns the parent draft serialized with api_post_drafts_show.",
+            "description": "Partial update on an existing comment. Body keys are all optional (presentFields tracking): { body?, status?, videoTimecodeSeconds? }. Threading (parentComment) is immutable and not exposed here. Per-field permissions: body + videoTimecodeSeconds require the caller to be the comment AUTHOR (403 ReviewCommentEditForbiddenException 33019 otherwise). status requires AGENCY editor on the project (PROJECT_EDIT voter). status / videoTimecodeSeconds on a reply both 409 (ReviewCommentStatusOnReplyForbiddenException 33018, ReviewCommentTimecodeOnReplyForbiddenException 33020). Pass videoTimecodeSeconds: null to clear a pin. Empty body → 400 ReviewCommentEmptyException (33011). Invalid status value → 400 ReviewCommentStatusInvalidException (33017). Unknown UUID → 404 ReviewCommentNotFoundException (33016). Returns the parent draft serialized with api_reviews_show.",
             "url": {
-              "raw": "{{baseUrl}}/api/post-draft-media-version-comments/{{postDraftMediaVersionCommentUuid}}",
+              "raw": "{{baseUrl}}/api/review-comments/{{reviewCommentUuid}}",
               "host": ["{{baseUrl}}"],
-              "path": ["api", "post-draft-media-version-comments", "{{postDraftMediaVersionCommentUuid}}"]
+              "path": ["api", "review-comments", "{{reviewCommentUuid}}"]
             }
           },
           "response": []
         }
       ],
-      "id": "post-drafts-folder-0001-000000000000"
+      "id": "reviews-folder-0001-000000000000"
     }
   ],
   "event": [
@@ -3865,12 +3865,12 @@
     },
     {
       "id": "d4e5f6a7-b8c9-0123-cdef-bbbbbbbb0001",
-      "key": "postDraftUuid",
+      "key": "reviewUuid",
       "value": ""
     },
     {
       "id": "d4e5f6a7-b8c9-0123-cdef-bbbbbbbb0002",
-      "key": "postDraftMediaVersionUuid",
+      "key": "reviewVersionUuid",
       "value": ""
     }
   ]

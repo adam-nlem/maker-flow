@@ -15,7 +15,7 @@ export const integrationCallbackPath = '/integrations/callback'
 export const agencyAreaPrefix = '/agency'
 export const agencyHomePath = agencyAreaPrefix
 export const agencyTasksPath = `${agencyAreaPrefix}/tasks`
-export const agencyDraftsPath = `${agencyAreaPrefix}/drafts`
+export const agencyReviewsPath = `${agencyAreaPrefix}/reviews`
 export const agencyContentsPath = `${agencyAreaPrefix}/contents`
 export const agencyScriptsPath = `${agencyAreaPrefix}/scripts`
 export const agencyCalendarPath = `${agencyAreaPrefix}/calendar`
@@ -28,7 +28,7 @@ export const agencySettingsSubscriptionPath = `${agencySettingsPath}/subscriptio
 // Client shell
 export const clientAreaPrefix = '/client'
 export const clientHomePath = clientAreaPrefix
-export const clientDraftsPath = `${clientAreaPrefix}/drafts`
+export const clientReviewsPath = `${clientAreaPrefix}/reviews`
 export const clientContentsPath = `${clientAreaPrefix}/contents`
 export const clientSettingsPath = `${clientAreaPrefix}/settings`
 export const clientSettingsGeneralPath = `${clientSettingsPath}/general`

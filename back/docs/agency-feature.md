@@ -94,7 +94,7 @@ Validation on upload (`AgencyLogoService::upload`):
 - MIME type must be `image/png`.
 - File size ≤ 5 MB.
 
-Any failure raises `AgencyLogoInvalidException` (code `27004`, HTTP 400) carrying a `FileInvalidReason` enum value in `meta.reason` (`file_too_large`, `invalid_mime_type`, `missing_file`). `FileInvalidReason` is the shared enum used by every file-upload validation exception across the app (also consumed by `PostDraftFileInvalidException`). The destination filename is fixed (`{uuid}.png`), so subsequent uploads naturally overwrite the previous logo — no manual cleanup needed.
+Any failure raises `AgencyLogoInvalidException` (code `27004`, HTTP 400) carrying a `FileInvalidReason` enum value in `meta.reason` (`file_too_large`, `invalid_mime_type`, `missing_file`). `FileInvalidReason` is the shared enum used by every file-upload validation exception across the app (also consumed by `ReviewFileInvalidException`). The destination filename is fixed (`{uuid}.png`), so subsequent uploads naturally overwrite the previous logo — no manual cleanup needed.
 
 Path is configured in `config/services.yaml`:
 
@@ -102,7 +102,7 @@ Path is configured in `config/services.yaml`:
 app.uploads.agency_root: "%kernel.project_dir%/private/uploads/agency"
 ```
 
-…and injected into `App\Service\Agency\AgencyLogoService` as `$agencyUploadsRoot`. The service writes each logo to `{root}/{agencyUuid}/logo/{agencyUuid}.png`, keeping every agency's assets (logo + post drafts — see [post-draft-feature.md](post-draft-feature.md)) under a single per-tenant directory. User-uploaded files under `private/uploads/agency/*` are gitignored.
+…and injected into `App\Service\Agency\AgencyLogoService` as `$agencyUploadsRoot`. The service writes each logo to `{root}/{agencyUuid}/logo/{agencyUuid}.png`, keeping every agency's assets (logo + post drafts — see [review-feature.md](review-feature.md)) under a single per-tenant directory. User-uploaded files under `private/uploads/agency/*` are gitignored.
 
 **Breaking change (2026-05-14):** the previous path was `private/uploads/agency/logo/{agencyUuid}.png`. Existing logos must be moved into the new agency-scoped layout (`private/uploads/agency/{agencyUuid}/logo/{agencyUuid}.png`) or re-uploaded.
 

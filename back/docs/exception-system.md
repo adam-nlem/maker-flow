@@ -64,7 +64,7 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | ProjectClient | 30 | `DomainCode::ProjectClient` |
 | AgencyCollaborator | 31 | `DomainCode::AgencyCollaborator` |
 | Onboarding | 32 | `DomainCode::Onboarding` |
-| PostDraft | 33 | `DomainCode::PostDraft` |
+| Review | 33 | `DomainCode::Review` |
 
 ## Exception Inventory
 
@@ -161,12 +161,12 @@ When an `AppException` is thrown, the `ApiExceptionSubscriber` builds an `ErrorR
 | 31001 | `AgencyCollaboratorNotFoundException` | 404 | — | `src/Exception/AgencyCollaborator/` |
 | **Onboarding (32xxx)** |
 | 32001 | `InvalidOnboardingStepException` | 400 | — | `src/Exception/Onboarding/` |
-| **PostDraft (33xxx)** |
-| 33001 | `PostDraftFileInvalidException` | 400 | `reason` (`FileInvalidReason`) | `src/Exception/PostDraft/` |
-| 33002 | `MissingPostDraftException` | 404 | `meta` | `src/Exception/PostDraft/` |
-| 33003 | `ScriptAlreadyHasPostDraftException` | 409 | `meta` | `src/Exception/PostDraft/` |
-| 33004 | `PostDraftLockedException` | 409 | `meta` | `src/Exception/PostDraft/` |
-| 33005 | `UnresolvableMediaVersionAgencyException` | 500 | `mediaVersionUuid` | `src/Exception/PostDraft/` |
+| **Review (33xxx)** |
+| 33001 | `ReviewFileInvalidException` | 400 | `reason` (`FileInvalidReason`) | `src/Exception/Review/` |
+| 33002 | `MissingReviewException` | 404 | `meta` | `src/Exception/Review/` |
+| 33003 | `ScriptAlreadyHasReviewException` | 409 | `meta` | `src/Exception/Review/` |
+| 33004 | `ReviewLockedException` | 409 | `meta` | `src/Exception/Review/` |
+| 33005 | `UnresolvableReviewVersionAgencyException` | 500 | `reviewVersionUuid` | `src/Exception/Review/` |
 
 ## Controller Pattern
 

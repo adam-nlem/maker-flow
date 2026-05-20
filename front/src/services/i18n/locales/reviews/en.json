@@ -1,0 +1,155 @@
+{
+    "pageTitle": "Reviews",
+    "pageSubtitle": "Upload content for client review before publishing.",
+    "emptyState": {
+        "title": "No reviews yet",
+        "subtitle": "Create your first review to start a client feedback loop.",
+        "cta": "New review",
+        "noSelection": {
+            "title": "Select a review",
+            "subtitle": "Pick a review from the list to see its details, files, and versions."
+        },
+        "noResults": {
+            "title": "No matches",
+            "subtitle": "Adjust your search or filter to see other reviews."
+        }
+    },
+    "search": {
+        "placeholder": "Search reviews…"
+    },
+    "filters": {
+        "all": "All",
+        "pending": "Pending",
+        "changesRequested": "Changes",
+        "approved": "Approved",
+        "rejected": "Rejected"
+    },
+    "actions": {
+        "create": "New review",
+        "edit": "Edit",
+        "delete": "Delete",
+        "save": "Save changes",
+        "cancel": "Cancel"
+    },
+    "status": {
+        "pending": "Pending review",
+        "changesRequested": "Changes requested",
+        "approved": "Approved",
+        "rejected": "Rejected"
+    },
+    "banner": {
+        "pending": {
+            "title": "Review pending",
+            "subtitle": "The client hasn't looked at this review yet."
+        },
+        "changesRequested": {
+            "title": "Changes requested",
+            "subtitle": "The client asked for revisions on this review."
+        },
+        "approved": {
+            "title": "Review approved",
+            "subtitle": "The client signed off — you're clear to publish."
+        },
+        "rejected": {
+            "title": "Review rejected",
+            "subtitle": "The client declined this review."
+        }
+    },
+    "form": {
+        "modalTitle": "New review",
+        "modalSubtitle": "Upload content for the client to review.",
+        "title": "Title",
+        "titlePlaceholder": "Give this review a title",
+        "description": "Description",
+        "descriptionPlaceholder": "Optional caption or context for the post",
+        "descriptionHint": "Caption or context shared with the client.",
+        "notes": "Notes for the client",
+        "notesPlaceholder": "Optional context shown to the client during review",
+        "notesHint": "Shared with the client during review.",
+        "mediaType": "Media type",
+        "files": "Files",
+        "dropHint": "Drop a file here, or click to choose",
+        "dropHintCarousel": "Drop 2 to 10 images here, or click to choose",
+        "submit": "Create review"
+    },
+    "detail": {
+        "eyebrow": {
+            "video": "Video review",
+            "image": "Image review",
+            "carousel": "Carousel review"
+        },
+        "fromScript": "From script · {{title}}",
+        "descriptionLabel": "Description",
+        "notesLabel": "Notes for the client",
+        "notesHint": "Shared with the client during review.",
+        "sideCard": {
+            "type": "Type",
+            "status": "Status",
+            "linkedScript": "Linked script",
+            "uploaded": "Uploaded",
+            "updated": "Updated"
+        },
+        "mediaLabel": {
+            "video": "Video"
+        },
+        "carousel": {
+            "slideCounter": "{{current}}/{{total}}",
+            "previousSlide": "Previous slide",
+            "nextSlide": "Next slide",
+            "goToSlide": "Go to slide {{index}}"
+        }
+    },
+    "validation": {
+        "titleRequired": "Title is required.",
+        "mediaTypeRequired": "Select a media type.",
+        "fileRequiredVideo": "Please add a video file.",
+        "fileRequiredImage": "Please add an image file.",
+        "fileRequiredCarousel": "A carousel needs between 2 and 10 images.",
+        "videoTooLarge": "Videos must be 500 MB or less.",
+        "imageTooLarge": "Images must be 20 MB or less.",
+        "invalidMime": "Unsupported file type.",
+        "scriptAlreadyHasReview": "This script already has a review."
+    },
+    "delete": {
+        "confirmTitle": "Delete this review?",
+        "confirmBody": "All uploaded files for this review will be permanently removed.",
+        "confirm": "Delete review"
+    },
+    "comments": {
+        "title": "Feedback history",
+        "versionLabel": "Version {{number}}",
+        "uploadedOn": "Uploaded on {{date}}",
+        "commentCount_one": "{{count}} comment",
+        "commentCount_other": "{{count}} comments",
+        "noComments": "No comments on this version.",
+        "unknownAuthor": "Unknown",
+        "resolved": "Resolved",
+        "open": "Open",
+        "reply": "Reply",
+        "resolve": "Mark as resolved",
+        "reopen": "Reopen",
+        "composer": {
+            "placeholder": "Write a reply…",
+            "submit": "Send",
+            "cancel": "Cancel",
+            "pinAtCurrentTime": "Pin at current time",
+            "pinnedAt": "Pinned at {{time}}",
+            "clearPin": "Clear pin",
+            "errors": {
+                "empty": "Please write a comment before sending.",
+                "tooLong": "Your comment is too long — please shorten it."
+            },
+            "toast": {
+                "success": "Comment sent.",
+                "error": "Couldn't send your comment. Please try again."
+            }
+        },
+        "update": {
+            "toast": {
+                "successResolved": "Comment marked as resolved.",
+                "successReopened": "Comment reopened.",
+                "error": "Couldn't update the comment. Please try again."
+            }
+        }
+    }
+}

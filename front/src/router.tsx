@@ -10,13 +10,13 @@ import {
   integrationCallbackPath,
   agencyHomePath,
   agencyTasksPath,
-  agencyDraftsPath,
+  agencyReviewsPath,
   agencyContentsPath,
   agencyScriptsPath,
   agencyCalendarPath,
   agencySettingsPath,
   clientHomePath,
-  clientDraftsPath,
+  clientReviewsPath,
   clientContentsPath,
   clientSettingsPath,
   inviteRouteMatcher,
@@ -39,14 +39,14 @@ import ClientShellLayout from "./components/client/ClientShellLayout";
 import AgencyHomePage from "./routes/agency/home";
 import AgencyTasksPage from "./routes/agency/tasks";
 import AgencyContentsPage from "./routes/agency/contents";
-import AgencyDraftsPage from "./routes/agency/drafts";
+import AgencyReviewsPage from "./routes/agency/reviews";
 import AgencyScriptsPage from "./routes/agency/scripts";
 import AgencyCalendarPage from "./routes/agency/calendar";
 import AgencySettingsLayout from "./routes/agency/settings";
 import AgencySettingsIndex from "./routes/agency/settings.index";
 import AgencySettingsSectionRoute from "./routes/agency/settings.section";
 import ClientHomePage from "./routes/client/home";
-import ClientDraftsPage from "./routes/client/drafts";
+import ClientReviewsPage from "./routes/client/reviews";
 import ClientContentsPage from "./routes/client/contents";
 import ClientSettingsLayout from "./routes/client/settings";
 import ClientSettingsIndex from "./routes/client/settings.index";
@@ -86,7 +86,7 @@ export const router = createBrowserRouter(
                 { path: agencyHomePath, element: <AgencyHomePage /> },
                 { path: agencyTasksPath, element: <AgencyTasksPage /> },
                 { path: agencyContentsPath, element: <AgencyContentsPage /> },
-                { path: agencyDraftsPath, element: <AgencyDraftsPage /> },
+                { path: agencyReviewsPath, element: <AgencyReviewsPage /> },
                 { path: agencyScriptsPath, element: <AgencyScriptsPage /> },
                 { path: agencyCalendarPath, element: <AgencyCalendarPage /> },
                 {
@@ -105,7 +105,7 @@ export const router = createBrowserRouter(
               element: <ClientShellLayout />,
               children: [
                 { path: clientHomePath, element: <ClientHomePage /> },
-                { path: clientDraftsPath, element: <ClientDraftsPage /> },
+                { path: clientReviewsPath, element: <ClientReviewsPage /> },
                 { path: clientContentsPath, element: <ClientContentsPage /> },
                 {
                   path: clientSettingsPath,

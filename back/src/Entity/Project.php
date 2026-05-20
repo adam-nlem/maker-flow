@@ -33,7 +33,7 @@ class Project
         'api_projects_reopen',
         'api_invitations_show',
         'api_invitations_create',
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?string $uuid = null;
 
@@ -47,7 +47,7 @@ class Project
         'api_projects_reopen',
         'api_invitations_show',
         'api_invitations_create',
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?string $name = null;
 
@@ -148,10 +148,10 @@ class Project
     private Collection $scriptTags;
 
     /**
-     * @var Collection<int, PostDraft>
+     * @var Collection<int, Review>
      */
-    #[ORM\OneToMany(targetEntity: PostDraft::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
-    private Collection $postDrafts;
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $reviews;
 
     public function __construct()
     {
@@ -171,7 +171,7 @@ class Project
         $this->integrations = new ArrayCollection();
         $this->scripts = new ArrayCollection();
         $this->scriptTags = new ArrayCollection();
-        $this->postDrafts = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -325,10 +325,10 @@ class Project
     }
 
     /**
-     * @return Collection<int, PostDraft>
+     * @return Collection<int, Review>
      */
-    public function getPostDrafts(): Collection
+    public function getReviews(): Collection
     {
-        return $this->postDrafts;
+        return $this->reviews;
     }
 }

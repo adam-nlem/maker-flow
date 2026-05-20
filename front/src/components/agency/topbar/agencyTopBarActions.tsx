@@ -2,7 +2,7 @@ import type { ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
-import { usePostDraftsStore } from "~/stores/postDrafts/postDraftsStore";
+import { useReviewsStore } from "~/stores/reviews/reviewsStore";
 import { useContentsStore } from "~/stores/contents/contentsStore";
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
@@ -12,16 +12,16 @@ import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCur
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import { isScriptLimitReached } from "~/utils/subscriptionHelpers";
 import { HttpException } from "~/services/httpClient/HttpException";
-import { agencyContentsPath, agencyDraftsPath, agencyScriptsPath } from "~/routes/routePaths";
+import { agencyContentsPath, agencyReviewsPath, agencyScriptsPath } from "~/routes/routePaths";
 
-function NewDraftAction() {
+function NewReviewAction() {
     const { t } = useTranslation();
-    const openCreatePanel = usePostDraftsStore((s) => s.openCreatePanel);
+    const openCreatePanel = useReviewsStore((s) => s.openCreatePanel);
 
     return (
         <Button type="button" style="primary" width="w-auto" onClick={openCreatePanel}>
             <PlusIcon className="size-4 mr-1" strokeWidth={2} />
-            {t("postDrafts:actions.create")}
+            {t("reviews:actions.create")}
         </Button>
     );
 }
@@ -72,7 +72,7 @@ function NewScriptAction() {
 }
 
 export const agencyTopBarActions: Record<string, ComponentType> = {
-    [agencyDraftsPath]: NewDraftAction,
+    [agencyReviewsPath]: NewReviewAction,
     [agencyContentsPath]: NewContentGroupAction,
     [agencyScriptsPath]: NewScriptAction,
 };

@@ -1,0 +1,42 @@
+{
+    "emptyState": {
+        "title": "Nothing to review",
+        "subtitle": "Your agency hasn't shared any reviews with you yet.",
+        "noSelection": {
+            "title": "Select a review",
+            "subtitle": "Pick a review from the list to watch the media, leave feedback, or approve it."
+        },
+        "noResults": {
+            "title": "No matches",
+            "subtitle": "Adjust your search or filter to see other reviews."
+        }
+    },
+    "search": {
+        "placeholder": "Search reviews…"
+    },
+    "filters": {
+        "all": "All"
+    },
+    "actions": {
+        "approve": "Approve",
+        "requestChanges": "Request changes",
+        "waitingForAgency": "Waiting for the agency to upload a new version."
+    },
+    "requestChangesModal": {
+        "title": "Request changes",
+        "subtitle": "Let your agency know what you'd like changed before publishing.",
+        "placeholder": "Describe what you'd like changed…",
+        "cancel": "Cancel",
+        "submit": "Send feedback",
+        "errors": {
+            "empty": "Please write your feedback before submitting.",
+            "tooLong": "Your feedback is too long — please shorten it."
+        }
+    },
+    "toast": {
+        "approveSuccess": "Review approved.",
+        "approveError": "Couldn't approve the review. Please try again.",
+        "requestChangesSuccess": "Feedback sent to your agency.",
+        "requestChangesError": "Couldn't send your feedback. Please try again."
+    }
+}

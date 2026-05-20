@@ -31,8 +31,8 @@ class Script
         'api_scripts_show',
         'api_post_groups_list',
         'api_post_groups_show',
-        'api_post_drafts_list',
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_list',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?string $uuid = null;
 
@@ -45,8 +45,8 @@ class Script
         'api_scripts_show',
         'api_post_groups_list',
         'api_post_groups_show',
-        'api_post_drafts_list',
-        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
+        'api_reviews_list',
+        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
     ])]
     private ?string $title = null;
 
@@ -131,8 +131,8 @@ class Script
     ])]
     private ?PostGroup $postGroup = null;
 
-    #[ORM\OneToOne(mappedBy: 'script', targetEntity: PostDraft::class)]
-    private ?PostDraft $postDraft = null;
+    #[ORM\OneToOne(mappedBy: 'script', targetEntity: Review::class)]
+    private ?Review $review = null;
 
     /**
      * @var Collection<int, ScriptTag>
@@ -328,9 +328,9 @@ class Script
         return $this;
     }
 
-    public function getPostDraft(): ?PostDraft
+    public function getReview(): ?Review
     {
-        return $this->postDraft;
+        return $this->review;
     }
 
     /**
