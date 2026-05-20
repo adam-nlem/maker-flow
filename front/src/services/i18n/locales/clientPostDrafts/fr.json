@@ -1,0 +1,42 @@
+{
+    "emptyState": {
+        "title": "Rien à valider",
+        "subtitle": "Votre agence ne vous a encore partagé aucun brouillon.",
+        "noSelection": {
+            "title": "Sélectionnez un brouillon",
+            "subtitle": "Choisissez un brouillon dans la liste pour le visionner, laisser un retour ou l'approuver."
+        },
+        "noResults": {
+            "title": "Aucun résultat",
+            "subtitle": "Ajustez votre recherche ou votre filtre pour voir d'autres brouillons."
+        }
+    },
+    "search": {
+        "placeholder": "Rechercher des brouillons…"
+    },
+    "filters": {
+        "all": "Tous"
+    },
+    "actions": {
+        "approve": "Approuver",
+        "requestChanges": "Demander des modifications",
+        "waitingForAgency": "En attente d'une nouvelle version de l'agence."
+    },
+    "requestChangesModal": {
+        "title": "Demander des modifications",
+        "subtitle": "Indiquez à votre agence ce que vous aimeriez modifier avant publication.",
+        "placeholder": "Décrivez ce que vous souhaitez modifier…",
+        "cancel": "Annuler",
+        "submit": "Envoyer le retour",
+        "errors": {
+            "empty": "Veuillez saisir votre retour avant d'envoyer.",
+            "tooLong": "Votre retour est trop long — veuillez le raccourcir."
+        }
+    },
+    "toast": {
+        "approveSuccess": "Brouillon approuvé.",
+        "approveError": "Impossible d'approuver le brouillon. Veuillez réessayer.",
+        "requestChangesSuccess": "Retour envoyé à votre agence.",
+        "requestChangesError": "Impossible d'envoyer votre retour. Veuillez réessayer."
+    }
+}

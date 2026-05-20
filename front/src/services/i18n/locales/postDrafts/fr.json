@@ -114,5 +114,26 @@
         "confirmTitle": "Supprimer ce brouillon ?",
         "confirmBody": "Tous les fichiers téléversés seront définitivement supprimés.",
         "confirm": "Supprimer le brouillon"
+    },
+    "comments": {
+        "title": "Historique des retours",
+        "versionLabel": "Version {{number}}",
+        "uploadedOn": "Mise en ligne le {{date}}",
+        "commentCount_one": "{{count}} commentaire",
+        "commentCount_other": "{{count}} commentaires",
+        "noComments": "Aucun commentaire sur cette version.",
+        "unknownAuthor": "Inconnu",
+        "composer": {
+            "placeholder": "Écrivez une réponse…",
+            "submit": "Envoyer",
+            "errors": {
+                "empty": "Veuillez saisir un commentaire avant d'envoyer.",
+                "tooLong": "Votre commentaire est trop long — veuillez le raccourcir."
+            },
+            "toast": {
+                "success": "Commentaire envoyé.",
+                "error": "Impossible d'envoyer votre commentaire. Veuillez réessayer."
+            }
+        }
     }
 }

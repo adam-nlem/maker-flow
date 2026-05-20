@@ -1,10 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
+    DocumentDuplicateIcon,
     HomeIcon,
     RectangleStackIcon,
 } from "@heroicons/react/24/outline";
 import {
+    DocumentDuplicateIcon as DocumentDuplicateIconSolid,
     HomeIcon as HomeIconSolid,
     RectangleStackIcon as RectangleStackIconSolid,
 } from "@heroicons/react/24/solid";
@@ -20,6 +22,7 @@ import SidebarShell from "~/components/sidebar/SidebarShell";
 import IdentityTile from "~/components/sidebar/IdentityTile";
 import {
     clientHomePath,
+    clientDraftsPath,
     clientContentsPath,
 } from "~/routes/routePaths";
 
@@ -34,6 +37,7 @@ export default function ClientDesktopSidebar() {
 
     const agency = project?.agency ?? null;
     const isHomeSelected = location.pathname === clientHomePath;
+    const isDraftsSelected = location.pathname === clientDraftsPath;
     const isContentsSelected = location.pathname === clientContentsPath;
 
     const identityTile = agency ? <IdentityTile agency={agency} compact /> : null;
@@ -46,6 +50,12 @@ export default function ClientDesktopSidebar() {
                     label={t("navigation:items.home")}
                     isSelected={isHomeSelected}
                     onClick={() => navigate(clientHomePath)}
+                />
+                <IconRailTile
+                    icon={isDraftsSelected ? DocumentDuplicateIconSolid : DocumentDuplicateIcon}
+                    label={t("navigation:items.drafts")}
+                    isSelected={isDraftsSelected}
+                    onClick={() => navigate(clientDraftsPath)}
                 />
                 <IconRailTile
                     icon={isContentsSelected ? RectangleStackIconSolid : RectangleStackIcon}

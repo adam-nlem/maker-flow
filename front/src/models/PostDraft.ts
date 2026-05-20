@@ -9,7 +9,6 @@ export interface PostDraftJSON {
     description?: string | null;
     notes?: string | null;
     mediaType: MediaType;
-    status: PostDraftStatus;
     createdAt: string;
     updatedAt: string;
     script: ScriptJSON | null;
@@ -24,7 +23,6 @@ export class PostDraft {
         public description: string | null,
         public notes: string | null,
         public mediaType: MediaType,
-        public status: PostDraftStatus,
         public createdAt: string,
         public updatedAt: string,
         public script: Script | null,
@@ -40,7 +38,6 @@ export class PostDraft {
             json.description ?? null,
             json.notes ?? null,
             json.mediaType,
-            json.status,
             json.createdAt,
             json.updatedAt,
             json.script ? Script.fromJSON(json.script) : null,
@@ -55,7 +52,6 @@ export class PostDraft {
             description: this.description,
             notes: this.notes,
             mediaType: this.mediaType,
-            status: this.status,
             createdAt: this.createdAt,
             updatedAt: this.updatedAt,
             script: this.script ? this.script.toJSON() : null,
@@ -67,5 +63,9 @@ export class PostDraft {
         if (this.mediaVersions.length === 0) return null;
         const sorted = [...this.mediaVersions].sort((a, b) => b.createdAt.localeCompare(a.createdAt));
         return sorted[0];
+    }
+
+    get currentStatus(): PostDraftStatus | null {
+        return this.latestMediaVersion?.status ?? null;
     }
 }

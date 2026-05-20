@@ -3624,6 +3624,60 @@
             }
           },
           "response": []
+        },
+        {
+          "name": "Approve Post Draft Media Version (client)",
+          "id": "post-drafts-approve-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "description": "ROLE_CLIENT only. Empty body. Transitions latestMediaVersion.status from AwaitingReview → Approved. 409 (code 33008) if the version is not the latest (reason: not_latest_version) or not in AwaitingReview (reason: not_awaiting_review). Returns the parent post draft serialized with api_post_drafts_show.",
+            "url": {
+              "raw": "{{baseUrl}}/api/post-draft-media-versions/{{postDraftMediaVersionUuid}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-draft-media-versions", "{{postDraftMediaVersionUuid}}", "approve"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Request Changes on Post Draft Media Version (client)",
+          "id": "post-drafts-request-changes-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": \"Please tighten the intro and add a CTA at 0:25.\"\n}"
+            },
+            "description": "ROLE_CLIENT only. JSON body { \"comment\": string } — trimmed, non-empty, max 5000 chars (PostDraftCommentEmptyException = 33011, TooLong = 33012, PayloadInvalid = 33013). Creates a PostDraftMediaVersionComment on the latest version (author = current user) and transitions latestMediaVersion.status to ChangesRequested. Allowed from AwaitingReview or Approved (else 409 PostDraftMediaVersionNotAwaitingReviewOrApprovedException = 33009). 409 PostDraftMediaVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent post draft serialized with api_post_drafts_show.",
+            "url": {
+              "raw": "{{baseUrl}}/api/post-draft-media-versions/{{postDraftMediaVersionUuid}}/request-changes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-draft-media-versions", "{{postDraftMediaVersionUuid}}", "request-changes"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Comment on Post Draft Media Version (agency or client)",
+          "id": "post-drafts-comment-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"comment\": \"Good point — we'll tighten the intro in the next version.\"\n}"
+            },
+            "description": "Open to any user with PROJECT_VIEW (agency Viewer+ or client). JSON body { \"comment\": string } — same validation as request-changes (PostDraftCommentEmptyException = 33011, TooLong = 33012, PayloadInvalid = 33013). Creates a PostDraftMediaVersionComment on the latest version (author = current user). Does NOT change status. The thread is bidirectional — used both by clients leaving follow-up feedback and the agency replying to client requests. 409 PostDraftMediaVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent post draft serialized with api_post_drafts_show.",
+            "url": {
+              "raw": "{{baseUrl}}/api/post-draft-media-versions/{{postDraftMediaVersionUuid}}/comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-draft-media-versions", "{{postDraftMediaVersionUuid}}", "comments"]
+            }
+          },
+          "response": []
         }
       ],
       "id": "post-drafts-folder-0001-000000000000"

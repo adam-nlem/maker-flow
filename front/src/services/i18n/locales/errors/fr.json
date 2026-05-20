@@ -105,7 +105,13 @@
         "notFound": "Brouillon introuvable.",
         "scriptAlreadyHasDraft": "Ce script a déjà un brouillon.",
         "locked": "Ce brouillon ne peut pas être modifié dans son statut actuel.",
-        "unresolvableAgency": "Impossible de résoudre l'agence pour ce brouillon."
+        "unresolvableAgency": "Impossible de résoudre l'agence pour ce brouillon.",
+        "notAwaitingReview": "Ce brouillon n'est plus en attente de validation.",
+        "notAwaitingReviewOrApproved": "Cette action n'est pas autorisée dans l'état actuel.",
+        "notLatestVersion": "Cette version n'est plus la plus récente — actualisez puis réessayez.",
+        "commentEmpty": "Veuillez saisir un commentaire avant d'envoyer.",
+        "commentTooLong": "Votre commentaire est trop long — veuillez le raccourcir.",
+        "commentPayloadInvalid": "Les données de la requête sont invalides."
     },
     "hookTemplate": {
         "notFound": "Modèle d'accroche introuvable.",

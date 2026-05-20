@@ -16,6 +16,7 @@ import {
   agencyCalendarPath,
   agencySettingsPath,
   clientHomePath,
+  clientDraftsPath,
   clientContentsPath,
   clientSettingsPath,
   inviteRouteMatcher,
@@ -45,6 +46,7 @@ import AgencySettingsLayout from "./routes/agency/settings";
 import AgencySettingsIndex from "./routes/agency/settings.index";
 import AgencySettingsSectionRoute from "./routes/agency/settings.section";
 import ClientHomePage from "./routes/client/home";
+import ClientDraftsPage from "./routes/client/drafts";
 import ClientContentsPage from "./routes/client/contents";
 import ClientSettingsLayout from "./routes/client/settings";
 import ClientSettingsIndex from "./routes/client/settings.index";
@@ -103,6 +105,7 @@ export const router = createBrowserRouter(
               element: <ClientShellLayout />,
               children: [
                 { path: clientHomePath, element: <ClientHomePage /> },
+                { path: clientDraftsPath, element: <ClientDraftsPage /> },
                 { path: clientContentsPath, element: <ClientContentsPage /> },
                 {
                   path: clientSettingsPath,

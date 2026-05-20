@@ -4,7 +4,7 @@
 
 Agency-side page at `/agency/drafts` for uploading content (video / image / carousel) and tracking client review status. UI label is "Drafts" / "Brouillons"; the underlying entities are `PostDraft` + `PostDraftMediaVersion` (see `back/docs/post-draft-feature.md` for the data model).
 
-Phase 1 ships the agency-side surface only. Clients have no visibility yet.
+Phase 2 adds the client-side review surface at `/client/drafts`, where a `ROLE_CLIENT` user reviews each draft, approves it in one click, or opens a modal to send written feedback. See [Phase 2 — client review surface](#phase-2--client-review-surface) below.
 
 ## Route + navigation
 
@@ -18,8 +18,9 @@ Phase 1 ships the agency-side surface only. Clients have no visibility yet.
 
 | File | Purpose |
 |---|---|
-| `front/src/models/PostDraft.ts` | Class + `fromJSON` / `toJSON`. Exposes a `latestMediaVersion` getter. The `script` field is a `Script` instance (reuses `front/src/models/Script.ts` — no separate summary type). |
-| `front/src/models/PostDraftMediaVersion.ts` | Class + serializers. |
+| `front/src/models/PostDraft.ts` | Class + `fromJSON` / `toJSON`. Exposes a `latestMediaVersion` getter and a `currentStatus` getter (returns the latest version's status — Phase 2 moved `status` off the draft). The `script` field is a `Script` instance (reuses `front/src/models/Script.ts` — no separate summary type). |
+| `front/src/models/PostDraftMediaVersion.ts` | Class + serializers. Carries `status: PostDraftStatus` and the `comments: PostDraftMediaVersionComment[]` thread for that version. |
+| `front/src/models/PostDraftMediaVersionComment.ts` | Single comment row: `uuid`, `body`, `createdAt`, and an optional `author: User` (reuses the existing [`User` model](../src/models/User.ts) — no ad-hoc author type). Backend serializes the author with `uuid`, `firstName`, `lastName`, `email` via the `api_post_drafts_show` group. |
 | `front/src/models/enums/PostDraftStatus.ts` | `AwaitingReview`, `ChangesRequested`, `Approved`, `Rejected` + translation keys, plus `postDraftStatusToBgClass` / `postDraftStatusToTextClass` / `postDraftStatusToBorderClass` / `postDraftStatusToIcon` / `postDraftStatusToBannerTitleKey` / `postDraftStatusToBannerSubtitleKey`. Call sites feed these maps into the generic `Tag` and `Banner` UI components. Mirrors the convention used in `ScriptGenerationStatus.ts`. |
 | `front/src/models/enums/FileInvalidReason.ts` | Mirror of the shared backend enum (`missing_file`, `too_many_files`, `too_few_files`, `file_too_large`, `invalid_mime_type`, `invalid_payload`) + translation keys. Consumed by the 33001 and 27004 resolvers in `errorCodeMessages.ts` (via the local `resolveFileInvalidReason` helper) to surface the specific reason via `meta.reason`. |
 | `front/src/models/enums/MediaType.ts` | Reused as-is (matches backend `Post.mediaType`). |
@@ -35,6 +36,9 @@ The list endpoint returns a per-row shape with `latestMediaVersion` (single, sum
 | `useCreatePostDraft()` | `POST /post-drafts` | Builds `FormData` with one `files[]` entry per file. Invalidates the list. |
 | `useUpdatePostDraft()` | `PATCH /post-drafts/{uuid}` | Invalidates list + detail. |
 | `useDeletePostDraft()` | `DELETE /post-drafts/{uuid}` | Invalidates list, removes detail. |
+| `useApprovePostDraftMediaVersion()` | `POST /post-draft-media-versions/{mediaVersionUuid}/approve` | Client-only. Takes `{ mediaVersionUuid, postDraftUuid, projectUuid }`. Response is the full updated `PostDraft` — written directly into the detail cache via `setQueryData` to avoid a refetch flicker; the list is invalidated. |
+| `useRequestChangesOnPostDraftMediaVersion()` | `POST /post-draft-media-versions/{mediaVersionUuid}/request-changes` | Client-only. Same input plus `comment: string`. Same response shape and cache strategy. |
+| `useCreatePostDraftMediaVersionComment()` | `POST /post-draft-media-versions/{mediaVersionUuid}/comments` | **Used by both surfaces** (agency replies + client follow-up comments). Same input shape as request-changes. Does not change status. Powers the shared `PostDraftCommentComposer`. |
 
 Query keys live in `postDraftsQueryKeys.ts`.
 
@@ -107,8 +111,73 @@ Two flat top-level routes on the backend, both driven by query-param DTOs — se
 
 Both routes return `404` when the file is missing (maps to `MissingPostDraftException`).
 
-## Out of scope (Phase 1)
+## Phase 2 — client review surface
 
-- Client-side review page, approve / changes-requested actions, feedback thread — Phase 2 / 3.
+A read-only / action surface at `/client/drafts` for `ROLE_CLIENT` users. The agency-side surface is unchanged, but reads status through the new model getter `postDraft.currentStatus` (= `latestMediaVersion.status`).
+
+### Route + navigation
+
+- Path: `clientDraftsPath = '/client/drafts'` (`front/src/routes/routePaths.ts`).
+- Route file: `front/src/routes/client/drafts.tsx` (mirrors the agency entry — `useSelectFocusedProject` + `ClientPostDraftsPageView`).
+- Registered in `front/src/router.tsx` next to `ClientHomePage` and `ClientContentsPage`.
+- Sidebar nav entry added directly in `ClientDesktopSidebar.tsx` (the client sidebar does not consume `NavigationItem`) between Home and Contents. Icon: `DocumentDuplicateIcon` (outline / solid variants), label from `navigation:items.drafts`.
+
+### State
+
+The client view reuses the existing shared Zustand stores under `front/src/stores/postDrafts/`:
+
+- `postDraftsStore.ts` — `selectedDraftUuid` is the only field the client surface reads. `isCreatePanelOpen` exists for the agency view and is ignored by client code.
+- `postDraftFilterStore.ts` — `selectedStatus` + `searchTerm`. Persistence key (`app:postDrafts:filter`) is shared; since a user is either agency or client (never both), there's no cross-role state contamination.
+
+The request-changes modal's open state is local to `ClientPostDraftDetailPanel` via `useState` — no need to leak that purely-client UI state into the shared store.
+
+### Shared components (`front/src/components/postDrafts/`)
+
+The list + layout + comments primitives are role-agnostic and live in the shared folder. Agency and client surfaces compose them via thin wrappers.
+
+| Component | Role |
+|---|---|
+| `PostDraftsLayout` | Two-region shell: left list (`w-75 border-r border-pale-gray`) + `<main>` that renders either the caller-supplied `detail` slot or the centered "select a draft" empty state. Takes an optional `onCreateDraft` callback (agency only) that wires the CTA in the list's empty state. |
+| `PostDraftsList` | Toolbar (`SearchBar` with `Cmd/Ctrl+F` shortcut + row of status `FilterChip`s) + infinite-scroll list driven by `useListPaginatedPostDrafts`. Reads selection + filters from the shared `usePostDraftsStore` / `usePostDraftFilterStore`. When `onCreateDraft` is provided, the empty state renders a primary CTA. |
+| `PostDraftListItem` | Visual row — thumbnail with type-icon overlay + carousel slide-count badge, title, type + relative-updated meta, status `Tag` driven by `postDraft.currentStatus`. Identical between roles — agency-side edit / delete affordances live in the detail panel, never here. |
+| `PostDraftMediaViewer` + `PostDraftVideoViewer` / `PostDraftImageViewer` / `PostDraftCarouselViewer` | Already shared in Phase 1; reused unchanged. |
+| `PostDraftCommentsTimeline` | Vertical timeline of all media versions (latest first + expanded, older collapsed). Each row labels `Version N · Uploaded on {date} · {count} comment(s)`. Expanded rows list `PostDraftCommentItem` entries sorted ascending and, **on the latest version only**, mount a `PostDraftCommentComposer` so both agency and client can reply on the active thread. |
+| `PostDraftCommentItem` | Single comment card: `comment.author?.fullName` (falls back to `postDrafts:comments.unknownAuthor`) · short date + body (`whitespace-pre-wrap`). |
+| `PostDraftCommentComposer` | `TextArea` (3 rows, max 5000 chars, trimmed) + Send button. Calls `useCreatePostDraftMediaVersionComment` with the latest version's UUID. Empty-on-submit / too-long inline error; success/error toasts. Clears on success. Used by both surfaces. |
+
+### Agency-only components (`front/src/components/agency/postDrafts/`)
+
+| Component | Role |
+|---|---|
+| `PostDraftsPageView` | Thin orchestrator: `<PostDraftsLayout onCreateDraft={openCreatePanel} detail={<PostDraftDetailPanel />} … />` + `CreatePostDraftModal` mounted alongside. |
+| `PostDraftDetailPanel` | Edit-aware orchestrator: loading guard → status `Banner` → editable header (`PostDraftDetailHeader`) → shared `PostDraftMediaViewer` → editable body (`PostDraftDetailBody`) + side card (`PostDraftDetailSideCard`) → shared `PostDraftCommentsTimeline` → `ConfirmDeleteDialog`. The form-state hook drives Save / Delete; the comments timeline lets the agency reply to client feedback inline. |
+| `PostDraftDetailHeader` | Eyebrow + editable title (`Input simple` when `form.canEdit`, `<h1>` otherwise) + animated Save / Delete cluster. |
+| `PostDraftDetailBody` | Description + dashed-callout notes + `LinkedScriptField` (latter only in edit mode); each section flips between `TextArea simple` and plain text based on `form.canEdit`. |
+| `PostDraftDetailSideCard` | Type / status / (linked script, when an `onLinkedScriptClick` handler is supplied) / uploaded / updated rows. |
+| `CreatePostDraftModal` + `PostDraftFileDropzone` | Agency-only create flow. |
+
+### Client-only components (`front/src/components/client/postDrafts/`)
+
+| Component | Role |
+|---|---|
+| `ClientPostDraftsPageView` | Thin wrapper: `<PostDraftsLayout detail={<ClientPostDraftDetailPanel />} … />`. No create modal. |
+| `ClientPostDraftDetailPanel` | Status `Banner` → `ClientPostDraftDetailHeader` → shared `PostDraftMediaViewer` → `ClientPostDraftDetailBody` + `ClientPostDraftDetailSideCard` → `ClientPostDraftActionsBar` → shared `PostDraftCommentsTimeline`. Hosts `ClientPostDraftRequestChangesModal`. Approve fires via `useApprovePostDraftMediaVersion`. |
+| `ClientPostDraftDetailHeader` | Read-only eyebrow + title (no edit input, no action cluster). |
+| `ClientPostDraftDetailBody` | Read-only description + dashed-callout notes. |
+| `ClientPostDraftDetailSideCard` | Read-only side card: type, status, uploaded / updated dates. |
+| `ClientPostDraftActionsBar` | Status-driven button row (`AwaitingReview` → Approve + Request changes; `Approved` → Request changes only; `ChangesRequested` → read-only "Waiting for the agency to upload a new version" message; `Rejected` → renders nothing). |
+| `ClientPostDraftRequestChangesModal` | `ModalOverlay` with required `TextArea` + Cancel / Submit footer. Calls `useRequestChangesOnPostDraftMediaVersion`. |
+
+### i18n
+
+- `postDrafts` namespace gains a `comments.*` block (timeline title, version label, uploaded-on, pluralized comment count, no-comments fallback, unknown-author fallback, composer placeholder / submit / inline errors / toasts). Used by both surfaces via the shared timeline + composer.
+- `clientPostDrafts` namespace covers what's truly client-only: page chrome (no-selection empty state), action labels + waiting message, request-changes modal copy, approve/request-changes toasts.
+
+Error code map (`front/src/services/apiErrorHandler/errorCodeMessages.ts`): direct one-to-one mappings for the six new exception codes — `33008` → `errors:postDraft.notAwaitingReview`, `33009` → `errors:postDraft.notAwaitingReviewOrApproved`, `33010` → `errors:postDraft.notLatestVersion`, `33011` → `errors:postDraft.commentEmpty`, `33012` → `errors:postDraft.commentTooLong`, `33013` → `errors:postDraft.commentPayloadInvalid`. No resolver functions — each error has a single user-facing message (matches the project convention: one exception per error condition).
+
+## Out of scope (Phase 2)
+
+- Agency-side feedback inbox / unread badge / per-version thread surfacing — Phase 3.
 - Re-uploading a new media version on the same draft — Phase 3.
 - Backlink to a published Post — Phase 4.
+- Subscription-tier gating on version history — Phase 5.

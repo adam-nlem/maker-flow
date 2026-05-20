@@ -33,6 +33,7 @@ class Project
         'api_project_reopen',
         'api_invitation_show',
         'api_invitation_create',
+        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $uuid = null;
 
@@ -46,6 +47,7 @@ class Project
         'api_project_reopen',
         'api_invitation_show',
         'api_invitation_create',
+        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $name = null;
 

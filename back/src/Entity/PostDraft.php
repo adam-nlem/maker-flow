@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\Enum\MediaType;
-use App\Entity\Enum\PostDraftStatus;
 use App\Helper\DateHelper;
 use App\Repository\PostDraftRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -23,35 +22,31 @@ class PostDraft
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
+    #[Groups(['api_post_drafts_list', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
+    #[Groups(['api_post_drafts_list', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_post_drafts_show'])]
+    #[Groups(['api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_post_drafts_show'])]
+    #[Groups(['api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?string $notes = null;
 
     #[ORM\Column(length: 32, enumType: MediaType::class)]
-    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
+    #[Groups(['api_post_drafts_list', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?MediaType $mediaType = null;
 
-    #[ORM\Column(length: 32, enumType: PostDraftStatus::class)]
-    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
-    private PostDraftStatus $status = PostDraftStatus::AwaitingReview;
-
     #[ORM\Column]
-    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
+    #[Groups(['api_post_drafts_list', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
+    #[Groups(['api_post_drafts_list', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'postDrafts')]
@@ -60,7 +55,7 @@ class PostDraft
 
     #[ORM\OneToOne(inversedBy: 'postDraft')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL', unique: true)]
-    #[Groups(['api_post_drafts_list', 'api_post_drafts_show'])]
+    #[Groups(['api_post_drafts_list', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?Script $script = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -72,7 +67,7 @@ class PostDraft
      */
     #[ORM\OneToMany(targetEntity: PostDraftMediaVersion::class, mappedBy: 'postDraft', cascade: ['remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'ASC'])]
-    #[Groups(['api_post_drafts_show'])]
+    #[Groups(['api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private Collection $mediaVersions;
 
     public function __construct()
@@ -159,18 +154,6 @@ class PostDraft
     public function setMediaType(MediaType $mediaType): static
     {
         $this->mediaType = $mediaType;
-
-        return $this;
-    }
-
-    public function getStatus(): PostDraftStatus
-    {
-        return $this->status;
-    }
-
-    public function setStatus(PostDraftStatus $status): static
-    {
-        $this->status = $status;
 
         return $this;
     }

@@ -5,7 +5,6 @@ namespace App\DTO\Request\PostDraft;
 use App\DTO\Request\AbstractRequestDTO;
 use App\Entity\Enum\FileInvalidReason;
 use App\Entity\Enum\MediaType;
-use App\Entity\Enum\PostDraftStatus;
 use App\Entity\PostDraft;
 use App\Exception\PostDraft\PostDraftFileInvalidException;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -56,7 +55,6 @@ class CreatePostDraftRequestDTO extends AbstractRequestDTO
         $postDraft->setDescription($this->description);
         $postDraft->setNotes($this->notes);
         $postDraft->setMediaType($this->mediaType);
-        $postDraft->setStatus(PostDraftStatus::AwaitingReview);
 
         return $postDraft;
     }

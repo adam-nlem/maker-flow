@@ -135,6 +135,12 @@ export const errorCodeKeys: Record<number, string | ErrorMessageResolver> = {
   33003: 'errors:postDraft.scriptAlreadyHasDraft',
   33004: 'errors:postDraft.locked',
   33005: 'errors:postDraft.unresolvableAgency',
+  33008: 'errors:postDraft.notAwaitingReview',
+  33009: 'errors:postDraft.notAwaitingReviewOrApproved',
+  33010: 'errors:postDraft.notLatestVersion',
+  33011: 'errors:postDraft.commentEmpty',
+  33012: 'errors:postDraft.commentTooLong',
+  33013: 'errors:postDraft.commentPayloadInvalid',
 }
 
 export function resolveErrorMessage(error: unknown): string {

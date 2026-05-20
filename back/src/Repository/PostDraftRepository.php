@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Enum\PostDraftStatus;
 use App\Entity\PostDraft;
+use App\Entity\PostDraftMediaVersion;
 use App\Entity\Project;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
@@ -77,7 +78,12 @@ class PostDraftRepository extends ServiceEntityRepository
             ->setMaxResults($limit);
 
         if ($status !== null) {
-            $qb->andWhere('pd.status = :status')
+            $qb->innerJoin('pd.mediaVersions', 'mv')
+                ->andWhere('mv.status = :status')
+                ->andWhere('NOT EXISTS (
+                    SELECT 1 FROM ' . PostDraftMediaVersion::class . ' mvLater
+                    WHERE mvLater.postDraft = pd AND mvLater.createdAt > mv.createdAt
+                )')
                 ->setParameter('status', $status);
         }
 

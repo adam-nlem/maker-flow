@@ -32,7 +32,7 @@ class Script
         'api_post_groups_list',
         'api_post_groups_show',
         'api_post_drafts_list',
-        'api_post_drafts_show',
+        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $uuid = null;
 
@@ -46,7 +46,7 @@ class Script
         'api_post_groups_list',
         'api_post_groups_show',
         'api_post_drafts_list',
-        'api_post_drafts_show',
+        'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $title = null;
 

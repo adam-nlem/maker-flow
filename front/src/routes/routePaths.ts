@@ -28,6 +28,7 @@ export const agencySettingsSubscriptionPath = `${agencySettingsPath}/subscriptio
 // Client shell
 export const clientAreaPrefix = '/client'
 export const clientHomePath = clientAreaPrefix
+export const clientDraftsPath = `${clientAreaPrefix}/drafts`
 export const clientContentsPath = `${clientAreaPrefix}/contents`
 export const clientSettingsPath = `${clientAreaPrefix}/settings`
 export const clientSettingsGeneralPath = `${clientSettingsPath}/general`

@@ -22,11 +22,11 @@ class Agency
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_project_get_by_uuid', 'api_invitation_show', 'api_invitation_create'])]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_project_get_by_uuid', 'api_invitation_show', 'api_invitation_create', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid'])]
+    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]

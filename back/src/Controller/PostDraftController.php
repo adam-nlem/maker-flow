@@ -39,7 +39,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class PostDraftController extends AbstractController
 {
     #[Route('', name: 'api_post_drafts_list', methods: ['GET'])]
-    #[IsGranted(UserRole::Viewer->value)]
+    #[IsGranted(UserRole::User->value)]
     public function list(
         ListPostDraftsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
@@ -72,7 +72,7 @@ final class PostDraftController extends AbstractController
     }
 
     #[Route('/{uuid}', name: 'api_post_drafts_show', methods: ['GET'], requirements: ['uuid' => Requirement::UUID])]
-    #[IsGranted(UserRole::Viewer->value)]
+    #[IsGranted(UserRole::User->value)]
     public function show(string $uuid, PostDraftRepository $postDraftRepository): JsonResponse
     {
         $postDraft = $postDraftRepository->getByUuid($uuid);
@@ -184,7 +184,7 @@ final class PostDraftController extends AbstractController
 
         $this->denyAccessUnlessGranted(ProjectVoter::EDIT, $postDraft->getProject());
 
-        if ($postDraft->getStatus() !== PostDraftStatus::AwaitingReview) {
+        if ($postDraft->getLatestMediaVersion()?->getStatus() !== PostDraftStatus::AwaitingReview) {
             throw new PostDraftLockedException();
         }
 

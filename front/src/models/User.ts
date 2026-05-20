@@ -1,4 +1,5 @@
 import { Agency } from "./Agency"
+import { Project, type ProjectJSON } from "./Project"
 import { UserRole, userRolePrecedence } from "./enums/UserRole"
 
 export interface UserJSON {
@@ -11,6 +12,7 @@ export interface UserJSON {
     referralCode: string | null;
     roles: string[];
     agency: ReturnType<Agency["toJSON"]> | null;
+    project?: ProjectJSON | null;
 }
 
 export class User {
@@ -24,6 +26,7 @@ export class User {
         public readonly referralCode: string | null,
         public readonly roles: UserRole[],
         public readonly agency: Agency | null,
+        public readonly project: Project | null,
     ) { }
 
     static fromJSON(json: UserJSON): User {
@@ -37,6 +40,7 @@ export class User {
             json.referralCode ?? null,
             (json.roles ?? []).map((r) => r as UserRole),
             json.agency ? Agency.fromJSON(json.agency) : null,
+            json.project ? Project.fromJSON(json.project) : null,
         );
     }
 
@@ -51,6 +55,7 @@ export class User {
             referralCode: this.referralCode,
             roles: this.roles,
             agency: this.agency?.toJSON() ?? null,
+            project: this.project?.toJSON() ?? null,
         };
     }
 

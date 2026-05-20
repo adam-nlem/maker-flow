@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { Banner } from "~/components/ui/Banner";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
 import PostDraftMediaViewer from "~/components/postDrafts/PostDraftMediaViewer";
+import PostDraftCommentsTimeline from "~/components/postDrafts/PostDraftCommentsTimeline";
 import PostDraftDetailHeader from "./PostDraftDetailHeader";
 import PostDraftDetailBody from "./PostDraftDetailBody";
 import PostDraftDetailSideCard from "./PostDraftDetailSideCard";
@@ -15,6 +16,7 @@ import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { agencyScriptsPath } from "~/routes/routePaths";
 import { PostDraft } from "~/models/PostDraft";
 import {
+    PostDraftStatus,
     postDraftStatusToBannerSubtitleKey,
     postDraftStatusToBannerTitleKey,
     postDraftStatusToBgClass,
@@ -67,6 +69,8 @@ function LoadedPostDraftDetailPanel({ postDraft, projectUuid }: LoadedPostDraftD
         closeAll();
     };
 
+    const status = postDraft.currentStatus ?? PostDraftStatus.AwaitingReview;
+
     return (
         <form
             onSubmit={(e) => {
@@ -77,12 +81,12 @@ function LoadedPostDraftDetailPanel({ postDraft, projectUuid }: LoadedPostDraftD
         >
             <Banner
                 className="mb-6"
-                icon={postDraftStatusToIcon[postDraft.status]}
-                title={t(postDraftStatusToBannerTitleKey[postDraft.status])}
-                subtitle={t(postDraftStatusToBannerSubtitleKey[postDraft.status])}
-                bgClassName={postDraftStatusToBgClass[postDraft.status]}
-                textClassName={postDraftStatusToTextClass[postDraft.status]}
-                borderClassName={postDraftStatusToBorderClass[postDraft.status]}
+                icon={postDraftStatusToIcon[status]}
+                title={t(postDraftStatusToBannerTitleKey[status])}
+                subtitle={t(postDraftStatusToBannerSubtitleKey[status])}
+                bgClassName={postDraftStatusToBgClass[status]}
+                textClassName={postDraftStatusToTextClass[status]}
+                borderClassName={postDraftStatusToBorderClass[status]}
             />
 
             <PostDraftDetailHeader
@@ -103,6 +107,8 @@ function LoadedPostDraftDetailPanel({ postDraft, projectUuid }: LoadedPostDraftD
                     onLinkedScriptClick={form.canEdit ? undefined : () => openLinkedScript(postDraft.script!.uuid)}
                 />
             </div>
+
+            <PostDraftCommentsTimeline postDraft={postDraft} projectUuid={projectUuid} />
 
             <ConfirmDeleteDialog
                 isOpen={isDeleteDialogOpen}

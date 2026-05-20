@@ -4,6 +4,7 @@ import { Tag } from "~/components/ui/Tag";
 import { PostDraft } from "~/models/PostDraft";
 import { mediaTypeToIcon } from "~/models/enums/MediaType";
 import {
+    PostDraftStatus,
     postDraftStatusToBgClass,
     postDraftStatusToIcon,
     postDraftStatusToTextClass,
@@ -20,6 +21,7 @@ export default function PostDraftDetailSideCard({ postDraft, onLinkedScriptClick
     const { t } = useTranslation();
     const MediaTypeIcon = mediaTypeToIcon[postDraft.mediaType];
     const typeLabel = t(`postDrafts:detail.eyebrow.${postDraft.mediaType}`);
+    const status = postDraft.currentStatus ?? PostDraftStatus.AwaitingReview;
 
     return (
         <aside className="bg-clear-2 border border-pale-gray rounded-xl p-1 self-start w-1/3">
@@ -29,10 +31,10 @@ export default function PostDraftDetailSideCard({ postDraft, onLinkedScriptClick
             </SideCardRow>
             <SideCardRow label={t("postDrafts:detail.sideCard.status")}>
                 <Tag
-                    icon={postDraftStatusToIcon[postDraft.status]}
-                    label={t(postDraftStatusTranslationKeys[postDraft.status])}
-                    bgClassName={postDraftStatusToBgClass[postDraft.status]}
-                    textClassName={postDraftStatusToTextClass[postDraft.status]}
+                    icon={postDraftStatusToIcon[status]}
+                    label={t(postDraftStatusTranslationKeys[status])}
+                    bgClassName={postDraftStatusToBgClass[status]}
+                    textClassName={postDraftStatusToTextClass[status]}
                 />
             </SideCardRow>
             {postDraft.script && onLinkedScriptClick && (
