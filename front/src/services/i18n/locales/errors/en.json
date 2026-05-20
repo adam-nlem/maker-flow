@@ -111,7 +111,14 @@
         "notLatestVersion": "This version is no longer the latest — refresh and try again.",
         "commentEmpty": "Please write a comment before submitting.",
         "commentTooLong": "Your comment is too long — please shorten it.",
-        "commentPayloadInvalid": "The request data is invalid."
+        "commentPayloadInvalid": "The request data is invalid.",
+        "commentParentNotFound": "The comment you're replying to no longer exists.",
+        "commentReplyCannotHaveTimecode": "Replies can't be pinned to a video timecode.",
+        "commentNotFound": "This comment no longer exists.",
+        "commentStatusInvalid": "Invalid comment status.",
+        "commentStatusOnReplyForbidden": "Only top-level comments can be resolved or reopened.",
+        "commentEditForbidden": "Only the comment's author can edit it.",
+        "commentTimecodeOnReplyForbidden": "Only top-level comments can carry a video timecode."
     },
     "hookTemplate": {
         "notFound": "Hook template not found.",

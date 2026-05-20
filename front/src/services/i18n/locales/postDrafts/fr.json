@@ -123,9 +123,18 @@
         "commentCount_other": "{{count}} commentaires",
         "noComments": "Aucun commentaire sur cette version.",
         "unknownAuthor": "Inconnu",
+        "resolved": "Résolu",
+        "open": "Ouvert",
+        "reply": "Répondre",
+        "resolve": "Marquer comme résolu",
+        "reopen": "Rouvrir",
         "composer": {
             "placeholder": "Écrivez une réponse…",
             "submit": "Envoyer",
+            "cancel": "Annuler",
+            "pinAtCurrentTime": "Épingler à l'instant courant",
+            "pinnedAt": "Épinglé à {{time}}",
+            "clearPin": "Retirer l'épingle",
             "errors": {
                 "empty": "Veuillez saisir un commentaire avant d'envoyer.",
                 "tooLong": "Votre commentaire est trop long — veuillez le raccourcir."
@@ -133,6 +142,13 @@
             "toast": {
                 "success": "Commentaire envoyé.",
                 "error": "Impossible d'envoyer votre commentaire. Veuillez réessayer."
+            }
+        },
+        "update": {
+            "toast": {
+                "successResolved": "Commentaire marqué comme résolu.",
+                "successReopened": "Commentaire rouvert.",
+                "error": "Impossible de mettre à jour le commentaire. Veuillez réessayer."
             }
         }
     }

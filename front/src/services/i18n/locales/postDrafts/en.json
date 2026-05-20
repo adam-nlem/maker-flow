@@ -123,9 +123,18 @@
         "commentCount_other": "{{count}} comments",
         "noComments": "No comments on this version.",
         "unknownAuthor": "Unknown",
+        "resolved": "Resolved",
+        "open": "Open",
+        "reply": "Reply",
+        "resolve": "Mark as resolved",
+        "reopen": "Reopen",
         "composer": {
             "placeholder": "Write a reply…",
             "submit": "Send",
+            "cancel": "Cancel",
+            "pinAtCurrentTime": "Pin at current time",
+            "pinnedAt": "Pinned at {{time}}",
+            "clearPin": "Clear pin",
             "errors": {
                 "empty": "Please write a comment before sending.",
                 "tooLong": "Your comment is too long — please shorten it."
@@ -133,6 +142,13 @@
             "toast": {
                 "success": "Comment sent.",
                 "error": "Couldn't send your comment. Please try again."
+            }
+        },
+        "update": {
+            "toast": {
+                "successResolved": "Comment marked as resolved.",
+                "successReopened": "Comment reopened.",
+                "error": "Couldn't update the comment. Please try again."
             }
         }
     }

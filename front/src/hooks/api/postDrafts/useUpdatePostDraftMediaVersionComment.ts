@@ -1,28 +1,29 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '~/services/httpClient/httpClient';
 import { PostDraft, type PostDraftJSON } from '~/models/PostDraft';
+import type { PostDraftCommentStatus } from '~/models/enums/PostDraftCommentStatus';
 import { postDraftsQueryKeys } from './postDraftsQueryKeys';
 
-interface CreatePostDraftMediaVersionCommentData {
-    mediaVersionUuid: string;
-    body: string;
-    parentCommentUuid?: string;
+interface UpdatePostDraftMediaVersionCommentData {
+    body?: string;
+    status?: PostDraftCommentStatus;
     videoTimecodeSeconds?: number | null;
 }
 
-interface CreatePostDraftMediaVersionCommentParams {
+interface UpdatePostDraftMediaVersionCommentParams {
+    commentUuid: string;
     postDraftUuid: string;
     projectUuid: string;
-    data: CreatePostDraftMediaVersionCommentData;
+    data: UpdatePostDraftMediaVersionCommentData;
 }
 
-export function useCreatePostDraftMediaVersionComment() {
+export function useUpdatePostDraftMediaVersionComment() {
     const queryClient = useQueryClient();
 
     const mutation = useMutation({
-        mutationFn: async ({ data }: CreatePostDraftMediaVersionCommentParams) => {
-            const response = await httpClient.post<PostDraftJSON>(
-                `/post-draft-media-version-comments`,
+        mutationFn: async ({ commentUuid, data }: UpdatePostDraftMediaVersionCommentParams) => {
+            const response = await httpClient.patch<PostDraftJSON>(
+                `/post-draft-media-version-comments/${commentUuid}`,
                 data,
             );
             return PostDraft.fromJSON(response.data);
@@ -34,7 +35,7 @@ export function useCreatePostDraftMediaVersionComment() {
     });
 
     return {
-        createPostDraftMediaVersionComment: mutation.mutateAsync,
+        updatePostDraftMediaVersionComment: mutation.mutateAsync,
         isPending: mutation.isPending,
         error: mutation.error,
         reset: mutation.reset,

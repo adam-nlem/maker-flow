@@ -141,6 +141,13 @@ export const errorCodeKeys: Record<number, string | ErrorMessageResolver> = {
   33011: 'errors:postDraft.commentEmpty',
   33012: 'errors:postDraft.commentTooLong',
   33013: 'errors:postDraft.commentPayloadInvalid',
+  33014: 'errors:postDraft.commentParentNotFound',
+  33015: 'errors:postDraft.commentReplyCannotHaveTimecode',
+  33016: 'errors:postDraft.commentNotFound',
+  33017: 'errors:postDraft.commentStatusInvalid',
+  33018: 'errors:postDraft.commentStatusOnReplyForbidden',
+  33019: 'errors:postDraft.commentEditForbidden',
+  33020: 'errors:postDraft.commentTimecodeOnReplyForbidden',
 }
 
 export function resolveErrorMessage(error: unknown): string {

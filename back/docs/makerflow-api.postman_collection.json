@@ -3668,13 +3668,51 @@
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n    \"mediaVersionUuid\": \"{{postDraftMediaVersionUuid}}\",\n    \"body\": \"Good point — we'll tighten the intro in the next version.\"\n}"
+              "raw": "{\n    \"mediaVersionUuid\": \"{{postDraftMediaVersionUuid}}\",\n    \"body\": \"Good point — we'll tighten the intro in the next version.\",\n    \"videoTimecodeSeconds\": 12.34\n}"
             },
-            "description": "Open to any authenticated user with PROJECT_VIEW (agency or client). Lives in PostDraftMediaVersionCommentController (separate from PostDraftMediaVersionController because the comment is a distinct entity). Flat resource URL — mediaVersionUuid is carried in the JSON body, matching the POST /api/post-drafts create convention. Body: { mediaVersionUuid, body } — body trimmed, non-empty, max 5000 chars. Validation is declarative on the DTO via #[Assert\\NotBlank] / #[Assert\\Length(max: 5000)] / #[Assert\\Uuid]. Creates a PostDraftMediaVersionComment on the latest version (author = current user). Does NOT change status. The thread is bidirectional — used both by clients leaving follow-up feedback and the agency replying to client requests. 409 PostDraftMediaVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent post draft serialized with api_post_draft_media_version_comments_create.",
+            "description": "Open to any authenticated user with PROJECT_VIEW (agency or client). Lives in PostDraftMediaVersionCommentController (separate from PostDraftMediaVersionController because the comment is a distinct entity). Flat resource URL — mediaVersionUuid is carried in the JSON body, matching the POST /api/post-drafts create convention. Body: { mediaVersionUuid, body, parentCommentUuid?, videoTimecodeSeconds? } — body trimmed, non-empty, max 5000 chars; videoTimecodeSeconds is a non-negative float (seconds), top-level + video only; parentCommentUuid turns the new comment into a reply. Validation is declarative on the DTO via #[Assert\\NotBlank] / #[Assert\\Length(max: 5000)] / #[Assert\\Uuid] / #[Assert\\Type('numeric')] / #[Assert\\PositiveOrZero]. Creates a PostDraftMediaVersionComment on the latest version (author = current user). Does NOT change status. The thread is bidirectional — used both by clients leaving follow-up feedback and the agency replying to client requests. Replies + timecode together → 400 PostDraftCommentReplyCannotHaveTimecodeException (33015). Unknown / cross-version parent UUID → 404 PostDraftCommentParentNotFoundException (33014). 409 PostDraftMediaVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent post draft serialized with api_post_draft_media_version_comments_create.",
             "url": {
               "raw": "{{baseUrl}}/api/post-draft-media-version-comments",
               "host": ["{{baseUrl}}"],
               "path": ["api", "post-draft-media-version-comments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reply to a Post Draft Media Version Comment (agency or client)",
+          "id": "post-drafts-comment-0002-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"mediaVersionUuid\": \"{{postDraftMediaVersionUuid}}\",\n    \"parentCommentUuid\": \"{{postDraftMediaVersionCommentUuid}}\",\n    \"body\": \"Got it — we'll re-cut the intro.\"\n}"
+            },
+            "description": "Convenience example for the reply flow. Same endpoint as the comment create; setting parentCommentUuid makes the new row a reply (fully threaded — replies can themselves be replied to). Replies must NOT carry a videoTimecodeSeconds (400 PostDraftCommentReplyCannotHaveTimecodeException 33015 otherwise). The parent must belong to the same media version (404 PostDraftCommentParentNotFoundException 33014 otherwise).",
+            "url": {
+              "raw": "{{baseUrl}}/api/post-draft-media-version-comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-draft-media-version-comments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update a Post Draft Media Version Comment",
+          "id": "post-drafts-comment-0003-000000000000",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"resolved\"\n}"
+            },
+            "description": "Partial update on an existing comment. Body keys are all optional (presentFields tracking): { body?, status?, videoTimecodeSeconds? }. Threading (parentComment) is immutable and not exposed here. Per-field permissions: body + videoTimecodeSeconds require the caller to be the comment AUTHOR (403 PostDraftCommentEditForbiddenException 33019 otherwise). status requires AGENCY editor on the project (PROJECT_EDIT voter). status / videoTimecodeSeconds on a reply both 409 (PostDraftCommentStatusOnReplyForbiddenException 33018, PostDraftCommentTimecodeOnReplyForbiddenException 33020). Pass videoTimecodeSeconds: null to clear a pin. Empty body → 400 PostDraftCommentEmptyException (33011). Invalid status value → 400 PostDraftCommentStatusInvalidException (33017). Unknown UUID → 404 PostDraftCommentNotFoundException (33016). Returns the parent draft serialized with api_post_drafts_show.",
+            "url": {
+              "raw": "{{baseUrl}}/api/post-draft-media-version-comments/{{postDraftMediaVersionCommentUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "post-draft-media-version-comments", "{{postDraftMediaVersionCommentUuid}}"]
             }
           },
           "response": []
