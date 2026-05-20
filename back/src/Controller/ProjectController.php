@@ -62,7 +62,7 @@ final class ProjectController extends AbstractController
 
         $projectRepository->save($project, true);
 
-        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_create']]);
+        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_projects_create']]);
     }
 
     #[Route('/{projectUuid}', name: 'api_projects_update', methods: ['PATCH'])]
@@ -96,7 +96,7 @@ final class ProjectController extends AbstractController
 
         $projectRepository->save($project, true);
 
-        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_update']]);
+        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_projects_update']]);
     }
 
     #[Route('/{projectUuid}', name: 'api_projects_show', methods: ['GET'])]
@@ -122,7 +122,7 @@ final class ProjectController extends AbstractController
             throw new AgencySubscriptionInactiveException();
         }
 
-        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_get_by_uuid']]);
+        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_projects_get_by_uuid']]);
     }
 
     #[Route('/{projectUuid}/finish', name: 'api_projects_finish', methods: ['POST'])]
@@ -146,7 +146,7 @@ final class ProjectController extends AbstractController
 
         $projectRepository->save($project, true);
 
-        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_finish']]);
+        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_projects_finish']]);
     }
 
     #[Route('/{projectUuid}/reopen', name: 'api_projects_reopen', methods: ['POST'])]
@@ -170,7 +170,7 @@ final class ProjectController extends AbstractController
 
         $projectRepository->save($project, true);
 
-        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_project_reopen']]);
+        return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_projects_reopen']]);
     }
 
     #[Route('', name: 'api_projects_list', methods: ['GET'])]

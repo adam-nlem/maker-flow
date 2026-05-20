@@ -60,7 +60,7 @@ final class AgencyController extends AbstractController
         return $this->json(
             data: $agency,
             status: Response::HTTP_CREATED,
-            context: ['groups' => ['api_agency_create']],
+            context: ['groups' => ['api_agencies_create']],
         );
     }
 
@@ -80,7 +80,7 @@ final class AgencyController extends AbstractController
         return $this->json(
             data: $agency,
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_agency_current']],
+            context: ['groups' => ['api_agencies_current']],
         );
     }
 
@@ -121,7 +121,7 @@ final class AgencyController extends AbstractController
         return $this->json(
             data: $agency,
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_agency_update']],
+            context: ['groups' => ['api_agencies_update']],
         );
     }
 

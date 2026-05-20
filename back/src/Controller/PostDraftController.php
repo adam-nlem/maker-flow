@@ -71,11 +71,11 @@ final class PostDraftController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_post_drafts_show', methods: ['GET'], requirements: ['uuid' => Requirement::UUID])]
+    #[Route('/{postDraftUuid}', name: 'api_post_drafts_show', methods: ['GET'], requirements: ['postDraftUuid' => Requirement::UUID])]
     #[IsGranted(UserRole::User->value)]
-    public function show(string $uuid, PostDraftRepository $postDraftRepository): JsonResponse
+    public function show(string $postDraftUuid, PostDraftRepository $postDraftRepository): JsonResponse
     {
-        $postDraft = $postDraftRepository->getByUuid($uuid);
+        $postDraft = $postDraftRepository->getByUuid($postDraftUuid);
 
         if ($postDraft === null) {
             throw new MissingPostDraftException();
@@ -164,10 +164,10 @@ final class PostDraftController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_post_drafts_update', methods: ['PATCH'], requirements: ['uuid' => Requirement::UUID])]
+    #[Route('/{postDraftUuid}', name: 'api_post_drafts_update', methods: ['PATCH'], requirements: ['postDraftUuid' => Requirement::UUID])]
     #[IsGranted(UserRole::Editor->value)]
     public function update(
-        string $uuid,
+        string $postDraftUuid,
         UpdatePostDraftRequestDTO $dto,
         PostDraftRepository $postDraftRepository,
         ScriptRepository $scriptRepository,
@@ -176,7 +176,7 @@ final class PostDraftController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $postDraft = $postDraftRepository->getByUuid($uuid);
+        $postDraft = $postDraftRepository->getByUuid($postDraftUuid);
 
         if ($postDraft === null) {
             throw new MissingPostDraftException();
@@ -224,13 +224,13 @@ final class PostDraftController extends AbstractController
         );
     }
 
-    #[Route('/{uuid}', name: 'api_post_drafts_delete', methods: ['DELETE'], requirements: ['uuid' => Requirement::UUID])]
+    #[Route('/{postDraftUuid}', name: 'api_post_drafts_delete', methods: ['DELETE'], requirements: ['postDraftUuid' => Requirement::UUID])]
     #[IsGranted(UserRole::Editor->value)]
     public function delete(
-        string $uuid,
+        string $postDraftUuid,
         PostDraftRepository $postDraftRepository,
     ): JsonResponse {
-        $postDraft = $postDraftRepository->getByUuid($uuid);
+        $postDraft = $postDraftRepository->getByUuid($postDraftUuid);
 
         if ($postDraft === null) {
             throw new MissingPostDraftException();

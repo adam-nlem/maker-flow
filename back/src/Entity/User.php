@@ -27,48 +27,48 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: Types::GUID, unique: true)]
     #[Groups([
-        'api_user_register',
-        'api_user_me',
-        'api_user_update',
+        'api_users_register',
+        'api_users_me',
+        'api_users_update',
         'api_otp_verify_login',
         'api_otp_verify_email',
         'api_otp_verify_prelaunch',
         'api_collaborators_list',
         'api_clients_list',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_invitations_show',
+        'api_invitations_create',
         'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups([
-        'api_user_register',
-        'api_user_me',
-        'api_user_update',
+        'api_users_register',
+        'api_users_me',
+        'api_users_update',
         'api_otp_verify_login',
         'api_otp_verify_email',
         'api_otp_verify_prelaunch',
         'api_collaborators_list',
         'api_clients_list',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_invitations_show',
+        'api_invitations_create',
         'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Groups([
-        'api_user_register',
-        'api_user_me',
-        'api_user_update',
+        'api_users_register',
+        'api_users_me',
+        'api_users_update',
         'api_otp_verify_login',
         'api_otp_verify_email',
         'api_otp_verify_prelaunch',
         'api_collaborators_list',
         'api_clients_list',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_invitations_show',
+        'api_invitations_create',
         'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $lastName = null;
@@ -76,16 +76,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     #[Assert\Email]
     #[Groups([
-        'api_user_register',
-        'api_user_me',
-        'api_user_update',
+        'api_users_register',
+        'api_users_me',
+        'api_users_update',
         'api_otp_verify_login',
         'api_otp_verify_email',
         'api_otp_verify_prelaunch',
         'api_collaborators_list',
         'api_clients_list',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_invitations_show',
+        'api_invitations_create',
         'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $email = null;
@@ -95,20 +95,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     #[Groups([
-        'api_user_register',
-        'api_user_me',
-        'api_user_update',
+        'api_users_register',
+        'api_users_me',
+        'api_users_update',
         'api_otp_verify_login',
         'api_otp_verify_email',
         'api_otp_verify_prelaunch',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_invitations_show',
+        'api_invitations_create',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column(type: Types::JSON)]
     #[Groups([
-        'api_user_me',
+        'api_users_me',
         'api_otp_verify_login',
         'api_otp_verify_email',
         'api_otp_verify_prelaunch',
@@ -118,9 +118,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(nullable: true)]
     #[Groups([
-        'api_user_register',
-        'api_user_me',
-        'api_user_update',
+        'api_users_register',
+        'api_users_me',
+        'api_users_update',
         'api_login',
         'api_otp_verify_login',
         'api_otp_verify_email',
@@ -130,7 +130,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 8, unique: true, nullable: true)]
     #[Groups([
-        'api_user_me',
+        'api_users_me',
         'api_otp_verify_prelaunch'
     ])]
     private ?string $referralCode = null;
@@ -151,7 +151,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'collaborators')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups([
-        'api_user_me',
+        'api_users_me',
         'api_otp_verify_login',
         'api_otp_verify_email',
         'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',

@@ -22,7 +22,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/todo-lists/tags', requirements: ['tagUuid' => Requirement::UUID])]
-class TodoListTagController extends AbstractController
+final class TodoListTagController extends AbstractController
 {
     #[Route('', name: 'api_todo_lists_tags_list', methods: ['GET'])]
     #[IsGranted(UserRole::Viewer->value)]

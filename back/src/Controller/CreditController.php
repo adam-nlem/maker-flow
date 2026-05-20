@@ -59,7 +59,7 @@ final class CreditController extends AbstractController
 
         $balance = $creditService->getOrCreateBalance($agency);
 
-        return $this->json(data: $balance, status: Response::HTTP_OK, context: ['groups' => ['api_credit_balance_show']]);
+        return $this->json(data: $balance, status: Response::HTTP_OK, context: ['groups' => ['api_credits_balance_show']]);
     }
 
     #[Route('/transactions', name: 'api_credits_transactions', methods: ['GET'])]
@@ -80,6 +80,6 @@ final class CreditController extends AbstractController
 
         $transactions = $creditTransactionRepository->getByAgencyPaginated($agency, $queryParamDto->getPage(), $queryParamDto->getLimit());
 
-        return $this->json(data: $transactions, status: Response::HTTP_OK, context: ['groups' => ['api_credit_transactions_list']]);
+        return $this->json(data: $transactions, status: Response::HTTP_OK, context: ['groups' => ['api_credits_transactions_list']]);
     }
 }

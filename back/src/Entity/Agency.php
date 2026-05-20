@@ -22,31 +22,31 @@ class Agency
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_project_get_by_uuid', 'api_invitation_show', 'api_invitation_create', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
+    #[Groups(['api_agencies_create', 'api_agencies_update', 'api_agencies_current', 'api_users_me', 'api_projects_get_by_uuid', 'api_invitations_show', 'api_invitations_create', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_invitation_show', 'api_invitation_create', 'api_project_get_by_uuid', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
+    #[Groups(['api_agencies_create', 'api_agencies_update', 'api_agencies_current', 'api_users_me', 'api_invitations_show', 'api_invitations_create', 'api_projects_get_by_uuid', 'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Email]
-    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_project_get_by_uuid', 'api_invitation_show', 'api_invitation_create'])]
+    #[Groups(['api_agencies_create', 'api_agencies_update', 'api_agencies_current', 'api_users_me', 'api_projects_get_by_uuid', 'api_invitations_show', 'api_invitations_create'])]
     private ?string $contactEmail = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_agency_create', 'api_agency_update', 'api_agency_current', 'api_user_me', 'api_project_get_by_uuid', 'api_invitation_show', 'api_invitation_create'])]
+    #[Groups(['api_agencies_create', 'api_agencies_update', 'api_agencies_current', 'api_users_me', 'api_projects_get_by_uuid', 'api_invitations_show', 'api_invitations_create'])]
     private ?string $website = null;
 
     #[ORM\Column(length: 255, unique: true, nullable: true)]
     private ?string $stripeCustomerId = null;
 
     #[ORM\Column]
-    #[Groups(['api_agency_create', 'api_agency_update'])]
+    #[Groups(['api_agencies_create', 'api_agencies_update'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    #[Groups(['api_agency_create', 'api_agency_update'])]
+    #[Groups(['api_agencies_create', 'api_agencies_update'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     /**

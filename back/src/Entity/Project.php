@@ -25,96 +25,96 @@ class Project
 
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
         'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
         'api_post_drafts_show', 'api_post_draft_media_versions_approve', 'api_post_draft_media_versions_request_changes', 'api_post_draft_media_version_comments_create',
     ])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
     ])]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen'
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen'
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen'
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen'
     ])]
     private ?\DateTimeImmutable $finishedAt = null;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ProjectType::class, nullable: true)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen',
-        'api_invitation_show',
-        'api_invitation_create',
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
     ])]
     private array $types = [];
 
     #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'projects')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    #[Groups(['api_project_get_by_uuid'])]
+    #[Groups(['api_projects_get_by_uuid'])]
     private ?Agency $agency = null;
 
     /**

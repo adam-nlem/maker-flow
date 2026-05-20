@@ -65,21 +65,21 @@ final class InvitationController extends AbstractController
         return $this->json(
             data: $invitation,
             status: Response::HTTP_CREATED,
-            context: ['groups' => ['api_invitation_create']],
+            context: ['groups' => ['api_invitations_create']],
         );
     }
 
-    #[Route('/{uuid}', name: 'api_invitations_delete', methods: ['DELETE'], requirements: ['uuid' => Requirement::UUID])]
+    #[Route('/{invitationUuid}', name: 'api_invitations_delete', methods: ['DELETE'], requirements: ['invitationUuid' => Requirement::UUID])]
     #[IsGranted(UserRole::Editor->value)]
     public function delete(
-        string $uuid,
+        string $invitationUuid,
         InvitationRepository $invitationRepository,
         AgencyRepository $agencyRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $invitation = $invitationRepository->getByUuid($uuid);
+        $invitation = $invitationRepository->getByUuid($invitationUuid);
 
         if ($invitation === null) {
             throw new InvitationNotFoundException();
@@ -124,7 +124,7 @@ final class InvitationController extends AbstractController
         return $this->json(
             data: $invitation,
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_invitation_show']],
+            context: ['groups' => ['api_invitations_show']],
         );
     }
 
@@ -148,7 +148,7 @@ final class InvitationController extends AbstractController
         $res = $this->json(
             data: $user,
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_user_me']],
+            context: ['groups' => ['api_users_me']],
         );
 
         $cookieService->addCookieToHeaders($authToken, $request, $res);

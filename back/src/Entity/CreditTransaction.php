@@ -20,39 +20,39 @@ class CreditTransaction
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_credit_transactions_list'])]
+    #[Groups(['api_credits_transactions_list'])]
     private ?string $uuid = null;
 
     #[ORM\Column(type: Types::INTEGER)]
-    #[Groups(['api_credit_transactions_list'])]
+    #[Groups(['api_credits_transactions_list'])]
     private ?int $amount = null;
 
     #[ORM\Column(enumType: CreditTransactionType::class)]
-    #[Groups(['api_credit_transactions_list'])]
+    #[Groups(['api_credits_transactions_list'])]
     private ?CreditTransactionType $type = null;
 
     #[ORM\Column(enumType: SourceBucket::class)]
-    #[Groups(['api_credit_transactions_list'])]
+    #[Groups(['api_credits_transactions_list'])]
     private ?SourceBucket $sourceBucket = null;
 
     #[ORM\Column(type: Types::INTEGER)]
-    #[Groups(['api_credit_transactions_list'])]
+    #[Groups(['api_credits_transactions_list'])]
     private ?int $balanceAfter = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_credit_transactions_list'])]
+    #[Groups(['api_credits_transactions_list'])]
     private ?string $stripePaymentIntentId = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['api_credit_transactions_list'])]
+    #[Groups(['api_credits_transactions_list'])]
     private ?string $stripeInvoiceId = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_credit_transactions_list'])]
+    #[Groups(['api_credits_transactions_list'])]
     private ?string $description = null;
 
     #[ORM\Column]
-    #[Groups(['api_credit_transactions_list'])]
+    #[Groups(['api_credits_transactions_list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]

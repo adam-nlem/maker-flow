@@ -20,56 +20,56 @@ class Invitation
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID, unique: true)]
-    #[Groups(['api_invitation_show', 'api_invitation_create', 'api_invitations_list'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create', 'api_invitations_list'])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255, unique: true)]
     private ?string $token = null;
 
     #[ORM\Column(length: 255, enumType: InvitationType::class)]
-    #[Groups(['api_invitation_show', 'api_invitation_create'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create'])]
     private ?InvitationType $type = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_invitation_show', 'api_invitation_create', 'api_invitations_list'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create', 'api_invitations_list'])]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_invitation_show', 'api_invitation_create', 'api_invitations_list'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create', 'api_invitations_list'])]
     private ?string $firstName = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_invitation_show', 'api_invitation_create', 'api_invitations_list'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create', 'api_invitations_list'])]
     private ?string $lastName = null;
 
     #[ORM\Column(length: 255, nullable: true, enumType: UserRole::class)]
-    #[Groups(['api_invitation_show', 'api_invitation_create', 'api_invitations_list'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create', 'api_invitations_list'])]
     private ?UserRole $role = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    #[Groups(['api_invitation_show', 'api_invitation_create'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create'])]
     private ?Agency $agency = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true, onDelete: 'CASCADE')]
-    #[Groups(['api_invitation_show', 'api_invitation_create'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create'])]
     private ?Project $project = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    #[Groups(['api_invitation_show', 'api_invitation_create'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create'])]
     private ?User $createdBy = null;
 
     #[ORM\Column]
-    #[Groups(['api_invitation_show', 'api_invitation_create', 'api_invitations_list'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create', 'api_invitations_list'])]
     private ?\DateTimeImmutable $expiresAt = null;
 
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $usedAt = null;
 
     #[ORM\Column]
-    #[Groups(['api_invitation_show', 'api_invitation_create', 'api_invitations_list'])]
+    #[Groups(['api_invitations_show', 'api_invitations_create', 'api_invitations_list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()

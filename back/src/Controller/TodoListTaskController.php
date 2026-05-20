@@ -23,7 +23,7 @@ use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/todo-lists/tasks', requirements: ['taskUuid' => Requirement::UUID])]
-class TodoListTaskController extends AbstractController
+final class TodoListTaskController extends AbstractController
 {
 
     #[Route('', name: 'api_todo_lists_tasks_list', methods: ['GET'])]

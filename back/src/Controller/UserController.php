@@ -29,7 +29,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/api/users')]
 final class UserController extends AbstractController
 {
-    #[Route('/logout', name: 'api_user_logout', methods: ["GET"])]
+    #[Route('/logout', name: 'api_users_logout', methods: ["GET"])]
     #[IsGranted(UserRole::User->value)]
     public function logout(
         Request $request,
@@ -48,7 +48,7 @@ final class UserController extends AbstractController
         return $response;
     }
 
-    #[Route('/register', name: 'api_user_register', methods: ["POST"])]
+    #[Route('/register', name: 'api_users_register', methods: ["POST"])]
     public function register(
         RegisterUserRequestDTO $dto,
         UserRepository $userRepository,
@@ -83,17 +83,17 @@ final class UserController extends AbstractController
         );
     }
 
-    #[Route('/me', name: 'api_user_me', methods: ["GET"])]
+    #[Route('/me', name: 'api_users_me', methods: ["GET"])]
     #[IsGranted(UserRole::User->value)]
     public function me(): Response
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        return $this->json(data: $user, status: Response::HTTP_CREATED, context: ['groups' => ['api_user_me']]);
+        return $this->json(data: $user, status: Response::HTTP_CREATED, context: ['groups' => ['api_users_me']]);
     }
 
-    #[Route('', name: 'api_user_update', methods: ["PATCH"])]
+    #[Route('', name: 'api_users_update', methods: ["PATCH"])]
     #[IsGranted(UserRole::User->value)]
     public function updateMe(
         UpdateUserRequestDTO $dto,
@@ -133,6 +133,6 @@ final class UserController extends AbstractController
 
         $userRepository->save($user, true);
 
-        return $this->json(data: $user, status: Response::HTTP_OK, context: ['groups' => ['api_user_update']]);
+        return $this->json(data: $user, status: Response::HTTP_OK, context: ['groups' => ['api_users_update']]);
     }
 }
