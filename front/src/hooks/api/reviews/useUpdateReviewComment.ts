@@ -32,9 +32,7 @@ export function useUpdateReviewComment() {
             );
             return ReviewWithLatestVersionDTO.fromJSON(response.data);
         },
-        onSuccess: (review, { reviewVersionUuid, reviewUuid, projectUuid }) => {
-            queryClient.setQueryData(reviewsQueryKeys.detail(reviewUuid), review);
-            queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.listAll(projectUuid) });
+        onSuccess: (_review, { reviewVersionUuid }) => {
             queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.comments(reviewVersionUuid) });
         },
     });
