@@ -39,10 +39,14 @@ function getSettingsBreadcrumbKeys(pathname: string, basePath: string): string[]
 
 /**
  * Checks whether a navigation item matches the current pathname.
- * Home is matched exactly so that nested agency routes (e.g. /agency/tasks)
+ * Home is matched exactly so that nested area routes (e.g. /agency/tasks)
  * don't keep Home selected; all other items use startsWith.
  */
-export function isNavigationItemSelected(item: NavigationItem, pathname: string): boolean {
-    const path = navigationItemToPath[item];
+export function isPathSelected(item: NavigationItem, path: string, pathname: string): boolean {
     return item === NavigationItem.Home ? pathname === path : pathname.startsWith(path);
+}
+
+/** Convenience overload for callers using the agency `navigationItemToPath` map. */
+export function isNavigationItemSelected(item: NavigationItem, pathname: string): boolean {
+    return isPathSelected(item, navigationItemToPath[item], pathname);
 }

@@ -1,7 +1,10 @@
 import { useMemo } from 'react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import { httpClient } from '~/services/httpClient/httpClient';
-import { Review } from '~/models/Review';
+import {
+    ReviewWithLatestVersionDTO,
+    type ReviewWithLatestVersionDTOJSON,
+} from '~/dtos/reviews/ReviewWithLatestVersionDTO';
 import type { ReviewStatus } from '~/models/enums/ReviewStatus';
 import { reviewsQueryKeys } from './reviewsQueryKeys';
 
@@ -16,7 +19,7 @@ export function useListPaginatedReviews({ projectUuid, limit = 20, status, searc
     const query = useInfiniteQuery({
         queryKey: reviewsQueryKeys.list(projectUuid ?? '', status, searchTerm),
         queryFn: async ({ pageParam }) => {
-            const res = await httpClient.get('/reviews', {
+            const res = await httpClient.get<ReviewWithLatestVersionDTOJSON[]>('/reviews', {
                 params: {
                     projectUuid,
                     page: pageParam,
@@ -25,7 +28,7 @@ export function useListPaginatedReviews({ projectUuid, limit = 20, status, searc
                     ...(searchTerm && { searchTerm }),
                 },
             });
-            return res.data.map((json: any) => Review.fromJSON(json));
+            return res.data.map((json) => ReviewWithLatestVersionDTO.fromJSON(json));
         },
         initialPageParam: 1,
         getNextPageParam: (lastPage, _, lastPageParam) =>

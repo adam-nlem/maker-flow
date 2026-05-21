@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\DTO\QueryParam\Review\ListReviewsQueryParamDTO;
 use App\DTO\Request\Review\CreateReviewRequestDTO;
 use App\DTO\Request\Review\UpdateReviewRequestDTO;
+use App\DTO\Response\Review\ReviewWithLatestVersionResponseDTO;
 use App\Entity\Enum\MediaType;
 use App\Entity\Enum\ReviewStatus;
 use App\Entity\Enum\UserRole;
@@ -64,8 +65,13 @@ final class ReviewController extends AbstractController
             $queryParamDto->getSearchTerm(),
         );
 
+        $items = array_map(
+            fn(Review $review) => ReviewWithLatestVersionResponseDTO::fromEntity($review),
+            $reviews,
+        );
+
         return $this->json(
-            data: $reviews,
+            data: $items,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_reviews_list']],
         );
@@ -84,7 +90,7 @@ final class ReviewController extends AbstractController
         $this->denyAccessUnlessGranted(ProjectVoter::VIEW, $review->getProject());
 
         return $this->json(
-            data: $review,
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_reviews_show']],
         );
@@ -158,9 +164,9 @@ final class ReviewController extends AbstractController
         }
 
         return $this->json(
-            data: $review,
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
             status: Response::HTTP_CREATED,
-            context: ['groups' => ['api_reviews_show']],
+            context: ['groups' => ['api_reviews_create']],
         );
     }
 
@@ -218,9 +224,9 @@ final class ReviewController extends AbstractController
         }
 
         return $this->json(
-            data: $review,
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_reviews_show']],
+            context: ['groups' => ['api_reviews_update']],
         );
     }
 

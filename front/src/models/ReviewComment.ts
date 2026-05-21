@@ -8,7 +8,7 @@ export interface ReviewCommentJSON {
     videoTimecodeSeconds: number | null;
     createdAt: string;
     author: UserJSON | null;
-    parentComment?: { uuid: string } | null;
+    parentCommentUuid?: string | null;
     replies?: ReviewCommentJSON[];
 }
 
@@ -32,7 +32,7 @@ export class ReviewComment {
             json.videoTimecodeSeconds ?? null,
             json.createdAt,
             json.author ? User.fromJSON(json.author) : null,
-            json.parentComment?.uuid ?? null,
+            json.parentCommentUuid ?? null,
             (json.replies ?? []).map(ReviewComment.fromJSON),
         );
     }
@@ -45,7 +45,7 @@ export class ReviewComment {
             videoTimecodeSeconds: this.videoTimecodeSeconds,
             createdAt: this.createdAt,
             author: this.author?.toJSON() ?? null,
-            parentComment: this.parentCommentUuid ? { uuid: this.parentCommentUuid } : null,
+            parentCommentUuid: this.parentCommentUuid,
             replies: this.replies.map(r => r.toJSON()),
         };
     }

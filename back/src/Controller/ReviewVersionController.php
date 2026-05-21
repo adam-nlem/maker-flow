@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\DTO\QueryParam\Review\StreamFileQueryParamDTO;
 use App\DTO\QueryParam\Review\StreamHlsQueryParamDTO;
 use App\DTO\Request\Review\RequestChangesOnReviewVersionRequestDTO;
+use App\DTO\Response\Review\ReviewWithLatestVersionResponseDTO;
 use App\Entity\Enum\ReviewStatus;
 use App\Entity\Enum\UserRole;
 use App\Entity\ReviewComment;
@@ -130,7 +131,7 @@ final class ReviewVersionController extends AbstractController
         $reviewVersionRepository->save($reviewVersion, true);
 
         return $this->json(
-            data: $review,
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_review_versions_approve']],
         );
@@ -176,7 +177,7 @@ final class ReviewVersionController extends AbstractController
         $reviewCommentRepository->save($comment, true);
 
         return $this->json(
-            data: $review,
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_review_versions_request_changes']],
         );

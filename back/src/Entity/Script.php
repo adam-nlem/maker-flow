@@ -32,7 +32,13 @@ class Script
         'api_post_groups_list',
         'api_post_groups_show',
         'api_reviews_list',
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
     ])]
     private ?string $uuid = null;
 
@@ -46,7 +52,13 @@ class Script
         'api_post_groups_list',
         'api_post_groups_show',
         'api_reviews_list',
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
     ])]
     private ?string $title = null;
 

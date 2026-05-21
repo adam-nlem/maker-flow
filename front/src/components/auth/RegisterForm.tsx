@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ArrowRightIcon, EnvelopeIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import { ArrowRightIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
 
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
@@ -24,8 +24,6 @@ export default function RegisterForm({ onRegistered, initialEmail = "" }: Regist
     const [email, setEmail] = useState(initialEmail)
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
-    const [showPassword, setShowPassword] = useState(false)
-    const [showConfirmPassword, setShowConfirmPassword] = useState(false)
     const [validationErrorKey, setValidationErrorKey] = useState<string | null>(null)
 
     const { register, isPending, error } = useRegister()
@@ -46,25 +44,6 @@ export default function RegisterForm({ onRegistered, initialEmail = "" }: Regist
     }
 
     const errorMessage = (validationErrorKey ? t(validationErrorKey) : null) || (error?.message ?? null)
-
-    const passwordTrailing = (
-        <button
-            type="button"
-            onClick={() => setShowPassword((v) => !v)}
-            className="text-muted-2 hover:text-dark transition-colors"
-        >
-            {showPassword ? <EyeSlashIcon className="size-4" /> : <EyeIcon className="size-4" />}
-        </button>
-    )
-    const confirmTrailing = (
-        <button
-            type="button"
-            onClick={() => setShowConfirmPassword((v) => !v)}
-            className="text-muted-2 hover:text-dark transition-colors"
-        >
-            {showConfirmPassword ? <EyeSlashIcon className="size-4" /> : <EyeIcon className="size-4" />}
-        </button>
-    )
 
     return (
         <>
@@ -115,12 +94,11 @@ export default function RegisterForm({ onRegistered, initialEmail = "" }: Regist
                     label={t("auth:fields.password")}
                     id="password"
                     name="password"
-                    type={showPassword ? "text" : "password"}
+                    type="password"
                     autoComplete="new-password"
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    trailingIcon={passwordTrailing}
                 />
                 {password.length > 0 && (
                     <PasswordRules rules={getPasswordRules(password)} />
@@ -130,12 +108,11 @@ export default function RegisterForm({ onRegistered, initialEmail = "" }: Regist
                     label={t("auth:fields.confirmPassword")}
                     id="confirmPassword"
                     name="confirmPassword"
-                    type={showConfirmPassword ? "text" : "password"}
+                    type="password"
                     autoComplete="new-password"
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    trailingIcon={confirmTrailing}
                 />
 
                 <Button

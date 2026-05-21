@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\DTO\QueryParam\Review\ListReviewCommentsQueryParamDTO;
 use App\DTO\Request\Review\CreateReviewCommentRequestDTO;
 use App\DTO\Request\Review\UpdateReviewCommentRequestDTO;
+use App\DTO\Response\Review\ReviewWithLatestVersionResponseDTO;
 use App\Entity\Enum\UserRole;
 use App\Entity\ReviewComment;
 use App\Entity\User;
@@ -30,6 +32,34 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/api/review-comments')]
 final class ReviewCommentController extends AbstractController
 {
+    #[Route('', name: 'api_review_comments_list', methods: ['GET'])]
+    #[IsGranted(UserRole::User->value)]
+    public function list(
+        ListReviewCommentsQueryParamDTO $queryParamDto,
+        ReviewVersionRepository $reviewVersionRepository,
+        ReviewCommentRepository $reviewCommentRepository,
+    ): JsonResponse {
+        $reviewVersion = $reviewVersionRepository->getByUuid($queryParamDto->getReviewVersionUuid());
+
+        if ($reviewVersion === null) {
+            throw new MissingReviewException();
+        }
+
+        $this->denyAccessUnlessGranted(ProjectVoter::VIEW, $reviewVersion->getReview()->getProject());
+
+        $comments = $reviewCommentRepository->getByReviewVersionPaginated(
+            $reviewVersion,
+            $queryParamDto->getPage(),
+            $queryParamDto->getLimit(),
+        );
+
+        return $this->json(
+            data: $comments,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_review_comments_list']],
+        );
+    }
+
     #[Route('', name: 'api_review_comments_create', methods: ['POST'])]
     #[IsGranted(UserRole::User->value)]
     public function create(
@@ -84,7 +114,7 @@ final class ReviewCommentController extends AbstractController
         $reviewCommentRepository->save($comment, true);
 
         return $this->json(
-            data: $review,
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_review_comments_create']],
         );
@@ -165,9 +195,9 @@ final class ReviewCommentController extends AbstractController
         $reviewCommentRepository->save($comment, true);
 
         return $this->json(
-            data: $review,
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
             status: Response::HTTP_OK,
-            context: ['groups' => ['api_reviews_show']],
+            context: ['groups' => ['api_review_comments_update']],
         );
     }
 }

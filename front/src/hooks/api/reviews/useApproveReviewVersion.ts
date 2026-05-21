@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '~/services/httpClient/httpClient';
-import { Review, type ReviewJSON } from '~/models/Review';
+import {
+    ReviewWithLatestVersionDTO,
+    type ReviewWithLatestVersionDTOJSON,
+} from '~/dtos/reviews/ReviewWithLatestVersionDTO';
 import { reviewsQueryKeys } from './reviewsQueryKeys';
 
 interface ApproveReviewVersionData {
@@ -14,10 +17,10 @@ export function useApproveReviewVersion() {
 
     const mutation = useMutation({
         mutationFn: async (data: ApproveReviewVersionData) => {
-            const response = await httpClient.post<ReviewJSON>(
+            const response = await httpClient.post<ReviewWithLatestVersionDTOJSON>(
                 `/review-versions/${data.reviewVersionUuid}/approve`,
             );
-            return Review.fromJSON(response.data);
+            return ReviewWithLatestVersionDTO.fromJSON(response.data);
         },
         onSuccess: (review, variables) => {
             queryClient.setQueryData(reviewsQueryKeys.detail(variables.reviewUuid), review);

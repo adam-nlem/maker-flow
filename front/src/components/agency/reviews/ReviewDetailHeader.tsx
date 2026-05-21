@@ -2,28 +2,28 @@ import { useTranslation } from "react-i18next";
 import { PencilSquareIcon, TrashIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
 import { Input } from "~/components/ui/Input";
-import { PostDraft } from "~/models/PostDraft";
+import { Review } from "~/models/Review";
 import { mediaTypeToIcon } from "~/models/enums/MediaType";
-import type { PostDraftEditForm } from "~/hooks/usePostDraftEditForm";
+import type { ReviewEditForm } from "~/hooks/useReviewEditForm";
 import { formatToRelative } from "~/utils/dateFormatters";
 
-interface PostDraftDetailHeaderProps {
-    postDraft: PostDraft;
-    form: PostDraftEditForm;
+interface ReviewDetailHeaderProps {
+    review: Review;
+    form: ReviewEditForm;
     onOpenLinkedScript: (scriptUuid: string) => void;
     onDeleteClick: () => void;
 }
 
-export default function PostDraftDetailHeader({
-    postDraft,
+export default function ReviewDetailHeader({
+    review,
     form,
     onOpenLinkedScript,
     onDeleteClick,
-}: PostDraftDetailHeaderProps) {
+}: ReviewDetailHeaderProps) {
     const { t } = useTranslation();
-    const MediaTypeIcon = mediaTypeToIcon[postDraft.mediaType];
-    const typeLabel = t(`postDrafts:detail.eyebrow.${postDraft.mediaType}`);
-    const relativeCreatedAt = formatToRelative(new Date(postDraft.createdAt));
+    const MediaTypeIcon = mediaTypeToIcon[review.mediaType];
+    const typeLabel = t(`reviews:detail.eyebrow.${review.mediaType}`);
+    const relativeCreatedAt = formatToRelative(new Date(review.createdAt));
 
     return (
         <header className="flex flex-row items-start justify-between gap-4 mb-5">
@@ -32,16 +32,16 @@ export default function PostDraftDetailHeader({
                     <MediaTypeIcon className="size-3.5" />
                     <span>{typeLabel}</span>
                     <span aria-hidden className="text-pale-gray-2">·</span>
-                    <span>v{postDraft.mediaVersions.length} · {relativeCreatedAt}</span>
-                    {postDraft.script && !form.canEdit && (
+                    <span>{relativeCreatedAt}</span>
+                    {review.script && !form.canEdit && (
                         <>
                             <span aria-hidden className="text-pale-gray-2">·</span>
                             <button
                                 type="button"
-                                onClick={() => onOpenLinkedScript(postDraft.script!.uuid)}
+                                onClick={() => onOpenLinkedScript(review.script!.uuid)}
                                 className="uppercase tracking-wider hover:text-dark transition-colors cursor-pointer"
                             >
-                                {t("postDrafts:detail.fromScript", { title: postDraft.script.title })}
+                                {t("reviews:detail.fromScript", { title: review.script.title })}
                             </button>
                         </>
                     )}
@@ -54,10 +54,10 @@ export default function PostDraftDetailHeader({
                         simple
                         required
                         textStyle="text-heading-2xl"
-                        placeholder={t("postDrafts:form.titlePlaceholder")}
+                        placeholder={t("reviews:form.titlePlaceholder")}
                     />
                 ) : (
-                    <h1 className="text-heading-2xl text-dark wrap-break-word">{postDraft.title}</h1>
+                    <h1 className="text-heading-2xl text-dark wrap-break-word">{review.title}</h1>
                 )}
             </div>
 
@@ -71,12 +71,12 @@ export default function PostDraftDetailHeader({
                         disabled={form.isPending}
                     >
                         <PencilSquareIcon className="size-4 mr-1" strokeWidth={2} />
-                        {t("postDrafts:actions.save")}
+                        {t("reviews:actions.save")}
                     </Button>
                 )}
                 <Button type="button" style="secondary" width="w-auto" onClick={onDeleteClick}>
                     <TrashIcon className="size-4 mr-1" strokeWidth={2} />
-                    {t("postDrafts:actions.delete")}
+                    {t("reviews:actions.delete")}
                 </Button>
             </div>
         </header>

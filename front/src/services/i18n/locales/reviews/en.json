@@ -116,12 +116,10 @@
         "confirm": "Delete review"
     },
     "comments": {
-        "title": "Feedback history",
-        "versionLabel": "Version {{number}}",
-        "uploadedOn": "Uploaded on {{date}}",
-        "commentCount_one": "{{count}} comment",
-        "commentCount_other": "{{count}} comments",
-        "noComments": "No comments on this version.",
+        "title": "Feedback",
+        "loading": "Loading comments…",
+        "loadMore": "Load more comments",
+        "noComments": "No comments yet.",
         "unknownAuthor": "Unknown",
         "resolved": "Resolved",
         "open": "Open",

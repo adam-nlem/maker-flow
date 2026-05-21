@@ -21,7 +21,7 @@ class ReviewComment
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups(['api_review_comments_list'])]
     private ?string $uuid = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
@@ -37,28 +37,28 @@ class ReviewComment
      */
     #[ORM\OneToMany(targetEntity: self::class, mappedBy: 'parentComment', cascade: ['remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'ASC'])]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups(['api_review_comments_list'])]
     private Collection $replies;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups(['api_review_comments_list'])]
     private ?User $author = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups(['api_review_comments_list'])]
     private ?string $body = null;
 
     #[ORM\Column(length: 32, enumType: ReviewCommentStatus::class)]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups(['api_review_comments_list'])]
     private ReviewCommentStatus $status = ReviewCommentStatus::Open;
 
     #[ORM\Column(type: Types::FLOAT, nullable: true)]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups(['api_review_comments_list'])]
     private ?float $videoTimecodeSeconds = null;
 
     #[ORM\Column]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups(['api_review_comments_list'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
@@ -118,6 +118,12 @@ class ReviewComment
     public function isTopLevel(): bool
     {
         return $this->parentComment === null;
+    }
+
+    #[Groups(['api_review_comments_list'])]
+    public function getParentCommentUuid(): ?string
+    {
+        return $this->parentComment?->getUuid();
     }
 
     /**

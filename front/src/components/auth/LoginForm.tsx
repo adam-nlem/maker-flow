@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ArrowRightIcon, EnvelopeIcon, EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline"
+import { ArrowRightIcon, EnvelopeIcon } from "@heroicons/react/24/outline"
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
 import SimpleTextButton from "~/components/ui/SimpleTextButton"
@@ -21,7 +21,6 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, onForgotPassw
 
     const [email, setEmail] = useState(initialEmail)
     const [password, setPassword] = useState("")
-    const [showPassword, setShowPassword] = useState(false)
 
     const { login, isPending } = useLogin()
 
@@ -70,22 +69,11 @@ export default function LoginForm({ onLoginSuccess, onOtpRequired, onForgotPassw
                 )}
                 id="password"
                 name="password"
-                type={showPassword ? "text" : "password"}
+                type="password"
                 autoComplete="current-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                trailingIcon={
-                    <button
-                        type="button"
-                        onClick={() => setShowPassword((v) => !v)}
-                        className="text-muted-2 hover:text-dark transition-colors"
-                    >
-                        {showPassword
-                            ? <EyeSlashIcon className="size-4" />
-                            : <EyeIcon className="size-4" />}
-                    </button>
-                }
             />
 
             <Button

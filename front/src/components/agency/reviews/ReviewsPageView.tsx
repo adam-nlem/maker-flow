@@ -1,29 +1,29 @@
-import { usePostDraftsStore } from "~/stores/postDrafts/postDraftsStore";
-import PostDraftsLayout from "~/components/postDrafts/PostDraftsLayout";
-import PostDraftDetailPanel from "./PostDraftDetailPanel";
-import CreatePostDraftModal from "./CreatePostDraftModal";
+import { useReviewsStore } from "~/stores/reviews/reviewsStore";
+import ReviewsLayout from "~/components/reviews/ReviewsLayout";
+import ReviewDetailPanel from "./ReviewDetailPanel";
+import CreateReviewModal from "./CreateReviewModal";
 
-interface PostDraftsPageViewProps {
+interface ReviewsPageViewProps {
     projectUuid: string;
 }
 
-export default function PostDraftsPageView({ projectUuid }: PostDraftsPageViewProps) {
-    const selectedDraftUuid = usePostDraftsStore((s) => s.selectedDraftUuid);
-    const isCreatePanelOpen = usePostDraftsStore((s) => s.isCreatePanelOpen);
-    const openCreatePanel = usePostDraftsStore((s) => s.openCreatePanel);
-    const closeCreatePanel = usePostDraftsStore((s) => s.closeCreatePanel);
+export default function ReviewsPageView({ projectUuid }: ReviewsPageViewProps) {
+    const selectedReviewUuid = useReviewsStore((s) => s.selectedReviewUuid);
+    const isCreatePanelOpen = useReviewsStore((s) => s.isCreatePanelOpen);
+    const openCreatePanel = useReviewsStore((s) => s.openCreatePanel);
+    const closeCreatePanel = useReviewsStore((s) => s.closeCreatePanel);
 
     return (
         <>
-            <PostDraftsLayout
+            <ReviewsLayout
                 projectUuid={projectUuid}
-                onCreateDraft={openCreatePanel}
-                hasSelection={selectedDraftUuid !== null}
-                detail={selectedDraftUuid && (
-                    <PostDraftDetailPanel projectUuid={projectUuid} draftUuid={selectedDraftUuid} />
+                onCreateReview={openCreatePanel}
+                hasSelection={selectedReviewUuid !== null}
+                detail={selectedReviewUuid && (
+                    <ReviewDetailPanel projectUuid={projectUuid} draftUuid={selectedReviewUuid} />
                 )}
             />
-            <CreatePostDraftModal
+            <CreateReviewModal
                 projectUuid={projectUuid}
                 showModal={isCreatePanelOpen}
                 onClose={closeCreatePanel}

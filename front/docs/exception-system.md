@@ -65,7 +65,7 @@ Takes any error, returns the localized user-facing message (resolved through i18
 
 `errorCodeKeys` is a `Record<number, string>` mapping backend error codes to **i18n keys** (e.g. `errors:agency.missing`). The keys resolve to the messages in `services/i18n/locales/errors/{en,fr}.json`. Unknown codes fall back to `errors:fallback`.
 
-The numeric code is computed by the backend as `DomainCode.value * 1000 + codeSuffix` (see `back/src/Exception/AppException.php` and `back/src/Exception/DomainCode.php`). Each domain owns a 1000-code block — e.g. PostDraft (`DomainCode::PostDraft = 33`) occupies `33xxx`.
+The numeric code is computed by the backend as `DomainCode.value * 1000 + codeSuffix` (see `back/src/Exception/AppException.php` and `back/src/Exception/DomainCode.php`). Each domain owns a 1000-code block — e.g. Review (`DomainCode::Review = 33`) occupies `33xxx`.
 
 ### Current domain blocks
 
@@ -94,25 +94,25 @@ The numeric code is computed by the backend as `DomainCode.value * 1000 + codeSu
 | 30xxx | ProjectClient | `errors:projectClient.*` |
 | 31xxx | AgencyCollaborator | `errors:agencyCollaborator.*` |
 | 32xxx | Onboarding | `errors:onboarding.*` |
-| 33xxx | PostDraft | `errors:postDraft.*` |
+| 33xxx | Review | `errors:review.*` |
 
 ### Adding a new error code
 
 1. Backend adds a new `AppException` subclass with a `self::CODE` constant (the suffix) and `getDomainCode()` returning the matching `DomainCode` case.
 2. Add the resolved numeric code (`domainValue * 1000 + suffix`) + i18n key to `errorCodeMessages.ts`:
    ```ts
-   33005: 'errors:postDraft.somethingElse',
+   33005: 'errors:review.somethingElse',
    ```
 3. Add the message under that key in both `services/i18n/locales/errors/en.json` and `…/fr.json`.
 4. The global handler (`handleMutationError`) will automatically show the correct toast.
 
 #### Meta-driven resolution
 
-When the same error code can carry several user-facing reasons (e.g. `PostDraftFileInvalidException` / `AgencyLogoInvalidException` with `meta.reason`), mirror the backend enum under `models/enums/` along with a translation key map (see `FileInvalidReason.ts` / `OAuthErrorCode.ts`), then pass a resolver function instead of a string in `errorCodeMessages.ts`:
+When the same error code can carry several user-facing reasons (e.g. `ReviewFileInvalidException` / `AgencyLogoInvalidException` with `meta.reason`), mirror the backend enum under `models/enums/` along with a translation key map (see `FileInvalidReason.ts` / `OAuthErrorCode.ts`), then pass a resolver function instead of a string in `errorCodeMessages.ts`:
 
 ```ts
 27004: (meta) => resolveFileInvalidReason(meta, 'errors:agency.logoInvalid'),
-33001: (meta) => resolveFileInvalidReason(meta, 'errors:postDraft.fileInvalid'),
+33001: (meta) => resolveFileInvalidReason(meta, 'errors:review.fileInvalid'),
 ```
 
 The local `resolveFileInvalidReason(meta, fallbackKey)` helper looks up `meta.reason` in `FileInvalidReason` and falls back to the supplied key if the reason is missing or unknown. Add a similar helper if you introduce another shared meta enum.

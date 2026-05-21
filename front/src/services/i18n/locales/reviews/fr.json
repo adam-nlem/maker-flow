@@ -116,12 +116,10 @@
         "confirm": "Supprimer la review"
     },
     "comments": {
-        "title": "Historique des retours",
-        "versionLabel": "Version {{number}}",
-        "uploadedOn": "Mise en ligne le {{date}}",
-        "commentCount_one": "{{count}} commentaire",
-        "commentCount_other": "{{count}} commentaires",
-        "noComments": "Aucun commentaire sur cette version.",
+        "title": "Retours",
+        "loading": "Chargement des commentaires…",
+        "loadMore": "Charger plus de commentaires",
+        "noComments": "Aucun commentaire pour le moment.",
         "unknownAuthor": "Inconnu",
         "resolved": "Résolu",
         "open": "Ouvert",

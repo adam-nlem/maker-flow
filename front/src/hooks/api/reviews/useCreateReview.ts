@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '~/services/httpClient/httpClient';
-import { Review } from '~/models/Review';
+import {
+    ReviewWithLatestVersionDTO,
+    type ReviewWithLatestVersionDTOJSON,
+} from '~/dtos/reviews/ReviewWithLatestVersionDTO';
 import type { MediaType } from '~/models/enums/MediaType';
 import { validateReviewFiles } from '~/utils/reviewFileValidation';
 import { reviewsQueryKeys } from './reviewsQueryKeys';
@@ -35,18 +38,18 @@ export function useCreateReview() {
                 formData.append('files[]', file);
             }
 
-            const res = await httpClient.post('/reviews', formData, {
+            const res = await httpClient.post<ReviewWithLatestVersionDTOJSON>('/reviews', formData, {
                 headers: { 'Content-Type': 'multipart/form-data' },
             });
 
-            return Review.fromJSON(res.data);
+            return ReviewWithLatestVersionDTO.fromJSON(res.data);
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.listAll(variables.projectUuid) });
         },
     });
 
-    const createReview = async (data: CreateReviewData): Promise<Review | undefined> => {
+    const createReview = async (data: CreateReviewData): Promise<ReviewWithLatestVersionDTO | undefined> => {
         if (!data.title.trim()) {
             setValidationErrorKey('reviews:validation.titleRequired');
             return;

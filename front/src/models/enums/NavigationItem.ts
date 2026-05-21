@@ -1,7 +1,17 @@
 import type { ComponentType, SVGProps } from "react";
 import { CalendarDaysIcon, ChartBarIcon, ClipboardDocumentCheckIcon, DocumentDuplicateIcon, HomeIcon } from "@heroicons/react/24/outline";
 import { CalendarDaysIcon as CalendarDaysIconSolid, ChartBarIcon as ChartBarIconSolid, ClipboardDocumentCheckIcon as ClipboardDocumentCheckIconSolid, DocumentDuplicateIcon as DocumentDuplicateIconSolid, HomeIcon as HomeIconSolid } from "@heroicons/react/24/solid";
-import { agencyHomePath, agencyScriptsPath, agencyCalendarPath, agencyReviewsPath, agencyContentsPath, agencyTasksPath } from "~/routes/routePaths";
+import {
+    agencyHomePath,
+    agencyScriptsPath,
+    agencyCalendarPath,
+    agencyReviewsPath,
+    agencyContentsPath,
+    agencyTasksPath,
+    clientHomePath,
+    clientReviewsPath,
+    clientContentsPath,
+} from "~/routes/routePaths";
 
 export enum NavigationItem {
     Home = 'home',
@@ -20,6 +30,12 @@ export const sidebarMainNavigationItems: NavigationItem[] = [
     NavigationItem.Calendar,
     NavigationItem.Reviews,
     NavigationItem.Contents,
+];
+
+export const clientSidebarNavigationItems: { item: NavigationItem; path: string }[] = [
+    { item: NavigationItem.Home, path: clientHomePath },
+    { item: NavigationItem.Reviews, path: clientReviewsPath },
+    { item: NavigationItem.Contents, path: clientContentsPath },
 ];
 
 export const navigationItemTranslationKeys: Record<NavigationItem, string> = {

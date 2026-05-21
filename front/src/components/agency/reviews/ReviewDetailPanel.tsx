@@ -1,39 +1,39 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { Banner } from "~/components/ui/Banner";
 import ConfirmDeleteDialog from "~/components/ui/ConfirmDeleteDialog";
-import PostDraftMediaViewer from "~/components/postDrafts/PostDraftMediaViewer";
-import PostDraftCommentsTimeline from "~/components/postDrafts/PostDraftCommentsTimeline";
-import PostDraftDetailHeader from "./PostDraftDetailHeader";
-import PostDraftDetailBody from "./PostDraftDetailBody";
-import PostDraftDetailSideCard from "./PostDraftDetailSideCard";
-import { useShowPostDraft } from "~/hooks/api/postDrafts/useShowPostDraft";
-import { useDeletePostDraft } from "~/hooks/api/postDrafts/useDeletePostDraft";
-import { usePostDraftEditForm } from "~/hooks/usePostDraftEditForm";
-import { usePostDraftsStore } from "~/stores/postDrafts/postDraftsStore";
+import ReviewMediaViewer from "~/components/reviews/ReviewMediaViewer";
+import ReviewCommentsTimeline from "~/components/reviews/ReviewCommentsTimeline";
+import ReviewDetailHeader from "./ReviewDetailHeader";
+import ReviewDetailBody from "./ReviewDetailBody";
+import ReviewDetailSideCard from "./ReviewDetailSideCard";
+import { useShowReview } from "~/hooks/api/reviews/useShowReview";
+import { useDeleteReview } from "~/hooks/api/reviews/useDeleteReview";
+import { useReviewEditForm } from "~/hooks/useReviewEditForm";
+import { useReviewsStore } from "~/stores/reviews/reviewsStore";
 import { useFocusScriptStore } from "~/stores/scripts/focusScriptStore";
 import { agencyScriptsPath } from "~/routes/routePaths";
-import { PostDraft } from "~/models/PostDraft";
+import { Review } from "~/models/Review";
 import {
-    PostDraftStatus,
-    postDraftStatusToBannerSubtitleKey,
-    postDraftStatusToBannerTitleKey,
-    postDraftStatusToBgClass,
-    postDraftStatusToBorderClass,
-    postDraftStatusToIcon,
-    postDraftStatusToTextClass,
-} from "~/models/enums/PostDraftStatus";
+    ReviewStatus,
+    reviewStatusToBannerSubtitleKey,
+    reviewStatusToBannerTitleKey,
+    reviewStatusToBgClass,
+    reviewStatusToBorderClass,
+    reviewStatusToIcon,
+    reviewStatusToTextClass,
+} from "~/models/enums/ReviewStatus";
 
-interface PostDraftDetailPanelProps {
+interface ReviewDetailPanelProps {
     projectUuid: string;
     draftUuid: string;
 }
 
-export default function PostDraftDetailPanel({ projectUuid, draftUuid }: PostDraftDetailPanelProps) {
-    const { postDraft, isLoading } = useShowPostDraft(draftUuid);
+export default function ReviewDetailPanel({ projectUuid, draftUuid }: ReviewDetailPanelProps) {
+    const { review, isLoading } = useShowReview(draftUuid);
 
-    if (isLoading || !postDraft) {
+    if (isLoading || !review) {
         return (
             <div className="mx-auto px-10 py-7 flex items-center justify-center h-64">
                 <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
@@ -41,21 +41,21 @@ export default function PostDraftDetailPanel({ projectUuid, draftUuid }: PostDra
         );
     }
 
-    return <LoadedPostDraftDetailPanel postDraft={postDraft} projectUuid={projectUuid} />;
+    return <LoadedReviewDetailPanel review={review} projectUuid={projectUuid} />;
 }
 
-interface LoadedPostDraftDetailPanelProps {
-    postDraft: PostDraft;
+interface LoadedReviewDetailPanelProps {
+    review: Review;
     projectUuid: string;
 }
 
-function LoadedPostDraftDetailPanel({ postDraft, projectUuid }: LoadedPostDraftDetailPanelProps) {
+function LoadedReviewDetailPanel({ review, projectUuid }: LoadedReviewDetailPanelProps) {
     const { t } = useTranslation();
     const navigate = useNavigate();
-    const closeAll = usePostDraftsStore((s) => s.closeAll);
+    const closeAll = useReviewsStore((s) => s.closeAll);
     const setFocusedScriptUuid = useFocusScriptStore((s) => s.setFocusedScriptUuid);
-    const form = usePostDraftEditForm(postDraft, projectUuid);
-    const { deletePostDraft, isPending: isDeleting } = useDeletePostDraft();
+    const form = useReviewEditForm(review, projectUuid);
+    const { deleteReview, isPending: isDeleting } = useDeleteReview();
     const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
     const openLinkedScript = (scriptUuid: string) => {
@@ -64,12 +64,13 @@ function LoadedPostDraftDetailPanel({ postDraft, projectUuid }: LoadedPostDraftD
     };
 
     const handleDeleteConfirmed = async () => {
-        await deletePostDraft({ uuid: postDraft.uuid, projectUuid });
+        await deleteReview({ uuid: review.uuid, projectUuid });
         setIsDeleteDialogOpen(false);
         closeAll();
     };
 
-    const status = postDraft.currentStatus ?? PostDraftStatus.AwaitingReview;
+    const status = review.currentStatus ?? ReviewStatus.Pending;
+    const videoElementRef = useRef<HTMLVideoElement>(null);
 
     return (
         <form
@@ -81,41 +82,45 @@ function LoadedPostDraftDetailPanel({ postDraft, projectUuid }: LoadedPostDraftD
         >
             <Banner
                 className="mb-6"
-                icon={postDraftStatusToIcon[status]}
-                title={t(postDraftStatusToBannerTitleKey[status])}
-                subtitle={t(postDraftStatusToBannerSubtitleKey[status])}
-                bgClassName={postDraftStatusToBgClass[status]}
-                textClassName={postDraftStatusToTextClass[status]}
-                borderClassName={postDraftStatusToBorderClass[status]}
+                icon={reviewStatusToIcon[status]}
+                title={t(reviewStatusToBannerTitleKey[status])}
+                subtitle={t(reviewStatusToBannerSubtitleKey[status])}
+                bgClassName={reviewStatusToBgClass[status]}
+                textClassName={reviewStatusToTextClass[status]}
+                borderClassName={reviewStatusToBorderClass[status]}
             />
 
-            <PostDraftDetailHeader
-                postDraft={postDraft}
+            <ReviewDetailHeader
+                review={review}
                 form={form}
                 onOpenLinkedScript={openLinkedScript}
                 onDeleteClick={() => setIsDeleteDialogOpen(true)}
             />
 
-            {postDraft.latestMediaVersion && (
-                <PostDraftMediaViewer mediaVersion={postDraft.latestMediaVersion} mediaType={postDraft.mediaType} />
+            {review.latestVersion && (
+                <ReviewMediaViewer
+                    reviewVersion={review.latestVersion}
+                    mediaType={review.mediaType}
+                    videoElementRef={videoElementRef}
+                />
             )}
 
             <div className="flex flex-row gap-3 mt-3.5">
-                <PostDraftDetailBody postDraft={postDraft} projectUuid={projectUuid} form={form} />
-                <PostDraftDetailSideCard
-                    postDraft={postDraft}
-                    onLinkedScriptClick={form.canEdit ? undefined : () => openLinkedScript(postDraft.script!.uuid)}
+                <ReviewDetailBody review={review} projectUuid={projectUuid} form={form} />
+                <ReviewDetailSideCard
+                    review={review}
+                    onLinkedScriptClick={form.canEdit ? undefined : () => openLinkedScript(review.script!.uuid)}
                 />
             </div>
 
-            <PostDraftCommentsTimeline postDraft={postDraft} projectUuid={projectUuid} />
+            <ReviewCommentsTimeline review={review} projectUuid={projectUuid} videoElementRef={videoElementRef} />
 
             <ConfirmDeleteDialog
                 isOpen={isDeleteDialogOpen}
                 onClose={() => setIsDeleteDialogOpen(false)}
                 onConfirm={handleDeleteConfirmed}
                 isPending={isDeleting}
-                message={t("postDrafts:delete.confirmBody")}
+                message={t("reviews:delete.confirmBody")}
             />
         </form>
     );

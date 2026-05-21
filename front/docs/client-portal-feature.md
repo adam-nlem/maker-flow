@@ -6,7 +6,7 @@ The frontend exposes two role-distinct shells over the same authentication: an *
 
 A public `/invite/:token` page sits outside both shells and turns an emailed invitation link into a logged-in client or collaborator session.
 
-The client dashboard (Phase 7) lives at `/client` and renders the same analytics widgets as the agency home, scoped to the client's single project. Phase 8 adds `/client/contents` (a read-only view of the agency-side Contents page) and exposes OAuth integration management to clients (Connect CTA on `/client` home + sidebar "Integrations" tile). Phase 2 of the Post Draft workflow adds `/client/drafts` — clients review the agency's content uploads and either approve them in one click or open a modal to send written feedback. See [post-draft-feature.md](post-draft-feature.md) for the full feature.
+The client dashboard (Phase 7) lives at `/client` and renders the same analytics widgets as the agency home, scoped to the client's single project. Phase 8 adds `/client/contents` (a read-only view of the agency-side Contents page) and exposes OAuth integration management to clients (Connect CTA on `/client` home + sidebar "Integrations" tile). Phase 2 of the Post Draft workflow adds `/client/reviews` — clients review the agency's content uploads and either approve them in one click or open a modal to send written feedback. See [review-feature.md](review-feature.md) for the full feature.
 
 ## Role-based routing
 
@@ -32,7 +32,7 @@ export const agencyTasksPath = `${agencyAreaPrefix}/tasks`
 // ...
 export const clientAreaPrefix = '/client'
 export const clientHomePath = clientAreaPrefix
-export const clientDraftsPath = `${clientAreaPrefix}/drafts`
+export const clientReviewsPath = `${clientAreaPrefix}/drafts`
 export const clientContentsPath = `${clientAreaPrefix}/contents`
 export const clientSettingsPath = `${clientAreaPrefix}/settings`
 export const clientSettingsGeneralPath = `${clientSettingsPath}/general`

@@ -22,31 +22,91 @@ class Review
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?string $title = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?string $description = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?string $notes = null;
 
     #[ORM\Column(length: 32, enumType: MediaType::class)]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?MediaType $mediaType = null;
 
     #[ORM\Column]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'reviews')]
@@ -55,7 +115,15 @@ class Review
 
     #[ORM\OneToOne(inversedBy: 'review')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL', unique: true)]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?Script $script = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)]
@@ -67,7 +135,6 @@ class Review
      */
     #[ORM\OneToMany(targetEntity: ReviewVersion::class, mappedBy: 'review', cascade: ['remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'ASC'])]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
     private Collection $versions;
 
     public function __construct()
@@ -236,7 +303,6 @@ class Review
         return $this;
     }
 
-    #[Groups(['api_reviews_list'])]
     public function getLatestVersion(): ?ReviewVersion
     {
         if ($this->versions->isEmpty()) {

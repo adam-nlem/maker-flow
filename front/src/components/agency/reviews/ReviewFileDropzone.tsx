@@ -8,9 +8,9 @@ import {
     CAROUSEL_MIN_FILES,
     IMAGE_ACCEPT_ATTR,
     VIDEO_ACCEPT_ATTR,
-} from "~/utils/postDraftFileValidation";
+} from "~/utils/reviewFileValidation";
 
-interface PostDraftFileDropzoneProps {
+interface ReviewFileDropzoneProps {
     mediaType: MediaType;
     files: File[];
     onChange: (files: File[]) => void;
@@ -36,12 +36,12 @@ function DropzoneSurface({ isDragActive, hint }: DropzoneSurfaceProps) {
     );
 }
 
-export default function PostDraftFileDropzone({ mediaType, files, onChange, errorMessage }: PostDraftFileDropzoneProps) {
+export default function ReviewFileDropzone({ mediaType, files, onChange, errorMessage }: ReviewFileDropzoneProps) {
     const { t } = useTranslation();
 
     const isMulti = mediaType === MediaType.Carousel;
     const accept = mediaType === MediaType.Video ? VIDEO_ACCEPT_ATTR : IMAGE_ACCEPT_ATTR;
-    const hint = isMulti ? t("postDrafts:form.dropHintCarousel") : t("postDrafts:form.dropHint");
+    const hint = isMulti ? t("reviews:form.dropHintCarousel") : t("reviews:form.dropHint");
 
     const removeAt = (index: number) => onChange(files.filter((_, i) => i !== index));
 
@@ -91,7 +91,7 @@ export default function PostDraftFileDropzone({ mediaType, files, onChange, erro
             )}
 
             {isMulti && files.length > 0 && files.length < CAROUSEL_MIN_FILES && (
-                <p className="text-body-xs text-muted-2">{t("postDrafts:validation.fileRequiredCarousel")}</p>
+                <p className="text-body-xs text-muted-2">{t("reviews:validation.fileRequiredCarousel")}</p>
             )}
         </div>
     );

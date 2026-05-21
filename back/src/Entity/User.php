@@ -37,7 +37,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_clients_list',
         'api_invitations_show',
         'api_invitations_create',
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_review_comments_list',
     ])]
     private ?string $uuid = null;
 
@@ -53,7 +53,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_clients_list',
         'api_invitations_show',
         'api_invitations_create',
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_review_comments_list',
     ])]
     private ?string $firstName = null;
 
@@ -69,7 +69,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_clients_list',
         'api_invitations_show',
         'api_invitations_create',
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_review_comments_list',
     ])]
     private ?string $lastName = null;
 
@@ -86,7 +86,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_clients_list',
         'api_invitations_show',
         'api_invitations_create',
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_review_comments_list',
     ])]
     private ?string $email = null;
 
@@ -154,14 +154,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_users_me',
         'api_otp_verify_login',
         'api_otp_verify_email',
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_review_comments_list',
     ])]
     private ?Agency $agency = null;
 
     #[ORM\ManyToOne(targetEntity: Project::class, inversedBy: 'clientUsers')]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups([
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_review_comments_list',
     ])]
     private ?Project $project = null;
 

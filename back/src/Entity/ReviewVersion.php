@@ -23,7 +23,16 @@ class ReviewVersion
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?string $uuid = null;
 
     #[ORM\ManyToOne(inversedBy: 'versions')]
@@ -31,23 +40,67 @@ class ReviewVersion
     private ?Review $review = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private int $fileCount = 1;
 
     #[ORM\Column(length: 32, enumType: ReviewStatus::class)]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ReviewStatus $status = ReviewStatus::Pending;
 
     #[ORM\Column(type: 'string', length: 32, nullable: true, enumType: VideoStreamingStatus::class)]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?VideoStreamingStatus $videoStreamingStatus = null;
 
     #[ORM\Column(type: 'string', length: 32, nullable: true, enumType: VideoStreamingFailureReason::class)]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?VideoStreamingFailureReason $videoStreamingFailureReason = null;
 
     #[ORM\Column]
-    #[Groups(['api_reviews_list', 'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
+    #[Groups([
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     /**
@@ -55,7 +108,6 @@ class ReviewVersion
      */
     #[ORM\OneToMany(targetEntity: ReviewComment::class, mappedBy: 'reviewVersion', cascade: ['remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'ASC'])]
-    #[Groups(['api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create'])]
     private Collection $comments;
 
     public function __construct()

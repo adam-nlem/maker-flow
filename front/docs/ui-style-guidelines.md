@@ -158,7 +158,7 @@ transition-all duration-300 ease-in-out  /* Panel animations */
 
 ### List items
 
-Pattern used for sidebar / left-panel list cards (Scripts, PostDrafts).
+Pattern used for sidebar / left-panel list cards (Scripts, Reviews).
 
 ```html
 <button class="w-full text-left flex gap-2.5 p-2.5 rounded-xl border transition-colors cursor-pointer
@@ -171,7 +171,7 @@ The active state is intentionally neutral (no `bg-primary/10` mint tint) so the 
 
 ### Status filter chips
 
-Compact dark-inverted chips for left-panel filter rows (e.g. `All / Awaiting / Changes / Approved / Rejected` on `/agency/drafts`).
+Compact dark-inverted chips for left-panel filter rows (e.g. `All / Awaiting / Changes / Approved / Rejected` on `/agency/reviews`).
 
 ```html
 <!-- unselected -->
@@ -197,7 +197,7 @@ Large drop-target surface inside a form (e.g. the create-draft modal). Built on 
             border-primary bg-primary/5 text-primary">
 ```
 
-Canonical example: [`PostDraftFileDropzone`](../src/components/agency/postDrafts/PostDraftFileDropzone.tsx) — passes a `DropzoneSurface` component to `FileUpload`'s `children` render-prop, which receives `{ isDragActive }` so the surface can flip into the primary-tinted state during drag. Use this pattern when you need a wide form-friendly dropzone; for compact pickers, stick with `FileUpload`'s default rendering (smaller dashed box).
+Canonical example: [`ReviewFileDropzone`](../src/components/agency/reviews/ReviewFileDropzone.tsx) — passes a `DropzoneSurface` component to `FileUpload`'s `children` render-prop, which receives `{ isDragActive }` so the surface can flip into the primary-tinted state during drag. Use this pattern when you need a wide form-friendly dropzone; for compact pickers, stick with `FileUpload`'s default rendering (smaller dashed box).
 
 ---
 
@@ -717,13 +717,13 @@ Non-interactive label for status, role, or category indicators with optional lea
 <Tag label="Archived" className="shrink-0" />
 <Tag
     icon={ClockIcon}
-    label={t(postDraftStatusTranslationKeys[status])}
-    bgClassName={postDraftStatusToBgClass[status]}
-    textClassName={postDraftStatusToTextClass[status]}
+    label={t(reviewStatusTranslationKeys[status])}
+    bgClassName={reviewStatusToBgClass[status]}
+    textClassName={reviewStatusToTextClass[status]}
 />
 ```
 
-**Used in:** `IdentityPopover` (role), `CollaboratorsTable` (role + status columns), `ProjectSettingsCard` (client status row pills), `PostDraftListItem` / `PostDraftDetailPanel` (status pill driven by `PostDraftStatus` maps).
+**Used in:** `IdentityPopover` (role), `CollaboratorsTable` (role + status columns), `ProjectSettingsCard` (client status row pills), `ReviewListItem` / `ReviewDetailPanel` (status pill driven by `ReviewStatus` maps).
 
 ---
 
@@ -749,16 +749,16 @@ Hero-style status callout: a circular icon chip on the left, a title and optiona
 ```tsx
 <Banner
     className="mb-6"
-    icon={postDraftStatusToIcon[postDraft.status]}
-    title={t(postDraftStatusToBannerTitleKey[postDraft.status])}
-    subtitle={t(postDraftStatusToBannerSubtitleKey[postDraft.status])}
-    bgClassName={postDraftStatusToBgClass[postDraft.status]}
-    textClassName={postDraftStatusToTextClass[postDraft.status]}
-    borderClassName={postDraftStatusToBorderClass[postDraft.status]}
+    icon={reviewStatusToIcon[review.status]}
+    title={t(reviewStatusToBannerTitleKey[review.status])}
+    subtitle={t(reviewStatusToBannerSubtitleKey[review.status])}
+    bgClassName={reviewStatusToBgClass[review.status]}
+    textClassName={reviewStatusToTextClass[review.status]}
+    borderClassName={reviewStatusToBorderClass[review.status]}
 />
 ```
 
-**Used in:** `PostDraftDetailPanel` (status banner driven by `PostDraftStatus` maps).
+**Used in:** `ReviewDetailPanel` (status banner driven by `ReviewStatus` maps).
 
 ---
 

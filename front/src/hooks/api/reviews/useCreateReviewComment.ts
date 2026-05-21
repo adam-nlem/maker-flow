@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '~/services/httpClient/httpClient';
-import { Review, type ReviewJSON } from '~/models/Review';
+import {
+    ReviewWithLatestVersionDTO,
+    type ReviewWithLatestVersionDTOJSON,
+} from '~/dtos/reviews/ReviewWithLatestVersionDTO';
 import { reviewsQueryKeys } from './reviewsQueryKeys';
 
 interface CreateReviewCommentData {
@@ -21,15 +24,16 @@ export function useCreateReviewComment() {
 
     const mutation = useMutation({
         mutationFn: async ({ data }: CreateReviewCommentParams) => {
-            const response = await httpClient.post<ReviewJSON>(
+            const response = await httpClient.post<ReviewWithLatestVersionDTOJSON>(
                 `/review-comments`,
                 data,
             );
-            return Review.fromJSON(response.data);
+            return ReviewWithLatestVersionDTO.fromJSON(response.data);
         },
-        onSuccess: (review, { reviewUuid, projectUuid }) => {
+        onSuccess: (review, { reviewUuid, projectUuid, data }) => {
             queryClient.setQueryData(reviewsQueryKeys.detail(reviewUuid), review);
             queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.listAll(projectUuid) });
+            queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.comments(data.reviewVersionUuid) });
         },
     });
 

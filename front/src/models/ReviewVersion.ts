@@ -1,12 +1,10 @@
 import { ReviewStatus } from "./enums/ReviewStatus";
-import { ReviewComment, type ReviewCommentJSON } from "./ReviewComment";
 
 export interface ReviewVersionJSON {
     uuid: string;
     fileCount: number;
     status: ReviewStatus;
-    createdAt: string;
-    comments?: ReviewCommentJSON[];
+    createdAt?: string;
 }
 
 export class ReviewVersion {
@@ -14,8 +12,7 @@ export class ReviewVersion {
         public readonly uuid: string,
         public fileCount: number,
         public status: ReviewStatus,
-        public createdAt: string,
-        public comments: ReviewComment[],
+        public createdAt: string | null,
     ) { }
 
     static fromJSON(json: ReviewVersionJSON): ReviewVersion {
@@ -23,8 +20,7 @@ export class ReviewVersion {
             json.uuid,
             json.fileCount,
             json.status,
-            json.createdAt,
-            (json.comments ?? []).map(ReviewComment.fromJSON),
+            json.createdAt ?? null,
         );
     }
 
@@ -33,8 +29,7 @@ export class ReviewVersion {
             uuid: this.uuid,
             fileCount: this.fileCount,
             status: this.status,
-            createdAt: this.createdAt,
-            comments: this.comments.map(c => c.toJSON()),
+            createdAt: this.createdAt ?? undefined,
         };
     }
 }

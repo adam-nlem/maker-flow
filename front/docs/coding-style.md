@@ -19,7 +19,7 @@ front/src/
 │   │   ├── home/         # Agency-only home widgets (HomeScriptsPanel, HomeScriptTile, …)
 │   │   ├── projects/     # Project feature components
 │   │   ├── scripts/      # Scripts + nested calendar/, chat/, parts/, hookTemplates/
-│   │   ├── postDrafts/   # Post-draft workflow
+│   │   ├── reviews/   # Review workflow
 │   │   ├── tasks/        # Todo lists / tasks
 │   │   └── settings/     # Agency settings (AgencySettings, SubscriptionSettings, ProjectsSettings + nested agency/, subscription/, project/)
 │   ├── client/           # Client-shell-only — everything a client sees

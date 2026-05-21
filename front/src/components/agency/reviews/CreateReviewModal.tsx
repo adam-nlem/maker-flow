@@ -8,20 +8,20 @@ import { TextArea } from "~/components/ui/TextArea";
 import LinkedScriptField from "~/components/agency/scripts/LinkedScriptField";
 import type { Script } from "~/models/Script";
 import { MediaType, mediaTypeToIcon, mediaTypeTranslationKeys, mediaTypeUploadHintTranslationKeys } from "~/models/enums/MediaType";
-import { useCreatePostDraft } from "~/hooks/api/postDrafts/useCreatePostDraft";
-import { usePostDraftsStore } from "~/stores/postDrafts/postDraftsStore";
+import { useCreateReview } from "~/hooks/api/reviews/useCreateReview";
+import { useReviewsStore } from "~/stores/reviews/reviewsStore";
 import { HttpException } from "~/services/httpClient/HttpException";
-import PostDraftFileDropzone from "./PostDraftFileDropzone";
+import ReviewFileDropzone from "./ReviewFileDropzone";
 
-interface CreatePostDraftModalProps {
+interface CreateReviewModalProps {
     projectUuid: string;
     showModal: boolean;
     onClose: () => void;
 }
 
-export default function CreatePostDraftModal({ projectUuid, showModal, onClose }: CreatePostDraftModalProps) {
+export default function CreateReviewModal({ projectUuid, showModal, onClose }: CreateReviewModalProps) {
     const { t } = useTranslation();
-    const selectDraft = usePostDraftsStore((s) => s.selectDraft);
+    const selectReview = useReviewsStore((s) => s.selectReview);
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -31,7 +31,7 @@ export default function CreatePostDraftModal({ projectUuid, showModal, onClose }
     const [files, setFiles] = useState<File[]>([]);
     const [isPickerOpen, setIsPickerOpen] = useState(false);
 
-    const { createPostDraft, isPending, error, validationErrorKey, clearValidationError } = useCreatePostDraft();
+    const { createReview, isPending, error, validationErrorKey, clearValidationError } = useCreateReview();
 
     const handleMediaTypeChange = (next: MediaType) => {
         setMediaType(next);
@@ -42,7 +42,7 @@ export default function CreatePostDraftModal({ projectUuid, showModal, onClose }
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
 
-        const created = await createPostDraft({
+        const created = await createReview({
             projectUuid,
             title: title.trim(),
             description: description.trim() || null,
@@ -53,12 +53,12 @@ export default function CreatePostDraftModal({ projectUuid, showModal, onClose }
         });
 
         if (created) {
-            selectDraft(created.uuid);
+            selectReview(created.uuid);
         }
     };
 
     const submitErrorKey = validationErrorKey
-        ?? (error instanceof HttpException && error.response.httpStatus === 409 ? "postDrafts:validation.scriptAlreadyHasDraft" : null);
+        ?? (error instanceof HttpException && error.response.httpStatus === 409 ? "reviews:validation.scriptAlreadyHasReview" : null);
 
     if (!showModal) return null;
 
@@ -77,13 +77,13 @@ export default function CreatePostDraftModal({ projectUuid, showModal, onClose }
         >
             <form className="flex flex-col h-full" onSubmit={handleSubmit}>
                 <div className="px-5 pt-5 pb-3 border-b border-pale-gray">
-                    <h2 className="text-heading-lg">{t("postDrafts:form.modalTitle")}</h2>
-                    <p className="text-body-sm text-muted">{t("postDrafts:form.modalSubtitle")}</p>
+                    <h2 className="text-heading-lg">{t("reviews:form.modalTitle")}</h2>
+                    <p className="text-body-sm text-muted">{t("reviews:form.modalSubtitle")}</p>
                 </div>
 
                 <div className="flex-1 min-h-0 overflow-y-auto px-5 py-4 flex flex-col gap-4">
                     <div className="flex flex-col gap-1.5">
-                        <label className="block text-heading-sm">{t("postDrafts:form.mediaType")}</label>
+                        <label className="block text-heading-sm">{t("reviews:form.mediaType")}</label>
                         <div className="flex flex-row gap-2">
                             {Object.values(MediaType).map((value) => {
                                 const Icon = mediaTypeToIcon[value];
@@ -114,8 +114,8 @@ export default function CreatePostDraftModal({ projectUuid, showModal, onClose }
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <label className="block text-heading-sm">{t("postDrafts:form.files")}</label>
-                        <PostDraftFileDropzone
+                        <label className="block text-heading-sm">{t("reviews:form.files")}</label>
+                        <ReviewFileDropzone
                             mediaType={mediaType}
                             files={files}
                             onChange={setFiles}
@@ -123,32 +123,32 @@ export default function CreatePostDraftModal({ projectUuid, showModal, onClose }
                     </div>
 
                     <Input
-                        label={t("postDrafts:form.title")}
-                        placeholder={t("postDrafts:form.titlePlaceholder")}
+                        label={t("reviews:form.title")}
+                        placeholder={t("reviews:form.titlePlaceholder")}
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                     />
 
                     <div className="flex flex-col gap-1.5">
-                        <label className="block text-heading-sm">{t("postDrafts:form.description")}</label>
+                        <label className="block text-heading-sm">{t("reviews:form.description")}</label>
                         <TextArea
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            placeholder={t("postDrafts:form.descriptionPlaceholder")}
+                            placeholder={t("reviews:form.descriptionPlaceholder")}
                             rows={3}
                         />
-                        <p className="text-body-xs text-muted-2">{t("postDrafts:form.descriptionHint")}</p>
+                        <p className="text-body-xs text-muted-2">{t("reviews:form.descriptionHint")}</p>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
-                        <label className="block text-heading-sm">{t("postDrafts:form.notes")}</label>
+                        <label className="block text-heading-sm">{t("reviews:form.notes")}</label>
                         <TextArea
                             value={notes}
                             onChange={(e) => setNotes(e.target.value)}
-                            placeholder={t("postDrafts:form.notesPlaceholder")}
+                            placeholder={t("reviews:form.notesPlaceholder")}
                             rows={3}
                         />
-                        <p className="text-body-xs text-muted-2">{t("postDrafts:form.notesHint")}</p>
+                        <p className="text-body-xs text-muted-2">{t("reviews:form.notesHint")}</p>
                     </div>
 
                     <div className="flex flex-col gap-1.5">
@@ -169,10 +169,10 @@ export default function CreatePostDraftModal({ projectUuid, showModal, onClose }
 
                 <div className="px-5 py-3.5 bg-clear-2 border-t border-pale-gray flex flex-row gap-2 justify-end">
                     <Button type="button" style="outline" onClick={onClose} disabled={isPending}>
-                        {t("postDrafts:actions.cancel")}
+                        {t("reviews:actions.cancel")}
                     </Button>
                     <Button type="submit" style="primary" isLoading={isPending} disabled={isPending}>
-                        {t("postDrafts:form.submit")}
+                        {t("reviews:form.submit")}
                     </Button>
                 </div>
             </form>

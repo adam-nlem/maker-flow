@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20260519142614 extends AbstractMigration
+final class Version20260520085515 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -22,18 +22,19 @@ final class Version20260519142614 extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql('CREATE TABLE agency (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, name VARCHAR(255) NOT NULL, contact_email VARCHAR(255) DEFAULT NULL, website VARCHAR(255) DEFAULT NULL, stripe_customer_id VARCHAR(255) DEFAULT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, UNIQUE INDEX UNIQ_70C0C6E6D17F50A6 (uuid), UNIQUE INDEX UNIQ_70C0C6E6708DC647 (stripe_customer_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
         $this->addSql('CREATE TABLE invitation (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, token VARCHAR(255) NOT NULL, type VARCHAR(255) NOT NULL, email VARCHAR(255) NOT NULL, first_name VARCHAR(255) NOT NULL, last_name VARCHAR(255) NOT NULL, role VARCHAR(255) DEFAULT NULL, expires_at DATETIME NOT NULL, used_at DATETIME DEFAULT NULL, created_at DATETIME NOT NULL, agency_id INT NOT NULL, project_id INT DEFAULT NULL, created_by_id INT DEFAULT NULL, UNIQUE INDEX UNIQ_F11D61A2D17F50A6 (uuid), UNIQUE INDEX UNIQ_F11D61A25F37A13B (token), INDEX IDX_F11D61A2CDEADB2A (agency_id), INDEX IDX_F11D61A2166D1F9C (project_id), INDEX IDX_F11D61A2B03A8386 (created_by_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
-        $this->addSql('CREATE TABLE post_draft (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, title VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, notes LONGTEXT DEFAULT NULL, media_type VARCHAR(32) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, project_id INT NOT NULL, script_id INT DEFAULT NULL, created_by_id INT DEFAULT NULL, INDEX IDX_D1671A7B166D1F9C (project_id), UNIQUE INDEX UNIQ_D1671A7BA1C01850 (script_id), INDEX IDX_D1671A7BB03A8386 (created_by_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
-        $this->addSql('CREATE TABLE post_draft_media_version (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, file_count SMALLINT NOT NULL, status VARCHAR(32) NOT NULL, video_streaming_status VARCHAR(32) DEFAULT NULL, video_streaming_failure_reason VARCHAR(32) DEFAULT NULL, created_at DATETIME NOT NULL, post_draft_id INT NOT NULL, INDEX IDX_C88FEF0C5D1E4C70 (post_draft_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
-        $this->addSql('CREATE TABLE post_draft_media_version_comment (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, body LONGTEXT NOT NULL, created_at DATETIME NOT NULL, media_version_id INT NOT NULL, author_id INT DEFAULT NULL, INDEX IDX_74F875B74199E991 (media_version_id), INDEX IDX_74F875B7F675F31B (author_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE review (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, title VARCHAR(255) NOT NULL, description LONGTEXT DEFAULT NULL, notes LONGTEXT DEFAULT NULL, media_type VARCHAR(32) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, project_id INT NOT NULL, script_id INT DEFAULT NULL, created_by_id INT DEFAULT NULL, INDEX IDX_794381C6166D1F9C (project_id), UNIQUE INDEX UNIQ_794381C6A1C01850 (script_id), INDEX IDX_794381C6B03A8386 (created_by_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE review_comment (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, body LONGTEXT NOT NULL, status VARCHAR(32) NOT NULL, video_timecode_seconds DOUBLE PRECISION DEFAULT NULL, created_at DATETIME NOT NULL, review_version_id INT NOT NULL, parent_comment_id INT DEFAULT NULL, author_id INT DEFAULT NULL, INDEX IDX_F9AE69B3C2CE608 (review_version_id), INDEX IDX_F9AE69BBF2AF943 (parent_comment_id), INDEX IDX_F9AE69BF675F31B (author_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
+        $this->addSql('CREATE TABLE review_version (id INT AUTO_INCREMENT NOT NULL, uuid CHAR(36) NOT NULL, file_count SMALLINT NOT NULL, status VARCHAR(32) NOT NULL, video_streaming_status VARCHAR(32) DEFAULT NULL, video_streaming_failure_reason VARCHAR(32) DEFAULT NULL, created_at DATETIME NOT NULL, review_id INT NOT NULL, INDEX IDX_24F267343E2E969B (review_id), PRIMARY KEY (id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci`');
         $this->addSql('ALTER TABLE invitation ADD CONSTRAINT FK_F11D61A2CDEADB2A FOREIGN KEY (agency_id) REFERENCES agency (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE invitation ADD CONSTRAINT FK_F11D61A2166D1F9C FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE invitation ADD CONSTRAINT FK_F11D61A2B03A8386 FOREIGN KEY (created_by_id) REFERENCES user (id) ON DELETE SET NULL');
-        $this->addSql('ALTER TABLE post_draft ADD CONSTRAINT FK_D1671A7B166D1F9C FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE post_draft ADD CONSTRAINT FK_D1671A7BA1C01850 FOREIGN KEY (script_id) REFERENCES script (id) ON DELETE SET NULL');
-        $this->addSql('ALTER TABLE post_draft ADD CONSTRAINT FK_D1671A7BB03A8386 FOREIGN KEY (created_by_id) REFERENCES user (id) ON DELETE SET NULL');
-        $this->addSql('ALTER TABLE post_draft_media_version ADD CONSTRAINT FK_C88FEF0C5D1E4C70 FOREIGN KEY (post_draft_id) REFERENCES post_draft (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE post_draft_media_version_comment ADD CONSTRAINT FK_74F875B74199E991 FOREIGN KEY (media_version_id) REFERENCES post_draft_media_version (id) ON DELETE CASCADE');
-        $this->addSql('ALTER TABLE post_draft_media_version_comment ADD CONSTRAINT FK_74F875B7F675F31B FOREIGN KEY (author_id) REFERENCES user (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE review ADD CONSTRAINT FK_794381C6166D1F9C FOREIGN KEY (project_id) REFERENCES project (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE review ADD CONSTRAINT FK_794381C6A1C01850 FOREIGN KEY (script_id) REFERENCES script (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE review ADD CONSTRAINT FK_794381C6B03A8386 FOREIGN KEY (created_by_id) REFERENCES user (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE review_comment ADD CONSTRAINT FK_F9AE69B3C2CE608 FOREIGN KEY (review_version_id) REFERENCES review_version (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE review_comment ADD CONSTRAINT FK_F9AE69BBF2AF943 FOREIGN KEY (parent_comment_id) REFERENCES review_comment (id) ON DELETE CASCADE');
+        $this->addSql('ALTER TABLE review_comment ADD CONSTRAINT FK_F9AE69BF675F31B FOREIGN KEY (author_id) REFERENCES user (id) ON DELETE SET NULL');
+        $this->addSql('ALTER TABLE review_version ADD CONSTRAINT FK_24F267343E2E969B FOREIGN KEY (review_id) REFERENCES review (id) ON DELETE CASCADE');
         $this->addSql('ALTER TABLE credit_balance DROP FOREIGN KEY `FK_967078D1A76ED395`');
         $this->addSql('DROP INDEX UNIQ_967078D1A76ED395 ON credit_balance');
         $this->addSql('ALTER TABLE credit_balance CHANGE user_id agency_id INT NOT NULL');
@@ -101,17 +102,18 @@ final class Version20260519142614 extends AbstractMigration
         $this->addSql('ALTER TABLE invitation DROP FOREIGN KEY FK_F11D61A2CDEADB2A');
         $this->addSql('ALTER TABLE invitation DROP FOREIGN KEY FK_F11D61A2166D1F9C');
         $this->addSql('ALTER TABLE invitation DROP FOREIGN KEY FK_F11D61A2B03A8386');
-        $this->addSql('ALTER TABLE post_draft DROP FOREIGN KEY FK_D1671A7B166D1F9C');
-        $this->addSql('ALTER TABLE post_draft DROP FOREIGN KEY FK_D1671A7BA1C01850');
-        $this->addSql('ALTER TABLE post_draft DROP FOREIGN KEY FK_D1671A7BB03A8386');
-        $this->addSql('ALTER TABLE post_draft_media_version DROP FOREIGN KEY FK_C88FEF0C5D1E4C70');
-        $this->addSql('ALTER TABLE post_draft_media_version_comment DROP FOREIGN KEY FK_74F875B74199E991');
-        $this->addSql('ALTER TABLE post_draft_media_version_comment DROP FOREIGN KEY FK_74F875B7F675F31B');
+        $this->addSql('ALTER TABLE review DROP FOREIGN KEY FK_794381C6166D1F9C');
+        $this->addSql('ALTER TABLE review DROP FOREIGN KEY FK_794381C6A1C01850');
+        $this->addSql('ALTER TABLE review DROP FOREIGN KEY FK_794381C6B03A8386');
+        $this->addSql('ALTER TABLE review_comment DROP FOREIGN KEY FK_F9AE69B3C2CE608');
+        $this->addSql('ALTER TABLE review_comment DROP FOREIGN KEY FK_F9AE69BBF2AF943');
+        $this->addSql('ALTER TABLE review_comment DROP FOREIGN KEY FK_F9AE69BF675F31B');
+        $this->addSql('ALTER TABLE review_version DROP FOREIGN KEY FK_24F267343E2E969B');
         $this->addSql('DROP TABLE agency');
         $this->addSql('DROP TABLE invitation');
-        $this->addSql('DROP TABLE post_draft');
-        $this->addSql('DROP TABLE post_draft_media_version');
-        $this->addSql('DROP TABLE post_draft_media_version_comment');
+        $this->addSql('DROP TABLE review');
+        $this->addSql('DROP TABLE review_comment');
+        $this->addSql('DROP TABLE review_version');
         $this->addSql('ALTER TABLE credit_balance DROP FOREIGN KEY FK_967078D1CDEADB2A');
         $this->addSql('DROP INDEX UNIQ_967078D1CDEADB2A ON credit_balance');
         $this->addSql('ALTER TABLE credit_balance CHANGE agency_id user_id INT NOT NULL');

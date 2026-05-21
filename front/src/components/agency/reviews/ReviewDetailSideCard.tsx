@@ -1,59 +1,59 @@
 import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Tag } from "~/components/ui/Tag";
-import { PostDraft } from "~/models/PostDraft";
+import { Review } from "~/models/Review";
 import { mediaTypeToIcon } from "~/models/enums/MediaType";
 import {
-    PostDraftStatus,
-    postDraftStatusToBgClass,
-    postDraftStatusToIcon,
-    postDraftStatusToTextClass,
-    postDraftStatusTranslationKeys,
-} from "~/models/enums/PostDraftStatus";
+    ReviewStatus,
+    reviewStatusToBgClass,
+    reviewStatusToIcon,
+    reviewStatusToTextClass,
+    reviewStatusTranslationKeys,
+} from "~/models/enums/ReviewStatus";
 import { formatToFrenchDateShort } from "~/utils/dateFormatters";
 
-interface PostDraftDetailSideCardProps {
-    postDraft: PostDraft;
+interface ReviewDetailSideCardProps {
+    review: Review;
     onLinkedScriptClick?: () => void;
 }
 
-export default function PostDraftDetailSideCard({ postDraft, onLinkedScriptClick }: PostDraftDetailSideCardProps) {
+export default function ReviewDetailSideCard({ review, onLinkedScriptClick }: ReviewDetailSideCardProps) {
     const { t } = useTranslation();
-    const MediaTypeIcon = mediaTypeToIcon[postDraft.mediaType];
-    const typeLabel = t(`postDrafts:detail.eyebrow.${postDraft.mediaType}`);
-    const status = postDraft.currentStatus ?? PostDraftStatus.AwaitingReview;
+    const MediaTypeIcon = mediaTypeToIcon[review.mediaType];
+    const typeLabel = t(`reviews:detail.eyebrow.${review.mediaType}`);
+    const status = review.currentStatus ?? ReviewStatus.Pending;
 
     return (
         <aside className="bg-clear-2 border border-pale-gray rounded-xl p-1 self-start w-1/3">
-            <SideCardRow label={t("postDrafts:detail.sideCard.type")}>
+            <SideCardRow label={t("reviews:detail.sideCard.type")}>
                 <MediaTypeIcon className="size-3.5 text-muted" />
                 <span>{typeLabel}</span>
             </SideCardRow>
-            <SideCardRow label={t("postDrafts:detail.sideCard.status")}>
+            <SideCardRow label={t("reviews:detail.sideCard.status")}>
                 <Tag
-                    icon={postDraftStatusToIcon[status]}
-                    label={t(postDraftStatusTranslationKeys[status])}
-                    bgClassName={postDraftStatusToBgClass[status]}
-                    textClassName={postDraftStatusToTextClass[status]}
+                    icon={reviewStatusToIcon[status]}
+                    label={t(reviewStatusTranslationKeys[status])}
+                    bgClassName={reviewStatusToBgClass[status]}
+                    textClassName={reviewStatusToTextClass[status]}
                 />
             </SideCardRow>
-            {postDraft.script && onLinkedScriptClick && (
-                <SideCardRow label={t("postDrafts:detail.sideCard.linkedScript")}>
+            {review.script && onLinkedScriptClick && (
+                <SideCardRow label={t("reviews:detail.sideCard.linkedScript")}>
                     <button
                         type="button"
                         onClick={onLinkedScriptClick}
                         className="text-left hover:text-primary transition-colors cursor-pointer"
                     >
-                        {postDraft.script.title}
+                        {review.script.title}
                     </button>
                 </SideCardRow>
             )}
-            <SideCardRow label={t("postDrafts:detail.sideCard.uploaded")}>
-                {formatToFrenchDateShort(new Date(postDraft.createdAt))}
+            <SideCardRow label={t("reviews:detail.sideCard.uploaded")}>
+                {formatToFrenchDateShort(new Date(review.createdAt))}
             </SideCardRow>
-            {postDraft.updatedAt !== postDraft.createdAt && (
-                <SideCardRow label={t("postDrafts:detail.sideCard.updated")}>
-                    {formatToFrenchDateShort(new Date(postDraft.updatedAt))}
+            {review.updatedAt !== null && review.updatedAt !== review.createdAt && (
+                <SideCardRow label={t("reviews:detail.sideCard.updated")}>
+                    {formatToFrenchDateShort(new Date(review.updatedAt))}
                 </SideCardRow>
             )}
         </aside>

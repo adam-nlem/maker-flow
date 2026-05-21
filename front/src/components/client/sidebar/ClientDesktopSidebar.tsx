@@ -1,30 +1,22 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import {
-    DocumentDuplicateIcon,
-    HomeIcon,
-    RectangleStackIcon,
-} from "@heroicons/react/24/outline";
-import {
-    DocumentDuplicateIcon as DocumentDuplicateIconSolid,
-    HomeIcon as HomeIconSolid,
-    RectangleStackIcon as RectangleStackIconSolid,
-} from "@heroicons/react/24/solid";
 import { useShowProject } from "~/hooks/api/projects/useShowProject";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore";
 import { useIntegrationLoginModalStore } from "~/stores/integrations/integrationLoginModalStore";
 import { platformOptions } from "~/models/enums/Platform";
+import {
+    clientSidebarNavigationItems,
+    navigationItemToIcon,
+    navigationItemToIconSolid,
+    navigationItemTranslationKeys,
+} from "~/models/enums/NavigationItem";
+import { isPathSelected } from "~/utils/navigationHelpers";
 import IconRailTile from "~/components/sidebar/IconRailTile";
 import IntegrationTile from "~/components/integrations/IntegrationTile";
 import IntegrationLoginModal from "~/components/integrations/IntegrationLoginModal";
 import SidebarShell from "~/components/sidebar/SidebarShell";
 import IdentityTile from "~/components/sidebar/IdentityTile";
-import {
-    clientHomePath,
-    clientDraftsPath,
-    clientContentsPath,
-} from "~/routes/routePaths";
 
 export default function ClientDesktopSidebar() {
     const navigate = useNavigate();
@@ -36,33 +28,23 @@ export default function ClientDesktopSidebar() {
     const openIntegrationLoginModal = useIntegrationLoginModalStore((state) => state.open);
 
     const agency = project?.agency ?? null;
-    const isHomeSelected = location.pathname === clientHomePath;
-    const isDraftsSelected = location.pathname === clientDraftsPath;
-    const isContentsSelected = location.pathname === clientContentsPath;
-
     const identityTile = agency ? <IdentityTile agency={agency} compact /> : null;
 
     const topSection = (
         <>
             <div className="flex flex-col items-center gap-1">
-                <IconRailTile
-                    icon={isHomeSelected ? HomeIconSolid : HomeIcon}
-                    label={t("navigation:items.home")}
-                    isSelected={isHomeSelected}
-                    onClick={() => navigate(clientHomePath)}
-                />
-                <IconRailTile
-                    icon={isDraftsSelected ? DocumentDuplicateIconSolid : DocumentDuplicateIcon}
-                    label={t("navigation:items.drafts")}
-                    isSelected={isDraftsSelected}
-                    onClick={() => navigate(clientDraftsPath)}
-                />
-                <IconRailTile
-                    icon={isContentsSelected ? RectangleStackIconSolid : RectangleStackIcon}
-                    label={t("navigation:items.contents")}
-                    isSelected={isContentsSelected}
-                    onClick={() => navigate(clientContentsPath)}
-                />
+                {clientSidebarNavigationItems.map(({ item, path }) => {
+                    const selected = isPathSelected(item, path, location.pathname);
+                    return (
+                        <IconRailTile
+                            key={item}
+                            icon={selected ? navigationItemToIconSolid[item] : navigationItemToIcon[item]}
+                            label={t(navigationItemTranslationKeys[item])}
+                            isSelected={selected}
+                            onClick={() => navigate(path)}
+                        />
+                    );
+                })}
             </div>
 
             <div className="mt-4 flex flex-col items-center gap-1">

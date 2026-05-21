@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\ReviewComment;
+use App\Entity\ReviewVersion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -43,5 +44,22 @@ class ReviewCommentRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return ReviewComment[]
+     */
+    public function getByReviewVersionPaginated(ReviewVersion $reviewVersion, int $page, int $limit): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.reviewVersion = :reviewVersion')
+            ->andWhere('c.parentComment IS NULL')
+            ->setParameter('reviewVersion', $reviewVersion)
+            ->orderBy('c.createdAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 }

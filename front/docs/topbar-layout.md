@@ -47,7 +47,7 @@ The sidebar spans full viewport height on the left. The top bar lives **inside**
 
 Pages don't import or render the top bar — the shell does it automatically, just like the sidebar. To add a custom button (or buttons) to the top bar for a specific page, **declare an action component in the appropriate registry**, keyed by the route's path constant.
 
-Example — the "New draft" button on `/agency/drafts`:
+Example — the "New draft" button on `/agency/reviews`:
 
 ```tsx
 // components/topbar/agencyTopBarActions.tsx
@@ -55,27 +55,27 @@ import type { ComponentType } from "react";
 import { useTranslation } from "react-i18next";
 import { PlusIcon } from "@heroicons/react/24/outline";
 import { Button } from "~/components/ui/Button";
-import { usePostDraftsStore } from "~/stores/postDrafts/postDraftsStore";
-import { agencyDraftsPath } from "~/routes/routePaths";
+import { useReviewsStore } from "~/stores/reviews/reviewsStore";
+import { agencyReviewsPath } from "~/routes/routePaths";
 
-function NewDraftAction() {
+function NewReviewAction() {
     const { t } = useTranslation();
-    const openCreatePanel = usePostDraftsStore((s) => s.openCreatePanel);
+    const openCreatePanel = useReviewsStore((s) => s.openCreatePanel);
 
     return (
         <Button type="button" style="primary" width="w-auto" onClick={openCreatePanel}>
             <PlusIcon className="size-4 mr-1" strokeWidth={2} />
-            {t("postDrafts:actions.create")}
+            {t("reviews:actions.create")}
         </Button>
     );
 }
 
 export const agencyTopBarActions: Record<string, ComponentType> = {
-    [agencyDraftsPath]: NewDraftAction,
+    [agencyReviewsPath]: NewReviewAction,
 };
 ```
 
-The action component uses existing Zustand stores (`usePostDraftsStore.openCreatePanel`) for its handlers, matching how the rest of the app shares state between unrelated components. Pages that need a new action add their component to this file; no other wiring is required.
+The action component uses existing Zustand stores (`useReviewsStore.openCreatePanel`) for its handlers, matching how the rest of the app shares state between unrelated components. Pages that need a new action add their component to this file; no other wiring is required.
 
 ## API
 

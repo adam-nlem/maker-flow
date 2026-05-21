@@ -33,7 +33,7 @@ class Project
         'api_projects_reopen',
         'api_invitations_show',
         'api_invitations_create',
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_review_comments_list',
     ])]
     private ?string $uuid = null;
 
@@ -47,7 +47,7 @@ class Project
         'api_projects_reopen',
         'api_invitations_show',
         'api_invitations_create',
-        'api_reviews_show', 'api_review_versions_approve', 'api_review_versions_request_changes', 'api_review_comments_create',
+        'api_review_comments_list',
     ])]
     private ?string $name = null;
 
