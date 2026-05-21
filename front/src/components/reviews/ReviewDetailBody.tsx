@@ -1,26 +1,27 @@
 import { useTranslation } from "react-i18next";
 import { TextArea } from "~/components/ui/TextArea";
 import LinkedScriptField from "~/components/agency/scripts/LinkedScriptField";
-import { Review } from "~/models/Review";
+import type { ReviewWithLatestVersionDTO } from "~/dtos/reviews/ReviewWithLatestVersionDTO";
 import type { ReviewEditForm } from "~/hooks/useReviewEditForm";
 
 interface ReviewDetailBodyProps {
-    review: Review;
+    reviewDTO: ReviewWithLatestVersionDTO;
     projectUuid: string;
-    form: ReviewEditForm;
+    form?: ReviewEditForm;
 }
 
-export default function ReviewDetailBody({ review, projectUuid, form }: ReviewDetailBodyProps) {
+export default function ReviewDetailBody({ reviewDTO, projectUuid, form }: ReviewDetailBodyProps) {
     const { t } = useTranslation();
+    const canEdit = form?.canEdit ?? false;
 
     return (
         <div className="flex flex-col gap-5 w-2/3">
-            {(form.canEdit || review.description) && (
+            {(canEdit || reviewDTO.review.description) && (
                 <section>
                     <h3 className="uppercase text-body-xs tracking-wider text-muted-2 mb-2">
                         {t("reviews:detail.descriptionLabel")}
                     </h3>
-                    {form.canEdit ? (
+                    {canEdit && form ? (
                         <TextArea
                             simple
                             textStyle="text-body-sm"
@@ -29,12 +30,12 @@ export default function ReviewDetailBody({ review, projectUuid, form }: ReviewDe
                             onChange={(e) => form.setDescription(e.target.value)}
                         />
                     ) : (
-                        <p className="text-body-sm text-dark-2 whitespace-pre-wrap">{review.description}</p>
+                        <p className="text-body-sm text-dark-2 whitespace-pre-wrap">{reviewDTO.review.description}</p>
                     )}
                 </section>
             )}
 
-            {(form.canEdit || review.notes) && (
+            {(canEdit || reviewDTO.review.notes) && (
                 <section>
                     <h3 className="uppercase text-body-xs tracking-wider text-muted-2 mb-2">
                         {t("reviews:detail.notesLabel")}
@@ -43,7 +44,7 @@ export default function ReviewDetailBody({ review, projectUuid, form }: ReviewDe
                         <span className="block text-body-xs text-muted-2 mb-1">
                             {t("reviews:detail.notesHint")}
                         </span>
-                        {form.canEdit ? (
+                        {canEdit && form ? (
                             <TextArea
                                 simple
                                 className="p-1 bg-clear-2"
@@ -53,13 +54,13 @@ export default function ReviewDetailBody({ review, projectUuid, form }: ReviewDe
                                 onChange={(e) => form.setNotes(e.target.value)}
                             />
                         ) : (
-                            <p className="text-body-sm text-dark-2 whitespace-pre-wrap italic">{review.notes}</p>
+                            <p className="text-body-sm text-dark-2 whitespace-pre-wrap italic">{reviewDTO.review.notes}</p>
                         )}
                     </div>
                 </section>
             )}
 
-            {form.canEdit && (
+            {canEdit && form && (
                 <section className="flex flex-col gap-2">
                     <h3 className="uppercase text-body-xs tracking-wider text-muted-2">
                         {t("scripts:picker.linkedField.label")}

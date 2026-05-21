@@ -53,7 +53,7 @@ export default function CreateReviewModal({ projectUuid, showModal, onClose }: C
         });
 
         if (created) {
-            selectReview(created.uuid);
+            selectReview(created.review.uuid);
         }
     };
 
