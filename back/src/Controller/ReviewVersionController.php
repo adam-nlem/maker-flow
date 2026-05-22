@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\DTO\QueryParam\Review\StreamFileQueryParamDTO;
-use App\DTO\QueryParam\Review\StreamHlsQueryParamDTO;
 use App\DTO\Request\Review\RequestChangesOnReviewVersionRequestDTO;
 use App\DTO\Response\Review\ReviewWithLatestVersionResponseDTO;
 use App\Entity\Enum\ReviewStatus;
@@ -65,27 +64,32 @@ final class ReviewVersionController extends AbstractController
         );
     }
 
-    #[Route('/stream', name: 'api_review_versions_stream_hls', methods: ['GET'])]
+    #[Route(
+        '/{reviewVersionUuid}/stream/{path}',
+        name: 'api_review_versions_stream_hls',
+        requirements: ['reviewVersionUuid' => Requirement::UUID, 'path' => '.+'],
+        methods: ['GET'],
+    )]
     #[IsGranted(UserRole::User->value)]
     public function streamHls(
-        StreamHlsQueryParamDTO $queryParamDto,
+        string $reviewVersionUuid,
+        string $path,
         ReviewVersionRepository $reviewVersionRepository,
         ReviewFileService $reviewFileService,
     ): Response {
-        $reviewVersion = $reviewVersionRepository->getByUuid($queryParamDto->getReviewVersionUuid());
+        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
+
+        if (!isset(self::HLS_CONTENT_TYPES[$extension])) {
+            throw new MissingReviewException();
+        }
+
+        $reviewVersion = $reviewVersionRepository->getByUuid($reviewVersionUuid);
 
         if ($reviewVersion === null) {
             throw new MissingReviewException();
         }
 
         $this->denyAccessUnlessGranted(ProjectVoter::VIEW, $reviewVersion->getReview()->getProject());
-
-        $path = $queryParamDto->getPath();
-        $extension = strtolower(pathinfo($path, PATHINFO_EXTENSION));
-
-        if (!isset(self::HLS_CONTENT_TYPES[$extension])) {
-            throw new MissingReviewException();
-        }
 
         $file = $reviewFileService->getStreamFile($reviewVersion, $path);
 

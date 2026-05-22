@@ -92,6 +92,21 @@
         "mediaLabel": {
             "video": "Vidéo"
         },
+        "video": {
+            "transcoding": "Préparation de la vidéo pour la lecture…",
+            "transcodingFailed": "Le traitement de cette vidéo a échoué. Veuillez la téléverser à nouveau.",
+            "playbackError": "Impossible de lire cette vidéo.",
+            "player": {
+                "play": "Lecture",
+                "pause": "Pause",
+                "mute": "Couper le son",
+                "unmute": "Activer le son",
+                "volume": "Volume",
+                "seek": "Avancer",
+                "enterFullscreen": "Passer en plein écran",
+                "exitFullscreen": "Quitter le plein écran"
+            }
+        },
         "carousel": {
             "slideCounter": "{{current}}/{{total}}",
             "previousSlide": "Diapositive précédente",

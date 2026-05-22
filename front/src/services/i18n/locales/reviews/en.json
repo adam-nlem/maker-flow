@@ -92,6 +92,21 @@
         "mediaLabel": {
             "video": "Video"
         },
+        "video": {
+            "transcoding": "Preparing video for playback…",
+            "transcodingFailed": "This video failed to process. Please re-upload it.",
+            "playbackError": "Unable to play this video.",
+            "player": {
+                "play": "Play",
+                "pause": "Pause",
+                "mute": "Mute",
+                "unmute": "Unmute",
+                "volume": "Volume",
+                "seek": "Seek",
+                "enterFullscreen": "Enter fullscreen",
+                "exitFullscreen": "Exit fullscreen"
+            }
+        },
         "carousel": {
             "slideCounter": "{{current}}/{{total}}",
             "previousSlide": "Previous slide",

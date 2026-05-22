@@ -49,7 +49,7 @@ class ReviewVideoStreamingService
             '-hls_playlist_type', 'vod',
             '-hls_segment_filename', "$streamDirectory/%v/segment_%03d.ts",
             '-master_pl_name', 'master.m3u8',
-            '-var_stream_map', 'v:0,a:0 v:1,a:1 v:2,a:2',
+            '-var_stream_map', 'v:0,a:0,name:1080p v:1,a:1,name:720p v:2,a:2,name:480p',
             "$streamDirectory/%v/index.m3u8",
         ]);
         $process->setTimeout(null);

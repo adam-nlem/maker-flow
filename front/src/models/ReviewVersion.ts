@@ -1,9 +1,11 @@
 import { ReviewStatus } from "./enums/ReviewStatus";
+import { VideoStreamingStatus } from "./enums/VideoStreamingStatus";
 
 export interface ReviewVersionJSON {
     uuid: string;
     fileCount: number;
     status: ReviewStatus;
+    videoStreamingStatus?: VideoStreamingStatus | null;
     createdAt?: string;
 }
 
@@ -12,6 +14,7 @@ export class ReviewVersion {
         public readonly uuid: string,
         public fileCount: number,
         public status: ReviewStatus,
+        public videoStreamingStatus: VideoStreamingStatus | null,
         public createdAt: string | null,
     ) { }
 
@@ -20,6 +23,7 @@ export class ReviewVersion {
             json.uuid,
             json.fileCount,
             json.status,
+            json.videoStreamingStatus ?? null,
             json.createdAt ?? null,
         );
     }
@@ -29,6 +33,7 @@ export class ReviewVersion {
             uuid: this.uuid,
             fileCount: this.fileCount,
             status: this.status,
+            videoStreamingStatus: this.videoStreamingStatus,
             createdAt: this.createdAt ?? undefined,
         };
     }
