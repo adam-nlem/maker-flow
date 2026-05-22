@@ -116,7 +116,7 @@
         "confirm": "Supprimer la review"
     },
     "comments": {
-        "title": "Retours",
+        "title": "Commentaires",
         "loading": "Chargement des commentaires…",
         "loadMore": "Charger plus de commentaires",
         "noComments": "Aucun commentaire pour le moment.",

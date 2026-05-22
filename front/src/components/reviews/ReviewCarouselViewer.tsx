@@ -20,7 +20,7 @@ export default function ReviewCarouselViewer({ reviewVersionUuid, fileCount }: R
     const handleNext = () => setActiveIndex((index) => Math.min(fileCount - 1, index + 1));
 
     return (
-        <div className="rounded-2xl overflow-hidden bg-dark shadow-md mb-4">
+        <div className="w-2/3 shrink-0 rounded-2xl overflow-hidden bg-dark shadow-md mb-4">
             <div className="relative w-full bg-dark flex items-center justify-center min-h-80">
                 <CarouselSlideImage
                     reviewVersionUuid={reviewVersionUuid}

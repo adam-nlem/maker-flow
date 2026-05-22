@@ -723,7 +723,7 @@ Non-interactive label for status, role, or category indicators with optional lea
 />
 ```
 
-**Used in:** `IdentityPopover` (role), `CollaboratorsTable` (role + status columns), `ProjectSettingsCard` (client status row pills), `ReviewListItem` / `ReviewDetailPanel` (status pill driven by `ReviewStatus` maps).
+**Used in:** `IdentityPopover` (role), `CollaboratorsTable` (role + status columns), `ProjectSettingsCard` (client status row pills), `ReviewTile` / `ReviewDetailPanel` (status pill driven by `ReviewStatus` maps).
 
 ---
 

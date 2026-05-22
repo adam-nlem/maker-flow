@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useKeyboardShortcut, type KeyboardShortcut } from '~/hooks/useKeyboardShortcut';
 import { ShortcutBadge } from './ShortcutBadge';
 
@@ -34,13 +34,15 @@ export function Button({
   className = '',
   shortcut,
 }: ButtonProps) {
+  const buttonRef = useRef<HTMLButtonElement>(null);
+
   useKeyboardShortcut(shortcut, () => {
-    if (disabled || isLoading) return;
-    onClick?.();
+    buttonRef.current?.click();
   });
 
-  const buttonElement = (
+  return (
     <button
+      ref={buttonRef}
       type={type}
       onClick={onClick}
       disabled={disabled || isLoading}
@@ -53,17 +55,7 @@ export function Button({
         </svg>
       ) : null}
       {children}
+      {shortcut && <ShortcutBadge simple textClassName='text-muted-2' label={shortcut.label} />}
     </button>
-  );
-
-  if (!shortcut) {
-    return buttonElement;
-  }
-
-  return (
-    <span className="inline-flex items-center gap-2">
-      <ShortcutBadge simple textClassName='text-muted' label={shortcut.label} />
-      {buttonElement}
-    </span>
   );
 }

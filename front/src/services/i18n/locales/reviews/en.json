@@ -116,7 +116,7 @@
         "confirm": "Delete review"
     },
     "comments": {
-        "title": "Feedback",
+        "title": "Comments",
         "loading": "Loading comments…",
         "loadMore": "Load more comments",
         "noComments": "No comments yet.",
