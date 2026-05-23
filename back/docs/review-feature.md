@@ -181,7 +181,7 @@ Video uploads get a second pass after the synchronous `POST /api/reviews` succee
    | `720p`  | 720  | 2800 kbps | 128 kbps |
    | `480p`  | 480  | 1400 kbps | 96 kbps  |
 
-   All variants are always generated regardless of source resolution (deliberate — keeps the player ladder predictable). Segments are 4 s VOD. Audio mapping is optional (`0:a:0?`) so videos without an audio track still produce valid output.
+   All variants are always generated regardless of source resolution (deliberate — keeps the player ladder predictable). Segments are 4 s VOD. The service probes the source with `ffprobe` first; if no audio stream is present (e.g. silent screen recordings), the audio map/codec args and the `a:N` entries in `-var_stream_map` are omitted so HLS still produces a valid video-only master + variants.
 4. After ffmpeg returns, the service asserts `master.m3u8` and every per-variant `index.m3u8` exist, then `unlink()`s the original `1.{ext}` source file.
 5. Handler flips status to `ready` and flushes.
 

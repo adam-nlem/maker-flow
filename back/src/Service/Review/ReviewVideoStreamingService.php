@@ -15,6 +15,7 @@ class ReviewVideoStreamingService
         private readonly ReviewFileService $reviewFileService,
         private readonly Filesystem $filesystem,
         private readonly string $ffmpegBinary = 'ffmpeg',
+        private readonly string $ffprobeBinary = 'ffprobe',
     ) {}
 
     public function generateHls(ReviewVersion $reviewVersion): void
@@ -38,18 +39,18 @@ class ReviewVideoStreamingService
             "$streamDirectory/480p",
         ]);
 
+        $hasAudio = $this->hasAudioStream($sourcePath);
+
         $process = new Process([
             $this->ffmpegBinary, '-y', '-i', $sourcePath,
             '-filter_complex', '[0:v]split=3[v0][v1][v2]; [v0]scale=-2:1080[v0out]; [v1]scale=-2:720[v1out]; [v2]scale=-2:480[v2out]',
-            '-map', '[v0out]', '-c:v:0', 'libx264', '-b:v:0', '5000k', '-map', '0:a:0?', '-c:a:0', 'aac', '-b:a:0', '128k',
-            '-map', '[v1out]', '-c:v:1', 'libx264', '-b:v:1', '2800k', '-map', '0:a:0?', '-c:a:1', 'aac', '-b:a:1', '128k',
-            '-map', '[v2out]', '-c:v:2', 'libx264', '-b:v:2', '1400k', '-map', '0:a:0?', '-c:a:2', 'aac', '-b:a:2', '96k',
+            ...$this->buildVariantArgs($hasAudio),
             '-f', 'hls',
             '-hls_time', '4',
             '-hls_playlist_type', 'vod',
             '-hls_segment_filename', "$streamDirectory/%v/segment_%03d.ts",
             '-master_pl_name', 'master.m3u8',
-            '-var_stream_map', 'v:0,a:0,name:1080p v:1,a:1,name:720p v:2,a:2,name:480p',
+            '-var_stream_map', $this->buildVarStreamMap($hasAudio),
             "$streamDirectory/%v/index.m3u8",
         ]);
         $process->setTimeout(null);
@@ -79,5 +80,72 @@ class ReviewVideoStreamingService
         }
 
         $this->filesystem->remove($sourcePath);
+    }
+
+    private function hasAudioStream(string $sourcePath): bool
+    {
+        $process = new Process([
+            $this->ffprobeBinary,
+            '-v', 'error',
+            '-select_streams', 'a',
+            '-show_entries', 'stream=index',
+            '-of', 'csv=p=0',
+            $sourcePath,
+        ]);
+
+        try {
+            $process->mustRun();
+        } catch (ProcessFailedException) {
+            return false;
+        }
+
+        return trim($process->getOutput()) !== '';
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function buildVariantArgs(bool $hasAudio): array
+    {
+        $variants = [
+            ['label' => 'v0out', 'videoBitrate' => '5000k', 'audioBitrate' => '128k'],
+            ['label' => 'v1out', 'videoBitrate' => '2800k', 'audioBitrate' => '128k'],
+            ['label' => 'v2out', 'videoBitrate' => '1400k', 'audioBitrate' => '96k'],
+        ];
+
+        $args = [];
+        foreach ($variants as $index => $variant) {
+            $args = [
+                ...$args,
+                '-map', sprintf('[%s]', $variant['label']),
+                sprintf('-c:v:%d', $index), 'libx264',
+                sprintf('-b:v:%d', $index), $variant['videoBitrate'],
+            ];
+
+            if ($hasAudio) {
+                $args = [
+                    ...$args,
+                    '-map', '0:a:0',
+                    sprintf('-c:a:%d', $index), 'aac',
+                    sprintf('-b:a:%d', $index), $variant['audioBitrate'],
+                ];
+            }
+        }
+
+        return $args;
+    }
+
+    private function buildVarStreamMap(bool $hasAudio): string
+    {
+        $names = ['1080p', '720p', '480p'];
+
+        $entries = [];
+        foreach ($names as $index => $name) {
+            $entries[] = $hasAudio
+                ? sprintf('v:%d,a:%d,name:%s', $index, $index, $name)
+                : sprintf('v:%d,name:%s', $index, $name);
+        }
+
+        return implode(' ', $entries);
     }
 }

@@ -36,22 +36,22 @@ export default function ReviewVideoViewer({
 
   return (
     <div className="shrink-0 w-[100vh] h-[50vh] rounded-xl overflow-hidden bg-dark mb-4">
-      <div className="bg-dark flex items-center justify-center">
+      <div className="bg-dark flex items-center w-full h-full justify-center">
         {isTranscoding && (
-          <div className="flex flex-col items-center gap-3 text-clear text-body-sm">
+          <div className="flex flex-col items-center gap-3 text-clear text-sm">
             <div className="size-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
             <span>{t("reviews:detail.video.transcoding")}</span>
           </div>
         )}
 
         {hasTranscodeFailed && (
-          <span className="text-clear text-body-sm px-4 text-center">
+          <span className="text-clear text-sm px-4 text-center">
             {t("reviews:detail.video.transcodingFailed")}
           </span>
         )}
 
         {hasPlaybackFailed && (
-          <span className="text-clear text-body-sm px-4 text-center">
+          <span className="text-clear text-sm px-4 text-center">
             {t("reviews:detail.video.playbackError")}
           </span>
         )}
