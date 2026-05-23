@@ -19,6 +19,7 @@ use App\Exception\Review\ReviewLockedException;
 use App\Exception\Review\ScriptAlreadyHasReviewException;
 use App\Message\ProcessReviewVideoMessage;
 use App\Repository\ProjectRepository;
+use App\Repository\ReviewCommentRepository;
 use App\Repository\ReviewRepository;
 use App\Repository\ReviewVersionRepository;
 use App\Repository\ScriptRepository;
@@ -45,6 +46,7 @@ final class ReviewController extends AbstractController
         ListReviewsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
         ReviewRepository $reviewRepository,
+        ReviewCommentRepository $reviewCommentRepository,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -65,8 +67,13 @@ final class ReviewController extends AbstractController
             $queryParamDto->getSearchTerm(),
         );
 
+        $unresolvedCounts = $reviewCommentRepository->getOpenTopLevelCountsForLatestVersions($reviews);
+
         $items = array_map(
-            fn(Review $review) => ReviewWithLatestVersionResponseDTO::fromEntity($review),
+            fn(Review $review) => ReviewWithLatestVersionResponseDTO::fromEntity(
+                $review,
+                $unresolvedCounts[$review->getId()] ?? 0,
+            ),
             $reviews,
         );
 
@@ -79,8 +86,11 @@ final class ReviewController extends AbstractController
 
     #[Route('/{reviewUuid}', name: 'api_reviews_show', methods: ['GET'], requirements: ['reviewUuid' => Requirement::UUID])]
     #[IsGranted(UserRole::User->value)]
-    public function show(string $reviewUuid, ReviewRepository $reviewRepository): JsonResponse
-    {
+    public function show(
+        string $reviewUuid,
+        ReviewRepository $reviewRepository,
+        ReviewCommentRepository $reviewCommentRepository,
+    ): JsonResponse {
         $review = $reviewRepository->getByUuid($reviewUuid);
 
         if ($review === null) {
@@ -89,8 +99,13 @@ final class ReviewController extends AbstractController
 
         $this->denyAccessUnlessGranted(ProjectVoter::VIEW, $review->getProject());
 
+        $latestVersion = $review->getLatestVersion();
+        $unresolvedCount = $latestVersion === null
+            ? 0
+            : $reviewCommentRepository->countOpenTopLevelForVersion($latestVersion);
+
         return $this->json(
-            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review, $unresolvedCount),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_reviews_show']],
         );
@@ -105,6 +120,7 @@ final class ReviewController extends AbstractController
         ScriptRepository $scriptRepository,
         ReviewRepository $reviewRepository,
         ReviewVersionRepository $reviewVersionRepository,
+        ReviewCommentRepository $reviewCommentRepository,
         ReviewFileService $reviewFileService,
         EntityManagerInterface $entityManager,
         MessageBusInterface $messageBus,
@@ -164,7 +180,10 @@ final class ReviewController extends AbstractController
         }
 
         return $this->json(
-            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
+            data: ReviewWithLatestVersionResponseDTO::fromEntity(
+                $review,
+                $reviewCommentRepository->countOpenTopLevelForVersion($version),
+            ),
             status: Response::HTTP_CREATED,
             context: ['groups' => ['api_reviews_create']],
         );
@@ -177,6 +196,7 @@ final class ReviewController extends AbstractController
         UpdateReviewRequestDTO $dto,
         ReviewRepository $reviewRepository,
         ScriptRepository $scriptRepository,
+        ReviewCommentRepository $reviewCommentRepository,
         EntityManagerInterface $entityManager,
     ): JsonResponse {
         /** @var User $user */
@@ -223,8 +243,13 @@ final class ReviewController extends AbstractController
             throw new ScriptAlreadyHasReviewException();
         }
 
+        $latestVersion = $review->getLatestVersion();
+        $unresolvedCount = $latestVersion === null
+            ? 0
+            : $reviewCommentRepository->countOpenTopLevelForVersion($latestVersion);
+
         return $this->json(
-            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review, $unresolvedCount),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_reviews_update']],
         );

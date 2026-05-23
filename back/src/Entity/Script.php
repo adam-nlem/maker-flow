@@ -37,6 +37,7 @@ class Script
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]
@@ -57,6 +58,7 @@ class Script
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]

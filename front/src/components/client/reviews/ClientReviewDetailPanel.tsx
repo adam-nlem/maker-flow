@@ -64,7 +64,7 @@ function LoadedClientReviewDetailPanel({ reviewDTO, projectUuid }: LoadedClientR
         <ReviewDetailPanel
             reviewDTO={reviewDTO}
             projectUuid={projectUuid}
-            footer={(
+            footer={({ isLatest }) => isLatest ? (
                 <ClientReviewActionsBar
                     status={status}
                     isApproving={isApproving}
@@ -72,7 +72,7 @@ function LoadedClientReviewDetailPanel({ reviewDTO, projectUuid }: LoadedClientR
                     onApprove={handleApprove}
                     onRequestChanges={() => setIsRequestChangesModalOpen(true)}
                 />
-            )}
+            ) : null}
         >
             {reviewDTO.latestVersion && (
                 <ClientReviewRequestChangesModal

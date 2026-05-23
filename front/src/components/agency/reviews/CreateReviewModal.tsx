@@ -11,7 +11,7 @@ import { MediaType, mediaTypeToIcon, mediaTypeTranslationKeys, mediaTypeUploadHi
 import { useCreateReview } from "~/hooks/api/reviews/useCreateReview";
 import { useReviewsStore } from "~/stores/reviews/reviewsStore";
 import { HttpException } from "~/services/httpClient/HttpException";
-import ReviewFileDropzone from "./ReviewFileDropzone";
+import ReviewFileDropzone from "~/components/reviews/ReviewFileDropzone";
 
 interface CreateReviewModalProps {
   projectUuid: string;

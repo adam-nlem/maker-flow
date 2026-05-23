@@ -29,6 +29,7 @@ class Review
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]
@@ -42,6 +43,7 @@ class Review
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]
@@ -54,6 +56,7 @@ class Review
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]
@@ -66,6 +69,7 @@ class Review
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]
@@ -79,6 +83,7 @@ class Review
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]
@@ -92,6 +97,7 @@ class Review
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]
@@ -104,6 +110,7 @@ class Review
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]
@@ -121,6 +128,7 @@ class Review
         'api_reviews_update',
         'api_review_versions_approve',
         'api_review_versions_request_changes',
+        'api_review_versions_create',
         'api_review_comments_create',
         'api_review_comments_update',
     ])]
@@ -135,6 +143,16 @@ class Review
      */
     #[ORM\OneToMany(targetEntity: ReviewVersion::class, mappedBy: 'review', cascade: ['remove'], orphanRemoval: true)]
     #[ORM\OrderBy(['createdAt' => 'ASC'])]
+    #[Groups([
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_request_changes',
+        'api_review_versions_create',
+        'api_review_comments_create',
+        'api_review_comments_update',
+    ])]
     private Collection $versions;
 
     public function __construct()

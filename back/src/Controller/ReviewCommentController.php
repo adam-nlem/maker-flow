@@ -114,7 +114,10 @@ final class ReviewCommentController extends AbstractController
         $reviewCommentRepository->save($comment, true);
 
         return $this->json(
-            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
+            data: ReviewWithLatestVersionResponseDTO::fromEntity(
+                $review,
+                $reviewCommentRepository->countOpenTopLevelForVersion($reviewVersion),
+            ),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_review_comments_create']],
         );
@@ -194,8 +197,13 @@ final class ReviewCommentController extends AbstractController
 
         $reviewCommentRepository->save($comment, true);
 
+        $latestVersion = $review->getLatestVersion();
+        $unresolvedCount = $latestVersion === null
+            ? 0
+            : $reviewCommentRepository->countOpenTopLevelForVersion($latestVersion);
+
         return $this->json(
-            data: ReviewWithLatestVersionResponseDTO::fromEntity($review),
+            data: ReviewWithLatestVersionResponseDTO::fromEntity($review, $unresolvedCount),
             status: Response::HTTP_OK,
             context: ['groups' => ['api_review_comments_update']],
         );

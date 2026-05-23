@@ -130,6 +130,25 @@
         "confirmBody": "Tous les fichiers téléversés seront définitivement supprimés.",
         "confirm": "Supprimer la review"
     },
+    "tile": {
+        "unresolved": "{{count}} non résolu",
+        "unresolved_other": "{{count}} non résolus"
+    },
+    "versions": {
+        "switcher": {
+            "trigger": "Version {{number}} sur {{total}}",
+            "uploaded": "envoyée {{relative}}",
+            "viewingHistorical": "Vous consultez une version antérieure — les commentaires sont en lecture seule."
+        }
+    },
+    "upload": {
+        "title": "Envoyer une nouvelle version",
+        "submit": "Envoyer cette version",
+        "toast": {
+            "success": "Nouvelle version envoyée.",
+            "error": "Impossible d'envoyer la nouvelle version. Veuillez réessayer."
+        }
+    },
     "comments": {
         "title": "Commentaires",
         "loading": "Chargement des commentaires…",

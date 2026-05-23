@@ -1,6 +1,8 @@
 import { type ReactNode } from "react";
 import { useTranslation } from "react-i18next";
 import { Tag } from "~/components/ui/Tag";
+import ReviewVersionUploader from "./ReviewVersionUploader";
+import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import type { ReviewWithLatestVersionDTO } from "~/dtos/reviews/ReviewWithLatestVersionDTO";
 import { mediaTypeToIcon } from "~/models/enums/MediaType";
 import {
@@ -14,14 +16,18 @@ import { formatToFrenchDateShort } from "~/utils/dateFormatters";
 
 interface ReviewDetailSideCardProps {
     reviewDTO: ReviewWithLatestVersionDTO;
+    projectUuid: string;
     onLinkedScriptClick?: () => void;
 }
 
-export default function ReviewDetailSideCard({ reviewDTO, onLinkedScriptClick }: ReviewDetailSideCardProps) {
+export default function ReviewDetailSideCard({ reviewDTO, projectUuid, onLinkedScriptClick }: ReviewDetailSideCardProps) {
     const { t } = useTranslation();
+    const { user } = useCurrentUser();
     const MediaTypeIcon = mediaTypeToIcon[reviewDTO.review.mediaType];
     const typeLabel = t(`reviews:detail.eyebrow.${reviewDTO.review.mediaType}`);
     const status = reviewDTO.currentStatus ?? ReviewStatus.Pending;
+
+    const isAgencyViewer = user !== null && user !== undefined && !user.isClient;
 
     return (
         <aside className="bg-clear-2 border border-pale-gray rounded-xl p-1 self-start w-1/3">
@@ -55,6 +61,9 @@ export default function ReviewDetailSideCard({ reviewDTO, onLinkedScriptClick }:
                 <SideCardRow label={t("reviews:detail.sideCard.updated")}>
                     {formatToFrenchDateShort(new Date(reviewDTO.review.updatedAt))}
                 </SideCardRow>
+            )}
+            {isAgencyViewer && (
+                <ReviewVersionUploader reviewDTO={reviewDTO} projectUuid={projectUuid} />
             )}
         </aside>
     );

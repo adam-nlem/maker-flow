@@ -5,6 +5,8 @@ import ReviewMediaViewer from "./ReviewMediaViewer";
 import ReviewCommentsTimeline from "./ReviewCommentsTimeline";
 import ReviewDetailHeader from "./ReviewDetailHeader";
 import ReviewDetailBody from "./ReviewDetailBody";
+import ReviewVersionDropdown from "./ReviewVersionDropdown";
+import { useReviewsStore } from "~/stores/reviews/reviewsStore";
 import type { ReviewWithLatestVersionDTO } from "~/dtos/reviews/ReviewWithLatestVersionDTO";
 import type { ReviewEditForm } from "~/hooks/useReviewEditForm";
 import {
@@ -30,7 +32,7 @@ interface ReviewDetailPanelProps {
   /** Rendered inside the body's "linked script" section (agency edit flow); omit on read-only surfaces. */
   linkedScriptField?: ReactNode;
   /** Inserted between the body row and the comments timeline (e.g. client approve/request-changes bar). */
-  footer?: ReactNode;
+  footer?: (args: { isLatest: boolean }) => ReactNode;
   /** Modals owned by the role-specific container (delete dialog, request-changes modal, …). */
   children?: ReactNode;
 }
@@ -48,6 +50,17 @@ export default function ReviewDetailPanel({
   const { t } = useTranslation();
   const status = reviewDTO.currentStatus ?? ReviewStatus.Pending;
   const videoElementRef = useRef<HTMLVideoElement>(null);
+
+  const selectedVersionUuid = useReviewsStore((s) => s.selectedVersionUuid);
+  const selectVersion = useReviewsStore((s) => s.selectVersion);
+
+  const versions = reviewDTO.versions;
+  const latestVersion = reviewDTO.latestVersion;
+  const selectedVersion = selectedVersionUuid
+    ? versions.find((v) => v.uuid === selectedVersionUuid) ?? null
+    : null;
+  const activeVersion = selectedVersion ?? latestVersion;
+  const isLatest = activeVersion !== null && latestVersion !== null && activeVersion.uuid === latestVersion.uuid;
 
   const inner = (
     <>
@@ -67,9 +80,17 @@ export default function ReviewDetailPanel({
         onOpenLinkedScript={onOpenLinkedScript}
       />
 
-      {reviewDTO.latestVersion && (
+      {activeVersion && (
+        <ReviewVersionDropdown
+          versions={versions}
+          activeVersionUuid={activeVersion.uuid}
+          onSelect={selectVersion}
+        />
+      )}
+
+      {activeVersion && (
         <ReviewMediaViewer
-          reviewVersion={reviewDTO.latestVersion}
+          reviewVersion={activeVersion}
           mediaType={reviewDTO.review.mediaType}
           videoElementRef={videoElementRef}
         />
@@ -83,15 +104,26 @@ export default function ReviewDetailPanel({
           actions={titleBarActions}
           linkedScriptField={linkedScriptField}
         />
-        <ReviewDetailSideCard reviewDTO={reviewDTO} onLinkedScriptClick={!form?.canEdit && onOpenLinkedScript && reviewDTO.review.script
-          ? () => onOpenLinkedScript(reviewDTO.review.script!.uuid)
-          : undefined}
+        <ReviewDetailSideCard
+          reviewDTO={reviewDTO}
+          projectUuid={projectUuid}
+          onLinkedScriptClick={!form?.canEdit && onOpenLinkedScript && reviewDTO.review.script
+            ? () => onOpenLinkedScript(reviewDTO.review.script!.uuid)
+            : undefined}
         />
       </div>
 
-      <ReviewCommentsTimeline reviewDTO={reviewDTO} projectUuid={projectUuid} videoElementRef={videoElementRef} />
+      {activeVersion && (
+        <ReviewCommentsTimeline
+          reviewDTO={reviewDTO}
+          activeVersion={activeVersion}
+          isLatest={isLatest}
+          projectUuid={projectUuid}
+          videoElementRef={videoElementRef}
+        />
+      )}
 
-      {footer}
+      {footer?.({ isLatest })}
 
       {children}
     </>

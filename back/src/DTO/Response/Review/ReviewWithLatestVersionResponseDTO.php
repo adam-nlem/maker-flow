@@ -17,6 +17,7 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
             'api_reviews_update',
             'api_review_versions_approve',
             'api_review_versions_request_changes',
+            'api_review_versions_create',
             'api_review_comments_create',
             'api_review_comments_update',
         ])]
@@ -28,17 +29,31 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
             'api_reviews_update',
             'api_review_versions_approve',
             'api_review_versions_request_changes',
+            'api_review_versions_create',
             'api_review_comments_create',
             'api_review_comments_update',
         ])]
         private readonly ?ReviewVersion $latestVersion,
+        #[Groups([
+            'api_reviews_list',
+            'api_reviews_show',
+            'api_reviews_create',
+            'api_reviews_update',
+            'api_review_versions_approve',
+            'api_review_versions_request_changes',
+            'api_review_versions_create',
+            'api_review_comments_create',
+            'api_review_comments_update',
+        ])]
+        private readonly ?int $unresolvedCommentsCount,
     ) {}
 
-    public static function fromEntity(Review $review): self
+    public static function fromEntity(Review $review, ?int $unresolvedCommentsCount = null): self
     {
         return new self(
             review: $review,
             latestVersion: $review->getLatestVersion(),
+            unresolvedCommentsCount: $unresolvedCommentsCount,
         );
     }
 
@@ -47,6 +62,7 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
         return [
             'review' => $this->review,
             'latestVersion' => $this->latestVersion,
+            'unresolvedCommentsCount' => $this->unresolvedCommentsCount,
         ];
     }
 
@@ -58,5 +74,10 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
     public function getLatestVersion(): ?ReviewVersion
     {
         return $this->latestVersion;
+    }
+
+    public function getUnresolvedCommentsCount(): ?int
+    {
+        return $this->unresolvedCommentsCount;
     }
 }

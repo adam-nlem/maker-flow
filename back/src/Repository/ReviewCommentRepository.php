@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Enum\ReviewCommentStatus;
+use App\Entity\Review;
 use App\Entity\ReviewComment;
 use App\Entity\ReviewVersion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -44,6 +46,67 @@ class ReviewCommentRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function countOpenTopLevelForVersion(ReviewVersion $reviewVersion): int
+    {
+        return (int) $this->createQueryBuilder('c')
+            ->select('COUNT(c.id)')
+            ->where('c.reviewVersion = :reviewVersion')
+            ->andWhere('c.parentComment IS NULL')
+            ->andWhere('c.status = :status')
+            ->setParameter('reviewVersion', $reviewVersion)
+            ->setParameter('status', ReviewCommentStatus::Open)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    /**
+     * Returns a map keyed by Review.id with the open top-level comment count
+     * on each review's latest ReviewVersion. Reviews with no version (or no
+     * matching comments) are absent from the map — callers should treat
+     * missing keys as zero.
+     *
+     * @param Review[] $reviews
+     * @return array<int, int>
+     */
+    public function getOpenTopLevelCountsForLatestVersions(array $reviews): array
+    {
+        if ($reviews === []) {
+            return [];
+        }
+
+        $reviewIds = array_values(array_filter(array_map(
+            static fn(Review $review) => $review->getId(),
+            $reviews,
+        )));
+
+        if ($reviewIds === []) {
+            return [];
+        }
+
+        $rows = $this->createQueryBuilder('c')
+            ->select('IDENTITY(rv.review) AS reviewId', 'COUNT(c.id) AS unresolvedCount')
+            ->innerJoin('c.reviewVersion', 'rv')
+            ->where('rv.review IN (:reviewIds)')
+            ->andWhere('c.parentComment IS NULL')
+            ->andWhere('c.status = :status')
+            ->andWhere('NOT EXISTS (
+                SELECT 1 FROM ' . ReviewVersion::class . ' rvLater
+                WHERE rvLater.review = rv.review AND rvLater.createdAt > rv.createdAt
+            )')
+            ->setParameter('reviewIds', $reviewIds)
+            ->setParameter('status', ReviewCommentStatus::Open)
+            ->groupBy('rv.review')
+            ->getQuery()
+            ->getArrayResult();
+
+        $counts = [];
+        foreach ($rows as $row) {
+            $counts[(int) $row['reviewId']] = (int) $row['unresolvedCount'];
+        }
+
+        return $counts;
     }
 
     /**

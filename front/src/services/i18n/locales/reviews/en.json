@@ -130,6 +130,25 @@
         "confirmBody": "All uploaded files for this review will be permanently removed.",
         "confirm": "Delete review"
     },
+    "tile": {
+        "unresolved": "{{count}} unresolved",
+        "unresolved_other": "{{count}} unresolved"
+    },
+    "versions": {
+        "switcher": {
+            "trigger": "Version {{number}} of {{total}}",
+            "uploaded": "uploaded {{relative}}",
+            "viewingHistorical": "You're viewing an earlier version — comments here are read-only."
+        }
+    },
+    "upload": {
+        "title": "Upload a new version",
+        "submit": "Send new version",
+        "toast": {
+            "success": "New version uploaded.",
+            "error": "Couldn't upload the new version. Please try again."
+        }
+    },
     "comments": {
         "title": "Comments",
         "loading": "Loading comments…",

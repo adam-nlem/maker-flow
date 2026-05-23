@@ -3556,6 +3556,27 @@
           "response": []
         },
         {
+          "name": "Upload New Review Media Version (multipart)",
+          "id": "reviews-versions-create-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "reviewUuid", "value": "{{reviewUuid}}", "type": "text" },
+                { "key": "files[]", "type": "file", "src": [] }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/review-versions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-versions"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Update Review",
           "id": "reviews-update-0001-000000000000",
           "request": {
