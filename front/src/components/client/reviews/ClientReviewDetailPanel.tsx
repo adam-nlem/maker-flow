@@ -2,7 +2,6 @@ import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import ReviewDetailPanel from "~/components/reviews/ReviewDetailPanel";
 import ClientReviewActionsBar from "./ClientReviewActionsBar";
-import ClientReviewRequestChangesModal from "./ClientReviewRequestChangesModal";
 import { useShowReview } from "~/hooks/api/reviews/useShowReview";
 import { useApproveReviewVersion } from "~/hooks/api/reviews/useApproveReviewVersion";
 import { useToastStore } from "~/stores/toast/toastStore";
@@ -39,7 +38,6 @@ function LoadedClientReviewDetailPanel({ reviewDTO, projectUuid }: LoadedClientR
     const addToast = useToastStore((s) => s.addToast);
     const { approveReviewVersion, isPending: isApproving } = useApproveReviewVersion();
 
-    const [isRequestChangesModalOpen, setIsRequestChangesModalOpen] = useState(false);
     const [approveError, setApproveError] = useState<string | null>(null);
 
     const status = reviewDTO.currentStatus ?? ReviewStatus.Pending;
@@ -70,19 +68,8 @@ function LoadedClientReviewDetailPanel({ reviewDTO, projectUuid }: LoadedClientR
                     isApproving={isApproving}
                     approveError={approveError}
                     onApprove={handleApprove}
-                    onRequestChanges={() => setIsRequestChangesModalOpen(true)}
                 />
             ) : null}
-        >
-            {reviewDTO.latestVersion && (
-                <ClientReviewRequestChangesModal
-                    isOpen={isRequestChangesModalOpen}
-                    onClose={() => setIsRequestChangesModalOpen(false)}
-                    reviewVersionUuid={reviewDTO.latestVersion.uuid}
-                    reviewUuid={reviewDTO.review.uuid}
-                    projectUuid={projectUuid}
-                />
-            )}
-        </ReviewDetailPanel>
+        />
     );
 }

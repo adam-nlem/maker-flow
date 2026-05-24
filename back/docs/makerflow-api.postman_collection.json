@@ -3508,7 +3508,7 @@
                 { "key": "projectUuid", "value": "{{projectUuid}}" },
                 { "key": "page", "value": "1" },
                 { "key": "limit", "value": "20" },
-                { "key": "status", "value": "awaiting_review", "description": "Optional: awaiting_review | changes_requested | approved | rejected", "disabled": true },
+                { "key": "status", "value": "awaiting_review", "description": "Optional: awaiting_review | approved | rejected", "disabled": true },
                 { "key": "searchTerm", "value": "", "description": "Optional: case-insensitive LIKE on title", "disabled": true }
               ]
             }
@@ -3673,25 +3673,6 @@
               "raw": "{{baseUrl}}/api/review-versions/{{reviewVersionUuid}}/approve",
               "host": ["{{baseUrl}}"],
               "path": ["api", "review-versions", "{{reviewVersionUuid}}", "approve"]
-            }
-          },
-          "response": []
-        },
-        {
-          "name": "Request Changes on Review Media Version (client)",
-          "id": "reviews-request-changes-0001-000000000000",
-          "request": {
-            "method": "POST",
-            "header": [{ "key": "Content-Type", "value": "application/json" }],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n    \"comment\": \"Please tighten the intro and add a CTA at 0:25.\"\n}"
-            },
-            "description": "ROLE_CLIENT only. JSON body { \"comment\": string } — trimmed, non-empty, max 5000 chars (ReviewCommentEmptyException = 33011, TooLong = 33012, PayloadInvalid = 33013). Creates a ReviewComment on the latest version (author = current user) and transitions latestVersion.status to ChangesRequested. Allowed from Pending or Approved (else 409 ReviewVersionNotPendingOrApprovedException = 33009). 409 ReviewVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent review serialized with api_review_versions_request_changes.",
-            "url": {
-              "raw": "{{baseUrl}}/api/review-versions/{{reviewVersionUuid}}/request-changes",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "review-versions", "{{reviewVersionUuid}}", "request-changes"]
             }
           },
           "response": []

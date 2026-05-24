@@ -4,19 +4,15 @@ namespace App\Controller;
 
 use App\DTO\QueryParam\Review\StreamFileQueryParamDTO;
 use App\DTO\Request\Review\CreateReviewVersionRequestDTO;
-use App\DTO\Request\Review\RequestChangesOnReviewVersionRequestDTO;
 use App\DTO\Response\Review\ReviewWithLatestVersionResponseDTO;
 use App\Entity\Enum\MediaType;
 use App\Entity\Enum\ReviewStatus;
 use App\Entity\Enum\UserRole;
 use App\Entity\Enum\VideoStreamingStatus;
-use App\Entity\ReviewComment;
 use App\Entity\ReviewVersion;
-use App\Entity\User;
 use App\Exception\Review\MissingReviewException;
 use App\Exception\Review\ReviewVersionNotLatestException;
 use App\Exception\Review\ReviewVersionNotPendingException;
-use App\Exception\Review\ReviewVersionNotPendingOrApprovedException;
 use App\Message\ProcessReviewVideoMessage;
 use App\Repository\ReviewCommentRepository;
 use App\Repository\ReviewRepository;
@@ -247,52 +243,4 @@ final class ReviewVersionController extends AbstractController
         );
     }
 
-    #[Route('/{reviewVersionUuid}/request-changes', name: 'api_review_versions_request_changes', methods: ['POST'], requirements: ['reviewVersionUuid' => Requirement::UUID])]
-    #[IsGranted(UserRole::Client->value)]
-    public function requestChanges(
-        string $reviewVersionUuid,
-        RequestChangesOnReviewVersionRequestDTO $dto,
-        ReviewVersionRepository $reviewVersionRepository,
-        ReviewCommentRepository $reviewCommentRepository,
-    ): JsonResponse {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $reviewVersion = $reviewVersionRepository->getByUuid($reviewVersionUuid);
-
-        if ($reviewVersion === null) {
-            throw new MissingReviewException();
-        }
-
-        $review = $reviewVersion->getReview();
-
-        $this->denyAccessUnlessGranted(ProjectVoter::VIEW, $review->getProject());
-
-        if ($review->getLatestVersion() !== $reviewVersion) {
-            throw new ReviewVersionNotLatestException();
-        }
-
-        if (!in_array($reviewVersion->getStatus(), [ReviewStatus::Pending, ReviewStatus::Approved], true)) {
-            throw new ReviewVersionNotPendingOrApprovedException();
-        }
-
-        $comment = new ReviewComment();
-        $comment->setReviewVersion($reviewVersion);
-        $comment->setAuthor($user);
-        $comment->setBody($dto->getComment());
-        $reviewVersion->addComment($comment);
-
-        $reviewVersion->setStatus(ReviewStatus::ChangesRequested);
-
-        $reviewCommentRepository->save($comment, true);
-
-        return $this->json(
-            data: ReviewWithLatestVersionResponseDTO::fromEntity(
-                $review,
-                $reviewCommentRepository->countOpenTopLevelForVersion($reviewVersion),
-            ),
-            status: Response::HTTP_OK,
-            context: ['groups' => ['api_review_versions_request_changes']],
-        );
-    }
 }

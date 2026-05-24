@@ -120,7 +120,7 @@ Right-column panel listing reviews in the focused project that have unresolved t
 
 Header shows a total `Tag` with the project's combined open count. Empty state covers "no review has open top-level comments". The body is a vertical stack of review groups, each with a clickable title row (review title + per-review count chevron) and a list of compact `HomePendingReviewCommentRow` entries (author avatar, name, relative timestamp, optional video-timecode `Tag`, two-line body).
 
-Clicking a review title or any comment row calls `useReviewsStore.selectReview(review.uuid)` and `navigate(agencyReviewsPath)` so the agency lands directly on the review's detail panel. Resolving / reopening / creating a comment, and uploading a new version, invalidate `reviewsQueryKeys.pendingComments(projectUuid)` (added to `useUpdateReviewComment`, `useCreateReviewComment`, `useRequestChangesOnReviewVersion`, `useCreateReviewVersion`) so the widget refreshes automatically.
+Clicking a review title or any comment row calls `useReviewsStore.selectReview(review.uuid)` and `navigate(agencyReviewsPath)` so the agency lands directly on the review's detail panel. Resolving / reopening / creating a comment, and uploading a new version, invalidate `reviewsQueryKeys.pendingComments(projectUuid)` (added to `useUpdateReviewComment`, `useCreateReviewComment`, `useCreateReviewVersion`) so the widget refreshes automatically.
 
 Props: `projectUuid: string`
 

@@ -20,7 +20,6 @@
     "filters": {
         "all": "All",
         "pending": "Pending",
-        "changesRequested": "Changes",
         "approved": "Approved",
         "rejected": "Rejected"
     },
@@ -33,7 +32,6 @@
     },
     "status": {
         "pending": "Pending review",
-        "changesRequested": "Changes requested",
         "approved": "Approved",
         "rejected": "Rejected"
     },
@@ -41,10 +39,6 @@
         "pending": {
             "title": "Review pending",
             "subtitle": "The client hasn't looked at this review yet."
-        },
-        "changesRequested": {
-            "title": "Changes requested",
-            "subtitle": "The client asked for revisions on this review."
         },
         "approved": {
             "title": "Review approved",

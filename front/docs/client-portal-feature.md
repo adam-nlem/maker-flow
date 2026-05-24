@@ -144,7 +144,7 @@ The gate is enforced **on the backend**, not via a serialized boolean: `GET /api
 - `GeneralSettings` is reused as-is for clients (same profile + password forms).
 - Mutation error handling, exception-code → translation mapping, and the `PasswordRules` component are shared.
 - `mobileSidebarStore` is a UI-only Zustand store shared by both mobile drawers.
-- The full Review UI (`ReviewsPageView`, `ReviewDetailPanel`, `ReviewDetailHeader` / `Body` / `SideCard`, `ReviewsList`, `ReviewTile`, comments timeline, media viewers) lives in `components/reviews/` and is composed identically by both surfaces. Role-specific behaviour is confined to two thin containers (`AgencyReviewDetailContainer`, `ClientReviewDetailContainer`) that wire the role's hooks and pass slots into the shared panel — agency adds `form` + delete + create modal; client adds the approve / request-changes footer + modal. See [review-feature.md](review-feature.md#components).
+- The full Review UI (`ReviewsPageView`, `ReviewDetailPanel`, `ReviewDetailHeader` / `Body` / `SideCard`, `ReviewsList`, `ReviewTile`, comments timeline, media viewers) lives in `components/reviews/` and is composed identically by both surfaces. Role-specific behaviour is confined to two thin containers (`AgencyReviewDetailContainer`, `ClientReviewDetailContainer`) that wire the role's hooks and pass slots into the shared panel — agency adds `form` + delete + create modal; client adds the approve footer (revisions are signaled purely via the shared comment thread). See [review-feature.md](review-feature.md#components).
 
 ## Out of scope (this phase)
 

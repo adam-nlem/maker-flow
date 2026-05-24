@@ -18,25 +18,10 @@
         "all": "Tous"
     },
     "actions": {
-        "approve": "Approuver",
-        "requestChanges": "Demander des modifications",
-        "waitingForAgency": "En attente d'une nouvelle version de l'agence."
-    },
-    "requestChangesModal": {
-        "title": "Demander des modifications",
-        "subtitle": "Indiquez à votre agence ce que vous aimeriez modifier avant publication.",
-        "placeholder": "Décrivez ce que vous souhaitez modifier…",
-        "cancel": "Annuler",
-        "submit": "Envoyer le retour",
-        "errors": {
-            "empty": "Veuillez saisir votre retour avant d'envoyer.",
-            "tooLong": "Votre retour est trop long — veuillez le raccourcir."
-        }
+        "approve": "Approuver"
     },
     "toast": {
         "approveSuccess": "Review approuvée.",
-        "approveError": "Impossible d'approuver la review. Veuillez réessayer.",
-        "requestChangesSuccess": "Retour envoyé à votre agence.",
-        "requestChangesError": "Impossible d'envoyer votre retour. Veuillez réessayer."
+        "approveError": "Impossible d'approuver la review. Veuillez réessayer."
     }
 }

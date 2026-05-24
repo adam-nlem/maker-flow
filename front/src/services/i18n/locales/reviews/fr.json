@@ -20,7 +20,6 @@
     "filters": {
         "all": "Tous",
         "pending": "En attente",
-        "changesRequested": "Modifications",
         "approved": "Validé",
         "rejected": "Rejeté"
     },
@@ -33,7 +32,6 @@
     },
     "status": {
         "pending": "En attente de validation",
-        "changesRequested": "Modifications demandées",
         "approved": "Validé",
         "rejected": "Rejeté"
     },
@@ -41,10 +39,6 @@
         "pending": {
             "title": "Review en attente de validation",
             "subtitle": "Le client n'a pas encore consulté cette review."
-        },
-        "changesRequested": {
-            "title": "Modifications demandées",
-            "subtitle": "Le client a demandé des révisions sur cette review."
         },
         "approved": {
             "title": "Review validée",

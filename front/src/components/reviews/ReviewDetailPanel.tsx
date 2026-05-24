@@ -31,9 +31,9 @@ interface ReviewDetailPanelProps {
   titleBarActions?: ReactNode;
   /** Rendered inside the body's "linked script" section (agency edit flow); omit on read-only surfaces. */
   linkedScriptField?: ReactNode;
-  /** Inserted between the body row and the comments timeline (e.g. client approve/request-changes bar). */
+  /** Inserted between the body row and the comments timeline (e.g. client approve bar). */
   footer?: (args: { isLatest: boolean }) => ReactNode;
-  /** Modals owned by the role-specific container (delete dialog, request-changes modal, …). */
+  /** Modals owned by the role-specific container (e.g. delete dialog). */
   children?: ReactNode;
 }
 
