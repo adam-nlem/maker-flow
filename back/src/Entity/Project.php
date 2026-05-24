@@ -34,6 +34,7 @@ class Project
         'api_invitations_show',
         'api_invitations_create',
         'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?string $uuid = null;
 
@@ -48,6 +49,7 @@ class Project
         'api_invitations_show',
         'api_invitations_create',
         'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?string $name = null;
 

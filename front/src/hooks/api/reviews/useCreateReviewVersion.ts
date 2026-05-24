@@ -40,6 +40,7 @@ export function useCreateReviewVersion() {
         onSuccess: (result, variables) => {
             queryClient.setQueryData(reviewsQueryKeys.detail(variables.reviewUuid), result);
             queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.listAll(variables.projectUuid) });
+            queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.pendingComments(variables.projectUuid) });
         },
     });
 

@@ -2,13 +2,13 @@
 
 ## Overview
 
-The home page (`/agency`) is a two-column view. The left column holds the analytics content (aggregated overview KPIs, per-integration metric cards, views evolution chart, engagement comparison, ranked top posts). The right column holds a persistent Scripts summary panel. All home-page analytics come from a single REST endpoint (`/api/integration-insights`); the Scripts panel uses `/api/scripts`.
+The home page (`/agency`) is a two-column view. The left column holds the analytics content (aggregated overview KPIs, per-integration metric cards, views evolution chart, engagement comparison, ranked top posts). The right column stacks two summary panels: `HomeScriptsPanel` on top, `HomePendingReviewCommentsPanel` below — both share the column height via `flex-1 min-h-0`. All home-page analytics come from a single REST endpoint (`/api/integration-insights`); the Scripts panel uses `/api/scripts`; the pending-review-comments panel uses the dedicated `/api/review-comments/pending` endpoint.
 
 ## Layout
 
 Two-column layout: `h-full flex flex-row gap-3 overflow-y-auto p-3 md:p-5`.
 - **Left column** (`flex-1 min-w-0`): stacked analytics sections with `gap-5` spacing.
-- **Right column** (`w-80 shrink-0`): `HomeScriptsPanel`, always visible when the user has integrations + an active subscription.
+- **Right column** (`w-full md:w-1/2 shrink-0 flex flex-col gap-3 min-h-0`): `HomeScriptsPanel` + `HomePendingReviewCommentsPanel` stacked, both visible when the user has integrations + an active subscription. Each panel uses `flex-1 min-h-0` so they share the column height and scroll internally.
 
 ## Sections
 
@@ -22,6 +22,7 @@ Two-column layout: `h-full flex flex-row gap-3 overflow-y-auto p-3 md:p-5`.
 
 ### Right column
 7. **HomeScriptsPanel** — Summary of the project's scripts grouped into 3 logical status groups, with a "+ Nouveau" shortcut to create a script and jump into the scripts editor.
+8. **HomePendingReviewCommentsPanel** — Overview of unresolved top-level comments on the latest version of each review in the focused project, grouped per review. Each comment row navigates to the review detail in `/agency/reviews`.
 
 ## Data Sources
 
@@ -108,6 +109,24 @@ The 3 groups are defined in `src/models/enums/ScriptStatusGroup.ts`:
 This grouping is intentionally local to this view; the rest of the app still uses the 6 individual `ScriptStatus` values (icons, pill colors, French translations inside each `HomeScriptRow` are still sourced from `ScriptStatus`).
 
 Props: `projectUuid: string`
+
+### HomePendingReviewCommentsPanel
+
+**File:** `src/components/agency/home/HomePendingReviewCommentsPanel.tsx`
+
+Right-column panel listing reviews in the focused project that have unresolved top-level comments on their latest version. Backed by a dedicated, single-round-trip endpoint:
+
+- `useListPendingReviewComments({ projectUuid, limit: 100 })` calls `GET /api/review-comments/pending` and returns `ReviewCommentsGroupedByReviewDTO[]` — each item already carries its parent review (with `unresolvedCommentsCount`) and the actual open top-level comments for the latest version, server-side filtered and ordered (`createdAt ASC` so the oldest unresolved feedback surfaces first). No per-review fanout from the client.
+
+Header shows a total `Tag` with the project's combined open count. Empty state covers "no review has open top-level comments". The body is a vertical stack of review groups, each with a clickable title row (review title + per-review count chevron) and a list of compact `HomePendingReviewCommentRow` entries (author avatar, name, relative timestamp, optional video-timecode `Tag`, two-line body).
+
+Clicking a review title or any comment row calls `useReviewsStore.selectReview(review.uuid)` and `navigate(agencyReviewsPath)` so the agency lands directly on the review's detail panel. Resolving / reopening / creating a comment, and uploading a new version, invalidate `reviewsQueryKeys.pendingComments(projectUuid)` (added to `useUpdateReviewComment`, `useCreateReviewComment`, `useRequestChangesOnReviewVersion`, `useCreateReviewVersion`) so the widget refreshes automatically.
+
+Props: `projectUuid: string`
+
+Sub-components (same folder):
+- `HomePendingReviewGroup.tsx` — one review group: header + comment list, receives its data from the parent.
+- `HomePendingReviewCommentRow.tsx` — compact single-comment row (smaller variant of `ReviewCommentItem` without reply/resolve controls).
 
 ## Detail side panels
 

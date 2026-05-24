@@ -110,6 +110,62 @@ class ReviewCommentRepository extends ServiceEntityRepository
     }
 
     /**
+     * Returns a map keyed by Review.id with the open top-level comments on each
+     * review's latest ReviewVersion. Reviews with no version (or no matching
+     * comments) are absent from the map — callers should treat missing keys as
+     * an empty array.
+     *
+     * Comments are ordered oldest-first within each review so the most
+     * long-standing feedback surfaces first.
+     *
+     * @param Review[] $reviews
+     * @return array<int, ReviewComment[]>
+     */
+    public function getOpenTopLevelForLatestVersionByReviews(array $reviews): array
+    {
+        if ($reviews === []) {
+            return [];
+        }
+
+        $reviewIds = array_values(array_filter(array_map(
+            static fn(Review $review) => $review->getId(),
+            $reviews,
+        )));
+
+        if ($reviewIds === []) {
+            return [];
+        }
+
+        /** @var ReviewComment[] $comments */
+        $comments = $this->createQueryBuilder('c')
+            ->innerJoin('c.reviewVersion', 'rv')
+            ->where('rv.review IN (:reviewIds)')
+            ->andWhere('c.parentComment IS NULL')
+            ->andWhere('c.status = :status')
+            ->andWhere('NOT EXISTS (
+                SELECT 1 FROM ' . ReviewVersion::class . ' rvLater
+                WHERE rvLater.review = rv.review AND rvLater.createdAt > rv.createdAt
+            )')
+            ->setParameter('reviewIds', $reviewIds)
+            ->setParameter('status', ReviewCommentStatus::Open)
+            ->orderBy('c.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+
+        $grouped = [];
+        foreach ($comments as $comment) {
+            $reviewId = $comment->getReviewVersion()?->getReview()?->getId();
+            if ($reviewId === null) {
+                continue;
+            }
+
+            $grouped[$reviewId][] = $comment;
+        }
+
+        return $grouped;
+    }
+
+    /**
      * @return ReviewComment[]
      */
     public function getByReviewVersionPaginated(ReviewVersion $reviewVersion, int $page, int $limit): array

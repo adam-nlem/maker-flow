@@ -2,13 +2,17 @@
 
 namespace App\Controller;
 
+use App\DTO\QueryParam\Review\ListPendingReviewCommentsQueryParamDTO;
 use App\DTO\QueryParam\Review\ListReviewCommentsQueryParamDTO;
 use App\DTO\Request\Review\CreateReviewCommentRequestDTO;
 use App\DTO\Request\Review\UpdateReviewCommentRequestDTO;
+use App\DTO\Response\Review\ListReviewCommentsGroupedByReviewResponseDTO;
 use App\DTO\Response\Review\ReviewWithLatestVersionResponseDTO;
 use App\Entity\Enum\UserRole;
+use App\Entity\Review;
 use App\Entity\ReviewComment;
 use App\Entity\User;
+use App\Exception\Project\ProjectNotFoundException;
 use App\Exception\Review\MissingReviewException;
 use App\Exception\Review\ReviewCommentEditForbiddenException;
 use App\Exception\Review\ReviewCommentEmptyException;
@@ -19,7 +23,9 @@ use App\Exception\Review\ReviewCommentStatusInvalidException;
 use App\Exception\Review\ReviewCommentStatusOnReplyForbiddenException;
 use App\Exception\Review\ReviewCommentTimecodeOnReplyForbiddenException;
 use App\Exception\Review\ReviewVersionNotLatestException;
+use App\Repository\ProjectRepository;
 use App\Repository\ReviewCommentRepository;
+use App\Repository\ReviewRepository;
 use App\Repository\ReviewVersionRepository;
 use App\Security\Voter\ProjectVoter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -57,6 +63,51 @@ final class ReviewCommentController extends AbstractController
             data: $comments,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_review_comments_list']],
+        );
+    }
+
+    #[Route('/pending', name: 'api_review_comments_pending', methods: ['GET'])]
+    #[IsGranted(UserRole::User->value)]
+    public function pending(
+        ListPendingReviewCommentsQueryParamDTO $queryParamDto,
+        ProjectRepository $projectRepository,
+        ReviewRepository $reviewRepository,
+        ReviewCommentRepository $reviewCommentRepository,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
+
+        if ($project === null) {
+            throw new ProjectNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted(ProjectVoter::VIEW, $project);
+
+        $reviews = $reviewRepository->getByProjectWithPendingCommentsPaginated(
+            $project,
+            $queryParamDto->getPage(),
+            $queryParamDto->getLimit(),
+        );
+
+        $commentsByReviewId = $reviewCommentRepository->getOpenTopLevelForLatestVersionByReviews($reviews);
+
+        $items = array_map(
+            fn(Review $review) => new ListReviewCommentsGroupedByReviewResponseDTO(
+                review: ReviewWithLatestVersionResponseDTO::fromEntity(
+                    $review,
+                    count($commentsByReviewId[$review->getId()] ?? []),
+                ),
+                comments: $commentsByReviewId[$review->getId()] ?? [],
+            ),
+            $reviews,
+        );
+
+        return $this->json(
+            data: $items,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_review_comments_pending']],
         );
     }
 

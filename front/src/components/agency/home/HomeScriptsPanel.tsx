@@ -45,7 +45,7 @@ export default function HomeScriptsPanel({ projectUuid }: HomeScriptsPanelProps)
     };
 
     return (
-        <div className="w-full md:w-1/2 shrink-0 flex flex-col border border-pale-gray rounded-lg bg-clear overflow-hidden">
+        <div className="w-full flex-1 min-h-0 flex flex-col border border-pale-gray rounded-lg bg-clear overflow-hidden">
             <div className="flex flex-row items-center justify-between px-4 py-3 border-b border-pale-gray">
                 <div className="flex flex-row items-center gap-2">
                     <DocumentTextIcon className="size-5 text-muted-2" strokeWidth={2} />

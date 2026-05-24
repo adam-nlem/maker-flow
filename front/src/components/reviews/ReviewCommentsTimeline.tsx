@@ -7,7 +7,7 @@ import { MediaType } from "~/models/enums/MediaType";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useListPaginatedReviewComments } from "~/hooks/api/reviews/useListPaginatedReviewComments";
 import { Button } from "~/components/ui/Button";
-import ReviewCommentItem from "./ReviewCommentItem";
+import ReviewCommentTile from "./ReviewCommentTile";
 import CreateReviewCommentForm from "./CreateReviewCommentForm";
 
 interface ReviewCommentsTimelineProps {
@@ -57,7 +57,7 @@ export default function ReviewCommentsTimeline({
           </p>
         ) : hasComments ? (
           comments.map((comment) => (
-            <ReviewCommentItem
+            <ReviewCommentTile
               key={comment.uuid}
               comment={comment}
               reviewVersionUuid={activeVersion.uuid}

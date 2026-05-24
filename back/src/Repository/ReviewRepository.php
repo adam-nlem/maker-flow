@@ -2,9 +2,11 @@
 
 namespace App\Repository;
 
+use App\Entity\Enum\ReviewCommentStatus;
 use App\Entity\Enum\ReviewStatus;
 use App\Entity\Project;
 use App\Entity\Review;
+use App\Entity\ReviewComment;
 use App\Entity\ReviewVersion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
@@ -96,6 +98,36 @@ class ReviewRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * Returns reviews in the project whose latest version has at least one open
+     * top-level comment, ordered by most recently updated review first.
+     *
+     * @return Review[]
+     */
+    public function getByProjectWithPendingCommentsPaginated(Project $project, int $page, int $limit): array
+    {
+        return $this->createQueryBuilder('r')
+            ->where('r.project = :project')
+            ->andWhere('EXISTS (
+                SELECT 1 FROM ' . ReviewComment::class . ' c
+                INNER JOIN ' . ReviewVersion::class . ' rv WITH c.reviewVersion = rv
+                WHERE rv.review = r
+                  AND c.parentComment IS NULL
+                  AND c.status = :status
+                  AND NOT EXISTS (
+                      SELECT 1 FROM ' . ReviewVersion::class . ' rvLater
+                      WHERE rvLater.review = r AND rvLater.createdAt > rv.createdAt
+                  )
+            )')
+            ->setParameter('project', $project)
+            ->setParameter('status', ReviewCommentStatus::Open)
+            ->orderBy('r.updatedAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     public function countByProject(Project $project): int

@@ -11,4 +11,6 @@ export const reviewsQueryKeys = {
         [...reviewsQueryKeys.all, 'versionFile', reviewVersionUuid, index] as const,
     comments: (reviewVersionUuid: string) =>
         [...reviewsQueryKeys.all, 'comments', reviewVersionUuid] as const,
+    pendingComments: (projectUuid: string) =>
+        [...reviewsQueryKeys.all, 'pendingComments', projectUuid] as const,
 }

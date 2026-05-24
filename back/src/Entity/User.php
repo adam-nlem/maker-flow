@@ -38,6 +38,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_invitations_show',
         'api_invitations_create',
         'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?string $uuid = null;
 
@@ -54,6 +55,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_invitations_show',
         'api_invitations_create',
         'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?string $firstName = null;
 
@@ -70,6 +72,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_invitations_show',
         'api_invitations_create',
         'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?string $lastName = null;
 
@@ -87,6 +90,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_invitations_show',
         'api_invitations_create',
         'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?string $email = null;
 
@@ -155,6 +159,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         'api_otp_verify_login',
         'api_otp_verify_email',
         'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?Agency $agency = null;
 
@@ -162,6 +167,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     #[Groups([
         'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?Project $project = null;
 

@@ -21,7 +21,7 @@ class ReviewComment
     private ?int $id = null;
 
     #[ORM\Column(type: Types::GUID)]
-    #[Groups(['api_review_comments_list'])]
+    #[Groups(['api_review_comments_list', 'api_review_comments_pending'])]
     private ?string $uuid = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
@@ -42,23 +42,23 @@ class ReviewComment
 
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
-    #[Groups(['api_review_comments_list'])]
+    #[Groups(['api_review_comments_list', 'api_review_comments_pending'])]
     private ?User $author = null;
 
     #[ORM\Column(type: Types::TEXT)]
-    #[Groups(['api_review_comments_list'])]
+    #[Groups(['api_review_comments_list', 'api_review_comments_pending'])]
     private ?string $body = null;
 
     #[ORM\Column(length: 32, enumType: ReviewCommentStatus::class)]
-    #[Groups(['api_review_comments_list'])]
+    #[Groups(['api_review_comments_list', 'api_review_comments_pending'])]
     private ReviewCommentStatus $status = ReviewCommentStatus::Open;
 
     #[ORM\Column(type: Types::FLOAT, nullable: true)]
-    #[Groups(['api_review_comments_list'])]
+    #[Groups(['api_review_comments_list', 'api_review_comments_pending'])]
     private ?float $videoTimecodeSeconds = null;
 
     #[ORM\Column]
-    #[Groups(['api_review_comments_list'])]
+    #[Groups(['api_review_comments_list', 'api_review_comments_pending'])]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
@@ -120,7 +120,7 @@ class ReviewComment
         return $this->parentComment === null;
     }
 
-    #[Groups(['api_review_comments_list'])]
+    #[Groups(['api_review_comments_list', 'api_review_comments_pending'])]
     public function getParentCommentUuid(): ?string
     {
         return $this->parentComment?->getUuid();

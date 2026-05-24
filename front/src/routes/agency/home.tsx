@@ -17,6 +17,7 @@ import SelectDropdown from "~/components/ui/SelectDropdown";
 import { ChevronUpDownIcon } from "@heroicons/react/24/outline";
 import IntegrationDetailCardRow from "~/components/integrations/IntegrationDetailCardRow";
 import HomeScriptsPanel from "~/components/agency/home/HomeScriptsPanel";
+import HomePendingReviewCommentsPanel from "~/components/agency/home/HomePendingReviewCommentsPanel";
 
 export default function AgencyHomePage() {
   const { t } = useTranslation();
@@ -57,7 +58,10 @@ export default function AgencyHomePage() {
           </div>
           <Shimmer width="w-full" height="h-72" radius="rounded-lg" />
         </div>
-        <Shimmer width="w-1/2" height="h-96" radius="rounded-lg" />
+        <div className="w-full md:w-1/2 shrink-0 flex flex-col gap-3">
+          <Shimmer width="w-full" height="h-96" radius="rounded-lg" />
+          <Shimmer width="w-full" height="h-96" radius="rounded-lg" />
+        </div>
       </div>
     );
   }
@@ -118,7 +122,12 @@ export default function AgencyHomePage() {
         <HomeEngagementChart groups={groups} />
       </div>
 
-      {focusedProjectUuid && <HomeScriptsPanel projectUuid={focusedProjectUuid} />}
+      {focusedProjectUuid && (
+        <div className="w-full md:w-1/2 shrink-0 flex flex-col gap-3 min-h-0">
+          <HomeScriptsPanel projectUuid={focusedProjectUuid} />
+          <HomePendingReviewCommentsPanel projectUuid={focusedProjectUuid} />
+        </div>
+      )}
     </div>
   );
 }

@@ -16,29 +16,33 @@ import CreateReviewCommentForm from "./CreateReviewCommentForm";
 
 const MAX_VISUAL_DEPTH = 3;
 
-interface ReviewCommentItemProps {
+interface ReviewCommentTileProps {
   comment: ReviewComment;
   reviewVersionUuid: string;
   reviewUuid: string;
   projectUuid: string;
   isAgencyViewer: boolean;
   canReply: boolean;
+  canResolve?: boolean;
   canSeek: boolean;
   videoElementRef?: RefObject<HTMLVideoElement | null>;
   depth?: number;
+  onClick?: () => void;
 }
 
-export default function ReviewCommentItem({
+export default function ReviewCommentTile({
   comment,
   reviewVersionUuid,
   reviewUuid,
   projectUuid,
   isAgencyViewer,
   canReply,
+  canResolve = true,
   canSeek,
   videoElementRef,
   depth = 0,
-}: ReviewCommentItemProps) {
+  onClick,
+}: ReviewCommentTileProps) {
   const { t } = useTranslation();
   const addToast = useToastStore((s) => s.addToast);
   const { updateReviewComment, isPending: isUpdatingStatus } = useUpdateReviewComment();
@@ -46,9 +50,10 @@ export default function ReviewCommentItem({
   const [isReplyOpen, setIsReplyOpen] = useState(false);
 
   const isResolved = comment.isResolved;
-  const showResolveToggle = isAgencyViewer && comment.isTopLevel;
+  const showResolveToggle = canResolve && isAgencyViewer && comment.isTopLevel;
   const canSeekChip = canSeek && comment.videoTimecodeSeconds !== null && videoElementRef !== undefined;
   const cappedDepth = Math.min(depth, MAX_VISUAL_DEPTH);
+  const isClickable = onClick !== undefined;
 
   const handleSeek = () => {
     if (!canSeekChip || comment.videoTimecodeSeconds === null) return;
@@ -81,7 +86,10 @@ export default function ReviewCommentItem({
 
   return (
     <div>
-      <div className={` ${cappedDepth > 0 ? "border rounded-xl bg-clear-2" : "border-t pt-5"} border-pale-gray p-3 `}>
+      <div
+        onClick={isClickable ? onClick : undefined}
+        className={`${cappedDepth > 0 ? "border rounded-xl bg-clear-2" : "border-t pt-5"} border-pale-gray p-3 ${isClickable ? "cursor-pointer transition-colors hover:bg-clear-2" : ""}`}
+      >
         <div className="flex flex-row items-start gap-2 mb-2">
           <AuthorAvatar author={comment.author} />
           <div className="flex flex-col">
@@ -112,7 +120,7 @@ export default function ReviewCommentItem({
             {comment.replies.length > 0 && (
               <div className="mt-2 flex flex-col gap-2">
                 {comment.replies.map((reply) => (
-                  <ReviewCommentItem
+                  <ReviewCommentTile
                     key={reply.uuid}
                     comment={reply}
                     reviewVersionUuid={reviewVersionUuid}
@@ -120,6 +128,7 @@ export default function ReviewCommentItem({
                     projectUuid={projectUuid}
                     isAgencyViewer={isAgencyViewer}
                     canReply={canReply}
+                    canResolve={canResolve}
                     canSeek={canSeek}
                     videoElementRef={videoElementRef}
                     depth={depth + 1}
@@ -132,20 +141,22 @@ export default function ReviewCommentItem({
         </div>
 
 
-        <footer className="flex flex-row items-center gap-3 mt-3">
-          {canReply && (
-            <SimpleTextButton onClick={() => setIsReplyOpen((open) => !open)}>
-              <ChatBubbleOvalLeftEllipsisIcon className="size-3.5" />
-              <span>{t("reviews:comments.reply")}</span>
-            </SimpleTextButton>
-          )}
-          {showResolveToggle && (
-            <SimpleTextButton onClick={isUpdatingStatus ? undefined : handleToggleStatus}>
-              <CheckIcon className="size-3.5" />
-              <span>{t(isResolved ? "reviews:comments.reopen" : "reviews:comments.resolve")}</span>
-            </SimpleTextButton>
-          )}
-        </footer>
+        {(canReply || showResolveToggle) && (
+          <footer className="flex flex-row items-center gap-3 mt-3">
+            {canReply && (
+              <SimpleTextButton onClick={() => setIsReplyOpen((open) => !open)}>
+                <ChatBubbleOvalLeftEllipsisIcon className="size-3.5" />
+                <span>{t("reviews:comments.reply")}</span>
+              </SimpleTextButton>
+            )}
+            {showResolveToggle && (
+              <SimpleTextButton onClick={isUpdatingStatus ? undefined : handleToggleStatus}>
+                <CheckIcon className="size-3.5" />
+                <span>{t(isResolved ? "reviews:comments.reopen" : "reviews:comments.resolve")}</span>
+              </SimpleTextButton>
+            )}
+          </footer>
+        )}
       </div>
 
       {isReplyOpen && canReply && (
@@ -178,4 +189,3 @@ function AuthorAvatar({ author }: { author: User | null }) {
     </div>
   );
 }
-

@@ -3682,6 +3682,26 @@
           "response": []
         },
         {
+          "name": "List Pending Review Comments for a Project",
+          "id": "reviews-comments-pending-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Project-scoped overview powering the agency home widget. Returns the reviews of the project whose latest version has at least one open top-level comment, grouped with that latest version's open top-level comments inlined under each review. Flat array of ListReviewCommentsGroupedByReviewResponseDTO ({ review: ReviewWithLatestVersionResponseDTO, comments: ReviewComment[] }). Reviews ordered updatedAt DESC, comments ordered createdAt ASC within each review. Replies, resolved comments, and comments on superseded versions are excluded. Mirrors the purpose-specific sibling pattern of GET /api/posts/rank / GET /api/scripts/calendar. Serialization group: api_review_comments_pending.",
+            "url": {
+              "raw": "{{baseUrl}}/api/review-comments/pending?projectUuid={{projectUuid}}&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-comments", "pending"],
+              "query": [
+                { "key": "projectUuid", "value": "{{projectUuid}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Comment on Review Media Version (agency or client)",
           "id": "reviews-comment-0001-000000000000",
           "request": {

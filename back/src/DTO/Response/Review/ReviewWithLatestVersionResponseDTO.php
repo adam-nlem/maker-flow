@@ -20,6 +20,7 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
             'api_review_versions_create',
             'api_review_comments_create',
             'api_review_comments_update',
+            'api_review_comments_pending',
         ])]
         private readonly Review $review,
         #[Groups([
@@ -32,6 +33,7 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
             'api_review_versions_create',
             'api_review_comments_create',
             'api_review_comments_update',
+            'api_review_comments_pending',
         ])]
         private readonly ?ReviewVersion $latestVersion,
         #[Groups([
@@ -44,6 +46,7 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
             'api_review_versions_create',
             'api_review_comments_create',
             'api_review_comments_update',
+            'api_review_comments_pending',
         ])]
         private readonly ?int $unresolvedCommentsCount,
     ) {}
