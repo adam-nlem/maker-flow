@@ -148,6 +148,8 @@ export const errorCodeKeys: Record<number, string | ErrorMessageResolver> = {
   33018: 'errors:review.commentStatusOnReplyForbidden',
   33019: 'errors:review.commentEditForbidden',
   33020: 'errors:review.commentTimecodeOnReplyForbidden',
+  33021: 'errors:review.coverSourceNotFound',
+  33022: 'errors:review.coverGenerationFailed',
 }
 
 export function resolveErrorMessage(error: unknown): string {

@@ -19,6 +19,7 @@ class ReviewFileService
     private const ALLOWED_IMAGE_MIMES = ['image/png', 'image/jpeg', 'image/webp'];
     private const CAROUSEL_MIN_FILES = 2;
     private const CAROUSEL_MAX_FILES = 10;
+    private const COVER_FILENAME = 'cover.jpg';
 
     public function __construct(
         private readonly Filesystem $filesystem,
@@ -70,6 +71,22 @@ class ReviewFileService
         }
 
         return new File($matches[0], false);
+    }
+
+    public function getCoverPath(ReviewVersion $reviewVersion): string
+    {
+        return sprintf('%s/%s', $this->getReviewVersionDirectory($reviewVersion), self::COVER_FILENAME);
+    }
+
+    public function getCoverFile(ReviewVersion $reviewVersion): ?File
+    {
+        $coverPath = $this->getCoverPath($reviewVersion);
+
+        if (!is_file($coverPath)) {
+            return null;
+        }
+
+        return new File($coverPath, false);
     }
 
     public function getStreamFile(ReviewVersion $reviewVersion, string $relativePath): ?File

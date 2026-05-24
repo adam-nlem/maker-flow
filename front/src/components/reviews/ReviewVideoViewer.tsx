@@ -1,5 +1,6 @@
 import { useRef, useState, type RefObject } from "react";
 import { useTranslation } from "react-i18next";
+import { useShowReviewVersionCover } from "~/hooks/api/reviews/useShowReviewVersionCover";
 import { useShowReviewVersionFile } from "~/hooks/api/reviews/useShowReviewVersionFile";
 import { VideoStreamingStatus } from "~/models/enums/VideoStreamingStatus";
 import ReviewVideoPlayer from "./ReviewVideoPlayer";
@@ -25,6 +26,7 @@ export default function ReviewVideoViewer({
     useLegacyBlob ? reviewVersionUuid : undefined,
     useLegacyBlob ? 1 : undefined,
   );
+  const { coverUrl } = useShowReviewVersionCover(reviewVersionUuid);
 
   const isTranscoding =
     videoStreamingStatus === VideoStreamingStatus.Pending ||
@@ -66,6 +68,7 @@ export default function ReviewVideoViewer({
             videoStreamingStatus={videoStreamingStatus}
             videoElementRef={effectiveVideoRef}
             src={useLegacyBlob ? fileUrl : undefined}
+            posterUrl={coverUrl}
             onPlaybackError={setHlsError}
           />
         )}

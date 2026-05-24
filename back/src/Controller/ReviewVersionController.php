@@ -173,6 +173,41 @@ final class ReviewVersionController extends AbstractController
         );
     }
 
+    #[Route(
+        '/{reviewVersionUuid}/cover',
+        name: 'api_review_versions_cover',
+        requirements: ['reviewVersionUuid' => Requirement::UUID],
+        methods: ['GET'],
+    )]
+    #[IsGranted(UserRole::User->value)]
+    public function showCover(
+        string $reviewVersionUuid,
+        ReviewVersionRepository $reviewVersionRepository,
+        ReviewFileService $reviewFileService,
+    ): Response {
+        $reviewVersion = $reviewVersionRepository->getByUuid($reviewVersionUuid);
+
+        if ($reviewVersion === null) {
+            throw new MissingReviewException();
+        }
+
+        $this->denyAccessUnlessGranted(ProjectVoter::VIEW, $reviewVersion->getReview()->getProject());
+
+        $coverFile = $reviewFileService->getCoverFile($reviewVersion);
+
+        if ($coverFile === null) {
+            return new Response(null, Response::HTTP_NO_CONTENT);
+        }
+
+        return new BinaryFileResponse(
+            $coverFile,
+            Response::HTTP_OK,
+            ['Content-Type' => 'image/jpeg'],
+            false,
+            ResponseHeaderBag::DISPOSITION_INLINE,
+        );
+    }
+
     #[Route('/{reviewVersionUuid}/approve', name: 'api_review_versions_approve', methods: ['POST'], requirements: ['reviewVersionUuid' => Requirement::UUID])]
     #[IsGranted(UserRole::Client->value)]
     public function approve(

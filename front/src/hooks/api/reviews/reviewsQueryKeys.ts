@@ -9,6 +9,8 @@ export const reviewsQueryKeys = {
     detail: (uuid: string) => [...reviewsQueryKeys.all, 'detail', uuid] as const,
     versionFile: (reviewVersionUuid: string, index: number) =>
         [...reviewsQueryKeys.all, 'versionFile', reviewVersionUuid, index] as const,
+    cover: (reviewVersionUuid: string) =>
+        [...reviewsQueryKeys.all, 'cover', reviewVersionUuid] as const,
     comments: (reviewVersionUuid: string) =>
         [...reviewsQueryKeys.all, 'comments', reviewVersionUuid] as const,
     pendingComments: (projectUuid: string) =>

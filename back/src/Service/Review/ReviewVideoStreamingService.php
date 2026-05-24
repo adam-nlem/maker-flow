@@ -3,6 +3,8 @@
 namespace App\Service\Review;
 
 use App\Entity\ReviewVersion;
+use App\Exception\Review\CoverGenerationFailedException;
+use App\Exception\Review\CoverSourceNotFoundException;
 use App\Exception\Review\VideoProcessingFailedException;
 use App\Exception\Review\VideoSourceNotFoundException;
 use Symfony\Component\Filesystem\Filesystem;
@@ -80,6 +82,48 @@ class ReviewVideoStreamingService
         }
 
         $this->filesystem->remove($sourcePath);
+    }
+
+    public function generateCover(ReviewVersion $reviewVersion): void
+    {
+        $sourceFile = $this->reviewFileService->getFileByIndex($reviewVersion, 1);
+
+        if ($sourceFile === null) {
+            throw new CoverSourceNotFoundException($reviewVersion->getUuid());
+        }
+
+        $coverPath = $this->reviewFileService->getCoverPath($reviewVersion);
+
+        if ($this->filesystem->exists($coverPath)) {
+            $this->filesystem->remove($coverPath);
+        }
+
+        $process = new Process([
+            $this->ffmpegBinary, '-y',
+            '-ss', '1',
+            '-i', $sourceFile->getPathname(),
+            '-frames:v', '1',
+            '-q:v', '2',
+            $coverPath,
+        ]);
+        $process->setTimeout(null);
+
+        try {
+            $process->mustRun();
+        } catch (ProcessFailedException $exception) {
+            throw new CoverGenerationFailedException(
+                $reviewVersion->getUuid(),
+                'ffmpeg cover extraction exited with a non-zero status.',
+                $exception,
+            );
+        }
+
+        if (!is_file($coverPath)) {
+            throw new CoverGenerationFailedException(
+                $reviewVersion->getUuid(),
+                sprintf('Expected cover artifact missing on disk: %s', $coverPath),
+            );
+        }
     }
 
     private function hasAudioStream(string $sourcePath): bool

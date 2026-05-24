@@ -75,6 +75,7 @@ private/uploads/agency/
               └── {reviewVersionUuid}/
                     ├── 1.{ext}              # original upload — deleted after a video is successfully transcoded
                     ├── 2.{ext}              # carousel uploads only
+                    ├── cover.jpg            # video uploads only, single frame extracted at t=1s
                     └── stream/              # video uploads only, populated by the HLS transcoder
                           ├── master.m3u8
                           ├── 1080p/index.m3u8 + segment_NNN.ts
@@ -101,6 +102,7 @@ Base path: `/api/reviews`. All routes require an authenticated user. Object-leve
 | `PATCH /api/reviews/{uuid}` | `Editor` | `PROJECT_EDIT` | JSON. Updatable fields: `title`, `description`, `notes`, `scriptUuid` (any can be set to `null`). Allowed only when the **latest media version's** status is `Pending`. Returns the same shape as the show route. |
 | `DELETE /api/reviews/{uuid}` | `Editor` | `PROJECT_EDIT` | Returns `200` + `{"message": "Review deleted successfully"}`. Doctrine cascade removes media versions (and their comments); a `ReviewVersionDiskCleanupListener` (`preRemove`) handles on-disk cleanup automatically. |
 | `GET /api/review-versions/files?reviewVersionUuid=&index=` | `User` (auth only) | `PROJECT_VIEW` on the media version's draft's project | Lives in **`ReviewVersionController`** (separate from `ReviewController`). Both params travel via the query string (`StreamFileQueryParamDTO`: `reviewVersionUuid` UUID + `index` positive int). Streams the corresponding stored file — extension globbed at runtime. Returns `BinaryFileResponse` with `DISPOSITION_INLINE`; range requests handled automatically. Used for image / carousel files and (pre-transcode) the original video. Returns 404 when the index is out of range or the file is missing on disk. For videos with `videoStreamingStatus === ready` this endpoint 404s — the original has been deleted; use the `/stream` endpoint instead. Reachable by both agency members and clients (voter scopes by project ownership). |
+| `GET /api/review-versions/{reviewVersionUuid}/cover` | `User` (auth only) | `PROJECT_VIEW` on the media version's draft's project | Serves the JPEG cover frame for the version's video. Returns `BinaryFileResponse` with `Content-Type: image/jpeg`, `DISPOSITION_INLINE`. Returns 204 No Content when the cover is missing on disk (matches the agency-logo behavior — e.g. cover extraction failed, or the version is not a video). Reachable by both agency members and clients (voter scopes by project ownership). |
 | `GET /api/review-versions/{reviewVersionUuid}/stream/{path}` | `User` (auth only) | `PROJECT_VIEW` on the media version's draft's project | Path-style route (`reviewVersionUuid` as UUID requirement; `path` requirement `.+` so embedded slashes like `1080p/index.m3u8` match). Serves any HLS artifact (master playlist, variant playlist, `.ts` segment) under the media version's `stream/` directory. Only `.m3u8` and `.ts` are accepted — anything else 404s. `realpath`-based path-traversal guard. `Content-Type` is set explicitly (`application/vnd.apple.mpegurl` / `video/mp2t`). The path-style URL design lets hls.js (and native HLS players) resolve relative URLs inside the playlists naturally — no client-side URL rewriting required. Reachable by both agency members and clients. |
 | `POST /api/review-versions/{reviewVersionUuid}/approve` | `Client` (`ROLE_CLIENT`) | `PROJECT_VIEW` on the version's draft's project | Empty body. Transitions `reviewVersion.status` from `Pending` → `Approved`. Returns 409 with `ReviewVersionNotLatestException` (33010) if the version is no longer the latest, or `ReviewVersionNotPendingException` (33008) if its status is not `Pending`. Returns the same shape as the show route. |
 | `POST /api/review-versions/{reviewVersionUuid}/request-changes` | `Client` (`ROLE_CLIENT`) | `PROJECT_VIEW` on the version's draft's project | JSON body `{ "comment": "non-empty string" }`. The DTO trims the comment and throws `ReviewCommentPayloadInvalidException` (33013) on missing / non-string payload, `ReviewCommentEmptyException` (33011) on empty-after-trim, or `ReviewCommentTooLongException` (33012) past 5000 chars. Creates a `ReviewComment` on the version (author = current user) **and** transitions `reviewVersion.status` to `ChangesRequested` in one flush. Allowed from `Pending` or `Approved` — otherwise 409 `ReviewVersionNotPendingOrApprovedException` (33009). 409 `ReviewVersionNotLatestException` (33010) if the version is no longer the latest. Returns the same shape as the show route (no comments in response — frontend invalidates the comments list query). |
@@ -166,15 +168,17 @@ Violations throw `ReviewFileInvalidException` (HTTP 400) carrying a `FileInvalid
 | `ReviewCommentStatusOnReplyForbiddenException` | 409 | 18 | PATCH tries to mutate `status` on a reply (top-level only). |
 | `ReviewCommentEditForbiddenException` | 403 | 19 | A user other than the comment author tries to PATCH `body` or `videoTimecodeSeconds`. |
 | `ReviewCommentTimecodeOnReplyForbiddenException` | 409 | 20 | PATCH tries to mutate `videoTimecodeSeconds` on a reply (top-level only). |
+| `CoverSourceNotFoundException` | 500 | 21 | The cover extractor started but the source `1.{ext}` is missing on disk. Always swallowed by the handler (logged to Sentry) — never reaches the HTTP layer. |
+| `CoverGenerationFailedException` | 500 | 22 | ffmpeg exited non-zero during cover extraction, or the expected `cover.jpg` is missing afterwards. Always swallowed by the handler (logged to Sentry) — never reaches the HTTP layer. |
 
-All exceptions extend `ReviewException` → `DomainCode::Review` (33). Full codes are `33001`–`33020`. **Convention:** each distinct error condition gets its own exception with a fixed code — we do **not** multiplex multiple reasons through a single exception with a `reason` enum in meta.
+All exceptions extend `ReviewException` → `DomainCode::Review` (33). Full codes are `33001`–`33022`. **Convention:** each distinct error condition gets its own exception with a fixed code — we do **not** multiplex multiple reasons through a single exception with a `reason` enum in meta.
 
 ## Async video streaming
 
 Video uploads get a second pass after the synchronous `POST /api/reviews` succeeds:
 
 1. `ReviewController::create` sets `videoStreamingStatus = pending` on the new `ReviewVersion`, flushes, then dispatches `ProcessReviewVideoMessage($reviewVersion->getId())` on the `messages` transport (the existing single RabbitMQ-backed transport — see [rabbitmq-messenger-feature.md](rabbitmq-messenger-feature.md)).
-2. `ProcessReviewVideoHandler` loads the entity, flips status to `processing`, then calls `ReviewVideoStreamingService::generateHls()`.
+2. `ProcessReviewVideoHandler` loads the entity, flips status to `processing`, then calls `ReviewVideoStreamingService::generateCover()` followed by `ReviewVideoStreamingService::generateHls()`. The cover call is wrapped in its own `try/catch` and reports failures to Sentry via `captureException` without demoting the version — a missing cover never blocks playback. Cover extraction runs **first** because `generateHls()` deletes the original `1.{ext}` source at the end of its successful run.
 3. `ReviewVideoStreamingService` shells out to `ffmpeg` (via `Symfony\Component\Process\Process`) with a single command that writes three HLS renditions and the master playlist into the media version's `stream/` subdirectory in one pass:
 
    | Variant | Height | Video bitrate | Audio bitrate |
@@ -186,6 +190,16 @@ Video uploads get a second pass after the synchronous `POST /api/reviews` succee
    All variants are always generated regardless of source resolution (deliberate — keeps the player ladder predictable). Segments are 4 s VOD. The service probes the source with `ffprobe` first; if no audio stream is present (e.g. silent screen recordings), the audio map/codec args and the `a:N` entries in `-var_stream_map` are omitted so HLS still produces a valid video-only master + variants.
 4. After ffmpeg returns, the service asserts `master.m3u8` and every per-variant `index.m3u8` exist, then `unlink()`s the original `1.{ext}` source file.
 5. Handler flips status to `ready` and flushes.
+
+### Cover extraction
+
+`ReviewVideoStreamingService::generateCover()` runs a separate `ffmpeg` invocation that writes a single JPEG frame to `{reviewVersionUuid}/cover.jpg`:
+
+```
+ffmpeg -y -ss 1 -i <source> -frames:v 1 -q:v 2 <coverPath>
+```
+
+`-ss` before `-i` performs a fast input seek to the 1-second mark, which sidesteps the black frames many sources start with while staying cheap (no decode of preceding frames). The path is owned by `ReviewFileService` via the `COVER_FILENAME` class constant (`cover.jpg`) and the `getCoverPath()` / `getCoverFile()` helpers — no `services.yaml` parameter, since the value is an internal asset name rather than environment-bound config.
 
 ### Retry & failure
 

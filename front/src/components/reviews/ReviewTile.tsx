@@ -5,6 +5,7 @@ import type { ReviewWithLatestVersionDTO } from "~/dtos/reviews/ReviewWithLatest
 import { MediaType, mediaTypeToIcon, mediaTypeTranslationKeys } from "~/models/enums/MediaType";
 import { ReviewStatus, reviewStatusToBgClass, reviewStatusToIcon, reviewStatusToTextClass, reviewStatusTranslationKeys } from "~/models/enums/ReviewStatus";
 import { formatToRelative } from "~/utils/dateFormatters";
+import ReviewVideoThumbnail from "./ReviewVideoThumbnail";
 
 interface ReviewTileProps {
   reviewDTO: ReviewWithLatestVersionDTO;
@@ -27,6 +28,13 @@ export default function ReviewTile({ reviewDTO, isSelected, onSelect }: ReviewTi
         }`}
     >
       <div className="size-16 shrink-0 rounded-lg bg-clear-3 overflow-hidden relative">
+        {reviewDTO.review.mediaType === MediaType.Video && reviewDTO.latestVersion && (
+          <ReviewVideoThumbnail
+            reviewVersionUuid={reviewDTO.latestVersion.uuid}
+            className="absolute inset-0 size-full"
+          />
+        )}
+
         <div className="absolute bottom-1 right-1 size-4.5 rounded bg-dark/65 flex items-center justify-center">
           <Icon className="size-3 text-clear" strokeWidth={2} />
         </div>

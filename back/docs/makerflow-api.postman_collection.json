@@ -3647,6 +3647,21 @@
           "response": []
         },
         {
+          "name": "Show Review Media Version Cover",
+          "id": "reviews-cover-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Returns the JPEG cover frame extracted at t=1s during async video processing. BinaryFileResponse with Content-Type image/jpeg, DISPOSITION_INLINE. 204 No Content when the cover is missing on disk (cover extraction failed, or the version is not a video). Authorization: ROLE_USER + ProjectVoter::VIEW on the parent project — reachable by both agency members and clients.",
+            "url": {
+              "raw": "{{baseUrl}}/api/review-versions/{{reviewVersionUuid}}/cover",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-versions", "{{reviewVersionUuid}}", "cover"]
+            }
+          },
+          "response": []
+        },
+        {
           "name": "Approve Review Media Version (client)",
           "id": "reviews-approve-0001-000000000000",
           "request": {

@@ -10,6 +10,7 @@ interface ReviewVideoPlayerProps {
   videoStreamingStatus: VideoStreamingStatus | null;
   videoElementRef: RefObject<HTMLVideoElement | null>;
   src?: string | null;
+  posterUrl?: string | null;
   onLoadedMetadata?: (event: React.SyntheticEvent<HTMLVideoElement>) => void;
   onPlaybackError?: (error: Error) => void;
 }
@@ -22,6 +23,7 @@ export default function ReviewVideoPlayer({
   videoStreamingStatus,
   videoElementRef,
   src,
+  posterUrl,
   onLoadedMetadata,
   onPlaybackError,
 }: ReviewVideoPlayerProps) {
@@ -57,6 +59,7 @@ export default function ReviewVideoPlayer({
       <video
         ref={videoElementRef}
         src={src ?? undefined}
+        poster={posterUrl ?? undefined}
         className="w-full max-h-[50vh] bg-dark cursor-pointer [:fullscreen_&]:max-h-full [:fullscreen_&]:h-full [:fullscreen_&]:object-contain"
         preload="metadata"
         onClick={handleVideoClick}

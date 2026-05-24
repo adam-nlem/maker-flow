@@ -118,7 +118,9 @@
         "commentStatusInvalid": "Invalid comment status.",
         "commentStatusOnReplyForbidden": "Only top-level comments can be resolved or reopened.",
         "commentEditForbidden": "Only the comment's author can edit it.",
-        "commentTimecodeOnReplyForbidden": "Only top-level comments can carry a video timecode."
+        "commentTimecodeOnReplyForbidden": "Only top-level comments can carry a video timecode.",
+        "coverSourceNotFound": "Could not generate the video cover because the source file is missing.",
+        "coverGenerationFailed": "Could not generate the video cover."
     },
     "hookTemplate": {
         "notFound": "Hook template not found.",

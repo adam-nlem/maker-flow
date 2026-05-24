@@ -33,6 +33,12 @@ class ProcessReviewVideoHandler
         $this->reviewVersionRepository->save($reviewVersion, true);
 
         try {
+            $this->reviewVideoStreamingService->generateCover($reviewVersion);
+        } catch (\Throwable $coverException) {
+            captureException($coverException);
+        }
+
+        try {
             $this->reviewVideoStreamingService->generateHls($reviewVersion);
         } catch (\Throwable $exception) {
             captureException($exception);

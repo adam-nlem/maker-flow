@@ -118,7 +118,9 @@
         "commentStatusInvalid": "Statut de commentaire invalide.",
         "commentStatusOnReplyForbidden": "Seuls les commentaires racine peuvent être résolus ou rouverts.",
         "commentEditForbidden": "Seul l'auteur du commentaire peut le modifier.",
-        "commentTimecodeOnReplyForbidden": "Seuls les commentaires racine peuvent porter un timecode vidéo."
+        "commentTimecodeOnReplyForbidden": "Seuls les commentaires racine peuvent porter un timecode vidéo.",
+        "coverSourceNotFound": "Impossible de générer la miniature vidéo : le fichier source est introuvable.",
+        "coverGenerationFailed": "Impossible de générer la miniature vidéo."
     },
     "hookTemplate": {
         "notFound": "Modèle d'accroche introuvable.",
