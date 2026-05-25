@@ -13,8 +13,10 @@
     "engagement": "Engagement"
   },
   "viewsEvolution": {
-    "title": "Évolution des vues"
+    "title": "Évolution des vues",
+    "empty": "Aucune donnée pour le moment."
   },
+  "engagementByPlatformEmpty": "Aucune donnée pour le moment.",
   "scripts": {
     "header": "Scripts",
     "newScript": "Nouveau",

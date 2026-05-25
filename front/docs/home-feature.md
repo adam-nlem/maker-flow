@@ -36,7 +36,7 @@ All home page analytics come from a single hook: `useListIntegrationInsights({ p
 
 ## Empty States
 
-- **No integrations:** `ConnectIntegrationPlaceholder`
+- **No integrations:** the analytics surfaces self-render their disconnected state — `IntegrationDetailCardRow` always renders one card per `Platform` (`platformOptions`), with disconnected platforms showing a `Connect <platform>` button that kicks off the OAuth flow directly via `useCreateIntegration`. `HomeViewsEvolutionChart` and `HomeEngagementChart` simply hide themselves when no connected platform has data.
 - **Not subscribed:** `PremiumPlaceholder`
 - **Loading:** Shimmer skeleton matching header + cards + chart layout
 
@@ -58,19 +58,43 @@ Renders 4 `InsightTile` components for Total Followers, Total Views, Engagement 
 
 Props: `overview: IntegrationInsightsOverviewDTO | null`
 
+### IntegrationDetailCardRow
+
+**File:** `src/components/integrations/IntegrationDetailCardRow.tsx`
+
+Renders one `IntegrationDetailCard` per `Platform` in `platformOptions`, in fixed enum order. For each platform it finds the matching `IntegrationInsightsGroupedByIntegrationDTO` in `groups` and forwards it; if no integration is connected for that platform, the card renders its self-contained disconnected state (platform icon + "Not connected" label + `Connect <platform>` primary button). The button opens `useIntegrationLoginModalStore` pre-targeted to that platform; it is disabled when `projectUuid` is `null`.
+
+Props: `groups: IntegrationInsightsGroupedByIntegrationDTO[]`, `projectUuid: string | null`
+
+### IntegrationDetailCard
+
+**File:** `src/components/integrations/IntegrationDetailCard.tsx`
+
+Self-contained card for a single platform. Always renders the card frame (border + platform color bar) and delegates the header to `IntegrationProfileInfo` (which self-handles its disconnected state). Metric rows (Followers, Views, Engagement, Reach) show formatted values when `group` is provided and `"—"` otherwise. The `Connect <platform>` button is rendered only when `group` is `null`; it kicks off the OAuth flow directly via `useCreateIntegration` (no intermediate modal) and is disabled / loading while the popup is in flight or when `projectUuid` is `null`.
+
+Props: `platform: Platform`, `group: IntegrationInsightsGroupedByIntegrationDTO | null`, `projectUuid: string | null`
+
+### IntegrationProfileInfo
+
+**File:** `src/components/integrations/IntegrationProfileInfo.tsx`
+
+Self-contained profile header for a single integration. When `integration` is provided, shows the profile picture (or fallback `UserIcon`), name, username, platform icon, and — if the integration is not `Active` — a status pill alongside a login pill. When `integration` is `null`, falls back to a placeholder header: `UserIcon` avatar + platform display name + `"Not connected"` subtitle + the platform icon. The `platform` prop is the source of truth for the platform-side rendering when `integration` is `null` (and used as a fallback when present).
+
+Props: `integration: Integration | null`, `platform: Platform`
+
 ### HomeViewsEvolutionChart
 
-**File:** `app/components/home/HomeViewsEvolutionChart.tsx`
+**File:** `src/components/home/HomeViewsEvolutionChart.tsx`
 
-Wraps the `MultiLineChart` component with a section heading. Transforms `IntegrationInsightsViewsTimelineDTO[]` into chart series grouped by platform.
+Wraps the `MultiLineChart` component with a section heading. Transforms `IntegrationInsightsViewsTimelineDTO[]` into chart series grouped by platform. Always renders the section frame; when there is no series to draw, shows a centered `home:viewsEvolution.empty` message in place of the chart.
 
 Props: `viewsTimeline: IntegrationInsightsViewsTimelineDTO[]`
 
 ### HomeEngagementChart
 
-**File:** `app/components/home/HomeEngagementChart.tsx`
+**File:** `src/components/home/HomeEngagementChart.tsx`
 
-Wraps the `HorizontalBarChart` component. Derives engagement comparison data from integration insight groups, computing engagement rate client-side from each group's `insights` array.
+Wraps the `HorizontalBarChart` component. Derives engagement comparison data from integration insight groups, computing engagement rate client-side from each group's `insights` array. Always renders the section frame; when no group yields a value, shows a centered `home:engagementByPlatformEmpty` message in place of the chart.
 
 Props: `groups: IntegrationInsightsGroupedByIntegrationDTO[]`
 

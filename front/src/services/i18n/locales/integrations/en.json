@@ -3,6 +3,7 @@
     "engagement": "Engagement",
     "notConnected": "Not connected",
     "connect": "Connect",
+    "connectPlatform": "Connect {{platform}}",
     "reconnect": "Reconnect",
     "disconnect": "Disconnect",
     "loginAction": "Sign in",

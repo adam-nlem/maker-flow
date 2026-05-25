@@ -10,6 +10,7 @@ interface HomeEngagementChartProps {
 
 export default function HomeEngagementChart({ groups }: HomeEngagementChartProps) {
     const { t } = useTranslation();
+
     const data = groups
         .map((group) => {
             const engagementRate = computeEngagementRate(group.insights);
@@ -23,12 +24,16 @@ export default function HomeEngagementChart({ groups }: HomeEngagementChartProps
         })
         .filter((d): d is NonNullable<typeof d> => d !== null);
 
-    if (data.length === 0) return null;
-
     return (
         <div className="border border-pale-gray rounded-lg p-3">
             <h2 className="text-heading-sm mb-3">{t("home:engagementByPlatform")}</h2>
-            <HorizontalBarChart data={data} />
+            {data.length > 0 ? (
+                <HorizontalBarChart data={data} />
+            ) : (
+                <div className="w-full h-30 flex items-center justify-center">
+                    <p className="text-body-sm text-muted-2">{t("home:engagementByPlatformEmpty")}</p>
+                </div>
+            )}
         </div>
     );
 }

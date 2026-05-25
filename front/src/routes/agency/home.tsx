@@ -2,11 +2,9 @@ import Shimmer from "~/components/ui/Shimmer";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import { useIsSubscribed } from "~/hooks/useIsSubscribed";
-import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
 import { useListIntegrationInsights } from "~/hooks/api/integrationInsights/useListIntegrationInsights";
 import { useHomePeriodStore } from "~/stores/home/homePeriodStore";
 import PremiumPlaceholder from "~/components/ui/PremiumPlaceholder";
-import ConnectIntegrationPlaceholder from "~/components/integrations/ConnectIntegrationPlaceholder";
 import HomeOverviewCards from "~/components/home/HomeOverviewCards";
 import HomeViewsEvolutionChart from "~/components/home/HomeViewsEvolutionChart";
 import HomeEngagementChart from "~/components/home/HomeEngagementChart";
@@ -24,7 +22,6 @@ export default function AgencyHomePage() {
   const { projects, isLoading } = useListPaginatedProjects();
   const { focusedProjectUuid } = useSelectFocusedProject({ projects });
   const { isSubscribed } = useIsSubscribed();
-  const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid });
   const timePeriod = useHomePeriodStore((state) => state.timePeriod);
   const setTimePeriod = useHomePeriodStore((state) => state.setTimePeriod);
   const { integrationInsights } = useListIntegrationInsights({
@@ -62,14 +59,6 @@ export default function AgencyHomePage() {
           <Shimmer width="w-full" height="h-96" radius="rounded-lg" />
           <Shimmer width="w-full" height="h-96" radius="rounded-lg" />
         </div>
-      </div>
-    );
-  }
-
-  if (integrations.length === 0) {
-    return (
-      <div className="h-full overflow-y-auto p-3 md:p-5">
-        <ConnectIntegrationPlaceholder projectUuid={focusedProjectUuid} />
       </div>
     );
   }
@@ -115,7 +104,7 @@ export default function AgencyHomePage() {
           />
         </div>
         <HomeOverviewCards overview={integrationInsights?.overview ?? null} />
-        <IntegrationDetailCardRow groups={groups} />
+        <IntegrationDetailCardRow groups={groups} projectUuid={focusedProjectUuid} />
 
 
         <HomeViewsEvolutionChart viewsTimeline={integrationInsights?.viewsTimeline ?? []} />

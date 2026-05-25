@@ -83,7 +83,7 @@ export default function ClientHomePage() {
             </div>
 
             <HomeOverviewCards overview={integrationInsights?.overview ?? null} />
-            <IntegrationDetailCardRow groups={groups} />
+            <IntegrationDetailCardRow groups={groups} projectUuid={projectUuid} />
             <HomeViewsEvolutionChart viewsTimeline={integrationInsights?.viewsTimeline ?? []} />
             <HomeEngagementChart groups={groups} />
         </div>
