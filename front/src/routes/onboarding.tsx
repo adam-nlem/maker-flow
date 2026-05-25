@@ -1,7 +1,7 @@
+import { useEffect } from "react"
 import type { ReactNode } from "react"
+import { useNavigate } from "react-router-dom"
 
-import WelcomeFeatureStep from "~/components/welcome/WelcomeFeatureStep"
-import WelcomeHowItWorksStep from "~/components/welcome/WelcomeHowItWorksStep"
 import OnboardingWelcomeTourStep from "~/components/onboarding/OnboardingWelcomeTourStep"
 import OnboardingCreateAgencyStep from "~/components/onboarding/OnboardingCreateAgencyStep"
 import OnboardingCreateProjectStep from "~/components/onboarding/OnboardingCreateProjectStep"
@@ -16,12 +16,7 @@ import { AgencyAdminOnboardingStep } from "~/models/enums/AgencyAdminOnboardingS
 import { AgencyCollaboratorOnboardingStep } from "~/models/enums/AgencyCollaboratorOnboardingStep"
 import { ClientOnboardingStep } from "~/models/enums/ClientOnboardingStep"
 import { UserRole } from "~/models/enums/UserRole"
-import { WelcomeStep } from "~/models/enums/WelcomeStep"
-
-const welcomeNodes: Record<WelcomeStep, ReactNode> = {
-    [WelcomeStep.Features]: <WelcomeFeatureStep />,
-    [WelcomeStep.HowItWorks]: <WelcomeHowItWorksStep />,
-}
+import { homePath } from "~/routes/routePaths"
 
 const adminNodes: Record<AgencyAdminOnboardingStep, ReactNode> = {
     [AgencyAdminOnboardingStep.WelcomeTour]: <OnboardingWelcomeTourStep />,
@@ -55,10 +50,17 @@ function resolveStepNode(role: UserRole | null, step: string): ReactNode {
 }
 
 export default function OnboardingPage() {
-    const { isAuthLoading, isAuthenticated, currentOnboardingStep, currentWelcomeStep } = useOnboardingFlow()
+    const navigate = useNavigate()
+    const { isAuthLoading, isAuthenticated, currentOnboardingStep } = useOnboardingFlow()
     const { user } = useCurrentUser()
 
-    if (isAuthLoading) {
+    useEffect(() => {
+        if (!isAuthLoading && !isAuthenticated) {
+            navigate(homePath, { replace: true })
+        }
+    }, [isAuthLoading, isAuthenticated, navigate])
+
+    if (isAuthLoading || !isAuthenticated) {
         return (
             <div className="flex min-h-screen items-center justify-center">
                 <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
@@ -68,9 +70,7 @@ export default function OnboardingPage() {
 
     return (
         <div className="bg-clear bg-dot-pattern h-screen relative overflow-y-auto">
-            {isAuthenticated
-                ? resolveStepNode(user?.displayRole ?? null, currentOnboardingStep)
-                : welcomeNodes[currentWelcomeStep]}
+            {resolveStepNode(user?.displayRole ?? null, currentOnboardingStep)}
         </div>
     )
 }

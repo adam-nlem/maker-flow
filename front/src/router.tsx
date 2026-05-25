@@ -64,6 +64,9 @@ export const router = createBrowserRouter(
     {
       element: <PrelaunchGuardLayout />,
       children: [
+        // Public root: redirects to /login for visitors, dispatches authenticated users by role
+        { index: true, element: <RootRedirect /> },
+
         // Public routes
         { path: onboardingPath, element: <OnboardingPage /> },
         { path: loginPath, element: <LoginPage /> },
@@ -76,9 +79,6 @@ export const router = createBrowserRouter(
           element: <ProtectedLayout />,
           errorElement: <ErrorBoundary />,
           children: [
-            // Smart redirect at root: dispatches by role
-            { index: true, element: <RootRedirect /> },
-
             // Agency shell — asserts non-client role internally
             {
               element: <AgencyShellLayout />,

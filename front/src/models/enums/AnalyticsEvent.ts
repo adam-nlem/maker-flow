@@ -1,6 +1,4 @@
 export enum AnalyticsEvent {
-    WelcomeStepViewed = 'welcome_step_viewed',
-    WelcomeCompleted = 'welcome_completed',
     UserRegistered = 'user_registered',
     UserLoggedIn = 'user_logged_in',
     OnboardingStepCompleted = 'onboarding_step_completed',

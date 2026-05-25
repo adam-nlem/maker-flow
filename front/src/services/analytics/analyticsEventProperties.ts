@@ -1,4 +1,3 @@
-import type { WelcomeStep } from "~/models/enums/WelcomeStep";
 import type { OtpType } from "~/models/enums/OtpType";
 import type { ProjectType } from "~/models/enums/ProjectType";
 import type { ScriptPartType } from "~/models/enums/ScriptPartType";
@@ -11,10 +10,6 @@ import type { SubscriptionPlan } from "~/models/enums/SubscriptionPlan";
 import type { UserRole } from "~/models/enums/UserRole";
 
 export interface EventProperties {}
-
-export interface WelcomeStepViewedEvent extends EventProperties {
-    step: WelcomeStep;
-}
 
 export interface UserLoggedInEvent extends EventProperties {
     method: OtpType;

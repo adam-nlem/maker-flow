@@ -2,28 +2,18 @@ import { ChevronRightIcon } from "@heroicons/react/24/solid"
 import { useTranslation } from "react-i18next"
 import { useIsDesktop } from "~/hooks/useIsDesktop"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
-import { WELCOME_STEP_ORDER, welcomeStepToIcon, welcomeStepShortLabelKeys } from "~/models/enums/WelcomeStep"
 
 export default function OnboardingProgressBar() {
     const { t } = useTranslation()
-    const { isAuthenticated, onboarding, currentOnboardingStep, currentWelcomeStep, currentStep, totalSteps, flowConfig } = useOnboardingFlow()
+    const { onboarding, currentOnboardingStep, currentStep, totalSteps, flowConfig } = useOnboardingFlow()
     const isDesktop = useIsDesktop()
 
-    const steps: string[] = isAuthenticated ? flowConfig.order : WELCOME_STEP_ORDER
-    const iconMap: Record<string, React.ComponentType<React.SVGProps<SVGSVGElement>>> = isAuthenticated ? flowConfig.icons : welcomeStepToIcon
-    const labelMap: Record<string, string> = isAuthenticated ? flowConfig.shortLabelKeys : welcomeStepShortLabelKeys
+    const steps = flowConfig.order
+    const iconMap = flowConfig.icons
+    const labelMap = flowConfig.shortLabelKeys
 
-    const currentWelcomeIndex = WELCOME_STEP_ORDER.indexOf(currentWelcomeStep)
-
-    const isCompleted = (step: string, index: number) =>
-        isAuthenticated
-            ? onboarding?.isStepCompleted(step) ?? false
-            : index < currentWelcomeIndex
-
-    const isCurrent = (step: string) =>
-        isAuthenticated
-            ? step === currentOnboardingStep
-            : step === currentWelcomeStep
+    const isCompleted = (step: string) => onboarding?.isStepCompleted(step) ?? false
+    const isCurrent = (step: string) => step === currentOnboardingStep
 
     const percentage = Math.round(((currentStep + 1) / totalSteps) * 100)
     const currentStepKey = steps[currentStep]
@@ -55,7 +45,7 @@ export default function OnboardingProgressBar() {
     return (
         <div className="flex items-center gap-2">
             {steps.map((step, index) => {
-                const completed = isCompleted(step, index)
+                const completed = isCompleted(step)
                 const current = isCurrent(step)
                 const Icon = iconMap[step]
 

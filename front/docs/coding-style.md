@@ -685,11 +685,11 @@ For non-persisted stores:
 ```tsx
 import { createResettableStore } from '~/stores/createResettableStore';
 
-export const useOnboardingStore = createResettableStore<OnboardingState & OnboardingAction>()(
+export const useMobileSidebarStore = createResettableStore<MobileSidebarState & MobileSidebarAction>()(
     (set) => ({
-        welcomeStep: WelcomeStep.Features,
-        pendingOtpToken: null,
-        otpEmail: null,
+        isOpen: false,
+        open: () => set({ isOpen: true }),
+        close: () => set({ isOpen: false }),
     })
 );
 ```

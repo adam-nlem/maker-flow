@@ -2,11 +2,9 @@
 
 ## Overview
 
-The onboarding system is a **role-aware full-page wizard** at `/onboarding`. The route covers two phases:
-1. **Welcome** (pre-auth): Features → HowItWorks → standalone `/register` route.
-2. **Setup** (post-auth): a step list chosen at runtime from one of three enums based on `user.displayRole`.
+The onboarding system is a **role-aware full-page wizard** at `/onboarding`. It is **strictly post-authentication** — a step list chosen at runtime from one of three enums based on `user.displayRole`. There is no in-app pre-login landing page; unauthenticated visitors are sent straight to `/login` (and from there to `/register` if they need an account).
 
-After registration → `/verify-otp` → `/` → `protected.tsx` redirects to `/onboarding` until `onboarding.isDismissed`. When dismissed, the page redirects agency members to `/agency` and clients to `/client`.
+After registration → `/verify-otp` → `/` → `RootRedirect` dispatches the authenticated user → `protected.tsx` detects `!onboarding.isDismissed` and redirects to `/onboarding`. When dismissed, `useOnboardingFlow` redirects agency members to `/agency` and clients to `/client`. If an unauthenticated visitor hits `/onboarding` directly, `OnboardingPage` redirects them to `/`, which `RootRedirect` then forwards to `/login`.
 
 ## Role-aware step lists
 
@@ -61,7 +59,7 @@ Files:
 
 ### Hooks
 
-- [`useOnboardingFlow`](../src/hooks/useOnboardingFlow.ts) — orchestrator. Selects the flow config from `user.displayRole`, computes `currentOnboardingStep`, redirects on dismiss (`/agency` or `/client`).
+- [`useOnboardingFlow`](../src/hooks/useOnboardingFlow.ts) — orchestrator. Selects the flow config from `user.displayRole`, computes `currentOnboardingStep`, redirects on dismiss (`/agency` or `/client`). Authenticated-only; the hook no longer carries any pre-auth state.
 - [`useAdvanceOnboardingStep`](../src/hooks/api/onboarding/useAdvanceOnboardingStep.ts) — completes the current step and dismisses on the last one. Drives every step component.
 - `useShowOnboarding` / `useCompleteOnboardingStep` / `useDismissOnboarding` — React Query wrappers for the three endpoints. `useCompleteOnboardingStep` accepts a raw `string` step value; the backend validates applicability and returns `InvalidOnboardingStepException` (code 32001) for cross-role attempts.
 

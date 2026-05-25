@@ -40,12 +40,6 @@ The service imports `posthog` directly from `posthog-js` (same singleton as the 
 
 ## Event Catalog
 
-### Welcome Funnel
-| Event | Properties | Location |
-|---|---|---|
-| `WelcomeStepViewed` | `step: WelcomeStep` | `WelcomeFeatureStep`, `WelcomeHowItWorksStep` |
-| `WelcomeCompleted` | — | `WelcomeHowItWorksStep` |
-
 ### Auth & Identity
 | Event | Properties | Location |
 |---|---|---|
