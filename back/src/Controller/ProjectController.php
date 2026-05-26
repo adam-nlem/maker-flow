@@ -12,14 +12,13 @@ use App\Exception\Agency\AgencySubscriptionInactiveException;
 use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Project\ProjectAlreadyFinishedException;
 use App\Exception\Project\ProjectAlreadyOpenException;
-use App\Exception\Project\ProjectLimitReachedException;
 use App\Exception\Project\ProjectNameConflictException;
 use App\Exception\Project\ProjectNotFoundException;
 use App\Helper\DateHelper;
 use App\Repository\AgencyRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\SubscriptionRepository;
-use App\Service\Stripe\StripePlanService;
+use App\Service\Subscription\SubscriptionLimitService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -36,8 +35,7 @@ final class ProjectController extends AbstractController
         CreateProjectRequestDTO $dto,
         AgencyRepository $agencyRepository,
         ProjectRepository $projectRepository,
-        SubscriptionRepository $subscriptionRepository,
-        StripePlanService $stripePlanService,
+        SubscriptionLimitService $subscriptionLimitService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -48,12 +46,7 @@ final class ProjectController extends AbstractController
             throw new MissingAgencyException();
         }
 
-        $plan = $subscriptionRepository->getLatestActiveByAgency($agency)?->getPlan();
-        $maxProjects = $plan !== null ? $stripePlanService->getPlanConfigFromSubscription($plan)?->getMaxProjects() : 1;
-
-        if ($maxProjects !== null && $projectRepository->countByAgency($agency) >= $maxProjects) {
-            throw new ProjectLimitReachedException();
-        }
+        $subscriptionLimitService->assertCanCreateProject($agency);
 
         /** @var Project $project */
         $project = $dto->build();

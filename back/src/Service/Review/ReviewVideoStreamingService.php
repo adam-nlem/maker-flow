@@ -126,6 +126,25 @@ class ReviewVideoStreamingService
         }
     }
 
+    public function probeDurationSeconds(string $absolutePath): int
+    {
+        $process = new Process([
+            $this->ffprobeBinary,
+            '-v', 'error',
+            '-show_entries', 'format=duration',
+            '-of', 'default=noprint_wrappers=1:nokey=1',
+            $absolutePath,
+        ]);
+
+        try {
+            $process->mustRun();
+        } catch (ProcessFailedException) {
+            return 0;
+        }
+
+        return (int) round((float) trim($process->getOutput()));
+    }
+
     private function hasAudioStream(string $sourcePath): bool
     {
         $process = new Process([

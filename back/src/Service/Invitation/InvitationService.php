@@ -26,6 +26,7 @@ use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use App\Service\Mailing\Template\ClientWelcomeEmailTemplate;
 use App\Service\Mailing\Template\CollaboratorWelcomeEmailTemplate;
+use App\Service\Subscription\SubscriptionLimitService;
 use Symfony\Component\Messenger\MessageBusInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
@@ -40,6 +41,7 @@ final class InvitationService
         private readonly ProjectRepository $projectRepository,
         private readonly MessageBusInterface $messageBus,
         private readonly UserPasswordHasherInterface $passwordHasher,
+        private readonly SubscriptionLimitService $subscriptionLimitService,
         private readonly string $frontendUrl,
     ) {}
 
@@ -138,6 +140,10 @@ final class InvitationService
         }
 
         $this->invitationRepository->invalidatePendingForCollaborator($dto->getEmail(), $agency);
+
+        if ($role === UserRole::Editor) {
+            $this->subscriptionLimitService->assertCanInviteEditor($agency);
+        }
 
         $invitation = (new Invitation())
             ->setType(InvitationType::Collaborator)

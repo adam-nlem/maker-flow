@@ -313,8 +313,8 @@
     },
     "subscriptionPlan": {
         "starter": "Starter",
-        "creator": "Creator",
-        "agency": "Agency"
+        "agency": "Agency",
+        "agencyPlus": "Agency+"
     },
     "subscriptionStatus": {
         "active": "Active",

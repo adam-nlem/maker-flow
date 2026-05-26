@@ -7,6 +7,7 @@ import {
 } from '~/dtos/reviews/ReviewWithLatestVersionDTO';
 import type { MediaType } from '~/models/enums/MediaType';
 import { validateReviewFiles } from '~/utils/reviewFileValidation';
+import { agencyQueryKeys } from '~/hooks/api/agency/agencyQueryKeys';
 import { reviewsQueryKeys } from './reviewsQueryKeys';
 
 interface CreateReviewVersionData {
@@ -41,6 +42,7 @@ export function useCreateReviewVersion() {
             queryClient.setQueryData(reviewsQueryKeys.detail(variables.reviewUuid), result);
             queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.listAll(variables.projectUuid) });
             queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.pendingComments(variables.projectUuid) });
+            queryClient.invalidateQueries({ queryKey: agencyQueryKeys.usage() });
         },
     });
 

@@ -46,7 +46,7 @@ Both flows share the same `Invitation` entity and the same public token endpoint
 
 ### Service (`Service/Invitation/InvitationService.php`)
 
-- `createForCollaborator(Agency, User $createdBy, email, firstName, lastName, UserRole)` — validates role, checks email uniqueness, invalidates previous pending, persists, dispatches `SendEmailMessage` with `CollaboratorWelcomeEmailTemplate`
+- `createForCollaborator(Agency, User $createdBy, email, firstName, lastName, UserRole)` — validates role, checks email uniqueness, invalidates previous pending (so a re-invite never double-counts the existing pending seat), then — when `role === Editor` — calls `SubscriptionLimitService::assertCanInviteEditor()` which compares `activeEditors + pendingEditorInvitations` against `max_editor_collaborators` and throws `EditorCollaboratorLimitReachedException` (HTTP 402, full code 31002) if the cap is reached. Viewer invitations skip the cap. Persists, dispatches `SendEmailMessage` with `CollaboratorWelcomeEmailTemplate`.
 - `createForClient(Project, User $createdBy, email, firstName, lastName)` — same shape, dispatches `ClientWelcomeEmailTemplate`
 - `verifyToken(string): Invitation` — throws `InvitationNotFoundException` (404), `InvitationAlreadyUsedException` (422), `InvitationExpiredException` (422)
 - `completeSetup(Invitation, plainPassword): User` — re-verifies, validates password via `PasswordHelper`, builds + persists `User` (sets `agency` for collaborator / `project` for client, applies role), marks invitation `usedAt`, returns the new user

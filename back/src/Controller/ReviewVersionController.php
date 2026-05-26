@@ -19,6 +19,7 @@ use App\Repository\ReviewRepository;
 use App\Repository\ReviewVersionRepository;
 use App\Security\Voter\ProjectVoter;
 use App\Service\Review\ReviewFileService;
+use App\Service\Subscription\SubscriptionLimitService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -49,6 +50,7 @@ final class ReviewVersionController extends AbstractController
         ReviewVersionRepository $reviewVersionRepository,
         ReviewCommentRepository $reviewCommentRepository,
         ReviewFileService $reviewFileService,
+        SubscriptionLimitService $subscriptionLimitService,
         EntityManagerInterface $entityManager,
         MessageBusInterface $messageBus,
     ): JsonResponse {
@@ -66,12 +68,24 @@ final class ReviewVersionController extends AbstractController
             $files = $files instanceof UploadedFile ? [$files] : [];
         }
 
+        $files = array_values($files);
+        $mediaType = $review->getMediaType();
+        $reviewFileService->validateFiles($files, $mediaType);
+
+        $metrics = $subscriptionLimitService->assertCanUploadReviewVersion(
+            $review->getProject()->getAgency(),
+            $files,
+            $mediaType,
+        );
+
         /** @var ReviewVersion $version */
         $version = $dto->build();
         $version->setReview($review);
         $version->setFileCount(count($files));
+        $version->setFileSizeBytes($metrics->getFileSizeBytes());
+        $version->setDurationSeconds($metrics->getDurationSeconds());
 
-        if ($review->getMediaType() === MediaType::Video) {
+        if ($mediaType === MediaType::Video) {
             $version->setVideoStreamingStatus(VideoStreamingStatus::Pending);
         }
 

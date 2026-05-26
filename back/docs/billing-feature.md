@@ -116,8 +116,8 @@ No UUID (stripeEventId serves as public identifier). No serialization groups (no
 | Case | Value |
 |------|-------|
 | Starter | `starter` |
-| Creator | `creator` |
 | Agency | `agency` |
+| AgencyPlus | `agency+` |
 
 > **Note:** There is no `Free` case. A "free user" is simply a user with no active subscription.
 
@@ -241,10 +241,13 @@ Each subscription product must have these metadata fields:
 | Key | Type | Description |
 |-----|------|-------------|
 | `type` | string | Must be `"subscription"` |
-| `plan` | string | Plan identifier (`starter`, `creator`, `agency`) — must match a `SubscriptionPlan` enum case |
+| `plan` | string | Plan identifier (`starter`, `agency`, `agency+`) — must match a `SubscriptionPlan` enum case |
 | `is_highlighted` | string | `"true"` or `"false"` -- marks the recommended plan |
 | `max_projects` | string | Number or `"null"` for unlimited |
 | `max_scripts_per_project` | string | Number or `"null"` for unlimited |
+| `max_editor_collaborators` | string | Number of seats for `ROLE_EDITOR` collaborators (counts active editors + pending non-expired editor invitations). `"null"` for unlimited. Free tier (no subscription) is fully blocked. |
+| `max_video_upload_hours` | string | Cap on total currently-stored video duration across the agency, in hours. `"null"` for unlimited. Free tier blocked. |
+| `max_storage_gb` | string | Cap on total currently-stored review files across the agency, in GB. `"null"` for unlimited. Free tier blocked. |
 | `sort_order` | string | Display ordering number |
 
 Feature labels are configured via Stripe's built-in **Marketing features** on each Product (not metadata).
@@ -277,6 +280,43 @@ Manually refreshes both the plans and refill Redis caches from Stripe. Use after
 
 - `PlanConfigResponseDTO` -- Single plan's display data (implements `ResponseDTOInterface`)
 - `ListPlansResponseDTO` -- Wraps array of `PlanConfigResponseDTO`
+
+---
+
+## SubscriptionLimitService (`Service/Subscription/SubscriptionLimitService.php`)
+
+Central authority for all subscription-derived quota checks. Controllers and services never resolve plan limits inline — they call one of the `assert*` methods on this service, which throws the matching `*LimitReachedException` (HTTP 402) when the limit is exceeded.
+
+### Public Methods
+
+- `assertCanCreateProject(Agency $agency): void` — enforces `max_projects`. Free tier falls back to `1` (matches pre-existing behaviour).
+- `assertCanCreateScript(Project $project): void` — enforces `max_scripts_per_project`. Free tier falls back to `1`.
+- `assertCanInviteEditor(Agency $agency): void` — enforces `max_editor_collaborators`. Counts `ROLE_EDITOR` active users plus pending non-expired collaborator invitations whose role is editor. Viewers do not count. Free tier blocks (cap = 0).
+- `assertCanUploadReviewVersion(Agency $agency, UploadedFile[] $files, MediaType $mediaType): ReviewUploadMetricsDTO` — single entry point for review-version uploads. Composes the upload cost (file-size sum via `ReviewFileService::computeTotalSize`, video duration via `ReviewVideoStreamingService::probeDurationSeconds` when `mediaType === Video`), then enforces both `max_video_upload_hours` (`current + duration ≤ hours × 3600`) and `max_storage_gb` (`current + bytes ≤ gb × 1024³`). Returns the computed metrics so the caller can persist them on the `ReviewVersion`. Free tier blocks both. The internal per-limit asserts (`assertCanUploadVideo`, `assertCanConsumeStorage`) are private — the orchestrator is the only public way to enforce these two limits together, which keeps all upload-cost logic in one place.
+- `computeUsage(Agency $agency): AgencyUsageResponseDTO` — read-side aggregation backing `GET /api/agencies/usage`. Returns each `*Used` value plus the matching `*Limit`, already expressed in absolute units (seconds, bytes, integer counts).
+
+### Free-tier semantics
+
+When `SubscriptionRepository::getLatestActiveByAgency()` returns `null`:
+- `max_projects` / `max_scripts_per_project` → cap **1** (preserves legacy fallback).
+- `max_editor_collaborators` / `max_video_upload_hours` / `max_storage_gb` → cap **0** (fully blocked).
+
+### Usage endpoint
+
+`GET /api/agencies/usage` (any `ROLE_USER` collaborator of the agency) returns:
+
+```json
+{
+  "editorCollaboratorsUsed": 1,
+  "editorCollaboratorsLimit": 5,
+  "videoSecondsUsed": 4320,
+  "videoSecondsLimit": 36000,
+  "storageBytesUsed": 1287456789,
+  "storageBytesLimit": 53687091200
+}
+```
+
+A `null` limit means unlimited (paid plan with `"null"` metadata). A `0` limit means free-tier blocked.
 
 ---
 
@@ -368,6 +408,18 @@ Removes the scheduled cancellation by setting `cancel_at_period_end = false`. Th
 
 ## Exceptions
 
+### Limit-reached exceptions
+
+All return HTTP 402 (Payment Required). Each has a stable composed code (`domain * 1000 + suffix`) used by the frontend to dispatch error messages.
+
+| Exception | Domain | Suffix | Composed code |
+|-----------|--------|--------|---------------|
+| `ProjectLimitReachedException` | Project (17) | 3 | 17003 |
+| `ScriptLimitReachedException` | Script (18) | 2 | 18002 |
+| `EditorCollaboratorLimitReachedException` | AgencyCollaborator (31) | 2 | 31002 |
+| `VideoHoursLimitReachedException` | Review (33) | 23 | 33023 |
+| `StorageLimitReachedException` | Review (33) | 24 | 33024 |
+
 ### CreditServiceException (`Service/Credit/Exception/CreditServiceException.php`)
 Abstract base exception for the credit domain. Service code: `120200`.
 
@@ -407,7 +459,7 @@ Thrown when a subscription management action fails (cancel, resume, or plan chan
 - DTO: `ListPlansResponseDTO` containing `PlanConfigResponseDTO[]`
 
 **POST /api/subscriptions/checkout**
-- Request body: `{"plan": "starter"}` (valid values: `starter`, `creator`, `agency`)
+- Request body: `{"plan": "starter"}` (valid values: `starter`, `agency`, `agency+`)
 - Response: `{"checkoutUrl": "https://checkout.stripe.com/..."}`
 - DTO: `CreateSubscriptionCheckoutRequestDTO`
 
@@ -661,11 +713,7 @@ Transport-level retry: 3 retries with exponential backoff (1s, 2s, 4s) configure
 
 ### Stripe Price Metadata Requirement
 
-Each Stripe price must have a `credit_amount` metadata field set in the Stripe dashboard:
-- Starter price → `credit_amount: 50`
-- Creator price → `credit_amount: 150`
-- Agency price → `credit_amount: 500`
-- Refill price → `credit_amount: <desired amount>`
+Each Stripe price must have a `credit_amount` metadata field set in the Stripe dashboard — one entry per plan (Starter, Agency, Agency+) plus the refill price. The exact numbers are owned by the Stripe dashboard, not this codebase.
 
 ### Configuration
 

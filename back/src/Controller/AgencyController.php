@@ -16,6 +16,7 @@ use App\Repository\UserRepository;
 use App\Security\Voter\AgencyVoter;
 use App\Service\Agency\AgencyLogoService;
 use App\Service\Credit\CreditService;
+use App\Service\Subscription\SubscriptionLimitService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -61,6 +62,27 @@ final class AgencyController extends AbstractController
             data: $agency,
             status: Response::HTTP_CREATED,
             context: ['groups' => ['api_agencies_create']],
+        );
+    }
+
+    #[Route('/usage', name: 'api_agencies_usage', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
+    public function usage(
+        AgencyRepository $agencyRepository,
+        SubscriptionLimitService $subscriptionLimitService,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        return $this->json(
+            data: $subscriptionLimitService->computeUsage($agency)->getData(),
+            status: Response::HTTP_OK,
         );
     }
 

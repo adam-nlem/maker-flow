@@ -7,6 +7,10 @@ import { useReviewsStore } from "~/stores/reviews/reviewsStore";
 import { useToastStore } from "~/stores/toast/toastStore";
 import { ToastType } from "~/models/enums/ToastType";
 import type { ReviewWithLatestVersionDTO } from "~/dtos/reviews/ReviewWithLatestVersionDTO";
+import { HttpException } from "~/services/httpClient/HttpException";
+
+const VIDEO_HOURS_LIMIT_CODE = 33023;
+const STORAGE_LIMIT_CODE = 33024;
 
 interface ReviewVersionUploaderProps {
     reviewDTO: ReviewWithLatestVersionDTO;
@@ -19,6 +23,7 @@ export default function ReviewVersionUploader({ reviewDTO, projectUuid }: Review
     const selectVersion = useReviewsStore((s) => s.selectVersion);
 
     const [files, setFiles] = useState<File[]>([]);
+    const [limitErrorKey, setLimitErrorKey] = useState<string | null>(null);
 
     const {
         createReviewVersion,
@@ -29,6 +34,7 @@ export default function ReviewVersionUploader({ reviewDTO, projectUuid }: Review
 
     const handleFilesChange = (next: File[]) => {
         clearValidationError();
+        setLimitErrorKey(null);
         setFiles(next);
     };
 
@@ -46,9 +52,20 @@ export default function ReviewVersionUploader({ reviewDTO, projectUuid }: Review
             if (!result) return;
 
             setFiles([]);
+            setLimitErrorKey(null);
             selectVersion(null);
             addToast(ToastType.Success, t("reviews:upload.toast.success"));
-        } catch {
+        } catch (error) {
+            if (error instanceof HttpException && error.response.httpStatus === 402) {
+                if (error.response.code === VIDEO_HOURS_LIMIT_CODE) {
+                    setLimitErrorKey("settings:subscription.errors.videoHoursLimit");
+                    return;
+                }
+                if (error.response.code === STORAGE_LIMIT_CODE) {
+                    setLimitErrorKey("settings:subscription.errors.storageLimit");
+                    return;
+                }
+            }
             addToast(ToastType.Error, t("reviews:upload.toast.error"));
         }
     };
@@ -75,6 +92,11 @@ export default function ReviewVersionUploader({ reviewDTO, projectUuid }: Review
                 >
                     {t("reviews:upload.submit")}
                 </Button>
+            )}
+            {limitErrorKey && (
+                <p className="text-body-xs text-danger text-center">
+                    {t(limitErrorKey)}
+                </p>
             )}
         </div>
     );

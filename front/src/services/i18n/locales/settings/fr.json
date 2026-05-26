@@ -78,6 +78,22 @@
             "creditsPerMonth": "{{count}} crédits / mois",
             "choose": "Choisir"
         },
+        "usage": {
+            "title": "Utilisation",
+            "editorCollaborators": "Éditeurs",
+            "videoHours": "Heures de vidéo",
+            "storage": "Stockage",
+            "unlimited": "Illimité",
+            "upgradeToUnlock": "Passez à un plan supérieur",
+            "countUnit": "{{used}} / {{limit}}",
+            "hoursUnit": "{{used}} h / {{limit}} h",
+            "gbUnit": "{{used}} Go / {{limit}} Go"
+        },
+        "errors": {
+            "editorCollaboratorLimit": "Limite d'éditeurs atteinte pour votre abonnement.",
+            "videoHoursLimit": "Limite d'heures de vidéo atteinte pour votre abonnement.",
+            "storageLimit": "Limite de stockage atteinte pour votre abonnement."
+        },
         "checkoutSuccess": "Paiement effectué avec succès"
     }
 }

@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { httpClient } from '~/services/httpClient/httpClient';
+import { agencyQueryKeys } from '~/hooks/api/agency/agencyQueryKeys';
 import { reviewsQueryKeys } from './reviewsQueryKeys';
 
 interface DeleteReviewData {
@@ -17,6 +18,7 @@ export function useDeleteReview() {
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.listAll(variables.projectUuid) });
             queryClient.removeQueries({ queryKey: reviewsQueryKeys.detail(variables.uuid) });
+            queryClient.invalidateQueries({ queryKey: agencyQueryKeys.usage() });
         },
     });
 

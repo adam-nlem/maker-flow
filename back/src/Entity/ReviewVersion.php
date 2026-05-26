@@ -96,6 +96,12 @@ class ReviewVersion
     ])]
     private ?VideoStreamingFailureReason $videoStreamingFailureReason = null;
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $durationSeconds = null;
+
+    #[ORM\Column(type: Types::BIGINT, nullable: true)]
+    private ?int $fileSizeBytes = null;
+
     #[ORM\Column]
     #[Groups([
         'api_reviews_show',
@@ -201,6 +207,30 @@ class ReviewVersion
     public function setVideoStreamingFailureReason(?VideoStreamingFailureReason $videoStreamingFailureReason): static
     {
         $this->videoStreamingFailureReason = $videoStreamingFailureReason;
+
+        return $this;
+    }
+
+    public function getDurationSeconds(): ?int
+    {
+        return $this->durationSeconds;
+    }
+
+    public function setDurationSeconds(?int $durationSeconds): static
+    {
+        $this->durationSeconds = $durationSeconds;
+
+        return $this;
+    }
+
+    public function getFileSizeBytes(): ?int
+    {
+        return $this->fileSizeBytes !== null ? (int) $this->fileSizeBytes : null;
+    }
+
+    public function setFileSizeBytes(?int $fileSizeBytes): static
+    {
+        $this->fileSizeBytes = $fileSizeBytes;
 
         return $this;
     }

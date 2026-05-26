@@ -5,6 +5,7 @@ import { UserRole } from "~/models/enums/UserRole"
 import { httpClient } from "~/services/httpClient/httpClient"
 import { AnalyticsEvent } from "~/models/enums/AnalyticsEvent"
 import { track } from "~/services/analytics/analytics"
+import { agencyQueryKeys } from "~/hooks/api/agency/agencyQueryKeys"
 import { collaboratorQueryKeys } from "./collaboratorQueryKeys"
 
 interface InviteCollaboratorData {
@@ -30,6 +31,7 @@ export function useInviteCollaborator() {
         },
         onSuccess: (_, variables) => {
             queryClient.invalidateQueries({ queryKey: collaboratorQueryKeys.all })
+            queryClient.invalidateQueries({ queryKey: agencyQueryKeys.usage() })
             track(AnalyticsEvent.CollaboratorInvited, { role: variables.role })
         },
     })

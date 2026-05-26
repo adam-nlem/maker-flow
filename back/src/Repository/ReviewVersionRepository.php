@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Agency;
 use App\Entity\ReviewVersion;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
@@ -53,5 +54,29 @@ class ReviewVersionRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function sumVideoSecondsByAgency(Agency $agency): int
+    {
+        return (int) $this->createQueryBuilder('rv')
+            ->select('COALESCE(SUM(rv.durationSeconds), 0)')
+            ->join('rv.review', 'r')
+            ->join('r.project', 'p')
+            ->where('p.agency = :agency')
+            ->setParameter('agency', $agency)
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function sumStorageBytesByAgency(Agency $agency): int
+    {
+        return (int) $this->createQueryBuilder('rv')
+            ->select('COALESCE(SUM(rv.fileSizeBytes), 0)')
+            ->join('rv.review', 'r')
+            ->join('r.project', 'p')
+            ->where('p.agency = :agency')
+            ->setParameter('agency', $agency)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 }

@@ -187,6 +187,15 @@ See the unified [Components](#components) section above. The `/client/reviews` r
 
 Error code map (`front/src/services/apiErrorHandler/errorCodeMessages.ts`): direct one-to-one mappings for every Review comment exception — `33008` → `errors:review.notPending`, `33010` → `errors:review.notLatestVersion`, `33011` → `errors:review.commentEmpty`, `33014` → `errors:review.commentParentNotFound`, `33015` → `errors:review.commentReplyCannotHaveTimecode`, `33016` → `errors:review.commentNotFound`, `33017` → `errors:review.commentStatusInvalid`, `33018` → `errors:review.commentStatusOnReplyForbidden`, `33019` → `errors:review.commentEditForbidden`, `33020` → `errors:review.commentTimecodeOnReplyForbidden`. No resolver functions — each error has a single user-facing message (matches the project convention: one exception per error condition).
 
+### Plan-limit handling on upload
+
+`ReviewVersionUploader` catches `HttpException` with `httpStatus === 402` and stores an i18n key in local `limitErrorKey` state, rendered as a centered `text-danger` `<p>` under the submit button (same pattern as `CreateProjectForm` / `InviteCollaboratorForm`). Toasts are reserved for the generic non-402 upload failure. The dispatch is keyed on the composed exception code in the JSON body:
+- `33023` (`VideoHoursLimitReachedException`) → `settings:subscription.errors.videoHoursLimit`.
+- `33024` (`StorageLimitReachedException`) → `settings:subscription.errors.storageLimit`.
+- Any other 4xx/5xx → generic `reviews:upload.toast.error` toast.
+
+The inline error clears whenever the user picks a new file set (`handleFilesChange`). Enforcement happens server-side via `SubscriptionLimitService` after a synchronous `ffprobe` duration probe (see `back/docs/review-feature.md`), so the file is never persisted when 402 is raised.
+
 ## Phase 3 — re-upload + version history + unresolved counter
 
 Phase 3 adds three surface-level capabilities on top of the Phase 1+2 base, with no schema change and no new exceptions.

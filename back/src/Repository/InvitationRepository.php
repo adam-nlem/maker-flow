@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Agency;
 use App\Entity\Enum\InvitationType;
+use App\Entity\Enum\UserRole;
 use App\Entity\Invitation;
 use App\Entity\Project;
 use App\Helper\DateHelper;
@@ -129,6 +130,23 @@ class InvitationRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function countPendingEditorInvitationsByAgency(Agency $agency): int
+    {
+        return (int) $this->createQueryBuilder('i')
+            ->select('COUNT(i.id)')
+            ->where('i.agency = :agency')
+            ->andWhere('i.type = :type')
+            ->andWhere('i.role = :role')
+            ->andWhere('i.usedAt IS NULL')
+            ->andWhere('i.expiresAt > :now')
+            ->setParameter('agency', $agency)
+            ->setParameter('type', InvitationType::Collaborator->value)
+            ->setParameter('role', UserRole::Editor->value)
+            ->setParameter('now', DateHelper::createUtcDateTimeImmutable())
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     public function hasPendingByEmail(string $email): bool

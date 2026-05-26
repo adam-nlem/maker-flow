@@ -43,6 +43,8 @@ Phase 1 shipped the agency-side surface (create, list, show, update, delete). Ph
 | `status` | `App\Entity\Enum\ReviewStatus` | NOT NULL, default `Pending`. Only transition: `Pending → Approved` (via the client approve action). Comments do not change the status — the client just posts on the version's comment thread when revisions are needed; a fresh upload starts a new version at `Pending`. |
 | `videoStreamingStatus` | `App\Entity\Enum\VideoStreamingStatus`, nullable | `pending`/`processing`/`ready`/`failed`. Set to `pending` on create when `mediaType === Video`. Stays `null` for image / carousel media versions and for legacy pre-2026-05-19 rows. |
 | `videoStreamingFailureReason` | `App\Entity\Enum\VideoStreamingFailureReason`, nullable | Populated by `ReviewVideoProcessingFailedSubscriber` when status flips to `failed`. Values: `invalid_source`, `processing_error`. |
+| `durationSeconds` | int, nullable | Probed via `ffprobe` synchronously at upload time for `MediaType::Video`. Null for image / carousel media and for legacy pre-limit rows. Aggregated by `ReviewVersionRepository::sumVideoSecondsByAgency()` to enforce the `max_video_upload_hours` plan limit. |
+| `fileSizeBytes` | bigint, nullable | Sum of bytes of all uploaded files for the version, captured at upload time. Null for legacy pre-limit rows. Aggregated by `ReviewVersionRepository::sumStorageBytesByAgency()` to enforce the `max_storage_gb` plan limit. |
 | `comments` | OneToMany `ReviewComment` | Cascade remove, orphan removal, ordered by `createdAt ASC`. Each version owns its own feedback thread; comments are created exclusively via `POST /api/review-comments` (no side-effect on the version status). |
 | `createdAt` | DateTimeImmutable | |
 
@@ -166,8 +168,18 @@ Violations throw `ReviewFileInvalidException` (HTTP 400) carrying a `FileInvalid
 | `ReviewCommentTimecodeOnReplyForbiddenException` | 409 | 20 | PATCH tries to mutate `videoTimecodeSeconds` on a reply (top-level only). |
 | `CoverSourceNotFoundException` | 500 | 21 | The cover extractor started but the source `1.{ext}` is missing on disk. Always swallowed by the handler (logged to Sentry) — never reaches the HTTP layer. |
 | `CoverGenerationFailedException` | 500 | 22 | ffmpeg exited non-zero during cover extraction, or the expected `cover.jpg` is missing afterwards. Always swallowed by the handler (logged to Sentry) — never reaches the HTTP layer. |
+| `VideoHoursLimitReachedException` | 402 | 23 | Synchronous video-duration probe at upload showed the agency would exceed `max_video_upload_hours`. Raised before the file is persisted — no DB row, no disk write. |
+| `StorageLimitReachedException` | 402 | 24 | Total size of the upload would exceed the agency's `max_storage_gb` cap. Applies to videos, single images, and carousels alike. Raised before persistence. |
 
-All exceptions extend `ReviewException` → `DomainCode::Review` (33). Full codes are `33001`–`33022`. **Convention:** each distinct error condition gets its own exception with a fixed code — we do **not** multiplex multiple reasons through a single exception with a `reason` enum in meta.
+All exceptions extend `ReviewException` → `DomainCode::Review` (33). Full codes are `33001`–`33024`. **Convention:** each distinct error condition gets its own exception with a fixed code — we do **not** multiplex multiple reasons through a single exception with a `reason` enum in meta.
+
+The two `*Limit*` exceptions are not raised inside `ReviewFileService`; they are thrown by `SubscriptionLimitService` (see `back/docs/billing-feature.md`). The controller orchestrates a thin three-step pipeline:
+
+1. `ReviewFileService::validateFiles($files, $mediaType)` — count / MIME / size validation only (HTTP 400 on failure).
+2. `SubscriptionLimitService::assertCanUploadReviewVersion($agency, $files, $mediaType): ReviewUploadMetricsDTO` — composes the upload cost (file-size sum via `ReviewFileService::computeTotalSize` + video duration via `ReviewVideoStreamingService::probeDurationSeconds`), then enforces both `max_video_upload_hours` and `max_storage_gb`. Returns the metrics for the controller to set on the entity.
+3. Persist the `ReviewVersion` with `durationSeconds` + `fileSizeBytes` from the metrics, then `ReviewFileService::storeUploadedFiles($version, $files)` moves files to disk.
+
+The split keeps each base service focused: `ReviewFileService` owns file-system concerns (validation + on-disk storage + size summing + path helpers), `ReviewVideoStreamingService` owns `ffmpeg`/`ffprobe` concerns, and `SubscriptionLimitService` owns all upload-cost composition + limit policy. Neither base service depends on the other.
 
 ## Async video streaming
 

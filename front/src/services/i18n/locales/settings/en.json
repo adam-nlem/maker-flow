@@ -78,6 +78,22 @@
             "creditsPerMonth": "{{count}} credits / month",
             "choose": "Choose"
         },
+        "usage": {
+            "title": "Usage",
+            "editorCollaborators": "Editor collaborators",
+            "videoHours": "Video upload hours",
+            "storage": "Storage",
+            "unlimited": "Unlimited",
+            "upgradeToUnlock": "Upgrade to unlock",
+            "countUnit": "{{used}} / {{limit}}",
+            "hoursUnit": "{{used}}h / {{limit}}h",
+            "gbUnit": "{{used}} GB / {{limit}} GB"
+        },
+        "errors": {
+            "editorCollaboratorLimit": "Editor collaborator limit reached for your plan.",
+            "videoHoursLimit": "Video upload hours limit reached for your plan.",
+            "storageLimit": "Storage limit reached for your plan."
+        },
         "checkoutSuccess": "Payment successful"
     }
 }

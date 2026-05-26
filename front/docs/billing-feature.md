@@ -49,12 +49,12 @@ The settings page uses React Router 7 nested routes with a dynamic `:section` pa
 | Case | Value |
 |------|-------|
 | Starter | `starter` |
-| Creator | `creator` |
 | Agency | `agency` |
+| AgencyPlus | `agency+` |
 
 > **Note:** There is no `Free` case. A "free user" is simply a user with no subscription (API returns 404).
 
-Exports: `subscriptionPlanOptions`, `subscriptionPlanToFrenchTranslation`
+Exports: `subscriptionPlanOptions`, `subscriptionPlanTranslationKeys`
 
 ### SubscriptionStatus (`models/enums/SubscriptionStatus.ts`)
 
@@ -137,6 +137,9 @@ export class PlanConfigDTO {
     creditsPerMonth: number;
     maxProjects: number | null;
     maxScriptsPerProject: number | null;
+    maxEditorCollaborators: number | null;
+    maxVideoUploadHours: number | null;
+    maxStorageGb: number | null;
     features: string[];
     isHighlighted: boolean;
     sortOrder: number;
@@ -179,6 +182,8 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 | Feature | Component | Behavior |
 |---------|-----------|----------|
 | Script creation | `ScriptListPanel` | "+" button disabled when `scripts.length >= maxScriptsPerProject` (limit from `useListPlans()`). Catches 402 from backend. |
+| Editor invitations | `InviteCollaboratorForm` | Catches 402 from `POST /invitations` (only fires when role=Editor on the backend). Shows `settings:subscription.errors.editorCollaboratorLimit` inline. |
+| Review version upload | `ReviewVersionUploader` | Catches 402 from `POST /review-versions` and stores an i18n key in local `limitErrorKey` state, rendered as a centered `text-danger` `<p>` (same inline-error pattern as `CreateProjectForm` / `InviteCollaboratorForm`). Dispatch on the composed code: `33023` → `videoHoursLimit`, `33024` → `storageLimit`. Inline message clears on file-set change. Non-402 errors still surface as the generic upload toast. |
 | Post detail page | `PostDetailPageView` | API call skipped via `enabled: isSubscribed`. Full `PremiumOverlay` shown instead of page content. Breadcrumb remains visible. |
 | Integration detail page | `IntegrationPageView` | API call skipped via `enabled: isSubscribed`. Full `PremiumOverlay` shown instead of detail content. |
 | Home aggregated view | `home.tsx` (parent) | Full `PremiumOverlay` replaces both `HomeInsightsOverview` and `RankedPostGroupsList` when "Toutes les plateformes" is selected and user is not subscribed. No API calls made. Pill row stays visible. Per-integration views remain accessible. |
@@ -195,6 +200,7 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 |------|------|
 | `hooks/api/credits/creditQueryKeys.ts` | `all`, `balance()`, `transactions(page, limit)` |
 | `hooks/api/subscriptions/subscriptionQueryKeys.ts` | `all`, `current()`, `plans()` |
+| `hooks/api/agency/agencyQueryKeys.ts` | `all`, `current()`, `logo(uuid)`, `usage()` |
 
 ### Hooks
 
@@ -203,6 +209,7 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 | `useShowCreditBalance` | `GET /api/credits/balance` | `{ creditBalance, isLoading, error }` |
 | `useListPlans` | `GET /api/subscriptions/plans` | `{ plans, isLoading, error }`. Plans fetched from Stripe via backend, cached with 30min staleTime. |
 | `useShowCurrentSubscription` | `GET /api/subscriptions/current` | `{ subscription, isLoading, error }` (null if no subscription). Accepts optional `{ refetchInterval }` for polling. |
+| `useShowAgencyUsage` | `GET /api/agencies/usage` | `{ usage, isLoading, error }`. Returns `AgencyUsageDTO` with `editorCollaboratorsUsed/Limit`, `videoSecondsUsed/Limit`, `storageBytesUsed/Limit`. Limits are already converted server-side to absolute units (seconds, bytes). `null` limit = unlimited, `0` limit = free-tier blocked. Invalidated by `useInviteCollaborator`, `useRemoveCollaborator`, `useDeleteInvitation`, `useCreateReviewVersion`, and `useDeleteReview` `onSuccess`. |
 | `useCreateSubscriptionCheckout` | `POST /api/subscriptions/checkout` | `{ createCheckout, isPending, error }` (redirects to Stripe on success). `createCheckout({ plan, checkoutRedirectPath? })` — optional base path for Stripe redirect (backend appends `?checkout=success` / `?checkout=cancel`). |
 | `useCancelSubscription` | `POST /api/subscriptions/cancel` | `{ cancelSubscription, isPending, error }` (invalidates subscription query) |
 | `useResumeSubscription` | `POST /api/subscriptions/resume` | `{ resumeSubscription, isPending, error }` (invalidates subscription query) |
@@ -218,7 +225,17 @@ Premium pages **do not call the API** when the user is not subscribed — they s
 Layout component for the subscription settings page. Displays:
 1. Credit balance card with refill button (always)
 2. `SubscriptionOverview` — handles subscription status and plan selection
-3. Credit transaction history (always, hidden if no transactions)
+3. `UsageOverview` — agency-level usage bars (always, falls back to a shimmer while loading)
+4. Credit transaction history (always, hidden if no transactions)
+
+### UsageOverview (`components/agency/settings/subscription/UsageOverview.tsx`)
+
+Renders three usage rows (editor collaborators, video upload hours, storage). Reads from `useShowAgencyUsage()`. For each row:
+- `limit === null` → shows current usage followed by "Unlimited"; progress bar is full-width with the primary color.
+- `limit === 0` → shows "Upgrade to unlock"; progress bar is empty and uses the muted divider color.
+- Otherwise → shows `used / limit` formatted per unit (count, `X.X h`, `X.XX GB`); bar fills to `min(100%, used/limit*100%)` and switches to `bg-yellow` ≥80% and `bg-danger` ≥100%.
+
+All i18n strings live under `settings:subscription.usage.*`.
 
 ### SubscriptionOverview (`components/settings/subscription/SubscriptionOverview.tsx`)
 

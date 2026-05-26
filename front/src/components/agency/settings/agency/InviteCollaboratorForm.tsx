@@ -5,6 +5,7 @@ import { Button } from "~/components/ui/Button";
 import Pill from "~/components/ui/Pill";
 import { UserRole, invitableUserRoles, userRoleTranslationKeys } from "~/models/enums/UserRole";
 import { useInviteCollaborator } from "~/hooks/api/collaborators/useInviteCollaborator";
+import { HttpException } from "~/services/httpClient/HttpException";
 
 interface InviteCollaboratorFormProps {
     onInvited: () => void;
@@ -17,17 +18,25 @@ export default function InviteCollaboratorForm({ onInvited }: InviteCollaborator
     const [lastName, setLastName] = useState("");
     const [email, setEmail] = useState("");
     const [role, setRole] = useState<UserRole>(UserRole.Editor);
+    const [limitError, setLimitError] = useState(false);
 
     const { inviteCollaborator, isPending } = useInviteCollaborator();
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        await inviteCollaborator({ firstName, lastName, email, role });
-        setFirstName("");
-        setLastName("");
-        setEmail("");
-        setRole(UserRole.Editor);
-        onInvited();
+        try {
+            await inviteCollaborator({ firstName, lastName, email, role });
+            setFirstName("");
+            setLastName("");
+            setEmail("");
+            setRole(UserRole.Editor);
+            setLimitError(false);
+            onInvited();
+        } catch (error) {
+            if (error instanceof HttpException && error.response.httpStatus === 402) {
+                setLimitError(true);
+            }
+        }
     };
 
     return (
@@ -71,6 +80,12 @@ export default function InviteCollaboratorForm({ onInvited }: InviteCollaborator
             <Button type="submit" style="primary" className="mt-2" isLoading={isPending} disabled={isPending}>
                 <p className="text-sm">{t("collaborators:invite.submit")}</p>
             </Button>
+
+            {limitError && (
+                <p className="text-body-xs text-danger text-center">
+                    {t("settings:subscription.errors.editorCollaboratorLimit")}
+                </p>
+            )}
         </form>
     );
 }

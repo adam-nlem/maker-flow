@@ -5,6 +5,7 @@ namespace App\Service\Stripe;
 use App\Entity\Agency;
 use App\Entity\Enum\SubscriptionPlan;
 use App\Repository\AgencyRepository;
+use App\Repository\UserRepository;
 use App\Exception\Stripe\CheckoutSessionCreationException;
 use Stripe\Checkout\Session;
 use Stripe\Customer;
@@ -17,6 +18,7 @@ class StripeCheckoutService
         private readonly string $stripeSecretKey,
         private readonly string $frontendUrl,
         private readonly AgencyRepository $agencyRepository,
+        private readonly UserRepository $userRepository,
         private readonly StripePlanService $stripePlanService,
         private readonly StripeRefillService $stripeRefillService,
     ) {
@@ -25,13 +27,17 @@ class StripeCheckoutService
 
     public function getOrCreateStripeCustomer(Agency $agency): string
     {
+        $adminEmail = $this->userRepository->getAdminByAgency($agency)?->getEmail();
+
         if ($agency->getStripeCustomerId() !== null) {
+            $this->syncCustomerEmail($agency->getStripeCustomerId(), $adminEmail);
+
             return $agency->getStripeCustomerId();
         }
 
         try {
             $customer = Customer::create([
-                'email' => $agency->getContactEmail(),
+                'email' => $adminEmail,
                 'name' => $agency->getName(),
                 'metadata' => [
                     'agency_uuid' => $agency->getUuid(),
@@ -45,6 +51,19 @@ class StripeCheckoutService
         $this->agencyRepository->save($agency, true);
 
         return $customer->id;
+    }
+
+    private function syncCustomerEmail(string $customerId, ?string $email): void
+    {
+        if ($email === null) {
+            return;
+        }
+
+        try {
+            Customer::update($customerId, ['email' => $email]);
+        } catch (ApiErrorException $e) {
+            throw new CheckoutSessionCreationException('Failed to sync Stripe customer email', $e);
+        }
     }
 
     /**

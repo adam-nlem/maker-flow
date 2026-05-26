@@ -2738,7 +2738,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"plan\": \"creator\"\n}"
+              "raw": "{\n  \"plan\": \"agency+\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/subscriptions/change-plan",
@@ -3128,6 +3128,26 @@
                 "api",
                 "agencies",
                 "current"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Agency Usage",
+          "id": "agency-usage-0001-000000000007",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/usage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "usage"
               ]
             }
           },

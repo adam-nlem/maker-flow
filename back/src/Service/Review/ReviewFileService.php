@@ -26,6 +26,35 @@ class ReviewFileService
         private readonly string $agencyUploadsRoot,
     ) {}
 
+    /**
+     * @param UploadedFile[] $files
+     */
+    public function validateFiles(array $files, MediaType $mediaType): void
+    {
+        if ($files === []) {
+            throw new ReviewFileInvalidException(FileInvalidReason::MissingFile);
+        }
+
+        match ($mediaType) {
+            MediaType::Video => $this->validateVideo($files),
+            MediaType::Image => $this->validateImage($files),
+            MediaType::Carousel => $this->validateCarousel($files),
+        };
+    }
+
+    /**
+     * @param UploadedFile[] $files
+     */
+    public function computeTotalSize(array $files): int
+    {
+        $total = 0;
+        foreach ($files as $file) {
+            $total += (int) $file->getSize();
+        }
+
+        return $total;
+    }
+
     public function getReviewVersionDirectory(ReviewVersion $reviewVersion): string
     {
         $agencyUuid = $reviewVersion->getReview()?->getProject()?->getAgency()?->getUuid()
@@ -40,8 +69,6 @@ class ReviewFileService
     public function storeUploadedFiles(ReviewVersion $reviewVersion, array $files): void
     {
         $files = array_values($files);
-        $mediaType = $reviewVersion->getReview()->getMediaType();
-        $this->validateFiles($files, $mediaType);
 
         $directory = $this->getReviewVersionDirectory($reviewVersion);
 
@@ -117,22 +144,6 @@ class ReviewFileService
         if ($this->filesystem->exists($directory)) {
             $this->filesystem->remove($directory);
         }
-    }
-
-    /**
-     * @param UploadedFile[] $files
-     */
-    private function validateFiles(array $files, MediaType $mediaType): void
-    {
-        if ($files === []) {
-            throw new ReviewFileInvalidException(FileInvalidReason::MissingFile);
-        }
-
-        match ($mediaType) {
-            MediaType::Video => $this->validateVideo($files),
-            MediaType::Image => $this->validateImage($files),
-            MediaType::Carousel => $this->validateCarousel($files),
-        };
     }
 
     /**

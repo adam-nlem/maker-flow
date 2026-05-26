@@ -12,13 +12,11 @@ use App\Entity\Script;
 use App\Entity\User;
 use App\Exception\Project\ProjectNotFoundException;
 use App\Exception\Script\ScriptNotFoundException;
-use App\Exception\Script\ScriptLimitReachedException;
 use App\Repository\PostGroupRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\ScriptRepository;
-use App\Repository\SubscriptionRepository;
-use App\Service\Stripe\StripePlanService;
 use App\Repository\ScriptTagRepository;
+use App\Service\Subscription\SubscriptionLimitService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -105,8 +103,7 @@ final class ScriptController extends AbstractController
         ScriptRepository $scriptRepository,
         PostGroupRepository $postGroupRepository,
         ScriptTagRepository $scriptTagRepository,
-        SubscriptionRepository $subscriptionRepository,
-        StripePlanService $stripePlanService,
+        SubscriptionLimitService $subscriptionLimitService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -117,12 +114,7 @@ final class ScriptController extends AbstractController
             throw new ProjectNotFoundException();
         }
 
-        $plan = $subscriptionRepository->getLatestActiveByAgency($project->getAgency())?->getPlan();
-        $maxScripts = $plan !== null ? $stripePlanService->getPlanConfigFromSubscription($plan)?->getMaxScriptsPerProject() : 1;
-
-        if ($maxScripts !== null && $scriptRepository->countByProject($project) >= $maxScripts) {
-            throw new ScriptLimitReachedException();
-        }
+        $subscriptionLimitService->assertCanCreateScript($project);
 
         /** @var Script $script */
         $script = $dto->build();
