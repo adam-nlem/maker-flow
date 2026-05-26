@@ -84,10 +84,7 @@
             "videoHours": "Video upload hours",
             "storage": "Storage",
             "unlimited": "Unlimited",
-            "upgradeToUnlock": "Upgrade to unlock",
-            "countUnit": "{{used}} / {{limit}}",
-            "hoursUnit": "{{used}}h / {{limit}}h",
-            "gbUnit": "{{used}} GB / {{limit}} GB"
+            "upgradeToUnlock": "Upgrade to unlock"
         },
         "errors": {
             "editorCollaboratorLimit": "Editor collaborator limit reached for your plan.",

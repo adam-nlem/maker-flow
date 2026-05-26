@@ -25,6 +25,7 @@ use App\Repository\ReviewVersionRepository;
 use App\Repository\ScriptRepository;
 use App\Security\Voter\ProjectVoter;
 use App\Service\Review\ReviewFileService;
+use App\Service\Subscription\SubscriptionLimitService;
 use Doctrine\DBAL\Exception\UniqueConstraintViolationException;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -122,6 +123,7 @@ final class ReviewController extends AbstractController
         ReviewVersionRepository $reviewVersionRepository,
         ReviewCommentRepository $reviewCommentRepository,
         ReviewFileService $reviewFileService,
+        SubscriptionLimitService $subscriptionLimitService,
         EntityManagerInterface $entityManager,
         MessageBusInterface $messageBus,
     ): JsonResponse {
@@ -147,17 +149,30 @@ final class ReviewController extends AbstractController
             $files = $files instanceof UploadedFile ? [$files] : [];
         }
 
+        $files = array_values($files);
+
         /** @var Review $review */
         $review = $dto->build();
         $review->setProject($project);
         $review->setScript($script);
         $review->setCreatedBy($user);
 
+        $mediaType = $review->getMediaType();
+        $reviewFileService->validateFiles($files, $mediaType);
+
+        $metrics = $subscriptionLimitService->assertCanUploadReviewVersion(
+            $project->getAgency(),
+            $files,
+            $mediaType,
+        );
+
         $version = new ReviewVersion();
         $version->setReview($review);
         $version->setFileCount(count($files));
+        $version->setFileSizeBytes($metrics->getFileSizeBytes());
+        $version->setDurationSeconds($metrics->getDurationSeconds());
 
-        if ($review->getMediaType() === MediaType::Video) {
+        if ($mediaType === MediaType::Video) {
             $version->setVideoStreamingStatus(VideoStreamingStatus::Pending);
         }
 

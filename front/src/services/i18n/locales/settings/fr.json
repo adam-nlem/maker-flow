@@ -84,10 +84,7 @@
             "videoHours": "Heures de vidéo",
             "storage": "Stockage",
             "unlimited": "Illimité",
-            "upgradeToUnlock": "Passez à un plan supérieur",
-            "countUnit": "{{used}} / {{limit}}",
-            "hoursUnit": "{{used}} h / {{limit}} h",
-            "gbUnit": "{{used}} Go / {{limit}} Go"
+            "upgradeToUnlock": "Passez à un plan supérieur"
         },
         "errors": {
             "editorCollaboratorLimit": "Limite d'éditeurs atteinte pour votre abonnement.",
