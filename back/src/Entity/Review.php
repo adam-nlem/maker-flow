@@ -24,6 +24,7 @@ class Review
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
         'api_reviews_list',
+        'api_reviews_awaiting_current_user_action',
         'api_review_comments_pending',
         'api_reviews_show',
         'api_reviews_create',
@@ -38,6 +39,7 @@ class Review
     #[ORM\Column(length: 255)]
     #[Groups([
         'api_reviews_list',
+        'api_reviews_awaiting_current_user_action',
         'api_review_comments_pending',
         'api_reviews_show',
         'api_reviews_create',
@@ -76,6 +78,7 @@ class Review
     #[ORM\Column(length: 32, enumType: MediaType::class)]
     #[Groups([
         'api_reviews_list',
+        'api_reviews_awaiting_current_user_action',
         'api_review_comments_pending',
         'api_reviews_show',
         'api_reviews_create',
@@ -90,6 +93,7 @@ class Review
     #[ORM\Column]
     #[Groups([
         'api_reviews_list',
+        'api_reviews_awaiting_current_user_action',
         'api_review_comments_pending',
         'api_reviews_show',
         'api_reviews_create',

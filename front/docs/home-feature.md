@@ -2,7 +2,12 @@
 
 ## Overview
 
-The home page (`/agency`) is a two-column view. The left column holds the analytics content (aggregated overview KPIs, per-integration metric cards, views evolution chart, engagement comparison, ranked top posts). The right column stacks two summary panels: `HomeScriptsPanel` on top, `HomePendingReviewCommentsPanel` below — both share the column height via `flex-1 min-h-0`. All home-page analytics come from a single REST endpoint (`/api/integration-insights`); the Scripts panel uses `/api/scripts`; the pending-review-comments panel uses the dedicated `/api/review-comments/pending` endpoint.
+The home page has two flavors driven by the user's role:
+
+- **Agency home** (`/agency`) — two-column view. Left: analytics content. Right: two summary panels stacked (`HomeScriptsPanel`, `HomePendingReviewCommentsPanel`).
+- **Client home** (`/client`) — same two-column layout. Left: analytics content (or `ConnectIntegrationPlaceholder` when no integration is connected). Right: a single `HomeAwaitingClientActionPanel` listing the review versions still awaiting the current client user's action.
+
+All home-page analytics come from a single REST endpoint (`/api/integration-insights`). The Scripts panel uses `/api/scripts`. The pending-review-comments panel uses `/api/review-comments/pending`. The awaiting-client-action panel uses its own dedicated endpoint `/api/reviews/awaiting-current-user-action` (paired with `useListReviewsAwaitingCurrentUserAction`).
 
 ## Layout
 
@@ -20,9 +25,12 @@ Two-column layout: `h-full flex flex-row gap-3 overflow-y-auto p-3 md:p-5`.
 5. **HomeEngagementChart** — Horizontal bar chart comparing engagement rate across platforms.
 6. **HomeTopPosts** — Platform pill selector + ranked posts list.
 
-### Right column
+### Right column (agency)
 7. **HomeScriptsPanel** — Summary of the project's scripts grouped into 3 logical status groups, with a "+ Nouveau" shortcut to create a script and jump into the scripts editor.
 8. **HomePendingReviewCommentsPanel** — Overview of unresolved top-level comments on the latest version of each review in the focused project, grouped per review. Each comment row navigates to the review detail in `/agency/reviews`.
+
+### Right column (client)
+- **HomeAwaitingClientActionPanel** (`src/components/client/home/HomeAwaitingClientActionPanel.tsx`) — Lists the reviews whose latest version is `Pending` and on which the **currently authenticated user** has not yet posted any comment. Backed by `useListReviewsAwaitingCurrentUserAction({ projectUuid })` against the dedicated `GET /api/reviews/awaiting-current-user-action` endpoint. Each tile (`HomeAwaitingClientActionTile`) selects the review via `useReviewsStore.selectReview(...)` and navigates to `clientReviewsPath`. When the list is empty the panel shows a friendly "all caught up" empty state.
 
 ## Data Sources
 

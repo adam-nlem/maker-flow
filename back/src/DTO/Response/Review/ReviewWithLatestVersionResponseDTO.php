@@ -12,6 +12,7 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
     public function __construct(
         #[Groups([
             'api_reviews_list',
+            'api_reviews_awaiting_current_user_action',
             'api_reviews_show',
             'api_reviews_create',
             'api_reviews_update',
@@ -24,6 +25,7 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
         private readonly Review $review,
         #[Groups([
             'api_reviews_list',
+            'api_reviews_awaiting_current_user_action',
             'api_reviews_show',
             'api_reviews_create',
             'api_reviews_update',
@@ -36,6 +38,7 @@ class ReviewWithLatestVersionResponseDTO implements ResponseDTOInterface
         private readonly ?ReviewVersion $latestVersion,
         #[Groups([
             'api_reviews_list',
+            'api_reviews_awaiting_current_user_action',
             'api_reviews_show',
             'api_reviews_create',
             'api_reviews_update',

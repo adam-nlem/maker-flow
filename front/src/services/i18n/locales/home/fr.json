@@ -34,5 +34,14 @@
       "title": "Aucun retour en attente.",
       "subtitle": "Tous les retours client sur les dernières versions des reviews ont été résolus."
     }
+  },
+  "awaitingClientAction": {
+    "header": "En attente de votre retour",
+    "count_one": "{{count}} à examiner",
+    "count_other": "{{count}} à examiner",
+    "empty": {
+      "title": "Tout est à jour.",
+      "subtitle": "Aucune nouvelle version de review n'attend votre retour ou votre approbation."
+    }
   }
 }

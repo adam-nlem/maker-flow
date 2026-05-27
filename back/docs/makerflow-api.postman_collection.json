@@ -3528,10 +3528,30 @@
                 { "key": "projectUuid", "value": "{{projectUuid}}" },
                 { "key": "page", "value": "1" },
                 { "key": "limit", "value": "20" },
-                { "key": "status", "value": "awaiting_review", "description": "Optional: awaiting_review | approved | rejected", "disabled": true },
+                { "key": "status", "value": "pending", "description": "Optional: pending | approved | rejected", "disabled": true },
                 { "key": "searchTerm", "value": "", "description": "Optional: case-insensitive LIKE on title", "disabled": true }
               ]
             }
+          },
+          "response": []
+        },
+        {
+          "name": "List Reviews Awaiting Current User Action",
+          "id": "reviews-awaiting-action-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/awaiting-current-user-action?projectUuid={{projectUuid}}&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "awaiting-current-user-action"],
+              "query": [
+                { "key": "projectUuid", "value": "{{projectUuid}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Reviews whose latest version is Pending and on which the currently authenticated user has not yet posted any comment. Powers the Client home awaiting-review panel. Same response shape as List Reviews."
           },
           "response": []
         },

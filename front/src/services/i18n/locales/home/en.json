@@ -34,5 +34,14 @@
       "title": "No pending feedback.",
       "subtitle": "All client feedback on the latest review versions has been resolved."
     }
+  },
+  "awaitingClientAction": {
+    "header": "Awaiting your review",
+    "count_one": "{{count}} to review",
+    "count_other": "{{count}} to review",
+    "empty": {
+      "title": "You're all caught up.",
+      "subtitle": "No new review versions are waiting for your feedback or approval."
+    }
   }
 }

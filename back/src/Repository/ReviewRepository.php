@@ -8,6 +8,7 @@ use App\Entity\Project;
 use App\Entity\Review;
 use App\Entity\ReviewComment;
 use App\Entity\ReviewVersion;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -98,6 +99,41 @@ class ReviewRepository extends ServiceEntityRepository
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * Returns reviews in the project whose latest version is `Pending` and on
+     * which the given user has not yet posted any comment. Powers the Client
+     * home "awaiting your review" panel.
+     *
+     * @return Review[]
+     */
+    public function getByProjectAwaitingUserActionPaginated(
+        Project $project,
+        User $user,
+        int $page,
+        int $limit,
+    ): array {
+        return $this->createQueryBuilder('r')
+            ->innerJoin('r.versions', 'rv')
+            ->where('r.project = :project')
+            ->andWhere('rv.status = :status')
+            ->andWhere('NOT EXISTS (
+                SELECT 1 FROM ' . ReviewVersion::class . ' rvLater
+                WHERE rvLater.review = r AND rvLater.createdAt > rv.createdAt
+            )')
+            ->andWhere('NOT EXISTS (
+                SELECT 1 FROM ' . ReviewComment::class . ' cByUser
+                WHERE cByUser.reviewVersion = rv AND cByUser.author = :user
+            )')
+            ->setParameter('project', $project)
+            ->setParameter('status', ReviewStatus::Pending)
+            ->setParameter('user', $user)
+            ->orderBy('r.updatedAt', 'DESC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
     }
 
     /**

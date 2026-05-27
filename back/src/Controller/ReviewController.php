@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\QueryParam\Review\ListReviewsAwaitingCurrentUserActionQueryParamDTO;
 use App\DTO\QueryParam\Review\ListReviewsQueryParamDTO;
 use App\DTO\Request\Review\CreateReviewRequestDTO;
 use App\DTO\Request\Review\UpdateReviewRequestDTO;
@@ -82,6 +83,49 @@ final class ReviewController extends AbstractController
             data: $items,
             status: Response::HTTP_OK,
             context: ['groups' => ['api_reviews_list']],
+        );
+    }
+
+    #[Route('/awaiting-current-user-action', name: 'api_reviews_awaiting_current_user_action', methods: ['GET'])]
+    #[IsGranted(UserRole::User->value)]
+    public function awaitingCurrentUserAction(
+        ListReviewsAwaitingCurrentUserActionQueryParamDTO $queryParamDto,
+        ProjectRepository $projectRepository,
+        ReviewRepository $reviewRepository,
+        ReviewCommentRepository $reviewCommentRepository,
+    ): JsonResponse {
+        /** @var User $user */
+        $user = $this->getUser();
+
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
+
+        if ($project === null) {
+            throw new ProjectNotFoundException();
+        }
+
+        $this->denyAccessUnlessGranted(ProjectVoter::VIEW, $project);
+
+        $reviews = $reviewRepository->getByProjectAwaitingUserActionPaginated(
+            $project,
+            $user,
+            $queryParamDto->getPage(),
+            $queryParamDto->getLimit(),
+        );
+
+        $unresolvedCounts = $reviewCommentRepository->getOpenTopLevelCountsForLatestVersions($reviews);
+
+        $items = array_map(
+            fn(Review $review) => ReviewWithLatestVersionResponseDTO::fromEntity(
+                $review,
+                $unresolvedCounts[$review->getId()] ?? 0,
+            ),
+            $reviews,
+        );
+
+        return $this->json(
+            data: $items,
+            status: Response::HTTP_OK,
+            context: ['groups' => ['api_reviews_awaiting_current_user_action']],
         );
     }
 

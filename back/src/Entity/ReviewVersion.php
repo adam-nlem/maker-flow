@@ -25,6 +25,7 @@ class ReviewVersion
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
         'api_reviews_list',
+        'api_reviews_awaiting_current_user_action',
         'api_review_comments_pending',
         'api_reviews_show',
         'api_reviews_create',
@@ -43,6 +44,7 @@ class ReviewVersion
     #[ORM\Column(type: Types::SMALLINT)]
     #[Groups([
         'api_reviews_list',
+        'api_reviews_awaiting_current_user_action',
         'api_review_comments_pending',
         'api_reviews_show',
         'api_reviews_create',
@@ -57,6 +59,7 @@ class ReviewVersion
     #[ORM\Column(length: 32, enumType: ReviewStatus::class)]
     #[Groups([
         'api_reviews_list',
+        'api_reviews_awaiting_current_user_action',
         'api_review_comments_pending',
         'api_reviews_show',
         'api_reviews_create',
@@ -71,6 +74,7 @@ class ReviewVersion
     #[ORM\Column(type: 'string', length: 32, nullable: true, enumType: VideoStreamingStatus::class)]
     #[Groups([
         'api_reviews_list',
+        'api_reviews_awaiting_current_user_action',
         'api_review_comments_pending',
         'api_reviews_show',
         'api_reviews_create',
@@ -85,6 +89,7 @@ class ReviewVersion
     #[ORM\Column(type: 'string', length: 32, nullable: true, enumType: VideoStreamingFailureReason::class)]
     #[Groups([
         'api_reviews_list',
+        'api_reviews_awaiting_current_user_action',
         'api_review_comments_pending',
         'api_reviews_show',
         'api_reviews_create',

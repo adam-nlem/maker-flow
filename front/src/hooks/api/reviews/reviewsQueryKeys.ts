@@ -15,4 +15,6 @@ export const reviewsQueryKeys = {
         [...reviewsQueryKeys.all, 'comments', reviewVersionUuid] as const,
     pendingComments: (projectUuid: string) =>
         [...reviewsQueryKeys.all, 'pendingComments', projectUuid] as const,
+    awaitingCurrentUserAction: (projectUuid: string) =>
+        [...reviewsQueryKeys.all, 'awaitingCurrentUserAction', projectUuid] as const,
 }
