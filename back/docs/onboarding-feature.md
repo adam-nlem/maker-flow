@@ -13,7 +13,7 @@ The onboarding system tracks new user progress through a short, **role-aware** s
 | id | int (auto) | Internal PK |
 | uuid | GUID | Public ID |
 | user_id | FK → user | Unique (one per user), CASCADE delete |
-| completed_steps | JSON | String array of step values: `["welcome_tour", "create_first_project"]` |
+| completed_steps | JSON | String array of step values: `["create_agency", "create_first_project"]` |
 | dismissed_at | datetime (nullable) | Set when user dismisses or all applicable steps are complete |
 | created_at | datetime | UTC |
 | updated_at | datetime | UTC, PreUpdate lifecycle |
@@ -32,11 +32,10 @@ The user's `displayRole` selects which enum applies:
 | `ROLE_EDITOR`, `ROLE_VIEWER` | `AgencyCollaboratorOnboardingStep` | `src/Entity/Enum/AgencyCollaboratorOnboardingStep.php` |
 | `ROLE_CLIENT` | `ClientOnboardingStep` | `src/Entity/Enum/ClientOnboardingStep.php` |
 
-### `AgencyAdminOnboardingStep` (6 steps)
+### `AgencyAdminOnboardingStep` (5 steps)
 
 | Case | Value |
 |------|-------|
-| WelcomeTour | `welcome_tour` |
 | CreateAgency | `create_agency` |
 | CreateFirstProject | `create_first_project` |
 | InviteFirstClient | `invite_first_client` |
@@ -45,23 +44,21 @@ The user's `displayRole` selects which enum applies:
 
 `InviteFirstCollaborator` is **not** part of onboarding — collaborator seat counts depend on the chosen subscription tier (last step), so the invite lives only in `/agency/settings/collaborators`.
 
-### `AgencyCollaboratorOnboardingStep` (3 steps)
+### `AgencyCollaboratorOnboardingStep` (2 steps)
 
 | Case | Value |
 |------|-------|
-| WelcomeTour | `welcome_tour` |
 | ExploreProjects | `explore_projects` |
 | ExploreContents | `explore_contents` |
 
-### `ClientOnboardingStep` (3 steps)
+### `ClientOnboardingStep` (2 steps)
 
 | Case | Value |
 |------|-------|
-| WelcomeTour | `welcome_tour` |
 | ConnectFirstIntegration | `connect_first_integration` |
 | ExploreContents | `explore_contents` |
 
-Step values that represent the same concept across roles (e.g., `welcome_tour`, `connect_first_integration`, `explore_contents`) are intentionally shared so the storage stays flat.
+Step values that represent the same concept across roles (e.g., `connect_first_integration`, `explore_contents`) are intentionally shared so the storage stays flat.
 
 ## Service: `OnboardingService`
 

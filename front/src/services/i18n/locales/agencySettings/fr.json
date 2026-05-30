@@ -14,8 +14,6 @@
     "validation": {
         "nameRequired": "Le nom de l'agence est obligatoire.",
         "contactEmailFormat": "L'email de contact n'est pas valide.",
-        "websiteFormat": "L'URL du site web doit commencer par http:// ou https://.",
-        "logoMimeType": "Le logo doit être une image PNG.",
-        "logoTooLarge": "Le logo doit faire 5 Mo ou moins."
+        "websiteFormat": "L'URL du site web doit commencer par http:// ou https://."
     }
 }

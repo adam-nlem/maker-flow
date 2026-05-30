@@ -12,7 +12,6 @@ use App\Exception\Agency\AgencyLogoInvalidException;
 use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Agency\UserAlreadyHasAgencyException;
 use App\Repository\AgencyRepository;
-use App\Repository\UserRepository;
 use App\Security\Voter\AgencyVoter;
 use App\Service\Agency\AgencyLogoService;
 use App\Service\Credit\CreditService;
@@ -21,7 +20,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
@@ -38,8 +36,8 @@ final class AgencyController extends AbstractController
     public function create(
         CreateAgencyRequestDTO $dto,
         AgencyRepository $agencyRepository,
-        UserRepository $userRepository,
         CreditService $creditService,
+        AgencyLogoService $agencyLogoService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -48,13 +46,20 @@ final class AgencyController extends AbstractController
             throw new UserAlreadyHasAgencyException();
         }
 
+        $logo = $dto->getLogo();
+
+        if (!$logo instanceof UploadedFile) {
+            throw new AgencyLogoInvalidException(FileInvalidReason::MissingFile);
+        }
+
+        $agencyLogoService->validate($logo);
+
         /** @var Agency $agency */
         $agency = $dto->build();
-
+        $user->setAgency($agency);
         $agencyRepository->save($agency, true);
 
-        $user->setAgency($agency);
-        $userRepository->save($user, true);
+        $agencyLogoService->save($agency, $logo);
 
         $creditService->addWelcomeCredits($agency, self::WELCOME_CREDITS, $user);
 
@@ -111,6 +116,7 @@ final class AgencyController extends AbstractController
     public function update(
         UpdateAgencyRequestDTO $dto,
         AgencyRepository $agencyRepository,
+        AgencyLogoService $agencyLogoService,
     ): JsonResponse {
         $agencyUuid = $dto->getAgencyUuid();
 
@@ -138,6 +144,11 @@ final class AgencyController extends AbstractController
             $agency->setWebsite($dto->getWebsite());
         }
 
+        if ($dto->getLogo() != null && $dto->getLogo() instanceof UploadedFile) {
+            $agencyLogoService->validate($dto->getLogo());
+            $agencyLogoService->save($agency, $dto->getLogo());
+        }
+
         $agencyRepository->save($agency, true);
 
         return $this->json(
@@ -145,35 +156,6 @@ final class AgencyController extends AbstractController
             status: Response::HTTP_OK,
             context: ['groups' => ['api_agencies_update']],
         );
-    }
-
-    #[Route('/logo', name: 'api_agencies_logo_upload', methods: ['POST'])]
-    #[IsGranted(UserRole::Admin->value)]
-    public function uploadLogo(
-        Request $request,
-        AgencyRepository $agencyRepository,
-        AgencyLogoService $agencyLogoService,
-    ): Response {
-        /** @var User $user */
-        $user = $this->getUser();
-
-        $agency = $agencyRepository->getByCollaborator($user);
-
-        if ($agency === null) {
-            throw new MissingAgencyException();
-        }
-
-        $this->denyAccessUnlessGranted(AgencyVoter::MANAGE_SETTINGS, $agency);
-
-        $file = $request->files->get('logo');
-
-        if (!$file instanceof UploadedFile) {
-            throw new AgencyLogoInvalidException(FileInvalidReason::MissingFile);
-        }
-
-        $agencyLogoService->upload($agency, $file);
-
-        return new Response(null, Response::HTTP_NO_CONTENT);
     }
 
     #[Route('/{agencyUuid}/logo', name: 'api_agencies_logo_show', methods: ['GET'], requirements: ['agencyUuid' => Requirement::UUID])]
@@ -202,7 +184,7 @@ final class AgencyController extends AbstractController
         $logoFile = $agencyLogoService->getFile($agency);
 
         if ($logoFile === null) {
-            return new Response(null, Response::HTTP_NO_CONTENT);
+            throw new AgencyLogoInvalidException(FileInvalidReason::MissingFile);
         }
 
         return new BinaryFileResponse(

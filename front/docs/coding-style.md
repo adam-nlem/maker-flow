@@ -14,6 +14,7 @@ front/src/
 │   ├── agency/           # Agency-shell-only — everything an agency user sees
 │   │   ├── AgencyShellLayout.tsx
 │   │   ├── AgencyLogo.tsx
+│   │   ├── AgencyLogoUpload.tsx
 │   │   ├── sidebar/      # DesktopSidebar, MobileSidebar (composed inside the shared shells)
 │   │   ├── topbar/       # AgencyTopBar + agencyTopBarActions registry
 │   │   ├── home/         # Agency-only home widgets (HomeScriptsPanel, HomeScriptTile, …)
@@ -37,7 +38,7 @@ front/src/
 │   ├── integrations/     # Shared integration tiles + login modal
 │   ├── insights/         # Shared insight tiles
 │   ├── settings/         # Shared settings only (SettingsPageView, GeneralSettings, LanguageSwitcher)
-│   ├── sidebar/          # Shared shells + tiles (SidebarShell, MobileSidebarShell, IconRailTile, IdentityTile, IdentityPopover)
+│   ├── sidebar/          # Shared shells + tiles (SidebarShell, MobileSidebarShell, IconRailTile, IdentityTile, IdentityPopover, IdentityPopoverView)
 │   ├── topbar/           # Shared shell (TopBarShell)
 │   └── ui/               # Generic UI primitives
 ├── hooks/                # Custom React hooks (organized by resource, not role — many hooks are shared)

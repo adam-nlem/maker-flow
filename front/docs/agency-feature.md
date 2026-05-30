@@ -42,7 +42,7 @@ Two places consume the helper:
 
 Orchestrator component for the merged Agency section. Sticky page header (`Agency` + subtitle) sits above a single scrollable body that stacks two blocks:
 
-1. [`AgencySettingsForm`](../src/components/settings/agency/AgencySettingsForm.tsx) — card-style form with a single **Brand identity** section: `AgencyLogo` (editable PNG upload) followed by inline-edit Name / Email / Website inputs. In-card right-aligned Save button visible only when `hasChanges`. Form state lives in [`useAgencySettingsForm`](../src/hooks/useAgencySettingsForm.ts); validation is delegated to [`validateAgencyForm`](../src/utils/agencyValidation.ts).
+1. [`AgencySettingsForm`](../src/components/settings/agency/AgencySettingsForm.tsx) — card-style form with a single **Brand identity** section: `AgencyLogoUpload` (editable PNG upload) followed by inline-edit Name / Email / Website inputs. In-card right-aligned Save button visible only when `hasChanges`. Form state lives in [`useAgencySettingsForm`](../src/hooks/useAgencySettingsForm.ts); validation is delegated to [`validateAgencyForm`](../src/utils/agencyValidation.ts).
 2. [`CollaboratorsSection`](../src/components/settings/agency/CollaboratorsSection.tsx) — flat block separated by a `border-t` divider. Header row with an `h3 "Collaborators"` and an "Invite collaborator" button, followed by the `DataTable<CollaboratorRow>` showing active collaborators then pending invitations.
 
 The three collaborator modals (`InviteCollaboratorModal`, `RemoveCollaboratorModal`, `DeleteInvitationModal`) are rendered at the `AgencySettings` root and driven by [`collaboratorModalsStore`](../src/stores/collaborators/collaboratorModalsStore.ts).
@@ -52,25 +52,39 @@ Data:
 - [`useUpdateAgency`](../src/hooks/api/agency/useUpdateAgency.ts) — `PATCH /agencies` (empty segment, matches the backend route shape). Mirrors `useUpdateUser`.
 - [`useListCollaborators`](../src/hooks/api/collaborators/useListCollaborators.ts) — drives both the table rows and the modal "removing user" lookup.
 
-### Agency logo — [src/components/agency/AgencyLogo.tsx](../src/components/agency/AgencyLogo.tsx)
+### Agency logo
 
-Self-contained component covering both display and upload. Props: `{ agency: Agency; editable?: boolean; className?: string }`. The backend returns `204 No Content` when an agency has no logo, so the component owns the empty state.
+Split into a display component and an upload component so neither carries the other's concerns.
 
-Rendering matrix:
+#### Display — [src/components/agency/AgencyLogo.tsx](../src/components/agency/AgencyLogo.tsx)
 
-| `editable` | logo state | What renders |
-| --- | --- | --- |
-| any | loading | `Shimmer` |
-| any | uploaded | `<img>` with the blob URL (object-cover) |
-| `false` | missing | `AgencyLogoInitial` — neutral `bg-pale-gray-2` block displaying the agency's first letter in `text-muted-2` |
-| `true` | missing | `AgencyLogoDropzone` — wraps the generic [`FileUpload`](../src/components/ui/FileUpload.tsx) with `accept="image/png"`, the `PhotoIcon`, and the `agencySettings:logo.*` translation keys. Click-to-browse and drag-and-drop are handled by `FileUpload` itself; this wrapper just bridges the agency hook with the generic UI. |
+Read-only rendering. Props: `{ agency?: Agency; logoUrl?: string | null; className?: string }`. When `logoUrl` is omitted and an `agency` is given, it fetches the current logo via [`useShowAgencyLogo`](../src/hooks/api/agency/useShowAgencyLogo.ts); when `logoUrl` is passed (any value, including `null`), it renders that directly and skips the fetch. The backend returns `204 No Content` when an agency has no logo, so the component owns the empty state.
 
-Client-side validation lives inside [`useUploadAgencyLogo`](../src/hooks/api/agency/useUploadAgencyLogo.ts) alongside the mutation — the component stays presentational. Checks (`file.type === "image/png"`, `file.size ≤ 5 MB`) mirror the backend and surface as `agencySettings:validation.logoMimeType` / `logoTooLarge` rendered below the drop zone. After a successful upload, the mutation invalidates `agencyQueryKeys.logo(uuid)` and the `<img>` renders automatically.
+| logo state | What renders |
+| --- | --- |
+| fetching | `Shimmer` |
+| logo present | `<img>` with the blob/preview URL (object-cover) |
+| missing, `agency` set | `AgencyLogoInitial` — neutral `bg-pale-gray-2` block displaying the agency's first letter in `text-muted-2` |
+| missing, no `agency` | empty `bg-pale-gray-2` placeholder block |
 
-Call sites:
-- [AgencySettings](../src/components/settings/agency/AgencySettings.tsx) — `editable` variant, `w-full max-w-md`.
-- [DesktopSidebar](../src/components/sidebar/DesktopSidebar.tsx) — read-only, `size-8 rounded-md` next to the agency name above the project selector. Mobile sidebar inherits via `MobileSidebarShell`.
-- [ClientDesktopSidebar](../src/components/client-portal/sidebar/ClientDesktopSidebar.tsx) — read-only, `size-8 rounded-md` next to the agency name. Mobile inherits the same way. Clients never see the drop zone (call sites enforce this, not the component).
+Call sites: `IdentityTile`, `IdentityPopover`, `ClientTopBar`, `ReviewCommentTile` — all read-only with a small `size-*` className.
+
+#### Upload — [src/components/agency/AgencyLogoUpload.tsx](../src/components/agency/AgencyLogoUpload.tsx)
+
+Editable drop zone. Props: `{ agency?: Agency; onFileSelected?: (file: File) => void | Promise<void>; hint?: string; className?: string }`. Wraps the generic [`FileUpload`](../src/components/ui/FileUpload.tsx) (`accept="image/png"`, `PhotoIcon`, hint) and reuses `AgencyLogo` to render the preview, with a hover/drag pencil overlay on top. A picked file is shown instantly via a local object-URL preview (revoked on unmount), in both modes.
+
+It runs in two modes:
+
+- **Uncontrolled (agency settings):** with an `agency` and no `onFileSelected`, it fetches the current logo via [`useShowAgencyLogo`](../src/hooks/api/agency/useShowAgencyLogo.ts) and uploads the picked file straight to that agency via [`useUploadAgencyLogo`](../src/hooks/api/agency/useUploadAgencyLogo.ts).
+- **Controlled (no agency yet — e.g. onboarding create-agency):** pass `onFileSelected` to take over the file. The component skips the internal fetch/upload and hands every picked file to the callback; the caller persists the logo itself (e.g. through the create hook). Use `hint` to override the default `agencySettings:logo.hint` text.
+
+In uncontrolled mode, client-side validation lives inside [`useUploadAgencyLogo`](../src/hooks/api/agency/useUploadAgencyLogo.ts) alongside the mutation. Checks (`file.type === "image/png"`, `file.size ≤ 5 MB`) mirror the backend and surface as `agencySettings:validation.logoMimeType` / `logoTooLarge` rendered below the drop zone. After a successful upload, the mutation invalidates `agencyQueryKeys.logo(uuid)` and the fetched `<img>` renders automatically. In controlled mode validation and pending/error display are the caller's responsibility.
+
+Call sites: `AgencySettingsForm` (uncontrolled, `w-24 h-24`) and `OnboardingCreateAgencyStep` (controlled, `h-50`). Clients never see the drop zone (call sites enforce this, not the component).
+
+### Agency creation — [src/hooks/api/agency/useCreateAgency.ts](../src/hooks/api/agency/useCreateAgency.ts)
+
+`useCreateAgency` sends a single `multipart/form-data` `POST /agencies` carrying `name` + a required `logo` file (no `contactEmail` / `website` — those are set later via `useUpdateAgency`). It mirrors `useCreateReview`: the exposed `createAgency` validates before mutating (name non-empty, then [`validateAgencyLogo`](../src/utils/agencyValidation.ts) for the PNG/5 MB/required checks), surfaces the failing i18n key via `validationErrorKey`, and returns the created `Agency` (or `undefined` when validation blocks). `validateAgencyLogo` is shared with `useUploadAgencyLogo` so the create and settings paths enforce identical rules. `OnboardingCreateAgencyStep` holds the `name` + `logo` (from `AgencyLogoUpload.onFileSelected`) and advances onboarding only when `createAgency` resolves to an agency.
 
 ### Collaborators section — [src/components/settings/agency/CollaboratorsSection.tsx](../src/components/settings/agency/CollaboratorsSection.tsx)
 

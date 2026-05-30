@@ -1,40 +1,34 @@
-import { DocumentTextIcon, FolderOpenIcon, HandRaisedIcon } from "@heroicons/react/24/outline"
+import { DocumentTextIcon, FolderOpenIcon } from "@heroicons/react/24/outline"
 import type { ComponentType, SVGProps } from "react"
 
 import { agencyContentsPath, agencyHomePath } from "~/routes/routePaths"
 
 export enum AgencyCollaboratorOnboardingStep {
-    WelcomeTour = 'welcome_tour',
     ExploreProjects = 'explore_projects',
     ExploreContents = 'explore_contents',
 }
 
 export const AGENCY_COLLABORATOR_ONBOARDING_STEP_ORDER: AgencyCollaboratorOnboardingStep[] = [
-    AgencyCollaboratorOnboardingStep.WelcomeTour,
     AgencyCollaboratorOnboardingStep.ExploreProjects,
     AgencyCollaboratorOnboardingStep.ExploreContents,
 ]
 
 export const agencyCollaboratorOnboardingStepTranslationKeys: Record<AgencyCollaboratorOnboardingStep, string> = {
-    [AgencyCollaboratorOnboardingStep.WelcomeTour]: "enums:onboardingStep.collaborator.titles.welcomeTour",
     [AgencyCollaboratorOnboardingStep.ExploreProjects]: "enums:onboardingStep.collaborator.titles.exploreProjects",
     [AgencyCollaboratorOnboardingStep.ExploreContents]: "enums:onboardingStep.collaborator.titles.exploreContents",
 }
 
 export const agencyCollaboratorOnboardingStepDescriptionKeys: Record<AgencyCollaboratorOnboardingStep, string> = {
-    [AgencyCollaboratorOnboardingStep.WelcomeTour]: "enums:onboardingStep.collaborator.descriptions.welcomeTour",
     [AgencyCollaboratorOnboardingStep.ExploreProjects]: "enums:onboardingStep.collaborator.descriptions.exploreProjects",
     [AgencyCollaboratorOnboardingStep.ExploreContents]: "enums:onboardingStep.collaborator.descriptions.exploreContents",
 }
 
 export const agencyCollaboratorOnboardingStepShortLabelKeys: Record<AgencyCollaboratorOnboardingStep, string> = {
-    [AgencyCollaboratorOnboardingStep.WelcomeTour]: "enums:onboardingStep.collaborator.shortLabels.welcomeTour",
     [AgencyCollaboratorOnboardingStep.ExploreProjects]: "enums:onboardingStep.collaborator.shortLabels.exploreProjects",
     [AgencyCollaboratorOnboardingStep.ExploreContents]: "enums:onboardingStep.collaborator.shortLabels.exploreContents",
 }
 
 export const agencyCollaboratorOnboardingStepToIcon: Record<AgencyCollaboratorOnboardingStep, ComponentType<SVGProps<SVGSVGElement>>> = {
-    [AgencyCollaboratorOnboardingStep.WelcomeTour]: HandRaisedIcon,
     [AgencyCollaboratorOnboardingStep.ExploreProjects]: FolderOpenIcon,
     [AgencyCollaboratorOnboardingStep.ExploreContents]: DocumentTextIcon,
 }

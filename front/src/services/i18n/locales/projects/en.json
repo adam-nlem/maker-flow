@@ -1,29 +1,34 @@
 {
-    "create": {
-        "modalTitle": "Create a new Project",
-        "modalDescription": "Projects let you group every module together so you can find your way around faster",
-        "fields": {
-            "name": "Name",
-            "namePlaceholder": "Enter the project name",
-            "description": "Description",
-            "descriptionPlaceholder": "Write a description (optional)",
-            "types": "Types"
-        },
-        "submit": "Create project",
-        "limitReached": "You have reached the project limit for your subscription. Upgrade to a higher plan to create more.",
-        "introductionStep": "Introduction",
-        "projectStep": "Project"
+  "create": {
+    "modalTitle": "Create a new Project",
+    "modalDescription": "Projects let you group every module together so you can find your way around faster",
+    "fields": {
+      "name": "Name",
+      "namePlaceholder": "Enter the project name",
+      "description": "Description",
+      "descriptionPlaceholder": "Write a description (optional)",
+      "types": "Types",
+      "logo": "Project logo",
+      "logoHint": "Upload or drag & drop your project logo"
     },
-    "update": {
-        "modalTitle": "Edit Project",
-        "fields": {
-            "title": "Title"
-        },
-        "submit": "Edit Project",
-        "delete": "Delete Project",
-        "deleteConfirm": "Are you sure you want to delete this project? This action is irreversible."
-    },
-    "tile": {
-        "createdAt": "Created on {{date}}"
+    "submit": "Create project",
+    "limitReached": "You have reached the project limit for your subscription. Upgrade to a higher plan to create more.",
+    "introductionStep": "Introduction",
+    "projectStep": "Project",
+    "validation": {
+      "nameRequired": "The project name is required."
     }
+  },
+  "update": {
+    "modalTitle": "Edit Project",
+    "fields": {
+      "title": "Title"
+    },
+    "submit": "Edit Project",
+    "delete": "Delete Project",
+    "deleteConfirm": "Are you sure you want to delete this project? This action is irreversible."
+  },
+  "tile": {
+    "createdAt": "Created on {{date}}"
+  }
 }

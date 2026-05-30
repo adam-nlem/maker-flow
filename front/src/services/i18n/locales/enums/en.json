@@ -1,358 +1,356 @@
 {
-    "aiModel": {
-        "names": {
-            "gemini": "Gemini",
-            "chatGpt": "ChatGPT",
-            "claude": "Claude"
-        },
-        "descriptions": {
-            "gemini": "Google — fast and creative",
-            "chatGpt": "OpenAI — precise and structured",
-            "claude": "Anthropic — nuanced and detailed"
-        }
+  "aiModel": {
+    "names": {
+      "gemini": "Gemini",
+      "chatGpt": "ChatGPT",
+      "claude": "Claude"
     },
-    "callToActionType": {
-        "subscribe": "Subscribe",
-        "like": "Like",
-        "comment": "Comment",
-        "share": "Share",
-        "link": "Link",
-        "custom": "Custom"
-    },
-    "chapterType": {
-        "onScreen": "On-screen",
-        "offScreen": "Off-screen"
-    },
-    "contentType": {
-        "shortForm": "Short form",
-        "longForm": "Long form"
-    },
-    "contentsTab": {
-        "groups": "Groups",
-        "posts": "Posts"
-    },
-    "creditTransactionType": {
-        "subscriptionRenewal": "Renewal",
-        "refillPurchase": "Top-up",
-        "scriptGeneration": "Script generation",
-        "scriptGenerationRefund": "Refund for a failed script generation",
-        "refund": "Refund",
-        "manualAdjustment": "Adjustment",
-        "welcomeBonus": "Welcome credits"
-    },
-    "hookTemplateCategory": {
-        "all": "All",
-        "public": "Public",
-        "private": "Private"
-    },
-    "hookTemplatePlaceholder": {
-        "topic": "Topic",
-        "audience": "Audience",
-        "benefit": "Benefit",
-        "statistic": "Statistic",
-        "problem": "Problem",
-        "product": "Product",
-        "result": "Result",
-        "emotion": "Emotion",
-        "number": "Number",
-        "goal": "Goal",
-        "date": "Date"
-    },
-    "insightType": {
-        "post": "Content",
-        "integration": "Accounts"
-    },
-    "integrationInsightType": {
-        "views": "Views",
-        "likes": "Likes",
-        "saves": "Saves",
-        "comments": "Comments",
-        "shares": "Shares",
-        "gainedFollowers": "New followers",
-        "totalFollowers": "Followers",
-        "impressions": "Impressions",
-        "dislikes": "Dislikes",
-        "profileLinksTaps": "Profile link clicks",
-        "reach": "Reach",
-        "videos": "Videos"
-    },
-    "integrationStatus": {
-        "active": "Connected",
-        "revoked": "Expired",
-        "error": "Error"
-    },
-    "mediaType": {
-        "image": "Image",
-        "video": "Video",
-        "carousel": "Carousel",
-        "uploadHint": {
-            "image": "PNG, JPEG or WebP up to 20 MB.",
-            "video": "Single MP4, MOV or WebM up to 500 MB.",
-            "carousel": "2 to 10 images, up to 20 MB each."
-        }
-    },
-    "oAuthErrorCode": {
-        "invalidState": "Session expired, please try again",
-        "missingCode": "Authorization code missing",
-        "userNotFound": "User not found",
-        "tokenExchangeFailed": "Connection failed, please try again",
-        "platformError": "Authentication platform error",
-        "popupBlocked": "The popup window was blocked by your browser",
-        "unknown": "An error occurred, please try again"
-    },
-    "fileInvalidReason": {
-        "missingFile": "Please add a file.",
-        "tooManyFiles": "Too many files were selected.",
-        "tooFewFiles": "Not enough files were selected.",
-        "fileTooLarge": "The file exceeds the maximum size.",
-        "invalidMimeType": "Unsupported file type.",
-        "invalidPayload": "The request data is invalid."
-    },
-    "onboardingStep": {
-        "admin": {
-            "titles": {
-                "welcomeTour": "Welcome to MakerFlow",
-                "createAgency": "Create your agency",
-                "createFirstProject": "Create your first project",
-                "inviteFirstClient": "Invite your first client",
-                "connectFirstIntegration": "Connect your social accounts",
-                "showSubscriptions": "Discover our plans"
-            },
-            "descriptions": {
-                "welcomeTour": "A few quick steps to prepare your agency workspace.",
-                "createAgency": "Set the agency name, brand color and contact details.",
-                "createFirstProject": "A project represents a client or brand whose content you manage.",
-                "inviteFirstClient": "Give your client read-only access to their own dashboard.",
-                "connectFirstIntegration": "Connect the project's social accounts to track performance.",
-                "showSubscriptions": "Pick the subscription that fits your needs to unlock every feature."
-            },
-            "shortLabels": {
-                "welcomeTour": "Welcome",
-                "createAgency": "Agency",
-                "createFirstProject": "Project",
-                "inviteFirstClient": "Client",
-                "connectFirstIntegration": "Social account",
-                "showSubscriptions": "Subscription"
-            }
-        },
-        "collaborator": {
-            "titles": {
-                "welcomeTour": "Welcome to the team",
-                "exploreProjects": "Discover the projects",
-                "exploreContents": "Discover the contents"
-            },
-            "descriptions": {
-                "welcomeTour": "A quick tour to get you familiar with your new workspace.",
-                "exploreProjects": "Browse every project of the agency and their social accounts.",
-                "exploreContents": "Centralize and organize the content of each project."
-            },
-            "shortLabels": {
-                "welcomeTour": "Welcome",
-                "exploreProjects": "Projects",
-                "exploreContents": "Contents"
-            }
-        },
-        "client": {
-            "titles": {
-                "welcomeTour": "Welcome to your portal",
-                "connectFirstIntegration": "Connect your accounts",
-                "exploreContents": "Your contents"
-            },
-            "descriptions": {
-                "welcomeTour": "Your agency prepared a dedicated space for your performance.",
-                "connectFirstIntegration": "Connect your accounts so your agency can track performance.",
-                "exploreContents": "Find all the contents your agency has shared with you."
-            },
-            "shortLabels": {
-                "welcomeTour": "Welcome",
-                "connectFirstIntegration": "Accounts",
-                "exploreContents": "Contents"
-            }
-        }
-    },
-    "openingStyle": {
-        "boldHook": "Bold hook",
-        "shockingStat": "Shocking stat",
-        "personalStory": "Personal story",
-        "relatableQuestion": "Relatable question",
-        "jumpIntoContent": "Jump into content"
-    },
-    "otpType": {
-        "login": "Login verification",
-        "emailVerification": "Email verification",
-        "prelaunchVerification": "Sign-up verification"
-    },
-    "platform": {
-        "instagram": "Instagram",
-        "youtube": "YouTube",
-        "tiktok": "TikTok"
-    },
-    "postInsightType": {
-        "reach": "Reach",
-        "totalInteractions": "Total interactions",
-        "saves": "Saves",
-        "shares": "Shares",
-        "views": "Views",
-        "likes": "Likes",
-        "comments": "Comments",
-        "averageWatchTime": "Avg. watch time",
-        "totalWatchTime": "Total watch time",
-        "dislikes": "Dislikes",
-        "thumbnailImpressions": "Thumbnail impressions",
-        "thumbnailImpressionsClickRate": "Thumbnail click-through rate",
-        "followersGained": "Followers gained",
-        "followersLost": "Followers lost",
-        "audienceWatchRatio": "Audience watch ratio"
-    },
-    "prelaunchRewardTier": {
-        "labels": {
-            "earlyBetaAccess": "Early beta access",
-            "devDiscordAccess": "Developer Discord access",
-            "lifetimeDiscount": "20% lifetime discount"
-        },
-        "descriptions": {
-            "earlyBetaAccess": "Be one of the first to try MakerFlow before everyone else.",
-            "devDiscordAccess": "Join our private Discord to share feedback and influence development.",
-            "lifetimeDiscount": "Get 20% off every subscription, for life."
-        }
-    },
-    "projectType": {
-        "saas": "SaaS",
-        "contentCreation": "Content creation",
-        "mobileApp": "Mobile app",
-        "extension": "Extension",
-        "automation": "Automation",
-        "webApp": "Web app",
-        "landingPage": "Landing page",
-        "blog": "Blog",
-        "portfolio": "Portfolio",
-        "hardware": "Hardware",
-        "iot": "IoT"
-    },
-    "retentionCueType": {
-        "question": "Question",
-        "teaser": "Teaser",
-        "patternBreak": "Pattern break",
-        "cliffhanger": "Cliffhanger"
-    },
-    "scriptFormat": {
-        "fullScript": "Full script",
-        "outline": "Detailed outline",
-        "hybrid": "Hybrid"
-    },
-    "scriptGenerationStatus": {
-        "pending": "Pending",
-        "processing": "Generating",
-        "completed": "Completed",
-        "failed": "Failed"
-    },
-    "scriptGoal": {
-        "educate": "Educate",
-        "entertain": "Entertain",
-        "inspire": "Inspire",
-        "sellPromote": "Sell / Promote",
-        "growAudience": "Grow audience",
-        "startConversation": "Start a conversation"
-    },
-    "scriptPartSuggestionAction": {
-        "rewrite": "Rewrite suggested",
-        "insert": "Insert suggested",
-        "delete": "Delete suggested",
-        "reorder": "Reorder suggested"
-    },
-    "scriptPartType": {
-        "hook": "Hook",
-        "text": "Text",
-        "chapter": "Chapter",
-        "voiceOver": "Voice over",
-        "dialogue": "Dialogue",
-        "shot": "Shot",
-        "callToAction": "Call to action",
-        "retentionCue": "Retention cue"
-    },
-    "scriptStatus": {
-        "idea": "Idea",
-        "scripting": "Scripting",
-        "shooting": "Shooting",
-        "editing": "Editing",
-        "scheduled": "Scheduled",
-        "published": "Published"
-    },
-    "scriptStatusGroup": {
-        "idea": "Ideas",
-        "inProgress": "In progress",
-        "done": "Done"
-    },
-    "shotType": {
-        "aRoll": "A-Roll",
-        "bRoll": "B-Roll"
-    },
-    "skillModule": {
-        "names": {
-            "strongHook": "Strong hook",
-            "retentionBoosters": "Retention boosters",
-            "storytellingMode": "Storytelling mode",
-            "seoOptimization": "SEO optimization",
-            "scriptFormat": "Script format",
-            "bRollCues": "B-Roll cues",
-            "callToAction": "Call to action"
-        },
-        "descriptions": {
-            "strongHook": "The first 3 seconds create curiosity or make a bold claim",
-            "retentionBoosters": "A re-engagement moment every 60-90 seconds",
-            "storytellingMode": "Anchor the script in a personal story",
-            "seoOptimization": "Naturally weave in a target keyword",
-            "scriptFormat": "Choose the output format: full script, outline, or hybrid",
-            "bRollCues": "Add visual B-Roll cues throughout the script",
-            "callToAction": "Add a call to action to the script"
-        }
-    },
-    "sourceBucket": {
-        "subscriptionCredits": "Subscription",
-        "refillCredits": "Top-up"
-    },
-    "subscriptionPlan": {
-        "starter": "Starter",
-        "agency": "Agency",
-        "agencyPlus": "Agency+"
-    },
-    "subscriptionStatus": {
-        "active": "Active",
-        "pastDue": "Past due",
-        "canceled": "Canceled",
-        "incomplete": "Incomplete",
-        "trialing": "Trialing",
-        "unpaid": "Unpaid"
-    },
-    "timePeriod": {
-        "last7Days": "Last 7 days",
-        "last30Days": "Last 30 days",
-        "last90Days": "Last 3 months",
-        "lastYear": "Last year"
-    },
-    "todoListPriority": {
-        "low": "Low",
-        "medium": "Medium",
-        "high": "High"
-    },
-    "todoListStatus": {
-        "pending": "To do",
-        "inProgress": "In progress",
-        "completed": "Completed"
-    },
-    "videoDuration": {
-        "thirtySeconds": "30 seconds",
-        "oneMinute": "1 minute",
-        "oneMinuteThirty": "1 min 30",
-        "twoMinutes": "2 minutes",
-        "fiveToTenMinutes": "5-10 minutes",
-        "tenToTwentyMinutes": "10-20 minutes",
-        "twentyPlusMinutes": "20+ minutes"
-    },
-    "welcomeStep": {
-        "shortLabels": {
-            "features": "Features",
-            "howItWorks": "Guide"
-        }
+    "descriptions": {
+      "gemini": "Google — fast and creative",
+      "chatGpt": "OpenAI — precise and structured",
+      "claude": "Anthropic — nuanced and detailed"
     }
+  },
+  "callToActionType": {
+    "subscribe": "Subscribe",
+    "like": "Like",
+    "comment": "Comment",
+    "share": "Share",
+    "link": "Link",
+    "custom": "Custom"
+  },
+  "chapterType": {
+    "onScreen": "On-screen",
+    "offScreen": "Off-screen"
+  },
+  "contentType": {
+    "shortForm": "Short form",
+    "longForm": "Long form"
+  },
+  "contentsTab": {
+    "groups": "Groups",
+    "posts": "Posts"
+  },
+  "creditTransactionType": {
+    "subscriptionRenewal": "Renewal",
+    "refillPurchase": "Top-up",
+    "scriptGeneration": "Script generation",
+    "scriptGenerationRefund": "Refund for a failed script generation",
+    "refund": "Refund",
+    "manualAdjustment": "Adjustment",
+    "welcomeBonus": "Welcome credits"
+  },
+  "hookTemplateCategory": {
+    "all": "All",
+    "public": "Public",
+    "private": "Private"
+  },
+  "hookTemplatePlaceholder": {
+    "topic": "Topic",
+    "audience": "Audience",
+    "benefit": "Benefit",
+    "statistic": "Statistic",
+    "problem": "Problem",
+    "product": "Product",
+    "result": "Result",
+    "emotion": "Emotion",
+    "number": "Number",
+    "goal": "Goal",
+    "date": "Date"
+  },
+  "insightType": {
+    "post": "Content",
+    "integration": "Accounts"
+  },
+  "integrationInsightType": {
+    "views": "Views",
+    "likes": "Likes",
+    "saves": "Saves",
+    "comments": "Comments",
+    "shares": "Shares",
+    "gainedFollowers": "New followers",
+    "totalFollowers": "Followers",
+    "impressions": "Impressions",
+    "dislikes": "Dislikes",
+    "profileLinksTaps": "Profile link clicks",
+    "reach": "Reach",
+    "videos": "Videos"
+  },
+  "integrationStatus": {
+    "active": "Connected",
+    "revoked": "Expired",
+    "error": "Error"
+  },
+  "mediaType": {
+    "image": "Image",
+    "video": "Video",
+    "carousel": "Carousel",
+    "uploadHint": {
+      "image": "PNG, JPEG or WebP up to 20 MB.",
+      "video": "Single MP4, MOV or WebM up to 500 MB.",
+      "carousel": "2 to 10 images, up to 20 MB each."
+    }
+  },
+  "oAuthErrorCode": {
+    "invalidState": "Session expired, please try again",
+    "missingCode": "Authorization code missing",
+    "userNotFound": "User not found",
+    "tokenExchangeFailed": "Connection failed, please try again",
+    "platformError": "Authentication platform error",
+    "popupBlocked": "The popup window was blocked by your browser",
+    "unknown": "An error occurred, please try again"
+  },
+  "fileInvalidReason": {
+    "missingFile": "Please add a file.",
+    "tooManyFiles": "Too many files were selected.",
+    "tooFewFiles": "Not enough files were selected.",
+    "fileTooLarge": "The file exceeds the maximum size.",
+    "invalidMimeType": "Unsupported file type.",
+    "invalidPayload": "The request data is invalid."
+  },
+  "onboardingStep": {
+    "admin": {
+      "titles": {
+        "createAgency": "Welcome to MakerFlow",
+        "createFirstProject": "Let's create your first project",
+        "inviteFirstClient": "Invite your first client",
+        "connectFirstIntegration": "Connect your social accounts",
+        "showSubscriptions": "Discover our plans"
+      },
+      "descriptions": {
+        "createAgency": "Enter the name of your agency and set you logo so that you clients can identify you",
+        "createFirstProject": "A project represents a client or brand whose content you manage.",
+        "inviteFirstClient": "Give your client read-only access to their own dashboard.",
+        "connectFirstIntegration": "Connect the project's social accounts to track performance.",
+        "showSubscriptions": "Pick the subscription that fits your needs to unlock every feature."
+      },
+      "shortLabels": {
+        "welcomeTour": "Welcome",
+        "createAgency": "Agency",
+        "createFirstProject": "Project",
+        "inviteFirstClient": "Client",
+        "connectFirstIntegration": "Social account",
+        "showSubscriptions": "Subscription"
+      }
+    },
+    "collaborator": {
+      "titles": {
+        "welcomeTour": "Welcome to the team",
+        "exploreProjects": "Discover the projects",
+        "exploreContents": "Discover the contents"
+      },
+      "descriptions": {
+        "welcomeTour": "A quick tour to get you familiar with your new workspace.",
+        "exploreProjects": "Browse every project of the agency and their social accounts.",
+        "exploreContents": "Centralize and organize the content of each project."
+      },
+      "shortLabels": {
+        "welcomeTour": "Welcome",
+        "exploreProjects": "Projects",
+        "exploreContents": "Contents"
+      }
+    },
+    "client": {
+      "titles": {
+        "welcomeTour": "Welcome to your portal",
+        "connectFirstIntegration": "Connect your accounts",
+        "exploreContents": "Your contents"
+      },
+      "descriptions": {
+        "welcomeTour": "Your agency prepared a dedicated space for your performance.",
+        "connectFirstIntegration": "Connect your accounts so your agency can track performance.",
+        "exploreContents": "Find all the contents your agency has shared with you."
+      },
+      "shortLabels": {
+        "welcomeTour": "Welcome",
+        "connectFirstIntegration": "Accounts",
+        "exploreContents": "Contents"
+      }
+    }
+  },
+  "openingStyle": {
+    "boldHook": "Bold hook",
+    "shockingStat": "Shocking stat",
+    "personalStory": "Personal story",
+    "relatableQuestion": "Relatable question",
+    "jumpIntoContent": "Jump into content"
+  },
+  "otpType": {
+    "login": "Login verification",
+    "emailVerification": "Email verification",
+    "prelaunchVerification": "Sign-up verification"
+  },
+  "platform": {
+    "instagram": "Instagram",
+    "youtube": "YouTube",
+    "tiktok": "TikTok"
+  },
+  "postInsightType": {
+    "reach": "Reach",
+    "totalInteractions": "Total interactions",
+    "saves": "Saves",
+    "shares": "Shares",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "averageWatchTime": "Avg. watch time",
+    "totalWatchTime": "Total watch time",
+    "dislikes": "Dislikes",
+    "thumbnailImpressions": "Thumbnail impressions",
+    "thumbnailImpressionsClickRate": "Thumbnail click-through rate",
+    "followersGained": "Followers gained",
+    "followersLost": "Followers lost",
+    "audienceWatchRatio": "Audience watch ratio"
+  },
+  "prelaunchRewardTier": {
+    "labels": {
+      "earlyBetaAccess": "Early beta access",
+      "devDiscordAccess": "Developer Discord access",
+      "lifetimeDiscount": "20% lifetime discount"
+    },
+    "descriptions": {
+      "earlyBetaAccess": "Be one of the first to try MakerFlow before everyone else.",
+      "devDiscordAccess": "Join our private Discord to share feedback and influence development.",
+      "lifetimeDiscount": "Get 20% off every subscription, for life."
+    }
+  },
+  "projectType": {
+    "saas": "SaaS",
+    "contentCreation": "Content creation",
+    "mobileApp": "Mobile app",
+    "extension": "Extension",
+    "automation": "Automation",
+    "webApp": "Web app",
+    "landingPage": "Landing page",
+    "blog": "Blog",
+    "portfolio": "Portfolio",
+    "hardware": "Hardware",
+    "iot": "IoT"
+  },
+  "retentionCueType": {
+    "question": "Question",
+    "teaser": "Teaser",
+    "patternBreak": "Pattern break",
+    "cliffhanger": "Cliffhanger"
+  },
+  "scriptFormat": {
+    "fullScript": "Full script",
+    "outline": "Detailed outline",
+    "hybrid": "Hybrid"
+  },
+  "scriptGenerationStatus": {
+    "pending": "Pending",
+    "processing": "Generating",
+    "completed": "Completed",
+    "failed": "Failed"
+  },
+  "scriptGoal": {
+    "educate": "Educate",
+    "entertain": "Entertain",
+    "inspire": "Inspire",
+    "sellPromote": "Sell / Promote",
+    "growAudience": "Grow audience",
+    "startConversation": "Start a conversation"
+  },
+  "scriptPartSuggestionAction": {
+    "rewrite": "Rewrite suggested",
+    "insert": "Insert suggested",
+    "delete": "Delete suggested",
+    "reorder": "Reorder suggested"
+  },
+  "scriptPartType": {
+    "hook": "Hook",
+    "text": "Text",
+    "chapter": "Chapter",
+    "voiceOver": "Voice over",
+    "dialogue": "Dialogue",
+    "shot": "Shot",
+    "callToAction": "Call to action",
+    "retentionCue": "Retention cue"
+  },
+  "scriptStatus": {
+    "idea": "Idea",
+    "scripting": "Scripting",
+    "shooting": "Shooting",
+    "editing": "Editing",
+    "scheduled": "Scheduled",
+    "published": "Published"
+  },
+  "scriptStatusGroup": {
+    "idea": "Ideas",
+    "inProgress": "In progress",
+    "done": "Done"
+  },
+  "shotType": {
+    "aRoll": "A-Roll",
+    "bRoll": "B-Roll"
+  },
+  "skillModule": {
+    "names": {
+      "strongHook": "Strong hook",
+      "retentionBoosters": "Retention boosters",
+      "storytellingMode": "Storytelling mode",
+      "seoOptimization": "SEO optimization",
+      "scriptFormat": "Script format",
+      "bRollCues": "B-Roll cues",
+      "callToAction": "Call to action"
+    },
+    "descriptions": {
+      "strongHook": "The first 3 seconds create curiosity or make a bold claim",
+      "retentionBoosters": "A re-engagement moment every 60-90 seconds",
+      "storytellingMode": "Anchor the script in a personal story",
+      "seoOptimization": "Naturally weave in a target keyword",
+      "scriptFormat": "Choose the output format: full script, outline, or hybrid",
+      "bRollCues": "Add visual B-Roll cues throughout the script",
+      "callToAction": "Add a call to action to the script"
+    }
+  },
+  "sourceBucket": {
+    "subscriptionCredits": "Subscription",
+    "refillCredits": "Top-up"
+  },
+  "subscriptionPlan": {
+    "starter": "Starter",
+    "agency": "Agency",
+    "agencyPlus": "Agency+"
+  },
+  "subscriptionStatus": {
+    "active": "Active",
+    "pastDue": "Past due",
+    "canceled": "Canceled",
+    "incomplete": "Incomplete",
+    "trialing": "Trialing",
+    "unpaid": "Unpaid"
+  },
+  "timePeriod": {
+    "last7Days": "Last 7 days",
+    "last30Days": "Last 30 days",
+    "last90Days": "Last 3 months",
+    "lastYear": "Last year"
+  },
+  "todoListPriority": {
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High"
+  },
+  "todoListStatus": {
+    "pending": "To do",
+    "inProgress": "In progress",
+    "completed": "Completed"
+  },
+  "videoDuration": {
+    "thirtySeconds": "30 seconds",
+    "oneMinute": "1 minute",
+    "oneMinuteThirty": "1 min 30",
+    "twoMinutes": "2 minutes",
+    "fiveToTenMinutes": "5-10 minutes",
+    "tenToTwentyMinutes": "10-20 minutes",
+    "twentyPlusMinutes": "20+ minutes"
+  },
+  "welcomeStep": {
+    "shortLabels": {
+      "features": "Features",
+      "howItWorks": "Guide"
+    }
+  }
 }

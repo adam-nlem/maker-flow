@@ -77,7 +77,7 @@ export default function AgencyHomePage() {
 
   return (
     <div className="h-full flex flex-col md:flex-row gap-3 overflow-y-auto p-3 md:p-5">
-      <div className="flex flex-col gap-3 md:justify-between flex-1 min-w-0">
+      <div className="flex flex-col gap-3 flex-1 min-w-0">
         <div className="flex flex-row gap-3">
           <SelectDropdown
             items={timePeriodOptions}

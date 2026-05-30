@@ -14,7 +14,9 @@ export default function OnboardingInviteFirstClientStep() {
     if (!projectUuid) return null
 
     return (
-        <OnboardingStepLayout maxWidth="max-w-md">
+        <OnboardingStepLayout
+            maxWidth="max-w-md"
+            left={
             <div className="flex flex-col items-center gap-5 w-full">
                 <InviteClientForm projectUuid={projectUuid} onInvited={advanceStep} />
 
@@ -22,6 +24,7 @@ export default function OnboardingInviteFirstClientStep() {
                     {t("onboarding:subscriptionStep.skip")}
                 </SimpleTextButton>
             </div>
-        </OnboardingStepLayout>
+            }
+        />
     )
 }

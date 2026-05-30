@@ -4,41 +4,37 @@ namespace App\DTO\Request\Agency;
 
 use App\DTO\Request\AbstractRequestDTO;
 use App\Entity\Agency;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class CreateAgencyRequestDTO extends AbstractRequestDTO
 {
     private string $name;
-    private ?string $contactEmail = null;
-    private ?string $website = null;
+    private File $logo;
 
     public function __construct(
         protected RequestStack $requestStack,
         protected ValidatorInterface $validator,
     ) {
-        parent::__construct($requestStack, $validator);
+
+        parent::__construct(
+            $requestStack,
+            $validator,
+            $requestStack->getCurrentRequest()->request->all(),
+        );
     }
 
     protected function fromPayload(array $payload)
     {
         $this->name = $payload['name'];
-        $this->contactEmail = $payload['contactEmail'] ?? null;
-        $this->website = $payload['website'] ?? null;
+        $this->logo  = $this->requestStack->getCurrentRequest()->files->get('logo');
     }
 
     protected function buildObject(): Agency
     {
         $agency = new Agency();
         $agency->setName($this->getName());
-
-        if ($this->getContactEmail() !== null) {
-            $agency->setContactEmail($this->getContactEmail());
-        }
-
-        if ($this->getWebsite() !== null) {
-            $agency->setWebsite($this->getWebsite());
-        }
 
         return $agency;
     }
@@ -48,13 +44,8 @@ class CreateAgencyRequestDTO extends AbstractRequestDTO
         return $this->name;
     }
 
-    public function getContactEmail(): ?string
+    public function getLogo(): File
     {
-        return $this->contactEmail;
-    }
-
-    public function getWebsite(): ?string
-    {
-        return $this->website;
+        return $this->logo;
     }
 }

@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\DTO\QueryParam\Project\ListProjectsQueryParamDTO;
 use App\DTO\Request\Project\CreateProjectRequestDTO;
 use App\DTO\Request\Project\UpdateProjectRequestDTO;
+use App\Entity\Enum\FileInvalidReason;
 use App\Entity\Enum\UserRole;
 use App\Entity\Project;
 use App\Entity\User;
@@ -12,16 +13,21 @@ use App\Exception\Agency\AgencySubscriptionInactiveException;
 use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Project\ProjectAlreadyFinishedException;
 use App\Exception\Project\ProjectAlreadyOpenException;
+use App\Exception\Project\ProjectLogoInvalidException;
 use App\Exception\Project\ProjectNameConflictException;
 use App\Exception\Project\ProjectNotFoundException;
 use App\Helper\DateHelper;
 use App\Repository\AgencyRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\SubscriptionRepository;
+use App\Service\Project\ProjectLogoService;
 use App\Service\Subscription\SubscriptionLimitService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -36,6 +42,7 @@ final class ProjectController extends AbstractController
         AgencyRepository $agencyRepository,
         ProjectRepository $projectRepository,
         SubscriptionLimitService $subscriptionLimitService,
+        ProjectLogoService $projectLogoService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
@@ -48,12 +55,21 @@ final class ProjectController extends AbstractController
 
         $subscriptionLimitService->assertCanCreateProject($agency);
 
+        $logo = $dto->getLogo();
+
+        if (!$logo instanceof UploadedFile) {
+            throw new ProjectLogoInvalidException(FileInvalidReason::MissingFile);
+        }
+
+        $projectLogoService->validate($logo);
+
         /** @var Project $project */
         $project = $dto->build();
 
         $project->setAgency($agency);
-
         $projectRepository->save($project, true);
+
+        $projectLogoService->save($project, $logo);
 
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_projects_create']]);
     }
@@ -166,6 +182,41 @@ final class ProjectController extends AbstractController
         return $this->json(data: $project, status: Response::HTTP_OK, context: ['groups' => ['api_projects_reopen']]);
     }
 
+    #[Route(
+        '/{projectUuid}/logo',
+        name: 'api_projects_logo_show',
+        methods: ['GET'],
+        requirements: ['projectUuid' => Requirement::UUID]
+    )]
+    #[IsGranted(UserRole::User->value)]
+    public function showLogo(
+        string $projectUuid,
+        ProjectRepository $projectRepository,
+        ProjectLogoService $projectLogoService,
+    ): Response {
+        /** @var User $user */
+        $user = $this->getUser();
+        $project = $projectRepository->getAccessibleByUuidForUser($projectUuid, $user);
+
+        if ($project === null) {
+            throw new ProjectNotFoundException();
+        }
+
+        $logo = $projectLogoService->getFile($project);
+
+        if ($logo === null) {
+            throw new ProjectLogoInvalidException(FileInvalidReason::MissingFile);
+        }
+
+        return new BinaryFileResponse(
+            $logo,
+            Response::HTTP_OK,
+            ['Content-Type' => $logo->getMimeType()],
+            false,
+            ResponseHeaderBag::DISPOSITION_INLINE,
+        );
+    }
+
     #[Route('', name: 'api_projects_list', methods: ['GET'])]
     #[IsGranted(UserRole::User->value)]
     public function list(
@@ -199,5 +250,4 @@ final class ProjectController extends AbstractController
 
         return $this->json(data: ["message" => "Project deleted successfully"], status: Response::HTTP_OK);
     }
-
 }

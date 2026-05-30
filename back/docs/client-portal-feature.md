@@ -80,11 +80,10 @@ Clients are created exclusively through the polymorphic Invitation system (`back
 ## Client onboarding
 
 First-login walkthrough is `ClientOnboardingStep` (`back/docs/onboarding-feature.md`):
-1. `WelcomeTour`
-2. `ConnectFirstIntegration`
-3. `ExploreContents`
+1. `ConnectFirstIntegration`
+2. `ExploreContents`
 
-`OnboardingService::getApplicableStepValues($user)` returns these three values for any `ROLE_CLIENT` user; the entity's `completed_steps` JSON stores the raw values. `WelcomeTour` and `ConnectFirstIntegration` share values with the admin and collaborator flows on purpose, so a client who briefly held another role would not redo identical steps.
+`OnboardingService::getApplicableStepValues($user)` returns these two values for any `ROLE_CLIENT` user; the entity's `completed_steps` JSON stores the raw values. `ConnectFirstIntegration` and `ExploreContents` share values with the admin and collaborator flows on purpose, so a client who briefly held another role would not redo identical steps.
 
 ## Related docs
 

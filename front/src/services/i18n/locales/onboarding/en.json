@@ -1,85 +1,59 @@
 {
-    "welcomeTour": {
-        "admin": {
-            "greeting": "Hi {{firstName}}, ready to set up your agency?",
-            "bullets": [
-                "Configure your agency profile",
-                "Create your first client project",
-                "Invite your client and connect their accounts",
-                "Pick a subscription"
-            ],
-            "cta": "Get started"
-        },
-        "collaborator": {
-            "greeting": "Hi {{firstName}}, welcome to the {{agencyName}} team.",
-            "bullets": [
-                "Browse the agency's projects",
-                "Review ongoing content",
-                "Monitor social account performance"
-            ],
-            "cta": "Start the tour"
-        },
-        "client": {
-            "greeting": "Hi {{firstName}}, welcome to your {{agencyName}} portal.",
-            "bullets": [
-                "See your social performance at a glance",
-                "Find your content in one place",
-                "Connect your accounts to share your data"
-            ],
-            "cta": "Explore my portal"
-        }
+  "exploreProjects": {
+    "body": "Every project of the agency is accessible from the left menu. Select a project to see its accounts and contents.",
+    "cta": "View projects",
+    "skip": "Later"
+  },
+  "exploreContents": {
+    "body": "Find all contents organized by group here. Click a content to see its details.",
+    "cta": "View contents",
+    "skip": "Later"
+  },
+  "createAgency": {
+    "name": {
+      "label": "Your agency",
+      "placeholder": "Enter your agency name"
     },
-    "exploreProjects": {
-        "body": "Every project of the agency is accessible from the left menu. Select a project to see its accounts and contents.",
-        "cta": "View projects",
-        "skip": "Later"
+    "contactEmail": {
+      "label": "Contact email (optional)",
+      "placeholder": "hello@my-agency.com"
     },
-    "exploreContents": {
-        "body": "Find all contents organized by group here. Click a content to see its details.",
-        "cta": "View contents",
-        "skip": "Later"
+    "website": {
+      "label": "Website (optional)",
+      "placeholder": "https://my-agency.com"
     },
-    "createAgency": {
-        "name": {
-            "label": "Agency name",
-            "placeholder": "My agency"
-        },
-        "contactEmail": {
-            "label": "Contact email (optional)",
-            "placeholder": "hello@my-agency.com"
-        },
-        "website": {
-            "label": "Website (optional)",
-            "placeholder": "https://my-agency.com"
-        },
-        "submit": "Create my agency"
+    "logo": {
+      "label": "Agency logo",
+      "hint": "Upload or drag & drop your agency logo"
     },
-    "generating": {
-        "messages": {
-            "analysis": "Analyzing the topic...",
-            "structure": "Structuring the script...",
-            "hook": "Writing the hook...",
-            "parts": "Developing the parts...",
-            "details": "Adding details...",
-            "finalization": "Finalizing..."
-        },
-        "title": "AI is writing your script",
-        "errorTitle": "An error occurred",
-        "errorDescription": "Generation failed. You can retry from the script editor."
+    "submit": "Create my agency"
+  },
+  "generating": {
+    "messages": {
+      "analysis": "Analyzing the topic...",
+      "structure": "Structuring the script...",
+      "hook": "Writing the hook...",
+      "parts": "Developing the parts...",
+      "details": "Adding details...",
+      "finalization": "Finalizing..."
     },
-    "generateStep": {
-        "title": "Chat with AI to generate your script",
-        "subtitle": "Open the AI chat in the editor and describe your video. The assistant will suggest line-by-line changes that you can accept or reject."
-    },
-    "subscriptionStep": {
-        "activatedTitle": "{{plan}} subscription activated",
-        "activatedSubtitle": "Your subscription is active.",
-        "primaryAction": "Start using MakerFlow",
-        "skip": "Skip"
-    },
-    "progress": {
-        "stepCount": "Step {{current}} of {{total}}"
-    },
-    "firstScriptTitle": "My first script",
-    "findScriptHint": "Find your script in the Scripts tab"
+    "title": "AI is writing your script",
+    "errorTitle": "An error occurred",
+    "errorDescription": "Generation failed. You can retry from the script editor."
+  },
+  "generateStep": {
+    "title": "Chat with AI to generate your script",
+    "subtitle": "Open the AI chat in the editor and describe your video. The assistant will suggest line-by-line changes that you can accept or reject."
+  },
+  "subscriptionStep": {
+    "activatedTitle": "{{plan}} subscription activated",
+    "activatedSubtitle": "Your subscription is active.",
+    "primaryAction": "Start using MakerFlow",
+    "skip": "Skip"
+  },
+  "progress": {
+    "stepCount": "Step {{current}} of {{total}}"
+  },
+  "firstScriptTitle": "My first script",
+  "findScriptHint": "Find your script in the Scripts tab"
 }

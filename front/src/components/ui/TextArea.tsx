@@ -14,7 +14,7 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
   ({ label, labelRight, error, width = 'w-full', simple = false, textStyle = 'text-xs', className = '', ...props }, ref) => {
     const internalRef = useRef<HTMLTextAreaElement>(null);
 
-    useAutoResizeTextarea(internalRef, (props.value as string) || '', 0);
+    useAutoResizeTextarea(internalRef, (props.value as string) || '', 120);
 
     useImperativeHandle(ref, () => internalRef.current as HTMLTextAreaElement);
 
@@ -34,8 +34,8 @@ export const TextArea = forwardRef<HTMLTextAreaElement, TextAreaProps>(
           ref={internalRef}
           placeholder={props.placeholder}
           className={`
-            block bg-clear placeholder-muted-2 text-dark ${textStyle} resize-none scrollbar-none
-            ${!simple ? `rounded-lg border border-pale-gray-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 py-1 px-2` : 'border-0 shadow-none outline-none focus:outline-none focus:ring-0 p-0'}
+            block bg-clear placeholder-muted-2 text-dark ${textStyle} resize-none scrollbar-none 
+            ${!simple ? `rounded-lg border border-pale-gray-2 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 p-3` : 'border-0 shadow-none outline-none focus:outline-none focus:ring-0 p-0'}
             ${error ? 'border-danger focus:border-danger focus:ring-danger/20' : ''}
             w-full
             ${className}

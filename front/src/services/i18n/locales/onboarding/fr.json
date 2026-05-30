@@ -1,85 +1,59 @@
 {
-    "welcomeTour": {
-        "admin": {
-            "greeting": "Bonjour {{firstName}}, prêt à mettre en place votre agence ?",
-            "bullets": [
-                "Configurez votre profil d'agence",
-                "Créez votre premier projet client",
-                "Invitez votre client et connectez ses comptes",
-                "Choisissez votre abonnement"
-            ],
-            "cta": "Commencer"
-        },
-        "collaborator": {
-            "greeting": "Bonjour {{firstName}}, bienvenue dans l'équipe de {{agencyName}}.",
-            "bullets": [
-                "Parcourez les projets de l'agence",
-                "Consultez les contenus en cours",
-                "Suivez les performances des réseaux sociaux"
-            ],
-            "cta": "Commencer la visite"
-        },
-        "client": {
-            "greeting": "Bonjour {{firstName}}, bienvenue sur votre portail {{agencyName}}.",
-            "bullets": [
-                "Visualisez les performances de vos réseaux",
-                "Retrouvez vos contenus en un seul endroit",
-                "Connectez vos comptes pour partager vos données"
-            ],
-            "cta": "Découvrir mon portail"
-        }
+  "exploreProjects": {
+    "body": "Tous les projets de l'agence sont accessibles depuis le menu de gauche. Sélectionnez un projet pour voir ses réseaux et ses contenus.",
+    "cta": "Voir les projets",
+    "skip": "Plus tard"
+  },
+  "exploreContents": {
+    "body": "Retrouvez ici tous les contenus organisés par groupe. Cliquez sur un contenu pour voir ses détails.",
+    "cta": "Voir les contenus",
+    "skip": "Plus tard"
+  },
+  "createAgency": {
+    "name": {
+      "label": "Votre agence",
+      "placeholder": "Entrez le nom de votre agence"
     },
-    "exploreProjects": {
-        "body": "Tous les projets de l'agence sont accessibles depuis le menu de gauche. Sélectionnez un projet pour voir ses réseaux et ses contenus.",
-        "cta": "Voir les projets",
-        "skip": "Plus tard"
+    "contactEmail": {
+      "label": "Email de contact (optionnel)",
+      "placeholder": "hello@mon-agence.com"
     },
-    "exploreContents": {
-        "body": "Retrouvez ici tous les contenus organisés par groupe. Cliquez sur un contenu pour voir ses détails.",
-        "cta": "Voir les contenus",
-        "skip": "Plus tard"
+    "website": {
+      "label": "Site web (optionnel)",
+      "placeholder": "https://mon-agence.com"
     },
-    "createAgency": {
-        "name": {
-            "label": "Nom de l'agence",
-            "placeholder": "Mon agence"
-        },
-        "contactEmail": {
-            "label": "Email de contact (optionnel)",
-            "placeholder": "hello@mon-agence.com"
-        },
-        "website": {
-            "label": "Site web (optionnel)",
-            "placeholder": "https://mon-agence.com"
-        },
-        "submit": "Créer mon agence"
+    "logo": {
+      "label": "Logo de l'agence",
+      "hint": "Importez ou glissez-déposez le logo de votre agence"
     },
-    "generating": {
-        "messages": {
-            "analysis": "Analyse du sujet...",
-            "structure": "Structure du script...",
-            "hook": "Rédaction du hook...",
-            "parts": "Développement des parties...",
-            "details": "Ajout des détails...",
-            "finalization": "Finalisation..."
-        },
-        "title": "L'IA rédige votre script",
-        "errorTitle": "Une erreur est survenue",
-        "errorDescription": "La génération a échoué. Vous pourrez réessayer depuis l'éditeur de script."
+    "submit": "Créer mon agence"
+  },
+  "generating": {
+    "messages": {
+      "analysis": "Analyse du sujet...",
+      "structure": "Structure du script...",
+      "hook": "Rédaction du hook...",
+      "parts": "Développement des parties...",
+      "details": "Ajout des détails...",
+      "finalization": "Finalisation..."
     },
-    "generateStep": {
-        "title": "Discutez avec l'IA pour générer votre script",
-        "subtitle": "Ouvrez le chat IA dans l'éditeur et décrivez votre vidéo. L'assistant proposera des modifications ligne par ligne que vous pourrez accepter ou rejeter."
-    },
-    "subscriptionStep": {
-        "activatedTitle": "Abonnement {{plan}} activé",
-        "activatedSubtitle": "Votre abonnement est actif.",
-        "primaryAction": "Commencer à utiliser MakerFlow",
-        "skip": "Ignorer"
-    },
-    "progress": {
-        "stepCount": "Étape {{current}} sur {{total}}"
-    },
-    "firstScriptTitle": "Mon premier script",
-    "findScriptHint": "Retrouvez votre script dans l'onglet Scripts"
+    "title": "L'IA rédige votre script",
+    "errorTitle": "Une erreur est survenue",
+    "errorDescription": "La génération a échoué. Vous pourrez réessayer depuis l'éditeur de script."
+  },
+  "generateStep": {
+    "title": "Discutez avec l'IA pour générer votre script",
+    "subtitle": "Ouvrez le chat IA dans l'éditeur et décrivez votre vidéo. L'assistant proposera des modifications ligne par ligne que vous pourrez accepter ou rejeter."
+  },
+  "subscriptionStep": {
+    "activatedTitle": "Abonnement {{plan}} activé",
+    "activatedSubtitle": "Votre abonnement est actif.",
+    "primaryAction": "Commencer à utiliser MakerFlow",
+    "skip": "Ignorer"
+  },
+  "progress": {
+    "stepCount": "Étape {{current}} sur {{total}}"
+  },
+  "firstScriptTitle": "Mon premier script",
+  "findScriptHint": "Retrouvez votre script dans l'onglet Scripts"
 }

@@ -10,31 +10,28 @@ After registration → `/verify-otp` → `/` → `RootRedirect` dispatches the a
 
 The active step order is resolved by [`getOnboardingFlowConfig(role)`](../src/models/enums/onboardingFlow.ts):
 
-### Admin — `AgencyAdminOnboardingStep` (6 steps)
+### Admin — `AgencyAdminOnboardingStep` (5 steps)
 | Order | Value | Component | Notes |
 |-------|-------|-----------|-------|
-| 0 | `welcome_tour` | `OnboardingWelcomeTourStep` | Role-aware copy. |
-| 1 | `create_agency` | `OnboardingCreateAgencyStep` | Auto-advances when `user.agency !== null`. Calls `POST /api/agencies`. |
-| 2 | `create_first_project` | `OnboardingCreateProjectStep` | Sets `focusedProjectUuid`. |
-| 3 | `invite_first_client` | `OnboardingInviteFirstClientStep` | Reuses `InviteClientForm` for the focused project. Skippable. |
-| 4 | `connect_first_integration` | `OnboardingConnectIntegrationStep` | OAuth tiles for the focused project. Skippable. |
-| 5 | `show_subscriptions` | `OnboardingSubscriptionStep` | `SubscriptionOverview` checkout. |
+| 0 | `create_agency` | `OnboardingCreateAgencyStep` | Auto-advances when `user.agency !== null`. Collects agency **name** + required **logo**; submits a single multipart `POST /api/agencies` via `useCreateAgency`. The right panel mocks the app sidebar and live-previews the agency identity (an inline `AgencyLogo` + name tile fed the typed name + a local object-URL of the picked logo) at the bottom, showing a `Shimmer` until either field is filled. Once filled, the full identity card (`IdentityPopoverView`, static/non-functional) also renders to the right of the sidebar by the tile. |
+| 1 | `create_first_project` | `OnboardingCreateProjectStep` | Sets `focusedProjectUuid`. |
+| 2 | `invite_first_client` | `OnboardingInviteFirstClientStep` | Reuses `InviteClientForm` for the focused project. Skippable. |
+| 3 | `connect_first_integration` | `OnboardingConnectIntegrationStep` | OAuth tiles for the focused project. Skippable. |
+| 4 | `show_subscriptions` | `OnboardingSubscriptionStep` | `SubscriptionOverview` checkout. |
 
 Collaborator invitation is **not** part of onboarding — seat count depends on the subscription tier picked at the last step. Collaborator invites live exclusively in the Collaborators block of `/agency/settings/agency`.
 
-### Collaborator (Editor / Viewer) — `AgencyCollaboratorOnboardingStep` (3 steps)
+### Collaborator (Editor / Viewer) — `AgencyCollaboratorOnboardingStep` (2 steps)
 | Order | Value | Component |
 |-------|-------|-----------|
-| 0 | `welcome_tour` | `OnboardingWelcomeTourStep` |
-| 1 | `explore_projects` | `OnboardingExploreProjectsStep` — info screen with "Take me there" → `/agency`. |
-| 2 | `explore_contents` | `OnboardingExploreContentsStep` — info screen with "Take me there" → `/agency/contents`. |
+| 0 | `explore_projects` | `OnboardingExploreProjectsStep` — info screen with "Take me there" → `/agency`. |
+| 1 | `explore_contents` | `OnboardingExploreContentsStep` — info screen with "Take me there" → `/agency/contents`. |
 
-### Client — `ClientOnboardingStep` (3 steps)
+### Client — `ClientOnboardingStep` (2 steps)
 | Order | Value | Component |
 |-------|-------|-----------|
-| 0 | `welcome_tour` | `OnboardingWelcomeTourStep` — agency-branded copy. |
-| 1 | `connect_first_integration` | `OnboardingConnectIntegrationStep` — reads `focusedProjectUuid` from the shared focus project store (seeded by `useSyncFocusedProject` in `protected.tsx`, which calls `GET /api/projects` — that returns the client's single project for `ROLE_CLIENT`). |
-| 2 | `explore_contents` | `OnboardingExploreContentsStep` — navigates to `/client/contents`. |
+| 0 | `connect_first_integration` | `OnboardingConnectIntegrationStep` — reads `focusedProjectUuid` from the shared focus project store (seeded by `useSyncFocusedProject` in `protected.tsx`, which calls `GET /api/projects` — that returns the client's single project for `ROLE_CLIENT`). |
+| 1 | `explore_contents` | `OnboardingExploreContentsStep` — navigates to `/client/contents`. |
 
 ## Architecture
 
@@ -55,7 +52,7 @@ Files:
 
 ### Route + node mapping
 
-`src/routes/onboarding.tsx` keeps one `Record<Enum, ReactNode>` per role and resolves the right node via `resolveStepNode(role, stepValue)`. Shared step values (e.g., `welcome_tour`, `connect_first_integration`, `explore_contents`) are mapped per-role so the component receives the correct flavor.
+`src/routes/onboarding.tsx` keeps one `Record<Enum, ReactNode>` per role and resolves the right node via `resolveStepNode(role, stepValue)`. Shared step values (e.g., `connect_first_integration`, `explore_contents`) are mapped per-role so the component receives the correct flavor.
 
 ### Hooks
 
@@ -69,11 +66,15 @@ Files:
 
 ## i18n
 
-Translation keys are namespaced per role under `enums:onboardingStep.{admin|collaborator|client}.{titles|descriptions|shortLabels}.<stepCamelCase>`. Welcome tour body text lives under `onboarding:welcomeTour.{admin|collaborator|client}.{greeting|bullets|cta}`. Explore step copy lives under `onboarding:exploreProjects.*` and `onboarding:exploreContents.*`.
+Translation keys are namespaced per role under `enums:onboardingStep.{admin|collaborator|client}.{titles|descriptions|shortLabels}.<stepCamelCase>`. Explore step copy lives under `onboarding:exploreProjects.*` and `onboarding:exploreContents.*`.
 
 ## Shared chrome
 
-- `OnboardingStepLayout` / `OnboardingStepHeader` / `OnboardingProgressBar` are unchanged structurally — they read from `useOnboardingFlow().flowConfig` so adding a step in any role file flows through automatically.
+- `OnboardingProgressBar` reads from `useOnboardingFlow().flowConfig` so adding a step in any role file flows through automatically.
+- `OnboardingStepLayout` exposes two content slots:
+  - `left: ReactNode` (required) — the step's primary content. The progress bar, title and description always render above it in the left column.
+  - `right?: ReactNode` (optional) — supporting content (illustration, preview, secondary panel). When provided, the screen splits 50/50 (left column + right column); when omitted, the left column stays centered as before.
+  - `maxWidth?: string` (default `max-w-lg`) — constrains the `left` content container.
 
 ## Key Files
 
@@ -91,7 +92,6 @@ Translation keys are namespaced per role under `enums:onboardingStep.{admin|coll
 - `src/components/onboarding/OnboardingStepLayout.tsx`
 - `src/components/onboarding/OnboardingStepHeader.tsx`
 - `src/components/onboarding/OnboardingProgressBar.tsx`
-- `src/components/onboarding/OnboardingWelcomeTourStep.tsx`
 - `src/components/onboarding/OnboardingCreateAgencyStep.tsx`
 - `src/components/onboarding/OnboardingCreateProjectStep.tsx`
 - `src/components/onboarding/OnboardingInviteFirstClientStep.tsx`

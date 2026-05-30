@@ -23,7 +23,9 @@ export default function OnboardingExploreContentsStep() {
     }
 
     return (
-        <OnboardingStepLayout maxWidth="max-w-md">
+        <OnboardingStepLayout
+            maxWidth="max-w-md"
+            left={
             <div className="flex flex-col items-center gap-5 w-full">
                 <div className="size-16 rounded-full bg-primary/10 flex items-center justify-center">
                     <DocumentTextIcon className="size-8 text-primary" />
@@ -44,6 +46,7 @@ export default function OnboardingExploreContentsStep() {
                     {t("onboarding:exploreContents.skip")}
                 </SimpleTextButton>
             </div>
-        </OnboardingStepLayout>
+            }
+        />
     )
 }

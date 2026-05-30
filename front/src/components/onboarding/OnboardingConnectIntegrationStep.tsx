@@ -21,7 +21,8 @@ export default function OnboardingConnectIntegrationStep() {
     if (!projectUuid) return null
 
     return (
-        <OnboardingStepLayout>
+        <OnboardingStepLayout
+            left={
             <div className="flex flex-col items-center gap-5 w-full">
                 <div className="flex flex-col sm:flex-row justify-center gap-3 w-full">
                     {isLoading ? (
@@ -50,6 +51,7 @@ export default function OnboardingConnectIntegrationStep() {
                     {t("onboarding:subscriptionStep.skip")}
                 </SimpleTextButton>
             </div>
-        </OnboardingStepLayout>
+            }
+        />
     )
 }

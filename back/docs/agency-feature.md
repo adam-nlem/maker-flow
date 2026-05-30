@@ -79,6 +79,8 @@ Both `GET` and `PATCH` resolve the current agency through `AgencyRepository::get
 
 The dedicated `api_agency_current` serialization group exposes the readable fields (`uuid`, `name`, `contactEmail`, `website`). It is independent from `api_agency_create` and `api_agency_update`.
 
+`POST /api/agencies` accepts **`multipart/form-data`** with a required `name` text field and a required `logo` file part — agency creation and logo storage happen in one request. `CreateAgencyRequestDTO` reads the `name` form field (via `$request->request->all()`, like `CreateReviewRequestDTO`); the controller reads the `logo` from `$request->files`, runs `AgencyLogoService::validate()` **before** persisting (so an invalid/missing logo never leaves an orphan agency), then `store()`s it after save. `contactEmail` / `website` are no longer part of the creation payload — they stay on the entity and are set later through `PATCH /api/agencies`.
+
 ## Agency logo
 
 Agency logos live on disk by UUID — same convention as post thumbnails — so the `Agency` entity stays untouched (no `logoPath` column). Every logo is stored at the deterministic path `private/uploads/agency/logo/{agencyUuid}.png`.
@@ -90,7 +92,9 @@ Agency logos live on disk by UUID — same convention as post thumbnails — so 
 
 There is no server-side placeholder: empty agencies return `204` and the frontend renders its own fallback (brand-color block with the agency's initial, or a drop zone in editable contexts).
 
-Validation on upload (`AgencyLogoService::upload`):
+Logo handling is split into two `AgencyLogoService` methods (mirrors `ReviewFileService`): `validate(UploadedFile)` asserts the constraints, `store(Agency, UploadedFile)` writes the file to disk. Both the settings upload endpoint and the create endpoint call `validate()` then `store()`.
+
+Validation (`AgencyLogoService::validate`):
 - MIME type must be `image/png`.
 - File size ≤ 5 MB.
 
@@ -108,7 +112,7 @@ app.uploads.agency_root: "%kernel.project_dir%/private/uploads/agency"
 
 ## Agency creation in onboarding
 
-Agency provisioning is its own onboarding step — it is **not** auto-bundled into `POST /api/users/register`. A freshly-registered admin lands on the frontend's `OnboardingCreateAgencyStep`, which submits to `POST /api/agencies`. The `AgencyShellLayout` redirects to `/onboarding` for any non-client user whose `agency` is still `null`, so the agency shell never renders against a null agency. See [onboarding-feature.md](onboarding-feature.md) for the `CreateAgency` step entry.
+Agency provisioning is its own onboarding step — it is **not** auto-bundled into `POST /api/users/register`. A freshly-registered admin lands on the frontend's `OnboardingCreateAgencyStep`, which collects only the agency **name** and a required **logo** and submits them as a single multipart `POST /api/agencies`. The `AgencyShellLayout` redirects to `/onboarding` for any non-client user whose `agency` is still `null`, so the agency shell never renders against a null agency. See [onboarding-feature.md](onboarding-feature.md) for the `CreateAgency` step entry.
 
 ## Related docs
 

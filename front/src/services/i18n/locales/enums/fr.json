@@ -111,7 +111,6 @@
     "onboardingStep": {
         "admin": {
             "titles": {
-                "welcomeTour": "Bienvenue sur MakerFlow",
                 "createAgency": "Créez votre agence",
                 "createFirstProject": "Créez votre premier projet",
                 "inviteFirstClient": "Invitez votre premier client",
@@ -119,7 +118,6 @@
                 "showSubscriptions": "Découvrez nos offres"
             },
             "descriptions": {
-                "welcomeTour": "Quelques étapes rapides pour préparer votre espace agence.",
                 "createAgency": "Renseignez le nom, la couleur de marque et les coordonnées de votre agence.",
                 "createFirstProject": "Un projet représente un client ou une marque dont vous gérez les contenus.",
                 "inviteFirstClient": "Donnez à votre client un accès en lecture seule à son tableau de bord.",
@@ -127,7 +125,6 @@
                 "showSubscriptions": "Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités."
             },
             "shortLabels": {
-                "welcomeTour": "Bienvenue",
                 "createAgency": "Agence",
                 "createFirstProject": "Projet",
                 "inviteFirstClient": "Client",
@@ -137,34 +134,28 @@
         },
         "collaborator": {
             "titles": {
-                "welcomeTour": "Bienvenue dans l'équipe",
                 "exploreProjects": "Découvrez les projets",
                 "exploreContents": "Découvrez les contenus"
             },
             "descriptions": {
-                "welcomeTour": "Voici un rapide tour pour vous familiariser avec votre nouvel espace.",
                 "exploreProjects": "Retrouvez tous les projets de l'agence et leurs réseaux sociaux.",
                 "exploreContents": "Centralisez et organisez les contenus de chaque projet."
             },
             "shortLabels": {
-                "welcomeTour": "Bienvenue",
                 "exploreProjects": "Projets",
                 "exploreContents": "Contenus"
             }
         },
         "client": {
             "titles": {
-                "welcomeTour": "Bienvenue sur votre portail",
                 "connectFirstIntegration": "Connectez vos réseaux",
                 "exploreContents": "Vos contenus"
             },
             "descriptions": {
-                "welcomeTour": "Votre agence vous a préparé un espace dédié à vos performances.",
                 "connectFirstIntegration": "Connectez vos comptes pour que votre agence puisse suivre les performances.",
                 "exploreContents": "Retrouvez tous vos contenus partagés par votre agence."
             },
             "shortLabels": {
-                "welcomeTour": "Bienvenue",
                 "connectFirstIntegration": "Réseaux",
                 "exploreContents": "Contenus"
             }

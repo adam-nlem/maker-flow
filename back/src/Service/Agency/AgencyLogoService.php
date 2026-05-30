@@ -20,10 +20,7 @@ class AgencyLogoService
         private readonly string $agencyUploadsRoot,
     ) {}
 
-    /**
-     * Stores an uploaded logo on disk, overwriting any existing one for this agency.
-     */
-    public function upload(Agency $agency, UploadedFile $file): string
+    public function validate(UploadedFile $file): void
     {
         if ($file->getSize() > self::MAX_FILE_SIZE) {
             throw new AgencyLogoInvalidException(FileInvalidReason::FileTooLarge);
@@ -32,7 +29,10 @@ class AgencyLogoService
         if ($file->getMimeType() !== self::ALLOWED_MIME_TYPE) {
             throw new AgencyLogoInvalidException(FileInvalidReason::InvalidMimeType);
         }
+    }
 
+    public function save(Agency $agency, UploadedFile $file): string
+    {
         $directory = $this->getDirectory($agency);
 
         if (!$this->filesystem->exists($directory)) {
@@ -41,23 +41,12 @@ class AgencyLogoService
 
         $file->move($directory, $this->getFilename($agency));
 
-        return $this->getPath($agency);
-    }
-
-    /**
-     * Returns the absolute path where this agency's logo lives on disk (whether or not the file exists).
-     */
-    public function getPath(Agency $agency): string
-    {
         return sprintf('%s/%s', $this->getDirectory($agency), $this->getFilename($agency));
     }
 
-    /**
-     * Returns the agency logo as a File object, or null when none is stored.
-     */
     public function getFile(Agency $agency): ?File
     {
-        $path = $this->getPath($agency);
+        $path = sprintf('%s/%s', $this->getDirectory($agency), $this->getFilename($agency));
 
         if (!file_exists($path)) {
             return null;

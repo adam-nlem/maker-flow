@@ -4,17 +4,18 @@ import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 
 export default function OnboardingCreateProjectStep() {
-    const setFocusedProjectUuid = useFocusProjectStore((s) => s.setFocusedProjectUuid)
-    const { advanceStep } = useAdvanceOnboardingStep()
+  const setFocusedProjectUuid = useFocusProjectStore((s) => s.setFocusedProjectUuid)
+  const { advanceStep } = useAdvanceOnboardingStep()
 
-    const handleProjectCreated = async (uuid: string) => {
-        setFocusedProjectUuid(uuid)
-        await advanceStep()
-    }
+  const handleProjectCreated = async (uuid: string) => {
+    setFocusedProjectUuid(uuid)
+    await advanceStep()
+  }
 
-    return (
-        <OnboardingStepLayout maxWidth="max-w-md">
-            <CreateProjectForm onProjectCreated={handleProjectCreated} buttonStyle="primary" />
-        </OnboardingStepLayout>
-    )
+  return (
+    <OnboardingStepLayout
+      maxWidth="max-w-md"
+      left={<CreateProjectForm onProjectCreated={handleProjectCreated} buttonStyle="primary" />}
+    />
+  )
 }

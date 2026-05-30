@@ -1,10 +1,9 @@
-import { BuildingOffice2Icon, FolderPlusIcon, HandRaisedIcon, LinkIcon, SparklesIcon, UserPlusIcon } from "@heroicons/react/24/outline"
+import { BuildingOffice2Icon, FolderPlusIcon, LinkIcon, SparklesIcon, UserPlusIcon } from "@heroicons/react/24/outline"
 import type { ComponentType, SVGProps } from "react"
 
 import { agencyHomePath, agencySettingsAgencyPath, agencySettingsProjectsPath, agencySettingsSubscriptionPath } from "~/routes/routePaths"
 
 export enum AgencyAdminOnboardingStep {
-    WelcomeTour = 'welcome_tour',
     CreateAgency = 'create_agency',
     CreateFirstProject = 'create_first_project',
     InviteFirstClient = 'invite_first_client',
@@ -13,7 +12,6 @@ export enum AgencyAdminOnboardingStep {
 }
 
 export const AGENCY_ADMIN_ONBOARDING_STEP_ORDER: AgencyAdminOnboardingStep[] = [
-    AgencyAdminOnboardingStep.WelcomeTour,
     AgencyAdminOnboardingStep.CreateAgency,
     AgencyAdminOnboardingStep.CreateFirstProject,
     AgencyAdminOnboardingStep.InviteFirstClient,
@@ -22,7 +20,6 @@ export const AGENCY_ADMIN_ONBOARDING_STEP_ORDER: AgencyAdminOnboardingStep[] = [
 ]
 
 export const agencyAdminOnboardingStepTranslationKeys: Record<AgencyAdminOnboardingStep, string> = {
-    [AgencyAdminOnboardingStep.WelcomeTour]: "enums:onboardingStep.admin.titles.welcomeTour",
     [AgencyAdminOnboardingStep.CreateAgency]: "enums:onboardingStep.admin.titles.createAgency",
     [AgencyAdminOnboardingStep.CreateFirstProject]: "enums:onboardingStep.admin.titles.createFirstProject",
     [AgencyAdminOnboardingStep.InviteFirstClient]: "enums:onboardingStep.admin.titles.inviteFirstClient",
@@ -31,7 +28,6 @@ export const agencyAdminOnboardingStepTranslationKeys: Record<AgencyAdminOnboard
 }
 
 export const agencyAdminOnboardingStepDescriptionKeys: Record<AgencyAdminOnboardingStep, string> = {
-    [AgencyAdminOnboardingStep.WelcomeTour]: "enums:onboardingStep.admin.descriptions.welcomeTour",
     [AgencyAdminOnboardingStep.CreateAgency]: "enums:onboardingStep.admin.descriptions.createAgency",
     [AgencyAdminOnboardingStep.CreateFirstProject]: "enums:onboardingStep.admin.descriptions.createFirstProject",
     [AgencyAdminOnboardingStep.InviteFirstClient]: "enums:onboardingStep.admin.descriptions.inviteFirstClient",
@@ -40,7 +36,6 @@ export const agencyAdminOnboardingStepDescriptionKeys: Record<AgencyAdminOnboard
 }
 
 export const agencyAdminOnboardingStepShortLabelKeys: Record<AgencyAdminOnboardingStep, string> = {
-    [AgencyAdminOnboardingStep.WelcomeTour]: "enums:onboardingStep.admin.shortLabels.welcomeTour",
     [AgencyAdminOnboardingStep.CreateAgency]: "enums:onboardingStep.admin.shortLabels.createAgency",
     [AgencyAdminOnboardingStep.CreateFirstProject]: "enums:onboardingStep.admin.shortLabels.createFirstProject",
     [AgencyAdminOnboardingStep.InviteFirstClient]: "enums:onboardingStep.admin.shortLabels.inviteFirstClient",
@@ -49,7 +44,6 @@ export const agencyAdminOnboardingStepShortLabelKeys: Record<AgencyAdminOnboardi
 }
 
 export const agencyAdminOnboardingStepToIcon: Record<AgencyAdminOnboardingStep, ComponentType<SVGProps<SVGSVGElement>>> = {
-    [AgencyAdminOnboardingStep.WelcomeTour]: HandRaisedIcon,
     [AgencyAdminOnboardingStep.CreateAgency]: BuildingOffice2Icon,
     [AgencyAdminOnboardingStep.CreateFirstProject]: FolderPlusIcon,
     [AgencyAdminOnboardingStep.InviteFirstClient]: UserPlusIcon,

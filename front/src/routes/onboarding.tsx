@@ -2,7 +2,6 @@ import { useEffect } from "react"
 import type { ReactNode } from "react"
 import { useNavigate } from "react-router-dom"
 
-import OnboardingWelcomeTourStep from "~/components/onboarding/OnboardingWelcomeTourStep"
 import OnboardingCreateAgencyStep from "~/components/onboarding/OnboardingCreateAgencyStep"
 import OnboardingCreateProjectStep from "~/components/onboarding/OnboardingCreateProjectStep"
 import OnboardingInviteFirstClientStep from "~/components/onboarding/OnboardingInviteFirstClientStep"
@@ -19,58 +18,55 @@ import { UserRole } from "~/models/enums/UserRole"
 import { homePath } from "~/routes/routePaths"
 
 const adminNodes: Record<AgencyAdminOnboardingStep, ReactNode> = {
-    [AgencyAdminOnboardingStep.WelcomeTour]: <OnboardingWelcomeTourStep />,
-    [AgencyAdminOnboardingStep.CreateAgency]: <OnboardingCreateAgencyStep />,
-    [AgencyAdminOnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
-    [AgencyAdminOnboardingStep.InviteFirstClient]: <OnboardingInviteFirstClientStep />,
-    [AgencyAdminOnboardingStep.ConnectFirstIntegration]: <OnboardingConnectIntegrationStep />,
-    [AgencyAdminOnboardingStep.ShowSubscriptions]: <OnboardingSubscriptionStep />,
+  [AgencyAdminOnboardingStep.CreateAgency]: <OnboardingCreateAgencyStep />,
+  [AgencyAdminOnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
+  [AgencyAdminOnboardingStep.InviteFirstClient]: <OnboardingInviteFirstClientStep />,
+  [AgencyAdminOnboardingStep.ConnectFirstIntegration]: <OnboardingConnectIntegrationStep />,
+  [AgencyAdminOnboardingStep.ShowSubscriptions]: <OnboardingSubscriptionStep />,
 }
 
 const collaboratorNodes: Record<AgencyCollaboratorOnboardingStep, ReactNode> = {
-    [AgencyCollaboratorOnboardingStep.WelcomeTour]: <OnboardingWelcomeTourStep />,
-    [AgencyCollaboratorOnboardingStep.ExploreProjects]: <OnboardingExploreProjectsStep />,
-    [AgencyCollaboratorOnboardingStep.ExploreContents]: <OnboardingExploreContentsStep />,
+  [AgencyCollaboratorOnboardingStep.ExploreProjects]: <OnboardingExploreProjectsStep />,
+  [AgencyCollaboratorOnboardingStep.ExploreContents]: <OnboardingExploreContentsStep />,
 }
 
 const clientNodes: Record<ClientOnboardingStep, ReactNode> = {
-    [ClientOnboardingStep.WelcomeTour]: <OnboardingWelcomeTourStep />,
-    [ClientOnboardingStep.ConnectFirstIntegration]: <OnboardingConnectIntegrationStep />,
-    [ClientOnboardingStep.ExploreContents]: <OnboardingExploreContentsStep />,
+  [ClientOnboardingStep.ConnectFirstIntegration]: <OnboardingConnectIntegrationStep />,
+  [ClientOnboardingStep.ExploreContents]: <OnboardingExploreContentsStep />,
 }
 
 function resolveStepNode(role: UserRole | null, step: string): ReactNode {
-    if (role === UserRole.Client) {
-        return clientNodes[step as ClientOnboardingStep] ?? null
-    }
-    if (role === UserRole.Editor || role === UserRole.Viewer) {
-        return collaboratorNodes[step as AgencyCollaboratorOnboardingStep] ?? null
-    }
-    return adminNodes[step as AgencyAdminOnboardingStep] ?? null
+  if (role === UserRole.Client) {
+    return clientNodes[step as ClientOnboardingStep] ?? null
+  }
+  if (role === UserRole.Editor || role === UserRole.Viewer) {
+    return collaboratorNodes[step as AgencyCollaboratorOnboardingStep] ?? null
+  }
+  return adminNodes[step as AgencyAdminOnboardingStep] ?? null
 }
 
 export default function OnboardingPage() {
-    const navigate = useNavigate()
-    const { isAuthLoading, isAuthenticated, currentOnboardingStep } = useOnboardingFlow()
-    const { user } = useCurrentUser()
+  const navigate = useNavigate()
+  const { isAuthLoading, isAuthenticated, currentOnboardingStep } = useOnboardingFlow()
+  const { user } = useCurrentUser()
 
-    useEffect(() => {
-        if (!isAuthLoading && !isAuthenticated) {
-            navigate(homePath, { replace: true })
-        }
-    }, [isAuthLoading, isAuthenticated, navigate])
-
-    if (isAuthLoading || !isAuthenticated) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            </div>
-        )
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      navigate(homePath, { replace: true })
     }
+  }, [isAuthLoading, isAuthenticated, navigate])
 
+  if (isAuthLoading || !isAuthenticated) {
     return (
-        <div className="bg-clear bg-dot-pattern h-screen relative overflow-y-auto">
-            {resolveStepNode(user?.displayRole ?? null, currentOnboardingStep)}
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
     )
+  }
+
+  return (
+    <div className="bg-clear bg-dot-pattern h-screen relative overflow-y-auto">
+      {resolveStepNode(user?.displayRole ?? null, currentOnboardingStep)}
+    </div>
+  )
 }

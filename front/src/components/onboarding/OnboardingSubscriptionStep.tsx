@@ -15,7 +15,10 @@ export default function OnboardingSubscriptionStep() {
     const { advanceStep } = useAdvanceOnboardingStep()
 
     return (
-        <OnboardingStepLayout maxWidth="max-w-4xl">
+        <OnboardingStepLayout
+            maxWidth="max-w-4xl"
+            left={
+            <>
             <SubscriptionOverview
                 checkoutRedirectPath={onboardingPath}
                 subscribedView={(subscription) => (
@@ -40,6 +43,8 @@ export default function OnboardingSubscriptionStep() {
             <SimpleTextButton onClick={advanceStep}>
                 {t("onboarding:subscriptionStep.skip")}
             </SimpleTextButton>
-        </OnboardingStepLayout>
+            </>
+            }
+        />
     )
 }

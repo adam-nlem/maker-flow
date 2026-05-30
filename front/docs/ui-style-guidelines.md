@@ -795,7 +795,7 @@ Two rendering modes: the default dashed-border + icon + hint variant, or a custo
 | `className` | `string` | `""` | Sizing class applied to the outer wrapper. |
 | `children` | `(state: { isDragActive: boolean }) => ReactNode` | — | Optional render prop. When provided, replaces the dashed-border default UI; the function receives `isDragActive` so children can react to drag-over (e.g. force a hover overlay visible). |
 
-**Default rendering (agency logo empty state, see `AgencyLogoDropzone` in `front/src/components/agency/AgencyLogo.tsx`):**
+**Default rendering (agency logo empty state, see `AgencyLogoUpload` in `front/src/components/agency/AgencyLogoUpload.tsx`):**
 
 ```tsx
 <FileUpload
@@ -809,7 +809,7 @@ Two rendering modes: the default dashed-border + icon + hint variant, or a custo
 />
 ```
 
-**Custom rendering (agency logo with an existing image, see `AgencyLogoEditableImage` in the same file):**
+**Custom rendering (agency logo with an existing image, see the same `editable` branch — render-prop case):**
 
 ```tsx
 <FileUpload
