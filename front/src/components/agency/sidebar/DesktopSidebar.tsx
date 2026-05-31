@@ -1,17 +1,15 @@
-import { PencilSquareIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { PlusIcon } from "@heroicons/react/24/outline";
 import { useListPaginatedProjects } from "~/hooks/api/projects/useListPaginatedProjects";
 import { useShowCurrentSubscription } from "~/hooks/api/subscriptions/useShowCurrentSubscription";
 import { useListPlans } from "~/hooks/api/subscriptions/useListPlans";
 import { useCurrentAgency } from "~/hooks/api/agency/useCurrentAgency";
 import useSelectFocusedProject from "~/hooks/api/projects/useSelectFocusedProject";
 import CreateProjectModal from "~/components/agency/projects/CreateProjectModal";
-import ProjectTile from "~/components/agency/projects/ProjectTile";
 import IconRailTile from "~/components/sidebar/IconRailTile";
-import IdentityTile from "~/components/sidebar/IdentityTile";
+import CurrentAgencyTile from "~/components/sidebar/CurrentAgencyTile";
+import CurrentProjectTile from "~/components/sidebar/CurrentProjectTile";
 import { useLocation, useNavigate } from "react-router-dom";
 import Shimmer from "~/components/ui/Shimmer";
-import SelectDropdown from "~/components/ui/SelectDropdown"
-import type { Project } from "~/models/Project"
 import { useCreateProjectModalStore } from "~/stores/project/createProjectModalStore";
 import UpdateProjectModal from "~/components/agency/projects/UpdateProjectModal";
 import { useUpdateProjectStore } from "~/stores/project/updateProjectStore";
@@ -56,28 +54,14 @@ export default function DesktopSidebar() {
       {isLoadingProjects ? (
         <Shimmer width="w-9" height="h-9" radius="rounded-lg" />
       ) : focusedProject ? (
-        <SelectDropdown<Project>
-          items={projects}
-          selectedItemId={focusedProject.uuid}
-          getItemId={(project) => project.uuid}
-          onSelect={(project) => setFocusedProjectUuid(project.uuid)}
-          onClickCreateButton={isAtProjectLimit ? undefined : () => setIsCreateProjectModalOpen(!isCreateProjectModalOpen)}
-          createButtonLabel={t("sidebar:createProject")}
-          renderTrigger={({ onClick }) => (
-            <ProjectTile project={focusedProject} onClick={onClick} compact />
-          )}
-          renderItem={({ item, isSelected, onSelect }) => (
-            <ProjectTile
-              project={item}
-              isSelected={isSelected}
-              showCreatedAt={true}
-              onHoverRightIcon={<PencilSquareIcon className="size-3.5 text-muted-2 -mb-0.5" strokeWidth={2} onClick={(e) => {
-                e.stopPropagation()
-                setUpdatingProjectUuid(item.uuid)
-              }} />}
-              onClick={onSelect}
-            />
-          )}
+        <CurrentProjectTile
+          project={focusedProject}
+          projects={projects}
+          onSelectProject={setFocusedProjectUuid}
+          onCreateProject={() => setIsCreateProjectModalOpen(true)}
+          onEditProject={() => setUpdatingProjectUuid(focusedProject.uuid)}
+          canCreateProject={!isAtProjectLimit}
+          compact
         />
       ) : (
         <button
@@ -122,7 +106,7 @@ export default function DesktopSidebar() {
     </>
   );
 
-  const identityTile = agency ? <IdentityTile agency={agency} compact /> : null;
+  const identityTile = agency ? <CurrentAgencyTile agency={agency} compact /> : null;
 
   return (
     <>
@@ -133,7 +117,7 @@ export default function DesktopSidebar() {
         onProjectCreated={() => setIsCreateProjectModalOpen(false)}
         onClose={() => setIsCreateProjectModalOpen(false)}
       />
-  
+
       {updatingProjectUuid && <UpdateProjectModal
         project={projects.find((project) => project.uuid === updatingProjectUuid)}
         showModal

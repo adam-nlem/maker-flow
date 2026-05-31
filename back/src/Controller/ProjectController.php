@@ -76,8 +76,11 @@ final class ProjectController extends AbstractController
 
     #[Route('/{projectUuid}', name: 'api_projects_update', methods: ['PATCH'])]
     #[IsGranted(UserRole::Editor->value)]
-    public function update(string $projectUuid, UpdateProjectRequestDTO $dto, ProjectRepository $projectRepository): JsonResponse
-    {
+    public function update(
+        string $projectUuid,
+        UpdateProjectRequestDTO $dto,
+        ProjectRepository $projectRepository
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 

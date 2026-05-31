@@ -10,7 +10,7 @@ import { projectQueryKeys } from "./projectQueryKeys";
 
 interface CreateProjectData {
   name: string;
-  description: string;
+  description?: string;
   types: ProjectType[];
   logo: File | null;
 }
@@ -20,10 +20,12 @@ export function useCreateProject() {
   const [validationErrorKey, setValidationErrorKey] = useState<string | null>(null);
 
   const mutation = useMutation({
-    mutationFn: async (data: { name: string; description: string; types: ProjectType[]; logo: File }) => {
+    mutationFn: async (data: { name: string; description?: string; types: ProjectType[]; logo: File }) => {
       const formData = new FormData();
       formData.append("name", data.name);
-      formData.append("description", data.description);
+      if (data.description && data.description.trim()) {
+        formData.append("description", data.description.trim());
+      }
       data.types.forEach((type) => formData.append("types[]", type));
       formData.append("logo", data.logo);
 

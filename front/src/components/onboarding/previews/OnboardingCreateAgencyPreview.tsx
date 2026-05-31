@@ -1,4 +1,4 @@
-import IdentityPopoverView from "~/components/sidebar/IdentityPopoverView";
+import CurrentAgencyPopoverView from "~/components/sidebar/CurrentAgencyPopoverView";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import OnboardingPreviewLayout from "../OnboardingPreviewLayout";
 import { useOnboardingStore } from "~/stores/onboarding/onboardingStore";
@@ -11,7 +11,7 @@ export default function OnboardingCreateAgencyPreview() {
   return (
     <OnboardingPreviewLayout>
       <div className="p-4">
-        <IdentityPopoverView name={agencyName} logoUrl={agencyLogoPreviewUrl} user={user} />
+        <CurrentAgencyPopoverView name={agencyName} logoUrl={agencyLogoPreviewUrl} user={user} />
       </div>
     </OnboardingPreviewLayout>
   )

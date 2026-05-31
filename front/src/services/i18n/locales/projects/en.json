@@ -30,5 +30,14 @@
   },
   "tile": {
     "createdAt": "Created on {{date}}"
+  },
+  "popover": {
+    "sections": {
+      "switchProject": "Switch project"
+    },
+    "actions": {
+      "edit": "Edit project",
+      "create": "Create project"
+    }
   }
 }

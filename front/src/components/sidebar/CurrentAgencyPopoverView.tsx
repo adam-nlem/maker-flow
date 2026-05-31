@@ -8,7 +8,7 @@ import { userRoleTranslationKeys } from "~/models/enums/UserRole";
 import type { Agency } from "~/models/Agency";
 import type { User } from "~/models/User";
 
-interface IdentityPopoverViewProps extends React.HTMLAttributes<HTMLDivElement> {
+interface CurrentAgencyPopoverViewProps extends React.HTMLAttributes<HTMLDivElement> {
   name?: string | null;
   agency?: Agency;
   logoUrl?: string | null;
@@ -18,7 +18,7 @@ interface IdentityPopoverViewProps extends React.HTMLAttributes<HTMLDivElement> 
   isLoggingOut?: boolean;
 }
 
-const IdentityPopoverView = forwardRef<HTMLDivElement, IdentityPopoverViewProps>(
+const CurrentAgencyPopoverView = forwardRef<HTMLDivElement, CurrentAgencyPopoverViewProps>(
   ({ name, agency, logoUrl, user, onSettings, onLogout, isLoggingOut = false, className = "", ...props }, ref) => {
     const { t } = useTranslation();
     return (
@@ -81,4 +81,4 @@ const IdentityPopoverView = forwardRef<HTMLDivElement, IdentityPopoverViewProps>
   }
 );
 
-export default IdentityPopoverView;
+export default CurrentAgencyPopoverView;
