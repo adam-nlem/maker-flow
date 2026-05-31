@@ -2,7 +2,9 @@
 
 ## Overview
 
-The onboarding system tracks new user progress through a short, **role-aware** setup flow. The same `onboarding` row backs three distinct step lists — one per persona — so the service picks the applicable steps based on the user's role. New users receive 3 free credits at registration to enable AI features once they reach the agency shell.
+The onboarding system tracks new user progress through a short **role-aware** setup flow. A **single unified enum** holds every step value; the service maps each role to the subset of steps it must complete. Roles with no applicable steps (Editor, Viewer) get their onboarding **auto-dismissed at creation** so they never enter the wizard.
+
+New users receive 3 free credits at registration to unlock AI features once they reach the agency shell.
 
 ## Entity: `Onboarding`
 
@@ -14,7 +16,7 @@ The onboarding system tracks new user progress through a short, **role-aware** s
 | uuid | GUID | Public ID |
 | user_id | FK → user | Unique (one per user), CASCADE delete |
 | completed_steps | JSON | String array of step values: `["create_agency", "create_first_project"]` |
-| dismissed_at | datetime (nullable) | Set when user dismisses or all applicable steps are complete |
+| dismissed_at | datetime (nullable) | Set when all applicable steps are complete, or at creation for roles without steps |
 | created_at | datetime | UTC |
 | updated_at | datetime | UTC, PreUpdate lifecycle |
 
@@ -22,17 +24,9 @@ The onboarding system tracks new user progress through a short, **role-aware** s
 
 **Serialization groups:** `api_onboarding_show`, `api_onboarding_complete_step`, `api_onboarding_dismiss`
 
-## Role-aware step enums
+## Unified enum: `OnboardingStep`
 
-The user's `displayRole` selects which enum applies:
-
-| Role | Enum | File |
-|------|------|------|
-| `ROLE_ADMIN` (and default) | `AgencyAdminOnboardingStep` | `src/Entity/Enum/AgencyAdminOnboardingStep.php` |
-| `ROLE_EDITOR`, `ROLE_VIEWER` | `AgencyCollaboratorOnboardingStep` | `src/Entity/Enum/AgencyCollaboratorOnboardingStep.php` |
-| `ROLE_CLIENT` | `ClientOnboardingStep` | `src/Entity/Enum/ClientOnboardingStep.php` |
-
-### `AgencyAdminOnboardingStep` (5 steps)
+**File:** `src/Entity/Enum/OnboardingStep.php`
 
 | Case | Value |
 |------|-------|
@@ -41,45 +35,44 @@ The user's `displayRole` selects which enum applies:
 | InviteFirstClient | `invite_first_client` |
 | ConnectFirstIntegration | `connect_first_integration` |
 | ShowSubscriptions | `show_subscriptions` |
-
-`InviteFirstCollaborator` is **not** part of onboarding — collaborator seat counts depend on the chosen subscription tier (last step), so the invite lives only in `/agency/settings/collaborators`.
-
-### `AgencyCollaboratorOnboardingStep` (2 steps)
-
-| Case | Value |
-|------|-------|
-| ExploreProjects | `explore_projects` |
 | ExploreContents | `explore_contents` |
 
-### `ClientOnboardingStep` (2 steps)
+`connect_first_integration` is shared by the Admin and Client flows — one value, two consumers.
 
-| Case | Value |
-|------|-------|
-| ConnectFirstIntegration | `connect_first_integration` |
-| ExploreContents | `explore_contents` |
+## Role → step mapping
 
-Step values that represent the same concept across roles (e.g., `connect_first_integration`, `explore_contents`) are intentionally shared so the storage stays flat.
+`OnboardingService::getApplicableStepValues(User): string[]`:
+
+| Role | Applicable steps |
+|------|------------------|
+| `ROLE_ADMIN` | CreateAgency → CreateFirstProject → InviteFirstClient → ConnectFirstIntegration → ShowSubscriptions |
+| `ROLE_CLIENT` | ConnectFirstIntegration → ExploreContents |
+| `ROLE_EDITOR`, `ROLE_VIEWER`, default | *(empty — onboarding auto-dismissed at creation)* |
 
 ## Service: `OnboardingService`
 
 **File:** `src/Service/OnboardingService.php`
 
-- `getOrCreateOnboarding(User)` — lazy-creates the row on first access.
-- `getApplicableStepValues(User): string[]` — returns the step values of the enum matching the user's role.
+- `getOrCreateOnboarding(User)` — lazy-creates the row on first access. If `getApplicableStepValues($user)` is empty, sets `dismissedAt` immediately so the user is never sent to `/onboarding`.
+- `getApplicableStepValues(User): string[]` — returns the applicable step values for the user's role.
 - `completeStep(Onboarding, string $stepValue, User)` — validates `$stepValue` is in `getApplicableStepValues($user)` (else throws `InvalidOnboardingStepException`), appends it, and auto-dismisses when every applicable step is completed.
-- `dismiss(Onboarding)` — manual dismiss; sets `dismissedAt`.
+- `dismiss(Onboarding)` — kept for a future "skip-all" CTA; not used by current flows.
 
 ## Exception
 
-`InvalidOnboardingStepException` (full code **32001**, HTTP 400) — thrown when the submitted step value is not applicable for the current user's role. Domain `Onboarding = 32` was added to `DomainCode`.
+`InvalidOnboardingStepException` (HTTP 400) — thrown when the submitted step value is not applicable for the current user's role. Domain `Onboarding = 32` in `DomainCode`.
 
 ## API Endpoints
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/onboarding` | Returns onboarding state (auto-creates if not exists) |
+| GET | `/api/onboarding` | Returns onboarding state (auto-creates if not exists, auto-dismisses for roles with no steps) |
 | POST | `/api/onboarding/complete-step` | Body: `{"step": "<step_value>"}`; rejects cross-role values |
-| POST | `/api/onboarding/dismiss` | Marks onboarding as complete |
+| POST | `/api/onboarding/dismiss` | Dormant endpoint, reserved for a future "skip-all" CTA |
+
+## Migration
+
+`back/migrations/Version20260531000000.php` retroactively dismisses onboarding for any existing Editor/Viewer with `dismissed_at IS NULL`, in line with the new role mapping.
 
 ## Welcome Credits
 
@@ -88,9 +81,7 @@ New users receive **3 free credits** at registration via `CreditService::addWelc
 ## Key Files
 
 - `src/Entity/Onboarding.php`
-- `src/Entity/Enum/AgencyAdminOnboardingStep.php`
-- `src/Entity/Enum/AgencyCollaboratorOnboardingStep.php`
-- `src/Entity/Enum/ClientOnboardingStep.php`
+- `src/Entity/Enum/OnboardingStep.php`
 - `src/Repository/OnboardingRepository.php`
 - `src/Service/OnboardingService.php`
 - `src/Exception/Onboarding/OnboardingException.php`
@@ -98,3 +89,4 @@ New users receive **3 free credits** at registration via `CreditService::addWelc
 - `src/Controller/OnboardingController.php`
 - `src/DTO/Request/Onboarding/CompleteOnboardingStepRequestDTO.php`
 - `src/Service/Credit/CreditService.php` (addWelcomeCredits)
+- `migrations/Version20260531000000.php` (auto-dismiss backfill for Editor/Viewer)

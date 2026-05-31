@@ -1,9 +1,4 @@
 {
-  "exploreProjects": {
-    "body": "Tous les projets de l'agence sont accessibles depuis le menu de gauche. Sélectionnez un projet pour voir ses réseaux et ses contenus.",
-    "cta": "Voir les projets",
-    "skip": "Plus tard"
-  },
   "exploreContents": {
     "body": "Retrouvez ici tous les contenus organisés par groupe. Cliquez sur un contenu pour voir ses détails.",
     "cta": "Voir les contenus",

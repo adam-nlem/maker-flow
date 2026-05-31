@@ -9,7 +9,7 @@ import type { Agency } from "~/models/Agency";
 import type { User } from "~/models/User";
 
 interface IdentityPopoverViewProps extends React.HTMLAttributes<HTMLDivElement> {
-  name: string;
+  name?: string | null;
   agency?: Agency;
   logoUrl?: string | null;
   user?: User | null;
@@ -31,7 +31,7 @@ const IdentityPopoverView = forwardRef<HTMLDivElement, IdentityPopoverViewProps>
 
         <div className="px-5 -mt-10">
           <div className="inline-block rounded-md bg-clear p-1">
-            <AgencyLogo agency={agency} logoUrl={logoUrl} className="size-16" />
+            <AgencyLogo agencyName={name} agencyUuid={agency?.uuid} logoUrl={logoUrl} className="size-16" />
           </div>
         </div>
 

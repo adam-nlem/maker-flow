@@ -1,9 +1,4 @@
 {
-  "exploreProjects": {
-    "body": "Every project of the agency is accessible from the left menu. Select a project to see its accounts and contents.",
-    "cta": "View projects",
-    "skip": "Later"
-  },
   "exploreContents": {
     "body": "Find all contents organized by group here. Click a content to see its details.",
     "cta": "View contents",

@@ -2,9 +2,7 @@
 
 namespace App\Service;
 
-use App\Entity\Enum\AgencyAdminOnboardingStep;
-use App\Entity\Enum\AgencyCollaboratorOnboardingStep;
-use App\Entity\Enum\ClientOnboardingStep;
+use App\Entity\Enum\OnboardingStep;
 use App\Entity\Enum\UserRole;
 use App\Entity\Onboarding;
 use App\Entity\User;
@@ -22,11 +20,18 @@ class OnboardingService
     {
         $onboarding = $this->onboardingRepository->getByUser($user);
 
-        if ($onboarding === null) {
-            $onboarding = (new Onboarding())
-                ->setUser($user);
-            $this->onboardingRepository->save($onboarding, true);
+        if ($onboarding !== null) {
+            return $onboarding;
         }
+
+        $onboarding = (new Onboarding())->setUser($user);
+
+        // Auto dismiss when no applicable values
+        if ($this->getApplicableStepValues($user) === []) {
+            $onboarding->setDismissedAt(DateHelper::createUtcDateTimeImmutable());
+        }
+
+        $this->onboardingRepository->save($onboarding, true);
 
         return $onboarding;
     }
@@ -54,6 +59,7 @@ class OnboardingService
         return $onboarding;
     }
 
+    // Kept for future "skip-all" CTA; not used by current flows.
     public function dismiss(Onboarding $onboarding): Onboarding
     {
         $onboarding->setDismissedAt(DateHelper::createUtcDateTimeImmutable());
@@ -68,18 +74,23 @@ class OnboardingService
     public function getApplicableStepValues(User $user): array
     {
         if ($user->hasRole(UserRole::Client)) {
-            return array_map(fn (ClientOnboardingStep $step) => $step->value, ClientOnboardingStep::cases());
+            return [
+                OnboardingStep::ConnectFirstIntegration->value,
+                OnboardingStep::ExploreContents->value,
+            ];
         }
 
         if ($user->hasRole(UserRole::Admin)) {
-            return array_map(fn (AgencyAdminOnboardingStep $step) => $step->value, AgencyAdminOnboardingStep::cases());
+            return [
+                OnboardingStep::CreateAgency->value,
+                OnboardingStep::CreateFirstProject->value,
+                OnboardingStep::InviteFirstClient->value,
+                OnboardingStep::ConnectFirstIntegration->value,
+                OnboardingStep::ShowSubscriptions->value,
+            ];
         }
 
-        if ($user->hasRole(UserRole::Editor) || $user->hasRole(UserRole::Viewer)) {
-            return array_map(fn (AgencyCollaboratorOnboardingStep $step) => $step->value, AgencyCollaboratorOnboardingStep::cases());
-        }
-
-        return array_map(fn (AgencyAdminOnboardingStep $step) => $step->value, AgencyAdminOnboardingStep::cases());
+        return [];
     }
 
     private function areAllStepsCompleted(Onboarding $onboarding, User $user): bool

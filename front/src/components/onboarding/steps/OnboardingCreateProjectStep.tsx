@@ -14,8 +14,7 @@ export default function OnboardingCreateProjectStep() {
 
   return (
     <OnboardingStepLayout
-      maxWidth="max-w-md"
-      left={<CreateProjectForm onProjectCreated={handleProjectCreated} buttonStyle="primary" />}
+      children={<CreateProjectForm onProjectCreated={handleProjectCreated} buttonStyle="primary" />}
     />
   )
 }

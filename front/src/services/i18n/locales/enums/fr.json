@@ -109,56 +109,21 @@
         "invalidPayload": "Les données de la requête sont invalides."
     },
     "onboardingStep": {
-        "admin": {
-            "titles": {
-                "createAgency": "Créez votre agence",
-                "createFirstProject": "Créez votre premier projet",
-                "inviteFirstClient": "Invitez votre premier client",
-                "connectFirstIntegration": "Connectez vos réseaux sociaux",
-                "showSubscriptions": "Découvrez nos offres"
-            },
-            "descriptions": {
-                "createAgency": "Renseignez le nom, la couleur de marque et les coordonnées de votre agence.",
-                "createFirstProject": "Un projet représente un client ou une marque dont vous gérez les contenus.",
-                "inviteFirstClient": "Donnez à votre client un accès en lecture seule à son tableau de bord.",
-                "connectFirstIntegration": "Connectez les comptes sociaux du projet pour suivre les performances.",
-                "showSubscriptions": "Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités."
-            },
-            "shortLabels": {
-                "createAgency": "Agence",
-                "createFirstProject": "Projet",
-                "inviteFirstClient": "Client",
-                "connectFirstIntegration": "Réseau social",
-                "showSubscriptions": "Abonnement"
-            }
+        "titles": {
+            "createAgency": "Créez votre agence",
+            "createFirstProject": "Créez votre premier projet",
+            "inviteFirstClient": "Invitez votre premier client",
+            "connectFirstIntegration": "Connectez vos réseaux sociaux",
+            "showSubscriptions": "Découvrez nos offres",
+            "exploreContents": "Vos contenus"
         },
-        "collaborator": {
-            "titles": {
-                "exploreProjects": "Découvrez les projets",
-                "exploreContents": "Découvrez les contenus"
-            },
-            "descriptions": {
-                "exploreProjects": "Retrouvez tous les projets de l'agence et leurs réseaux sociaux.",
-                "exploreContents": "Centralisez et organisez les contenus de chaque projet."
-            },
-            "shortLabels": {
-                "exploreProjects": "Projets",
-                "exploreContents": "Contenus"
-            }
-        },
-        "client": {
-            "titles": {
-                "connectFirstIntegration": "Connectez vos réseaux",
-                "exploreContents": "Vos contenus"
-            },
-            "descriptions": {
-                "connectFirstIntegration": "Connectez vos comptes pour que votre agence puisse suivre les performances.",
-                "exploreContents": "Retrouvez tous vos contenus partagés par votre agence."
-            },
-            "shortLabels": {
-                "connectFirstIntegration": "Réseaux",
-                "exploreContents": "Contenus"
-            }
+        "descriptions": {
+            "createAgency": "Renseignez le nom, la couleur de marque et les coordonnées de votre agence.",
+            "createFirstProject": "Un projet représente un client ou une marque dont vous gérez les contenus.",
+            "inviteFirstClient": "Donnez à votre client un accès en lecture seule à son tableau de bord.",
+            "connectFirstIntegration": "Connectez les comptes sociaux du projet pour suivre les performances.",
+            "showSubscriptions": "Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités.",
+            "exploreContents": "Retrouvez tous vos contenus partagés par votre agence."
         }
     },
     "openingStyle": {

@@ -1,72 +1,38 @@
-import { ChevronRightIcon } from "@heroicons/react/24/solid"
 import { useTranslation } from "react-i18next"
 import { useIsDesktop } from "~/hooks/useIsDesktop"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 
 export default function OnboardingProgressBar() {
-    const { t } = useTranslation()
-    const { onboarding, currentOnboardingStep, currentStep, totalSteps, flowConfig } = useOnboardingFlow()
-    const isDesktop = useIsDesktop()
+  const { currentStepIndex: currentStep, totalSteps, flowConfig } = useOnboardingFlow()
 
-    const steps = flowConfig.order
-    const iconMap = flowConfig.icons
-    const labelMap = flowConfig.shortLabelKeys
+  const pastStepNumbers = Array.from({ length: currentStep }, (_, i) => i + 1)
+  const futureStepNumbers = Array.from(
+    { length: totalSteps - currentStep - 1 },
+    (_, i) => currentStep + 2 + i,
+  )
 
-    const isCompleted = (step: string) => onboarding?.isStepCompleted(step) ?? false
-    const isCurrent = (step: string) => step === currentOnboardingStep
-
-    const percentage = Math.round(((currentStep + 1) / totalSteps) * 100)
-    const currentStepKey = steps[currentStep]
-
-    if (!isDesktop) {
-        return (
-            <div className="flex flex-col gap-1 w-full">
-                <div className="flex items-center justify-between">
-                    <span className="text-body-xs text-muted-2 uppercase">
-                        {t("onboarding:progress.stepCount", { current: currentStep + 1, total: totalSteps })}
-                    </span>
-                    <span className="text-body-xs text-muted-2">
-                        {percentage}%
-                    </span>
-                </div>
-                <span className="text-body-sm text-dark font-semibold">
-                    {t(labelMap[currentStepKey])}
-                </span>
-                <div className="h-1.5 w-full bg-pale-gray-2 rounded-full">
-                    <div
-                        className="h-full bg-primary rounded-full transition-all duration-300"
-                        style={{ width: `${percentage}%` }}
-                    />
-                </div>
-            </div>
-        )
-    }
-
-    return (
-        <div className="flex items-center gap-2">
-            {steps.map((step, index) => {
-                const completed = isCompleted(step)
-                const current = isCurrent(step)
-                const Icon = iconMap[step]
-
-                return (
-                    <div key={step} className="flex items-center gap-2">
-                        {index > 0 && (
-                            <ChevronRightIcon className="size-4 text-muted-2 shrink-0" />
-                        )}
-                        <div className="flex flex-col gap-1">
-
-                            <div className="flex items-center gap-1.5 shrink-0">
-                                <Icon className={`size-5 shrink-0 ${completed ? 'text-primary' : 'text-muted-2'}`} />
-                                <span className={`text-body-xs whitespace-nowrap ${current ? 'text-dark' : completed ? 'text-dark' : 'text-muted-2'}`}>
-                                    {t(labelMap[step])}
-                                </span>
-                            </div>
-                        </div>
-
-                    </div>
-                )
-            })}
+  return (
+    <div className="flex items-center gap-3 w-full">
+      <div className="flex items-center gap-2 shrink-0">
+        {pastStepNumbers.map((number) => (
+          stepNumber(number, "bg-pale-gray-2", "text-clear")
+        ))}
+        {stepNumber(currentStep + 1, "bg-primary", "text-clear")}
+      </div>
+      <div className="h-px flex-1 bg-pale-gray-2" />
+      {futureStepNumbers.length > 0 && (
+        <div className="flex items-center gap-2 shrink-0">
+          {futureStepNumbers.map((number) => (
+            stepNumber(number, "bg-dark", "text-clear")))}
         </div>
-    )
+      )}
+    </div>
+  )
+
+  function stepNumber(number: number, bgClassName: string, textClassName: string) {
+    return <div key={number} className={`${bgClassName} ${textClassName} flex items-center justify-center size-7 rounded-md text-sm shrink-0`} >
+      {number}
+    </div >
+
+  }
 }

@@ -3,14 +3,15 @@ import { Agency } from "~/models/Agency";
 import Shimmer from "~/components/ui/Shimmer";
 
 interface AgencyLogoProps {
-  agency?: Agency;
+  agencyUuid?: string | null,
+  agencyName?: string | null,
   logoUrl?: string | null;
   className?: string;
 }
 
-export default function AgencyLogo({ agency, logoUrl: logoUrlProp, className = "" }: AgencyLogoProps) {
+export default function AgencyLogo({ agencyUuid, agencyName, logoUrl: logoUrlProp, className = "" }: AgencyLogoProps) {
   const controlled = logoUrlProp !== undefined;
-  const { logoUrl: fetchedLogoUrl, isLoading } = useShowAgencyLogo(controlled ? undefined : agency?.uuid);
+  const { logoUrl: fetchedLogoUrl, isLoading } = useShowAgencyLogo(controlled ? undefined : agencyUuid!);
   const logoUrl = controlled ? logoUrlProp : fetchedLogoUrl;
 
   if (!controlled && isLoading) {
@@ -29,15 +30,15 @@ export default function AgencyLogo({ agency, logoUrl: logoUrlProp, className = "
     );
   }
 
-  if (agency) {
-    return <AgencyLogoInitial agency={agency} className={className} />;
+  if (agencyName) {
+    return <AgencyLogoInitial name={agencyName} className={className} />;
   }
 
   return <div className={`rounded-md bg-pale-gray-2 ${className}`} />;
 }
 
-function AgencyLogoInitial({ agency, className }: { agency: Agency; className: string }) {
-  const initial = agency.name.trim().charAt(0).toUpperCase();
+function AgencyLogoInitial({ name, className }: { name: string; className: string }) {
+  const initial = name.trim().charAt(0).toUpperCase();
 
   return (
     <div className={`flex items-center justify-center rounded-md bg-pale-gray-2 text-muted-2 ${className}`}>
