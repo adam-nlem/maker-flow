@@ -9,6 +9,7 @@ interface FileUploadBaseProps {
   icon?: ComponentType<SVGProps<SVGSVGElement>>;
   isPending?: boolean;
   className?: string;
+  children?: (state: { isDragActive: boolean }) => ReactNode;
 }
 
 type FileUploadProps = FileUploadBaseProps & (
@@ -28,6 +29,7 @@ export default function FileUpload(props: FileUploadProps) {
     icon: Icon = ArrowUpTrayIcon,
     isPending = false,
     className = "",
+    children,
   } = props;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragActive, setIsDragActive] = useState(false);
@@ -95,9 +97,13 @@ export default function FileUpload(props: FileUploadProps) {
     <div className={`flex flex-col gap-2 ${className}`}>
       <button
         {...buttonProps}
-        className={`${baseButtonClasses} ${DEFAULT_BUTTON_CLASSES} ${isDragActive ? DEFAULT_BUTTON_DRAGGING : DEFAULT_BUTTON_IDLE}`}
+        className={children
+          ? baseButtonClasses
+          : `${baseButtonClasses} ${DEFAULT_BUTTON_CLASSES} ${isDragActive ? DEFAULT_BUTTON_DRAGGING : DEFAULT_BUTTON_IDLE}`}
       >
-        {previewUrl ? (<><img src={previewUrl} alt="" className="w-30 rounded-md object-cover" />
+        {children ? (
+          children({ isDragActive })
+        ) : previewUrl ? (<><img src={previewUrl} alt="" className="w-30 rounded-md object-cover" />
           <p className="text-sm text-muted-2">Your agency logo has been uploaded!</p>
         </>) :
           (<>

@@ -1,9 +1,7 @@
-import { useTranslation } from "react-i18next"
-import { useIsDesktop } from "~/hooks/useIsDesktop"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 
 export default function OnboardingProgressBar() {
-  const { currentStepIndex: currentStep, totalSteps, flowConfig } = useOnboardingFlow()
+  const { currentStepIndex: currentStep, totalSteps } = useOnboardingFlow()
 
   const pastStepNumbers = Array.from({ length: currentStep }, (_, i) => i + 1)
   const futureStepNumbers = Array.from(

@@ -2,7 +2,6 @@ import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useIsDesktop } from "~/hooks/useIsDesktop";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
-import { SidePanel } from "~/components/ui/SidePanel";
 import IconWithTextTile from "~/components/ui/IconWithTextTile";
 import { SettingsSection, getSettingsSectionsForRoles, settingsSectionTranslationKeys, settingsSectionToIcon, settingsSectionToPath } from "~/models/enums/SettingsSection";
 import { agencySettingsPath } from "~/routes/routePaths";
