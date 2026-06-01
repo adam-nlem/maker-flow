@@ -1,5 +1,4 @@
 import { useShowAgencyLogo } from "~/hooks/api/agency/useShowAgencyLogo";
-import { Agency } from "~/models/Agency";
 import Shimmer from "~/components/ui/Shimmer";
 
 interface AgencyLogoProps {

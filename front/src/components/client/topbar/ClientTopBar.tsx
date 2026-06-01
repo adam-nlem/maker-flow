@@ -15,7 +15,7 @@ export default function ClientTopBar() {
 
     const brand = agency ? (
         <>
-            <AgencyLogo agency={agency} className="size-7 shrink-0" />
+            <AgencyLogo agencyUuid={agency.uuid} agencyName={agency.name} className="size-7 shrink-0" />
             <span className="text-heading-sm text-dark truncate max-w-32 sm:max-w-none hidden sm:inline">
                 {agency.name}
             </span>

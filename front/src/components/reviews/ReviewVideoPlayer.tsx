@@ -15,9 +15,6 @@ interface ReviewVideoPlayerProps {
   onPlaybackError?: (error: Error) => void;
 }
 
-const KEYBOARD_SEEK_SECONDS = 5;
-const KEYBOARD_VOLUME_STEP = 0.05;
-
 export default function ReviewVideoPlayer({
   reviewVersionUuid,
   videoStreamingStatus,

@@ -1,6 +1,6 @@
 import { useState } from "react"
 import { useTranslation } from "react-i18next"
-import { ArrowRightIcon, EnvelopeIcon, LockClosedIcon, UserCircleIcon, UserIcon } from "@heroicons/react/24/outline"
+import { ArrowRightIcon, EnvelopeIcon, LockClosedIcon, UserCircleIcon } from "@heroicons/react/24/outline"
 
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"

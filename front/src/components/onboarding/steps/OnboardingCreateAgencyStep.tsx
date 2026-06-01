@@ -1,11 +1,10 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { ArrowRightIcon, BuildingOffice2Icon, PhotoIcon } from "@heroicons/react/24/outline"
 import { useTranslation } from "react-i18next"
 
 import { Button } from "~/components/ui/Button"
 import { Input } from "~/components/ui/Input"
 import OnboardingStepLayout from "~/components/onboarding/OnboardingStepLayout"
-import { useCurrentUser } from "~/hooks/api/users/useCurrentUser"
 import { useCreateAgency } from "~/hooks/api/agency/useCreateAgency"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages"
@@ -14,7 +13,6 @@ import { useOnboardingCreateAgencyStore } from "~/stores/onboarding/onboardingCr
 
 export default function OnboardingCreateAgencyStep() {
   const { t } = useTranslation()
-  const { user } = useCurrentUser()
   const { createAgency, isPending, error, validationErrorKey } = useCreateAgency()
   const { advanceStep } = useAdvanceOnboardingStep()
 

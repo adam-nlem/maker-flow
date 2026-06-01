@@ -178,7 +178,7 @@ export default function ReviewCommentTile({
 
 function AuthorAvatar({ author }: { author: User | null }) {
   if (author?.agency) {
-    return <AgencyLogo agency={author.agency} className="size-8 shrink-0" />;
+    return <AgencyLogo agencyUuid={author.agency.uuid} agencyName={author.agency.name} className="size-8 shrink-0" />;
   }
 
   const initial = (author?.project?.name?.trim().charAt(0) ?? "?").toUpperCase();
