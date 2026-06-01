@@ -24,16 +24,18 @@ export default function OnboardingStepLayout({
   }
 
   return (
-    <div className={`${width} ${height} flex flex-col justify-center items-start py-5 px-30`} >
+    <div className={`${width} ${height} flex flex-col gap-3 justify-center items-start py-5 px-30`} >
       {showProgressBar && <OnboardingProgressBar />}
-      <h2 className="text-heading-3xl text-dark mt-10 ">
-        {t(currentStepConfig.titleKey)}
-      </h2>
-      <p className="text-body-sm text-muted-2 mt-2 ">
-        {t(currentStepConfig.descriptionKey)}
-      </p>
+      <div className="flex flex-col gap-1">
+        <h2 className="text-heading-3xl text-dark">
+          {t(currentStepConfig.titleKey)}
+        </h2>
+        <p className="text-body-sm text-muted-2">
+          {t(currentStepConfig.descriptionKey)}
+        </p>
+      </div>
 
-      <div className="mt-20 bg-clear w-full flex flex-col items-center justify-center">
+      <div className="bg-clear w-full flex flex-col items-center justify-center">
         {children}
       </div>
     </div >

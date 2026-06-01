@@ -10,7 +10,7 @@ export default function OnboardingConnectIntegrationPreview() {
   const { posts, isLoading } = useListPaginatedPosts({ projectUuid: projectUuid, platform: null, limit: 30 })
   return (
     <OnboardingPreviewLayout>
-      <div className="h-330">
+      <div className="h-screen">
         <ContentListPanel projectUuid={projectUuid!} isReadOnly />
       </div>
     </OnboardingPreviewLayout>

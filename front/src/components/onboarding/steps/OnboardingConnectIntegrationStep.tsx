@@ -17,14 +17,12 @@ export default function OnboardingConnectIntegrationStep() {
   const { integrations, isLoading } = useListIntegrations({ projectUuid })
   const { advanceStep } = useAdvanceOnboardingStep()
 
-  const hasConnectedIntegration = integrations.some((i) => i.status === IntegrationStatus.Active)
-
   if (!projectUuid) return null
 
   return (
     <OnboardingStepLayout>
-      <div className="flex flex-col gap-5 w-full">
-        <div className="flex flex-col justify-center gap-3 w-full">
+      <div className="flex flex-col w-full">
+        <div className="flex flex-col justify-center gap-1 w-full">
           {isLoading ? (
             <Shimmer height="h-32" width="w-full" />
           ) : (
@@ -41,7 +39,7 @@ export default function OnboardingConnectIntegrationStep() {
 
         <Button
           style="primary"
-          className="mt-5"
+          className="mt-3"
           width="w-fit"
           height="h-11"
           isLoading={isLoading}
