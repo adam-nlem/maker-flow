@@ -1,0 +1,39 @@
+{
+    "subtitle": "Invitez d'autres membres à rejoindre votre agence.",
+    "empty": "Aucun collaborateur pour le moment.",
+    "self": "Vous",
+    "columns": {
+        "name": "Nom",
+        "email": "Email",
+        "role": "Rôle",
+        "status": "Statut",
+        "actions": "Actions"
+    },
+    "status": {
+        "active": "Actif",
+        "pending": "En attente"
+    },
+    "invite": {
+        "button": "Inviter un collaborateur",
+        "modalTitle": "Inviter un collaborateur",
+        "modalDescription": "L'invité recevra un email pour rejoindre votre agence.",
+        "submit": "Envoyer l'invitation",
+        "fields": {
+            "firstName": "Prénom",
+            "lastName": "Nom",
+            "email": "Email",
+            "role": "Rôle"
+        },
+        "role": {
+            "editor": "Éditeur",
+            "viewer": "Lecteur"
+        }
+    },
+    "remove": {
+        "button": "Retirer",
+        "confirm": "Retirer {{target}} de l'agence ? Sa session sera fermée."
+    },
+    "cancel": {
+        "button": "Annuler l'invitation"
+    }
+}

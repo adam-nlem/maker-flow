@@ -19,7 +19,7 @@ export default function InsightTile({
   chart,
 }: InsightTileProps) {
   return (
-    <div className="flex flex-row gap-10 border border-light-gray rounded-xl p-5 w-fit items-center">
+    <div className="flex flex-row gap-10 border border-pale-gray rounded-xl p-5 w-fit items-center">
       <div>
         <p className="text-xs whitespace-nowrap">{label}</p>
         <h1 className="text-heading-lg">{formatCompactNumber(value)}</h1>
@@ -30,7 +30,7 @@ export default function InsightTile({
           <Icon className="size-4 text-dark" strokeWidth={2} />
           {evolutionPercentage !== undefined && evolutionPercentage !== null && (
             <span
-              className={`text-sm font-medium ${evolutionPercentage.startsWith('+') ? "text-green-500" : "text-red-500"
+              className={`text-sm font-medium ${evolutionPercentage.startsWith('+') ? "text-primary" : "text-red-500"
                 }`}
             >
               {evolutionPercentage}

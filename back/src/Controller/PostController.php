@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\DTO\QueryParam\Post\ListPostsQueryParamDTO;
 use App\DTO\QueryParam\Post\RankPostsQueryParamDTO;
@@ -22,6 +23,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/posts', requirements: ['postUuid' => Requirement::UUID])]
 final class PostController extends AbstractController
@@ -29,6 +31,7 @@ final class PostController extends AbstractController
     public function __construct(private PostService $postService) {}
 
     #[Route('', name: 'api_posts_list', methods: ['GET'])]
+    #[IsGranted(UserRole::User->value)]
     public function list(
         ListPostsQueryParamDTO $queryParamDto,
         ProjectRepository $projectRepository,
@@ -36,14 +39,13 @@ final class PostController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
         $posts = $this->postService->getPostListItems(
-            user: $user,
             project: $project,
             platform: $queryParamDto->getPlatform(),
             searchTerm: $queryParamDto->getSearchTerm(),
@@ -59,12 +61,13 @@ final class PostController extends AbstractController
     }
 
     #[Route('/{postUuid}', name: 'api_posts_show', methods: ['GET'])]
+    #[IsGranted(UserRole::User->value)]
     public function show(string $postUuid, PostRepository $postRepository): JsonResponse
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $post = $postRepository->getByUuidAndUser($postUuid, $user);
+        $post = $postRepository->getAccessibleByUuidForUser($postUuid, $user);
 
         if ($post === null) {
             throw new PostNotFoundException();
@@ -78,6 +81,7 @@ final class PostController extends AbstractController
     }
 
     #[Route('/rank', name: 'api_posts_rank', methods: ['GET'])]
+    #[IsGranted(UserRole::User->value)]
     public function rank(
         RankPostsQueryParamDTO $queryParamDto,
         IntegrationRepository $integrationRepository,
@@ -85,14 +89,13 @@ final class PostController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $integration = $integrationRepository->getByUuidAndUser($queryParamDto->getIntegrationUuid(), $user);
+        $integration = $integrationRepository->getAccessibleByUuidForUser($queryParamDto->getIntegrationUuid(), $user);
 
         if ($integration === null) {
             throw new IntegrationNotFoundException();
         }
 
         $posts = $this->postService->getRankedPosts(
-            user: $user,
             integration: $integration,
             page: $queryParamDto->getPage(),
             limit: $queryParamDto->getLimit(),
@@ -106,6 +109,7 @@ final class PostController extends AbstractController
     }
 
     #[Route('/{postUuid}/thumbnail', name: 'api_posts_thumbnail', methods: ['GET'])]
+    #[IsGranted(UserRole::User->value)]
     public function getThumbnail(
         string $postUuid,
         PostRepository $postRepository,
@@ -114,7 +118,7 @@ final class PostController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $post = $postRepository->getByUuidAndUser($postUuid, $user);
+        $post = $postRepository->getAccessibleByUuidForUser($postUuid, $user);
 
         if ($post === null) {
             throw new PostNotFoundException();

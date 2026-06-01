@@ -25,6 +25,12 @@ class PlanConfigResponseDTO implements ResponseDTOInterface
         private ?int $maxProjects,
         #[Groups(['api_subscriptions_plans_list'])]
         private ?int $maxScriptsPerProject,
+        #[Groups(['api_subscriptions_plans_list'])]
+        private ?int $maxEditorCollaborators,
+        #[Groups(['api_subscriptions_plans_list'])]
+        private ?int $maxVideoUploadHours,
+        #[Groups(['api_subscriptions_plans_list'])]
+        private ?int $maxStorageGb,
         /** @var string[] */
         #[Groups(['api_subscriptions_plans_list'])]
         private array $features,
@@ -44,6 +50,9 @@ class PlanConfigResponseDTO implements ResponseDTOInterface
             creditsPerMonth: $data['creditsPerMonth'],
             maxProjects: $data['maxProjects'],
             maxScriptsPerProject: $data['maxScriptsPerProject'],
+            maxEditorCollaborators: $data['maxEditorCollaborators'] ?? null,
+            maxVideoUploadHours: $data['maxVideoUploadHours'] ?? null,
+            maxStorageGb: $data['maxStorageGb'] ?? null,
             features: $data['features'],
             isHighlighted: $data['isHighlighted'],
             sortOrder: $data['sortOrder'],
@@ -60,6 +69,9 @@ class PlanConfigResponseDTO implements ResponseDTOInterface
             'creditsPerMonth' => $this->getCreditsPerMonth(),
             'maxProjects' => $this->getMaxProjects(),
             'maxScriptsPerProject' => $this->getMaxScriptsPerProject(),
+            'maxEditorCollaborators' => $this->getMaxEditorCollaborators(),
+            'maxVideoUploadHours' => $this->getMaxVideoUploadHours(),
+            'maxStorageGb' => $this->getMaxStorageGb(),
             'features' => $this->getFeatures(),
             'isHighlighted' => $this->isHighlighted(),
             'sortOrder' => $this->getSortOrder(),
@@ -99,6 +111,21 @@ class PlanConfigResponseDTO implements ResponseDTOInterface
     public function getMaxScriptsPerProject(): ?int
     {
         return $this->maxScriptsPerProject;
+    }
+
+    public function getMaxEditorCollaborators(): ?int
+    {
+        return $this->maxEditorCollaborators;
+    }
+
+    public function getMaxVideoUploadHours(): ?int
+    {
+        return $this->maxVideoUploadHours;
+    }
+
+    public function getMaxStorageGb(): ?int
+    {
+        return $this->maxStorageGb;
     }
 
     public function getFeatures(): array

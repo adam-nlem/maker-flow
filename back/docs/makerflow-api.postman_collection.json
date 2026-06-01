@@ -176,7 +176,8 @@
                 "projects",
                 "{{projectUuid}}"
               ]
-            }
+            },
+            "description": "Returns the project with its parent agency nested under `agency` (`uuid`, `name`, `contactEmail`, `website`). Used by the client portal to read agency identity for the sidebar.\n\nErrors:\n- `403` with `{ \"code\": 27003 }` (`AgencySubscriptionInactiveException`) when the requester is a `ROLE_CLIENT` user whose parent agency has no active subscription. Agency members are never gated."
           },
           "response": []
         },
@@ -266,6 +267,53 @@
                 "projects",
                 "{{projectUuid}}",
                 "reopen"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Project Clients",
+          "id": "projects-clients-list-0001-000000000001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/clients?projectUuid={{projectUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "clients"
+              ],
+              "query": [
+                {
+                  "key": "projectUuid",
+                  "value": "{{projectUuid}}"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Project Client",
+          "id": "projects-clients-remove-0001-000000000003",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/projects/clients/{{clientUserUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "projects",
+                "clients",
+                "{{clientUserUuid}}"
               ]
             }
           },
@@ -991,6 +1039,12 @@
                   "key": "status",
                   "value": "idea",
                   "description": "Optional filter by ScriptStatus (idea, scripting, shooting, editing, scheduled, published)",
+                  "disabled": true
+                },
+                {
+                  "key": "searchTerm",
+                  "value": "",
+                  "description": "Optional. Case-insensitive LIKE filter on script title.",
                   "disabled": true
                 }
               ]
@@ -2684,7 +2738,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"plan\": \"creator\"\n}"
+              "raw": "{\n  \"plan\": \"agency+\"\n}"
             },
             "url": {
               "raw": "{{baseUrl}}/api/subscriptions/change-plan",
@@ -2895,6 +2949,340 @@
         }
       ],
       "id": "onboarding-folder-0001-000000000000"
+    },
+    {
+      "name": "Invitations",
+      "item": [
+        {
+          "name": "Create Collaborator Invitation",
+          "id": "invitations-create-collaborator-0001-000000000003",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"collaborator\",\n  \"firstName\": \"Alex\",\n  \"lastName\": \"Doe\",\n  \"email\": \"alex@example.com\",\n  \"role\": \"ROLE_EDITOR\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/invitations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invitations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Client Invitation",
+          "id": "invitations-create-client-0001-000000000004",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"client\",\n  \"firstName\": \"Casey\",\n  \"lastName\": \"Client\",\n  \"email\": \"client@example.com\",\n  \"projectUuid\": \"{{projectUuid}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/invitations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invitations"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Invitation (public)",
+          "id": "invitations-show-0001-000000000001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invitations/{{invitationToken}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invitations",
+                "{{invitationToken}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Complete Invitation (public)",
+          "id": "invitations-complete-0001-000000000002",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"NewPassw0rd!\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/invitations/{{invitationToken}}/complete",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invitations",
+                "{{invitationToken}}",
+                "complete"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Invitation",
+          "id": "invitations-delete-0001-000000000005",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/invitations/{{invitationUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "invitations",
+                "{{invitationUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "invitations-folder-0001-000000000000"
+    },
+    {
+      "name": "Agency",
+      "item": [
+        {
+          "name": "Create Agency",
+          "id": "agency-create-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "My Agency",
+                  "type": "text"
+                },
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Current Agency",
+          "id": "agency-current-0001-000000000004",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/current",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "current"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Agency Usage",
+          "id": "agency-usage-0001-000000000007",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/usage",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "usage"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Current Agency",
+          "id": "agency-update-0001-000000000005",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"agencyUuid\": \"{{agencyUuid}}\",\n  \"name\": \"My Agency Renamed\",\n  \"contactEmail\": \"hello@my-agency.test\",\n  \"website\": \"https://my-agency.test\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Agency Logo",
+          "id": "agency-logo-upload-0001-000000000006",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "logo",
+                  "type": "file",
+                  "src": []
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/logo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "logo"
+              ]
+            },
+            "description": "Uploads or replaces the current agency's logo. Accepts `image/png` up to 5 MB. The logo is always stored at `private/uploads/agency/logo/{agencyUuid}.png`, so a subsequent upload overwrites the previous one. Auth: `ROLE_ADMIN` + `AgencyVoter::MANAGE_SETTINGS`. Returns `204 No Content`.\n\nErrors:\n- `400` with `{ \"code\": 27004, \"meta\": { \"reason\": \"...\" } }` (`AgencyLogoInvalidException`) when the file is missing, oversized, or not a PNG."
+          },
+          "response": []
+        },
+        {
+          "name": "Show Agency Logo",
+          "id": "agency-logo-show-0001-000000000007",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/{{agencyUuid}}/logo",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "{{agencyUuid}}",
+                "logo"
+              ]
+            },
+            "description": "Returns the agency logo as a binary image (inline disposition). `200 OK` with the PNG when a logo exists, `204 No Content` when none has been uploaded yet — the frontend handles the empty state. Access: any authenticated user that belongs to the agency, either as collaborator (`User.agency`) or via their client project (`User.project.agency`)."
+          },
+          "response": []
+        },
+        {
+          "name": "List Collaborators",
+          "id": "agency-collaborators-list-0001-000000000001",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/collaborators",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "collaborators"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Remove Collaborator",
+          "id": "agency-collaborators-remove-0001-000000000003",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/agencies/collaborators/{{collaboratorUuid}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "agencies",
+                "collaborators",
+                "{{collaboratorUuid}}"
+              ]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "agency-folder-0001-000000000000"
     },
     {
       "name": "Target Audiences",
@@ -3128,6 +3516,292 @@
         }
       ],
       "id": "script-versions-folder-0001-00000"
+    },
+    {
+      "name": "Reviews",
+      "item": [
+        {
+          "name": "List Reviews",
+          "id": "reviews-list-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews?projectUuid={{projectUuid}}&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews"],
+              "query": [
+                { "key": "projectUuid", "value": "{{projectUuid}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "status", "value": "pending", "description": "Optional: pending | approved | rejected", "disabled": true },
+                { "key": "searchTerm", "value": "", "description": "Optional: case-insensitive LIKE on title", "disabled": true }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Reviews Awaiting Current User Action",
+          "id": "reviews-awaiting-action-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/awaiting-current-user-action?projectUuid={{projectUuid}}&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "awaiting-current-user-action"],
+              "query": [
+                { "key": "projectUuid", "value": "{{projectUuid}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            },
+            "description": "Reviews whose latest version is Pending and on which the currently authenticated user has not yet posted any comment. Powers the Client home awaiting-review panel. Same response shape as List Reviews."
+          },
+          "response": []
+        },
+        {
+          "name": "Show Review",
+          "id": "reviews-show-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "{{reviewUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Create Review (multipart)",
+          "id": "reviews-create-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "projectUuid", "value": "{{projectUuid}}", "type": "text" },
+                { "key": "title", "value": "My new draft", "type": "text" },
+                { "key": "mediaType", "value": "video", "type": "text" },
+                { "key": "description", "value": "Optional caption", "type": "text" },
+                { "key": "notes", "value": "Optional context for the client", "type": "text" },
+                { "key": "scriptUuid", "value": "", "type": "text" },
+                { "key": "files[]", "type": "file", "src": [] }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Upload New Review Media Version (multipart)",
+          "id": "reviews-versions-create-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "reviewUuid", "value": "{{reviewUuid}}", "type": "text" },
+                { "key": "files[]", "type": "file", "src": [] }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/review-versions",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-versions"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update Review",
+          "id": "reviews-update-0001-000000000000",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated title\",\n  \"description\": null,\n  \"notes\": \"Context for the client\",\n  \"scriptUuid\": null\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "{{reviewUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Review",
+          "id": "reviews-delete-0001-000000000000",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/reviews/{{reviewUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "reviews", "{{reviewUuid}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stream Review Media Version File",
+          "id": "reviews-stream-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/review-versions/files?reviewVersionUuid={{reviewVersionUuid}}&index=1",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-versions", "files"],
+              "query": [
+                { "key": "reviewVersionUuid", "value": "{{reviewVersionUuid}}" },
+                { "key": "index", "value": "1", "description": "1-based file index (image / carousel / original video before transcoding)" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Stream Review Media Version HLS Master Playlist",
+          "id": "reviews-stream-hls-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/api/review-versions/stream?reviewVersionUuid={{reviewVersionUuid}}&path=master.m3u8",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-versions", "stream"],
+              "query": [
+                { "key": "reviewVersionUuid", "value": "{{reviewVersionUuid}}" },
+                { "key": "path", "value": "master.m3u8", "description": "Relative path under the media version's stream/ dir (master.m3u8, 1080p/index.m3u8, 720p/segment_001.ts, …). Only .m3u8 / .ts accepted." }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Show Review Media Version Cover",
+          "id": "reviews-cover-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Returns the JPEG cover frame extracted at t=1s during async video processing. BinaryFileResponse with Content-Type image/jpeg, DISPOSITION_INLINE. 204 No Content when the cover is missing on disk (cover extraction failed, or the version is not a video). Authorization: ROLE_USER + ProjectVoter::VIEW on the parent project — reachable by both agency members and clients.",
+            "url": {
+              "raw": "{{baseUrl}}/api/review-versions/{{reviewVersionUuid}}/cover",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-versions", "{{reviewVersionUuid}}", "cover"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Review Media Version (client)",
+          "id": "reviews-approve-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{}" },
+            "description": "ROLE_CLIENT only. Empty body. Transitions latestVersion.status from Pending → Approved. 409 (code 33008) if the version is not the latest (reason: not_latest_version) or not in Pending (reason: not_pending). Returns the parent review serialized with api_review_versions_approve.",
+            "url": {
+              "raw": "{{baseUrl}}/api/review-versions/{{reviewVersionUuid}}/approve",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-versions", "{{reviewVersionUuid}}", "approve"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "List Pending Review Comments for a Project",
+          "id": "reviews-comments-pending-0001-000000000000",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "description": "Project-scoped overview powering the agency home widget. Returns the reviews of the project whose latest version has at least one open top-level comment, grouped with that latest version's open top-level comments inlined under each review. Flat array of ListReviewCommentsGroupedByReviewResponseDTO ({ review: ReviewWithLatestVersionResponseDTO, comments: ReviewComment[] }). Reviews ordered updatedAt DESC, comments ordered createdAt ASC within each review. Replies, resolved comments, and comments on superseded versions are excluded. Mirrors the purpose-specific sibling pattern of GET /api/posts/rank / GET /api/scripts/calendar. Serialization group: api_review_comments_pending.",
+            "url": {
+              "raw": "{{baseUrl}}/api/review-comments/pending?projectUuid={{projectUuid}}&page=1&limit=20",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-comments", "pending"],
+              "query": [
+                { "key": "projectUuid", "value": "{{projectUuid}}" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Comment on Review Media Version (agency or client)",
+          "id": "reviews-comment-0001-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reviewVersionUuid\": \"{{reviewVersionUuid}}\",\n    \"body\": \"Good point — we'll tighten the intro in the next version.\",\n    \"videoTimecodeSeconds\": 12.34\n}"
+            },
+            "description": "Open to any authenticated user with PROJECT_VIEW (agency or client). Lives in ReviewCommentController (separate from ReviewVersionController because the comment is a distinct entity). Flat resource URL — reviewVersionUuid is carried in the JSON body, matching the POST /api/reviews create convention. Body: { reviewVersionUuid, body, parentCommentUuid?, videoTimecodeSeconds? } — body trimmed, non-empty, max 5000 chars; videoTimecodeSeconds is a non-negative float (seconds), top-level + video only; parentCommentUuid turns the new comment into a reply. Validation is declarative on the DTO via #[Assert\\NotBlank] / #[Assert\\Length(max: 5000)] / #[Assert\\Uuid] / #[Assert\\Type('numeric')] / #[Assert\\PositiveOrZero]. Creates a ReviewComment on the latest version (author = current user). Does NOT change status. The thread is bidirectional — used both by clients leaving follow-up feedback and the agency replying to client requests. Replies + timecode together → 400 ReviewCommentReplyCannotHaveTimecodeException (33015). Unknown / cross-version parent UUID → 404 ReviewCommentParentNotFoundException (33014). 409 ReviewVersionNotLatestException (33010) if the version is no longer the latest. Returns the parent review serialized with api_review_comments_create.",
+            "url": {
+              "raw": "{{baseUrl}}/api/review-comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-comments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reply to a Review Media Version Comment (agency or client)",
+          "id": "reviews-comment-0002-000000000000",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"reviewVersionUuid\": \"{{reviewVersionUuid}}\",\n    \"parentCommentUuid\": \"{{reviewCommentUuid}}\",\n    \"body\": \"Got it — we'll re-cut the intro.\"\n}"
+            },
+            "description": "Convenience example for the reply flow. Same endpoint as the comment create; setting parentCommentUuid makes the new row a reply (fully threaded — replies can themselves be replied to). Replies must NOT carry a videoTimecodeSeconds (400 ReviewCommentReplyCannotHaveTimecodeException 33015 otherwise). The parent must belong to the same media version (404 ReviewCommentParentNotFoundException 33014 otherwise).",
+            "url": {
+              "raw": "{{baseUrl}}/api/review-comments",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-comments"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Update a Review Media Version Comment",
+          "id": "reviews-comment-0003-000000000000",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"status\": \"resolved\"\n}"
+            },
+            "description": "Partial update on an existing comment. Body keys are all optional (presentFields tracking): { body?, status?, videoTimecodeSeconds? }. Threading (parentComment) is immutable and not exposed here. Per-field permissions: body + videoTimecodeSeconds require the caller to be the comment AUTHOR (403 ReviewCommentEditForbiddenException 33019 otherwise). status requires AGENCY editor on the project (PROJECT_EDIT voter). status / videoTimecodeSeconds on a reply both 409 (ReviewCommentStatusOnReplyForbiddenException 33018, ReviewCommentTimecodeOnReplyForbiddenException 33020). Pass videoTimecodeSeconds: null to clear a pin. Empty body → 400 ReviewCommentEmptyException (33011). Invalid status value → 400 ReviewCommentStatusInvalidException (33017). Unknown UUID → 404 ReviewCommentNotFoundException (33016). Returns the parent draft serialized with api_reviews_show.",
+            "url": {
+              "raw": "{{baseUrl}}/api/review-comments/{{reviewCommentUuid}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "review-comments", "{{reviewCommentUuid}}"]
+            }
+          },
+          "response": []
+        }
+      ],
+      "id": "reviews-folder-0001-000000000000"
     }
   ],
   "event": [
@@ -3255,6 +3929,31 @@
     {
       "id": "c3a4d5e6-f7a8-9012-bcde-dddddddddddd",
       "key": "messageUuid",
+      "value": ""
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-cdef-eeeeeeeeeeee",
+      "key": "invitationToken",
+      "value": ""
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-cdef-ffffffffffff",
+      "key": "collaboratorUuid",
+      "value": ""
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-cdef-aaaaaaaa1234",
+      "key": "clientUserUuid",
+      "value": ""
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-cdef-bbbbbbbb0001",
+      "key": "reviewUuid",
+      "value": ""
+    },
+    {
+      "id": "d4e5f6a7-b8c9-0123-cdef-bbbbbbbb0002",
+      "key": "reviewVersionUuid",
       "value": ""
     }
   ]

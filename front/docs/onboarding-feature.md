@@ -2,251 +2,137 @@
 
 ## Overview
 
-The onboarding system is a **full-page step flow** at `/onboarding` covering two phases: welcome presentation (Features → HowItWorks) then post-auth setup (project, integrations, creator profile, AI script generation, subscriptions). After the welcome steps, users are redirected to the standalone `/register` route. The auth routes (`/login`, `/register`, `/verify-otp`) use `AuthStepLayout` for a consistent visual style.
+The onboarding system is a **role-aware full-page wizard** at `/onboarding`. It is **strictly post-authentication** — a single unified enum + config map drives the wizard, filtered by `user.displayRole` at runtime. There is no in-app pre-login landing page; unauthenticated visitors are sent to `/login`.
+
+After registration → `/verify-otp` → `/` → `RootRedirect` dispatches the authenticated user → `protected.tsx` detects `!onboarding.isDismissed` and redirects to `/onboarding`. When dismissed, `useOnboardingFlow` redirects agency members to `/agency` and clients to `/client`.
+
+Editor and Viewer roles have **no onboarding steps**; their `Onboarding` row is auto-dismissed at creation server-side so they land directly on `/agency`.
+
+## Role-aware step flows
+
+The active step list is resolved by `getOrderedStepsForRole(role)` from [`OnboardingStep.tsx`](../src/models/enums/OnboardingStep.tsx). Filtering is driven by each step's `applicableRoles` declared in `ONBOARDING_STEP_CONFIG`.
+
+### Admin (5 steps)
+| Order | Value | Component | Notes |
+|-------|-------|-----------|-------|
+| 0 | `create_agency` | `OnboardingCreateAgencyStep` | Auto-advances when `user.agency !== null`. Collects agency name + required logo; submits multipart `POST /api/agencies`. |
+| 1 | `create_first_project` | `OnboardingCreateProjectStep` | Sets `focusedProjectUuid` after creation. |
+| 2 | `invite_first_client` | `OnboardingInviteFirstClientStep` | Reuses `InviteClientForm`; skippable. |
+| 3 | `connect_first_integration` | `OnboardingConnectIntegrationStep` | OAuth tiles for the focused project; skippable. |
+| 4 | `show_subscriptions` | `OnboardingSubscriptionStep` | `SubscriptionOverview` checkout. |
+
+### Client (2 steps)
+| Order | Value | Component |
+|-------|-------|-----------|
+| 0 | `connect_first_integration` | `OnboardingConnectIntegrationStep` — reads `focusedProjectUuid` from the shared focus project store (seeded by `useSyncFocusedProject` in `protected.tsx`). |
+| 1 | `explore_contents` | `OnboardingExploreContentsStep` — navigates to `/client/contents`. |
+
+### Editor / Viewer
+No steps — onboarding is auto-dismissed server-side on first GET. User lands directly on `/agency`.
 
 ## Architecture
 
-All onboarding step components are **self-contained** (zero props). Auth pages (`/login`, `/register`, `/verify-otp`) are standalone routes using `AuthStepLayout`. The onboarding route file uses `Record<Enum, ReactNode>` mappings instead of switch statements.
+### Single source of truth
 
-### Component Mapping Pattern
+[`src/models/enums/OnboardingStep.tsx`](../src/models/enums/OnboardingStep.tsx) exposes:
 
-The route (`app/routes/onboarding.tsx`) maps enum values to components using Records:
+- `enum OnboardingStep` (6 string-backed cases shared with the backend enum)
+- `interface OnboardingStepConfig { titleKey, descriptionKey, icon, component, applicableRoles }`
+- `const ONBOARDING_STEP_CONFIG: Record<OnboardingStep, OnboardingStepConfig>` — every step's metadata + JSX component + the roles allowed to see it
+- `getOrderedStepsForRole(role)` — returns the steps in enum declaration order, filtered by `applicableRoles`
 
-```tsx
-const welcomeNodes: Record<WelcomeStep, ReactNode> = {
-    [WelcomeStep.Features]: <WelcomeFeatureStep />,
-    // ...
-}
+Adding a step = adding one entry to `ONBOARDING_STEP_CONFIG`. There is no per-role enum, no separate metadata map, no per-role component dispatch table.
 
-const onboardingNodes: Record<OnboardingStep, ReactNode> = {
-    [OnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
-    // ...
-}
+### Hooks
+
+- [`useOnboardingFlow`](../src/hooks/useOnboardingFlow.ts) — orchestrator. Computes `order`, `currentOnboardingStep`, `currentStepConfig`, `currentStep` index. Redirects on dismiss (`/agency` or `/client` based on `user.isClient`).
+- [`useAdvanceOnboardingStep`](../src/hooks/api/onboarding/useAdvanceOnboardingStep.ts) — calls `completeStep(currentOnboardingStep)`. Backend auto-dismisses when every applicable step is done; the explicit dismiss branch was removed.
+- `useShowOnboarding` / `useCompleteOnboardingStep` — React Query wrappers.
+- `useDismissOnboarding` — present but unused; reserved for a future "skip-all" CTA.
+
+### Model
+
+`src/models/Onboarding.ts` — `isStepCompleted(step: string)`. Enum-agnostic.
+
+## i18n
+
+A single flat namespace per locale:
+
+```
+enums:onboardingStep.titles.<stepCamelCase>
+enums:onboardingStep.descriptions.<stepCamelCase>
 ```
 
-This follows the same pattern as `settings.section.tsx`.
+The shared `connect_first_integration` step uses one copy (currently the admin wording). Body copy for the explore step still lives at `onboarding:exploreContents.*`.
 
-### State Management
+## Shared chrome
 
-- **`useOnboardingStore`** (`app/stores/onboarding/onboardingStore.ts`): Ephemeral Zustand store (no persist) for welcome step navigation (`welcomeStep`, `setWelcomeStep`). Only used by the welcome step components (Features, HowItWorks).
-- **`useFocusProjectStore`**: Post-auth components read `focusedProjectUuid` from this store.
-- **`useFocusScriptStore`**: `OnboardingGenerateScriptStep` reads `focusedScriptUuid` from this store.
-- **`useAdvanceOnboardingStep`** (`app/hooks/api/onboarding/useAdvanceOnboardingStep.ts`): Hook that encapsulates step completion logic. Post-auth components call `advanceStep()` internally.
-- **`useOnboardingFlow`** (`app/hooks/useOnboardingFlow.ts`): Thin orchestrator hook used only by the route. Provides auth state, current step enum values, and progress dot data.
+- `OnboardingProgressBar` reads `currentStep` + `totalSteps` from `useOnboardingFlow`. Adding a step in the config propagates automatically. Renders numbered badges: past steps `bg-pale-gray-2`, current `bg-primary`, future `bg-dark`.
+- `OnboardingStepLayout` exposes two content slots:
+  - `left: ReactNode` (required) — the step's primary content. Progress bar, title and description always render above it.
+  - `right?: ReactNode` (optional) — supporting content. When provided the screen splits 50/50; when omitted the left column stays centered.
+  - Title and description come from `currentStepConfig.titleKey` / `descriptionKey`.
 
-## Auth Prefill Store
+## Routing entry point
 
-**File:** `app/stores/auth/authPrefillStore.ts`
+`src/routes/onboarding.tsx` reads `currentStepConfig` from `useOnboardingFlow` and renders `currentStepConfig.component`. No per-role dispatch — the config map already encodes which step is rendered.
 
-Persistent Zustand store (`app:auth:prefill`): `{ email: string | null, setEmail }`. Resettable (cleared on logout).
+## Per-step staging stores
 
-- Set on login/register form submit (both standalone pages and onboarding flow)
-- Used by login/register pages to prefill the email input
+Each data-bearing step owns a dedicated `createResettableStore`-wrapped, persisted Zustand store under `src/stores/onboarding/`. A store holds two kinds of state:
 
-## Routing & Auth Guard
+1. **Staging fields** — the in-progress form values so the live preview can mirror them as the user types.
+2. **The created entity object** (`null` until the step's API call succeeds, then set on submit).
 
-### Route
+**Object-first preview rule.** Previews (and the shared `OnboardingPreviewLayout` sidebar) prefer the created object when present, falling back to the staging fields otherwise. This fixes stale previews after a step completes: the staging logo is a `blob:` object URL that gets revoked, leaving a broken image. When the created object exists, the preview reads the **real** `name` and switches the logo component to **uncontrolled** mode — passing the entity `uuid` (and omitting `logoUrl`) so `AgencyLogo` / `ProjectLogo` fetch the persisted server logo via `useShowAgencyLogo` / `useShowProjectLogo`.
 
-**Route:** `/onboarding` (public, handles both pre-auth and post-auth phases)
+**Persist primitives only.** Each store persists only its plain-primitive staging fields via `partialize`. Blob preview URLs (invalid after a reload) and the created class instances (would lose their prototype through JSON) are excluded.
 
-### Protected Layout (`routes/protected.tsx`)
+| Store (`use…`) | Persist key | State | `partialize` |
+|----------------|-------------|-------|--------------|
+| `useOnboardingCreateAgencyStore` | `app:onboarding:create-agency` | `agencyName`, `agencyLogoPreviewUrl`, `agency: Agency \| null` | `{ agencyName }` |
+| `useOnboardingCreateProjectStore` | `app:onboarding:create-project` | `projectName`, `projectLogoPreviewUrl`, `projectTypes`, `project: Project \| null` | `{ projectName, projectTypes }` |
+| `useOnboardingInviteFirstClientStore` | `app:onboarding:invite-first-client` | `firstName`, `lastName`, `email`, `invitation: Invitation \| null` | `{ firstName, lastName, email }` |
 
-Single effect with two redirect layers:
-1. **Unauthenticated**: redirects to `/onboarding` (first-time, no stored email) or `/login` (returning user, has stored email via `authPrefillStore`).
-2. **Onboarding guard**: fetches onboarding via `useShowOnboarding({ enabled: !!user })` → if not dismissed, redirects to `/onboarding`
+Each setter writes exactly one field — no cross-field side effects. All stores are `createResettableStore`-wrapped so `resetAllStores()` (logout / 401) clears form state.
 
-## Enums
+The created object is set inside each step's submit handler: `OnboardingCreateAgencyStep` calls `setAgency(agency)`, `OnboardingCreateProjectStep` calls `setProject(project)` (alongside `setFocusedProjectUuid`), and `OnboardingInviteFirstClientStep` calls `setInvitation(invitation)`.
 
-### `WelcomeStep`
+### Shared `InviteClientForm`
 
-**File:** `app/models/enums/WelcomeStep.ts`
+`InviteClientForm` (`components/agency/settings/project/InviteClientForm.tsx`) is reused by both the agency settings page and the onboarding step, so it stays self-contained (its own `useState`). Two **optional** props let the onboarding context observe it without coupling the settings usage to any store:
 
-Values: `features`, `how_it_works`. Exports `WELCOME_STEP_ORDER` array and metadata maps (`welcomeStepToIcon`, `welcomeStepToShortLabel`). Auth steps (login, register, verify OTP) are handled by standalone routes, not welcome steps.
+- `onValuesChange?: (v: { firstName, lastName, email }) => void` — fired on every field change; the onboarding step pipes it into `useOnboardingInviteFirstClientStore` so the preview mirrors typed values.
+- `onInvited: (invitation: Invitation) => void` — widened to receive the created `Invitation` (settings callers simply ignore the argument).
 
-### `OnboardingStep`
+## WIP — not wired
 
-**File:** `app/models/enums/OnboardingStep.ts`
-
-Values: `create_first_project`, `connect_integration`, `create_creator_profile`, `create_first_script`, `generate_first_script`, `show_subscriptions`
-
-Step metadata defined as const maps: `onboardingStepToFrenchTranslation`, `onboardingStepToDescription`, `onboardingStepToIcon`, `onboardingStepToActionLabel`, `onboardingStepToNavigateTo`.
-
-## Pre-Auth Steps
-
-| Step | Enum | Component | Description |
-|------|------|-----------|-------------|
-| 0 | `WelcomeStep.Features` | `WelcomeFeatureStep` | Feature cards grid |
-| 1 | `WelcomeStep.HowItWorks` | `WelcomeHowItWorksStep` | 3-step visual guide, "Next" navigates to `/register` |
-
-After HowItWorks, the user is redirected to `/register` (standalone route). After registration → `/verify-otp` → `/` → `protected.tsx` redirects to `/onboarding` for post-auth steps.
-
-## Post-Auth Steps
-
-| Step | Enum | Component | Required | Description |
-|------|------|-----------|----------|-------------|
-| 0 | `CreateFirstProject` | `OnboardingCreateProjectStep` | Yes | Reuses `CreateProjectForm`, sets `focusedProjectUuid` in store |
-| 1 | `ConnectIntegration` | `OnboardingConnectIntegrationStep` | No (skippable) | Reuses `IntegrationSettingCard` components |
-| 2 | `CreateCreatorProfile` | `OnboardingCreatorProfileStep` | No (skippable) | Reuses `CreatorProfileForm` with `variant="onboarding"` |
-| 3 | `CreateFirstScript` | `OnboardingCreateScriptStep` | No (skippable) | Creates a script with title + platforms, sets `focusedScriptUuid` in store |
-| 4 | `GenerateFirstScript` | `OnboardingGenerateScriptStep` | No (skippable) | 3-phase: brief form → AI generation → preview |
-| 5 | `ShowSubscriptions` | `OnboardingSubscriptionStep` | No | Uses shared `SubscriptionOverview` with `successUrl="/onboarding?checkout=success"` and a custom `subscribedView` (success confirmation with CheckCircleIcon + plan name). |
-
-All post-auth components read `projectUuid` from `useFocusProjectStore` and advance via `useAdvanceOnboardingStep().advanceStep()`.
-
-## Model
-
-**File:** `app/models/Onboarding.ts`
-
-Class with `fromJSON`, computed getters: `isCompleted`, `isDismissed`, `completionCount`, `totalSteps`, `isStepCompleted(step)`.
-
-## React Query Hooks
-
-**Directory:** `app/hooks/api/onboarding/`
-- `onboardingQueryKeys.ts` — Query key factory
-- `useShowOnboarding.ts` — `GET /api/onboarding` (supports `enabled` option)
-- `useCompleteOnboardingStep.ts` — `POST /api/onboarding/complete-step`
-- `useAdvanceOnboardingStep.ts` — Encapsulates advance logic (determines current step, calls `completeStep`)
-- `useDismissOnboarding.ts` — `POST /api/onboarding/dismiss`
-
-## Shared Components
-
-### `OnboardingStepLayout`
-
-**File:** `app/components/onboarding/OnboardingStepLayout.tsx`
-
-Shared layout component used by all onboarding step components. Provides consistent structure: full-screen centered layout with `OnboardingStepHeader` and content area.
-
-Props: `maxWidth?` (string, defaults to `"max-w-lg"`), `disableNextButton?` (boolean), `fullHeight?` (boolean, uses `h-screen` with top padding instead of `min-h-screen` centered), `padding?` (string, defaults to `"px-6"`), `children` (ReactNode).
-
-### `OnboardingStepHeader`
-
-**File:** `app/components/onboarding/OnboardingStepHeader.tsx`
-
-Self-contained header used by `OnboardingStepLayout`. Reads the current step from `useOnboardingFlow` and looks up title/description from enum metadata (`onboardingStepToFrenchTranslation`, `onboardingStepToDescription`). Also renders the progress bar and "Continuer" button.
-
-Props: `disableNextButton?` (optional, used by `OnboardingCreateScriptStep`).
-
-### `PlatformPill`
-
-**File:** `app/components/ui/PlatformPill.tsx`
-
-Shared pill component for platform selection.
-
-Props: `platform` (Platform), `isSelected` (boolean), `onToggle` (() => void).
-
-### `CreatorProfileForm`
-
-**File:** `app/components/scripts/creatorProfile/CreatorProfileForm.tsx`
-
-Shared creator profile form supporting two variants:
-- `'settings'` (default): full 8-field form with scrollable layout, change detection, sticky footer
-- `'onboarding'`: 6-field form (platforms, content type, niche, target audience, tones, style sample), always-visible submit button
-
-Props: `projectUuid`, `creatorProfile`, `onSuccess`, `variant?`.
-
-### `ScriptBriefForm`
-
-**File:** `app/components/scripts/generation/ScriptBriefForm.tsx`
-
-Self-contained brief form that manages its own state internally. Accepts `initialValues` for pre-filling, `onSubmit` callback with validated `ScriptBriefValues`, optional `submitLabel`/`submitIcon` (renders submit button inside form), and optional `formId` (for external submit trigger).
-
-### `CreateProjectForm`
-
-**File:** `app/components/projects/CreateProjectForm.tsx`
-
-Shared project creation form. Contains all form state, validation, fields (name, description, type pills), and submit logic.
-
-Props: `onProjectCreated(projectUuid)`, `formSpacing?`, `buttonStyle?`.
-
-### `RegisterForm`
-
-**File:** `app/components/auth/RegisterForm.tsx`
-
-Shared register form. Contains all form state, validation, fields, and submit logic.
-
-Props: `onRegistered({ pendingOtpToken, email })`, `initialEmail?`, `formSpacing?`.
-
-### `VerifyOtpForm`
-
-**File:** `app/components/auth/VerifyOtpForm.tsx`
-
-Shared OTP verification form. Contains code input, cooldown timer, verify/resend logic.
-
-Props: `pendingOtpToken`, `purpose`, `onVerified?`, `formSpacing?`.
-
-### AuthStepLayout
-
-**File:** `app/components/auth/AuthStepLayout.tsx`
-
-Shared layout component used by all auth step components and welcome steps. Provides consistent structure: full-screen centered layout, optional icon badge, title, subtitle, content wrapper, and standardized button footer.
-
-Props: `icon?` (HeroIcon), `title` (string), `subtitle` (ReactNode), `onBack?` (() => void), `onNext?` (() => void), `nextLabel?` (string, defaults to "Suivant"), `children?` (ReactNode).
-
-### Auth Form Components
-
-**Directory:** `app/components/auth/`
-- `LoginForm` — Login form (email + password). Props: `onLoginSuccess()`, `onOtpRequired(data)`, `initialEmail?`
-
-Auth pages (`/login`, `/register`, `/verify-otp`) are standalone route pages that compose `AuthStepLayout` with the appropriate form component (`LoginForm`, `RegisterForm`, `VerifyOtpForm`).
-
-### Welcome Components
-
-**Directory:** `app/components/welcome/`
-- `WelcomeFeatureStep` — Feature cards (uses `AuthStepLayout`)
-- `WelcomeHowItWorksStep` — How it works guide (uses `AuthStepLayout`)
-
-## OnboardingGenerateScriptStep Detail
-
-### `useGenerateScriptFlow` hook
-
-**File:** `app/hooks/useGenerateScriptFlow.ts`
-
-Encapsulates all generation flow state and logic: phase transitions (`brief` → `generating` → `preview`), script/generation UUID management, rotating messages interval, recovery on reload (falls back to most recent script via `useListPaginatedScripts`, and resumes from existing generations via `useLatestScriptGeneration` — in-progress → Generating phase, completed → Preview phase), and the `handleBriefSubmit` handler (creates script if needed, triggers generation).
-
-Returns: `{ phase, script, isPending, isFailed, messageIndex, handleBriefSubmit }`
-
-### Phase Sub-Components
-
-| Phase | Component | Layout | Description |
-|-------|-----------|--------|-------------|
-| brief | `OnboardingGenerateScriptStep` (inline) | Two-column | Left: `ScriptEditorPanel` (read-only), Right: `ScriptBriefForm` + skip button |
-| generating | `GenerateScriptGeneratingPhase` | Two-column | Left: `ScriptEditorPanel`, Right: animated loading or error state |
-| preview | `GenerateScriptPreviewPhase` | Centered | Success header + `ScriptEditorPanel` + continue button |
-
-**Files:**
-- `app/components/onboarding/GenerateScriptPreviewPhase.tsx`
-- `app/components/onboarding/GenerateScriptGeneratingPhase.tsx`
+`OnboardingLivePreview.tsx` is a draft preview component (sidebar mock + identity tile). It still has unresolved bindings (`hasIdentity`, `logoPreviewUrl`, `name`, `user`, `AgencyLogo`, `IdentityPopoverView`, `Shimmer`) and is **not imported anywhere**. Finish wiring before consuming.
 
 ## Key Files
 
-- `app/routes/onboarding.tsx`
-- `app/hooks/useOnboardingFlow.ts`
-- `app/stores/onboarding/onboardingStore.ts`
-- `app/stores/auth/authPrefillStore.ts`
-- `app/models/enums/WelcomeStep.ts`
-- `app/models/enums/OnboardingStep.ts`
-- `app/hooks/api/onboarding/useAdvanceOnboardingStep.ts`
-- `app/hooks/api/onboarding/useCompleteOnboardingStep.ts`
-- `app/hooks/api/onboarding/useShowOnboarding.ts`
-- `app/hooks/api/onboarding/useDismissOnboarding.ts`
-- `app/components/onboarding/OnboardingStepHeader.tsx`
-- `app/components/auth/AuthStepLayout.tsx`
-- `app/components/auth/LoginForm.tsx`
-- `app/components/onboarding/OnboardingCreateProjectStep.tsx`
-- `app/components/onboarding/OnboardingConnectIntegrationStep.tsx`
-- `app/components/onboarding/OnboardingCreatorProfileStep.tsx`
-- `app/components/onboarding/OnboardingCreateScriptStep.tsx`
-- `app/components/onboarding/OnboardingGenerateScriptStep.tsx`
-- `app/components/onboarding/GenerateScriptPreviewPhase.tsx`
-- `app/components/onboarding/GenerateScriptGeneratingPhase.tsx`
-- `app/components/onboarding/OnboardingSubscriptionStep.tsx`
-- `app/hooks/useGenerateScriptFlow.ts`
-- `app/components/ui/PlatformPill.tsx`
-- `app/components/scripts/creatorProfile/CreatorProfileForm.tsx`
-- `app/components/scripts/generation/ScriptBriefForm.tsx`
-- `app/components/projects/CreateProjectForm.tsx`
-- `app/components/auth/RegisterForm.tsx`
-- `app/components/auth/VerifyOtpForm.tsx`
-- `app/utils/registerValidation.ts`
-- `app/models/Onboarding.ts`
-- `app/routes/protected.tsx`
+- `src/routes/onboarding.tsx`
+- `src/hooks/useOnboardingFlow.ts`
+- `src/hooks/api/onboarding/useAdvanceOnboardingStep.ts`
+- `src/hooks/api/onboarding/useCompleteOnboardingStep.ts`
+- `src/hooks/api/onboarding/useShowOnboarding.ts`
+- `src/hooks/api/onboarding/useDismissOnboarding.ts` (dormant)
+- `src/models/enums/OnboardingStep.tsx`
+- `src/models/Onboarding.ts`
+- `src/components/onboarding/OnboardingStepLayout.tsx`
+- `src/components/onboarding/OnboardingProgressBar.tsx`
+- `src/components/onboarding/OnboardingStepHeader.tsx`
+- `src/components/onboarding/OnboardingCreateAgencyStep.tsx`
+- `src/components/onboarding/OnboardingCreateProjectStep.tsx`
+- `src/components/onboarding/OnboardingInviteFirstClientStep.tsx`
+- `src/components/onboarding/OnboardingConnectIntegrationStep.tsx`
+- `src/components/onboarding/OnboardingExploreContentsStep.tsx`
+- `src/components/onboarding/OnboardingSubscriptionStep.tsx`
+- `src/components/onboarding/OnboardingPreviewLayout.tsx`
+- `src/components/onboarding/previews/OnboardingCreateAgencyPreview.tsx`
+- `src/components/onboarding/previews/OnboardingCreateProjectPreview.tsx`
+- `src/components/onboarding/previews/OnboardingInviteFirstClientPreview.tsx`
+- `src/stores/onboarding/onboardingCreateAgencyStore.ts`
+- `src/stores/onboarding/onboardingCreateProjectStore.ts`
+- `src/stores/onboarding/onboardingInviteFirstClientStore.ts`
+- `src/components/agency/settings/project/InviteClientForm.tsx` (reused; optional `onValuesChange`)

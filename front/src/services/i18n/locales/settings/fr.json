@@ -2,6 +2,8 @@
     "title": "Paramètres",
     "sections": {
         "general": "Général",
+        "agency": "Agence",
+        "collaborators": "Collaborateurs",
         "projects": "Projets",
         "subscription": "Abonnement"
     },
@@ -31,7 +33,19 @@
             "createdAt": "Créé le {{date}}",
             "descriptionPlaceholder": "Écrivez une description (optionnel)",
             "types": "Types",
-            "deleteConfirm": "En supprimant ce projet, vous supprimez toutes les données qui lui sont associés. Cette action est irréversible."
+            "deleteConfirm": "En supprimant ce projet, vous supprimez toutes les données qui lui sont associés. Cette action est irréversible.",
+            "clients": {
+                "title": "Clients",
+                "invite": "Inviter un client",
+                "empty": "Aucun client pour le moment.",
+                "remove": "Retirer",
+                "cancel": "Annuler l'invitation",
+                "removeConfirm": "Retirer {{target}} de ce projet ?",
+                "status": {
+                    "active": "Actif",
+                    "pending": "En attente"
+                }
+            }
         }
     },
     "subscription": {
@@ -63,6 +77,19 @@
             "perMonth": "/ mois",
             "creditsPerMonth": "{{count}} crédits / mois",
             "choose": "Choisir"
+        },
+        "usage": {
+            "title": "Utilisation",
+            "editorCollaborators": "Éditeurs",
+            "videoHours": "Heures de vidéo",
+            "storage": "Stockage",
+            "unlimited": "Illimité",
+            "upgradeToUnlock": "Passez à un plan supérieur"
+        },
+        "errors": {
+            "editorCollaboratorLimit": "Limite d'éditeurs atteinte pour votre abonnement.",
+            "videoHoursLimit": "Limite d'heures de vidéo atteinte pour votre abonnement.",
+            "storageLimit": "Limite de stockage atteinte pour votre abonnement."
         },
         "checkoutSuccess": "Paiement effectué avec succès"
     }

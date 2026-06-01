@@ -1,83 +1,38 @@
-import { ChevronRightIcon } from "@heroicons/react/24/solid"
 import { useTranslation } from "react-i18next"
 import { useIsDesktop } from "~/hooks/useIsDesktop"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
-import { type OnboardingStep, ONBOARDING_STEP_ORDER, onboardingStepToIcon, onboardingStepShortLabelKeys } from "~/models/enums/OnboardingStep"
-import { WELCOME_STEP_ORDER, welcomeStepToIcon, welcomeStepShortLabelKeys } from "~/models/enums/WelcomeStep"
 
 export default function OnboardingProgressBar() {
-    const { t } = useTranslation()
-    const { isAuthenticated, onboarding, currentOnboardingStep, currentWelcomeStep, currentStep, totalSteps } = useOnboardingFlow()
-    const isDesktop = useIsDesktop()
+  const { currentStepIndex: currentStep, totalSteps, flowConfig } = useOnboardingFlow()
 
-    const steps = isAuthenticated ? ONBOARDING_STEP_ORDER : WELCOME_STEP_ORDER
-    const iconMap = isAuthenticated ? onboardingStepToIcon : welcomeStepToIcon
-    const labelMap = isAuthenticated ? onboardingStepShortLabelKeys : welcomeStepShortLabelKeys
+  const pastStepNumbers = Array.from({ length: currentStep }, (_, i) => i + 1)
+  const futureStepNumbers = Array.from(
+    { length: totalSteps - currentStep - 1 },
+    (_, i) => currentStep + 2 + i,
+  )
 
-    const currentWelcomeIndex = WELCOME_STEP_ORDER.indexOf(currentWelcomeStep)
-
-    const isCompleted = (step: string, index: number) =>
-        isAuthenticated
-            ? onboarding?.isStepCompleted(step as OnboardingStep) ?? false
-            : index < currentWelcomeIndex
-
-    const isCurrent = (step: string) =>
-        isAuthenticated
-            ? step === currentOnboardingStep
-            : step === currentWelcomeStep
-
-    const percentage = Math.round(((currentStep + 1) / totalSteps) * 100)
-    const currentStepKey = steps[currentStep]
-
-    if (!isDesktop) {
-        return (
-            <div className="flex flex-col gap-1 w-full">
-                <div className="flex items-center justify-between">
-                    <span className="text-body-xs text-gray uppercase">
-                        {t("onboarding:progress.stepCount", { current: currentStep + 1, total: totalSteps })}
-                    </span>
-                    <span className="text-body-xs text-gray">
-                        {percentage}%
-                    </span>
-                </div>
-                <span className="text-body-sm text-dark font-semibold">
-                    {t(labelMap[currentStepKey as keyof typeof labelMap])}
-                </span>
-                <div className="h-1.5 w-full bg-light-gray rounded-full">
-                    <div
-                        className="h-full bg-primary rounded-full transition-all duration-300"
-                        style={{ width: `${percentage}%` }}
-                    />
-                </div>
-            </div>
-        )
-    }
-
-    return (
-        <div className="flex items-center gap-2">
-            {steps.map((step, index) => {
-                const completed = isCompleted(step, index)
-                const current = isCurrent(step)
-                const Icon = iconMap[step as keyof typeof iconMap] as React.ComponentType<React.SVGProps<SVGSVGElement>>
-
-                return (
-                    <div key={step} className="flex items-center gap-2">
-                        {index > 0 && (
-                            <ChevronRightIcon className="size-4 text-gray shrink-0" />
-                        )}
-                        <div className="flex flex-col gap-1">
-
-                            <div className="flex items-center gap-1.5 shrink-0">
-                                <Icon className={`size-5 shrink-0 ${completed ? 'text-primary' : 'text-gray'}`} />
-                                <span className={`text-body-xs whitespace-nowrap ${current ? 'text-dark' : completed ? 'text-dark' : 'text-gray'}`}>
-                                    {t(labelMap[step as keyof typeof labelMap])}
-                                </span>
-                            </div>
-                        </div>
-
-                    </div>
-                )
-            })}
+  return (
+    <div className="flex items-center gap-3 w-full">
+      <div className="flex items-center gap-2 shrink-0">
+        {pastStepNumbers.map((number) => (
+          stepNumber(number, "bg-pale-gray-2", "text-clear")
+        ))}
+        {stepNumber(currentStep + 1, "bg-primary", "text-clear")}
+      </div>
+      <div className="h-px flex-1 bg-pale-gray-2" />
+      {futureStepNumbers.length > 0 && (
+        <div className="flex items-center gap-2 shrink-0">
+          {futureStepNumbers.map((number) => (
+            stepNumber(number, "bg-dark", "text-clear")))}
         </div>
-    )
+      )}
+    </div>
+  )
+
+  function stepNumber(number: number, bgClassName: string, textClassName: string) {
+    return <div key={number} className={`${bgClassName} ${textClassName} flex items-center justify-center size-7 rounded-md text-sm shrink-0`} >
+      {number}
+    </div >
+
+  }
 }

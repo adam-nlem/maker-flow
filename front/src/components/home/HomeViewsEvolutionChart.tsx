@@ -10,8 +10,6 @@ interface HomeViewsEvolutionChartProps {
 export default function HomeViewsEvolutionChart({ viewsTimeline }: HomeViewsEvolutionChartProps) {
     const { t } = useTranslation();
 
-    if (viewsTimeline.length === 0) return null;
-
     const series = viewsTimeline
         .filter((timeline) => platformOptions.includes(timeline.platform))
         .map((timeline) => ({
@@ -21,9 +19,15 @@ export default function HomeViewsEvolutionChart({ viewsTimeline }: HomeViewsEvol
         }));
 
     return (
-        <div className="border border-light-gray rounded-lg p-3">
+        <div className="border border-pale-gray rounded-lg p-3">
             <h2 className="text-heading-sm mb-3">{t("home:viewsEvolution.title")}</h2>
-            <MultiLineChart series={series} />
+            {series.length > 0 ? (
+                <MultiLineChart series={series} />
+            ) : (
+                <div className="w-full h-50 flex items-center justify-center">
+                    <p className="text-body-sm text-muted-2">{t("home:viewsEvolution.empty")}</p>
+                </div>
+            )}
         </div>
     );
 }

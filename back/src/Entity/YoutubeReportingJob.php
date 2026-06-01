@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Entity\Integration;
-use App\Entity\User;
 use App\Helper\DateHelper;
 use App\Entity\Enum\YoutubeReportType;
 use App\Repository\YoutubeReportingJobRepository;
@@ -45,10 +44,6 @@ class YoutubeReportingJob
     #[ORM\ManyToOne(targetEntity: Integration::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
     private ?Integration $integration = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
 
     public function __construct()
     {
@@ -143,17 +138,6 @@ class YoutubeReportingJob
     public function setIntegration(?Integration $integration): static
     {
         $this->integration = $integration;
-        return $this;
-    }
-
-    public function getUser(): ?User
-    {
-        return $this->user;
-    }
-
-    public function setUser(?User $user): static
-    {
-        $this->user = $user;
         return $this;
     }
 }

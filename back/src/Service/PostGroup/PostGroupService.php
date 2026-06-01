@@ -11,7 +11,6 @@ use App\Helper\InsightHelper;
 use App\Entity\Post;
 use App\Entity\PostGroup;
 use App\Entity\Project;
-use App\Entity\User;
 use App\Helper\CaptionHelper;
 use App\Helper\ThumbnailHashHelper;
 use App\Repository\PostGroupRepository;
@@ -40,11 +39,10 @@ class PostGroupService
     /**
      * @return PostGroupWithAggregatedInsightsResponseDTO[]
      */
-    public function getRankedPostGroups(User $user, Project $project, int $page, int $limit): array
+    public function getRankedPostGroups(Project $project, int $page, int $limit): array
     {
-        $postGroupIds = $this->postGroupRepository->getRankedIdsByProjectAndUserSortedByInsightValue(
+        $postGroupIds = $this->postGroupRepository->getRankedIdsByProjectSortedByInsightValue(
             $project,
-            $user,
             PostInsightType::Views,
             $page,
             $limit,
@@ -75,13 +73,12 @@ class PostGroupService
      * @return PostGroupListItemResponseDTO[]
      */
     public function getPostGroupListItems(
-        User $user,
         Project $project,
         ?string $searchTerm,
         int $page,
         int $limit
     ): array {
-        $postGroups = $this->postGroupRepository->getByProjectAndUserPaginatedAndSearchTerm($project, $user, $searchTerm, $page, $limit);
+        $postGroups = $this->postGroupRepository->getByProjectPaginatedAndSearchTerm($project, $searchTerm, $page, $limit);
 
         if (empty($postGroups)) {
             return [];
@@ -129,11 +126,9 @@ class PostGroupService
         }
 
         $project = $post->getIntegration()->getProject();
-        $user = $post->getUser();
 
         $candidates = $this->postRepository->getByProjectAndPublishedAtWindow(
             $project,
-            $user,
             $post->getPublishedAt(),
             self::AUTO_GROUP_HOURS_WINDOW,
             $post->getIntegration(),
@@ -166,7 +161,6 @@ class PostGroupService
             $postGroup = new PostGroup();
             $postGroup
                 ->setTitle($title)
-                ->setUser($user)
                 ->setProject($project);
 
             $this->postGroupRepository->save($postGroup);

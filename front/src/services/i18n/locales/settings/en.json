@@ -2,6 +2,8 @@
     "title": "Settings",
     "sections": {
         "general": "General",
+        "agency": "Agency",
+        "collaborators": "Collaborators",
         "projects": "Projects",
         "subscription": "Subscription"
     },
@@ -31,7 +33,19 @@
             "createdAt": "Created on {{date}}",
             "descriptionPlaceholder": "Write a description (optional)",
             "types": "Types",
-            "deleteConfirm": "Deleting this project will delete all data associated with it. This action is irreversible."
+            "deleteConfirm": "Deleting this project will delete all data associated with it. This action is irreversible.",
+            "clients": {
+                "title": "Clients",
+                "invite": "Invite a client",
+                "empty": "No clients yet.",
+                "remove": "Remove",
+                "cancel": "Cancel invitation",
+                "removeConfirm": "Remove {{target}} from this project?",
+                "status": {
+                    "active": "Active",
+                    "pending": "Pending"
+                }
+            }
         }
     },
     "subscription": {
@@ -63,6 +77,19 @@
             "perMonth": "/ month",
             "creditsPerMonth": "{{count}} credits / month",
             "choose": "Choose"
+        },
+        "usage": {
+            "title": "Usage",
+            "editorCollaborators": "Editor collaborators",
+            "videoHours": "Video upload hours",
+            "storage": "Storage",
+            "unlimited": "Unlimited",
+            "upgradeToUnlock": "Upgrade to unlock"
+        },
+        "errors": {
+            "editorCollaboratorLimit": "Editor collaborator limit reached for your plan.",
+            "videoHoursLimit": "Video upload hours limit reached for your plan.",
+            "storageLimit": "Storage limit reached for your plan."
         },
         "checkoutSuccess": "Payment successful"
     }

@@ -5,7 +5,7 @@ import Shimmer from "~/components/ui/Shimmer"
 import { useListPaginatedRankedPosts } from "~/hooks/api/posts/useListPaginatedRankedPosts"
 import { useInfiniteScroll } from "~/hooks/useInfiniteScroll"
 import { PostInsightType } from "~/models/enums/PostInsightType"
-import { formatToFrenchRelative } from "~/utils/dateFormatters"
+import { formatToRelative } from "~/utils/dateFormatters"
 
 const DISPLAYED_METRIC_TYPES = [PostInsightType.Views, PostInsightType.Likes, PostInsightType.Comments] as const
 
@@ -39,7 +39,7 @@ export default function RankedPostsList({ integrationUuid }: RankedPostsListProp
   }
 
   if (posts.length === 0) {
-    return <p className="text-body-sm text-gray">{t("home:noPosts")}</p>
+    return <p className="text-body-sm text-muted-2">{t("home:noPosts")}</p>
   }
 
   return (
@@ -52,7 +52,7 @@ export default function RankedPostsList({ integrationUuid }: RankedPostsListProp
             index={index}
             postUuid={post.post.uuid}
             title={post.post.caption}
-            subtitle={formatToFrenchRelative(post.post.publishedAt)}
+            subtitle={formatToRelative(post.post.publishedAt)}
             metrics={DISPLAYED_METRIC_TYPES.map((type) => ({
               type,
               value: post.aggregatedInsights.find((i) => i.type === type)?.value ?? 0,

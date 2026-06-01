@@ -719,15 +719,25 @@ Integration management is accessible from the sidebar's "PLATEFORMES" section. E
 
 ### Architecture
 
-The modal is controlled via a Zustand store (`useIntegrationLoginModalStore`) holding `selectedPlatform: Platform | null`. This allows any component to open the modal — the sidebar tiles and `ConnectIntegrationPlaceholder` both use this store.
+The modal is controlled via a Zustand store (`useIntegrationLoginModalStore`) holding `projectUuid: string | null` and `selectedPlatform: Platform | null`. The store has a single open action and a single close action:
+
+- `open(projectUuid: string, platform: Platform)` — sets both fields, mounts the modal
+- `close()` — clears both fields, unmounts the modal
+
+The modal reads `projectUuid` directly from the store — it does **not** read `useFocusProjectStore`. Every caller passes the project UUID explicitly, so agency-side and client-side flows share exactly the same code path.
 
 ```
-SideBar.tsx
-  └── IntegrationTile × 3  (one per platform, shows status dot)
-  └── IntegrationLoginModal  (reads from store, renders ModalOverlay + IntegrationLoginCard)
+Agency sidebar (DesktopSidebar.tsx)
+  └── IntegrationTile × 3  → open(focusedProjectUuid, platform)  (guarded on focusedProjectUuid)
+  └── IntegrationLoginModal  (one shared mount for the whole agency shell)
 
-ConnectIntegrationPlaceholder.tsx
-  └── Button onClick → setSelectedPlatform(Platform.Instagram)
+Client sidebar (ClientDesktopSidebar.tsx)
+  └── IntegrationTile × 3  → open(clientProjectUuid, platform)  (guarded on clientProjectUuid)
+  └── IntegrationLoginModal  (one shared mount for the whole client shell)
+
+ConnectIntegrationPlaceholder.tsx (shared)
+  └── takes projectUuid: string | null prop; button disabled when null
+  └── Button onClick → open(projectUuid, Platform.Instagram)
 ```
 
 ### Status dot colors
@@ -742,3 +752,11 @@ ConnectIntegrationPlaceholder.tsx
 - **Click action:** Opens a centered modal (`ModalOverlay`) containing `IntegrationLoginCard` for the clicked platform, allowing the user to connect/disconnect/reconnect.
 - **Reactivity:** After connecting or disconnecting via the modal, the `useListIntegrations` query is invalidated by the mutation hooks, so the status dot updates automatically.
 - **ConnectIntegrationPlaceholder:** The "Connecter un compte" button on the home page opens the modal defaulting to Instagram.
+
+## Client portal OAuth surface (Phase 8)
+
+Clients connect their own social accounts through the same OAuth pipeline and the same UI primitives as the agency. Both sides call the same single `open(projectUuid, platform)` action on the modal store; only the source of `projectUuid` differs (`focusedProjectUuid` for agency, `user.clientProjectUuid` for client). Backend access is granted by `ProjectVoter::MANAGE_INTEGRATIONS`, which already permits `ROLE_CLIENT` on their own project.
+
+- **Client sidebar — per-platform tiles**: `ClientDesktopSidebar` renders the same `IntegrationTile × 3` PLATEFORMES section as `DesktopSidebar`. The shared `IntegrationLoginModal` is mounted once in `ClientDesktopSidebar` for the whole client shell.
+- **Client home — empty state CTA**: the shared `ConnectIntegrationPlaceholder` is reused with an explicit `projectUuid` prop. The populated client home does not render its own Connect button — clients connect via the sidebar tiles, matching the agency populated state.
+- Client-side integrations created this way carry `Integration.createdBy = clientUser` (set server-side by `IntegrationController::create`), so the agency UI can show which connection came from the client.

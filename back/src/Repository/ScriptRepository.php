@@ -35,13 +35,15 @@ class ScriptRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?Script
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?Script
     {
         return $this->createQueryBuilder('s')
+            ->join('s.project', 'p')
             ->where('s.uuid = :uuid')
-            ->andWhere('s.user = :user')
+            ->andWhere('(p.agency = :agency OR p = :clientProject)')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -50,13 +52,11 @@ class ScriptRepository extends ServiceEntityRepository
     /**
      * @return Script[]
      */
-    public function getByProjectAndUser(Project $project, User $user): array
+    public function getByProject(Project $project): array
     {
         return $this->createQueryBuilder('s')
             ->where('s.project = :project')
-            ->andWhere('s.user = :user')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->orderBy('s.createdAt', 'DESC')
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
@@ -66,13 +66,11 @@ class ScriptRepository extends ServiceEntityRepository
     /**
      * @return Script[]
      */
-    public function getByProjectAndUserPaginated(Project $project, User $user, int $page, int $limit, ?ScriptStatus $status = null): array
+    public function getByProjectPaginated(Project $project, int $page, int $limit, ?ScriptStatus $status = null, ?string $searchTerm = null): array
     {
         $qb = $this->createQueryBuilder('s')
             ->where('s.project = :project')
-            ->andWhere('s.user = :user')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->orderBy('s.createdAt', 'DESC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
@@ -82,39 +80,37 @@ class ScriptRepository extends ServiceEntityRepository
                 ->setParameter('status', $status);
         }
 
+        if ($searchTerm !== null) {
+            $qb->andWhere('LOWER(s.title) LIKE LOWER(:searchTerm)')
+                ->setParameter('searchTerm', '%' . $searchTerm . '%');
+        }
+
         return $qb
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    /**
-     * @return Script[]
-     */
-    public function countByProjectAndUser(Project $project, User $user): int
+    public function countByProject(Project $project): int
     {
         return (int) $this->createQueryBuilder('s')
             ->select('COUNT(s.id)')
             ->where('s.project = :project')
-            ->andWhere('s.user = :user')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->getQuery()
             ->getSingleScalarResult();
     }
 
-    public function getByProjectAndUserAndMonth(Project $project, User $user, int $year, int $month): array
+    public function getByProjectAndMonth(Project $project, int $year, int $month): array
     {
         $startOfMonth = new \DateTimeImmutable("$year-$month-01");
         $startOfNextMonth = $startOfMonth->modify('first day of next month');
 
         return $this->createQueryBuilder('s')
             ->where('s.project = :project')
-            ->andWhere('s.user = :user')
             ->andWhere('s.publishedAt >= :startOfMonth')
             ->andWhere('s.publishedAt < :startOfNextMonth')
             ->setParameter('project', $project)
-            ->setParameter('user', $user)
             ->setParameter('startOfMonth', $startOfMonth)
             ->setParameter('startOfNextMonth', $startOfNextMonth)
             ->orderBy('s.publishedAt', 'ASC')
@@ -122,5 +118,4 @@ class ScriptRepository extends ServiceEntityRepository
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
-
 }

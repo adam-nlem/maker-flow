@@ -8,6 +8,9 @@ export interface PlanConfigDTOJSON {
     creditsPerMonth: number;
     maxProjects: number | null;
     maxScriptsPerProject: number | null;
+    maxEditorCollaborators: number | null;
+    maxVideoUploadHours: number | null;
+    maxStorageGb: number | null;
     features: string[];
     isHighlighted: boolean;
     sortOrder: number;
@@ -22,6 +25,9 @@ export class PlanConfigDTO {
         public readonly creditsPerMonth: number,
         public readonly maxProjects: number | null,
         public readonly maxScriptsPerProject: number | null,
+        public readonly maxEditorCollaborators: number | null,
+        public readonly maxVideoUploadHours: number | null,
+        public readonly maxStorageGb: number | null,
         public readonly features: string[],
         public readonly isHighlighted: boolean,
         public readonly sortOrder: number,
@@ -36,6 +42,9 @@ export class PlanConfigDTO {
             json.creditsPerMonth,
             json.maxProjects,
             json.maxScriptsPerProject,
+            json.maxEditorCollaborators ?? null,
+            json.maxVideoUploadHours ?? null,
+            json.maxStorageGb ?? null,
             json.features,
             json.isHighlighted,
             json.sortOrder,

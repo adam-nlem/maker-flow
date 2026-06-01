@@ -17,7 +17,7 @@ export default function PlatformPill({ platform, isSelected, onToggle }: Platfor
             label={t(platformTranslationKeys[platform])}
             isSelected={onToggle ? isSelected : true}
             onClick={onToggle}
-            borderColorClassName="border-light-gray"
+            borderColorClassName="border-pale-gray"
             bgColorClassName="bg-clear"
         />
     )

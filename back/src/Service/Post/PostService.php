@@ -53,8 +53,7 @@ class PostService
             ->setDuration(0)
             ->setCaption($postDTO->getCaption())
             ->setExternalUrl($postDTO->getExternalUrl())
-            ->setIntegration($integration)
-            ->setUser($integration->getUser());
+            ->setIntegration($integration);
 
         if ($postDTO->getThumbnailUrl() !== null) {
             $this->postThumbnailService->downloadAndStore($post, $postDTO->getThumbnailUrl());
@@ -91,8 +90,7 @@ class PostService
             ->setDuration($postDTO->getDuration())
             ->setCaption($postDTO->getCaption())
             ->setExternalUrl($postDTO->getExternalUrl())
-            ->setIntegration($integration)
-            ->setUser($integration->getUser());
+            ->setIntegration($integration);
 
         if ($postDTO->getThumbnailUrl() !== null) {
             $this->postThumbnailService->downloadAndStore($post, $postDTO->getThumbnailUrl());
@@ -129,8 +127,7 @@ class PostService
             ->setDuration($postDTO->getDuration())
             ->setCaption($postDTO->getCaption())
             ->setExternalUrl($postDTO->getExternalUrl())
-            ->setIntegration($integration)
-            ->setUser($integration->getUser());
+            ->setIntegration($integration);
 
         if ($postDTO->getThumbnailUrl() !== null) {
             $this->postThumbnailService->downloadAndStore($post, $postDTO->getThumbnailUrl());
@@ -146,13 +143,11 @@ class PostService
      * @return PostWithAggregatedInsightsResponseDTO[]
      */
     public function getRankedPosts(
-        User $user,
         Integration $integration,
         int $page,
         int $limit,
     ): array {
-        $postIds = $this->repository->getRankedIdsByUserAndIntegrationSortedByInsightValue(
-            $user,
+        $postIds = $this->repository->getRankedIdsByIntegrationSortedByInsightValue(
             $integration,
             PostInsightType::Views,
             $page,
@@ -184,14 +179,13 @@ class PostService
      * @return PostListItemResponseDTO[]
      */
     public function getPostListItems(
-        User $user,
         Project $project,
         ?Platform $platform,
         ?string $searchTerm,
         int $page,
         int $limit,
     ): array {
-        $posts = $this->repository->getByProjectAndUserPaginatedAndSearchTerm($project, $user, $platform, $searchTerm, $page, $limit);
+        $posts = $this->repository->getByProjectPaginatedAndSearchTerm($project, $platform, $searchTerm, $page, $limit);
 
         if (empty($posts)) {
             return [];

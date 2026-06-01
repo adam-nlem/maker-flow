@@ -39,7 +39,7 @@ export default function ContentPostList({ projectUuid }: ContentPostListProps) {
         return (
             <div className="flex flex-row flex-wrap gap-3 p-4 flex-1">
                 {[...Array(9)].map((_, i) => (
-                    <div key={i} className="flex flex-col w-100 justify-between border border-light-gray rounded-lg p-4">
+                    <div key={i} className="flex flex-col w-100 justify-between border border-pale-gray rounded-lg p-4">
                         <div className="flex flex-row justify-between">
                             <Shimmer width="w-40" height="h-7" />
                             <Shimmer width="w-24" height="h-5" />
@@ -60,7 +60,7 @@ export default function ContentPostList({ projectUuid }: ContentPostListProps) {
     if (posts.length === 0) {
         return (
             <div className="flex items-center justify-center py-20">
-                <p className="text-body-sm text-gray">
+                <p className="text-body-sm text-muted-2">
                     {t("contents:noPosts")}
                 </p>
             </div>

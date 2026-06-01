@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libonig-dev \
     libpq-dev \
     libzip-dev \
+    ffmpeg \
     npm
 
 RUN docker-php-ext-install pdo pdo_mysql sodium intl curl fileinfo gd zip
@@ -22,6 +23,7 @@ RUN apt clean && rm -rf /var/lib/apt/lists/*
 RUN a2enmod rewrite
 
 COPY .docker/apache2/000-default.conf /etc/apache2/sites-available/000-default.conf
+COPY .docker/build/php-uploads.ini /usr/local/etc/php/conf.d/zz-uploads.ini
 
 RUN php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" \
     && php composer-setup.php --install-dir=/usr/local/bin --filename=composer \

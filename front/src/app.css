@@ -24,25 +24,36 @@ body {
   --font-family-sans: Roboto, ui-sans-serif, system-ui, sans-serif;
   --font-family-display: Outfit, ui-sans-serif, system-ui, sans-serif;
 
-  --color-gray-900: #F0F0F0;
-  --color-light-gray: #2d2d44;
-  --color-gray: #9ca3af;
-  --color-gray-400: #6b7280;
-  --color-purple: #715AFF;
-
-  --color-primary: #43CEA9;
-  --color-dark: #F0F0F0;
-  --color-clear: #141115;
+  --color-primary: #5BBDA0;
+  --color-dark: #14111A;
+  --color-clear: #FFFFFF;
   --color-danger: #D33F49;
 
   --color-red: #E4572E;
   --color-yellow: #E7BC21;
-  --color-green: #A8C686;
+  --color-green: #6B9477;
   --color-blue: #669BBC;
   --color-purple: #5346B6;
 
   --color-pastel-green: #BCD5AA;
-  --color-surface-hover: rgba(67, 206, 169, 0.05);
+
+  /* Extended light surfaces (layered paper / card backgrounds) */
+  --color-clear-2: #F6F8F7;
+  --color-clear-3: #EEF1EF;
+  --color-clear-4: #E2E7E4;
+
+  /* Extended dark ramp */
+  --color-dark-2: #2E3437;
+
+  /* Muted text ramp */
+  --color-muted: #6A7074;
+  --color-muted-2: #9DA3A5;
+
+  /* Pale dividers */
+  --color-pale-gray: #ECEFED;
+  --color-pale-gray-2: #DADFDC;
+
+  --color-surface-hover: color-mix(in srgb, var(--color-primary) 10%, transparent);
 
   /* Custom text sizes with appropriate fonts */
   --font-size-xs: 0.75rem;
@@ -111,73 +122,55 @@ body {
 
 
 .text-body-lg {
-  font-family: var(--font-family-display);
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-lg);
-  color: var(--color-gray);
+  font-weight: normal;
+  color: var(--color-dark-2);
 }
 
 .text-body-md {
-  font-family: var(--font-family-display);
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-md);
-  color: var(--color-gray);
+  font-weight: normal;
+  color: var(--color-dark-2);
 }
 
 .text-body-base {
-  font-family: var(--font-family-display);
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-base);
-  color: var(--color-gray);
+  font-weight: normal;
+  color: var(--color-dark-2);
 }
 
 .text-body-sm {
-  font-family: var(--font-family-display);
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-sm);
-  color: var(--color-gray);
+  font-weight: normal;
+  color: var(--color-dark-2);
 }
 
 .text-body-xs {
-  font-family: var(--font-family-display);
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-xs);
-  color: var(--color-gray);
+  font-weight: normal;
+  color: var(--color-dark-2);
 }
 
 /* Override default Tailwind text classes to use appropriate fonts */
-.text-4xl {
-  font-family: var(--font-family-display);
-  font-weight: 700;
-}
-
-.text-3xl {
-  font-family: var(--font-family-display);
-  font-weight: 600;
-}
-
-.text-2xl {
-  font-family: var(--font-family-display);
-  font-weight: 600;
-}
-
-.text-xl {
-  font-family: var(--font-family-display);
-  font-weight: 600;
-}
-
-.text-lg {
-  font-family: var(--font-family-display);
-  font-weight: 500;
-}
-
-.text-md {
-  font-family: var(--font-family-display);
-  font-size: var(--font-size-md);
-}
-
-.text-sm {
-  font-family: var(--font-family-display);
-  font-size: var(--font-size-sm);
+.text-4xl,
+.text-3xl,
+.text-2xl,
+.text-xl,
+.text-lg,
+.text-md,
+.text-sm,
+.text-xs {
+  font-family: var(--font-family-sans);
+  font-weight: normal;
 }
 
 .bg-dot-pattern {
-  background-image: radial-gradient(circle, var(--color-light-gray) 0.5px, transparent 0.5px);
+  background-image: radial-gradient(circle, var(--color-muted) 0.5px, transparent 0.5px);
   background-size: 30px 30px;
 }
 

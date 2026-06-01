@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createResettableStore } from '~/stores/createResettableStore'
 import { ContentsRightPanel } from '~/models/enums/ContentsRightPanel'
 
 export { ContentsRightPanel }
@@ -14,7 +14,7 @@ type ContentsRightPanelAction = {
     togglePanel: (panel: ContentsRightPanel) => void
 }
 
-export const useContentsRightPanelStore = create<ContentsRightPanelState & ContentsRightPanelAction>()(
+export const useContentsRightPanelStore = createResettableStore<ContentsRightPanelState & ContentsRightPanelAction>()(
     persist(
         (set) => ({
             activePanel: null,

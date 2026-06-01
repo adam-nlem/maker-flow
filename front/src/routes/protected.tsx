@@ -1,13 +1,14 @@
 import { Outlet, useNavigate } from "react-router-dom";
 import { useCurrentUser } from "~/hooks/api/users/useCurrentUser";
 import { useShowOnboarding } from "~/hooks/api/onboarding/useShowOnboarding";
+import useSyncFocusedProject from "~/hooks/api/projects/useSyncFocusedProject";
 import { useRef, useEffect } from "react";
-import { useAuthPrefillStore } from "~/stores/auth/authPrefillStore";
 import { loginPath, onboardingPath } from "~/routes/routePaths";
 
 export default function ProtectedLayout() {
     const { user, isLoading } = useCurrentUser()
     const { onboarding, isLoading: onboardingLoading } = useShowOnboarding({ enabled: !!user })
+    useSyncFocusedProject()
     const navigate = useNavigate();
     const hasRedirected = useRef(false);
 
@@ -17,8 +18,7 @@ export default function ProtectedLayout() {
         if (!user) {
             if (!hasRedirected.current) {
                 hasRedirected.current = true
-                const hasEmail = useAuthPrefillStore.getState().email !== null
-                navigate(hasEmail ? loginPath : onboardingPath, { replace: true })
+                navigate(loginPath, { replace: true })
             }
             return
         }
@@ -38,6 +38,7 @@ export default function ProtectedLayout() {
                 </div>
             );
         }
+
         return <Outlet />;
     }
 

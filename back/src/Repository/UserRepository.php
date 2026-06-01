@@ -2,6 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Agency;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -40,16 +42,6 @@ class UserRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('u')
             ->where('u.uuid = :uuid')
             ->setParameter('uuid', $uuid)
-            ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
-    }
-
-    public function getByStripeCustomerId(string $stripeCustomerId): ?User
-    {
-        return $this->createQueryBuilder('u')
-            ->where('u.stripeCustomerId = :stripeCustomerId')
-            ->setParameter('stripeCustomerId', $stripeCustomerId)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -95,5 +87,30 @@ class UserRepository extends ServiceEntityRepository
             ->setParameter('referrer', $referrer)
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    public function countActiveEditorsByAgency(Agency $agency): int
+    {
+        return (int) $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('u.agency = :agency')
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('agency', $agency)
+            ->setParameter('role', '%"' . UserRole::Editor->value . '"%')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getAdminByAgency(Agency $agency): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.agency = :agency')
+            ->andWhere('u.roles LIKE :role')
+            ->setParameter('agency', $agency)
+            ->setParameter('role', '%"' . UserRole::Admin->value . '"%')
+            ->setMaxResults(1)
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 }

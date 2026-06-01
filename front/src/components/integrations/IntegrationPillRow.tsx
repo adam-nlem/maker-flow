@@ -25,7 +25,7 @@ export default function IntegrationPillRow({ integrations, showAllOption = true 
                     label={t(platformTranslationKeys[integration.platform])}
                     isSelected={integration.uuid === focusedIntegrationUuid}
                     onClick={() => setFocusedIntegrationUuid(integration.uuid)}
-                    borderColorClassName="border-light-gray"
+                    borderColorClassName="border-pale-gray"
                 />
             ))}
             {showAllOption && (
@@ -34,7 +34,7 @@ export default function IntegrationPillRow({ integrations, showAllOption = true 
                     label={t("integrations:allPlatforms")}
                     isSelected={focusedIntegrationUuid === null}
                     onClick={() => setFocusedIntegrationUuid(null)}
-                    borderColorClassName="border-light-gray"
+                    borderColorClassName="border-pale-gray"
                 />
             )}
         </div>

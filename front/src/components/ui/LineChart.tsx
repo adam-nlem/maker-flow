@@ -31,11 +31,11 @@ function CustomTooltip({ active, payload, label }: CustomTooltipProps) {
     }
 
     return (
-        <div className="bg-clear border border-light-gray rounded-md p-2 shadow-sm flex flex-col gap-1">
-            <p className="text-body-xs text-gray mb-1">{t("lineChart.durationAfterPublication", { duration: formatHoursToFrench(label) })}</p>
+        <div className="bg-clear border border-pale-gray rounded-md p-2 shadow-sm flex flex-col gap-1">
+            <p className="text-body-xs text-muted-2 mb-1">{t("lineChart.durationAfterPublication", { duration: formatHoursToFrench(label) })}</p>
             {payload.map((entry) => (
                 <div className="flex flex-row gap-1">
-                    <div className={`rounded-full p-1 ${entry.dataKey === "value" ? 'bg-primary' : 'bg-light-gray'}`}></div>
+                    <div className={`rounded-full p-1 ${entry.dataKey === "value" ? 'bg-primary' : 'bg-pale-gray-2'}`}></div>
                     <p key={entry.dataKey} className="text-xs">
                         {entry.dataKey === "value" ? t("lineChart.thisContentValue") : t("lineChart.averageContentValue")}:{" "}
                         <span className="text-heading-xs">{entry.value?.toLocaleString("fr-FR") ?? "—"}</span>
@@ -59,14 +59,14 @@ export default function LineChart({ data, formatValue }: LineChartProps) {
                         tick={{ fontSize: 12 }}
                         interval="preserveEnd"
                         minTickGap={30} // Ensures at least 30px between labels
-                        stroke="var(--color-light-gray)" />
+                        stroke="var(--color-muted)" />
                     <YAxis width="auto" tickFormatter={tickFormatter}
                         tick={{ fontSize: 12 }}
                         tickCount={5}
                         domain={['dataMin', 'auto']} // Ensure the axis starts at the minimum data value (or averageValue)
                         allowDecimals={false}
 
-                        stroke="var(--color-light-gray)" />
+                        stroke="var(--color-muted)" />
                     <Tooltip content={<CustomTooltip />} />
                     <Line
                         type="monotone"
@@ -79,7 +79,7 @@ export default function LineChart({ data, formatValue }: LineChartProps) {
                     <Line
                         type="monotone"
                         dataKey="averageValue"
-                        stroke="var(--color-gray-400)"
+                        stroke="var(--color-muted)"
                         strokeWidth={2}
                         strokeDasharray="5 5"
                         dot={false}

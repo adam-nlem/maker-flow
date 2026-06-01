@@ -18,14 +18,19 @@ Shared page for both login 2FA and email verification. Receives state via React 
 - `email: string` — displayed to user
 
 **UI features:**
-- Same centered layout as login/register pages
+- Same `AuthStepLayout` card chrome as login/register (wordmark, eyebrow, heading, subtitle, trust footer, "Back to sign in" helper link)
 - Purpose-specific title
-- Email display showing where code was sent
-- Single numeric input (maxLength=6, inputMode="numeric")
+- Pill chip at top of form: envelope icon + "Code sent to" + the user's email
+- Six-digit numeric input rendered as 6 separate boxes via the shared `OtpDigitsInput` component:
+  - Auto-advance on key entry
+  - Backspace clears the current digit (or jumps left if empty)
+  - ArrowLeft/ArrowRight navigate between boxes
+  - Paste fills all 6 boxes at once
+  - Autofocus first box on mount
+  - Per-box state: `border-pale-gray-2` idle, `border-primary` + mint ring on focus, `border-danger` on error
 - Error banner (same `bg-danger/10 text-danger` pattern)
-- Submit button with loading state
-- Resend button with 60-second cooldown timer
-- "Retour à la connexion" link
+- Submit button with arrow icon + loading state, disabled until 6 digits are entered
+- Resend control: clock icon + `Resend in 0:NN` countdown while cooling down, otherwise an underlined "Resend code" link
 - Redirects to `/login` if accessed directly without state
 
 **Error handling:**

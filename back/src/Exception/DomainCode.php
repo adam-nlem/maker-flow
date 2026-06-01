@@ -21,4 +21,11 @@ enum DomainCode: int
     case Chat = 24;
     case ScriptPart = 25;
     case ScriptPartSuggestion = 26;
+    case Agency = 27;
+    case HookTemplate = 28;
+    case Invitation = 29;
+    case ProjectClient = 30;
+    case AgencyCollaborator = 31;
+    case Onboarding = 32;
+    case Review = 33;
 }

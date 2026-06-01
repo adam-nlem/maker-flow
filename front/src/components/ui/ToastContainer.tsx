@@ -25,7 +25,7 @@ function ToastItem({ toast }: { toast: Toast }) {
           <div className="shrink-0">
             {isError
               ? <ExclamationCircleIcon aria-hidden="true" className="size-6 text-danger" />
-              : <CheckCircleIcon aria-hidden="true" className="size-6 text-green-500" />
+              : <CheckCircleIcon aria-hidden="true" className="size-6 text-primary" />
             }
           </div>
           <div className="ml-3 w-0 flex-1 pt-0.5">
@@ -35,7 +35,7 @@ function ToastItem({ toast }: { toast: Toast }) {
             <button
               type="button"
               onClick={() => removeToast(toast.id)}
-              className="inline-flex cursor-pointer rounded-md bg-clear text-gray hover:text-dark"
+              className="inline-flex cursor-pointer rounded-md bg-clear text-muted-2 hover:text-dark"
             >
               <span className="sr-only">{t("actions.close")}</span>
               <XMarkIcon aria-hidden="true" className="size-5" />

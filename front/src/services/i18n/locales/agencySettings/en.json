@@ -1,0 +1,19 @@
+{
+    "subtitle": "Customize your agency identity.",
+    "sections": {
+        "identity": "Brand identity"
+    },
+    "fields": {
+        "namePlaceholder": "Your agency name",
+        "contactEmailPlaceholder": "hello@your-agency.com",
+        "websitePlaceholder": "https://your-agency.com"
+    },
+    "logo": {
+        "hint": "PNG. 5 MB max."
+    },
+    "validation": {
+        "nameRequired": "Agency name is required.",
+        "contactEmailFormat": "The contact email is invalid.",
+        "websiteFormat": "The website URL must start with http:// or https://."
+    }
+}

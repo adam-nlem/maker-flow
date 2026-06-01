@@ -1,13 +1,15 @@
+import { Agency, type AgencyJSON } from "./Agency"
 import type { ProjectType } from "./enums/ProjectType"
 
-interface ProjectJSON {
+export interface ProjectJSON {
     uuid: string;
     name: string;
-    description: string;
-    types: ProjectType[];
-    createdAt: string;
+    description?: string;
+    types?: ProjectType[];
+    createdAt?: string;
     updatedAt?: string;
     finishedAt?: string;
+    agency?: AgencyJSON | null;
 }
 
 export class Project {
@@ -19,17 +21,19 @@ export class Project {
         public readonly createdAt: Date,
         public readonly updatedAt?: Date,
         public readonly finishedAt?: Date,
+        public readonly agency: Agency | null = null,
     ) { }
 
     static fromJSON(json: ProjectJSON): Project {
         return new Project(
             json.uuid,
             json.name,
-            json.description,
-            json.types,
-            new Date(json.createdAt),
+            json.description ?? "",
+            json.types ?? [],
+            json.createdAt ? new Date(json.createdAt) : new Date(0),
             json.updatedAt ? new Date(json.updatedAt) : undefined,
             json.finishedAt ? new Date(json.finishedAt) : undefined,
+            json.agency ? Agency.fromJSON(json.agency) : null,
         )
     }
 
@@ -42,6 +46,7 @@ export class Project {
             createdAt: this.createdAt.toISOString(),
             updatedAt: this.updatedAt?.toISOString(),
             finishedAt: this.finishedAt?.toISOString(),
+            agency: this.agency?.toJSON() ?? null,
         }
     }
 

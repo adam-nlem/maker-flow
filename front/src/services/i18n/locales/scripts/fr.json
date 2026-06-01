@@ -2,9 +2,30 @@
     "header": "Scripts",
     "noScripts": "Aucun script.",
     "newScriptHint": "Cliquez sur + pour en créer un.",
+    "searchPlaceholder": "Rechercher un script...",
     "newScriptTitle": "Nouveau script",
     "limitReached": "Votre abonnement ne vous permet plus de générer de script",
     "selectOrCreate": "Sélectionnez ou créez un script.",
+    "picker": {
+        "linkedField": {
+            "label": "Script associé",
+            "linkAction": "Associer un script",
+            "changeAction": "Modifier",
+            "unlinkAction": "Détacher"
+        },
+        "modalTitle": "Choisir un script",
+        "searchPlaceholder": "Rechercher un script…",
+        "statusAll": "Tous",
+        "confirm": "Sélectionner",
+        "empty": {
+            "title": "Aucun script",
+            "subtitle": "Créez d'abord un script pour l'associer ici."
+        },
+        "noResults": {
+            "title": "Aucun résultat",
+            "subtitle": "Ajustez votre recherche ou votre filtre de statut."
+        }
+    },
     "card": {
         "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce script ? Cette action est irréversible."
     },

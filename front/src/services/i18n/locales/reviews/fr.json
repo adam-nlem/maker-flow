@@ -1,0 +1,181 @@
+{
+    "pageTitle": "Reviews",
+    "pageSubtitle": "Téléversez du contenu pour validation client avant publication.",
+    "emptyState": {
+        "title": "Aucune review",
+        "subtitle": "Créez votre première review pour lancer la boucle de validation client.",
+        "cta": "Nouvelle review",
+        "noSelection": {
+            "title": "Sélectionnez une review",
+            "subtitle": "Choisissez une review dans la liste pour voir ses détails, fichiers et versions."
+        },
+        "noResults": {
+            "title": "Aucun résultat",
+            "subtitle": "Ajustez votre recherche ou votre filtre pour voir d'autres reviews."
+        }
+    },
+    "search": {
+        "placeholder": "Rechercher…"
+    },
+    "filters": {
+        "all": "Tous",
+        "pending": "En attente",
+        "approved": "Validé",
+        "rejected": "Rejeté"
+    },
+    "actions": {
+        "create": "Nouvelle review",
+        "edit": "Modifier",
+        "delete": "Supprimer",
+        "save": "Enregistrer",
+        "cancel": "Annuler"
+    },
+    "status": {
+        "pending": "En attente de validation",
+        "approved": "Validé",
+        "rejected": "Rejeté"
+    },
+    "banner": {
+        "pending": {
+            "title": "Review en attente de validation",
+            "subtitle": "Le client n'a pas encore consulté cette review."
+        },
+        "approved": {
+            "title": "Review validée",
+            "subtitle": "Le client a donné son accord — vous pouvez publier."
+        },
+        "rejected": {
+            "title": "Review rejetée",
+            "subtitle": "Le client a refusé cette review."
+        }
+    },
+    "form": {
+        "modalTitle": "Nouvelle review",
+        "modalSubtitle": "Uploadez du contenu à faire valider par le client.",
+        "title": "Titre",
+        "titlePlaceholder": "Donnez un titre à cette review",
+        "description": "Description",
+        "descriptionPlaceholder": "Légende ou contexte optionnel pour la publication",
+        "descriptionHint": "Légende ou contexte partagé avec le client.",
+        "notes": "Notes pour le client",
+        "notesPlaceholder": "Contexte optionnel affiché au client pendant la revue",
+        "notesHint": "Partagé avec le client pendant la revue.",
+        "mediaType": "Type de média",
+        "files": "Fichiers",
+        "dropHint": "Déposez un fichier ici, ou cliquez pour choisir",
+        "dropHintCarousel": "Déposez 2 à 10 images ici, ou cliquez pour choisir",
+        "submit": "Créer la review"
+    },
+    "detail": {
+        "eyebrow": {
+            "video": "Review vidéo",
+            "image": "Review image",
+            "carousel": "Review carrousel"
+        },
+        "fromScript": "Depuis le script · {{title}}",
+        "descriptionLabel": "Description",
+        "notesLabel": "Notes pour le client",
+        "notesHint": "Partagé avec le client pendant la revue.",
+        "sideCard": {
+            "type": "Type",
+            "status": "Statut",
+            "linkedScript": "Script associé",
+            "uploaded": "Uploadé",
+            "updated": "Mis à jour"
+        },
+        "mediaLabel": {
+            "video": "Vidéo"
+        },
+        "video": {
+            "transcoding": "Préparation de la vidéo pour la lecture…",
+            "transcodingFailed": "Le traitement de cette vidéo a échoué. Veuillez la téléverser à nouveau.",
+            "playbackError": "Impossible de lire cette vidéo.",
+            "player": {
+                "play": "Lecture",
+                "pause": "Pause",
+                "mute": "Couper le son",
+                "unmute": "Activer le son",
+                "volume": "Volume",
+                "seek": "Avancer",
+                "enterFullscreen": "Passer en plein écran",
+                "exitFullscreen": "Quitter le plein écran"
+            }
+        },
+        "carousel": {
+            "slideCounter": "{{current}}/{{total}}",
+            "previousSlide": "Diapositive précédente",
+            "nextSlide": "Diapositive suivante",
+            "goToSlide": "Aller à la diapositive {{index}}"
+        }
+    },
+    "validation": {
+        "titleRequired": "Le titre est requis.",
+        "mediaTypeRequired": "Sélectionnez un type de média.",
+        "fileRequiredVideo": "Veuillez ajouter une vidéo.",
+        "fileRequiredImage": "Veuillez ajouter une image.",
+        "fileRequiredCarousel": "Un carrousel doit contenir entre 2 et 10 images.",
+        "videoTooLarge": "Les vidéos doivent peser 500 Mo ou moins.",
+        "imageTooLarge": "Les images doivent peser 20 Mo ou moins.",
+        "invalidMime": "Type de fichier non supporté.",
+        "scriptAlreadyHasReview": "Ce script a déjà une review."
+    },
+    "delete": {
+        "confirmTitle": "Supprimer cette review ?",
+        "confirmBody": "Tous les fichiers téléversés seront définitivement supprimés.",
+        "confirm": "Supprimer la review"
+    },
+    "tile": {
+        "unresolved": "{{count}} non résolu",
+        "unresolved_other": "{{count}} non résolus"
+    },
+    "versions": {
+        "switcher": {
+            "trigger": "Version {{number}} sur {{total}}",
+            "uploaded": "envoyée {{relative}}",
+            "viewingHistorical": "Vous consultez une version antérieure — les commentaires sont en lecture seule."
+        }
+    },
+    "upload": {
+        "title": "Envoyer une nouvelle version",
+        "submit": "Envoyer cette version",
+        "toast": {
+            "success": "Nouvelle version envoyée.",
+            "error": "Impossible d'envoyer la nouvelle version. Veuillez réessayer."
+        }
+    },
+    "comments": {
+        "title": "Commentaires",
+        "loading": "Chargement des commentaires…",
+        "loadMore": "Charger plus de commentaires",
+        "noComments": "Aucun commentaire pour le moment.",
+        "unknownAuthor": "Inconnu",
+        "resolved": "Résolu",
+        "open": "Ouvert",
+        "reply": "Répondre",
+        "resolve": "Marquer comme résolu",
+        "reopen": "Rouvrir",
+        "composer": {
+            "placeholder": "Écrivez une réponse…",
+            "submit": "Envoyer",
+            "cancel": "Annuler",
+            "pinAtCurrentTime": "Épingler à l'instant courant",
+            "pinnedAt": "Épinglé à {{time}}",
+            "clearPin": "Retirer l'épingle",
+            "errors": {
+                "empty": "Veuillez saisir un commentaire avant d'envoyer.",
+                "tooLong": "Votre commentaire est trop long — veuillez le raccourcir."
+            },
+            "toast": {
+                "success": "Commentaire envoyé.",
+                "error": "Impossible d'envoyer votre commentaire. Veuillez réessayer."
+            }
+        },
+        "update": {
+            "toast": {
+                "successResolved": "Commentaire marqué comme résolu.",
+                "successReopened": "Commentaire rouvert.",
+                "error": "Impossible de mettre à jour le commentaire. Veuillez réessayer."
+            }
+        }
+    }
+}

@@ -4,6 +4,15 @@
 
 The Project feature provides a complete UI for managing projects including creation, selection, update, and deletion. It uses React Query for data fetching, Zustand for state management, and integrates with the sidebar navigation.
 
+### Role-aware behaviour
+
+The hooks and components below are reused unchanged between the agency shell (`AgencyShellLayout`) and the client shell (`ClientShellLayout`). The role-aware behaviour lives **server-side** in `ProjectRepository::getAccessibleByUserPaginated` and `ProjectVoter` (see `back/docs/project-feature.md` and `back/docs/client-portal-feature.md`). The frontend just reads what the API returns:
+
+- **Agency members** see all projects of their agency, paginated as usual, with mutation buttons enabled per role (Editor+ can create / update / delete; Viewer is read-only).
+- **Clients** receive a single-row list containing only their own `User.project`. `useSelectFocusedProject` auto-selects it on first load; the project picker is hidden in `ClientDesktopSidebar` but the focused-project store is still seeded, so every downstream page (`/client/home`, `/client/contents`, etc.) reads `focusedProjectUuid` without a client-specific code path.
+
+Mutation buttons (`CreateProjectModal`, `UpdateProjectModal`, delete, finish/reopen) are rendered only in the agency settings shell; clients have no entry point to reach them.
+
 ---
 
 ## Data Model
@@ -161,6 +170,16 @@ Manages the currently focused/selected project.
 **Behavior:**
 - Auto-selects first project if none selected
 - Auto-selects first project if current selection no longer exists in list
+
+---
+
+### `useSyncFocusedProject`
+
+**Location:** `front/src/hooks/api/projects/useSyncFocusedProject.ts`
+
+Combines `useListPaginatedProjects` and `useSelectFocusedProject` into a single hook called once in [`routes/protected.tsx`](../src/routes/protected.tsx). Guarantees the focused project store is seeded for every authenticated route — agency members and clients alike — before any page-level component reads from it.
+
+For clients this matters because `GET /api/projects` returns the client's single accessible project (server-side voter-driven), the auto-select logic in `useSelectFocusedProject` picks it, and downstream client UI reads `focusedProjectUuid` without ever knowing about a client-specific code path.
 
 ---
 

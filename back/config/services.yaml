@@ -50,6 +50,8 @@ parameters:
     app.mailing.from_name: "%env(string:MAILING_FROM_NAME)%"
 
     app.prelaunch.enabled: "%env(bool:PRELAUNCH_ENABLED)%"
+
+    app.uploads.agency_root: "%kernel.project_dir%/private/uploads/agency"
 services:
     # default configuration for services in *this* file
     _defaults:
@@ -64,8 +66,8 @@ services:
     ### Normalizers ###
     App\Serializer\UserTimezoneDateTimeNormalizer:
         arguments:
-            $dateTimeNormalizer: '@serializer.normalizer.datetime'
-        tags: ['serializer.normalizer']
+            $dateTimeNormalizer: "@serializer.normalizer.datetime"
+        tags: ["serializer.normalizer"]
 
     App\Service\Cookie\CookieService:
         arguments:
@@ -142,17 +144,33 @@ services:
         arguments:
             $encryptionKey: "%app.encryption.token_key%"
     Resend\Client:
-        factory: ['Resend', 'client']
-        arguments: ['%app.resend.api_key%']
+        factory: ["Resend", "client"]
+        arguments: ["%app.resend.api_key%"]
 
     App\Service\Mailing\MailingService:
         arguments:
             $fromAddress: "%app.mailing.from_address%"
             $fromName: "%app.mailing.from_name%"
-            $resendApiLimiter: '@limiter.resend_api'
+            $resendApiLimiter: "@limiter.resend_api"
     App\EventSubscriber\IntegrationTokenExpiredSubscriber:
         arguments:
             $frontendUrl: "%app.frontend_url%"
+
+    App\Service\Invitation\InvitationService:
+        arguments:
+            $frontendUrl: "%app.frontend_url%"
+
+    App\Service\Agency\AgencyLogoService:
+        arguments:
+            $agencyUploadsRoot: "%app.uploads.agency_root%"
+
+    App\Service\Project\ProjectLogoService:
+        arguments:
+            $agencyUploadsRoot: "%app.uploads.agency_root%"
+
+    App\Service\Review\ReviewFileService:
+        arguments:
+            $agencyUploadsRoot: "%app.uploads.agency_root%"
 
     App\Service\Prelaunch\PrelaunchService:
         arguments:
@@ -163,11 +181,45 @@ services:
 
     App\EventListener\IntegrationTokenEncryptionListener:
         tags:
-            - { name: 'doctrine.orm.entity_listener', event: 'postLoad', entity: 'App\Entity\Integration', lazy: true }
-            - { name: 'doctrine.orm.entity_listener', event: 'prePersist', entity: 'App\Entity\Integration', lazy: true }
-            - { name: 'doctrine.orm.entity_listener', event: 'preUpdate', entity: 'App\Entity\Integration', lazy: true }
-            - { name: 'doctrine.orm.entity_listener', event: 'postPersist', entity: 'App\Entity\Integration', lazy: true }
-            - { name: 'doctrine.orm.entity_listener', event: 'postUpdate', entity: 'App\Entity\Integration', lazy: true }
+            - {
+                  name: "doctrine.orm.entity_listener",
+                  event: "postLoad",
+                  entity: 'App\Entity\Integration',
+                  lazy: true,
+              }
+            - {
+                  name: "doctrine.orm.entity_listener",
+                  event: "prePersist",
+                  entity: 'App\Entity\Integration',
+                  lazy: true,
+              }
+            - {
+                  name: "doctrine.orm.entity_listener",
+                  event: "preUpdate",
+                  entity: 'App\Entity\Integration',
+                  lazy: true,
+              }
+            - {
+                  name: "doctrine.orm.entity_listener",
+                  event: "postPersist",
+                  entity: 'App\Entity\Integration',
+                  lazy: true,
+              }
+            - {
+                  name: "doctrine.orm.entity_listener",
+                  event: "postUpdate",
+                  entity: 'App\Entity\Integration',
+                  lazy: true,
+              }
+
+    App\EventListener\ReviewVersionDiskCleanupListener:
+        tags:
+            - {
+                  name: "doctrine.orm.entity_listener",
+                  event: "preRemove",
+                  entity: 'App\Entity\ReviewVersion',
+                  lazy: true,
+              }
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

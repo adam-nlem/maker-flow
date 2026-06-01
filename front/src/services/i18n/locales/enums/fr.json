@@ -83,8 +83,13 @@
     },
     "mediaType": {
         "image": "Image",
-        "video": "Video",
-        "carousel": "Carousel"
+        "video": "Vidéo",
+        "carousel": "Carrousel",
+        "uploadHint": {
+            "image": "PNG, JPEG ou WebP jusqu'à 20 Mo.",
+            "video": "Une vidéo MP4, MOV ou WebM jusqu'à 500 Mo.",
+            "carousel": "2 à 10 images, jusqu'à 20 Mo chacune."
+        }
     },
     "oAuthErrorCode": {
         "invalidState": "Session expirée, veuillez réessayer",
@@ -95,27 +100,30 @@
         "popupBlocked": "La fenêtre popup a été bloquée par votre navigateur",
         "unknown": "Une erreur est survenue, veuillez réessayer"
     },
+    "fileInvalidReason": {
+        "missingFile": "Veuillez ajouter un fichier.",
+        "tooManyFiles": "Trop de fichiers sélectionnés.",
+        "tooFewFiles": "Pas assez de fichiers sélectionnés.",
+        "fileTooLarge": "Le fichier dépasse la taille maximale.",
+        "invalidMimeType": "Type de fichier non supporté.",
+        "invalidPayload": "Les données de la requête sont invalides."
+    },
     "onboardingStep": {
         "titles": {
+            "createAgency": "Créez votre agence",
             "createFirstProject": "Créez votre premier projet",
-            "connectIntegration": "Connectez vos réseaux sociaux",
-            "createFirstScript": "Créez votre premier script",
-            "generateFirstScript": "Améliorez votre script avec l'IA",
-            "showSubscriptions": "Découvrez nos offres"
+            "inviteFirstClient": "Invitez votre premier client",
+            "connectFirstIntegration": "Connectez vos réseaux sociaux",
+            "showSubscriptions": "Découvrez nos offres",
+            "exploreContents": "Vos contenus"
         },
         "descriptions": {
-            "createFirstProject": "Les projets vous permettent de regrouper vos contenus et vos réseaux sociaux.",
-            "connectIntegration": "Connectez vos comptes pour analyser vos performances et centraliser vos contenus.",
-            "createFirstScript": "Voici votre premier script vidéo. Vous pourrez le modifier plus tard.",
-            "generateFirstScript": "L'IA va créer un script vidéo complet basé sur vos indications.",
-            "showSubscriptions": "Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités."
-        },
-        "shortLabels": {
-            "createFirstProject": "Projet",
-            "connectIntegration": "Réseau social",
-            "createFirstScript": "Script",
-            "generateFirstScript": "Génération",
-            "showSubscriptions": "Abonnements"
+            "createAgency": "Renseignez le nom, la couleur de marque et les coordonnées de votre agence.",
+            "createFirstProject": "Un projet représente un client ou une marque dont vous gérez les contenus.",
+            "inviteFirstClient": "Donnez à votre client un accès en lecture seule à son tableau de bord.",
+            "connectFirstIntegration": "Connectez les comptes sociaux du projet pour suivre les performances.",
+            "showSubscriptions": "Choisissez l'abonnement qui correspond à vos besoins pour débloquer toutes les fonctionnalités.",
+            "exploreContents": "Retrouvez tous vos contenus partagés par votre agence."
         }
     },
     "openingStyle": {
@@ -261,8 +269,8 @@
     },
     "subscriptionPlan": {
         "starter": "Starter",
-        "creator": "Créateur",
-        "agency": "Agence"
+        "agency": "Agence",
+        "agencyPlus": "Agence+"
     },
     "subscriptionStatus": {
         "active": "Actif",

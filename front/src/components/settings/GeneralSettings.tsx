@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages";
-import { SettingsSection, settingsSectionTranslationKeys } from "~/models/enums/SettingsSection";
 import { Input } from "~/components/ui/Input";
 import { Button } from "~/components/ui/Button";
 import PasswordRules from "~/components/ui/PasswordRules";
@@ -41,7 +40,7 @@ export default function GeneralSettings() {
 
     const errorMessage = error ? resolveErrorMessage(error) : null;
 
-    const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (hasPasswordChanges && (!currentPassword || !newPassword || !confirmNewPassword)) {
             setValidationError(t("settings:general.validation.passwordFieldsRequired"));
@@ -71,10 +70,6 @@ export default function GeneralSettings() {
 
     return (
         <div className="h-full flex flex-col overflow-hidden">
-            <div className="px-4 md:px-6 py-4 md:py-5 border-b border-light-gray">
-                <h2 className="text-heading-xl">{t(settingsSectionTranslationKeys[SettingsSection.General])}</h2>
-            </div>
-
             <form className="flex-1 flex flex-col min-h-0" onSubmit={handleSubmit}>
                 <div className="flex-1 overflow-y-auto scrollbar-none px-4 md:px-6 py-4 md:py-5">
                     <div className="flex flex-col gap-5">
@@ -95,7 +90,7 @@ export default function GeneralSettings() {
                             label={t("settings:general.fields.email")}
                             value={user.email}
                             readOnly
-                            className="text-gray cursor-not-allowed"
+                            className="text-muted-2 cursor-not-allowed"
                         />
 
                         <h3 className="text-heading-sm mt-5">{t("settings:general.preferences")}</h3>
@@ -138,7 +133,7 @@ export default function GeneralSettings() {
                 </div>
 
                 {hasChanges && (
-                    <div className="px-4 md:px-6 py-3 md:py-4 border-t border-light-gray">
+                    <div className="px-4 md:px-6 py-3 md:py-4 border-t border-pale-gray">
                         <Button type="submit" style="primary" isLoading={isPending} disabled={isPending}>
                             <p className="text-sm">{t("actions.save")}</p>
                         </Button>

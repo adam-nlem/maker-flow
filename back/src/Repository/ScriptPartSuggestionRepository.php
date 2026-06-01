@@ -36,13 +36,16 @@ class ScriptPartSuggestionRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?ScriptPartSuggestion
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?ScriptPartSuggestion
     {
         return $this->createQueryBuilder('sps')
+            ->join('sps.script', 's')
+            ->join('s.project', 'p')
             ->where('sps.uuid = :uuid')
-            ->andWhere('sps.user = :user')
+            ->andWhere('(p.agency = :agency OR p = :clientProject)')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -51,13 +54,11 @@ class ScriptPartSuggestionRepository extends ServiceEntityRepository
     /**
      * @return ScriptPartSuggestion[]
      */
-    public function getByScriptAndUser(Script $script, User $user, ?ScriptPartSuggestionStatus $status = null): array
+    public function getByScript(Script $script, ?ScriptPartSuggestionStatus $status = null): array
     {
         $qb = $this->createQueryBuilder('sps')
             ->where('sps.script = :script')
-            ->andWhere('sps.user = :user')
             ->setParameter('script', $script)
-            ->setParameter('user', $user)
             ->orderBy('sps.createdAt', 'ASC');
 
         if ($status !== null) {

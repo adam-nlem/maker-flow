@@ -1,23 +1,22 @@
 import { useIntegrationLoginModalStore } from "~/stores/integrations/integrationLoginModalStore";
-import { useFocusProjectStore } from "~/stores/project/focusProjectStore";
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations";
 import IntegrationLoginCard from "./IntegrationLoginCard";
 import ModalOverlay from "../ui/ModalOverlay";
 
 export default function IntegrationLoginModal() {
+    const projectUuid = useIntegrationLoginModalStore((state) => state.projectUuid);
     const selectedPlatform = useIntegrationLoginModalStore((state) => state.selectedPlatform);
-    const setSelectedPlatform = useIntegrationLoginModalStore((state) => state.setSelectedPlatform);
-    const focusedProjectUuid = useFocusProjectStore((state) => state.focusedProjectUuid);
+    const close = useIntegrationLoginModalStore((state) => state.close);
 
-    const { integrations } = useListIntegrations({ projectUuid: focusedProjectUuid });
+    const { integrations } = useListIntegrations({ projectUuid });
 
-    if (!selectedPlatform || !focusedProjectUuid) return null;
+    if (!selectedPlatform || !projectUuid) return null;
 
     return (
-        <ModalOverlay isOpen onClose={() => setSelectedPlatform(null)} height="max-h-fit">
+        <ModalOverlay isOpen onClose={close} height="max-h-fit">
             <div className="flex-1 min-h-0 overflow-y-auto">
                 <IntegrationLoginCard
-                    projectUuid={focusedProjectUuid}
+                    projectUuid={projectUuid}
                     platform={selectedPlatform}
                     integration={integrations.find((i) => i.platform === selectedPlatform) ?? null}
                 />

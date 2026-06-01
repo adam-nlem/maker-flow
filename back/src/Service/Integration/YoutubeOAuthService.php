@@ -107,7 +107,7 @@ class YoutubeOAuthService
 
         $integration = new Integration();
         $integration
-            ->setUser($user)
+            ->setCreatedBy($user)
             ->setPlatform(Platform::Youtube)
             ->setAccessToken($tokenDTO->getAccessToken())
             ->setRefreshToken($tokenDTO->getRefreshToken())
@@ -195,8 +195,8 @@ class YoutubeOAuthService
 
         $channelData = $this->getUserChannel();
 
-        $existingIntegration = $this->integrationRepository->getByUserAndPlatformAndAccountId(
-            $user,
+        $existingIntegration = $this->integrationRepository->getByAgencyAndPlatformAndAccountId(
+            $project->getAgency(),
             Platform::Youtube,
             $channelData->getChannelId()
         );

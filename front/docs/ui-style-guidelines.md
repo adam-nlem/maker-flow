@@ -73,19 +73,28 @@ Use these classes for body text. All use the **Outfit** font family with gray co
 
 | Name | Variable | Hex | Usage |
 |------|----------|-----|-------|
-| **Primary** | `--color-primary` | `#43CEA9` | Primary actions, highlights, selection |
-| **Dark** | `--color-dark` | `#141115` | Text, dark backgrounds |
-| **Clear** | `--color-clear` | `#FFFFFF` | White backgrounds, text on dark |
+| **Primary** | `--color-primary` | `#6FCDB1` | Primary actions, highlights, selection |
+| **Dark** | `--color-dark` | `#141115` | Headings, primary text, dark backgrounds |
+| **Dark 2** | `--color-dark-2` | `#2E3437` | Body copy, comment text, secondary text on buttons |
+| **Clear** | `--color-clear` | `#FFFFFF` | Primary app surface — background, sidebar, modal body |
+| **Clear 2** | `--color-clear-2` | `#F6F8F7` | Composer body, callout backgrounds, list-item hover, modal footer |
+| **Clear 3** | `--color-clear-3` | `#EEF1EF` | Active list-item, keyboard-shortcut chips, scrollbar tracks, secondary button hover |
+| **Clear 4** | `--color-clear-4` | `#E2E7E4` | Reserved deeper surface (upload thumbnails) |
 | **Danger** | `--color-danger` | `#D33F49` | Error states, destructive actions |
 
-### Gray Scale
+### Muted Text Ramp
 
 | Name | Variable | Hex | Usage |
 |------|----------|-----|-------|
-| **Gray 900** | `--color-gray-900` | `#F0F0F0` | Darkest text |
-| **Gray** | `--color-gray` | `#9ca3af` | Secondary text, icons |
-| **Gray 400** | `--color-gray-400` | `#6b7280` | Placeholder text |
-| **Light Gray** | `--color-light-gray` | `#2d2d44` | Borders, dividers, hover states |
+| **Muted** | `--color-muted` | `#6A7074` | Meta info, eyebrow labels, breadcrumb context, comment timestamps, chart axis strokes |
+| **Muted 2** | `--color-muted-2` | `#9DA3A5` | Placeholders, UPPERCASE eyebrow section labels, low-importance metadata |
+
+### Dividers
+
+| Name | Variable | Hex | Usage |
+|------|----------|-----|-------|
+| **Pale Gray** | `--color-pale-gray` | `#ECEFED` | Default 1px dividers — topbar, sidebar, scene rows, modal sections |
+| **Pale Gray 2** | `--color-pale-gray-2` | `#DADFDC` | Heavier borders — composer outline, button outlines, dashed dropzone |
 
 ### Accent Colors
 
@@ -93,10 +102,12 @@ Use these classes for body text. All use the **Outfit** font family with gray co
 |------|----------|-----|-------|
 | **Red** | `--color-red` | `#E4572E` | Warnings, alerts |
 | **Yellow** | `--color-yellow` | `#E7BC21` | Warnings, pending states |
-| **Green** | `--color-green` | `#A8C686` | Success states |
+| **Green** | `--color-green` | `#6B9477` | Success states, approved status |
 | **Blue** | `--color-blue` | `#669BBC` | Info, links |
 | **Purple** | `--color-purple` | `#5346B6` | Special highlights |
 | **Pastel Green** | `--color-pastel-green` | `#BCD5AA` | Soft success backgrounds |
+
+All design tokens are fixed application-wide — agencies do not customize colors or fonts. The MakerFlow palette and the Outfit / Roboto font stacks apply consistently to every surface.
 
 ---
 
@@ -144,6 +155,49 @@ hover:bg-gray        /* Button hover */
 transition-colors    /* Color transitions */
 transition-all duration-300 ease-in-out  /* Panel animations */
 ```
+
+### List items
+
+Pattern used for sidebar / left-panel list cards (Scripts, Reviews).
+
+```html
+<button class="w-full text-left flex gap-2.5 p-2.5 rounded-xl border transition-colors cursor-pointer
+               border-transparent hover:bg-clear-2">          <!-- default -->
+<button class="w-full text-left flex gap-2.5 p-2.5 rounded-xl border transition-colors cursor-pointer
+               bg-clear-2 border-pale-gray shadow-sm">         <!-- active / selected -->
+```
+
+The active state is intentionally neutral (no `bg-primary/10` mint tint) so the page reads as white-dominant with the status pill carrying the color cue.
+
+### Status filter chips
+
+Compact dark-inverted chips for left-panel filter rows (e.g. `All / Awaiting / Changes / Approved / Rejected` on `/agency/reviews`).
+
+```html
+<!-- unselected -->
+<button class="inline-flex items-center h-6 px-2.5 rounded-full border text-body-xs
+               border-pale-gray text-muted hover:bg-clear-2">
+<!-- selected -->
+<button class="inline-flex items-center h-6 px-2.5 rounded-full border text-body-xs
+               bg-dark text-clear border-dark">
+```
+
+This is distinct from `ToggleChip`, which uses a `bg-primary text-clear` selected state. Use the dark-inverted chip when the chip row sits next to colored status pills and should not compete for color.
+
+### Dropzone surface
+
+Large drop-target surface inside a form (e.g. the create-draft modal). Built on top of [`FileUpload`](../src/components/ui/FileUpload.tsx)'s `children` render-prop so each consumer can supply its own visual without affecting other dropzones.
+
+```html
+<!-- idle -->
+<div class="flex flex-col items-center justify-center gap-2 p-8 rounded-xl border-2 border-dashed transition-colors
+            border-pale-gray bg-clear-2 text-muted-2 hover:border-primary hover:bg-primary/5 hover:text-primary">
+<!-- drag-active -->
+<div class="flex flex-col items-center justify-center gap-2 p-8 rounded-xl border-2 border-dashed transition-colors
+            border-primary bg-primary/5 text-primary">
+```
+
+Canonical example: [`ReviewFileDropzone`](../src/components/agency/reviews/ReviewFileDropzone.tsx) — passes a `DropzoneSurface` component to `FileUpload`'s `children` render-prop, which receives `{ isDragActive }` so the surface can flip into the primary-tinted state during drag. Use this pattern when you need a wide form-friendly dropzone; for compact pickers, stick with `FileUpload`'s default rendering (smaller dashed box).
 
 ---
 
@@ -334,7 +388,7 @@ Placeholder for premium-only content. Blurs children and shows an upgrade CTA wh
 **When restricted:**
 - Children: `blur-sm pointer-events-none select-none`
 - Placeholder: `absolute inset-0 bg-clear/60 z-10 rounded-xl`
-- Content: `LockClosedIcon` (size-6, text-gray) + heading (`text-heading-md`) + description (`text-body-sm text-gray`) + primary Button to `/settings/subscription`
+- Content: `LockClosedIcon` (size-6, text-gray) + heading (`text-heading-md`) + description (`text-body-sm text-gray`) + primary Button to `/agency/settings/subscription`
 
 **When not restricted:** Renders children as-is.
 
@@ -640,6 +694,74 @@ Compact inline row of PostInsightType-based metrics. Each metric renders as an i
 
 ---
 
+### Tag
+
+**Location:** `front/src/components/ui/Tag.tsx`
+
+Non-interactive label for status, role, or category indicators with optional leading icon. Distinct from `Pill` (toggleable) and `Badge` (icon + label with actions): `Tag` has no click handler and no hover state. Color is driven by raw Tailwind class strings — the caller owns the design token choice, consistent with `Pill` and `Banner`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `label` | `string` | — | Tag text |
+| `icon` | `ComponentType<SVGProps<SVGSVGElement>>` | — | Optional leading icon (Heroicons) |
+| `bgClassName` | `string` | `"bg-pale-gray-2"` | Background utility class (e.g. `bg-primary/10`) |
+| `textClassName` | `string` | `"text-muted-2"` | Text color utility class (e.g. `text-primary`) |
+| `className` | `string` | `""` | Extra utility classes (e.g. `shrink-0` inside flex rows) |
+
+**Styling:** `inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-body-xs` plus the supplied `bgClassName` + `textClassName`. Icon renders at `size-3.5` with `strokeWidth={2}`.
+
+**Examples:**
+```tsx
+<Tag bgClassName="bg-primary/10" textClassName="text-primary" label="Active" />
+<Tag bgClassName="bg-yellow/10" textClassName="text-yellow" label="Pending" />
+<Tag label="Archived" className="shrink-0" />
+<Tag
+    icon={ClockIcon}
+    label={t(reviewStatusTranslationKeys[status])}
+    bgClassName={reviewStatusToBgClass[status]}
+    textClassName={reviewStatusToTextClass[status]}
+/>
+```
+
+**Used in:** `IdentityPopover` (role), `CollaboratorsTable` (role + status columns), `ProjectSettingsCard` (client status row pills), `ReviewTile` / `ReviewDetailPanel` (status pill driven by `ReviewStatus` maps).
+
+---
+
+### Banner
+
+**Location:** `front/src/components/ui/Banner.tsx`
+
+Hero-style status callout: a circular icon chip on the left, a title and optional subtitle on the right, wrapped in a rounded box. Pure presentational — color and border are driven by raw Tailwind class strings supplied by the caller (consistent with `Pill` and `Tag`).
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `icon` | `ComponentType<SVGProps<SVGSVGElement>>` | — | Required leading icon (Heroicons) |
+| `title` | `string` | — | Banner title (`text-heading-sm text-dark`) |
+| `subtitle` | `string` | — | Optional secondary line (`text-body-sm text-muted`) |
+| `bgClassName` | `string` | `""` | Background utility class applied to the banner and the icon chip (e.g. `bg-primary/10`) |
+| `textClassName` | `string` | `"text-dark"` | Icon color utility class (e.g. `text-primary`) |
+| `borderClassName` | `string` | `""` | Border utility classes (e.g. `border border-primary/30`) |
+| `className` | `string` | `""` | Extra utility classes (e.g. `mb-6` for spacing) |
+
+**Styling:** `flex items-center gap-3.5 px-4 py-3.5 rounded-xl` plus the supplied background / border. The icon chip is `size-9 rounded-full` with the same background; the icon renders at `size-5`.
+
+**Example:**
+```tsx
+<Banner
+    className="mb-6"
+    icon={reviewStatusToIcon[review.status]}
+    title={t(reviewStatusToBannerTitleKey[review.status])}
+    subtitle={t(reviewStatusToBannerSubtitleKey[review.status])}
+    bgClassName={reviewStatusToBgClass[review.status]}
+    textClassName={reviewStatusToTextClass[review.status]}
+    borderClassName={reviewStatusToBorderClass[review.status]}
+/>
+```
+
+**Used in:** `ReviewDetailPanel` (status banner driven by `ReviewStatus` maps).
+
+---
+
 ### Shimmer
 
 **Location:** `@/Users/adam/1-dev/projets/maker-flow/front/app/components/ui/Shimmer.tsx`
@@ -651,6 +773,63 @@ Loading placeholder with shimmer animation.
 | `width` | `string` | `'w-full'` | Width class |
 | `height` | `string` | `'h-4'` | Height class |
 | `radius` | `string` | `'rounded-md'` | Border radius class |
+
+---
+
+### FileUpload
+
+**Location:** `front/src/components/ui/FileUpload.tsx`
+
+Generic drop zone for picking a single file. Supports click-to-browse (via a hidden `<input type="file">`) and drag-and-drop. Presentational only — it forwards the selected file to the caller via `onFileSelected` and renders an optional error message; validation and the actual upload live in the caller's hook.
+
+Two rendering modes: the default dashed-border + icon + hint variant, or a custom render-prop variant where the caller controls the entire inner UI (e.g. an existing image with a hover overlay). When `children` is provided, the dashed-border / icon / hint styling is dropped — only the click/drag plumbing and the `group` class are kept on the underlying `<button>` so children can react to hover via `group-hover:*`.
+
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `accept` | `string` | — | MIME types / extensions for the `<input>`'s `accept` attribute (e.g. `"image/png"`, `"application/pdf,video/mp4"`). |
+| `onFileSelected` | `(file: File) => void \| Promise<void>` | — | Called with the picked or dropped file. The caller is responsible for MIME / size validation, since the `accept` attribute only filters the picker — not drag-and-drop. |
+| `hint` | `string` | — | Default rendering only. Translated hint shown under the icon (e.g. "PNG. 5 MB max."). |
+| `errorMessage` | `string \| null` | — | Optional error rendered below the drop zone in `text-danger`. Usually a translated validation key from the caller's mutation hook. |
+| `icon` | `ComponentType<SVGProps<SVGSVGElement>>` | `ArrowUpTrayIcon` | Default rendering only. Heroicon centred in the drop zone — override per file kind (`PhotoIcon`, `DocumentIcon`, `VideoCameraIcon`, …). |
+| `isPending` | `boolean` | `false` | Disables the drop zone and dims it while the caller's upload mutation is in flight. |
+| `className` | `string` | `""` | Sizing class applied to the outer wrapper. |
+| `children` | `(state: { isDragActive: boolean }) => ReactNode` | — | Optional render prop. When provided, replaces the dashed-border default UI; the function receives `isDragActive` so children can react to drag-over (e.g. force a hover overlay visible). |
+
+**Default rendering (agency logo empty state, see `AgencyLogoUpload` in `front/src/components/agency/AgencyLogoUpload.tsx`):**
+
+```tsx
+<FileUpload
+    accept="image/png"
+    icon={PhotoIcon}
+    hint={t("agencySettings:logo.hint")}
+    errorMessage={validationErrorKey ? t(validationErrorKey) : null}
+    isPending={isPending}
+    onFileSelected={(file) => uploadLogo({ agencyUuid: agency.uuid, file })}
+    className={className}
+/>
+```
+
+**Custom rendering (agency logo with an existing image, see the same `editable` branch — render-prop case):**
+
+```tsx
+<FileUpload
+    accept="image/png"
+    isPending={isPending}
+    onFileSelected={(file) => uploadLogo({ agencyUuid: agency.uuid, file })}
+    className={className}
+>
+    {({ isDragActive }) => (
+        <div className="relative w-full h-full overflow-hidden rounded-md">
+            <img src={logoUrl} alt="" className="w-full h-full object-cover" />
+            <div className={`absolute inset-0 flex items-center justify-center bg-dark/50 transition-opacity ${isDragActive ? "opacity-100" : "opacity-0 group-hover:opacity-100"}`}>
+                <PencilIcon className="size-5 text-clear" strokeWidth={1.8} />
+            </div>
+        </div>
+    )}
+</FileUpload>
+```
+
+For other file kinds (PDF, video, …): swap `accept`, `icon`, and the i18n keys, and point `onFileSelected` at the corresponding upload mutation hook.
 
 ---
 

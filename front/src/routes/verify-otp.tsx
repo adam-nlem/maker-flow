@@ -1,7 +1,7 @@
-import { EnvelopeIcon } from "@heroicons/react/24/outline"
 import { useEffect } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { useTranslation } from "react-i18next"
+import { ArrowLeftIcon } from "@heroicons/react/24/outline"
 
 import AuthStepLayout from "~/components/auth/AuthStepLayout"
 import VerifyOtpForm from "~/components/auth/VerifyOtpForm"
@@ -33,19 +33,22 @@ export default function VerifyOtpPage() {
     const successPath = isPrelaunch ? prelaunchPath : homePath
 
     return (
-        <div className="bg-clear bg-dot-pattern min-h-screen relative">
-            <AuthStepLayout
-                icon={EnvelopeIcon}
-                title={t(otpTypeTranslationKeys[state.purpose])}
-                subtitle={<>{t("auth:verify.subtitlePrefix")} <span className="text-dark font-medium">{state.email}</span></>}
-                onBack={() => navigate(backPath)}
-            >
-                <VerifyOtpForm
-                    pendingOtpToken={state.pendingOtpToken}
-                    type={state.purpose}
-                    onVerified={() => navigate(successPath)}
-                />
-            </AuthStepLayout>
-        </div>
+        <AuthStepLayout
+            eyebrow={t("auth:verify.eyebrow")}
+            title={t(otpTypeTranslationKeys[state.purpose])}
+            subtitle={t("auth:verify.subtitle")}
+            helperLink={{
+                leading: <ArrowLeftIcon className="size-3.5 text-muted" />,
+                linkText: t("auth:verify.backToSignIn"),
+                onClick: () => navigate(backPath),
+            }}
+        >
+            <VerifyOtpForm
+                pendingOtpToken={state.pendingOtpToken}
+                type={state.purpose}
+                email={state.email}
+                onVerified={() => navigate(successPath)}
+            />
+        </AuthStepLayout>
     )
 }

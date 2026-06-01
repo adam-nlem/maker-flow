@@ -102,9 +102,13 @@ class HookTemplate
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(targetEntity: Agency::class)]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    private ?Agency $agency = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
 
     public function __construct()
     {
@@ -204,14 +208,26 @@ class HookTemplate
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getAgency(): ?Agency
     {
-        return $this->user;
+        return $this->agency;
     }
 
-    public function setUser(?User $user): static
+    public function setAgency(?Agency $agency): static
     {
-        $this->user = $user;
+        $this->agency = $agency;
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

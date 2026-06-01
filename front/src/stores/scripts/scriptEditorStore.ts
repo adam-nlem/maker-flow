@@ -1,5 +1,5 @@
-import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
+import { createResettableStore } from '~/stores/createResettableStore'
 
 type ScriptEditorState = {
     isExpanded: boolean
@@ -10,7 +10,7 @@ type ScriptEditorAction = {
     setIsExpanded: (expanded: boolean) => void
 }
 
-export const useScriptEditorStore = create<ScriptEditorState & ScriptEditorAction>()(
+export const useScriptEditorStore = createResettableStore<ScriptEditorState & ScriptEditorAction>()(
     persist(
         (set) => ({
             isExpanded: true,

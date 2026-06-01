@@ -6,6 +6,7 @@ use App\DTO\QueryParam\Chat\ListChatsQueryParamDTO;
 use App\DTO\Request\Chat\CreateChatRequestDTO;
 use App\DTO\Request\Chat\UpdateChatRequestDTO;
 use App\Entity\Chat;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\Chat\ChatNotFoundException;
 use App\Exception\Script\ScriptNotFoundException;
@@ -16,11 +17,13 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/chats', requirements: ['chatUuid' => Requirement::UUID])]
 final class ChatController extends AbstractController
 {
     #[Route('', name: 'api_chats_create', methods: ['POST'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateChatRequestDTO $dto,
         ScriptRepository $scriptRepository,
@@ -29,7 +32,7 @@ final class ChatController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($dto->getScriptUuid(), $user);
+        $script = $scriptRepository->getAccessibleByUuidForUser($dto->getScriptUuid(), $user);
 
         if ($script === null) {
             throw new ScriptNotFoundException();
@@ -52,6 +55,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('', name: 'api_chats_list', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListChatsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -60,15 +64,14 @@ final class ChatController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($queryParamDto->getScriptUuid(), $user);
+        $script = $scriptRepository->getAccessibleByUuidForUser($queryParamDto->getScriptUuid(), $user);
 
         if ($script === null) {
             throw new ScriptNotFoundException();
         }
 
-        $chats = $chatRepository->getByScriptAndUserPaginated(
+        $chats = $chatRepository->getByScriptPaginated(
             $script,
-            $user,
             $queryParamDto->getPage(),
             $queryParamDto->getLimit()
         );
@@ -81,6 +84,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('/{chatUuid}', name: 'api_chats_show', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
     public function show(
         string $chatUuid,
         ChatRepository $chatRepository,
@@ -88,7 +92,7 @@ final class ChatController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $chat = $chatRepository->getByUuidAndUser($chatUuid, $user);
+        $chat = $chatRepository->getAccessibleByUuidForUser($chatUuid, $user);
 
         if ($chat === null) {
             throw new ChatNotFoundException();
@@ -102,6 +106,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('/{chatUuid}', name: 'api_chats_update', methods: ['PATCH'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $chatUuid,
         UpdateChatRequestDTO $dto,
@@ -110,7 +115,7 @@ final class ChatController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $chat = $chatRepository->getByUuidAndUser($chatUuid, $user);
+        $chat = $chatRepository->getAccessibleByUuidForUser($chatUuid, $user);
 
         if ($chat === null) {
             throw new ChatNotFoundException();
@@ -130,6 +135,7 @@ final class ChatController extends AbstractController
     }
 
     #[Route('/{chatUuid}', name: 'api_chats_delete', methods: ['DELETE'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(
         string $chatUuid,
         ChatRepository $chatRepository,
@@ -137,7 +143,7 @@ final class ChatController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $chat = $chatRepository->getByUuidAndUser($chatUuid, $user);
+        $chat = $chatRepository->getAccessibleByUuidForUser($chatUuid, $user);
 
         if ($chat === null) {
             throw new ChatNotFoundException();

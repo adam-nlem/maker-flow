@@ -1,26 +1,47 @@
 {
-    "noPosts": "Aucun post trouvé.",
-    "noPostGroups": "Aucun groupe de posts trouvé.",
-    "rankingPostGroups": "Classement des groupes de posts",
-    "rankingPosts": "Classement des posts",
-    "postsCount_one": "{{count}} post",
-    "postsCount_other": "{{count}} posts",
-    "overview": {
-        "header": "Vue d'ensemble — Toutes plateformes",
-        "totalFollowers": "Abonnés total",
-        "totalViews": "Vues totales",
-        "engagement": "Engagement"
-    },
-    "viewsEvolution": {
-        "title": "Évolution des vues"
-    },
-    "scripts": {
-        "header": "Scripts",
-        "newScript": "Nouveau",
-        "newScriptTitle": "Nouveau script",
-        "noScripts": "Aucun script.",
-        "newScriptHint": "Cliquez sur + Nouveau pour en créer un.",
-        "modifiedRelative": "Modifié {{when}}",
-        "noScriptsInCategory": "Aucun script dans cette catégorie."
+  "noPosts": "Aucun post trouvé.",
+  "noPostGroups": "Aucun groupe de posts trouvé.",
+  "rankingPostGroups": "Classement des groupes de posts",
+  "rankingPosts": "Classement des posts",
+  "engagementByPlatform": "Engagement par plateforme",
+  "postsCount_one": "{{count}} post",
+  "postsCount_other": "{{count}} posts",
+  "overview": {
+    "header": "Vue d'ensemble — Toutes plateformes",
+    "totalFollowers": "Abonnés total",
+    "totalViews": "Vues totales",
+    "engagement": "Engagement"
+  },
+  "viewsEvolution": {
+    "title": "Évolution des vues",
+    "empty": "Aucune donnée pour le moment."
+  },
+  "engagementByPlatformEmpty": "Aucune donnée pour le moment.",
+  "scripts": {
+    "header": "Scripts",
+    "newScript": "Nouveau",
+    "newScriptTitle": "Nouveau script",
+    "noScripts": "Aucun script.",
+    "newScriptHint": "Cliquez sur + Nouveau pour en créer un.",
+    "modifiedRelative": "Modifié {{when}}",
+    "noScriptsInCategory": "Aucun script dans cette catégorie."
+  },
+  "pendingReviewComments": {
+    "header": "Retours client",
+    "openCount_one": "{{count}} ouvert",
+    "openCount_other": "{{count}} ouverts",
+    "empty": {
+      "title": "Aucun retour en attente.",
+      "subtitle": "Tous les retours client sur les dernières versions des reviews ont été résolus."
     }
+  },
+  "awaitingClientAction": {
+    "header": "En attente de votre retour",
+    "count_one": "{{count}} à examiner",
+    "count_other": "{{count}} à examiner",
+    "empty": {
+      "title": "Tout est à jour.",
+      "subtitle": "Aucune nouvelle version de review n'attend votre retour ou votre approbation."
+    }
+  }
 }

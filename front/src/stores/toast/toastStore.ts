@@ -1,4 +1,4 @@
-import { create } from 'zustand'
+import { createResettableStore } from '~/stores/createResettableStore'
 import { ToastType } from '~/models/enums/ToastType'
 
 export type Toast = {
@@ -16,7 +16,7 @@ type ToastAction = {
     removeToast: (id: string) => void
 }
 
-export const useToastStore = create<ToastState & ToastAction>((set) => ({
+export const useToastStore = createResettableStore<ToastState & ToastAction>()((set) => ({
     toasts: [],
     addToast: (type, message) => {
         const id = crypto.randomUUID()

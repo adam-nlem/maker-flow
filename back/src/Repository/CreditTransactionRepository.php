@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Agency;
 use App\Entity\CreditTransaction;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\Query;
 use Doctrine\Persistence\ManagerRegistry;
@@ -36,11 +36,12 @@ class CreditTransactionRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByUserPaginated(User $user, int $page, int $limit): array
+    public function getByAgencyPaginated(Agency $agency, int $page, int $limit): array
     {
         return $this->createQueryBuilder('ct')
-            ->where('ct.user = :user')
-            ->setParameter('user', $user)
+            ->join('ct.creditBalance', 'cb')
+            ->where('cb.agency = :agency')
+            ->setParameter('agency', $agency)
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
             ->orderBy('ct.createdAt', 'DESC')

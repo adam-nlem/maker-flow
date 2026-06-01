@@ -1,0 +1,27 @@
+{
+    "emptyState": {
+        "title": "Nothing to review",
+        "subtitle": "Your agency hasn't shared any reviews with you yet.",
+        "noSelection": {
+            "title": "Select a review",
+            "subtitle": "Pick a review from the list to watch the media, leave feedback, or approve it."
+        },
+        "noResults": {
+            "title": "No matches",
+            "subtitle": "Adjust your search or filter to see other reviews."
+        }
+    },
+    "search": {
+        "placeholder": "Search reviews…"
+    },
+    "filters": {
+        "all": "All"
+    },
+    "actions": {
+        "approve": "Approve"
+    },
+    "toast": {
+        "approveSuccess": "Review approved.",
+        "approveError": "Couldn't approve the review. Please try again."
+    }
+}

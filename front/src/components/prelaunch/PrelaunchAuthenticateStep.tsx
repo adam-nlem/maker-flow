@@ -66,7 +66,7 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
 
     return (
         <div className="flex flex-col items-center min-h-screen w-full pb-20">
-            <div className="flex flex-row items-center justify-between w-full border-b border-light-gray py-2 px-4">
+            <div className="flex flex-row items-center justify-between w-full border-b border-pale-gray py-2 px-4">
                 <h1 className="text-heading-xl">MakerFlow</h1>
                 <Pill label={t("prelaunch:earlyAccessOpen")} bgColorClassName="bg-yellow/10" borderColorClassName="border border-yellow/30" textColorClassName="text-yellow" isSelected />
             </div>
@@ -112,7 +112,7 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                     <p className="text-heading-sm text-danger">{error}</p>
                 )}
 
-                <div className="border-t border-light-gray rounded w-full my-8 sm:my-10"></div>
+                <div className="border-t border-pale-gray rounded w-full my-8 sm:my-10"></div>
 
                 <p className="text-body-xs mb-3">
                     {t("prelaunch:concreteChange")}
@@ -122,7 +122,7 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                     {featureKeys.map((feature, index) => (
                         <div
                             key={feature.key}
-                            className="flex flex-col items-start p-4 sm:p-5 rounded-xl border border-light-gray text-left bg-clear animate-fade-in-up"
+                            className="flex flex-col items-start p-4 sm:p-5 rounded-xl border border-pale-gray text-left bg-clear animate-fade-in-up"
                             style={{ animationDelay: `${0.3 + index * 0.1}s` }}
                         >
                             <feature.icon className="h-6 w-6 text-primary mb-3" />
@@ -132,7 +132,7 @@ export default function PrelaunchAuthenticateStep({ referralCodeFromUrl }: Prela
                     ))}
                 </div>
 
-                <div className="border-t border-light-gray rounded w-full my-8 sm:my-10"></div>
+                <div className="border-t border-pale-gray rounded w-full my-8 sm:my-10"></div>
 
                 <h3 className="text-heading-lg sm:text-heading-xl mb-3 animate-fade-in-up" style={{ animationDelay: "0.7s" }}>
                     {t("prelaunch:rewards.headlinePrefix")} <span className="text-primary">{t("prelaunch:rewards.headlineHighlight")}</span>

@@ -67,8 +67,7 @@ class YoutubeReportingService
             $job = new YoutubeReportingJob();
             $job->setExternalJobId($googleJob->getId())
                 ->setReportType($reportType)
-                ->setIntegration($integration)
-                ->setUser($integration->getUser());
+                ->setIntegration($integration);
 
             $this->reportingJobRepository->save($job, true);
             $jobs[] = $job;
@@ -221,8 +220,7 @@ class YoutubeReportingService
                     ->setCountryCode($countryCode)
                     ->setSubscribedStatus($subscribedStatus)
                     ->setLiveOrOnDemand($liveOrOnDemand)
-                    ->setPost($post)
-                    ->setUser($integration->getUser());
+                    ->setPost($post);
 
                 $breakdownEntities[] = $breakdown;
             }

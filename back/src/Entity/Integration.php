@@ -71,9 +71,9 @@ class Integration
     #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
     private ?\DateTimeImmutable $lastSyncedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'integrations')]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
 
     #[ORM\Column(enumType: IntegrationStatus::class)]
     #[Groups(['api_integrations_list', 'api_integrations_show', 'api_integration_insights_list'])]
@@ -277,14 +277,14 @@ class Integration
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getCreatedBy(): ?User
     {
-        return $this->user;
+        return $this->createdBy;
     }
 
-    public function setUser(?User $user): static
+    public function setCreatedBy(?User $createdBy): static
     {
-        $this->user = $user;
+        $this->createdBy = $createdBy;
 
         return $this;
     }

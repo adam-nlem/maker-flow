@@ -9,11 +9,12 @@ interface UseListPaginatedScriptsProps {
     projectUuid: string | null;
     limit?: number;
     status?: ScriptStatus;
+    searchTerm?: string;
 }
 
-export function useListPaginatedScripts({ projectUuid, limit = 20, status }: UseListPaginatedScriptsProps) {
+export function useListPaginatedScripts({ projectUuid, limit = 20, status, searchTerm }: UseListPaginatedScriptsProps) {
     const query = useInfiniteQuery({
-        queryKey: scriptQueryKeys.list(projectUuid ?? '', status),
+        queryKey: scriptQueryKeys.list(projectUuid ?? '', status, searchTerm),
         queryFn: async ({ pageParam }) => {
             const res = await httpClient.get<ScriptJSON[]>('/scripts', {
                 params: {
@@ -21,6 +22,7 @@ export function useListPaginatedScripts({ projectUuid, limit = 20, status }: Use
                     page: pageParam,
                     limit,
                     ...(status && { status }),
+                    ...(searchTerm && { searchTerm }),
                 },
             });
             return res.data.map((json) => Script.fromJSON(json));

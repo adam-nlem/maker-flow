@@ -6,16 +6,17 @@ use App\DTO\Request\User\RegisterUserRequestDTO;
 use App\DTO\Request\User\UpdateUserRequestDTO;
 use App\DTO\Response\User\RegisterResponseDTO;
 use App\Entity\Enum\OtpType;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\Exception\User\IncorrectCurrentPasswordException;
 use App\Exception\User\InvalidPasswordException;
 use App\Exception\User\MissingPasswordFieldsException;
 use App\Exception\User\PasswordMismatchException;
 use App\Helper\PasswordHelper;
+use App\Repository\InvitationRepository;
 use App\Repository\TokenRepository;
 use App\Repository\UserRepository;
 use App\Service\Cookie\CookieService;
-use App\Service\Credit\CreditService;
 use App\Service\Otp\OtpService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,11 +24,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/users')]
 final class UserController extends AbstractController
 {
-    #[Route('/logout', name: 'api_user_logout', methods: ["GET"])]
+    #[Route('/logout', name: 'api_users_logout', methods: ["GET"])]
+    #[IsGranted(UserRole::User->value)]
     public function logout(
         Request $request,
         CookieService $cookieService,
@@ -45,28 +48,30 @@ final class UserController extends AbstractController
         return $response;
     }
 
-    #[Route('/register', name: 'api_user_register', methods: ["POST"])]
+    #[Route('/register', name: 'api_users_register', methods: ["POST"])]
     public function register(
         RegisterUserRequestDTO $dto,
         UserRepository $userRepository,
+        InvitationRepository $invitationRepository,
         OtpService $otpService,
-        CreditService $creditService,
     ): Response {
         if (!PasswordHelper::isValid($dto->getPlainPassword())) {
             throw new InvalidPasswordException();
         }
 
-        if ($userRepository->getByEmail($dto->getEmail())) {
+        if (
+            $userRepository->getByEmail($dto->getEmail()) ||
+            $invitationRepository->hasPendingByEmail($dto->getEmail())
+        ) {
             $responseDto = new RegisterResponseDTO(true, bin2hex(random_bytes(32)), $dto->getEmail());
             return $this->json(data: $responseDto->getData(), status: Response::HTTP_OK);
         }
 
         /** @var User $user */
         $user = $dto->build();
+        $user->setRole(UserRole::Admin);
 
         $userRepository->save($user, true);
-
-        $creditService->addWelcomeCredits($user, 3);
 
         $otp = $otpService->createAndSend($user, OtpType::EmailVerification);
 
@@ -78,16 +83,18 @@ final class UserController extends AbstractController
         );
     }
 
-    #[Route('/me', name: 'api_user_me', methods: ["GET"])]
+    #[Route('/me', name: 'api_users_me', methods: ["GET"])]
+    #[IsGranted(UserRole::User->value)]
     public function me(): Response
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        return $this->json(data: $user, status: Response::HTTP_CREATED, context: ['groups' => ['api_user_me']]);
+        return $this->json(data: $user, status: Response::HTTP_CREATED, context: ['groups' => ['api_users_me']]);
     }
 
-    #[Route('', name: 'api_user_update', methods: ["PATCH"])]
+    #[Route('', name: 'api_users_update', methods: ["PATCH"])]
+    #[IsGranted(UserRole::User->value)]
     public function updateMe(
         UpdateUserRequestDTO $dto,
         UserRepository $userRepository,
@@ -126,6 +133,6 @@ final class UserController extends AbstractController
 
         $userRepository->save($user, true);
 
-        return $this->json(data: $user, status: Response::HTTP_OK, context: ['groups' => ['api_user_update']]);
+        return $this->json(data: $user, status: Response::HTTP_OK, context: ['groups' => ['api_users_update']]);
     }
 }

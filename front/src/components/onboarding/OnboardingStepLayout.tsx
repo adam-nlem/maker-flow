@@ -1,24 +1,44 @@
 import type { ReactNode } from "react"
-import OnboardingStepHeader from "~/components/onboarding/OnboardingStepHeader"
+import OnboardingProgressBar from "./OnboardingProgressBar"
+import { useTranslation } from "react-i18next"
+import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 
 interface OnboardingStepLayoutProps {
-    maxWidth?: string
-    children: ReactNode
+  children: ReactNode
+  width?: string
+  height?: string
+  showProgressBar?: boolean
 }
 
 export default function OnboardingStepLayout({
-    maxWidth = "max-w-lg",
-    children,
+  children,
+  width = "w-1/2",
+  height = "h-1/2",
+  showProgressBar = true
 }: OnboardingStepLayoutProps) {
-    return (
-        <div className="h-screen flex flex-col items-center justify-between p-6">
-            <OnboardingStepHeader />
+  const { t } = useTranslation()
+  const { currentStepConfig } = useOnboardingFlow()
 
-            <div className={`${maxWidth} w-full bg-clear flex flex-col items-center justify-center`}>
-                {children}
-            </div>
+  if (!currentStepConfig) {
+    return null
+  }
 
-            <div />
-        </div>
-    )
+  return (
+    <div className={`${width} ${height} flex flex-col gap-3 justify-center items-start py-5 px-30`} >
+      {showProgressBar && <OnboardingProgressBar />}
+      <div className="flex flex-col gap-1">
+        <h2 className="text-heading-3xl text-dark">
+          {t(currentStepConfig.titleKey)}
+        </h2>
+        <p className="text-body-sm text-muted-2">
+          {t(currentStepConfig.descriptionKey)}
+        </p>
+      </div>
+
+      <div className="bg-clear w-full flex flex-col items-center justify-center">
+        {children}
+      </div>
+    </div >
+
+  )
 }

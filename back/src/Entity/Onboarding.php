@@ -2,7 +2,6 @@
 
 namespace App\Entity;
 
-use App\Entity\Enum\OnboardingStep;
 use App\Helper\DateHelper;
 use App\Repository\OnboardingRepository;
 use Doctrine\DBAL\Types\Types;
@@ -108,18 +107,18 @@ class Onboarding
         return $this;
     }
 
-    public function addCompletedStep(OnboardingStep $step): static
+    public function addCompletedStep(string $stepValue): static
     {
-        if (!in_array($step->value, $this->completedSteps, true)) {
-            $this->completedSteps[] = $step->value;
+        if (!in_array($stepValue, $this->completedSteps, true)) {
+            $this->completedSteps[] = $stepValue;
         }
 
         return $this;
     }
 
-    public function isStepCompleted(OnboardingStep $step): bool
+    public function isStepCompleted(string $stepValue): bool
     {
-        return in_array($step->value, $this->completedSteps, true);
+        return in_array($stepValue, $this->completedSteps, true);
     }
 
     public function getDismissedAt(): ?\DateTimeImmutable

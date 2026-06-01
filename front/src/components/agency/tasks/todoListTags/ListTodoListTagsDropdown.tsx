@@ -1,0 +1,153 @@
+import { useEffect, useRef, useState } from "react";
+import { useFloating, offset, flip, shift, autoUpdate, useDismiss, useInteractions, FloatingPortal } from "@floating-ui/react"
+import { useTranslation } from "react-i18next";
+import { Badge } from "~/components/ui/Badge";
+import { useListTodoListTagsWithSearch } from "~/hooks/api/todoListTags/useListTodoListTagsWithSearch";
+import { TagIcon } from "@heroicons/react/16/solid";
+import { Color, colorOptions, colorToBgClass, colorToTextClass } from "~/models/enums/Color";
+import { Input } from "~/components/ui/Input";
+import { PlusIcon } from "@heroicons/react/24/outline";
+import { useCreateTodoListTag } from "~/hooks/api/todoListTags/useCreateTodoListTag";
+import type { TodoListTag } from "~/models/TodoListTag";
+import SimpleTextButton from "~/components/ui/SimpleTextButton";
+import UpdateTodoListTagDropdown from "./UpdateTodoListTagDropdown";
+
+interface ListTodoListTagsDropdownProps {
+    anchorRef: React.RefObject<HTMLElement | null>;
+    todoListUuid: string;
+    selectedTags: TodoListTag[];
+    onClose: () => void;
+    onTagSelected: (selectedTag: TodoListTag) => void;
+    onTagDeleted?: (deletedTagUuid: string) => void;
+}
+
+export default function ListTodoListTagsDropdown({ anchorRef, todoListUuid, selectedTags, onClose, onTagSelected, onTagDeleted }: ListTodoListTagsDropdownProps) {
+    const { t } = useTranslation();
+    const { setSearchTerm, todoListTags, isLoading } = useListTodoListTagsWithSearch({ todoListUuid: todoListUuid });
+    const [title, setTitle] = useState("");
+    const [color, setColor] = useState(Color.Purple);
+    const { createTodoListTag } = useCreateTodoListTag({ todoListUuid: todoListUuid })
+    const [updatingTag, setUpdatingTag] = useState<TodoListTag | null>(null);
+
+    const inputRef = useRef<HTMLInputElement>(null);
+    const tagAnchorRefs = useRef<Map<string, HTMLElement>>(new Map())
+
+    const { refs, floatingStyles, context } = useFloating({
+        open: true,
+        onOpenChange: (open) => { if (!open) onClose() },
+        placement: "bottom-start",
+        elements: { reference: anchorRef.current },
+        middleware: [offset(4), flip(), shift({ padding: 8 })],
+        whileElementsMounted: autoUpdate,
+    })
+
+    const dismiss = useDismiss(context)
+    const { getFloatingProps } = useInteractions([dismiss])
+
+    // Auto-focus the search input when the dropdown opens
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
+
+    const handleCreateTag = async () => {
+        const newTag = await createTodoListTag({ title, color });
+        onTagSelected(newTag);
+        onClose();
+    }
+
+    const renderContent = () => {
+        if (isLoading) return null
+
+        if (todoListTags.length > 0) {
+            return (
+                <div className="flex flex-col gap-1">
+                    {todoListTags.map((tag) => {
+                        if (!selectedTags.some(t => t.uuid === tag.uuid))
+                            return (
+                                <div key={tag.uuid} ref={(el) => {
+                                    if (el) tagAnchorRefs.current.set(tag.uuid, el)
+                                    else tagAnchorRefs.current.delete(tag.uuid)
+                                }}>
+                                    <Badge
+                                        icon={TagIcon}
+                                        label={tag.title}
+                                        textColor={colorToTextClass[tag.color]}
+                                        bgColor={colorToBgClass[tag.color]}
+                                        onOptionClick={() => setUpdatingTag(tag)}
+                                        onClick={() => onTagSelected(tag)}
+                                    />
+                                    {updatingTag?.uuid === tag.uuid && tagAnchorRefs.current.get(tag.uuid) && (
+                                        <UpdateTodoListTagDropdown
+                                            anchorRef={{ current: tagAnchorRefs.current.get(tag.uuid) ?? null }}
+                                            tag={tag}
+                                            onClose={() => setUpdatingTag(null)}
+                                            onTagDeleted={(deletedTagUuid) => {
+                                                onTagDeleted?.(deletedTagUuid);
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                            )
+
+                    })}
+                </div>
+            )
+        }
+
+        if (title !== "") {
+            return (<div>
+                <div className="flex flex-row gap-2 mb-3">
+                    {colorOptions.map((c) => (
+                        <div
+                            key={c}
+                            onClick={() => setColor(c)}
+                            className={`size-5 rounded cursor-pointer ${colorToBgClass[c]} ${color === c ? 'ring-2 ring-offset-1 ring-muted-2' : ''}`}
+                        />
+                    ))}
+                </div>
+                <SimpleTextButton onClick={handleCreateTag} children={
+                    <>
+                        <PlusIcon className="size-3.5" strokeWidth={2} />
+                        <p>{t("tasks:tags.createPrefix", { title })}</p>
+                    </>
+                }
+                />
+            </div>
+
+            )
+        }
+
+        return <p className="text-body-xs">{t("tasks:tags.emptyHint")}</p>
+    }
+
+    return (
+        <FloatingPortal>
+            <div
+                ref={refs.setFloating}
+                style={floatingStyles}
+                {...getFloatingProps()}
+                className="z-70 bg-clear border border-pale-gray rounded-lg shadow-md min-w-max p-2 text-center"
+            >
+                <Input
+                    ref={inputRef}
+                    placeholder={t("tasks:tags.tagPlaceholder")}
+                    id="title"
+                    name="title"
+                    type="text"
+                    required
+                    simple
+
+                    className="mb-3"
+
+                    value={title}
+                    onChange={(e) => {
+                        setTitle(e.target.value)
+                        setSearchTerm(e.target.value)
+                    }}
+                />
+
+                {renderContent()}
+            </div>
+        </FloatingPortal>
+    );
+}

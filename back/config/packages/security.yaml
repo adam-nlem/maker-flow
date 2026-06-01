@@ -1,7 +1,7 @@
 security:
     # https://symfony.com/doc/current/security.html#registering-the-user-hashing-passwords
     password_hashers:
-        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: 'auto'
+        Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface: "auto"
     # https://symfony.com/doc/current/security.html#loading-the-user-the-user-provider
     providers:
         user_provider:
@@ -21,16 +21,31 @@ security:
             form_login:
                 login_path: api_login
                 check_path: api_login
-            
+
             entry_point: App\Security\AuthenticationEntryPoint
+
+    # Each line says: "anyone with the role on the left automatically has all the roles on the right too". 
+    # Symfony walks the chain transitively. So:
+    # - ROLE_ADMIN → also gets ROLE_EDITOR → also gets ROLE_VIEWER → also gets ROLE_USER 
+    #   (admins can do everything an editor/viewer/user can do).
+    # - ROLE_EDITOR → also gets ROLE_VIEWER → also gets ROLE_USER.
+    # - ROLE_VIEWER → also gets ROLE_USER.
+    # - ROLE_CLIENT is a separate branch that only inherits ROLE_USER. 
+    #   Clients are NOT viewers/editors/admins — they have their own limited capability set.
+    role_hierarchy:
+        ROLE_ADMIN: [ ROLE_EDITOR ]
+        ROLE_EDITOR: [ ROLE_VIEWER ]
+        ROLE_VIEWER: [ ROLE_USER ]
+        ROLE_CLIENT: [ ROLE_USER ]
 
     access_control:
         - { path: ^/health, roles: PUBLIC_ACCESS }
         - { path: ^/api/users/register, roles: PUBLIC_ACCESS }
-        - { path: "^/api/integrations/[^/]+/callback", roles: PUBLIC_ACCESS  }
+        - { path: "^/api/integrations/[^/]+/callback", roles: PUBLIC_ACCESS }
         - { path: ^/api/stripe/webhook, roles: PUBLIC_ACCESS }
         - { path: ^/api/otp/, roles: PUBLIC_ACCESS }
         - { path: ^/api/prelaunch/authenticate, roles: PUBLIC_ACCESS }
+        - { path: ^/api/invitations/, roles: PUBLIC_ACCESS }
         - { path: ^/api/, roles: ROLE_USER }
 
 when@test:

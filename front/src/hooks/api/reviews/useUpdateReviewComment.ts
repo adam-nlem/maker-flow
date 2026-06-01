@@ -1,0 +1,47 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { httpClient } from '~/services/httpClient/httpClient';
+import {
+    ReviewWithLatestVersionDTO,
+    type ReviewWithLatestVersionDTOJSON,
+} from '~/dtos/reviews/ReviewWithLatestVersionDTO';
+import type { ReviewCommentStatus } from '~/models/enums/ReviewCommentStatus';
+import { reviewsQueryKeys } from './reviewsQueryKeys';
+
+interface UpdateReviewCommentData {
+    body?: string;
+    status?: ReviewCommentStatus;
+    videoTimecodeSeconds?: number | null;
+}
+
+interface UpdateReviewCommentParams {
+    commentUuid: string;
+    reviewVersionUuid: string;
+    reviewUuid: string;
+    projectUuid: string;
+    data: UpdateReviewCommentData;
+}
+
+export function useUpdateReviewComment() {
+    const queryClient = useQueryClient();
+
+    const mutation = useMutation({
+        mutationFn: async ({ commentUuid, data }: UpdateReviewCommentParams) => {
+            const response = await httpClient.patch<ReviewWithLatestVersionDTOJSON>(
+                `/review-comments/${commentUuid}`,
+                data,
+            );
+            return ReviewWithLatestVersionDTO.fromJSON(response.data);
+        },
+        onSuccess: (_review, { reviewVersionUuid, projectUuid }) => {
+            queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.comments(reviewVersionUuid) });
+            queryClient.invalidateQueries({ queryKey: reviewsQueryKeys.pendingComments(projectUuid) });
+        },
+    });
+
+    return {
+        updateReviewComment: mutation.mutateAsync,
+        isPending: mutation.isPending,
+        error: mutation.error,
+        reset: mutation.reset,
+    };
+}

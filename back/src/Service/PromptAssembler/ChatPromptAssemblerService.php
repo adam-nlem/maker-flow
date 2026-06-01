@@ -31,7 +31,7 @@ class ChatPromptAssemblerService
             $blocks[] = $referenceBlock;
         }
 
-        $currentScriptBlock = $this->buildCurrentScriptBlock($chat->getScript(), $chat->getUser());
+        $currentScriptBlock = $this->buildCurrentScriptBlock($chat->getScript());
         if ($currentScriptBlock !== null) {
             $blocks[] = $currentScriptBlock;
         }
@@ -76,13 +76,15 @@ PROMPT;
             return null;
         }
 
-        $referenceScript = $this->scriptRepository->getByUuidAndUser($referenceScriptUuid, $chat->getUser());
+        $referenceScript = $chat->getUser() !== null
+            ? $this->scriptRepository->getAccessibleByUuidForUser($referenceScriptUuid, $chat->getUser())
+            : null;
 
         if ($referenceScript === null) {
             return null;
         }
 
-        $content = $this->serializeScriptParts($referenceScript, $chat->getUser(), withUuids: false);
+        $content = $this->serializeScriptParts($referenceScript, withUuids: false);
 
         if ($content === '') {
             return null;
@@ -91,9 +93,9 @@ PROMPT;
         return "Script de référence :\n{$content}";
     }
 
-    private function buildCurrentScriptBlock(Script $script, $user): ?string
+    private function buildCurrentScriptBlock(Script $script): ?string
     {
-        $content = $this->serializeScriptParts($script, $user, withUuids: true);
+        $content = $this->serializeScriptParts($script, withUuids: true);
 
         if ($content === '') {
             return "Script actuel : (vide)";
@@ -102,9 +104,9 @@ PROMPT;
         return "Script actuel (parts ordonnées) :\n{$content}";
     }
 
-    private function serializeScriptParts(Script $script, $user, bool $withUuids): string
+    private function serializeScriptParts(Script $script, bool $withUuids): string
     {
-        $parts = $this->scriptPartRepository->getByScriptAndUserOrderedByPosition($script, $user);
+        $parts = $this->scriptPartRepository->getByScriptOrderedByPosition($script);
 
         $lines = [];
         foreach ($parts as $part) {

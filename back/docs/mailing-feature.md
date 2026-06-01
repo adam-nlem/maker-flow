@@ -76,7 +76,9 @@ src/Service/Mailing/
 │   ├── LoginOtpEmailTemplate.php
 │   ├── EmailVerificationOtpEmailTemplate.php
 │   ├── PrelaunchVerificationEmailTemplate.php
-│   └── IntegrationTokenExpiredEmailTemplate.php
+│   ├── IntegrationTokenExpiredEmailTemplate.php
+│   ├── CollaboratorWelcomeEmailTemplate.php
+│   └── ClientWelcomeEmailTemplate.php
 └── Exception/
     ├── MailingServiceException.php       # Abstract base exception (code 140200)
     └── MailingRetryableException.php     # Thrown on retryable Resend errors (429, 5xx)
@@ -88,6 +90,21 @@ src/Message/
     ├── SendEmailHandler.php             # Delegates to MailingService::send()
     └── SyncReferrerSegmentsHandler.php  # Syncs referrer segments with retry/backoff
 ```
+
+## Templates
+
+All templates extend `AbstractEmailTemplate` (recipient email/name + Symfony `Address` resolution + subject/body abstract methods). New templates added with the agency model:
+
+| Template | Subject | Dispatched by | Inputs |
+|----------|---------|---------------|--------|
+| `LoginOtpEmailTemplate` | 6-digit OTP code | `OtpService` on login challenge | `code` |
+| `EmailVerificationOtpEmailTemplate` | 6-digit OTP code | `OtpService` on email verification | `code` |
+| `PrelaunchVerificationEmailTemplate` | Pre-launch confirmation | Pre-launch flow | `verification URL` |
+| `IntegrationTokenExpiredEmailTemplate` | Token expired notification | `TokenExpiredEventSubscriber` | `platform`, `accountName`, `projectName` |
+| `CollaboratorWelcomeEmailTemplate` | `Rejoignez l'agence {agencyName} sur MakerFlow` | `InvitationService::createForCollaborator` (via `SendEmailMessage`) | `agencyName`, `inviterName`, `roleLabel`, `setupUrl` (`{APP_URL}/invite/{token}`) |
+| `ClientWelcomeEmailTemplate` | `Bienvenue sur votre portail {agencyName}` | `InvitationService::createForClient` (via `SendEmailMessage`) | `agencyName`, `contactEmail` (optional, rendered as `mailto:` line), `setupUrl` |
+
+The two welcome templates back the polymorphic Invitation flow described in `back/docs/invitation-feature.md`. Both link to the public `/invite/{token}` page on the frontend; the backend never exposes the password setup form itself.
 
 ## Usage
 

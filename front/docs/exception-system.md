@@ -21,7 +21,8 @@ The backend returns errors in this format:
 | `src/models/dtos/ErrorResponseDTO.ts` | DTO class with `tryFrom(data)` factory for parsing error responses |
 | `src/services/httpClient/HttpException.ts` | Single exception class thrown by the HTTP interceptor |
 | `src/services/httpClient/httpClient.ts` | Axios interceptor — creates `HttpException` for all errors |
-| `src/services/apiErrorHandler/errorCodeMessages.ts` | Maps numeric error codes to French messages + `resolveErrorMessage` helper |
+| `src/services/apiErrorHandler/errorCodeMessages.ts` | Maps numeric error codes to i18n keys + `resolveErrorMessage` helper |
+| `src/services/i18n/locales/errors/{en,fr}.json` | Translated error messages keyed by domain (e.g. `errors:agency.missing`) |
 | `src/services/apiErrorHandler/apiErrorHandler.ts` | Global mutation error handler |
 
 ## `ErrorResponseDTO`
@@ -58,20 +59,63 @@ class HttpException extends Error {
 function resolveErrorMessage(error: unknown): string
 ```
 
-Takes any error, returns the French user-facing message. Always returns a string (defaults to generic fallback `99999`).
+Takes any error, returns the localized user-facing message (resolved through i18next). Always returns a string (defaults to `errors:fallback`).
 
 ## Error Code Message Mapping
 
-`errorCodeMessages` is a `Record<number, string>` mapping backend error codes to French messages. Code `99999` is the generic fallback.
+`errorCodeKeys` is a `Record<number, string>` mapping backend error codes to **i18n keys** (e.g. `errors:agency.missing`). The keys resolve to the messages in `services/i18n/locales/errors/{en,fr}.json`. Unknown codes fall back to `errors:fallback`.
+
+The numeric code is computed by the backend as `DomainCode.value * 1000 + codeSuffix` (see `back/src/Exception/AppException.php` and `back/src/Exception/DomainCode.php`). Each domain owns a 1000-code block — e.g. Review (`DomainCode::Review = 33`) occupies `33xxx`.
+
+### Current domain blocks
+
+| Prefix | Domain | Frontend i18n namespace |
+|---|---|---|
+| 10xxx | Integration | `errors:integration.*` |
+| 11xxx | AiClient | `errors:aiClient.*` |
+| 12xxx | Credit | `errors:credit.*` |
+| 13xxx | Stripe | `errors:stripe.*` |
+| 14xxx | Mailing | `errors:mailing.*` |
+| 15xxx | Otp | `errors:otp.*` |
+| 16xxx | Prelaunch | `errors:prelaunch.*` |
+| 17xxx | Project | `errors:project.*` |
+| 18xxx | Script | `errors:script.*` |
+| 19xxx | TodoList | `errors:todoList.*` |
+| 20xxx | Post | `errors:post.*` |
+| 21xxx | User | `errors:user.*` |
+| 22xxx | Validation | `errors:validation.*` |
+| 23xxx | Auth | `errors:auth.*` |
+| 24xxx | Chat | `errors:chat.*` |
+| 25xxx | ScriptPart | `errors:scriptPart.*` |
+| 26xxx | ScriptPartSuggestion | `errors:scriptPartSuggestion.*` |
+| 27xxx | Agency | `errors:agency.*` |
+| 28xxx | HookTemplate | `errors:hookTemplate.*` |
+| 29xxx | Invitation | `errors:invitation.*` |
+| 30xxx | ProjectClient | `errors:projectClient.*` |
+| 31xxx | AgencyCollaborator | `errors:agencyCollaborator.*` |
+| 32xxx | Onboarding | `errors:onboarding.*` |
+| 33xxx | Review | `errors:review.*` |
 
 ### Adding a new error code
 
-1. Backend adds a new `AppException` with a code (e.g., `17001`)
-2. Add the code + French message to `errorCodeMessages.ts`:
+1. Backend adds a new `AppException` subclass with a `self::CODE` constant (the suffix) and `getDomainCode()` returning the matching `DomainCode` case.
+2. Add the resolved numeric code (`domainValue * 1000 + suffix`) + i18n key to `errorCodeMessages.ts`:
    ```ts
-   17001: 'Le projet est introuvable.',
+   33005: 'errors:review.somethingElse',
    ```
-3. The global handler (`handleMutationError`) will automatically show the correct toast
+3. Add the message under that key in both `services/i18n/locales/errors/en.json` and `…/fr.json`.
+4. The global handler (`handleMutationError`) will automatically show the correct toast.
+
+#### Meta-driven resolution
+
+When the same error code can carry several user-facing reasons (e.g. `ReviewFileInvalidException` / `AgencyLogoInvalidException` with `meta.reason`), mirror the backend enum under `models/enums/` along with a translation key map (see `FileInvalidReason.ts` / `OAuthErrorCode.ts`), then pass a resolver function instead of a string in `errorCodeMessages.ts`:
+
+```ts
+27004: (meta) => resolveFileInvalidReason(meta, 'errors:agency.logoInvalid'),
+33001: (meta) => resolveFileInvalidReason(meta, 'errors:review.fileInvalid'),
+```
+
+The local `resolveFileInvalidReason(meta, fallbackKey)` helper looks up `meta.reason` in `FileInvalidReason` and falls back to the supplied key if the reason is missing or unknown. Add a similar helper if you introduce another shared meta enum.
 
 ## How It Works
 

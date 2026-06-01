@@ -1,22 +1,29 @@
 {
     "login": {
-        "title": "Log in",
+        "eyebrow": "SIGN IN",
+        "title": "Welcome back.",
         "subtitle": "Log in to access your content.",
-        "submit": "Log in",
-        "switchToRegister": "Create an account"
+        "submit": "Sign in",
+        "helperQuestion": "New to MakerFlow?",
+        "switchToRegister": "Create an account",
+        "forgotPassword": "Forgot password?"
     },
     "register": {
+        "eyebrow": "GET STARTED",
         "title": "Create your account",
         "subtitle": "Start for free and manage your content from now on.",
         "submit": "Create my account",
-        "switchToLogin": "I already have an account"
+        "helperQuestion": "Already have an account?",
+        "switchToLogin": "Sign in"
     },
     "verify": {
-        "subtitlePrefix": "A code has been sent to",
-        "codeLabel": "Verification code",
+        "eyebrow": "TWO-FACTOR VERIFICATION",
+        "subtitle": "Enter the 6-digit code we sent to your email.",
+        "codeSentTo": "Code sent to",
         "submit": "Verify",
         "resend": "Resend code",
-        "resendCooldown": "Resend code ({{seconds}}s)"
+        "resendCountdown": "Resend in {{time}}",
+        "backToSignIn": "Back to sign in"
     },
     "fields": {
         "email": "Email address",

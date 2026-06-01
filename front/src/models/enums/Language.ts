@@ -9,3 +9,8 @@ export const languageToLabel: Record<Language, string> = {
     [Language.Fr]: 'Français',
     [Language.En]: 'English',
 }
+
+export const languageToLocale: Record<Language, string> = {
+    [Language.Fr]: 'fr-FR',
+    [Language.En]: 'en-US',
+}

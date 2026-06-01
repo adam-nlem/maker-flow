@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\DTO\QueryParam\TodoListTask\ListTodoListTasksQueryParamDTO;
 use App\DTO\Request\TodoListTask\CreateTodoListTaskRequestDTO;
@@ -19,12 +20,14 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/todo-lists/tasks', requirements: ['taskUuid' => Requirement::UUID])]
-class TodoListTaskController extends AbstractController
+final class TodoListTaskController extends AbstractController
 {
 
     #[Route('', name: 'api_todo_lists_tasks_list', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListTodoListTasksQueryParamDTO $queryParamDto,
         TodoListTaskRepository $taskRepository,
@@ -33,7 +36,7 @@ class TodoListTaskController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $todoList = $todoListRepository->getByUuidAndUser($queryParamDto->getTodoListUuid(), $user);
+        $todoList = $todoListRepository->getAccessibleByUuidForUser($queryParamDto->getTodoListUuid(), $user);
 
         if ($todoList === null) {
             throw new TodoListNotFoundException();
@@ -46,10 +49,9 @@ class TodoListTaskController extends AbstractController
         $result = array_map(
             fn(TodoListStatus $status) => (new ListTodoListTasksGroupedByStatusResponseDTO(
                 $status,
-                $taskRepository->getByTodoListAndStatusAndUserPaginated(
+                $taskRepository->getByTodoListAndStatusPaginated(
                     $todoList,
                     $status,
-                    $user,
                     $queryParamDto->getPage(),
                     $queryParamDto->getLimit()
                 )
@@ -61,6 +63,7 @@ class TodoListTaskController extends AbstractController
     }
 
     #[Route('', name: 'api_todo_lists_tasks_create', methods: ['POST'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateTodoListTaskRequestDTO $dto,
         TodoListRepository $todoListRepository,
@@ -70,7 +73,7 @@ class TodoListTaskController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $todoList = $todoListRepository->getByUuidAndUser($dto->getTodoListUuid(), $user);
+        $todoList = $todoListRepository->getAccessibleByUuidForUser($dto->getTodoListUuid(), $user);
 
         if ($todoList === null) {
             throw new TodoListNotFoundException();
@@ -81,7 +84,7 @@ class TodoListTaskController extends AbstractController
 
         $tagUuids = $dto->getTagUuids();
 
-        $tags = $tagRepository->getByUserAndWithUuidIn($user, $tagUuids);
+        $tags = $tagRepository->getByTodoListAndWithUuidIn($todoList, $tagUuids);
 
         $task
             ->setUser($user)
@@ -101,9 +104,11 @@ class TodoListTaskController extends AbstractController
     }
 
     #[Route('/{taskUuid}', name: 'api_todo_lists_tasks_show', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
     public function show(string $taskUuid) {}
 
     #[Route('/{taskUuid}', name: 'api_todo_lists_tasks_update', methods: ['PATCH'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $taskUuid,
         UpdateTodoListTaskRequestDTO $dto,
@@ -113,7 +118,7 @@ class TodoListTaskController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $task = $taskRepository->getByUuidAndUser($taskUuid, $user);
+        $task = $taskRepository->getAccessibleByUuidForUser($taskUuid, $user);
 
         if ($task === null) {
             throw new TodoListTaskNotFoundException();
@@ -146,7 +151,7 @@ class TodoListTaskController extends AbstractController
             sort($newTagUuids);
 
             if ($currentTagUuids !== $newTagUuids) {
-                $tags = $tagRepository->getByUserAndWithUuidIn($user, $dto->getTagUuids());
+                $tags = $tagRepository->getByTodoListAndWithUuidIn($task->getTodoList(), $dto->getTagUuids());
 
                 $task->getTags()->clear();
                 foreach ($tags as $tag) {
@@ -165,12 +170,13 @@ class TodoListTaskController extends AbstractController
     }
 
     #[Route('/{taskUuid}', name: 'api_todo_lists_tasks_delete', methods: ['DELETE'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(string $taskUuid, TodoListTaskRepository $taskRepository)
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $task = $taskRepository->getByUuidAndUser($taskUuid, $user);
+        $task = $taskRepository->getAccessibleByUuidForUser($taskUuid, $user);
 
         if ($task === null) {
             throw new TodoListTaskNotFoundException();

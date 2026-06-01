@@ -91,7 +91,7 @@ class TiktokOAuthService
 
         $integration = new Integration();
         $integration
-            ->setUser($user)
+            ->setCreatedBy($user)
             ->setPlatform(Platform::Tiktok)
             ->setAccessToken($tokenDTO->getAccessToken())
             ->setRefreshToken($tokenDTO->getRefreshToken())
@@ -183,8 +183,8 @@ class TiktokOAuthService
         $tokenDTO = $this->exchangeCodeForToken($code);
         $userProfile = $this->getUserProfile($tokenDTO->getAccessToken());
 
-        $existingIntegration = $this->integrationRepository->getByUserAndPlatformAndAccountId(
-            $user,
+        $existingIntegration = $this->integrationRepository->getByAgencyAndPlatformAndAccountId(
+            $project->getAgency(),
             Platform::Tiktok,
             $tokenDTO->getOpenId()
         );

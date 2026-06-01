@@ -1,0 +1,27 @@
+{
+    "emptyState": {
+        "title": "Rien à valider",
+        "subtitle": "Votre agence ne vous a encore partagé aucune review.",
+        "noSelection": {
+            "title": "Sélectionnez une review",
+            "subtitle": "Choisissez une review dans la liste pour la visionner, laisser un retour ou l'approuver."
+        },
+        "noResults": {
+            "title": "Aucun résultat",
+            "subtitle": "Ajustez votre recherche ou votre filtre pour voir d'autres reviews."
+        }
+    },
+    "search": {
+        "placeholder": "Rechercher des reviews…"
+    },
+    "filters": {
+        "all": "Tous"
+    },
+    "actions": {
+        "approve": "Approuver"
+    },
+    "toast": {
+        "approveSuccess": "Review approuvée.",
+        "approveError": "Impossible d'approuver la review. Veuillez réessayer."
+    }
+}

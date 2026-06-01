@@ -2,7 +2,9 @@
 
 ## Overview
 
-The onboarding system tracks new user progress through key app features. It stores completion state in a dedicated `onboarding` table, enabling cross-device persistence. New users receive 3 free credits at registration to enable the AI script generation step.
+The onboarding system tracks new user progress through a short **role-aware** setup flow. A **single unified enum** holds every step value; the service maps each role to the subset of steps it must complete. Roles with no applicable steps (Editor, Viewer) get their onboarding **auto-dismissed at creation** so they never enter the wizard.
+
+New users receive 3 free credits at registration to unlock AI features once they reach the agency shell.
 
 ## Entity: `Onboarding`
 
@@ -13,60 +15,78 @@ The onboarding system tracks new user progress through key app features. It stor
 | id | int (auto) | Internal PK |
 | uuid | GUID | Public ID |
 | user_id | FK → user | Unique (one per user), CASCADE delete |
-| completed_steps | JSON | Simple string array: `["create_first_project", "connect_integration"]` |
-| dismissed_at | datetime (nullable) | Set when user dismisses or all steps complete |
+| completed_steps | JSON | String array of step values: `["create_agency", "create_first_project"]` |
+| dismissed_at | datetime (nullable) | Set when all applicable steps are complete, or at creation for roles without steps |
 | created_at | datetime | UTC |
 | updated_at | datetime | UTC, PreUpdate lifecycle |
 
+`addCompletedStep(string)` / `isStepCompleted(string)` operate on raw step values — the entity is enum-agnostic.
+
 **Serialization groups:** `api_onboarding_show`, `api_onboarding_complete_step`, `api_onboarding_dismiss`
 
-## Enum: `OnboardingStep`
+## Unified enum: `OnboardingStep`
 
 **File:** `src/Entity/Enum/OnboardingStep.php`
 
 | Case | Value |
 |------|-------|
+| CreateAgency | `create_agency` |
 | CreateFirstProject | `create_first_project` |
-| ConnectIntegration | `connect_integration` |
-| CreateCreatorProfile | `create_creator_profile` |
-| CreateFirstScript | `create_first_script` |
-| GenerateFirstScript | `generate_first_script` |
+| InviteFirstClient | `invite_first_client` |
+| ConnectFirstIntegration | `connect_first_integration` |
 | ShowSubscriptions | `show_subscriptions` |
+| ExploreContents | `explore_contents` |
 
-To add a new step: add a case here and update the frontend `OnboardingStep` enum const maps.
+`connect_first_integration` is shared by the Admin and Client flows — one value, two consumers.
 
-## Welcome Credits
+## Role → step mapping
 
-New users receive **3 free credits** at registration via `CreditService::addWelcomeCredits()`, called from `UserController::register()`. This uses `CreditTransactionType::WelcomeBonus` and `SourceBucket::RefillCredits`.
+`OnboardingService::getApplicableStepValues(User): string[]`:
 
-## API Endpoints
-
-| Method | Endpoint | Description |
-|--------|----------|-------------|
-| GET | `/api/onboarding` | Returns onboarding state (auto-creates if not exists) |
-| POST | `/api/onboarding/complete-step` | Body: `{"step": "create_first_project"}` |
-| POST | `/api/onboarding/dismiss` | Marks onboarding as complete (called at end of onboarding flow) |
+| Role | Applicable steps |
+|------|------------------|
+| `ROLE_ADMIN` | CreateAgency → CreateFirstProject → InviteFirstClient → ConnectFirstIntegration → ShowSubscriptions |
+| `ROLE_CLIENT` | ConnectFirstIntegration → ExploreContents |
+| `ROLE_EDITOR`, `ROLE_VIEWER`, default | *(empty — onboarding auto-dismissed at creation)* |
 
 ## Service: `OnboardingService`
 
 **File:** `src/Service/OnboardingService.php`
 
-- `getOrCreateOnboarding(User)` — Lazy-creates onboarding row on first access
-- `completeStep(Onboarding, OnboardingStep)` — Adds step if not already completed. Auto-dismisses when all steps done.
-- `dismiss(Onboarding)` — Sets `dismissedAt`
+- `getOrCreateOnboarding(User)` — lazy-creates the row on first access. If `getApplicableStepValues($user)` is empty, sets `dismissedAt` immediately so the user is never sent to `/onboarding`.
+- `getApplicableStepValues(User): string[]` — returns the applicable step values for the user's role.
+- `completeStep(Onboarding, string $stepValue, User)` — validates `$stepValue` is in `getApplicableStepValues($user)` (else throws `InvalidOnboardingStepException`), appends it, and auto-dismisses when every applicable step is completed.
+- `dismiss(Onboarding)` — kept for a future "skip-all" CTA; not used by current flows.
 
-## Step Completion
+## Exception
 
-All steps are completed by the frontend via `POST /api/onboarding/complete-step`. The `useOnboardingFlow` hook calls `advanceStep` → `completeStep` when the user advances through each onboarding step.
+`InvalidOnboardingStepException` (HTTP 400) — thrown when the submitted step value is not applicable for the current user's role. Domain `Onboarding = 32` in `DomainCode`.
+
+## API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/api/onboarding` | Returns onboarding state (auto-creates if not exists, auto-dismisses for roles with no steps) |
+| POST | `/api/onboarding/complete-step` | Body: `{"step": "<step_value>"}`; rejects cross-role values |
+| POST | `/api/onboarding/dismiss` | Dormant endpoint, reserved for a future "skip-all" CTA |
+
+## Migration
+
+`back/migrations/Version20260531000000.php` retroactively dismisses onboarding for any existing Editor/Viewer with `dismissed_at IS NULL`, in line with the new role mapping.
+
+## Welcome Credits
+
+New users receive **3 free credits** at registration via `CreditService::addWelcomeCredits()`, called from `UserController::register()`. Uses `CreditTransactionType::WelcomeBonus` and `SourceBucket::RefillCredits`.
 
 ## Key Files
 
 - `src/Entity/Onboarding.php`
 - `src/Entity/Enum/OnboardingStep.php`
-- `src/Entity/Enum/CreditTransactionType.php` (WelcomeBonus case)
 - `src/Repository/OnboardingRepository.php`
 - `src/Service/OnboardingService.php`
-- `src/Service/Credit/CreditService.php` (addWelcomeCredits method)
+- `src/Exception/Onboarding/OnboardingException.php`
+- `src/Exception/Onboarding/InvalidOnboardingStepException.php`
 - `src/Controller/OnboardingController.php`
-- `src/Controller/UserController.php` (register action grants welcome credits)
 - `src/DTO/Request/Onboarding/CompleteOnboardingStepRequestDTO.php`
+- `src/Service/Credit/CreditService.php` (addWelcomeCredits)
+- `migrations/Version20260531000000.php` (auto-dismiss backfill for Editor/Viewer)

@@ -24,7 +24,7 @@ class TokenAuthenticator extends AbstractAuthenticator
 {
     private const EXCLUDED_ROUTES = [
         'api_login',
-        'api_user_register',
+        'api_users_register',
         'api_integrations_callback',
         'api_stripe_webhook',
         'api_otp_verify_login',
@@ -32,6 +32,8 @@ class TokenAuthenticator extends AbstractAuthenticator
         'api_otp_resend',
         'api_prelaunch_authenticate',
         'api_otp_verify_prelaunch',
+        'api_invitations_show',
+        'api_invitations_complete',
     ];
 
     public function __construct(

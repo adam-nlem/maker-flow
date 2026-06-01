@@ -59,7 +59,7 @@ export default function PostPicker({ projectUuid, selectedUuids, onSelectionChan
             ))}
           </div>
         ) : items.length === 0 ? (
-          <p className="text-body-xs text-gray py-4 text-center">{t("contents:noPosts")}</p>
+          <p className="text-body-xs text-muted-2 py-4 text-center">{t("contents:noPosts")}</p>
         ) : (
           <>
             {items.map((item) => (

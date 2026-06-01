@@ -2,8 +2,9 @@
 
 namespace App\Service\Stripe;
 
+use App\Entity\Agency;
 use App\Entity\Enum\SubscriptionPlan;
-use App\Entity\User;
+use App\Repository\AgencyRepository;
 use App\Repository\UserRepository;
 use App\Exception\Stripe\CheckoutSessionCreationException;
 use Stripe\Checkout\Session;
@@ -16,6 +17,7 @@ class StripeCheckoutService
     public function __construct(
         private readonly string $stripeSecretKey,
         private readonly string $frontendUrl,
+        private readonly AgencyRepository $agencyRepository,
         private readonly UserRepository $userRepository,
         private readonly StripePlanService $stripePlanService,
         private readonly StripeRefillService $stripeRefillService,
@@ -23,41 +25,58 @@ class StripeCheckoutService
         Stripe::setApiKey($this->stripeSecretKey);
     }
 
-    public function getOrCreateStripeCustomer(User $user): string
+    public function getOrCreateStripeCustomer(Agency $agency): string
     {
-        if ($user->getStripeCustomerId() !== null) {
-            return $user->getStripeCustomerId();
+        $adminEmail = $this->userRepository->getAdminByAgency($agency)?->getEmail();
+
+        if ($agency->getStripeCustomerId() !== null) {
+            $this->syncCustomerEmail($agency->getStripeCustomerId(), $adminEmail);
+
+            return $agency->getStripeCustomerId();
         }
 
         try {
             $customer = Customer::create([
-                'email' => $user->getEmail(),
-                'name' => $user->getFirstName() . ' ' . $user->getLastName(),
+                'email' => $adminEmail,
+                'name' => $agency->getName(),
                 'metadata' => [
-                    'user_uuid' => $user->getUuid(),
+                    'agency_uuid' => $agency->getUuid(),
                 ],
             ]);
         } catch (ApiErrorException $e) {
             throw new CheckoutSessionCreationException('Failed to create Stripe customer', $e);
         }
 
-        $user->setStripeCustomerId($customer->id);
-        $this->userRepository->save($user, true);
+        $agency->setStripeCustomerId($customer->id);
+        $this->agencyRepository->save($agency, true);
 
         return $customer->id;
+    }
+
+    private function syncCustomerEmail(string $customerId, ?string $email): void
+    {
+        if ($email === null) {
+            return;
+        }
+
+        try {
+            Customer::update($customerId, ['email' => $email]);
+        } catch (ApiErrorException $e) {
+            throw new CheckoutSessionCreationException('Failed to sync Stripe customer email', $e);
+        }
     }
 
     /**
      * @throws CheckoutSessionCreationException
      */
-    public function createSubscriptionCheckoutSession(User $user, SubscriptionPlan $plan, string $checkoutRedirectPath = '/settings/subscription'): string
+    public function createSubscriptionCheckoutSession(Agency $agency, SubscriptionPlan $plan, string $checkoutRedirectPath = '/agency/settings/subscription'): string
     {
         $priceId = $this->stripePlanService->getPriceIdForPlan($plan);
 
         if ($priceId === null) {
             throw new CheckoutSessionCreationException('No price found for plan: ' . $plan->value);
         }
-        $customerId = $this->getOrCreateStripeCustomer($user);
+        $customerId = $this->getOrCreateStripeCustomer($agency);
 
         try {
             $session = Session::create([
@@ -72,7 +91,7 @@ class StripeCheckoutService
                 'success_url' => $this->frontendUrl . $checkoutRedirectPath . '?checkout=success',
                 'cancel_url' => $this->frontendUrl . $checkoutRedirectPath . '?checkout=cancel',
                 'metadata' => [
-                    'user_uuid' => $user->getUuid(),
+                    'agency_uuid' => $agency->getUuid(),
                 ],
             ]);
         } catch (ApiErrorException $e) {
@@ -85,7 +104,7 @@ class StripeCheckoutService
     /**
      * @throws CheckoutSessionCreationException
      */
-    public function createRefillCheckoutSession(User $user): string
+    public function createRefillCheckoutSession(Agency $agency): string
     {
         $priceId = $this->stripeRefillService->getRefillPriceId();
 
@@ -93,7 +112,7 @@ class StripeCheckoutService
             throw new CheckoutSessionCreationException('No refill price found in Stripe');
         }
 
-        $customerId = $this->getOrCreateStripeCustomer($user);
+        $customerId = $this->getOrCreateStripeCustomer($agency);
 
         try {
             $session = Session::create([
@@ -105,10 +124,10 @@ class StripeCheckoutService
                         'quantity' => 1,
                     ],
                 ],
-                'success_url' => $this->frontendUrl . '/settings/subscription?checkout=success',
-                'cancel_url' => $this->frontendUrl . '/settings/subscription?checkout=cancel',
+                'success_url' => $this->frontendUrl . '/agency/settings/subscription?checkout=success',
+                'cancel_url' => $this->frontendUrl . '/agency/settings/subscription?checkout=cancel',
                 'metadata' => [
-                    'user_uuid' => $user->getUuid(),
+                    'agency_uuid' => $agency->getUuid(),
                 ],
             ]);
         } catch (ApiErrorException $e) {

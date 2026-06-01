@@ -1,3 +1,11 @@
+import i18n from "~/services/i18n/i18n";
+import { Language, languageToLocale } from "~/models/enums/Language";
+
+function getCurrentLocale(): string {
+    const language = (i18n.resolvedLanguage ?? i18n.language ?? Language.Fr) as Language;
+    return languageToLocale[language] ?? languageToLocale[Language.Fr];
+}
+
 /**
  * Formats a date to French locale with abbreviated month: "01 janv. 2024"
  */
@@ -31,15 +39,20 @@ export function formatToNumericDate(date: Date): string {
     }).format(date);
 }
 
-export function formatToFrenchRelative(date: Date): string {
+/**
+ * Formats a date relative to "now" in the user's active language.
+ * Within a week: localized relative ("il y a 3 heures" / "3 hours ago").
+ * Beyond a week: short date in the active locale ("24 janv." / "Jan 24").
+ */
+export function formatToRelative(date: Date): string {
+    if (isNaN(date.getTime())) return '';
 
+    const locale = getCurrentLocale();
+    const diffInSec = Math.round((date.getTime() - Date.now()) / 1000);
 
-    if (isNaN(date.getTime())) {
-        return "Date invalide"; // Or return an empty string/fallback
+    if (Math.abs(diffInSec) >= 604800) {
+        return new Intl.DateTimeFormat(locale, { day: '2-digit', month: 'short' }).format(date);
     }
-
-    const diffInMs = date.getTime() - Date.now();
-    const diffInSec = Math.round(diffInMs / 1000);
 
     const units: { unit: Intl.RelativeTimeFormatUnit; seconds: number }[] = [
         { unit: 'year', seconds: 31536000 },
@@ -47,18 +60,11 @@ export function formatToFrenchRelative(date: Date): string {
         { unit: 'day', seconds: 86400 },
         { unit: 'hour', seconds: 3600 },
         { unit: 'minute', seconds: 60 },
-        { unit: 'second', seconds: 1 }
+        { unit: 'second', seconds: 1 },
     ];
+    const match = units.find(u => Math.abs(diffInSec) >= u.seconds) ?? units[units.length - 1];
 
-    // Find the first unit where the difference is larger than the unit's value
-    const match = units.find(u => Math.abs(diffInSec) >= u.seconds) || units[units.length - 1];
-
-    // If older than a week, use your existing short date format
-    if (Math.abs(diffInSec) >= 604800) {
-        return `le ${formatToFrenchDateShort(date).replace(/ \d{4}$/, '')}`;
-    }
-
-    return new Intl.RelativeTimeFormat('fr-FR', { numeric: 'auto' })
+    return new Intl.RelativeTimeFormat(locale, { numeric: 'auto' })
         .format(Math.round(diffInSec / match.seconds), match.unit);
 }
 

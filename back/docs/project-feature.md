@@ -2,7 +2,12 @@
 
 ## Overview
 
-The Project feature allows users to create, manage, and organize their projects. Each project belongs to a user and has built-in features (Tasks, Insights) always available. Projects support categorization through types and lifecycle management (finish/reopen).
+The Project feature allows agencies to create, manage, and organize projects on behalf of their clients. Each project belongs to a single **Agency** (its workspace) and may have any number of **Client Users** attached to it (`Project.clientUsers`). Built-in features (Tasks, Insights) are always available. Projects support categorization through types and lifecycle management (finish/reopen).
+
+Access control is enforced by `ProjectVoter` (see `back/docs/agency-feature.md`):
+- Agency members (Admin / Editor / Viewer) reach any project of their agency through `VIEW`.
+- Clients reach only the project referenced by their `User.project` FK.
+- Mutations (`EDIT`, `MANAGE_INTEGRATIONS`, `MANAGE_CLIENT`) gate on `ROLE_EDITOR` or above, with one carve-out: clients can run `MANAGE_INTEGRATIONS` on their own project so they can connect their own social accounts from the portal (see `back/docs/integration-oauth-feature.md`).
 
 ---
 
@@ -22,11 +27,12 @@ The Project feature allows users to create, manage, and organize their projects.
 | `createdAt` | `DateTimeImmutable` | Creation timestamp (UTC) |
 | `updatedAt` | `DateTimeImmutable` | Last update timestamp (UTC, auto-updated) |
 | `finishedAt` | `DateTimeImmutable` | Completion timestamp (nullable) |
-| `user` | `User` | Owner of the project (ManyToOne) |
+| `agency` | `Agency` | Owning agency (ManyToOne, NOT NULL) — also serialized under `api_project_get_by_uuid` |
+| `clientUsers` | `Collection<User>` | OneToMany inverse of `User.project`. Lists the Client Users attached to this project; agency members of the project's agency are **not** in this collection (they reach the project via `Project.agency` instead). |
 
 **Constraints:**
-- Unique constraint on `(name, user)` combination
-- Cascade delete on user deletion
+- Unique constraint on `(name, agency)` combination — two projects in the same agency cannot share a name; two agencies can.
+- Cascade delete on agency removal. Removing the agency removes the project; removing a client user only nulls their `User.project` FK (no project deletion).
 
 **Lifecycle Callbacks:**
 - `@PreUpdate`: Automatically sets `updatedAt` to current UTC time
@@ -65,9 +71,12 @@ The Project feature allows users to create, manage, and organize their projects.
 |--------|------------|--------|-------------|
 | `save` | `Project $entity, bool $flush` | `void` | Persists a project |
 | `remove` | `Project $entity, bool $flush` | `void` | Removes a project |
-| `getByUuidAndUser` | `string $uuid, User $user` | `?Project` | Finds project by UUID for a specific user |
-| `getByNameAndUser` | `string $name, User $user` | `?Project` | Finds project by name for a specific user |
-| `getByUserPaginated` | `User $user, int $page, int $limit` | `array` | Returns paginated projects ordered by creation date (DESC) |
+| `getByUuidAndAgency` | `string $uuid, Agency $agency` | `?Project` | Finds a project by UUID scoped to a specific agency (used by agency-side controllers after the voter check). |
+| `getAccessibleByUuidForUser` | `string $uuid, User $user` | `?Project` | Resolves a project visible to the current user: either inside their agency, or referenced by their `User.project` if they are a client. The single repository entry point used by endpoints reachable from both shells. |
+| `getByNameAndAgency` | `string $name, Agency $agency` | `?Project` | Used by uniqueness checks during create/rename. |
+| `countByAgency` | `Agency $agency` | `int` | Used by the plan-limit guard on `POST /api/projects`. |
+| `getByAgencyPaginated` | `Agency $agency, int $page, int $limit` | `array` | Paginated agency project list ordered by `createdAt DESC`. |
+| `getAccessibleByUserPaginated` | `User $user, int $page, int $limit` | `array` | Role-aware paginated list used by `GET /api/projects`. Agency members get the agency's projects; clients get exactly one row on page 1 (their `User.project`) and an empty array on subsequent pages. |
 
 ---
 
@@ -133,7 +142,7 @@ The Project feature allows users to create, manage, and organize their projects.
 - **Response:** `200 OK` with updated project
 - **Serialization Group:** `api_project_update`
 - **Errors:**
-  - `404 Not Found` if project doesn't exist or doesn't belong to user
+  - `404 Not Found` if project doesn't exist or isn't visible to the current user (per `ProjectVoter::VIEW`)
   - `409 Conflict` if name already used by another project
 
 #### Get Project
@@ -141,7 +150,11 @@ The Project feature allows users to create, manage, and organize their projects.
 - **Name:** `api_projects_show`
 - **Response:** `200 OK` with project details
 - **Serialization Group:** `api_project_get_by_uuid`
-- **Error:** `404 Not Found` if project doesn't exist
+- **Errors:**
+  - `404 Not Found` if project doesn't exist
+  - `403 Forbidden` with code `27003` (`AgencySubscriptionInactiveException`) when the requester is a `ROLE_CLIENT` user whose parent agency has no active subscription. Agency members are never gated by this check. The client portal relies on this error to render its "access suspended" lock screen.
+- **Access:** Agency members on any project of their agency (`ProjectVoter::VIEW`), and the client user(s) linked to the project. The client portal uses this endpoint to read the parent agency for sidebar branding.
+- **Response shape includes nested `agency`:** `uuid`, `name`, `description`, `types`, `createdAt`, `updatedAt`, `finishedAt`, and `agency: { uuid, name, contactEmail, website }`. List endpoints (`api_projects_get_paginated`) do **not** include the agency — only this get-by-uuid response does.
 
 #### List Projects (Paginated)
 - **Route:** `GET /api/projects`
@@ -149,6 +162,11 @@ The Project feature allows users to create, manage, and organize their projects.
 - **Query Params:** `page`, `limit`
 - **Response:** `200 OK` with array of projects
 - **Serialization Group:** `api_projects_get_paginated`
+- **Role-aware result** (resolved in `ProjectRepository::getAccessibleByUserPaginated($user, $page, $limit)`):
+  - **Agency members** (Admin / Editor / Viewer): returns the agency's projects, paginated by `createdAt DESC`.
+  - **Clients** (`ROLE_CLIENT`): runs the same paginated DQL filtered by `p = :clientProject`, which naturally returns one row on page 1 and an empty array on subsequent pages — no special-case wrapper logic.
+
+  The endpoint is intentionally the same for both roles. `IsGranted(UserRole::User->value)` allows every authenticated user; access control is enforced inside the repository query.
 
 #### Delete Project
 - **Route:** `DELETE /api/projects/{projectUuid}`
@@ -178,22 +196,26 @@ The Project feature allows users to create, manage, and organize their projects.
 
 ## Serialization Groups
 
-| Group | Used In |
-|-------|---------|
-| `api_project_create` | Create endpoint response |
-| `api_project_update` | Update endpoint response |
-| `api_projects_get_paginated` | List endpoint response |
-| `api_project_get_by_uuid` | Show endpoint response |
-| `api_project_finish` | Finish endpoint response |
-| `api_project_reopen` | Reopen endpoint response |
+| Group | Used In | Notes |
+|-------|---------|-------|
+| `api_project_create` | Create endpoint response | |
+| `api_project_update` | Update endpoint response | |
+| `api_projects_get_paginated` | List endpoint response | No agency field |
+| `api_project_get_by_uuid` | Show endpoint response | Includes nested `agency` (`uuid`, `name`, `contactEmail`, `website`) so the client portal can read agency identity without a separate request |
+| `api_project_finish` | Finish endpoint response | |
+| `api_project_reopen` | Reopen endpoint response | |
 
 ---
 
 ## Relationships
 
 ```
-User (1) ------------ (N) Project
+Agency (1) ----------- (N) Project (N) ----------- (N) User (clientUsers)
+                              |                          (via User.project FK)
+                              └─── ProjectVoter ─── agency members of the same agency
 ```
 
-- A **User** can have multiple **Projects**
-- Deleting a User cascades to delete all their Projects
+- A **Project** belongs to exactly one **Agency** (NOT NULL FK, CASCADE on agency removal).
+- A **Project** can have any number of **Client Users** via `Project.clientUsers` (inverse of `User.project`). Removing a client user only nulls their `project` FK; the project survives.
+- **Agency members** (`ROLE_ADMIN` / `ROLE_EDITOR` / `ROLE_VIEWER`) reach a project via `Project.agency` and `ProjectVoter::VIEW`. They are not stored on the project itself — agency membership lives on `User.agency`.
+- Project-scoped client management endpoints (`GET /api/projects/{uuid}/clients`, `DELETE …`) are documented in `back/docs/invitation-feature.md` (the polymorphic Invitation system creates client users; the project-clients controller manages and lists them).

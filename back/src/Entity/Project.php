@@ -14,7 +14,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints as ORMAssert;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProjectRepository::class)]
-#[ORMAssert\UniqueEntity(fields: ['name', 'user'])]
+#[ORMAssert\UniqueEntity(fields: ['name', 'agency'])]
 #[ORM\HasLifecycleCallbacks]
 class Project
 {
@@ -25,84 +25,105 @@ class Project
 
     #[ORM\Column(type: Types::GUID)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen'
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
+        'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?string $uuid = null;
 
     #[ORM\Column(length: 255)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen'
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
+        'api_review_comments_list',
+        'api_review_comments_pending',
     ])]
     private ?string $name = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen'
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
     ])]
     private ?string $description = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen'
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
     ])]
     private ?\DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen'
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen'
     ])]
     private ?\DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(nullable: true)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen'
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen'
     ])]
     private ?\DateTimeImmutable $finishedAt = null;
 
     #[ORM\Column(type: Types::SIMPLE_ARRAY, enumType: ProjectType::class, nullable: true)]
     #[Groups([
-        'api_project_create',
-        'api_project_update',
+        'api_projects_create',
+        'api_projects_update',
         'api_projects_get_paginated',
-        'api_project_get_by_uuid',
-        'api_project_finish',
-        'api_project_reopen'
+        'api_projects_get_by_uuid',
+        'api_projects_finish',
+        'api_projects_reopen',
+        'api_invitations_show',
+        'api_invitations_create',
     ])]
     private array $types = [];
 
-    #[ORM\ManyToOne(inversedBy: 'projects')]
+    #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'projects')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    #[Groups(['api_projects_get_by_uuid'])]
+    private ?Agency $agency = null;
+
+    /**
+     * @var Collection<int, User>
+     */
+    #[ORM\OneToMany(targetEntity: User::class, mappedBy: 'project')]
+    private Collection $clientUsers;
 
     /**
      * @var Collection<int, TodoList>
@@ -128,6 +149,12 @@ class Project
     #[ORM\OneToMany(targetEntity: ScriptTag::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
     private Collection $scriptTags;
 
+    /**
+     * @var Collection<int, Review>
+     */
+    #[ORM\OneToMany(targetEntity: Review::class, mappedBy: 'project', cascade: ['remove'], orphanRemoval: true)]
+    private Collection $reviews;
+
     public function __construct()
     {
         if ($this->uuid === null) {
@@ -141,10 +168,12 @@ class Project
         if ($this->updatedAt === null) {
             $this->updatedAt = DateHelper::createUtcDateTimeImmutable();
         }
+        $this->clientUsers = new ArrayCollection();
         $this->todoLists = new ArrayCollection();
         $this->integrations = new ArrayCollection();
         $this->scripts = new ArrayCollection();
         $this->scriptTags = new ArrayCollection();
+        $this->reviews = new ArrayCollection();
     }
 
     #[ORM\PreUpdate]
@@ -245,16 +274,24 @@ class Project
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getAgency(): ?Agency
     {
-        return $this->user;
+        return $this->agency;
     }
 
-    public function setUser(?User $user): static
+    public function setAgency(?Agency $agency): static
     {
-        $this->user = $user;
+        $this->agency = $agency;
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, User>
+     */
+    public function getClientUsers(): Collection
+    {
+        return $this->clientUsers;
     }
 
     /**
@@ -287,5 +324,13 @@ class Project
     public function getScriptTags(): Collection
     {
         return $this->scriptTags;
+    }
+
+    /**
+     * @return Collection<int, Review>
+     */
+    public function getReviews(): Collection
+    {
+        return $this->reviews;
     }
 }

@@ -56,9 +56,9 @@ class Subscription
     #[Groups(['api_subscription_show'])]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\ManyToOne(inversedBy: 'subscriptions')]
+    #[ORM\ManyToOne(targetEntity: Agency::class, inversedBy: 'subscriptions')]
     #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    private ?Agency $agency = null;
 
     public function __construct()
     {
@@ -194,14 +194,14 @@ class Subscription
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getAgency(): ?Agency
     {
-        return $this->user;
+        return $this->agency;
     }
 
-    public function setUser(?User $user): static
+    public function setAgency(?Agency $agency): static
     {
-        $this->user = $user;
+        $this->agency = $agency;
 
         return $this;
     }

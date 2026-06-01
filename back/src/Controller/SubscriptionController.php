@@ -6,9 +6,12 @@ use App\DTO\Request\Subscription\ChangePlanRequestDTO;
 use App\DTO\Request\Subscription\CreateSubscriptionCheckoutRequestDTO;
 use App\DTO\Response\Subscription\CreateSubscriptionCheckoutResponseDTO;
 use App\DTO\Response\Subscription\ListPlansResponseDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
-use App\Repository\SubscriptionRepository;
+use App\Exception\Agency\MissingAgencyException;
 use App\Exception\Stripe\SubscriptionNotFoundException;
+use App\Repository\AgencyRepository;
+use App\Repository\SubscriptionRepository;
 use App\Service\Stripe\StripeCheckoutService;
 use App\Service\Stripe\StripePlanService;
 use App\Service\Stripe\StripeSubscriptionService;
@@ -16,11 +19,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/subscriptions')]
 final class SubscriptionController extends AbstractController
 {
     #[Route('/plans', name: 'api_subscriptions_plans_list', methods: ['GET'])]
+    #[IsGranted(UserRole::User->value)]
     public function plans(StripePlanService $stripePlanService): JsonResponse
     {
         $plans = $stripePlanService->getPlanConfigs();
@@ -35,14 +40,24 @@ final class SubscriptionController extends AbstractController
     }
 
     #[Route('/checkout', name: 'api_subscriptions_checkout', methods: ['POST'])]
-    public function checkout(CreateSubscriptionCheckoutRequestDTO $dto, StripeCheckoutService $stripeCheckoutService): JsonResponse
-    {
+    #[IsGranted(UserRole::Admin->value)]
+    public function checkout(
+        CreateSubscriptionCheckoutRequestDTO $dto,
+        AgencyRepository $agencyRepository,
+        StripeCheckoutService $stripeCheckoutService,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
         $dto->build();
 
-        $checkoutUrl = $stripeCheckoutService->createSubscriptionCheckoutSession($user, $dto->getPlan(), $dto->getCheckoutRedirectPath());
+        $checkoutUrl = $stripeCheckoutService->createSubscriptionCheckoutSession($agency, $dto->getPlan(), $dto->getCheckoutRedirectPath());
 
         $responseDto = new CreateSubscriptionCheckoutResponseDTO($checkoutUrl);
 
@@ -50,23 +65,42 @@ final class SubscriptionController extends AbstractController
     }
 
     #[Route('/current', name: 'api_subscriptions_current', methods: ['GET'])]
-    public function current(SubscriptionRepository $subscriptionRepository): JsonResponse
-    {
+    #[IsGranted(UserRole::Viewer->value)]
+    public function current(
+        AgencyRepository $agencyRepository,
+        SubscriptionRepository $subscriptionRepository,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $subscription = $subscriptionRepository->getLatestActiveByUser($user);
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        $subscription = $subscriptionRepository->getLatestActiveByAgency($agency);
 
         return $this->json(data: $subscription, status: Response::HTTP_OK, context: ['groups' => ['api_subscription_show']]);
     }
 
     #[Route('/cancel', name: 'api_subscriptions_cancel', methods: ['POST'])]
-    public function cancel(SubscriptionRepository $subscriptionRepository, StripeSubscriptionService $stripeSubscriptionService): JsonResponse
-    {
+    #[IsGranted(UserRole::Admin->value)]
+    public function cancel(
+        AgencyRepository $agencyRepository,
+        SubscriptionRepository $subscriptionRepository,
+        StripeSubscriptionService $stripeSubscriptionService,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $subscription = $subscriptionRepository->getLatestByUser($user);
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        $subscription = $subscriptionRepository->getLatestByAgency($agency);
 
         if ($subscription === null) {
             throw new SubscriptionNotFoundException();
@@ -78,12 +112,22 @@ final class SubscriptionController extends AbstractController
     }
 
     #[Route('/resume', name: 'api_subscriptions_resume', methods: ['POST'])]
-    public function resume(SubscriptionRepository $subscriptionRepository, StripeSubscriptionService $stripeSubscriptionService): JsonResponse
-    {
+    #[IsGranted(UserRole::Admin->value)]
+    public function resume(
+        AgencyRepository $agencyRepository,
+        SubscriptionRepository $subscriptionRepository,
+        StripeSubscriptionService $stripeSubscriptionService,
+    ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $subscription = $subscriptionRepository->getLatestByUser($user);
+        $agency = $agencyRepository->getByCollaborator($user);
+
+        if ($agency === null) {
+            throw new MissingAgencyException();
+        }
+
+        $subscription = $subscriptionRepository->getLatestByAgency($agency);
 
         if ($subscription === null) {
             throw new SubscriptionNotFoundException();

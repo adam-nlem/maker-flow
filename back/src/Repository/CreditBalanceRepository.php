@@ -2,8 +2,8 @@
 
 namespace App\Repository;
 
+use App\Entity\Agency;
 use App\Entity\CreditBalance;
-use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\DBAL\LockMode;
 use Doctrine\ORM\Query;
@@ -37,21 +37,21 @@ class CreditBalanceRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByUser(User $user): ?CreditBalance
+    public function getByAgency(Agency $agency): ?CreditBalance
     {
         return $this->createQueryBuilder('cb')
-            ->where('cb.user = :user')
-            ->setParameter('user', $user)
+            ->where('cb.agency = :agency')
+            ->setParameter('agency', $agency)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserWithLock(User $user): ?CreditBalance
+    public function getByAgencyWithLock(Agency $agency): ?CreditBalance
     {
         return $this->createQueryBuilder('cb')
-            ->where('cb.user = :user')
-            ->setParameter('user', $user)
+            ->where('cb.agency = :agency')
+            ->setParameter('agency', $agency)
             ->getQuery()
             ->setLockMode(LockMode::PESSIMISTIC_WRITE)
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)

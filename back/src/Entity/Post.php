@@ -67,9 +67,9 @@ class Post
     #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
     private ?PostGroup $postGroup = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false, onDelete: 'CASCADE')]
-    private ?User $user = null;
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $createdBy = null;
 
     /**
      * @var Collection<int, PostInsight>
@@ -236,14 +236,14 @@ class Post
         return $this;
     }
 
-    public function getUser(): ?User
+    public function getCreatedBy(): ?User
     {
-        return $this->user;
+        return $this->createdBy;
     }
 
-    public function setUser(?User $user): static
+    public function setCreatedBy(?User $createdBy): static
     {
-        $this->user = $user;
+        $this->createdBy = $createdBy;
 
         return $this;
     }

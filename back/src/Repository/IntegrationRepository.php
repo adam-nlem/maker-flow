@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Agency;
 use App\Entity\Enum\Platform;
 use App\Entity\Enum\IntegrationStatus;
 use App\Entity\Integration;
@@ -59,56 +60,60 @@ class IntegrationRepository extends ServiceEntityRepository
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?Integration
+    public function getByUuidAndAgency(string $uuid, Agency $agency): ?Integration
     {
         return $this->createQueryBuilder('i')
+            ->join('i.project', 'p')
             ->where('i.uuid = :uuid')
-            ->andWhere('i.user = :user')
+            ->andWhere('p.agency = :agency')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $agency)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserPaginated(User $user, int $page, int $limit): array
-    {
-        $query = $this->createQueryBuilder('i')
-            ->where('i.user = :user')
-            ->setParameter('user', $user)
-            ->setFirstResult(($page - 1) * $limit)
-            ->setMaxResults($limit)
-            ->orderBy('i.createdAt', 'DESC')
-            ->getQuery();
-        $query->setHint(Query::HINT_INCLUDE_META_COLUMNS, true);
-        return $query->getResult(Query::HYDRATE_SIMPLEOBJECT);
-    }
-
-    public function getByUserAndPlatformAndAccountId(User $user, Platform $platform, string $accountId): ?Integration
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?Integration
     {
         return $this->createQueryBuilder('i')
-            ->where('i.user = :user')
+            ->join('i.project', 'p')
+            ->where('i.uuid = :uuid')
+            ->andWhere('(p.agency = :agency OR p = :clientProject)')
+            ->setParameter('uuid', $uuid)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    /**
+     * @return Integration[]
+     */
+    public function getByProject(Project $project): array
+    {
+        return $this->createQueryBuilder('i')
+            ->where('i.project = :project')
+            ->setParameter('project', $project)
+            ->orderBy('i.createdAt', 'DESC')
+            ->getQuery()
+            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
+            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
+    }
+
+    public function getByAgencyAndPlatformAndAccountId(Agency $agency, Platform $platform, string $accountId): ?Integration
+    {
+        return $this->createQueryBuilder('i')
+            ->join('i.project', 'p')
+            ->where('p.agency = :agency')
             ->andWhere('i.platform = :platform')
             ->andWhere('i.accountId = :accountId')
-            ->setParameter('user', $user)
+            ->setParameter('agency', $agency)
             ->setParameter('platform', $platform)
             ->setParameter('accountId', $accountId)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
-    }
-
-    public function getByProjectAndUser(Project $project, User $user): array
-    {
-        return $this->createQueryBuilder('i')
-            ->where('i.project = :project')
-            ->andWhere('i.user = :user')
-            ->setParameter('project', $project)
-            ->setParameter('user', $user)
-            ->orderBy('i.createdAt', 'DESC')
-            ->getQuery()
-            ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
-            ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
     public function getOneByProjectAndPlatformAndStatus(Project $project, Platform $platform, IntegrationStatus $status): ?Integration

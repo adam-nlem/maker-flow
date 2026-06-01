@@ -1,29 +1,43 @@
 {
-    "create": {
-        "modalTitle": "Créez un nouveau Projet",
-        "modalDescription": "Les projets vous permettront de regrouper tous les modules afin de vous y retrouver plus rapidement",
-        "fields": {
-            "name": "Nom",
-            "namePlaceholder": "Entrez le nom du Projet",
-            "description": "Description",
-            "descriptionPlaceholder": "Écrivez une description (optionel)",
-            "types": "Types"
-        },
-        "submit": "Créer le projet",
-        "limitReached": "Vous avez atteint la limite de projets pour votre abonnement. Passez à un abonnement supérieur pour en créer davantage.",
-        "introductionStep": "Introduction",
-        "projectStep": "Projet"
+  "create": {
+    "modalTitle": "Créez un nouveau Projet",
+    "modalDescription": "Les projets vous permettront de regrouper tous les modules afin de vous y retrouver plus rapidement",
+    "fields": {
+      "name": "Nom",
+      "namePlaceholder": "Entrez le nom du Projet",
+      "description": "Description",
+      "descriptionPlaceholder": "Écrivez une description (optionel)",
+      "types": "Types",
+      "logo": "Project logo",
+      "logoHint": "Upload or drag & drop your project logo"
     },
-    "update": {
-        "modalTitle": "Modifier le Projet",
-        "fields": {
-            "title": "Titre"
-        },
-        "submit": "Modifier le Projet",
-        "delete": "Supprimer le Projet",
-        "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible."
-    },
-    "tile": {
-        "createdAt": "Créé le {{date}}"
+    "submit": "Créer le projet",
+    "limitReached": "Vous avez atteint la limite de projets pour votre abonnement. Passez à un abonnement supérieur pour en créer davantage.",
+    "introductionStep": "Introduction",
+    "projectStep": "Projet",
+    "validation": {
+      "nameRequired": "Le nom du projet est obligatoire."
     }
+  },
+  "update": {
+    "modalTitle": "Modifier le Projet",
+    "fields": {
+      "title": "Titre"
+    },
+    "submit": "Modifier le Projet",
+    "delete": "Supprimer le Projet",
+    "deleteConfirm": "Êtes-vous sûr de vouloir supprimer ce projet ? Cette action est irréversible."
+  },
+  "tile": {
+    "createdAt": "Créé le {{date}}"
+  },
+  "popover": {
+    "sections": {
+      "switchProject": "Changer de projet"
+    },
+    "actions": {
+      "edit": "Modifier le projet",
+      "create": "Créer un projet"
+    }
+  }
 }

@@ -10,7 +10,7 @@ export default function PostThumbnail({ postUuid, className = "" }: PostThumbnai
     const { thumbnailUrl, isLoading } = useShowPostThumbnail(postUuid)
 
     return (
-        <div className={`bg-light-gray overflow-hidden ${className}`}>
+        <div className={`bg-pale-gray-2 overflow-hidden ${className}`}>
             {isLoading
                 ? <Shimmer width="w-full" height="h-full" radius="rounded-none" />
                 : thumbnailUrl && <img src={thumbnailUrl} alt="" className="w-full h-full object-cover" />}

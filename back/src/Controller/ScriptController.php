@@ -7,27 +7,28 @@ use App\DTO\QueryParam\Script\ListScriptsQueryParamDTO;
 use App\DTO\Response\Script\ListScriptsGroupedByDayResponseDTO;
 use App\DTO\Request\Script\CreateScriptRequestDTO;
 use App\DTO\Request\Script\UpdateScriptRequestDTO;
+use App\Entity\Enum\UserRole;
 use App\Entity\Script;
 use App\Entity\User;
 use App\Exception\Project\ProjectNotFoundException;
 use App\Exception\Script\ScriptNotFoundException;
-use App\Exception\Script\ScriptLimitReachedException;
 use App\Repository\PostGroupRepository;
 use App\Repository\ProjectRepository;
 use App\Repository\ScriptRepository;
-use App\Repository\SubscriptionRepository;
-use App\Service\Stripe\StripePlanService;
 use App\Repository\ScriptTagRepository;
+use App\Service\Subscription\SubscriptionLimitService;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/scripts', requirements: ['scriptUuid' => Requirement::UUID])]
 final class ScriptController extends AbstractController
 {
     #[Route('', name: 'api_scripts_list', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListScriptsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -36,13 +37,19 @@ final class ScriptController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
-        $scripts = $scriptRepository->getByProjectAndUserPaginated($project, $user, $queryParamDto->getPage(), $queryParamDto->getLimit(), $queryParamDto->getStatus());
+        $scripts = $scriptRepository->getByProjectPaginated(
+            $project,
+            $queryParamDto->getPage(),
+            $queryParamDto->getLimit(),
+            $queryParamDto->getStatus(),
+            $queryParamDto->getSearchTerm(),
+        );
 
         return $this->json(
             data: $scripts,
@@ -52,6 +59,7 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('/calendar', name: 'api_scripts_calendar', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
     public function calendar(
         ListCalendarScriptsQueryParamDTO $queryParamDto,
         ScriptRepository $scriptRepository,
@@ -60,13 +68,13 @@ final class ScriptController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($queryParamDto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($queryParamDto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
-        $scripts = $scriptRepository->getByProjectAndUserAndMonth($project, $user, $queryParamDto->getYear(), $queryParamDto->getMonth());
+        $scripts = $scriptRepository->getByProjectAndMonth($project, $queryParamDto->getYear(), $queryParamDto->getMonth());
 
         $grouped = [];
         foreach ($scripts as $script) {
@@ -88,30 +96,25 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('', name: 'api_scripts_create', methods: ['POST'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateScriptRequestDTO $dto,
         ProjectRepository $projectRepository,
         ScriptRepository $scriptRepository,
         PostGroupRepository $postGroupRepository,
         ScriptTagRepository $scriptTagRepository,
-        SubscriptionRepository $subscriptionRepository,
-        StripePlanService $stripePlanService,
+        SubscriptionLimitService $subscriptionLimitService,
     ): JsonResponse {
         /** @var User $user */
         $user = $this->getUser();
 
-        $project = $projectRepository->getByUuidAndUser($dto->getProjectUuid(), $user);
+        $project = $projectRepository->getAccessibleByUuidForUser($dto->getProjectUuid(), $user);
 
         if ($project === null) {
             throw new ProjectNotFoundException();
         }
 
-        $plan = $subscriptionRepository->getLatestActiveByUser($user)?->getPlan();
-        $maxScripts = $plan !== null ? $stripePlanService->getPlanConfigFromSubscription($plan)?->getMaxScriptsPerProject() : 1;
-
-        if ($maxScripts !== null && $scriptRepository->countByProjectAndUser($project, $user) >= $maxScripts) {
-            throw new ScriptLimitReachedException();
-        }
+        $subscriptionLimitService->assertCanCreateScript($project);
 
         /** @var Script $script */
         $script = $dto->build();
@@ -121,14 +124,14 @@ final class ScriptController extends AbstractController
             ->setProject($project);
 
         if ($dto->getPostGroupUuid() !== null) {
-            $postGroup = $postGroupRepository->getByUuidAndUser($dto->getPostGroupUuid(), $user);
+            $postGroup = $postGroupRepository->getAccessibleByUuidForUser($dto->getPostGroupUuid(), $user);
             if ($postGroup !== null) {
                 $script->setPostGroup($postGroup);
             }
         }
 
         if ($dto->getTagUuids() !== null && count($dto->getTagUuids()) > 0) {
-            $tags = $scriptTagRepository->getByUserAndWithUuidIn($user, $dto->getTagUuids());
+            $tags = $scriptTagRepository->getByProjectAndWithUuidIn($project, $dto->getTagUuids());
             foreach ($tags as $tag) {
                 $script->addTag($tag);
             }
@@ -144,6 +147,7 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('/{scriptUuid}', name: 'api_scripts_show', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
     public function show(
         string $scriptUuid,
         ScriptRepository $scriptRepository,
@@ -151,7 +155,7 @@ final class ScriptController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
+        $script = $scriptRepository->getAccessibleByUuidForUser($scriptUuid, $user);
 
         if ($script === null) {
             throw new ScriptNotFoundException();
@@ -165,6 +169,7 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('/{scriptUuid}', name: 'api_scripts_update', methods: ['PATCH'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $scriptUuid,
         UpdateScriptRequestDTO $dto,
@@ -175,7 +180,7 @@ final class ScriptController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
+        $script = $scriptRepository->getAccessibleByUuidForUser($scriptUuid, $user);
 
         if ($script === null) {
             throw new ScriptNotFoundException();
@@ -193,7 +198,7 @@ final class ScriptController extends AbstractController
             if ($dto->getPostGroupUuid() === null) {
                 $script->setPostGroup(null);
             } else {
-                $postGroup = $postGroupRepository->getByUuidAndUser($dto->getPostGroupUuid(), $user);
+                $postGroup = $postGroupRepository->getAccessibleByUuidForUser($dto->getPostGroupUuid(), $user);
                 if ($postGroup !== null) {
                     $script->setPostGroup($postGroup);
                 }
@@ -206,7 +211,7 @@ final class ScriptController extends AbstractController
             }
 
             if (count($dto->getTagUuids()) > 0) {
-                $tags = $scriptTagRepository->getByUserAndWithUuidIn($user, $dto->getTagUuids());
+                $tags = $scriptTagRepository->getByProjectAndWithUuidIn($script->getProject(), $dto->getTagUuids());
                 foreach ($tags as $tag) {
                     $script->addTag($tag);
                 }
@@ -231,6 +236,7 @@ final class ScriptController extends AbstractController
     }
 
     #[Route('/{scriptUuid}', name: 'api_scripts_delete', methods: ['DELETE'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(
         string $scriptUuid,
         ScriptRepository $scriptRepository,
@@ -238,7 +244,7 @@ final class ScriptController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $script = $scriptRepository->getByUuidAndUser($scriptUuid, $user);
+        $script = $scriptRepository->getAccessibleByUuidForUser($scriptUuid, $user);
 
         if ($script === null) {
             throw new ScriptNotFoundException();

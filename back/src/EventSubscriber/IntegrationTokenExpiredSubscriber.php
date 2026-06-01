@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use App\Entity\Enum\UserRole;
 use App\Event\IntegrationTokenExpiredEvent;
 use App\Message\SendEmailMessage;
 use App\Service\Mailing\Template\IntegrationTokenExpiredEmailTemplate;
@@ -25,16 +26,26 @@ class IntegrationTokenExpiredSubscriber implements EventSubscriberInterface
     public function onIntegrationTokenExpired(IntegrationTokenExpiredEvent $event): void
     {
         $integration = $event->getIntegration();
-        $user = $integration->getUser();
+        $agency = $integration->getProject()?->getAgency();
 
-        $template = new IntegrationTokenExpiredEmailTemplate(
-            $user->getEmail(),
-            $user->getFirstName(),
-            ucfirst($integration->getPlatform()->value),
-            $integration->getUserName(),
-            $this->frontendUrl . '/settings/integrations',
-        );
+        if ($agency === null) {
+            return;
+        }
 
-        $this->messageBus->dispatch(new SendEmailMessage($template));
+        foreach ($agency->getCollaborators() as $collaborator) {
+            if (!$collaborator->hasRole(UserRole::Editor) && !$collaborator->hasRole(UserRole::Admin)) {
+                continue;
+            }
+
+            $template = new IntegrationTokenExpiredEmailTemplate(
+                $collaborator->getEmail(),
+                $collaborator->getFirstName(),
+                ucfirst($integration->getPlatform()->value),
+                $integration->getUserName(),
+                $this->frontendUrl . '/settings/integrations',
+            );
+
+            $this->messageBus->dispatch(new SendEmailMessage($template));
+        }
     }
 }

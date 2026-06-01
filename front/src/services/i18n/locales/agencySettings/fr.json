@@ -1,0 +1,19 @@
+{
+    "subtitle": "Personnalisez l'identité de votre agence.",
+    "sections": {
+        "identity": "Identité de marque"
+    },
+    "fields": {
+        "namePlaceholder": "Nom de votre agence",
+        "contactEmailPlaceholder": "contact@votre-agence.com",
+        "websitePlaceholder": "https://votre-agence.com"
+    },
+    "logo": {
+        "hint": "PNG. 5 Mo max."
+    },
+    "validation": {
+        "nameRequired": "Le nom de l'agence est obligatoire.",
+        "contactEmailFormat": "L'email de contact n'est pas valide.",
+        "websiteFormat": "L'URL du site web doit commencer par http:// ou https://."
+    }
+}

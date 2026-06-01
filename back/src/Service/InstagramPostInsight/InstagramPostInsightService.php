@@ -53,8 +53,7 @@ class InstagramPostInsightService
                     ->setType($postInsightDTO->getType())
                     ->setValue($value)
                     ->setValueFormat($postInsightDTO->getType()->getValueFormat())
-                    ->setPost($post)
-                    ->setUser($post->getUser());
+                    ->setPost($post);
 
                 $this->postInsightRepository->save(entity: $insight);
             }

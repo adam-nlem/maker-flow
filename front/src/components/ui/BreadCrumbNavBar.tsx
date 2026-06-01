@@ -20,7 +20,7 @@ export function BreadCrumbNavbar({ pages }: BreadCrumbNavbarProps) {
           return (
             <li key={page.route} className="flex items-center gap-1">
               {index > 0 && (
-                <ChevronRightIcon className="size-3.5 text-gray" strokeWidth={2} />
+                <ChevronRightIcon className="size-3.5 text-muted-2" strokeWidth={2} />
               )}
               {isLast ? (
                 <span>{page.name}</span>

@@ -34,14 +34,14 @@ export default function HorizontalBarChart({ data }: HorizontalBarChartProps) {
                         type="number"
                         tickFormatter={(v: number) => `${v}%`}
                         tick={{ fontSize: 12 }}
-                        stroke="var(--color-gray)"
+                        stroke="var(--color-muted-2)"
                     />
                     <YAxis
                         type="category"
                         dataKey="label"
                         tick={{ fontSize: 12 }}
                         width={80}
-                        stroke="var(--color-gray)"
+                        stroke="var(--color-muted-2)"
                     />
                     <Bar dataKey="value" radius={[0, 4, 4, 0]} isAnimationActive={true} shape={CustomBar} barSize={20} />
                 </BarChart>

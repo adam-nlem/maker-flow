@@ -3,7 +3,6 @@
 namespace App\DTO\Request\Onboarding;
 
 use App\DTO\Request\AbstractRequestDTO;
-use App\Entity\Enum\OnboardingStep;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
@@ -11,7 +10,7 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 class CompleteOnboardingStepRequestDTO extends AbstractRequestDTO
 {
     #[Assert\NotBlank]
-    private OnboardingStep $step;
+    private string $step;
 
     public function __construct(
         protected RequestStack $requestStack,
@@ -22,7 +21,7 @@ class CompleteOnboardingStepRequestDTO extends AbstractRequestDTO
 
     protected function fromPayload(array $payload): void
     {
-        $this->step = OnboardingStep::tryFrom($payload["step"]);
+        $this->step = (string) ($payload["step"] ?? '');
     }
 
     protected function buildObject(): array
@@ -32,7 +31,7 @@ class CompleteOnboardingStepRequestDTO extends AbstractRequestDTO
         ];
     }
 
-    public function getStep(): OnboardingStep
+    public function getStep(): string
     {
         return $this->step;
     }

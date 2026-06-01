@@ -1,5 +1,3 @@
-import { OnboardingStep } from "./enums/OnboardingStep"
-
 interface OnboardingJSON {
     uuid: string;
     completedSteps: string[];
@@ -31,7 +29,7 @@ export class Onboarding {
         return this.dismissedAt !== null
     }
 
-    isStepCompleted(step: OnboardingStep): boolean {
+    isStepCompleted(step: string): boolean {
         return this.completedSteps.includes(step)
     }
 }

@@ -2,9 +2,9 @@
 
 namespace App\Repository;
 
-use App\Entity\User;
 use App\Entity\TodoList;
 use App\Entity\TodoListTag;
+use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query;
@@ -37,49 +37,48 @@ class TodoListTagRepository extends ServiceEntityRepository
         }
     }
 
-    public function removeByTodoListAndUser(TodoList $todoList, User $user): void
+    public function removeByTodoList(TodoList $todoList): void
     {
         $this->createQueryBuilder('t')
             ->delete()
             ->where('t.todoList = :todoList')
-            ->andWhere('t.user = :user')
             ->setParameter('todoList', $todoList)
-            ->setParameter('user', $user)
             ->getQuery()
             ->execute();
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?TodoListTag
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?TodoListTag
     {
         return $this->createQueryBuilder('t')
+            ->join('t.todoList', 'tl')
+            ->join('tl.project', 'p')
             ->where('t.uuid = :uuid')
-            ->andWhere('t.user = :user')
+            ->andWhere('(p.agency = :agency OR p = :clientProject)')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
+            ->setParameter('clientProject', $user->getProject())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserAndWithUuidIn(User $user, array $uuids): array
+    public function getByTodoListAndWithUuidIn(TodoList $todoList, array $uuids): array
     {
         return $this->createQueryBuilder('t')
-            ->where('t.user = :user')
+            ->where('t.todoList = :todoList')
             ->andWhere('t.uuid IN (:uuids)')
-            ->setParameter('user', $user)
+            ->setParameter('todoList', $todoList)
             ->setParameter('uuids', $uuids)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByUserAndTodoListLimited(User $user, TodoList $todoList, int $limit)
+    public function getByTodoListLimited(TodoList $todoList, int $limit): array
     {
         return $this->createQueryBuilder('t')
-            ->where('t.user = :user')
-            ->andWhere('t.todoList = :todoList')
+            ->where('t.todoList = :todoList')
             ->setParameter('todoList', $todoList)
-            ->setParameter('user', $user)
             ->setMaxResults($limit)
             ->addOrderBy(
                 'CASE WHEN t.updatedAt IS NOT NULL THEN t.updatedAt ELSE t.createdAt END',
@@ -90,13 +89,11 @@ class TodoListTagRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getBySearchTermAndUserAndTodoListLimited(string $searchTerm, User $user, TodoList $todoList, int $limit): array
+    public function getBySearchTermAndTodoListLimited(string $searchTerm, TodoList $todoList, int $limit): array
     {
         return $this->createQueryBuilder('t')
-            ->where('t.user = :user')
-            ->andWhere('t.todoList = :todoList')
+            ->where('t.todoList = :todoList')
             ->andWhere('LOWER(t.title) LIKE LOWER(:searchTerm)')
-            ->setParameter('user', $user)
             ->setParameter('todoList', $todoList)
             ->setParameter('searchTerm', '%' . $searchTerm . '%')
             ->setMaxResults($limit)
@@ -109,42 +106,15 @@ class TodoListTagRepository extends ServiceEntityRepository
             ->getResult(Query::HYDRATE_SIMPLEOBJECT);
     }
 
-    public function getByTitleAndTodoListAndUser(string $title, TodoList $todoList, User $user): ?TodoListTag
+    public function getByTitleAndTodoList(string $title, TodoList $todoList): ?TodoListTag
     {
         return $this->createQueryBuilder('t')
             ->where('t.title = :title')
             ->andWhere('t.todoList = :todoList')
-            ->andWhere('t.user = :user')
             ->setParameter('title', $title)
-            ->setParameter('user', $user)
             ->setParameter('todoList', $todoList)
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
     }
-
-    //    /**
-    //     * @return TodoListTag[] Returns an array of TodoListTag objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('t.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
-
-    //    public function findOneBySomeField($value): ?TodoListTag
-    //    {
-    //        return $this->createQueryBuilder('t')
-    //            ->andWhere('t.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
 }

@@ -1,4 +1,8 @@
-interface UserJSON {
+import { Agency } from "./Agency"
+import { Project, type ProjectJSON } from "./Project"
+import { UserRole, userRolePrecedence } from "./enums/UserRole"
+
+export interface UserJSON {
     uuid: string;
     firstName: string | null;
     lastName: string | null;
@@ -6,6 +10,9 @@ interface UserJSON {
     createdAt: string;
     verifiedAt: string | null;
     referralCode: string | null;
+    roles: string[];
+    agency: ReturnType<Agency["toJSON"]> | null;
+    project?: ProjectJSON | null;
 }
 
 export class User {
@@ -17,6 +24,9 @@ export class User {
         public readonly createdAt: Date,
         public readonly verifiedAt: Date | null,
         public readonly referralCode: string | null,
+        public readonly roles: UserRole[],
+        public readonly agency: Agency | null,
+        public readonly project: Project | null,
     ) { }
 
     static fromJSON(json: UserJSON): User {
@@ -28,6 +38,9 @@ export class User {
             new Date(json.createdAt),
             json.verifiedAt ? new Date(json.verifiedAt) : null,
             json.referralCode ?? null,
+            (json.roles ?? []).map((r) => r as UserRole),
+            json.agency ? Agency.fromJSON(json.agency) : null,
+            json.project ? Project.fromJSON(json.project) : null,
         );
     }
 
@@ -40,6 +53,9 @@ export class User {
             createdAt: this.createdAt.toISOString(),
             verifiedAt: this.verifiedAt?.toISOString() ?? null,
             referralCode: this.referralCode,
+            roles: this.roles,
+            agency: this.agency?.toJSON() ?? null,
+            project: this.project?.toJSON() ?? null,
         };
     }
 
@@ -53,5 +69,17 @@ export class User {
 
     get isPrelaunchSubscriber(): boolean {
         return this.referralCode !== null;
+    }
+
+    get isClient(): boolean {
+        return this.hasRole(UserRole.Client);
+    }
+
+    get displayRole(): UserRole | null {
+        return userRolePrecedence.find((role) => this.roles.includes(role)) ?? null;
+    }
+
+    hasRole(role: UserRole): boolean {
+        return this.roles.includes(role);
     }
 }

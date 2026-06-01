@@ -1,0 +1,20 @@
+{
+    "home": {
+        "title": "Bienvenue sur votre portail",
+        "greeting": "Bonjour {{name}}",
+        "subtitle": "Votre espace dédié arrive très prochainement. Vous pourrez bientôt y consulter les statistiques et contenus de votre marque.",
+        "logout": "Se déconnecter",
+        "empty": {
+            "title": "Votre tableau de bord est en préparation",
+            "body": "Votre agence n'a pas encore connecté de source de données. Dès qu'elle le fera, vous verrez ici les statistiques de votre marque."
+        }
+    },
+    "sidebar": {
+        "greeting": "Bonjour {{name}}"
+    },
+    "locked": {
+        "title": "Accès suspendu",
+        "body": "L'abonnement de votre agence n'est plus actif. Contactez-la pour rétablir votre accès.",
+        "logout": "Se déconnecter"
+    }
+}

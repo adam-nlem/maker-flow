@@ -24,7 +24,7 @@ export default function RankingItemTile({
       <div className="flex flex-col items-center w-6 shrink-0">
         <span className="text-heading-sm">{index + 1}.</span>
         {!isLast && (
-          <div className="flex-1 border-l border-dashed border-light-gray" />
+          <div className="flex-1 border-l border-dashed border-pale-gray" />
         )}
       </div>
 
@@ -37,7 +37,7 @@ export default function RankingItemTile({
         <div className="flex flex-col min-w-0 max-w-xs justify-center">
           {title && <p className="text-xs truncate">{title}</p>}
           {subtitle && (
-            <p className="text-body-xs text-gray">{subtitle}</p>
+            <p className="text-body-xs text-muted-2">{subtitle}</p>
           )}
 
           <CompactMetricRow metrics={metrics} />

@@ -22,7 +22,6 @@ use App\Entity\Enum\TimePeriod;
 use App\Entity\Integration;
 use App\Entity\IntegrationInsight;
 use App\Entity\Project;
-use App\Entity\User;
 use App\Exception\Integration\OAuthTokenRevokedException;
 use App\Helper\DateHelper;
 use App\Helper\InsightEvolutionHelper;
@@ -95,17 +94,16 @@ class IntegrationInsightService
     }
 
     public function list(
-        User $user,
         Project $project,
         TimePeriod $timePeriod,
     ): ListIntegrationInsightsResponseDTO {
         $bounds = $this->computePeriodBounds($timePeriod);
 
-        $integrations = $this->integrationRepository->getByProjectAndUser($project, $user);
+        $integrations = $this->integrationRepository->getByProject($project);
 
-        $groups = $this->buildGroups($user, $project, $integrations, $bounds['currentStart'], $bounds['currentEnd']);
-        $overview = $this->buildOverview($user, $project, $bounds['currentStart'], $bounds['currentEnd'], $bounds['previousStart'], $bounds['previousEnd']);
-        $viewsTimeline = $this->buildViewsTimeline($user, $project, $bounds['currentStart'], $bounds['currentEnd']);
+        $groups = $this->buildGroups($project, $integrations, $bounds['currentStart'], $bounds['currentEnd']);
+        $overview = $this->buildOverview($project, $bounds['currentStart'], $bounds['currentEnd'], $bounds['previousStart'], $bounds['previousEnd']);
+        $viewsTimeline = $this->buildViewsTimeline($project, $bounds['currentStart'], $bounds['currentEnd']);
 
         return new ListIntegrationInsightsResponseDTO(
             groups: $groups,
@@ -269,14 +267,13 @@ class IntegrationInsightService
      * @return ListIntegrationInsightsGroupedByIntegrationResponseDTO[]
      */
     private function buildGroups(
-        User $user,
         Project $project,
         array $integrations,
         \DateTimeImmutable $startDate,
         \DateTimeImmutable $endDate,
     ): array {
-        $perIntegrationGrowths = $this->postInsightRepository->getGrowthByProjectAndUserAndTypesInPeriodGroupedByIntegration(
-            $project, $user, self::OVERVIEW_POST_INSIGHT_TYPES, $startDate, $endDate,
+        $perIntegrationGrowths = $this->postInsightRepository->getGrowthByProjectAndTypesInPeriodGroupedByIntegration(
+            $project, self::OVERVIEW_POST_INSIGHT_TYPES, $startDate, $endDate,
         );
 
         $growthsByIntegration = [];
@@ -285,7 +282,7 @@ class IntegrationInsightService
         }
 
         $followersByIntegrationId = $this->integrationInsightRepository
-            ->getLatestTotalFollowersByProjectAndUserGroupedByIntegration($project, $user);
+            ->getLatestTotalFollowersByProjectGroupedByIntegration($project);
 
         $groups = [];
         foreach ($integrations as $integration) {
@@ -318,27 +315,26 @@ class IntegrationInsightService
     }
 
     private function buildOverview(
-        User $user,
         Project $project,
         \DateTimeImmutable $currentStart,
         \DateTimeImmutable $currentEnd,
         \DateTimeImmutable $previousStart,
         \DateTimeImmutable $previousEnd,
     ): IntegrationInsightsOverviewDTO {
-        $currentSums = $this->postInsightRepository->getGrowthByProjectAndUserAndTypesInPeriod(
-            $project, $user, self::OVERVIEW_POST_INSIGHT_TYPES, $currentStart, $currentEnd,
+        $currentSums = $this->postInsightRepository->getGrowthByProjectAndTypesInPeriod(
+            $project, self::OVERVIEW_POST_INSIGHT_TYPES, $currentStart, $currentEnd,
         );
 
-        $previousSums = $this->postInsightRepository->getGrowthByProjectAndUserAndTypesInPeriod(
-            $project, $user, self::OVERVIEW_POST_INSIGHT_TYPES, $previousStart, $previousEnd,
+        $previousSums = $this->postInsightRepository->getGrowthByProjectAndTypesInPeriod(
+            $project, self::OVERVIEW_POST_INSIGHT_TYPES, $previousStart, $previousEnd,
         );
 
-        $currentFollowers = $this->integrationInsightRepository->getAggregatedTotalFollowersByProjectAndUserBeforeDate(
-            $project, $user, $currentEnd,
+        $currentFollowers = $this->integrationInsightRepository->getAggregatedTotalFollowersByProjectBeforeDate(
+            $project, $currentEnd,
         ) ?? 0.0;
 
-        $previousFollowers = $this->integrationInsightRepository->getAggregatedTotalFollowersByProjectAndUserBeforeDate(
-            $project, $user, $currentStart,
+        $previousFollowers = $this->integrationInsightRepository->getAggregatedTotalFollowersByProjectBeforeDate(
+            $project, $currentStart,
         ) ?? 0.0;
 
         $currentByType = $this->buildGrowthByType($currentSums);
@@ -372,13 +368,12 @@ class IntegrationInsightService
      * @return IntegrationInsightsViewsTimelineDTO[]
      */
     private function buildViewsTimeline(
-        User $user,
         Project $project,
         \DateTimeImmutable $startDate,
         \DateTimeImmutable $endDate,
     ): array {
-        $rows = $this->postInsightRepository->getDailyGrowthByProjectAndUserAndTypeInPeriod(
-            $project, $user, PostInsightType::Views, $startDate, $endDate,
+        $rows = $this->postInsightRepository->getDailyGrowthByProjectAndTypeInPeriod(
+            $project, PostInsightType::Views, $startDate, $endDate,
         );
 
         $pointsByPlatform = [];
@@ -515,8 +510,7 @@ class IntegrationInsightService
                 ->setType($insightType)
                 ->setValue($dto->getValue())
                 ->setValueFormat($insightType->getValueFormat())
-                ->setIntegration($integration)
-                ->setUser($integration->getUser());
+                ->setIntegration($integration);
 
             $this->integrationInsightRepository->save($insight);
         }

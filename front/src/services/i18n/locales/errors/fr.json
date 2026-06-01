@@ -4,8 +4,15 @@
         "notFound": "Intégration introuvable.",
         "alreadyConnected": "Ce projet a déjà une intégration pour cette plateforme."
     },
+    "aiClient": {
+        "retryable": "Le service IA est temporairement indisponible. Veuillez réessayer dans un instant.",
+        "permanent": "Le service IA a renvoyé une erreur. Veuillez contacter le support si le problème persiste."
+    },
     "credit": {
         "insufficient": "Vous n'avez pas assez de crédits."
+    },
+    "mailing": {
+        "retryable": "Le service d'envoi d'emails est temporairement indisponible. Une nouvelle tentative sera effectuée automatiquement."
     },
     "stripe": {
         "checkoutFailed": "Impossible de créer la session de paiement.",
@@ -37,12 +44,8 @@
     "script": {
         "notFound": "Script introuvable.",
         "limitReached": "Vous avez atteint la limite de scripts pour votre abonnement.",
-        "generationNotFound": "Génération introuvable.",
-        "planNotFound": "Plan introuvable.",
         "tagNotFound": "Tag introuvable.",
-        "tagTitleTaken": "Ce titre de tag est déjà utilisé.",
-        "generationInProgress": "Une génération de script est déjà en cours.",
-        "cannotDeleteRunningGeneration": "Impossible de supprimer une génération en cours."
+        "tagTitleTaken": "Ce titre de tag est déjà utilisé."
     },
     "todoList": {
         "listNotFound": "Liste introuvable.",
@@ -71,6 +74,63 @@
         "tokenExpired": "Session expirée. Veuillez vous reconnecter.",
         "invalidSession": "Session invalide. Veuillez vous reconnecter.",
         "emailNotVerified": "Votre email n'est pas vérifié."
+    },
+    "chat": {
+        "notFound": "Conversation introuvable."
+    },
+    "scriptPart": {
+        "notFound": "Partie de script introuvable."
+    },
+    "scriptPartSuggestion": {
+        "notFound": "Suggestion introuvable.",
+        "notPending": "Cette suggestion n'est plus en attente."
+    },
+    "agency": {
+        "missing": "Vous n'êtes rattaché à aucune agence.",
+        "alreadyExists": "Vous appartenez déjà à une agence.",
+        "subscriptionInactive": "L'abonnement de votre agence n'est plus actif.",
+        "logoInvalid": "Le logo d'agence fourni est invalide."
+    },
+    "agencyCollaborator": {
+        "notFound": "Collaborateur introuvable dans cette agence."
+    },
+    "projectClient": {
+        "notFound": "Client introuvable dans ce projet."
+    },
+    "onboarding": {
+        "invalidStep": "Cette étape d'onboarding n'est pas applicable."
+    },
+    "review": {
+        "fileInvalid": "Le ou les fichiers fournis sont invalides.",
+        "notFound": "Review introuvable.",
+        "scriptAlreadyHasReview": "Ce script a déjà une review.",
+        "locked": "Cette review ne peut pas être modifiée dans son statut actuel.",
+        "unresolvableAgency": "Impossible de résoudre l'agence pour cette review.",
+        "notPending": "Cette version de review n'est plus en attente.",
+        "notLatestVersion": "Cette version n'est plus la plus récente — actualisez puis réessayez.",
+        "commentEmpty": "Veuillez saisir un commentaire avant d'envoyer.",
+        "commentParentNotFound": "Le commentaire auquel vous répondez n'existe plus.",
+        "commentReplyCannotHaveTimecode": "Une réponse ne peut pas être épinglée à un instant de la vidéo.",
+        "commentNotFound": "Ce commentaire n'existe plus.",
+        "commentStatusInvalid": "Statut de commentaire invalide.",
+        "commentStatusOnReplyForbidden": "Seuls les commentaires racine peuvent être résolus ou rouverts.",
+        "commentEditForbidden": "Seul l'auteur du commentaire peut le modifier.",
+        "commentTimecodeOnReplyForbidden": "Seuls les commentaires racine peuvent porter un timecode vidéo.",
+        "coverSourceNotFound": "Impossible de générer la miniature vidéo : le fichier source est introuvable.",
+        "coverGenerationFailed": "Impossible de générer la miniature vidéo."
+    },
+    "hookTemplate": {
+        "notFound": "Modèle d'accroche introuvable.",
+        "modificationForbidden": "Seul le créateur d'origine ou un admin de l'agence peut modifier ce modèle."
+    },
+    "invitation": {
+        "notFound": "Cette invitation n'existe plus.",
+        "expired": "Cette invitation a expiré. Demandez à votre interlocuteur de vous en renvoyer une.",
+        "alreadyUsed": "Cette invitation a déjà été utilisée.",
+        "emailAlreadyUsed": "Un compte existe déjà avec cet email. Veuillez vous connecter.",
+        "invalidRole": "Le rôle de cette invitation est invalide.",
+        "invalidType": "Le type d'invitation est manquant ou invalide.",
+        "invalidProject": "Un projet est requis pour inviter un client."
     },
     "fallback": "Une erreur est survenue"
 }

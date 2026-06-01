@@ -6,11 +6,10 @@ use App\Entity\Enum\StripeEventType;
 use App\Entity\Enum\SubscriptionStatus;
 use App\Entity\Subscription;
 use App\Entity\StripeWebhookEvent;
+use App\Repository\AgencyRepository;
 use App\Repository\SubscriptionRepository;
-use App\Repository\UserRepository;
 use App\Service\Credit\CreditService;
 use App\Exception\Stripe\WebhookSignatureVerificationException;
-use Psr\Log\LoggerInterface;
 use Stripe\Checkout\Session;
 use Stripe\Exception\SignatureVerificationException;
 use Stripe\Price;
@@ -22,7 +21,7 @@ class StripeWebhookService
     public function __construct(
         private readonly string $stripeSecretKey,
         private readonly string $stripeWebhookSecret,
-        private readonly UserRepository $userRepository,
+        private readonly AgencyRepository $agencyRepository,
         private readonly SubscriptionRepository $subscriptionRepository,
         private readonly CreditService $creditService,
         private readonly StripePlanService $stripePlanService,
@@ -66,9 +65,9 @@ class StripeWebhookService
         }
 
         $customerId = $session['customer'];
-        $user = $this->userRepository->getByStripeCustomerId($customerId);
+        $agency = $this->agencyRepository->getByStripeCustomerId($customerId);
 
-        if ($user === null) {
+        if ($agency === null) {
             return;
         }
 
@@ -89,7 +88,7 @@ class StripeWebhookService
             return;
         }
 
-        $this->creditService->addRefillCredits($user, $creditAmount, $paymentIntentId);
+        $this->creditService->addRefillCredits($agency, $creditAmount, null, $paymentIntentId);
     }
 
     private function handleCustomerSubscriptionCreated(array $payload): void
@@ -97,9 +96,9 @@ class StripeWebhookService
         $subscriptionData = $payload['data']['object'];
 
         $customerId = $subscriptionData['customer'];
-        $user = $this->userRepository->getByStripeCustomerId($customerId);
+        $agency = $this->agencyRepository->getByStripeCustomerId($customerId);
 
-        if ($user === null) {
+        if ($agency === null) {
             return;
         }
 
@@ -120,7 +119,7 @@ class StripeWebhookService
         $status = SubscriptionStatus::tryFrom($subscriptionData['status']) ?? SubscriptionStatus::Incomplete;
 
         $subscription = new Subscription();
-        $subscription->setUser($user)
+        $subscription->setAgency($agency)
             ->setStripeSubscriptionId($subscriptionData['id'])
             ->setPlan($plan)
             ->setStatus($status)
@@ -195,12 +194,12 @@ class StripeWebhookService
 
 
         if ($subscription !== null) {
-            $user = $subscription->getUser();
+            $agency = $subscription->getAgency();
         } else {
             $customerId = $invoiceData['customer'] ?? null;
-            $user = $customerId !== null ? $this->userRepository->getByStripeCustomerId($customerId) : null;
+            $agency = $customerId !== null ? $this->agencyRepository->getByStripeCustomerId($customerId) : null;
 
-            if ($user === null) {
+            if ($agency === null) {
                 return;
             }
         }
@@ -221,7 +220,7 @@ class StripeWebhookService
         if ($creditAmount <= 0) {
             return;
         }
-        $this->creditService->renewSubscriptionCredits($user, $creditAmount, $invoiceId);
+        $this->creditService->renewSubscriptionCredits($agency, $creditAmount, $invoiceId);
     }
 
     private function handleInvoicePaymentFailed(array $payload): void

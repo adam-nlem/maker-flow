@@ -1,0 +1,12 @@
+{
+    "invite": {
+        "modalTitle": "Inviter un client à {{projectName}}",
+        "modalDescription": "Le client recevra un email pour accéder à son portail.",
+        "submit": "Envoyer l'invitation",
+        "fields": {
+            "firstName": "Prénom",
+            "lastName": "Nom",
+            "email": "Email"
+        }
+    }
+}

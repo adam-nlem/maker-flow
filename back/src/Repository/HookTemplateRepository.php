@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Agency;
 use App\Entity\HookTemplate;
 use App\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -36,13 +37,13 @@ class HookTemplateRepository extends ServiceEntityRepository
         }
     }
 
-    public function getByUuidAndUser(string $uuid, User $user): ?HookTemplate
+    public function getAccessibleByUuidForUser(string $uuid, User $user): ?HookTemplate
     {
         return $this->createQueryBuilder('ht')
             ->where('ht.uuid = :uuid')
-            ->andWhere('ht.user = :user')
+            ->andWhere('ht.agency = :agency')
             ->setParameter('uuid', $uuid)
-            ->setParameter('user', $user)
+            ->setParameter('agency', $user->getAgency())
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
             ->getOneOrNullResult(Query::HYDRATE_SIMPLEOBJECT);
@@ -61,11 +62,11 @@ class HookTemplateRepository extends ServiceEntityRepository
     /**
      * @return HookTemplate[]
      */
-    public function getPublicOrByUser(User $user): array
+    public function getPublicOrByAgency(Agency $agency): array
     {
         return $this->createQueryBuilder('ht')
-            ->where('ht.isPublic = true OR ht.user = :user')
-            ->setParameter('user', $user)
+            ->where('ht.isPublic = true OR ht.agency = :agency')
+            ->setParameter('agency', $agency)
             ->orderBy('ht.createdAt', 'DESC')
             ->getQuery()
             ->setHint(Query::HINT_INCLUDE_META_COLUMNS, true)
@@ -75,11 +76,11 @@ class HookTemplateRepository extends ServiceEntityRepository
     /**
      * @return HookTemplate[]
      */
-    public function getPublicOrByUserPaginated(User $user, int $page, int $limit): array
+    public function getPublicOrByAgencyPaginated(Agency $agency, int $page, int $limit): array
     {
         return $this->createQueryBuilder('ht')
-            ->where('ht.isPublic = true OR ht.user = :user')
-            ->setParameter('user', $user)
+            ->where('ht.isPublic = true OR ht.agency = :agency')
+            ->setParameter('agency', $agency)
             ->orderBy('ht.createdAt', 'DESC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit)
@@ -91,12 +92,12 @@ class HookTemplateRepository extends ServiceEntityRepository
     /**
      * @return HookTemplate[]
      */
-    public function searchByTitlePublicOrByUser(string $searchTerm, User $user): array
+    public function searchByTitlePublicOrByAgency(string $searchTerm, Agency $agency): array
     {
         return $this->createQueryBuilder('ht')
-            ->where('ht.isPublic = true OR ht.user = :user')
+            ->where('ht.isPublic = true OR ht.agency = :agency')
             ->andWhere('LOWER(ht.title) LIKE LOWER(:searchTerm)')
-            ->setParameter('user', $user)
+            ->setParameter('agency', $agency)
             ->setParameter('searchTerm', '%' . $searchTerm . '%')
             ->orderBy('ht.createdAt', 'DESC')
             ->getQuery()
@@ -107,12 +108,12 @@ class HookTemplateRepository extends ServiceEntityRepository
     /**
      * @return HookTemplate[]
      */
-    public function searchByTitlePublicOrByUserPaginated(string $searchTerm, User $user, int $page, int $limit): array
+    public function searchByTitlePublicOrByAgencyPaginated(string $searchTerm, Agency $agency, int $page, int $limit): array
     {
         return $this->createQueryBuilder('ht')
-            ->where('ht.isPublic = true OR ht.user = :user')
+            ->where('ht.isPublic = true OR ht.agency = :agency')
             ->andWhere('LOWER(ht.title) LIKE LOWER(:searchTerm)')
-            ->setParameter('user', $user)
+            ->setParameter('agency', $agency)
             ->setParameter('searchTerm', '%' . $searchTerm . '%')
             ->orderBy('ht.createdAt', 'DESC')
             ->setFirstResult(($page - 1) * $limit)

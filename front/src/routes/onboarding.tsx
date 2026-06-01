@@ -1,50 +1,31 @@
-import type { ReactNode } from "react"
+import { useEffect } from "react"
+import { useNavigate } from "react-router-dom"
 
-import WelcomeFeatureStep from "~/components/welcome/WelcomeFeatureStep"
-import WelcomeHowItWorksStep from "~/components/welcome/WelcomeHowItWorksStep"
-import OnboardingCreateProjectStep from "~/components/onboarding/OnboardingCreateProjectStep"
-import OnboardingConnectIntegrationStep from "~/components/onboarding/OnboardingConnectIntegrationStep"
-import OnboardingCreateScriptStep from "~/components/onboarding/OnboardingCreateScriptStep"
-import OnboardingGenerateScriptStep from "~/components/onboarding/OnboardingGenerateScriptStep"
-import OnboardingSubscriptionStep from "~/components/onboarding/OnboardingSubscriptionStep"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
-import { OnboardingStep } from "~/models/enums/OnboardingStep"
-import { WelcomeStep } from "~/models/enums/WelcomeStep"
-
-const welcomeNodes: Record<WelcomeStep, ReactNode> = {
-    [WelcomeStep.Features]: <WelcomeFeatureStep />,
-    [WelcomeStep.HowItWorks]: <WelcomeHowItWorksStep />,
-}
-
-const onboardingNodes: Record<OnboardingStep, ReactNode> = {
-    [OnboardingStep.CreateFirstProject]: <OnboardingCreateProjectStep />,
-    [OnboardingStep.ConnectIntegration]: <OnboardingConnectIntegrationStep />,
-    [OnboardingStep.CreateFirstScript]: <OnboardingCreateScriptStep />,
-    [OnboardingStep.GenerateFirstScript]: <OnboardingGenerateScriptStep />,
-    [OnboardingStep.ShowSubscriptions]: <OnboardingSubscriptionStep />,
-}
+import { homePath } from "~/routes/routePaths"
 
 export default function OnboardingPage() {
-    const {
-        isAuthLoading,
-        isAuthenticated,
-        currentOnboardingStep,
-        currentWelcomeStep,
-    } = useOnboardingFlow()
+  const navigate = useNavigate()
+  const { isAuthLoading, isAuthenticated, currentStepConfig } = useOnboardingFlow()
 
-    if (isAuthLoading) {
-        return (
-            <div className="flex min-h-screen items-center justify-center">
-                <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
-            </div>
-        )
+  useEffect(() => {
+    if (!isAuthLoading && !isAuthenticated) {
+      navigate(homePath, { replace: true })
     }
+  }, [isAuthLoading, isAuthenticated, navigate])
 
+  if (isAuthLoading || !isAuthenticated) {
     return (
-        <div className="bg-clear bg-dot-pattern h-screen relative overflow-y-auto">
-            {isAuthenticated
-                ? onboardingNodes[currentOnboardingStep]
-                : welcomeNodes[currentWelcomeStep]}
-        </div>
+      <div className="flex min-h-screen items-center justify-center">
+        <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent"></div>
+      </div>
     )
+  }
+
+  return (
+    <div className="bg-clear bg-dot-pattern h-screen flex flex-row gap-3 items-center overflow-y-auto">
+      {currentStepConfig?.stepComponent ?? null}
+      {currentStepConfig?.previewComponent ?? null}
+    </div>
+  )
 }

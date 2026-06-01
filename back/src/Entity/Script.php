@@ -31,6 +31,14 @@ class Script
         'api_scripts_show',
         'api_post_groups_list',
         'api_post_groups_show',
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_create',
+        'api_review_comments_create',
+        'api_review_comments_update',
     ])]
     private ?string $uuid = null;
 
@@ -43,6 +51,14 @@ class Script
         'api_scripts_show',
         'api_post_groups_list',
         'api_post_groups_show',
+        'api_reviews_list',
+        'api_reviews_show',
+        'api_reviews_create',
+        'api_reviews_update',
+        'api_review_versions_approve',
+        'api_review_versions_create',
+        'api_review_comments_create',
+        'api_review_comments_update',
     ])]
     private ?string $title = null;
 
@@ -126,6 +142,9 @@ class Script
         'api_scripts_show',
     ])]
     private ?PostGroup $postGroup = null;
+
+    #[ORM\OneToOne(mappedBy: 'script', targetEntity: Review::class)]
+    private ?Review $review = null;
 
     /**
      * @var Collection<int, ScriptTag>
@@ -319,6 +338,11 @@ class Script
         $this->postGroup = $postGroup;
 
         return $this;
+    }
+
+    public function getReview(): ?Review
+    {
+        return $this->review;
     }
 
     /**

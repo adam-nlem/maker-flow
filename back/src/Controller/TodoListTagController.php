@@ -2,12 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Enum\UserRole;
 use App\Entity\User;
 use App\DTO\QueryParam\TodoListTag\ListTodoListTagsQueryParamDTO;
 use App\DTO\Request\TodoListTag\CreateTodoListTagRequestDTO;
 use App\DTO\Request\TodoListTag\UpdateTodoListTagRequestDTO;
 use App\Entity\TodoListTag;
-use App\Entity\TodoListTask;
 use App\Exception\TodoList\TodoListNotFoundException;
 use App\Exception\TodoList\TodoListTagNotFoundException;
 use App\Exception\TodoList\TodoListTagTitleConflictException;
@@ -19,11 +19,13 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Requirement\Requirement;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/api/todo-lists/tags', requirements: ['tagUuid' => Requirement::UUID])]
-class TodoListTagController extends AbstractController
+final class TodoListTagController extends AbstractController
 {
     #[Route('', name: 'api_todo_lists_tags_list', methods: ['GET'])]
+    #[IsGranted(UserRole::Viewer->value)]
     public function list(
         ListTodoListTagsQueryParamDTO $queryParamDto,
         TodoListTagRepository $tagRepository,
@@ -33,17 +35,16 @@ class TodoListTagController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $todoList = $todoListRepository->getByUuidAndUser($queryParamDto->getTodoListUuid(), $user);
+        $todoList = $todoListRepository->getAccessibleByUuidForUser($queryParamDto->getTodoListUuid(), $user);
 
         if ($todoList === null) {
             throw new TodoListNotFoundException();
         }
 
         if ($queryParamDto->getSearchTerm() !== null) {
-            $tags = $tagRepository->getBySearchTermAndUserAndTodoListLimited($queryParamDto->getSearchTerm(), $user, $todoList, 20);
-            // List Tags by serach term and limit to 20
+            $tags = $tagRepository->getBySearchTermAndTodoListLimited($queryParamDto->getSearchTerm(), $todoList, 20);
         } else {
-            $tags = $tagRepository->getByUserAndTodoListLimited($user, $todoList, 20);
+            $tags = $tagRepository->getByTodoListLimited($todoList, 20);
         }
 
         return $this->json(
@@ -54,6 +55,7 @@ class TodoListTagController extends AbstractController
     }
 
     #[Route('', name: 'api_todo_lists_tags_create', methods: ['POST'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function create(
         CreateTodoListTagRequestDTO $dto,
         TodoListRepository $todoListRepository,
@@ -62,7 +64,7 @@ class TodoListTagController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $todoList = $todoListRepository->getByUuidAndUser($dto->getTodoListUuid(), $user);
+        $todoList = $todoListRepository->getAccessibleByUuidForUser($dto->getTodoListUuid(), $user);
 
         if ($todoList === null) {
             throw new TodoListNotFoundException();
@@ -85,6 +87,7 @@ class TodoListTagController extends AbstractController
     }
 
     #[Route('/{tagUuid}', name: 'api_todo_lists_tags_update', methods: ['PATCH'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function update(
         string $tagUuid,
         UpdateTodoListTagRequestDTO $dto,
@@ -93,7 +96,7 @@ class TodoListTagController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
 
-        $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
+        $tag = $tagRepository->getAccessibleByUuidForUser($tagUuid, $user);
 
         if ($tag === null) {
             throw new TodoListTagNotFoundException();
@@ -101,7 +104,7 @@ class TodoListTagController extends AbstractController
 
         if ($dto->getTitle() !== null && $dto->getTitle() != $tag->getTitle()) {
             // We check if there is another tag with the same title in the same todo list (we don't want that to happen)
-            $tagWithSameTitle = $tagRepository->getByTitleAndTodoListAndUser($dto->getTitle(), $tag->getTodoList(), $user);
+            $tagWithSameTitle = $tagRepository->getByTitleAndTodoList($dto->getTitle(), $tag->getTodoList());
             if ($tagWithSameTitle !== null) {
                 throw new TodoListTagTitleConflictException();
             }
@@ -118,12 +121,13 @@ class TodoListTagController extends AbstractController
     }
 
     #[Route('/{tagUuid}', name: 'api_todo_lists_tags_delete', methods: ['DELETE'])]
+    #[IsGranted(UserRole::Editor->value)]
     public function delete(string $tagUuid, TodoListTagRepository $tagRepository)
     {
         /** @var User $user */
         $user = $this->getUser();
 
-        $tag = $tagRepository->getByUuidAndUser($tagUuid, $user);
+        $tag = $tagRepository->getAccessibleByUuidForUser($tagUuid, $user);
 
         if ($tag === null) {
             throw new TodoListTagNotFoundException();

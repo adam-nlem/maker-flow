@@ -1,5 +1,7 @@
-// Public routes
+// Smart redirect entry — RootRedirect dispatches to the agency or client shell by role
 export const homePath = '/'
+
+// Public / auth
 export const prelaunchPath = '/prelaunch'
 export const privacyPolicyPath = '/privacy-policy'
 export const termsOfServicePath = '/terms-of-service'
@@ -9,15 +11,29 @@ export const registerPath = '/register'
 export const verifyOtpPath = '/verify-otp'
 export const integrationCallbackPath = '/integrations/callback'
 
-// Protected routes
-export const tasksPath = '/tasks'
-export const contentsPath = '/contents'
-export const scriptsPath = '/scripts'
-export const calendarPath = '/calendar'
-export const settingsPath = '/settings'
+// Agency shell
+export const agencyAreaPrefix = '/agency'
+export const agencyHomePath = agencyAreaPrefix
+export const agencyTasksPath = `${agencyAreaPrefix}/tasks`
+export const agencyReviewsPath = `${agencyAreaPrefix}/reviews`
+export const agencyContentsPath = `${agencyAreaPrefix}/contents`
+export const agencyScriptsPath = `${agencyAreaPrefix}/scripts`
+export const agencyCalendarPath = `${agencyAreaPrefix}/calendar`
+export const agencySettingsPath = `${agencyAreaPrefix}/settings`
+export const agencySettingsGeneralPath = `${agencySettingsPath}/general`
+export const agencySettingsAgencyPath = `${agencySettingsPath}/agency`
+export const agencySettingsProjectsPath = `${agencySettingsPath}/projects`
+export const agencySettingsSubscriptionPath = `${agencySettingsPath}/subscription`
 
-// Settings sections
-export const settingsGeneralPath = '/settings/general'
-export const settingsProjectsPath = '/settings/projects'
-export const settingsSubscriptionPath = '/settings/subscription'
+// Client shell
+export const clientAreaPrefix = '/client'
+export const clientHomePath = clientAreaPrefix
+export const clientReviewsPath = `${clientAreaPrefix}/reviews`
+export const clientContentsPath = `${clientAreaPrefix}/contents`
+export const clientSettingsPath = `${clientAreaPrefix}/settings`
+export const clientSettingsGeneralPath = `${clientSettingsPath}/general`
 
+// Invitations (public, tokenized link from welcome emails)
+export const inviteAreaPrefix = '/invite'
+export const inviteRouteMatcher = `${inviteAreaPrefix}/:token`
+export const invitePath = (token: string) => `${inviteAreaPrefix}/${token}`

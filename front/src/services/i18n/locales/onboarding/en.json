@@ -1,30 +1,54 @@
 {
-    "generating": {
-        "messages": {
-            "analysis": "Analyzing the topic...",
-            "structure": "Structuring the script...",
-            "hook": "Writing the hook...",
-            "parts": "Developing the parts...",
-            "details": "Adding details...",
-            "finalization": "Finalizing..."
-        },
-        "title": "AI is writing your script",
-        "errorTitle": "An error occurred",
-        "errorDescription": "Generation failed. You can retry from the script editor."
+  "exploreContents": {
+    "body": "Find all contents organized by group here. Click a content to see its details.",
+    "cta": "View contents",
+    "skip": "Later"
+  },
+  "createAgency": {
+    "name": {
+      "label": "Your agency",
+      "placeholder": "Enter your agency name"
     },
-    "generateStep": {
-        "title": "Chat with AI to generate your script",
-        "subtitle": "Open the AI chat in the editor and describe your video. The assistant will suggest line-by-line changes that you can accept or reject."
+    "contactEmail": {
+      "label": "Contact email (optional)",
+      "placeholder": "hello@my-agency.com"
     },
-    "subscriptionStep": {
-        "activatedTitle": "{{plan}} subscription activated",
-        "activatedSubtitle": "Your subscription is active.",
-        "primaryAction": "Start using MakerFlow",
-        "skip": "Skip"
+    "website": {
+      "label": "Website (optional)",
+      "placeholder": "https://my-agency.com"
     },
-    "progress": {
-        "stepCount": "Step {{current}} of {{total}}"
+    "logo": {
+      "label": "Agency logo",
+      "hint": "Upload or drag & drop your agency logo"
     },
-    "firstScriptTitle": "My first script",
-    "findScriptHint": "Find your script in the Scripts tab"
+    "submit": "Create my agency"
+  },
+  "generating": {
+    "messages": {
+      "analysis": "Analyzing the topic...",
+      "structure": "Structuring the script...",
+      "hook": "Writing the hook...",
+      "parts": "Developing the parts...",
+      "details": "Adding details...",
+      "finalization": "Finalizing..."
+    },
+    "title": "AI is writing your script",
+    "errorTitle": "An error occurred",
+    "errorDescription": "Generation failed. You can retry from the script editor."
+  },
+  "generateStep": {
+    "title": "Chat with AI to generate your script",
+    "subtitle": "Open the AI chat in the editor and describe your video. The assistant will suggest line-by-line changes that you can accept or reject."
+  },
+  "subscriptionStep": {
+    "activatedTitle": "{{plan}} subscription activated",
+    "activatedSubtitle": "Your subscription is active.",
+    "primaryAction": "Start using MakerFlow",
+    "skip": "Skip"
+  },
+  "progress": {
+    "stepCount": "Step {{current}} of {{total}}"
+  },
+  "firstScriptTitle": "My first script",
+  "findScriptHint": "Find your script in the Scripts tab"
 }

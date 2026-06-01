@@ -26,7 +26,7 @@ export function CalendarHeatMap({
     }
 
     return (
-        <div className="flex flex-col gap-1 border border-light-gray rounded-lg p-2">
+        <div className="flex flex-col gap-1 border border-pale-gray rounded-lg p-2">
             <h1 className="text-heading-xs">{t("calendarHeatmap.title")}</h1>
             <h2 className="text-heading-sm">{totalValue}</h2>
             <div className="flex gap-1 p-2">
@@ -93,9 +93,9 @@ function buildWeeksGrid(data: ChartDataPoint[], daysToDisplay: number): HeatMapC
 }
 
 function getColor(count: number) {
-    if (count === 0) return "bg-zinc-200";
-    if (count < 1000) return "bg-emerald-200";
-    if (count < 5000) return "bg-emerald-400";
-    if (count < 10000) return "bg-emerald-600";
-    return "bg-emerald-800";
+    if (count === 0) return "bg-pale-gray-2";
+    if (count < 1000) return "bg-primary/20";
+    if (count < 5000) return "bg-primary/40";
+    if (count < 10000) return "bg-primary/60";
+    return "bg-primary/80";
 }

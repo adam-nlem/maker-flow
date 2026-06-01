@@ -15,6 +15,13 @@
     "language": {
         "label": "Language"
     },
+    "validation": {
+        "logo": {
+            "required": "A logo is required.",
+            "mimeType": "The logo must be a PNG image.",
+            "tooLarge": "The logo must be 5 MB or smaller."
+        }
+    },
     "legal": {
         "privacyPolicy": "Privacy",
         "termsOfService": "Terms"
