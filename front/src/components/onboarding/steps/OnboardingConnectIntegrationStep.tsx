@@ -9,6 +9,7 @@ import { IntegrationStatus } from "~/models/enums/IntegrationStatus"
 import { useListIntegrations } from "~/hooks/api/integrations/useListIntegrations"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
+import { ArrowRightIcon } from "@heroicons/react/24/outline"
 
 export default function OnboardingConnectIntegrationStep() {
   const { t } = useTranslation()
@@ -21,37 +22,36 @@ export default function OnboardingConnectIntegrationStep() {
   if (!projectUuid) return null
 
   return (
-    <OnboardingStepLayout
-      children={
-        <div className="flex flex-col items-center gap-5 w-full">
-          <div className="flex flex-col sm:flex-row justify-center gap-3 w-full">
-            {isLoading ? (
-              <Shimmer height="h-32" width="w-full" />
-            ) : (
-              platformOptions.map((platform) => (
-                <IntegrationLoginCard
-                  key={platform}
-                  projectUuid={projectUuid}
-                  platform={platform}
-                  integration={integrations.find((i) => i.platform === platform) ?? null}
-                />
-              ))
-            )}
-          </div>
-
-          <Button
-            style="primary"
-            disabled={!hasConnectedIntegration}
-            onClick={advanceStep}
-          >
-            {t("actions.continue")}
-          </Button>
-
-          <SimpleTextButton onClick={advanceStep}>
-            {t("onboarding:subscriptionStep.skip")}
-          </SimpleTextButton>
+    <OnboardingStepLayout>
+      <div className="flex flex-col gap-5 w-full">
+        <div className="flex flex-col justify-center gap-3 w-full">
+          {isLoading ? (
+            <Shimmer height="h-32" width="w-full" />
+          ) : (
+            platformOptions.map((platform) => (
+              <IntegrationLoginCard
+                key={platform}
+                projectUuid={projectUuid}
+                platform={platform}
+                integration={integrations.find((i) => i.platform === platform) ?? null}
+              />
+            ))
+          )}
         </div>
-      }
-    />
-  )
+
+        <Button
+          style="primary"
+          className="mt-5"
+          width="w-fit"
+          height="h-11"
+          isLoading={isLoading}
+          disabled={isLoading}
+          onClick={advanceStep}
+        >
+          <p className="text-sm">{t("actions.continue")}</p>
+          <ArrowRightIcon className="size-4" />
+        </Button>
+
+      </div>
+    </OnboardingStepLayout>)
 }

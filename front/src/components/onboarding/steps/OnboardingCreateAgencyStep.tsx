@@ -10,7 +10,7 @@ import { useCreateAgency } from "~/hooks/api/agency/useCreateAgency"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 import { resolveErrorMessage } from "~/services/apiErrorHandler/errorCodeMessages"
 import FileUpload from "../../ui/FileUpload"
-import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
+import { useOnboardingCreateAgencyStore } from "~/stores/onboarding/onboardingCreateAgencyStore"
 
 export default function OnboardingCreateAgencyStep() {
   const { t } = useTranslation()
@@ -18,19 +18,12 @@ export default function OnboardingCreateAgencyStep() {
   const { createAgency, isPending, error, validationErrorKey } = useCreateAgency()
   const { advanceStep } = useAdvanceOnboardingStep()
 
-  const agencyName = useOnboardingStore((state) => state.agencyName);
-  const setAgencyName = useOnboardingStore((state) => state.setAgencyName);
-  const setAgencyLogoPreviewUrl = useOnboardingStore((state) => state.setAgencyLogoPreviewUrl);
-  const agencyLogoPreviewUrl = useOnboardingStore((state) => state.agencyLogoPreviewUrl);
+  const agencyName = useOnboardingCreateAgencyStore((state) => state.agencyName);
+  const setAgencyName = useOnboardingCreateAgencyStore((state) => state.setAgencyName);
+  const setAgencyLogoPreviewUrl = useOnboardingCreateAgencyStore((state) => state.setAgencyLogoPreviewUrl);
+  const setAgency = useOnboardingCreateAgencyStore((state) => state.setAgency);
 
   const [logo, setLogo] = useState<File | null>(null)
-
-  useEffect(() => {
-    if (!user) return
-    if (user.agency !== null || user.isClient) {
-      void advanceStep()
-    }
-  }, [user, advanceStep])
 
   const handleLogoSelected = (file: File, previewUrl: string | null) => {
     setLogo(file)
@@ -43,6 +36,7 @@ export default function OnboardingCreateAgencyStep() {
     try {
       const agency = await createAgency({ name: agencyName, logo })
       if (!agency) return
+      setAgency(agency)
       await advanceStep()
     } catch {
       // surfaced via mutation error / global toast

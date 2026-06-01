@@ -11,6 +11,8 @@ import OnboardingSubscriptionStep from "~/components/onboarding/steps/Onboarding
 import { UserRole } from "./UserRole"
 import OnboardingCreateAgencyPreview from "~/components/onboarding/previews/OnboardingCreateAgencyPreview"
 import OnboardingCreateProjectPreview from "~/components/onboarding/previews/OnboardingCreateProjectPreview"
+import OnboardingInviteFirstClientPreview from "~/components/onboarding/previews/OnboardingInviteFirstClientPreview"
+import OnboardingConnectIntegrationPreview from "~/components/onboarding/previews/OnboardingConnectIntegrationPreview"
 
 export enum OnboardingStep {
   CreateAgency = 'create_agency',
@@ -26,7 +28,7 @@ export interface OnboardingStepConfig {
   descriptionKey: string
   icon: ComponentType<SVGProps<SVGSVGElement>>
   stepComponent: ReactNode
-  previewComponent: ReactNode
+  previewComponent?: ReactNode
   applicableRoles: UserRole[]
 }
 
@@ -52,7 +54,7 @@ export const ONBOARDING_STEP_CONFIG: Record<OnboardingStep, OnboardingStepConfig
     descriptionKey: "enums:onboardingStep.descriptions.inviteFirstClient",
     icon: UserPlusIcon,
     stepComponent: <OnboardingInviteFirstClientStep />,
-    previewComponent: <OnboardingInviteFirstClientStep />,
+    previewComponent: <OnboardingInviteFirstClientPreview />,
     applicableRoles: [UserRole.Admin],
   },
   [OnboardingStep.ConnectFirstIntegration]: {
@@ -60,7 +62,7 @@ export const ONBOARDING_STEP_CONFIG: Record<OnboardingStep, OnboardingStepConfig
     descriptionKey: "enums:onboardingStep.descriptions.connectFirstIntegration",
     icon: LinkIcon,
     stepComponent: <OnboardingConnectIntegrationStep />,
-    previewComponent: <OnboardingConnectIntegrationStep />,
+    previewComponent: <OnboardingConnectIntegrationPreview />,
     applicableRoles: [UserRole.Admin, UserRole.Client],
   },
   [OnboardingStep.ShowSubscriptions]: {
@@ -68,7 +70,6 @@ export const ONBOARDING_STEP_CONFIG: Record<OnboardingStep, OnboardingStepConfig
     descriptionKey: "enums:onboardingStep.descriptions.showSubscriptions",
     icon: SparklesIcon,
     stepComponent: <OnboardingSubscriptionStep />,
-    previewComponent: <OnboardingSubscriptionStep />,
     applicableRoles: [UserRole.Admin],
   },
   [OnboardingStep.ExploreContents]: {

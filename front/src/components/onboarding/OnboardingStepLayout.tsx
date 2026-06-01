@@ -5,10 +5,16 @@ import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 
 interface OnboardingStepLayoutProps {
   children: ReactNode
+  width?: string
+  height?: string
+  showProgressBar?: boolean
 }
 
 export default function OnboardingStepLayout({
   children,
+  width = "w-1/2",
+  height = "h-1/2",
+  showProgressBar = true
 }: OnboardingStepLayoutProps) {
   const { t } = useTranslation()
   const { currentStepConfig } = useOnboardingFlow()
@@ -18,8 +24,8 @@ export default function OnboardingStepLayout({
   }
 
   return (
-    <div className="h-1/2 w-1/2 flex flex-col justify-center items-start py-5 px-30">
-      <OnboardingProgressBar />
+    <div className={`${width} ${height} flex flex-col justify-center items-start py-5 px-30`} >
+      {showProgressBar && <OnboardingProgressBar />}
       <h2 className="text-heading-3xl text-dark mt-10 ">
         {t(currentStepConfig.titleKey)}
       </h2>
@@ -30,7 +36,7 @@ export default function OnboardingStepLayout({
       <div className="mt-20 bg-clear w-full flex flex-col items-center justify-center">
         {children}
       </div>
-    </div>
+    </div >
 
   )
 }

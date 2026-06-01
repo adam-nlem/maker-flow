@@ -77,20 +77,33 @@ The shared `connect_first_integration` step uses one copy (currently the admin w
 
 `src/routes/onboarding.tsx` reads `currentStepConfig` from `useOnboardingFlow` and renders `currentStepConfig.component`. No per-role dispatch — the config map already encodes which step is rendered.
 
-## Form staging store
+## Per-step staging stores
 
-`src/stores/onboarding/onboardingStore.ts` — persisted (`app:onboarding`) Zustand store that holds the in-progress agency / project form values so the live preview can mirror them in real time:
+Each data-bearing step owns a dedicated `createResettableStore`-wrapped, persisted Zustand store under `src/stores/onboarding/`. A store holds two kinds of state:
 
-| Field | Type | Init | Notes |
-|-------|------|------|-------|
-| `agencyName` | `string` | `""` | Fed to `<Input value=...>` in `OnboardingCreateAgencyStep`. Init `""` (not `null`) to keep React's controlled-input contract and allow `.trim()` without a guard. |
-| `agencyLogoPreviewUrl` | `string \| null` | `null` | Object-URL of the locally picked logo file. Passed to `<AgencyLogo logoUrl=...>` in the preview (controlled mode). |
-| `projectName` | `string` | `""` | Mirrors `agencyName` for the future project preview. |
-| `projectLogoPreviewUrl` | `string \| null` | `null` | Mirrors `agencyLogoPreviewUrl`. |
+1. **Staging fields** — the in-progress form values so the live preview can mirror them as the user types.
+2. **The created entity object** (`null` until the step's API call succeeds, then set on submit).
 
-Each setter writes exactly one field — no cross-field side effects. The store is `createResettableStore`-wrapped so `resetAllStores()` (logout / 401) clears form state.
+**Object-first preview rule.** Previews (and the shared `OnboardingPreviewLayout` sidebar) prefer the created object when present, falling back to the staging fields otherwise. This fixes stale previews after a step completes: the staging logo is a `blob:` object URL that gets revoked, leaving a broken image. When the created object exists, the preview reads the **real** `name` and switches the logo component to **uncontrolled** mode — passing the entity `uuid` (and omitting `logoUrl`) so `AgencyLogo` / `ProjectLogo` fetch the persisted server logo via `useShowAgencyLogo` / `useShowProjectLogo`.
 
-`agencyUuid` and `projectUuid` are **not** in this store: post-creation the agency UUID comes from `useCurrentUser().user.agency`, and the focused project UUID lives in `focusProjectStore`.
+**Persist primitives only.** Each store persists only its plain-primitive staging fields via `partialize`. Blob preview URLs (invalid after a reload) and the created class instances (would lose their prototype through JSON) are excluded.
+
+| Store (`use…`) | Persist key | State | `partialize` |
+|----------------|-------------|-------|--------------|
+| `useOnboardingCreateAgencyStore` | `app:onboarding:create-agency` | `agencyName`, `agencyLogoPreviewUrl`, `agency: Agency \| null` | `{ agencyName }` |
+| `useOnboardingCreateProjectStore` | `app:onboarding:create-project` | `projectName`, `projectLogoPreviewUrl`, `projectTypes`, `project: Project \| null` | `{ projectName, projectTypes }` |
+| `useOnboardingInviteFirstClientStore` | `app:onboarding:invite-first-client` | `firstName`, `lastName`, `email`, `invitation: Invitation \| null` | `{ firstName, lastName, email }` |
+
+Each setter writes exactly one field — no cross-field side effects. All stores are `createResettableStore`-wrapped so `resetAllStores()` (logout / 401) clears form state.
+
+The created object is set inside each step's submit handler: `OnboardingCreateAgencyStep` calls `setAgency(agency)`, `OnboardingCreateProjectStep` calls `setProject(project)` (alongside `setFocusedProjectUuid`), and `OnboardingInviteFirstClientStep` calls `setInvitation(invitation)`.
+
+### Shared `InviteClientForm`
+
+`InviteClientForm` (`components/agency/settings/project/InviteClientForm.tsx`) is reused by both the agency settings page and the onboarding step, so it stays self-contained (its own `useState`). Two **optional** props let the onboarding context observe it without coupling the settings usage to any store:
+
+- `onValuesChange?: (v: { firstName, lastName, email }) => void` — fired on every field change; the onboarding step pipes it into `useOnboardingInviteFirstClientStore` so the preview mirrors typed values.
+- `onInvited: (invitation: Invitation) => void` — widened to receive the created `Invitation` (settings callers simply ignore the argument).
 
 ## WIP — not wired
 
@@ -117,5 +130,9 @@ Each setter writes exactly one field — no cross-field side effects. The store 
 - `src/components/onboarding/OnboardingSubscriptionStep.tsx`
 - `src/components/onboarding/OnboardingPreviewLayout.tsx`
 - `src/components/onboarding/previews/OnboardingCreateAgencyPreview.tsx`
-- `src/stores/onboarding/onboardingStore.ts`
-- `src/components/settings/project/InviteClientForm.tsx` (reused)
+- `src/components/onboarding/previews/OnboardingCreateProjectPreview.tsx`
+- `src/components/onboarding/previews/OnboardingInviteFirstClientPreview.tsx`
+- `src/stores/onboarding/onboardingCreateAgencyStore.ts`
+- `src/stores/onboarding/onboardingCreateProjectStore.ts`
+- `src/stores/onboarding/onboardingInviteFirstClientStore.ts`
+- `src/components/agency/settings/project/InviteClientForm.tsx` (reused; optional `onValuesChange`)

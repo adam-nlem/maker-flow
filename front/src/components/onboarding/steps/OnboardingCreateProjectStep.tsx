@@ -11,7 +11,7 @@ import { ProjectType, projectTypeOptions, projectTypeTranslationKeys } from "~/m
 import { useCreateProject } from "~/hooks/api/projects/useCreateProject"
 import { useAdvanceOnboardingStep } from "~/hooks/api/onboarding/useAdvanceOnboardingStep"
 import { useFocusProjectStore } from "~/stores/project/focusProjectStore"
-import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
+import { useOnboardingCreateProjectStore } from "~/stores/onboarding/onboardingCreateProjectStore"
 import { HttpException } from "~/services/httpClient/HttpException"
 
 export default function OnboardingCreateProjectStep() {
@@ -20,12 +20,13 @@ export default function OnboardingCreateProjectStep() {
   const { advanceStep } = useAdvanceOnboardingStep()
   const setFocusedProjectUuid = useFocusProjectStore((s) => s.setFocusedProjectUuid)
 
-  const projectName = useOnboardingStore((state) => state.projectName)
-  const setProjectName = useOnboardingStore((state) => state.setProjectName)
-  const projectLogoPreviewUrl = useOnboardingStore((state) => state.projectLogoPreviewUrl)
-  const setProjectLogoPreviewUrl = useOnboardingStore((state) => state.setProjectLogoPreviewUrl)
-  const projectTypes = useOnboardingStore((state) => state.projectTypes)
-  const setProjectTypes = useOnboardingStore((state) => state.setProjectTypes)
+  const projectName = useOnboardingCreateProjectStore((state) => state.projectName)
+  const setProjectName = useOnboardingCreateProjectStore((state) => state.setProjectName)
+  const projectLogoPreviewUrl = useOnboardingCreateProjectStore((state) => state.projectLogoPreviewUrl)
+  const setProjectLogoPreviewUrl = useOnboardingCreateProjectStore((state) => state.setProjectLogoPreviewUrl)
+  const projectTypes = useOnboardingCreateProjectStore((state) => state.projectTypes)
+  const setProjectTypes = useOnboardingCreateProjectStore((state) => state.setProjectTypes)
+  const setProject = useOnboardingCreateProjectStore((state) => state.setProject)
 
   const [logo, setLogo] = useState<File | null>(null)
   const [limitError, setLimitError] = useState(false)
@@ -56,6 +57,7 @@ export default function OnboardingCreateProjectStep() {
       const project = await createProject({ name: projectName, types: projectTypes, logo })
       if (!project) return
       setLimitError(false)
+      setProject(project)
       setFocusedProjectUuid(project.uuid)
       await advanceStep()
     } catch (error) {

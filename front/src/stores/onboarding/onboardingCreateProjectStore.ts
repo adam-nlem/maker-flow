@@ -1,38 +1,40 @@
 import { persist } from "zustand/middleware"
 import { createResettableStore } from "~/stores/createResettableStore"
 import type { ProjectType } from "~/models/enums/ProjectType"
+import type { Project } from "~/models/Project"
 
-type OnboardingState = {
-  agencyName: string
-  agencyLogoPreviewUrl: string | null
+type OnboardingCreateProjectState = {
   projectName: string
   projectLogoPreviewUrl: string | null
   projectTypes: ProjectType[]
+  project: Project | null
 }
 
-type OnboardingAction = {
-  setAgencyName: (name: string) => void
-  setAgencyLogoPreviewUrl: (url: string | null) => void
+type OnboardingCreateProjectAction = {
   setProjectName: (name: string) => void
   setProjectLogoPreviewUrl: (url: string | null) => void
   setProjectTypes: (types: ProjectType[]) => void
+  setProject: (project: Project | null) => void
 }
 
-export const useOnboardingStore = createResettableStore<OnboardingState & OnboardingAction>()(
+export const useOnboardingCreateProjectStore = createResettableStore<
+  OnboardingCreateProjectState & OnboardingCreateProjectAction
+>()(
   persist(
     (set) => ({
-      agencyName: "",
-      agencyLogoPreviewUrl: null,
       projectName: "",
       projectLogoPreviewUrl: null,
       projectTypes: [],
+      project: null,
 
-      setAgencyName: (name) => set({ agencyName: name }),
-      setAgencyLogoPreviewUrl: (url) => set({ agencyLogoPreviewUrl: url }),
       setProjectName: (name) => set({ projectName: name }),
       setProjectLogoPreviewUrl: (url) => set({ projectLogoPreviewUrl: url }),
       setProjectTypes: (types) => set({ projectTypes: types }),
+      setProject: (project) => set({ project }),
     }),
-    { name: "app:onboarding" }
+    {
+      name: "app:onboarding:create-project",
+      partialize: (state) => ({ projectName: state.projectName, projectTypes: state.projectTypes }),
+    }
   )
 )

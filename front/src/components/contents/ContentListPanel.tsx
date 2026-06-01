@@ -30,7 +30,7 @@ export default function ContentListPanel({ projectUuid, isReadOnly = false }: Co
   return (
     <div className="flex-1 h-full flex flex-col overflow-hidden">
       {/* Tab bar */}
-      <div className="flex flex-row items-center gap-2 px-6 py-3 border-b border-pale-gray">
+      {!isReadOnly && <div className="flex flex-row items-center gap-2 px-6 py-3 border-b border-pale-gray">
         {contentsTabOptions.map((tab) => (
           <Pill
             key={tab}
@@ -45,7 +45,7 @@ export default function ContentListPanel({ projectUuid, isReadOnly = false }: Co
             textColorClassName="text-primary"
           />
         ))}
-      </div>
+      </div>}
 
       <div className="px-6 py-3 flex flex-row justify-between">
         <ContentsPlatformFilter
@@ -54,7 +54,11 @@ export default function ContentListPanel({ projectUuid, isReadOnly = false }: Co
           onPlatformChange={setPlatformFilter}
         />
 
-        <SearchBar setDebouncedSearchTerm={setSearchTerm} width="w-1/3" />
+        <SearchBar
+          setDebouncedSearchTerm={setSearchTerm}
+          width="max-w-72"
+          focusShortcut={{ key: "f", label: "F" }}
+        />
       </div>
 
       {isGroupTab ? <ContentGroupList projectUuid={projectUuid} /> : <ContentPostList projectUuid={projectUuid} />}

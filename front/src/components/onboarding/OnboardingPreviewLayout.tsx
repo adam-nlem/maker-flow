@@ -1,14 +1,13 @@
 import type { ReactNode } from "react"
-import OnboardingProgressBar from "./OnboardingProgressBar"
 import { useTranslation } from "react-i18next"
 import { useOnboardingFlow } from "~/hooks/useOnboardingFlow"
 import { sidebarMainNavigationItems, navigationItemToIconSolid, navigationItemToIcon, navigationItemTranslationKeys } from "~/models/enums/NavigationItem"
 import { isNavigationItemSelected } from "~/utils/navigationHelpers"
 import AgencyLogo from "../agency/AgencyLogo"
-import CurrentAgencyPopoverView from "../sidebar/CurrentAgencyPopoverView"
 import IconWithTextTile from "../ui/IconWithTextTile"
 import Shimmer from "../ui/Shimmer"
-import { useOnboardingStore } from "~/stores/onboarding/onboardingStore"
+import { useOnboardingCreateAgencyStore } from "~/stores/onboarding/onboardingCreateAgencyStore"
+import { useOnboardingCreateProjectStore } from "~/stores/onboarding/onboardingCreateProjectStore"
 import ProjectLogo from "../project/ProjectLogo"
 
 interface OnboardingPreviewLayoutProps {
@@ -20,13 +19,17 @@ export default function OnboardingPreviewLayout({
 }: OnboardingPreviewLayoutProps) {
   const { t } = useTranslation()
   const { currentStepConfig } = useOnboardingFlow()
-  const agencyName = useOnboardingStore((state) => state.agencyName);
-  const agencyLogoPreviewUrl = useOnboardingStore((state) => state.agencyLogoPreviewUrl);
-  const projectName = useOnboardingStore((state) => state.projectName);
-  const projectLogoPreviewUrl = useOnboardingStore((state) => state.projectLogoPreviewUrl);
+  const stagedAgencyName = useOnboardingCreateAgencyStore((state) => state.agencyName);
+  const agencyLogoPreviewUrl = useOnboardingCreateAgencyStore((state) => state.agencyLogoPreviewUrl);
+  const agency = useOnboardingCreateAgencyStore((state) => state.agency);
+  const stagedProjectName = useOnboardingCreateProjectStore((state) => state.projectName);
+  const projectLogoPreviewUrl = useOnboardingCreateProjectStore((state) => state.projectLogoPreviewUrl);
+  const project = useOnboardingCreateProjectStore((state) => state.project);
 
-
-
+  // Once an entity is created, mirror the persisted record (real name + uuid-driven logo fetch)
+  // instead of the staging blob URL, which gets revoked and would leave a broken logo.
+  const agencyName = agency?.name ?? stagedAgencyName;
+  const projectName = project?.name ?? stagedProjectName;
 
   if (!currentStepConfig) {
     return null
@@ -39,7 +42,11 @@ export default function OnboardingPreviewLayout({
           <div className="h-full w-50 border-r border-pale-gray rounded-l-xl p-2 flex flex-col">
             {projectName ? (
               <div className="m-3 flex flex-row items-center gap-3 rounded-lg p-1 border border-transparent min-w-0">
-                <ProjectLogo logoUrl={projectLogoPreviewUrl} projectName={projectName} className="size-9 shrink-0" />
+                {project ? (
+                  <ProjectLogo projectUuid={project.uuid} projectName={projectName} className="size-9 shrink-0" />
+                ) : (
+                  <ProjectLogo logoUrl={projectLogoPreviewUrl} projectName={projectName} className="size-9 shrink-0" />
+                )}
                 <span className="text-heading-sm font-semibold whitespace-nowrap truncate text-left">
                   {projectName}
                 </span>
@@ -67,7 +74,11 @@ export default function OnboardingPreviewLayout({
             <div className="mt-auto">
               {agencyName ? (
                 <div className="m-3 flex flex-row items-center gap-3 rounded-lg p-1 border border-transparent min-w-0">
-                  <AgencyLogo logoUrl={agencyLogoPreviewUrl} agencyName={agencyName} className="size-9 shrink-0" />
+                  {agency ? (
+                    <AgencyLogo agencyUuid={agency.uuid} agencyName={agencyName} className="size-9 shrink-0" />
+                  ) : (
+                    <AgencyLogo logoUrl={agencyLogoPreviewUrl} agencyName={agencyName} className="size-9 shrink-0" />
+                  )}
                   <span className="text-heading-sm font-semibold whitespace-nowrap truncate text-left">
                     {agencyName}
                   </span>
